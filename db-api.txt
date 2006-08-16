@@ -2,7 +2,7 @@
 データベース API リファレンス
 =============================
 
-:revision-up-to: 3491 (release 0.95)
+:revision-up-to: 3570 (release 0.95+)
 
 `データモデル`_ を作成したら，次はデータベースからデータを取り出す必要があ
 ります．このドキュメントでは，モデルから利用できるデータベース抽象化 API と，
@@ -622,6 +622,8 @@ Django の作者たちは，全ての SQL 関係のメソッドを先に配置し，その後に (必要
     p = b.author         # Hits the database.
     c = p.hometown       # Hits the database.
 
+``select_related()`` は ``null=True`` であるような外部キーカラムは追跡しな
+いので注意してください．
 
 ``extra(select=None, where=None, params=None, tables=None)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -768,12 +770,12 @@ QuerySet を返さないクエリセットメソッド
 すなわち、以下の文::
 
     p = Person.objects.create(first_name="Bruce", last_name="Springsteen")
-    
+
 と、以下の文::
 
     p = Person(first_name="Bruce", last_name="Springsteen")
     p.save()
-    
+
 は等価です。
 
 ``get_or_create(**kwargs)``
@@ -1572,13 +1574,13 @@ Django はまた，リレーションの「相手側」へのアクセス API，すなわちリレーショ
           e = Entry.objects.get(id=234)
           b.entry_set.remove(e) # Blog b から Entry e を除去します．
 
-      データベースの一貫性が破られないようにするため，このメソッドは
-      ``null=True`` である外部キーでしか使えません．リレーション先
-      のフィールドを ``None`` (``NULL``) にできなければ，あるオブジェクトを
-      削除しようとしたときに，必ず何らかの別のオブジェクトに追加せねばなら
-      なくなるからです．上の例では， ``b.entry_set()`` から ``e`` を除去す
-      る操作は ``e.blog = None`` と同じになり， 外部キー``blog`` は
-      ``null=True`` でないので無効な操作になります．
+      データベースの一貫性を壊さないようにするため，このメソッドは
+      ``null=True`` である ``ForeignKey`` オブジェクトでしか使えません．リ
+      レーション先のフィールドを ``None`` (``NULL``) にできない場合，あるオ
+      ブジェクトを削除しようとしたときに，必ず何らかの別のオブジェクトに追
+      加せねばならなくなるからです．上の例では， ``b.entry_set()`` から
+      ``e`` を除去する操作は ``e.blog = None`` と同じになり， 外部キー
+      ``blog`` が ``null=True`` でないために無効な操作になります．
 
     * ``clear()``: リレーション先オブジェクトのセットから全てのオブジェクト
       を除去します．
@@ -1678,7 +1680,7 @@ Django は ``INSTALLED_APPS`` の全てのモデルを走査して，必要に応じて後方参照
 
 例えば、 ``id=5`` であるようなBlog オブジェクト ``b`` に対しては、以下の三
 つのクエリはすべて等価になります::
-     
+
     Entry.objects.filter(blog=b) # オブジェクトインスタンスを使ったクエリ
     Entry.objects.filter(blog=b.id) # インスタンスの id を使ったクエリ
     Entry.objects.filter(blog=5) # id を直接使ったクエリ

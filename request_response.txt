@@ -2,7 +2,7 @@
 リクエストオブジェクトとレスポンスオブジェクト
 ==============================================
 
-:revision-up-to: 3491 (release 0.95)
+:revision-up-to: 3562 (release 0.95+)
 
 .. _`Quick overview`:
 
@@ -407,9 +407,14 @@ Django によって自動生成される ``HttpRequest`` オブジェクトとは対象的に，
     .. _`Morsel オブジェクト`: http://www.python.jp/doc/current/lib/morsel-objects.html
     .. _`cookie Morsel`: http://www.python.org/doc/current/lib/morsel-objects.html
 
-``delete_cookie(key)``
+``delete_cookie(key, path='/', domain=None)``
     指定のキーに対するクッキーを削除します．キーが存在しなければ，暗黙のう
     ちに失敗します．
+
+    開発版の Django では， ``path`` と ``domain`` という 2 つの引数が追加さ
+    れました． cookie の動作原理上， ``path`` と ``domain`` を
+    ``set_cookie()`` に指定した値と同じにしないと，クッキーを削除できなくな
+    ります．
 
 ``content``
     Python 文字列の内容を返します．必要ならば Unicode オブジェクトにエンコー

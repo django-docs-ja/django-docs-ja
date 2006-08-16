@@ -2,7 +2,7 @@
 URL ディスパッチャ
 ==================
 
-:revision-up-to: 3491 (release 0.95)
+:revision-up-to: 3562 (release 0.95+)
 
 すっきりした，簡潔で明解な URL スキームの設計は，高品質の Web アプリケーショ
 ンでは重要な要素です．Django では，フレームワークの制限なしに，望み通りの
@@ -296,15 +296,12 @@ Python 文字列型になります．例えば，下のような URLconf の行::
     from django.conf.urls.defaults import *
 
     urlpatterns = patterns('',
-        (r'^articles/(\d{4})/$', 
-         'myproject.news.views.year_archive'),
-        (r'^articles/(\d{4})/(\d{2})/$', 
-         'myproject.news.views.month_archive'),
-        (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 
-         'myproject.news.views.article_detail'),
+        (r'^articles/(\d{4})/$', 'mysite.news.views.year_archive'),
+        (r'^articles/(\d{4})/(\d{2})/$', 'mysite.news.views.month_archive'),
+        (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'mysite.news.views.article_detail'),
     )
 
-この例では，各ビューには共通のプレフィクス， ``'myproject.news.views'`` があり
+この例では，各ビューには共通のプレフィクス， ``'mysite.news.views'`` があり
 ます． ``urlpatterns`` の各エントリに繰り返し入力する代わりに，
 ``patterns()`` 関数の最初の引数にプレフィクスを指定して，各ビュー関数に適用
 できます．
@@ -313,7 +310,7 @@ Python 文字列型になります．例えば，下のような URLconf の行::
 
     from django.conf.urls.defaults import *
 
-    urlpatterns = patterns('myproject.news.views',
+    urlpatterns = patterns('mysite.news.views',
         (r'^articles/(\d{4})/$', 'year_archive'),
         (r'^articles/(\d{4})/(\d{2})/$', 'month_archive'),
         (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'article_detail'),
@@ -440,3 +437,94 @@ URLconf タプルにはオプションとして 3 つめの要素を指定できます．この要素は
 .. _generic views: http://www.djangoproject.com/documentation/generic_views/
 .. _`配信フィードフレームワーク`: syndication_feeds.html
 .. _syndication framework: http://www.djangoproject.com/documentation/syndication/
+
+.. _`Passing extra options to include()`:
+
+``include()`` に追加のオプションを渡す
+--------------------------------------
+
+**開発版の Django で新たに追加された機能です**
+
+``include()`` にも追加のオプションを渡せます． ``include()`` に追加のオプショ
+ンを渡すと，そのオプションは include された側の URLconf の 
+*全ての URL 設定* に適用されます．
+
+例えば，以下の二つの URLconf は機能的に全く同じです:
+
+その 1::
+
+    # main.py: include する側
+    urlpatterns = patterns('',
+        (r'^blog/', include('inner'), {'blogid': 3}),
+    )
+
+    # inner.py: include される側
+    urlpatterns = patterns('',
+        (r'^archive/$', 'mysite.views.archive'),
+        (r'^about/$', 'mysite.views.about'),
+    )
+
+その 2::
+
+    # main.py: include する側
+    urlpatterns = patterns('',
+        (r'^blog/', include('inner')),
+    )
+
+    # inner.py: include される側
+    urlpatterns = patterns('',
+        (r'^archive/$', 'mysite.views.archive', {'blogid': 3}),
+        (r'^about/$', 'mysite.views.about', {'blogid': 3}),
+    )
+
+追加オプションは，ビューがオプションを実際に有効なオプションとして受け取る
+かどうかに関わらず， *常に* include される側の URLconf の *全ての* 行に渡さ
+れるので注意してください．このため， include に追加オプションを渡すテクニッ
+クが有効なのは，include される側の URLconf に入っている全てのビューが，追加
+のオプションを受け取れるとはっきりしている場合だけです．
+
+.. _Passing callable objects instead of strings:
+
+文字列の代わりに呼び出し可能オブジェクトを渡す
+==============================================
+
+**開発版の Django で新たに追加された機能です**
+
+開発者の中には，ビューのパスが入った文字列の代わりに，ビューそのものを表す
+Python 関数オブジェクトを渡す方が自然だと考えている者もいます．この代替案も
+サポートされており，任意の呼び出し可能オブジェクトをビューに渡せます．
+
+例えば， 以下のような「文字列の」URLconf があったとします::
+
+    urlpatterns = patterns('',
+        (r'^archive/$', 'mysite.views.archive'),
+        (r'^about/$', 'mysite.views.about'),
+        (r'^contact/$', 'mysite.views.contact'),
+    )
+
+文字列の代わりにオブジェクトを渡して，同じ機能の URLconf を実現できます．オ
+ブジェクトを忘れず import してください::
+
+    from mysite.views import archive, about, contact
+
+    urlpatterns = patterns('',
+        (r'^archive/$', archive),
+        (r'^about/$', about),
+        (r'^contact/$', contact),
+    )
+
+以下の例も機能的に全く同じです．個々のビューを個別に import する代わりにビュー
+の入ったモジュールを import すると，すこしだけすっきり書けます::
+
+    from mysite import views
+
+    urlpatterns = patterns('',
+        (r'^archive/$', views.archive),
+        (r'^about/$', views.about),
+        (r'^contact/$', views.contact),
+    )
+
+どのスタイルを使うかは自由です．
+
+このテクニックを使った場合 (文字列の代わりにオブジェクトを渡した場合)
+(上で説明した) `ビュープレフィクス`_ は効果を及ぼさないので注意してください．

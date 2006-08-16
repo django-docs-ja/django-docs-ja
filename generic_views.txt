@@ -2,7 +2,7 @@
 汎用ビュー
 ==========
 
-:revision-up-to: 3491 (release 0.95)
+:revision-up-to: 3541 (release 0.95+)
 
 Web アプリケーションの作成は，同じパターンを何度も何度も繰り返し書くことに
 なるため，退屈なものです． Django では，そんなパターンに共通する部分のほと
@@ -135,7 +135,7 @@ URL に ``Nune`` を指定すると， ``HttpResponseGone`` (410) を発行します．
 以下の例では， ``/foo/<id>/`` を ``/bar/<id>/`` にリダイレクトします::
 
     urlpatterns = patterns('django.views.generic.simple',
-        ('^foo/(?p<id>\d+)/$', 'redirect_to', {'url' : '/bar/%(id)s/'}),
+        ('^foo/(?P<id>\d+)/$', 'redirect_to', {'url' : '/bar/%(id)s/'}),
     )
 
 以下の例では， ``/bar/`` へのリクエストに対して HTTP 410 エラーを返します::

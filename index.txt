@@ -5,7 +5,9 @@ Django オンラインドキュメント和訳
 和訳
     Yasushi Masuda (ymasuda at ethercube dot com)
 底本
-    SVN revision 3491 (release 0.95)
+    SVN trunk (release 0.95+)
+追従済みリビジョン
+    3589
 
 必読
 ----------

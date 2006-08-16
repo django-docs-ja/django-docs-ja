@@ -2,13 +2,16 @@
 "contrib" 下のアドオン
 =========================
 
-:revision-up-to: 3491 (release 0.95)
+:revision-up-to: 3541 (release 0.95+)
 
-Django は Python の "batteries included" 哲学を目指しています． Django には
-Web 開発における課題を解くための様々な外部オプションツールがついてきます．
+Django は Python の `"batteries included" 哲学`_ を目指しています． Django
+には Web 開発における課題を解くための様々な外部オプションツールがついてきま
+す．
 
 これらのコードは Django 配布物中の ``django/contrib`` にあります．
 ``contrib`` 下のパッケージの概要を以下に示します:
+
+.. _`"batteries included" 哲学`: http://python.jp/doc/release/tut/node12.html#batteries-included                                                
 
 admin
 =====

@@ -2,7 +2,7 @@
 Django についてよくある質問
 ===========================
 
-:revision-up-to: 3491 (release 0.95)
+:revision-up-to: 3541 (release 0.95+)
 
 .. contents::
 
@@ -381,8 +381,8 @@ Django をデータベースと合わせて使うならデータベースエンジンも必要です．
 
 .. _Do I have to use mod_python?:
 
-mod_python を使わなければいけないのでしょうか？
------------------------------------------------
+mod_python を使わねばならないのでしょうか？
+-------------------------------------------
 
 実際に運用する上では mod_python を使うよう勧めていますが， Django は WSGI_
 と呼ばれる構成を使っているため，必ずしも mod_python を使わねばならないわけ
@@ -397,7 +397,8 @@ Django を試してみたり，ローカルのコンピュータ上で開発するだけなら， Django
 に付いてくる開発用 Web サーバを使ってください．
 
 
-
+.. _`FastCGI で Django を使う`: fastcgi.html
+.. _`サーバ構成に関する wikiページ`: http://code.djangoproject.com/wiki/ServerArrangements
 .. _WSGI: http://www.python.org/peps/pep-0333.html
 .. _`サーバ設定に関する wiki ページ`: http://code.djangoproject.com/wiki/ServerArrangements
 .. _server arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
@@ -762,14 +763,12 @@ admin のルック & フィールをカスタマイズしたいのなら，次の質問に進んで下さい．
 パスワードハッシュを編集せずにユーザを作成する方法は？
 ------------------------------------------------------
 
-admin インタフェースでのユーザ作成はお勧めしません．というのも，現状では手
-動でパスワードハッシュを編集せねばならないからです (セキュリティ上の配慮か
-ら，パスワードは一方向ハッシュ関数を使ってハッシュ化されています．今のとこ
-ろ，ハッシュでなく実パスワードを入力してパスワードを変更できるような Web イ
-ンタフェースはありません．
+admin サイトでユーザを作成したいのなら， Django の開発版を使ってください．
+この問題は 2006 年 8 月 4 日に修正されたので，それ以降のバージョンが必要で
+す．
 
-ユーザを作成するには， Python API を使って下さい．詳しくは `ユーザの作成`_
-を参照してください．
+ユーザの作成には Python API も利用できます．詳しくは `ユーザの作成`_ を参照
+してください．
 
 .. _`ユーザの作成`: authentication.html#creating-users
 .. _creating users: http://www.djangoproject.com/documentation/authentication/#creating-users
