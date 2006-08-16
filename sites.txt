@@ -1,0 +1,342 @@
+======================
+"sites" フレームワーク
+======================
+
+:revision-up-to: 3491 (release 0.95)
+
+Django にはオプションとして使える "sites" フレームワークが付属しています．
+"sites" はオブジェクトや機能を特定の Web サイトに関連付けるためのフックであ
+ると同時に， Django で作成したサイトのドメイン名と「分かりやすい名前
+verbose name」を保存しています．
+
+一つの Django で複数のサイトを管理していて，サイト間に違いを持たせたい場合
+に使ってください．
+
+sites フレームワークは，以下の二つの簡単なコンセプトに基づいています:
+
+    * ``django.contrib.sites`` の ``Site`` モデルには， ``domain`` と
+      ``name`` フィールドがあります．
+    * あるサイトの設定ファイルの ``SITE_ID`` 設定には，そのサイトを表す
+      ``Site`` オブジェクトのデータベース上での ID を指定します．
+
+site の使い道は自由ですが， Django では簡単な呼び出し規約で自動的に sites
+を使える方法を 2 種類提供しています．
+
+.. _Example usage:
+
+使用例
+======
+
+どういう状況で sites を使うのでしょうか？例を挙げて説明しましょう．
+
+.. _Associating content with multiple sites:
+
+コンテンツを複数のサイトに関連づける
+------------------------------------
+
+LJWorld.com_ と Lawrence.com_ は同じニュース組織，Kansaz 州 Lawrence にある
+Lawrence Journal-World newspaper が管理しています． LJWorld.com はニュース
+に， Lawrence.com は地域の娯楽情報にフォーカスしていますが，編集者は 
+*両方の* サイトで同じニュースを公開したいと考える場合もあります．
+
+この問題を何も考えずに処理するなら，サイト構築担当者に対して， LJWorld.com
+と Lawrence.com に同じ記事を出すよう 2 度依頼することになります．しかしこれ
+はサイト構築担当にとって非効率的ですし，同じ記事のコピーが複数データベース
+に入ることになってしまいます．
+
+もっとましで簡単な方法ががあります: どちらのサイトも同じデータベースを使い，
+1 つの記事を複数のサイトに関連づけるというものです．この関係は， Django モ
+デルの用語で言えば ``Article`` モデルの ``ManyToManyField`` で表現されます::
+
+    from django.db import models
+    from django.contrib.sites.models import Site
+
+    class Article(models.Model):
+        headline = models.CharField(maxlength=200)
+        # ...
+        sites = models.ManyToManyField(Site)
+
+このモデルは，以下のようにいくつかの点で優れています:
+
+    * site 構築担当が 1 つのインタフェース (Django admin サイト) で両方のサ
+      イトにある全てのコンテンツを編集できます．
+
+    * 同じ記事をデータベース上に何度も書き込まなくて済み，一つのレコードと
+      して保存できます．
+
+    * サイト開発者は同じビューコードを両方のサイトで使えます．ビューコード
+      では，リクエストされている記事が現在のサイト用のものかチェックします．
+      例えば以下のようなコードになるでしょう::
+
+          from django.conf import settings
+
+          def article_detail(request, article_id):
+              try:
+                  a = Article.objects.get(id=article_id, sites__id__exact=settings.SITE_ID)
+              except Article.DoesNotExist:
+                  raise Http404
+              # ...
+
+.. _ljworld.com: http://www.ljworld.com/
+.. _lawrence.com: http://www.lawrence.com/
+
+.. _Associating content with a single site:
+
+コンテンツを単一のサイトに関連づける
+------------------------------------
+
+あるモデルを ``ForeignKey`` を使って他対一の関係で ``Site`` に関連づけても
+構いません．
+
+例えば，ある記事をあるサイトだけで表示できるようにしたければ，モデルは以下
+のように書きます::
+
+    from django.db import models
+    from django.contrib.sites.models import Site
+
+    class Article(models.Model):
+        headline = models.CharField(maxlength=200)
+        # ...
+        site = models.ForeignKey(Site)
+
+この方法でも，前節で述べたのと同じような恩恵を得られます．
+
+.. _Hooking into the current site from views:
+
+ビュー内で現在のサイトをフックに使う
+------------------------------------
+
+低水準では， Django ビューの中で sites フレームワークを使って，ビューを呼び
+出しているサイトごとに固有の処理を実行できます．
+
+例えば::
+
+    from django.conf import settings
+
+    def my_view(request):
+        if settings.SITE_ID == 3:
+            # Do something.
+        else:
+            # Do something else.
+
+もちろん，上のようにサイト ID をハードコードするのは見栄えよくありません．
+この種のハードコード化は，すぐに実行しなければならないハックのときにはベス
+トでしょう．同じことをよりクリーンに実現するには，サイトのドメイン名をチェッ
+クします::
+
+    from django.conf import settings
+    from django.contrib.sites.models import Site
+
+    def my_view(request):
+        current_site = Site.objects.get(id=settings.SITE_ID)
+        if current_site.domain == 'foo.com':
+            # Do something
+        else:
+            # Do something else.
+
+``settings.SITE_ID`` の値から ``Site`` オブジェクトを取得するというイディオ
+ムはよく使われるので， ``Site`` のモデルマネジャには ``get_current()`` メソッ
+ドがあります．以下の例は上の例と同じになります::
+
+    from django.contrib.sites.models import Site
+
+    def my_view(request):
+        current_site = Site.objects.get_current()
+        if current_site.domain == 'foo.com':
+            # Do something
+        else:
+            # Do something else.
+
+.. _Getting the current domain for display:
+
+現在のドメインをディスプレイ用に取得する
+----------------------------------------
+
+LJWorld.com と Lawrence.com には e-mail による通知機能があり，読者が登録し
+ておくとニュースが届いたときに通知メールを受け取れるようになっています．こ
+のからくりは簡単で， Web フォームから登録すると，「ご登録ありがとうございま
+した」という内容のメールを受け取ります．
+
+登録処理を行うコードを二度開発するのは非効率的で冗長なので，舞台裏では複数
+サイトで同じコードを使うようにします．ただし，「ご登録ありがとうございます」
+通知はサイトごとに変えなければなりません． ``Site`` オブジェクトを使えば，
+現在のサイトの ``name`` と ``domain`` の値を使って「ありがとうございます」
+メッセージを抽象化できます．
+
+フォーム処理ビューの例は以下のようになります::
+
+    from django.contrib.sites.models import Site
+    from django.core.mail import send_mail
+
+    def register_for_newsletter(request):
+        # Check form values, etc., and subscribe the user.
+        # ...
+
+        current_site = Site.objects.get_current()
+        send_mail('Thanks for subscribing to %s alerts' % current_site.name,
+            'Thanks for your subscription. We appreciate it.\n\n-The %s team.' % current_site.name,
+            'editor@%s' % current_site.domain,
+            [user.email])
+
+        # ...
+
+Lawrence.com では， e-mail の件名は "Thanks for subscribing to lawrence.com
+alerts." です． LJWorld.com では，件名は "Thanks for subscribing to
+LJWorld.com alerts." で，メール本体も同様です．
+
+より柔軟 (で，重量な) 方法として， Django テンプレートシステムを使った方法
+と比較してみましょう． Lawrence.com と LJWorld.com は別々のテンプレートディ
+レクトリ (``TEMPLATE_DIRS``) を持っているので，以下のようにすればサイト間の
+違いをテンプレートシステムに追い出せます::
+
+    from django.core.mail import send_mail
+    from django.template import loader, Context
+
+    def register_for_newsletter(request):
+        # Check form values, etc., and subscribe the user.
+        # ...
+
+        subject = loader.get_template('alerts/subject.txt').render(Context({}))
+        message = loader.get_template('alerts/message.txt').render(Context({}))
+        send_mail(subject, message, 'editor@ljworld.com', [user.email])
+
+        # ...
+
+この場合， LJWorld.com と Lawrence.com のテンプレートディレクトリ下に
+``subject.txt`` と ``message.txt`` の二つのテンプレートを作成することになり
+ます．ただし，こうすればより柔軟にはなりますが，複雑さは増します．
+
+不要な複雑さと冗長性を排除するためには， ``Site`` オブジェクトを可能な限り
+使うとよいでしょう．
+
+.. _Getting the current domain for full URLs:
+
+現在のドメインの完全な URL を取得する
+-------------------------------------
+
+Django の ``get_absolute_url()`` は，オブジェクトの URL をドメイン名なしで
+取得する際には便利ですが，場合によっては，完全な URL，すなわち ``http://``
+とドメイン名，その他全てを表示したいこともあるでしょう．これには sites フレー
+ムワークを使います．簡単な例を示します::
+
+    >>> from django.contrib.sites.models import Site
+    >>> obj = MyModel.objects.get(id=3)
+    >>> obj.get_absolute_url()
+    '/mymodel/objects/3/'
+    >>> Site.objects.get_current().domain
+    'example.com'
+    >>> 'http://%s%s' % (Site.objects.get_current().domain, obj.get_absolute_url())
+    'http://example.com/mymodel/objects/3/'
+
+.. _`The CurrentSiteManager`:
+
+``CurrentSiteManager``
+======================
+
+アプリケーション内で ``Site`` が重要な働きを持っている場合，
+``CurrentSiteManager`` という便利なクラスを使うよう検討してみてください．
+``CurrentSiteManager`` はモデルの `マネジャ`_ クラスで，クエリ結果を現在の
+``Site`` に関連づけられたオブジェクトだけに自動的にフィルタします．
+
+``CurrentSiteManager`` を使うには，モデルの中に明示的に追加します．例を示し
+ます::
+
+    from django.db import models
+    from django.contrib.sites.models import Site
+    from django.contrib.sites.managers import CurrentSiteManager
+
+    class Photo(models.Model):
+        photo = models.FileField(upload_to='/home/photos')
+        photographer_name = models.CharField(maxlength=100)
+        pub_date = models.DateField()
+        site = models.ForeignKey(Site)
+        objects = models.Manager()
+        on_site = CurrentSiteManager()
+
+このモデルでは， ``Photo.objects.all()`` を使うとデーターベース上の全ての
+``Photo`` オブジェクトを返しますが， ``Photo.on_site.all()`` を使うと，
+``SITE_ID`` 設定に従って，現在のサイトに関連づけられた  ``Photo`` オブジェ
+クトだけを返します．
+
+つまり，以下の二つの文は等価になります::
+
+    Photo.objects.filter(site=settings.SITE_ID)
+    Photo.on_site.all()
+
+``CurrentSiteManager`` は ``Photo`` のどのフィールドが ``Site`` なのかをど
+うやって見付けるのでしょう？ ``CurrentSiteManager`` はデフォルトでは
+``site`` という名前のフィールドを探します．モデル内で ``site`` *以外の*
+名前の ``ForeignKey`` や ``ManyToManyField`` を定義している場合，
+``CurrentSiteManager`` に明示的にフィールド名を渡す必要があります．
+以下のモデルでは， ``publish_on`` という名前のフィールドがその例になってい
+ます::
+
+    from django.db import models
+    from django.contrib.sites.models import Site
+    from django.contrib.sites.managers import CurrentSiteManager
+
+    class Photo(models.Model):
+        photo = models.FileField(upload_to='/home/photos')
+        photographer_name = models.CharField(maxlength=100)
+        pub_date = models.DateField()
+        publish_on = models.ForeignKey(Site)
+        objects = models.Manager()
+        on_site = CurrentSiteManager('publish_on')
+
+``CurrentSiteManager`` を使って，存在しないフィールド名を渡そうとすると，
+Django は ``ValueError`` を送出します．
+
+.. _`マネジャ`: model_api.html#managers
+.. _manager: http://www.djangoproject.com/documentation/model_api/#managers
+
+.. _How Django uses the sites framework:
+
+Django 内での site フレームワークの役割
+=======================================
+
+Django を使う際，必ずしも sites フレームワークを使わねばならないというわけ
+ではありません．とはいえ， Django はいくつかの場所で sites の恩恵を利用でき
+るので，ぜひとも sites を活用するよう勧めます． Django を単一のサイトを駆動
+するためだけに使っているとしても，ひと手間かけてサイトオブジェクトを作成し，
+``domain`` と ``name`` を指定して，その ID を ``SITE_ID`` 設定に指定してみ
+てください．
+
+Django における sites フレームワークの役割は以下の通りです:
+
+    * `リダイレクションフレームワーク`_ では，各リダイレクトオブジェクトが特定の
+      サイトに関連づけられています． Django がリダイレクト先を探すとき，フ
+      レームワークは現在の ``SITE_ID`` を考慮します．
+
+    * コメントフレームワークでは，各コメントが特定のサイトに関連づけられて
+      います．コメントが投稿されると， ``site`` は現在の ``SITE_ID`` に設定
+      されます．コメントを何らかのテンプレートタグでリスト表示する場合，現
+      在のサイトに関するコメントだけが表示されます．
+
+    * `フラットページフレームワーク`_ では，各フラットページは特定のサイト
+      に関連づけられています．フラットページを作成する際には， ``site`` を
+      指定せねばなりません． ``FlatpageFallbackMiddleware`` は現在の
+      ``SITE_ID`` をチェックして，表示すべきフラットページを取得します．
+
+    * `配信フレームワーク`_ では， ``title`` および ``description`` のテン
+      プレートから自動的に ``{{{ site }}}`` にアクセスできるようになります．
+      ``{{{ site }}}`` は ``Site`` オブジェクトで，現在の site を表現します．
+      また，フィード項目の URL を提供するためのフックでは，完全指定
+      (full-qualified) のドメインを指定していない場合，現在の ``Site``
+      オブジェクトの ``domain`` を使います．
+
+    * `認証フレームワーク`_ では， ``django.contrib.auth.views.login`` ビュー
+      が現在の ``Site`` 名を ``{{{ site_name }}}``` という形でテンプレート
+      に渡しています．
+
+    * ショートカットビュー (``django.views.defaults.shortcut``) では，オブ
+      ジェクトの URL のドメイン部を計算する際に現在の ``Site`` オブジェクト
+      を使います．
+
+.. _`リダイレクションフレームワーク`: redirects.html
+.. _`フラットページフレームワーク`: flatpages.html
+.. _`配信フレームワーク`: syndication.html
+.. _`認証フレームワーク`: authentication.html
+.. _redirects framework: http://www.djangoproject.com/documentation/redirects/
+.. _flatpages framework: http://www.djangoproject.com/documentation/flatpages/
+.. _syndication framework: http://www.djangoproject.com/documentation/syndication/
+.. _authentication framework: http://www.djangoproject.com/documentation/authentication/

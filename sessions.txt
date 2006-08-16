@@ -1,0 +1,324 @@
+===================
+セッションの使い方
+===================
+
+:revision-up-to: 3491 (release 0.95)
+
+Django では匿名セッション (anonymous session) を完全にサポートしています．
+セッションフレームワークを使うと，任意のデータをサイト訪問者単位
+(per-site-visitor) で保存したり取得したりできます．セッションフレームワーク
+はサーバ側にデータを保存し，クッキーの送受信操作を抽象化します．クッキーに
+はセッション ID だけが保存され，データ自体は送受信されません．
+
+.. _Enabling sessions:
+
+セッションを有効にする
+======================
+
+セッション機能は `ミドルウェア`_ として実装されており， Django モデル
+になっています．
+
+セッションを有効にするには，以下の二つの作業が必要です:
+
+セッション機能をオンオフするには ``MIDDLEWARE_CLASSES`` 設定を編集します．
+
+    * ``MIDDLEWARE_CLASSES`` を編集して，
+      ``'django.contrib.sessions.middleware.SessionMiddleware'`` 
+      を入れます． ``django-admiin.py startproject`` の作成するデフォルトの
+      ``settings.py`` では ``SessionMiddleware`` が有効になっています．
+
+    * ``INSTALLED_APPS`` 設定に ``'django.contrib.sessions'`` を入れ，
+      ``manage.py syncdb`` を実行して，セッションデータを保存するためのデー
+      タベーステーブルを作成します．
+
+セッション機能を必要としないのなら， ``MIDDLEWARE_CLASSES`` から
+``SessionMiddleware`` の行を削り， ``INSTALLED_APPS`` からも
+``'django.contrib.sessions'`` を削って下さい．セッションを無効にすると，ほ
+んのわずかだけオーバヘッドを軽減できます．
+
+.. _`ミドルウェア`: middileware.html
+
+.. _Using sessions in views:
+
+ビュー中でセッションを扱う
+==========================
+
+``SessionMiddleware`` を有効にすると，各々の ``HttpRequest`` オブジェクト
+(Django ビュー関数の最初の引数) は辞書ライクオブジェクトの属性 ``session``
+を持つようになります．この属性は読み書き可能です．
+
+``session`` は以下のような標準辞書オブジェクトのメソッドを実装しています:
+
+    * ``__getitem__(key)``
+      例: ``fav_color = request.session['fav_color']``
+
+    * ``__setitem__(key, value)``
+      例: ``request.session['fav_color'] = 'blue'``
+
+    * ``__delitem__(key)``
+      例: ``del request.session['fav_color']``
+
+      ``key`` がない場合には ``KeyError`` を送出します．
+
+    * ``__contains__(key)``
+      例: ``'fav_color' in request.session``
+
+    * ``get(key, default=None)``
+      例: ``fav_color = request.session.get('fav_color', 'red')``
+
+    * ``keys()``
+
+    * ``items()``
+
+また，以下の三つのメソッドを持ちます:
+
+    * ``set_test_cookie()``
+      テストクッキーを設定して，ユーザのブラウザがクッキーをサポートしてい
+      るかどうかを調べられるようにします．クッキーの動作仕様上，次にブラウ
+      ザがリクエストを送信してくるまでテストは行えません．詳しくは後述の
+      「テストクッキーを設定する」を参照してください．
+
+
+    * ``test_cookie_worked()``
+      ユーザのブラウザがテストクッキーを受け入れたかどうかに応じて ``True``
+      または ``False`` を返します．クッキーの動作仕様上，あらかじめ別のペー
+      ジリクエストで ``set_test_cookie()`` を呼び出しておかねばなりません．
+      後述の「テストクッキーを設定する」を参照してください．
+
+    * ``delete_test_cookie()``
+      テストクッキーを削除します．後始末に使って下さい．
+
+``request.session`` はビューのどこで変更しても，何度変更してもかまいません．
+
+.. _Session object guidelines:
+
+セッションオブジェクト使用上のガイドライン
+------------------------------------------
+
+    * ``request.session`` のキーには通常の Python 文字列を使って下さい．と
+      はいえ，これは厳格な掟 (hard-and-fast rule) ではなく単なる規約です．
+
+    * アンダースコアで始まるセッション辞書のキーは Django の内部使用のため
+      に予約されています．
+
+    * ``request.session`` を新たなオブジェクトでオーバライドしたり，属性を
+      いじってはなりません．Python 辞書型のように扱って下さい．
+
+.. _Examples:
+
+使用例
+--------
+
+以下の簡単なビューの例では，ユーザがコメントをポストした後に
+``has_commented`` という変数を ``True`` に設定しています．これにより，一人
+のユーザに一つのコメントを何度もポストさせないようにします::
+
+    def post_comment(request, new_comment):
+        if request.session.get('has_commented', False):
+            return HttpResponse("You've already commented.")
+        c = comments.Comment(comment=new_comment)
+        c.save()
+        request.session['has_commented'] = True
+        return HttpResponse('Thanks for your comment!')
+
+以下のビューでは，「メンバ」をサイトにログインさせます::
+
+    def login(request):
+        m = members.get_object(username__exact=request.POST['username'])
+        if m.password == request.POST['password']:
+            request.session['member_id'] = m.id
+            return HttpResponse("You're logged in.")
+        else:
+            return HttpResponse("Your username and password didn't match.")
+
+そして下の例では，上で ``login()`` したメンバをログアウトさせます::
+
+    def logout(request):
+        try:
+            del request.session['member_id']
+        except KeyError:
+            pass
+        return HttpResponse("You're logged out.")
+
+
+.. _Setting test cookies:
+
+テストクッキーを設定する
+========================
+
+利便性のために， Django ではユーザのブラウザがクッキーを受け入れるかどうか
+を調べるための簡単な方法を提供しています．ビュー内で
+``request.session.set_test_cookie()`` を呼び出しておき，それ以後のビュー，
+すなわち別のビュー呼び出しで
+``request.session.test_cookie_worked()`` を呼び出すようにしてください．
+
+``set_test_cookie()`` と ``test_cookie_worked()`` が別々のビュー呼び出しに
+分離されるのは不恰好ですが，これはクッキーの動作上仕方のないことです．ある
+ブラウザに対して一度クッキーを設定しても，そのブラウザが次にリクエストを送
+信するまではクッキーを受け入れたかどうかを確かめる術はないのです．
+
+テストが終わったら， ``delete_test_cookie()`` を呼び出して後始末をしておく
+のがよいでしょう．
+
+クッキーの動作テストが終わった時点で，この関数を呼び出して下さい．
+
+典型的な使用例を以下に示します::
+
+    def login(request):
+        if request.POST:
+            if request.session.test_cookie_worked():
+                request.session.delete_test_cookie()
+                return HttpResponse("You're logged in.")
+            else:
+                return HttpResponse("Please enable cookies and try again.")
+        request.session.set_test_cookie()
+        return render_to_response('foo/login_form.html')
+
+.. _Using sessions out of views:
+
+ビューの外でセッションを使う
+============================
+
+各セッションは，内部的には単なる通常の Django モデルにすぎません．
+``Session`` モデルは ``django/contrib/sessions/models.py`` で定義されていま
+す．セッションは通常のモデルなので，通常の Django データベース API を使って
+アクセスできます::
+
+    >>> from django.contrib.sessions.models import Session
+    >>> from django.contrib.sessions.models import Session
+    >>> s = Session.objects.get_object(pk='2b1189a188b44ad18c35e113ac6ceead')
+    datetime.datetime(2005, 8, 20, 13, 35, 12)
+
+セッション情報の辞書を取得するには ``get_decoded()`` を呼び出す必要があるの
+で注意して下さい．というのも，セッション情報はエンコードされた形式で保存さ
+れているからです．
+
+    >>> s.session_data
+    'KGRwMQpTJ19hdXRoX3VzZXJfaWQnCnAyCkkxCnMuMTExY2ZjODI2Yj...'
+    >>> s.get_decoded()
+    {'user_id': 42}
+
+.. _When sessions are saved:
+
+セッションはいつ保存されるのか
+==============================
+
+デフォルトでは， Django はセッション情報が変更された場合，すなわちセッショ
+ン情報の入った辞書に値を代入したり，値を削除した場合にのみ，セッションデー
+タベースを保存します::
+
+    # Session is modified.
+    request.session['foo'] = 'bar'
+
+    # Session is modified.
+    del request.session['foo']
+
+    # Session is modified.
+    request.session['foo'] = {}
+
+    # Gotcha: Session is NOT modified, because this alters
+    # request.session['foo'] instead of request.session.
+    request.session['foo']['bar'] = 'baz'
+
+この振舞いを変更したければ， ``SESSION_SAVE_EVERY_REQUEST`` 設定を ``True``
+に設定してください． ``SESSION_SAVE_EVERY_REQUEST`` を ``True`` にすると，
+Django はリクエスト一つ一つに対してセッションを保存します．
+
+セッションクッキーはセッションが作成されたり変更されたりした場合にのみ送信
+されることに注意してください． ``SESSION_SAVE_EVERY_REQUEST`` を ``True``
+にすると，リクエストごとに必ずセッションクッキーを送信するようになります．
+
+同様に，セッションクッキーの ``expires`` 部分もセッションクッキーの送信ごと
+に更新されます．
+
+.. _Browser-length sessions vs. persistent sessions:
+
+ブラウザアクセス単位のセッションと永続的セッション
+==================================================
+
+``SESSION_EXPIRE_AT_BROWSER_CLOSE`` 設定を使うと，セッションフレームワーク
+に，ブラウザアクセス単位のセッションと永続的セッションのどちらを使わせるか
+を指定できます．
+
+デフォルトでは， ``SESSION_EXPIRE_AT_BROWSER_CLOSE`` は ``False`` に設定さ
+れています．これはセッションクッキーが ``SESSION_COOKIE_AGE`` の間だけブラ
+ウザに保存されることを示します．ユーザがブラウザを起動するたびにログインし
+なくてもすむようにしたければ，この設定を使ってください．
+
+``SESSION_EXPIRE_AT_BROWSER_CLOSE`` を ``True`` にすると， Django はブラウ
+ザアクセス単位のクッキー，すなわちユーザがブラウザを閉じると有効期限が切れ
+るようなクッキーを使うようになります．ブラウザを起動するたびにユーザにログ
+イン操作を行わせたい場合，この設定を使ってください．
+
+.. _Settings:
+
+設定
+========
+
+
+`Django 設定ファイル`_ には，セッションの振舞いを操作するための設定がいくつ
+かあります:
+
+SESSION_COOKIE_AGE
+------------------
+
+デフォルト値: ``1209600`` (秒単位で 2 週間)
+
+セッションクッキーの寿命を秒で表したものです．
+
+SESSION_COOKIE_DOMAIN
+---------------------
+
+デフォルト値: ``None``
+
+セッションクッキーを使うドメインです．クロスドメインのクッキーを使う場合に
+は ``".lawrence.com"`` といった値に，通常のドメイン内クッキーの場合には
+``None`` を指定します．
+
+SESSION_COOKIE_NAME
+-------------------
+
+Default: ``'sessionid'``
+
+セッションに使うクッキーの名前です．どんな名前にしてもかまいません．
+
+SESSION_SAVE_EVERY_REQUEST
+--------------------------
+
+デフォルト値: ``False``
+
+リクエストごとにセッションデータを保存するかどうかを決めます．この値が
+``False`` (デフォルト) の場合，セッションデータの保存は内容が変更された場合，
+すなわちセッションデータ辞書に値を設定したり，値を削除したりした場合だけに
+なります．
+
+.. _`Django 設定ファイル`: settings.html
+.. _Django settings: http://www.djangoproject.com/documentation/settings/
+
+.. _Technical details:
+
+技術的な詳細
+============
+
+    * セッション辞書には pickle 化可能な全てのオブジェクトを使えます．詳し
+      くは `pickle モジュールのドキュメント`_ を参照してください．
+
+    * セッション情報は ``django_session`` という名前のデータベーステーブルに
+      保存されます．
+
+    * Django は必要なときにしかクッキーを送信しません．従って，セッション情
+      報を設定しない限り，セッションクッキーの送信を行いません．
+
+.. _`pickle モジュールのドキュメント`: http://www.python.jp/doc/nightly/lib/module-pickle.html
+.. _`the pickle module`: http://www.python.org/doc/current/lib/module-pickle.html
+
+.. _Session IDs in URLs:
+
+URL と Session ID
+=================
+
+Django のセッションフレームワークは完全なクッキーベースであり，クッキー以外
+の情報を扱いません．従って， PHP のように URL にセッション ID を入れる方法
+を最後の手段に残したりはしていません．これは設計上の意図的な決定です．とい
+うのも，URL にセッション ID を含めると，みっともない URL になるだけでなく，
+"Referer" ヘッダを使ってセッション ID を盗まれるという脆弱性を招くからです．

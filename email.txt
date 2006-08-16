@@ -1,0 +1,208 @@
+==============
+e-mail の送信
+==============
+
+:revision-up-to: 3491 (release 0.95)
+
+Python の `smtplib ライブラリ`_ を使えば，比較的簡単に電子メールを送信でき
+ますが， Django ではこのライブラリへの軽量ラッパを二つ用意して，電子メール
+の送信を極めて素早くおこなえるようにしています．
+
+コードは: ``django.core.mail`` にあります．
+
+.. _`smtplib ライブラリ`: http://www.python.jp/doc/release/lib/module-smtplib.html
+.. _smtplib library: http://www.python.org/doc/current/lib/module-smtplib.html
+
+
+.. _Quick example:
+
+お手軽な例
+==========
+
+二行だけです::
+
+    from django.core.mail import send_mail
+
+    send_mail('Subject here', 'Here is the message.', 'from@example.com',
+        ['to@example.com'], fail_silently=False)
+
+.. note::
+
+    ``django.core.mail`` で送信される電子メールの文字セットは
+    `DEFAULT_CHARSET 設定`_ の値に設定されます．
+    
+.. _`DEFAULT_CHARSET 設定`: settings.html#default-charset
+.. _DEFAULT_CHARSET setting: ../settings/#DEFAULT_CHARSET
+
+
+
+send_mail()
+===========
+
+電子メールを送信する最も簡単な方法は ``django.core.mail.send_mail()``
+関数です．この関数の定義は以下のようになっています::
+
+    send_mail(subject, message, from_email, recipient_list,
+        fail_silently=False, auth_user=EMAIL_HOST_USER,
+        auth_password=EMAIL_HOST_PASSWORD)
+
+``subject``, ``message``, ``from_email`` および ``recipient_list`` は必須の
+パラメタです．
+
+    * ``subject``: 文字列です．
+    * ``message``: 文字列です．
+    * ``from_email``: 文字列です．
+    * ``recipient_list``: 文字列からなるリストで，各々が電子メールアドレス
+      を表します． ``recipient_list`` に入っているユーザは，お互いに他のユー
+      ザをメールの "To:" フィールドで見られます．
+    * ``fail_silently``: ブール型の値です． ``False`` なら ``send_mail`` は
+      ``smtplib.SMTPException`` 例外を出すようになります． 
+      送出されうる例外のリストは `smtplib のドキュメント`_ を参照してくださ
+      い．いずれの例外も ``SMTPException`` のサブクラスです．
+    * ``auth_user``: オプションです． SMTP サーバでの認証に使うユーザ名です．
+      この値を指定しなければ， Django は ``EMAIL_HOST_USER`` 設定を使います．
+    * ``auth_password``: オプションです． SMTP サーバでの認証に使うパスワー
+      ドです．この値を指定しなければ， Django は ``EMAIL_HOST_PASSWORD`` 設
+      定を使います．
+
+.. _`smtplib のドキュメント`:
+   http://www.python.jp/doc/release/lib/module-smtplib.html
+.. _smtplib docs:
+   http://www.python.org/doc/current/lib/module-smtplib.html
+
+
+send_mass_mail()
+================
+
+``django.core.mail.send_mass_mail()`` は一括電子メール (mass e-mail) の送信
+用の関数です．この関数の定義は以下のようになっています::
+
+    send_mass_mail(datatuple, fail_silently=False,
+        auth_user=EMAIL_HOST_USER, auth_password=EMAIL_HOST_PASSWORD):
+
+``datatuple`` はタプルで，各要素は以下の形式になっています::
+
+    (subject, message, from_email, recipient_list)
+
+``fail_silently``, ``auth_user`` および ``auth_password`` は
+``send_mail()`` と同じです．
+
+``datatuple`` の各要素ごとに個別の電子メールメッセージを作成して送信します．
+``send_mail()`` と同様，同じ ``recipient_list`` に入っている受信者は，他の
+受信者を "To:" フィールドで見られます．
+
+.. _`send_mass_mail() vs. send_mail()`:
+
+send_mass_mail() と send_mail()
+-------------------------------
+
+``send_mass_mail()`` と ``send_mail()`` の大きな違いは， ``send_mail()``
+は実行の度にメールサーバに接続するのに対し， ``send_mass_mail()`` は全ての
+メッセージの送信に一つの接続を使う点です．このため， ``send_mass_mail()`` 
+の方が少しだけ効率的です．
+
+.. _`mail_admins()`:
+
+mail_admins()
+=============
+
+``django.core.mail.mail_admins()`` は `ADMINS 設定`_ に書かれたサイト管理者へ
+の電子メール送信を行うためのショートカットです．関数の定義は以下の通りです::
+
+    mail_admins(subject, message, fail_silently=False)
+
+``mail_admins()`` はサブジェクトの先頭に `EMAIL_SUBJECT_PREFIX 設定`_ の値
+を付加します．デフォルトは ``"[Django] "`` です．
+
+電子メールの "From:" ヘッダは `SERVER_EMAIL 設定`_ の設定値になります．
+
+このメソッドは利便性と可読性のために用意されています．
+
+.. _ADMINS 設定: settings.html#admins
+.. _EMAIL_SUBJECT_PREFIX 設定: settings.html#email-subject-prefix
+.. _SERVER_EMAIL 設定: settings.html#server-email
+.. _ADMINS setting: 
+   http://www.djangoproject.com/documentation/settings/#admins
+.. _EMAIL_SUBJECT_PREFIX setting: 
+   http://www.djangoproject.com/documentation/settings/#email-subject-prefix
+.. _SERVER_EMAIL setting: 
+   http://www.djangoproject.com/documentation/settings/#server-email
+
+
+mail_managers()
+===============
+
+``django.core.mail.mail_managers()`` は ``mail_admins`` と同じですが，
+電子メールを `MANAGERS 設定`_ に書かれたサイトマネジャに送信します
+関数は以下のように定義されています::
+
+    mail_managers(subject, message, fail_silently=False)
+
+.. _`MANAGERS 設定`: settings.html#managers
+.. _MANAGERS setting: 
+   http://www.djangoproject.com/documentation/settings/#managers
+
+.. _Examples:
+
+例
+==
+
+以下の例は，単一の電子メールを john@example.com と jane@example.com に送信
+します．両方の宛先が "To:" に表示されます::
+
+    send_mail('Subject', 'Message.', 'from@example.com',
+        ['john@example.com', 'jane@example.com'])
+
+以下の例は，単一の電子メールを john@example.com と jane@example.com に送信
+しますが，受け取り人はそれぞれ別々のメッセージを受け取ります::
+
+    datatuple = (
+        ('Subject', 'Message.', 'from@example.com', ['john@example.com']),
+        ('Subject', 'Message.', 'from@example.com', ['jane@example.com']),
+    )
+    send_mass_mail(datatuple)
+
+
+.. _Preventing header injection:
+
+ヘッダインジェクションの抑制
+============================
+
+`ヘッダインジェクション`_ とは，スクリプトが生成したメッセージの "To:" や
+"From:" に，攻撃者が余分な電子メールヘッダを挿入するというセキュリティ侵害
+です．
+
+上記で解説した Django の電子メール機能では，ヘッダの値に改行を使えないよう
+にしてヘッダインジェクションを防御しています． ``subject``, ``from_email`` 
+および ``recipient_list`` が (Unix, Windows または Mac 形式の) 改行を含む場
+合，電子メール送信関数 (``send_mail()`` など) は
+``django.core.mail.BadHeaderError`` 例外 (``ValueError`` のサブクラス) を送
+出します．このため，電子メールは送信されません．電子メール送信関数に渡すデー
+タの検証はユーザに任されています．
+
+``message`` の文字列の先頭にヘッダが入っている場合，ヘッダは単に電子メッセー
+ジ本文の先頭部分として出力されます．
+
+以下に示すのは，  ``subject``, ``message`` および ``from_email`` をリクエス
+トの POST データから受け取り，メールを admin@example.com に送信し，終了した
+ら "/contact/thanks/" にリダイレクトする例です::
+
+    from django.core.mail import send_mail, BadHeaderError
+
+    def send_email(request):
+        subject = request.POST.get('subject', '')
+        message = request.POST.get('message', '')
+        from_email = request.POST.get('from_email', '')
+        if subject and message and from_email:
+            try:
+                send_mail(subject, message, from_email, ['admin@example.com'])
+            except BadHeaderError:
+                return HttpResponse('Invalid header found.')
+            return HttpResponseRedirect('/contact/thanks/')
+        else:
+            # 実際にはマニピュレータを使って適切な検証エラーを
+            # 取得するべきでしょう．
+            return HttpResponse('Make sure all fields are entered and valid.')
+
+.. _`ヘッダインジェクション`: http://securephp.damonkohler.com/index.php/Email_Injection
+.. _Header injection: http://securephp.damonkohler.com/index.php/Email_Injection

@@ -1,0 +1,155 @@
+============
+API の安定性
+============
+
+:revision-up-to: 3491 (release 0.95)
+
+Django はまだリリース 1.0 に到達していませんが， Django の公開 API の大半は
+リリース 0.95 をもってほぼ安定したといえます．このドキュメントでは，1.0 の
+リリースに向け，どの API を変更する予定か，どの API はそうでないかについて
+説明します．
+
+.. _What "stable" means:
+
+「安定」であるとは
+==================
+
+ここでいう「安定」とは，以下のような意味をもちます:
+
+   - 公開 API -- リンクからたどれるドキュメント内で開設されていて，メソッド
+     名がアンダースコアで始まらないもの -- の配置や名前を変更する場合には，
+     以前のバージョンとの互換性のための別名のメソッドを提供します．
+     
+   - API に新たな機能を追加する場合 -- これはよくあることですが -- でも，
+     既存のメソッドの意味を無くしたり，変えたりすることはありません．換言す
+     れば，「安定」していても (必ずしも) 「完全」ではない，ということです．
+     
+   - すでに安定と宣言されている API を何らかの理由で削除したり移動したりせ
+     ねばならない場合，それらのメソッドは撤廃 (deprecated) とみなされ，少な
+     くともバージョン 1.1 までは API 中に残します．撤廃されたメソッドを呼び
+     出した場合には警告メッセージを表示します．
+     
+   - 深刻なバグやセキュリティホールによってやむを得ない場合に限り，これらの
+     API に対して互換性のない変更を行います．
+
+安定な API
+==========
+
+以下の API は安定です:
+
+   - `キャッシュ`_ ．
+   
+   - `カスタムテンプレートタグとライブラリ`_ (テンプレートの登録やロード方
+     法について例外的に変更される可能性があります)．
+     
+   - `データベース照合`_ (バリデーションを除きます．下記参照)．
+   
+   - `django-admin ユーティリティ`_ ．
+   
+   - `FastCGI の組み込み`_ ．
+   
+   - `フラットページ`_ ．
+   
+   - `汎用ビュー`_ ．
+   
+   - `国際化`_ ．
+   
+   - `古いデータベースの組み込み`_ ．
+   
+   - `モデル定義`_ (汎用リレーション: generic relation を除きます．下記参照)．
+   
+   - `mod_python の組み込み`_ ．
+   
+   - `リダイレクション`_ ．
+   
+   - `リクエスト／レスポンスオブジェクト`_ ．
+   
+   - `メールの送信`_ ．
+   
+   - `セッション`_ ．
+   
+   - `設定ファイル`_ ．
+   
+   - `配信フィード`_ ．
+   
+   - `テンプレート言語`_ (タグやフィルタに引数を渡す方法について例外的に変
+     更される可能性があります)．
+   
+   - `トランザクション`_ ．
+   
+   - `URL のディスパッチ`_ ．
+
+上記のリストが Django API の大半に対応していることにお気づきでしょう．これ
+はある意味真理です -- というのも， Django 1.0 に向けて計画されている変更は，
+まだまだ水面下で行われているものか，あるいはわずかな部分的変更だからです．
+
+現時点では，Django の 90% が将来のバージョンと互換性を持っているといっても
+よいでしょう．
+
+とはいえ，以下の API についてはまだ安定 *ではない* と考えており，変更される
+可能性があります:
+
+   - `フォームとバリデータ`_ は，おそらくバリデーション機能を備えたモデル
+     (validation-aware model) を使って完全に書き直すことになるでしょう．
+
+   - `シリアライゼーション`_ 関連の機能は現在活発に開発されており，おそらく
+     変更されることでしょう．
+
+   - `認証`_ フレームワークはより柔軟なものに向けて変更中であり，必然的に
+     API への変更を伴うでしょう．
+
+   - コア部分 (core) のオプションコンポーネントへの依存を避けるため，汎用リ
+     レーション (generic relation) をコアから，contrib の content-types パッ
+     ケージに移動させるでしょう．
+
+   - コメント (comments) フレームワークにはまだドキュメントがありませんが，
+     このフレームワークは Django 1.0 以前に完全に書き直される予定です．劇的
+     な変更ではないにしろ，かなりの変更が加わることでしょう．
+     
+.. _caching: http://www.djangoproject.com/documentation/cache/
+.. _custom template tags and libraries: http://www.djangoproject.com/documentation/templates_python/
+.. _database lookup: http://www.djangoproject.com/documentation/db_api/
+.. _django-admin utility: http://www.djangoproject.com/documentation/django_admin/
+.. _fastcgi integration: http://www.djangoproject.com/documentation/fastcgi/
+.. _flatpages: http://www.djangoproject.com/documentation/flatpages/
+.. _generic views: http://www.djangoproject.com/documentation/generic_views/
+.. _internationalization: http://www.djangoproject.com/documentation/i18n/
+.. _legacy database integration: http://www.djangoproject.com/documentation/legacy_databases/
+.. _model definition: http://www.djangoproject.com/documentation/model_api/
+.. _mod_python integration: http://www.djangoproject.com/documentation/modpython/
+.. _redirects: http://www.djangoproject.com/documentation/redirects/
+.. _request/response objects: http://www.djangoproject.com/documentation/request_response/
+.. _sending email: http://www.djangoproject.com/documentation/email/
+.. _sessions: http://www.djangoproject.com/documentation/sessions/
+.. _settings: http://www.djangoproject.com/documentation/settings/
+.. _syndication: http://www.djangoproject.com/documentation/syndication/
+.. _template language: http://www.djangoproject.com/documentation/templates/
+.. _transactions: http://www.djangoproject.com/documentation/transactions/
+.. _url dispatch: http://www.djangoproject.com/documentation/url_dispatch/
+.. _forms and validation: http://www.djangoproject.com/documentation/forms/
+.. _serialization: http://www.djangoproject.com/documentation/serialization/
+.. _authentication: http://www.djangoproject.com/documentation/authentication/
+
+.. _`キャッシュ`: cache.html
+.. _`カスタムテンプレートタグとライブラリ`: templates_python.html
+.. _`データベース照合`: db_api.html
+.. _`django-admin ユーティリティ`: django_admin.html
+.. _`FastCGI の組み込み`: fastcgi.html
+.. _`フラットページ`: flatpages.html
+.. _`汎用ビュー`: generic_views.html
+.. _`国際化`: i18n.html
+.. _`古いデータベースの組み込み`: legacy_databases.html
+.. _`モデル定義`: model_api.html
+.. _`mod_python の組み込み`: modpython.html
+.. _`リダイレクション`: redirects.html
+.. _`リクエスト／レスポンスオブジェクト`: request_response.html
+.. _`メールの送信`: email.html
+.. _`セッション`: sessions.html
+.. _`設定ファイル`: settings.html
+.. _`配信フィード`: syndication.html
+.. _`テンプレート言語`: templates.html
+.. _`トランザクション`: transactions.html
+.. _`URL のディスパッチ`: url_dispatch.html
+.. _`フォームとバリデータ`: forms.html
+.. _`シリアライゼーション`: serialization.html
+.. _`認証`: authentication.html

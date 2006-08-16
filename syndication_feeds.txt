@@ -1,0 +1,764 @@
+==========================
+配信フィードフレームワーク
+==========================
+
+:revision-up-to: 3491 (release 0.95)
+
+Django には高水準の配信フィード (syndication feed) 生成フレームワークがつい
+てきます．このフレームワークを使えば， RSS_ 形式や Atom_ 形式のフィードを簡
+単に生成できます．
+
+ちょっとした Python クラスを書くだけで配信フィードを作成できます．フィード
+は好きな数だけ生成できます．
+
+Django には低水準のフィード生成 API もついてきます． Web コンテキストの外で
+フィードを作成したい場合や，低水準での操作が必要な場合に使ってください．
+
+.. _RSS: http://www.whatisrss.com/
+.. _Atom: http://www.atomenabled.org/
+
+
+高水準フレームワーク
+====================
+
+概要
+----
+
+高水準のフィード生成フレームワークはビューで実現されていて，デフォルトでは
+``/feeds/`` にフックされています． Django は URL の残りの部分 (``/feeds/``
+以後の部分) を使って，どのフィードを出力するかを決めます．
+
+フィードの生成は， ``Feed`` クラスを書いて URLConf が ``Feed`` クラスを指す
+ように設定するだけでできます． 
+(`URLConf のドキュメント <url_dispatch.html>`__) 
+
+.. _URLconf: http://www.djangoproject.com/documentation/url_dispatch/
+
+初期化
+--------------
+
+Django サイトで配信フィードを使うには， `URLconf <url_dispatch.html>`__ に
+以下のような行を追加します::
+
+    (r'^feeds/(?P<url>.*)/$', 
+     'django.contrib.syndication.views.feed', {'feed_dict': feeds}),
+
+この行は， Django に ``"feeds/"`` で始まる全ての URL を RSS フレームワーク
+で処理するように教えます (もちろん ``"feeds/"`` は自分の好きなプレフィクス
+に置き換えられます)．
+
+上の URLconf には追加の引数， ``{'feed_dict': feeds}`` があります．この引数
+は，URL に対してどのクラスを使ってフィード生成を行うかを配信フレームワーク
+に教えます．
+
+特に，``feed_dict`` はフィードの slug (短い URL ラベル) を ``Feed`` クラス
+に対応づける辞書でなくてはなりません．
+
+``feed_dict`` は URLconf の中で定義できます． URLconf の完全な例を示しましょ
+う::
+
+    from django.conf.urls.defaults import *
+    from myproject.feeds import LatestEntries, LatestEntriesByCategory
+
+    feeds = {
+        'latest': LatestEntries,
+        'categories': LatestEntriesByCategory,
+    }
+
+    urlpatterns = patterns('',
+        # ...
+        (r'^feeds/(?P<url>.*)/$', 'django.contrib.syndication.views.feed',
+            {'feed_dict': feeds}),
+        # ...
+    )
+
+上の例では，二つのフィード:
+
+    * ``feeds/latest/`` にある， ``LatestEntries`` で表されるフィード
+    * ``feeds/categories/`` にある，  ``LatestEntriesByCategory`` で表され
+      るフィード
+
+を登録しています．
+
+セットアップしたら，あとは ``Feed`` クラス自体を定義するだけです．
+
+.. _URLconf: http://www.djangoproject.com/documentation/url_dispatch/
+.. _settings file: http://www.djangoproject.com/documentation/settings/
+
+Feed クラス
+------------
+
+``Feed`` クラスは，ひとつの配信フィードを表現する単純な Python クラスです．
+フィードは単純な形式 (「サイトニュース」フィードや，最新のブログエントリを
+表示する基本的な形式 ) にも，もっと複雑な形式 (特定のカテゴリの全てのエント
+リを表示するフィード) にもできます．
+
+``Feed`` クラスは ``django.contrib.syndication.feeds.Feed`` にせねばなりま
+せん．クラスはコードベースのどこにでも置けます．
+
+簡単な例
+----------------
+
+以下の例は `chicagocrime.org`_ で使っているもので，最新の 5 件のニュース項
+目を記述するようになっています::
+
+    from django.contrib.syndication.feeds import Feed
+    from chicagocrime.models import NewsItem
+
+    class SiteNewsFeed(Feed):
+        title = "Chicagocrime.org site news"
+        link = "/sitenews/"
+        description = "Updates on changes and additions to chicagocrime.org."
+
+        def items(self):
+            return NewsItem.objects.order_by('-pub_date')[:5]
+
+注意:
+
+    * ``django.contrib.syndication.feeds.Feed`` のサブクラスになっています．
+    * ``title``, ``link`` および ``description`` は，それぞれ標準的な RSS の
+      RSS ``<title>``, ``<link>`` および ``<description>`` 要素に対応してい
+      ます．
+    * ``items()`` はフィードの ``<item>`` 要素に含めるオブジェクトのリスト
+      を返すメソッドです．この例では Django の `Object-Relational マッパ`_
+      を使って ``NewsItem`` を返していますが， ``items()`` は必ずしもモデル
+      インスタンスを返さねばならないわけではありません． Django モデルを使
+      えばいくつかの機能を何もせずに使えるというだけの話で， ``items()`` は
+      望みのどんな型のオブジェクトを返してもかまいません．
+
+まだやるべきことが残っています． RSS フィード中では， ``<item>`` には
+``<title>``, ``<link>``, ``<description>`` といったエレメントがあります．
+そこで，これらのエレメントにどのデータを入れるのかをフレームワークに教える
+必要があります．
+
+    * ``<title>`` や ``<description>`` の中身を指定するには，
+      ``feeds/sitenews_title.html`` または 
+      ``feeds/sitenews_description.html`` という名前の
+      `Django テンプレート`_ を作成します． ``sitenews`` は URLconf 中に指
+      定しておいた，フィードの ``slug`` です．  ``.html`` 拡張子が必要なこ
+      とに注意して下さい． RSS システムはこれらのテンプレートを各要素に対し
+      てレンダリングします．このとき，二つのテンプレートコンテキスト変数を
+      渡します:
+
+          * ``{{ obj }}`` -- 現在のオブジェクト (``items()`` の返すオブジェ
+            クトの中の一つ) です．
+          * ``{{ site }}`` -- 現在のサイトを表現する，
+            ``django.contrib.sites.models.Site`` オブジェクトです．この変数
+            は ``{{ site.domain }}`` や ``{{ site.name }}`` を参照する際に
+            便利です．
+
+      ``title`` や ``description`` のテンプレートを作成しなかった場合， RSS
+      フレームワークは ``"{{ obj }}"`` で表されるテンプレートをデフォルト値
+      として使います．すなわち，オブジェクトの文字列表現が使われます． 
+      ``Feed`` クラスに ``title_template`` や ``description_template`` といっ
+      た属性値を指定すれば，これらのテンプレートの名前を指定できます．
+    * ``<link>`` の内容を指定するには二つの方法があります． ``items()`` の
+      各要素毎に，Django はまずオブジェクトに対して ``get_absolute_url()``
+      メソッドを実行しようと試みます．このメソッドがなければ， ``Feed`` ク
+      ラスで定義されている ``item_link()`` メソッドを呼び出そうとします．こ
+      のとき，メソッドにはオブジェクト自体を引数 ``item`` として渡します．
+      ``get_absolute_url()`` や ``item_link()`` は，いずれも通常の Python
+      文字列で URL を返さねばなりません．
+
+.. _chicagocrime.org: http://www.chicagocrime.org/
+.. _`Object-Relational マッパ`: db-api.html
+.. _`Django テンプレート`: templates.html
+.. _object-relational mapper: http://www.djangoproject.com/documentation/db_api/
+.. _Django templates: http://www.djangoproject.com/documentation/templates/
+
+複雑な例
+-----------------
+
+配信フレームワークでは，パラメタを使ったより複雑なフィードをサポートしてい
+ます．
+
+例えば， `chicagocrime.org`_ では，シカゴ市内の全ての警官の巡回区域 (beat)
+ごとに最新の犯罪情報のフィードを提供しています．全ての巡回区域毎に ``Feed``
+クラスを用意するのは馬鹿らしい話です． `DRY 則`_ に反していますし，データの
+都合とプログラムロジックを連結させてしまうことになります．その代わりに，配
+信フレームワークでは，フィードの URL に指定した情報に従って適切な要素を出力
+するような汎用のフィードを生成できるようにしています．
+
+chicagocrime.org では，巡回区域単位のフィードに以下のような URL でアクセス
+できるようになっています:
+
+    * ``/rss/beats/0613/`` -- 0613 区の最近の犯罪を返します．
+    * ``/rss/beats/1424/`` -- 1424 区の最近の犯罪を返します．
+
+ここでは ``"beats"`` が slug になっています．配信フレームワークは slug より
+後ろの URL 部分要素 (URL bit) を調べ (``0613`` や ``1424``)，それらの URL
+bit にどのような意味を与え，フィード公開する項目の選択にどう影響を及ぼさせ
+るかをユーザがフックで指定できるようにします．
+
+例を挙げてわかりやすく説明しましょう．巡回区域単位のフィードを生成するコー
+ドは以下のようになります::
+
+    class BeatFeed(Feed):
+        def get(self, bits):
+            # In case of "/rss/beats/0613/foo/bar/baz/", or other such clutter,
+            # check that bits has only one member.
+            if len(bits) != 1:
+                raise ObjectDoesNotExist
+            return Beat.objects.get(beat__exact=bits[0])
+    
+        def title(self, obj):
+            return "Chicagocrime.org: Crimes for beat %s" % obj.beat
+    
+        def link(self, obj):
+            return obj.get_absolute_url()
+    
+        def description(self, obj):
+            return "Crimes recently reported in police beat %s" % obj.beat
+    
+        def items(self, obj):
+            return Crime.objects.filter(beat__id__exact=obj.id).order_by('-crime_date')[:30]
+
+このクラスに URL ``/rss/beats/0613/`` でアクセスしたときの， RSS フレームワー
+クの基本的なアルゴリズムは以下のようになります:
+
+    * フレームワークに URL ``/rss/beats/0613/`` が渡されます．フレームワー
+      クは slug 以後に追加の URL bit があることに気づき， slug 以後の文字列
+      をスラッシュ (``"/"``) で分割して，``Feed`` クラスの ``get()`` メソッ
+      ドの引数に渡して呼び出します．上の例では， bit は ``['0613']`` になり
+      ます．リクエストが ``/rss/beats/0613/foo/bar/`` であれば bit は
+      ``['0613', 'foo', 'bar']`` です．
+    * ``get()`` は指定された ``bit`` を使って適切な巡回区域を選択する役割を
+      担っています．上の場合では， Django のデータベース API を使って巡回区
+      域を決定しています． 無効なパラメタが指定された場合， ``get()`` は
+      ``django.core.exceptions.ObjectDoesNotExist`` を返さねばなりません．
+      関数が失敗すると ``Beat.DoesNotExist`` を送出し，
+      ``Beat.DoesNotExist`` は ``ObjectDoesNotExist`` のサブクラスなので，
+      `Beat.objects.get()`` 呼び出しの周りには ``try``/``except`` がありま
+      せん． ``get()`` の中で ``ObjectDoesNotExist`` を送出すると， Django
+      はリクエストに対して 404 エラーを返します．
+    * フィードの ``<title>``, ``<link>``, および ``<description>`` を生成す
+      るために， Django はそれぞれ ``title()``, ``link()`` および
+      ``description()`` といったメソッドを使います．こうしたメソッドは前述
+      の例では単なる文字列でできたクラス属性でしたが，実際には文字列にもメ
+      ソッドにもできます． ``title``, ``link`` および ``description`` につ
+      いては， Django は以下のようなアルゴリズムで値を決めます:
+
+          * ``get()`` の返すオブジェクト ``obj`` を引数にして，メソッドを呼
+            び出そうと試みます．
+          * 失敗した場合，メソッドを引数無しで呼び出そうと試みます．
+          * 失敗した場合，クラス属性を使います．
+
+    * 最後に，上の例の ``items()`` には引数 ``obj`` があることに注意して下
+      さい． ``items`` の内容を解決するアルゴリズムは上と同じです．すなわち，
+      まず ``items(obj)``, 次いで ``items()``, そしてクラス属性 ``items`` 
+      (この値はリストでなければなりません) の順です．
+
+下記の ``ExampleFeed`` クラスには， ``Feed`` クラスの全てのメソッドと属性に
+ついてのドキュメントが書かれています．
+
+.. _`DRY 則`: http://c2.com/cgi/wiki?DontRepeatYourself
+
+フィードの形式を指定する
+---------------------------
+
+このフレームワークは，デフォルトでは RSS 2.0 のフィードを生成します．
+
+生成するフィードの形式を変えたければ， ``Feed`` クラスの ``feed_type`` 属性
+を変更します::
+
+    from django.utils.feedgenerator import Atom1Feed
+
+    class MyFeed(Feed):
+        feed_type = Atom1Feed
+
+``feed_type`` にはインスタンスではなくクラスオブジェクトを指定するよう注意
+して下さい．
+
+現在利用可能なフィードの型は以下の 3 つです:
+
+    * ``django.utils.feedgenerator.Rss201rev2Feed`` (RSS 2.01. デフォルト.)
+    * ``django.utils.feedgenerator.RssUserland091Feed`` (RSS 0.91.)
+    * ``django.utils.feedgenerator.Atom1Feed`` (Atom 1.0.)
+
+エンクロージャ
+---------------
+
+podcast のフィードを生成するときなどに使われるエンクロージャ (enclusure) の
+指定には， ``item_enclosure_url``, ``item_enclosure_length`` および
+``item_enclosure_mime_type`` フックを使って下さい．
+後述の使用例にある ``ExampleFeed`` クラスを参照してください．
+
+言語
+--------
+
+配信フレームワークによって生成されたフィードには，自動的に適切な
+``<language>`` タグ (RSS 2.0) や ``xml:lang`` 属性 (Atom) が入ります．
+これらの値には `LANGUAGE_CODE setting`_ を直接使います．
+
+.. _`LANGUAGE_CODE 設定`: settings.html#language-code
+.. _LANGUAGE_CODE setting: http://www.djangoproject.com/documentation/settings/#language-code
+
+URL
+----
+
+``link`` メソッド/属性は絶対 URL (すなわち ``"/blog/"``) またはドメインやプ
+ロトコルを完全指定した URL (``"http://www.example.com/blog/"``) のいずれか
+を返さねばなりません． ``link`` がドメインを返さない場合，配信フレームワー
+クは現在のサイトのドメインを `SITE_ID の設定`_ に従って挿入します．
+Atom フィードにはフィードの現在の場所を定義する ``<link rel="self">`` が必
+要です．配信フレームワークは現在の SITE_ID の設定に従ってドメインから取り出
+した値を自動的に入れるようになっています．
+
+.. _SITE_ID の設定: settings.html#site-id
+.. _SITE_ID setting: http://www.djangoproject.com/documentation/settings/#site-id
+
+Atom フィードと RSS フィードを並行出力する
+---------------------------------------------
+
+開発者によっては， Atom と RSS の *両方の* バージョンを利用できるようにした
+いと望むことでしょう． Django でこれを実現するのは簡単です: 自作の ``feed``
+クラスをサブクラス化して， ``feed_type`` を変更し， URLconf を更新して，
+他のバージョン向けのエントリを追加するだけです．
+
+完全な例を示しましょう::
+
+    from django.contrib.syndication.feeds import Feed
+    from chicagocrime.models import NewsItem
+    from django.utils.feedgenerator import Atom1Feed
+    
+    class RssSiteNewsFeed(Feed):
+        title = "Chicagocrime.org site news"
+        link = "/sitenews/"
+        description = "Updates on changes and additions to chicagocrime.org."
+    
+        def items(self):
+            return NewsItem.objects.order_by('-pub_date')[:5]
+    
+    class AtomSiteNewsFeed(RssSiteNewsFeed):
+        feed_type = Atom1Feed
+
+対応する URLconf は以下のようにします::
+
+    from django.conf.urls.defaults import *
+    from myproject.feeds import RssSiteNewsFeed, AtomSiteNewsFeed
+
+    feeds = {
+        'rss': RssSiteNewsFeed,
+        'atom': AtomSiteNewsFeed,
+    }
+
+    urlpatterns = patterns('',
+        # ...
+        (r'^feeds/(?P<url>.*)/$', 'django.contrib.syndication.views.feed',
+            {'feed_dict': feeds}),
+        # ...
+    )
+
+Feed クラスリファレンス
+-----------------------
+
+この節の例では， ``Feed`` クラスで利用できる全ての属性とメソッドについて説
+明しています::
+
+    from django.contrib.syndication.feeds import Feed
+    from django.utils import feedgenerator
+
+    class ExampleFeed(Feed):
+
+        # FEED TYPE -- 省略可能です．
+        # django.utils.feedgenerator.SyndicationFeed のサブクラスを
+        # 指定せねばなりません． RSS 2.0, Atom 1.0 といったフィードの形式
+        # を表します．
+        # feed_type を指定しなければ， RSS 2.0 を使います．
+        # クラスのインスタンスではなく，クラス自体にせねばなりません．
+
+        feed_type = feedgenerator.Rss201rev2Feed
+
+        # TEMPLATE NAMES -- 省略可能です．
+        # フィード項目のタイトルと詳細をレンダリングするための Django テン
+        # プレート名を表す名前でなければなりません．いずれも省略可能です．
+        # 片方，または両方を省略した場合， Django は
+        # 'feeds/SLUG_title.html' および 'feeds/SLUG_description.html' とい
+        # う名前のテンプレートを使います． SLUG は URL に指定した slug です．
+
+        title_template = None
+        description_template = None
+
+        # TITLE -- 以下の三つの形式の少なくともいずれか一つが必要です．配信
+        # フレームワークは以下の順に値を探します．
+
+        def title(self, obj):
+            """
+            get() の返すオブジェクトを引数にとり，フィードのタイトルを
+            通常の python 文字列で返します．
+            """
+
+        def title(self):
+            """
+            フィードのタイトルを通常の python 文字列で返します．
+            """
+
+        title = 'foo' # ハードコード形式のフィードのタイトルです．
+
+        # LINK -- 以下の三つの形式の少なくともいずれか一つが必要です．配信
+        # フレームワークは以下の順に値を探します．
+
+        def link(self, obj):
+            """
+            get() の返すオブジェクトを引数にとり，フィードへのリンクを
+            通常の python 文字列で返します．
+            """
+
+        def link(self):
+            """
+            フィードへのリンクを通常の python 文字列で返します．
+            """
+
+        link = '/foo/bar/' # ハードコード形式のフィードのリンクです．
+
+        # DESCRIPTION -- 以下の三つの形式の少なくともいずれか一つが必要です．配信
+        # フレームワークは以下の順に値を探します．
+
+        def description(self, obj):
+            """
+            get() の返すオブジェクトを引数にとり，フィードの説明
+            を通常の python 文字列で返します．
+            """
+
+        def description(self):
+            """
+            フィードの説明を通常の python 文字列で返します．
+            """
+
+        description = 'Foo bar baz.' # ハードコード形式のフィードの説明です．
+
+        # AUTHOR NAME -- 以下の三つの形式のいずれか一つを指定できます．配信
+        # フレームワークは以下の順に値を探します．省略可能です．
+
+        def author_name(self, obj):
+            """
+            get() の返すオブジェクトを引数にとり，フィードの作者名を
+            通常の python 文字列で返します．
+            """
+
+        def author_name(self):
+            """
+            フィードの作者名を通常の python 文字列で返します．
+            """
+
+        author_name = 'Sally Smith' # ハードコード形式のフィードの作者名です．
+
+        # AUTHOR E-MAIL -- 以下の三つの形式のいずれか一つを指定できます．配信
+        # フレームワークは以下の順に値を探します．省略可能です．
+
+        def author_email(self, obj):
+            """
+            get() の返すオブジェクトを引数にとり，フィードの作者の email を
+            通常の python 文字列で返します．
+            """
+
+        def author_name(self):
+            """
+            フィードの作者の email を通常の python 文字列で返します．
+            """
+
+        author_email = 'test@example.com' # ハードコード形式の作者の email です．
+
+        # AUTHOR LINK -- 以下の三つの形式のいずれか一つを指定できます．配信
+        # フレームワークは以下の順に値を探します．省略可能です．どの場合でも，
+        # URL には "http://" およびドメイン名を入れねばなりません．
+
+        def author_link(self, obj):
+            """
+            get() の返すオブジェクトを引数にとり，フィードの作者の
+            URL を通常の python 文字列で返します．
+            """
+
+        def author_link(self):
+            """
+            フィードの作者の URL を通常の python 文字列で返します．
+            """
+
+        author_link = 'http://www.example.com/' # ハードコード形式の作者 URL です．
+
+        # CATEGORIES -- 以下の三つの形式はいずれも省略可能です．フレームワー
+        # クは以下に示した順番で値を探します．いずれの場合も，メソッド/属性
+        # 値は文字列を返すイテレータを返さねばなりません．
+
+        def categories(self, obj):
+            """
+            get_object() の返すオブジェクトを引数にとり，フィードのカテゴリ
+            を表す文字列を返すイテレータを返します．
+            """
+
+        def categories(self):
+            """
+	    フィードのカテゴリを表す文字列を返すイテレータを返します．
+            """
+
+        categories = ("python", "django") # ハードコード形式のカテゴリリストです．
+
+        # ITEMS -- 以下の三つの形式の少なくともいずれか一つが必要です．配信
+        # フレームワークは以下の順に値を探します．
+
+        def items(self, obj):
+            """
+            get() の返すオブジェクトを引数にとり，このフィードで公
+            開する item のリストを返します．
+            """
+
+        def items(self):
+            """
+            フィードで公開する item のリストを返します．
+            """
+
+        items = ('Item 1', 'Item 2') # ハードコード形式の item リストです．
+
+        # GET_OBJECT -- 異なる URL パラメタに対して異なるデータを公開する場
+        # 合に必要なメソッドです． (前述の "複雑な例" を参照してください)
+
+        def get(self, bits):
+            """
+            URL から取り出した文字列のリストを引数にとり，フィードで表現す
+            るオブジェクトからなるリストを返します．エラー時には
+            django.core.exceptions.ObjectDoesNotExist を送出します．
+            """
+
+        # ITEM LINK -- 以下の三つの形式の少なくともいずれか一つが必要です．配信
+        # フレームワークは以下の順に値を探します．
+
+        # まず，フレームワークは items() の返す各オブジェクトに対して
+        # get_absolute_url() を呼び出します．失敗すると，以下の二つのメソッ
+        # ドを試します:
+
+        def item_link(self, item):
+            """
+            items() の返す item を引数に取り，item への URL を返します．
+            """
+
+        def item_link(self):
+            """
+            item への URL を返します．
+            """
+
+        # ITEM AUTHOR NAME -- 以下の三つの形式のいずれか一つを指定できます．配信
+        # フレームワークは以下の順に値を探します．省略可能です．
+
+        def item_author_name(self, item):
+            """
+            items() の返す item を引数に取り，item の作者名を通常の python
+            文字列で返します．
+            """
+
+        def item_author_name(self):
+            """
+            作者名を返します．
+            """
+
+        item_author_name = 'Sally Smith' # ハードコード形式の作者名です．
+
+        # ITEM AUTHOR E-MAIL -- 以下の三つの形式のいずれか一つを指定できます．配信
+        # フレームワークは以下の順に値を探します．省略可能です．
+        #
+        # この属性を指定する場合，item_author_name も指定せねばなりません．
+
+        def item_author_email(self, obj):
+            """
+            items() の返す item を引数に取り，item の作者の e-mail を通常の
+            python 文字列で返します．
+            """
+
+        def item_author_email(self):
+            """
+            作者の e-mail を返します．
+            """
+
+        item_author_email = 'test@example.com' # ハードコード形式の作者 e-mail です．
+
+        # ITEM AUTHOR LINK -- 以下の三つの形式のいずれか一つを指定できます．配信
+        # フレームワークは以下の順に値を探します．省略可能です．この場合，
+        # URL には "http://" およびドメイン名を入れねばなりません．
+        #
+        # この属性を指定する場合， item_author_name も指定せねばなりません．
+
+        def item_author_link(self, obj):
+            """
+            items() の返す item を引数に取り，item の作者の URL を通常の
+            python 文字列で返します．
+            """
+
+        def item_author_link(self):
+            """
+            item の作者の URL を通常の python 文字列で返します．
+            """
+
+        item_author_link = 'http://www.example.com/' # ハードコード形式の作者 URL です．
+
+        # ITEM ENCLOSURE URL -- エンクロージャを公開する場合，以下の三つの
+        # 形式の少なくともいずれか一つが必要です．配信フレームワークは以下
+        # の順に値を探します．
+
+
+        def item_enclosure_url(self, item):
+            """
+            items() の返す item を引数に取り，item のエンクロージャ URL を返します．
+            """
+
+        def item_enclosure_url(self):
+            """
+            フィード中の各 item のエンクロージャ URL を返します．
+            """
+
+        item_enclosure_url = "/foo/bar.mp3" # ハードコード形式のエンクロージャ URL です．
+
+        # ITEM ENCLOSURE LENGTH -- エンクロージャを公開する場合，以下の三つ
+        # の形式の少なくともいずれか一つが必要です．配信フレームワークは以
+        # 下の順に値を探します．この場合，戻り値はバイト単位で長さを表した
+        # 整数か，整数を表す文字列でなければなりません．
+
+        def item_enclosure_length(self, item):
+            """
+            items() の返す item を引数に取り，item のエンクロージャ長を返します．
+            """
+
+        def item_enclosure_length(self):
+            """
+            フィード中の各 item のエンクロージャ長を返します．
+            """
+
+        item_enclosure_length = 32000 # ハードコード形式のエンクロージャ長です．
+
+        # ITEM ENCLOSURE MIME TYPE -- エンクロージャを公開する場合，以下の
+        # 三つの形式の少なくともいずれか一つが必要です．配信フレームワーク
+        # は以下の順に値を探します．
+
+        def item_enclosure_mime_type(self, item):
+            """
+            items() の返す item を引数に取り，item のエンクロージャ mime タ
+            イプを返します．
+            """
+
+        def item_enclosure_mime_type(self):
+            """
+            各 item のエンクロージャの mime タイプを返します．
+            """
+
+        item_enclosure_mime_type = "audio/mpeg" # ハードコード形式の mime-type です．
+
+        # ITEM PUBDATE -- 以下の三つの形式のいずれか一つを指定できます．省略可能です．
+        # このメソッドは指定の要素に対する公開日を取得するためのフックです．
+        # どのケースでも，メソッドや属性は Python の datetime.datetime 
+        # オブジェクトを返さねばなりません．
+
+        def item_pubdate(self, item):
+            """
+            items() の返す item を引数に取り，item の公開日を返します．
+            """
+
+        def item_pubdate(self):
+            """
+            公開日を返します．
+            """
+
+        item_pubdate = datetime.datetime(2005, 5, 3) # ハードコード形式の公開日です．
+
+        # ITEM CATEGORIES -- 以下の三つの形式はいずれも省略可能です．指定さ
+        # れた item に対するカテゴリリストを取得するためのフックです．いずれ
+        # の場合も，メソッド/属性値は文字列を返すイテレータを返さねばなりま
+        # せん．
+
+        def item_categories(self, item):
+            """
+            items() の返す item を引数にとり， item のカテゴリ
+            を表す文字列を返すイテレータを返します．
+            """
+
+        def item_categories(self):
+            """
+            フィード内の全 items のカテゴリを返します．
+            """
+
+        item_categories = ("python", "django") # ハードコード形式のカテゴリです．
+
+
+低水準フレームワーク
+====================
+
+高水準の RSS フレームワークは，背後で低水準のフレームワークを使ってフィード
+の XML を生成しています．このフレームワーク自体は，
+`django/utils/feedgenerator.py`_ に単一のモジュールとして収められています．
+
+低水準のタスクを実現したければ，このフレームワークを自分で操作してください．
+
+``feedgenerator`` モジュールには，基底クラスである ``SyndicationFeed`` に加
+え，以下のサブクラスが収められています:
+
+    * ``RssUserland091Feed``
+    * ``Rss201rev2Feed``
+    * ``Atom1Feed``
+
+これらのクラスはいずれも，特定のタイプの XML を生成する方法を知っており，
+以下のような共通のインタフェースを持っています:
+
+``__init__(title, link, description, language=None, author_email=None,``
+``author_name=None, author_link=None, subtitle=None, categories=None,``
+``feed_url=None)``
+
+このメソッドは指定されたメタデータに対してフィードを初期化します．ここでい
+うメタデータは，(フィードの特定の item に対する情報ではなく) フィード全体に
+関わるメタデータです．
+
+パラメタを指定する場合には， ``categories`` を除いてすべて Unicode オブジェ
+クトにします． ``categories`` には Unicode オブジェクトのシークエンスを
+指定します．
+
+``add_item(title, link, description, author_email=None, author_name=None,``
+``author_link=None, pubdate=None, comments=None, unique_id=None,``
+`` enclosure=None, categories=())``
+
+指定のパラメタを持った item をフィードに追加します．パラメタを指定する場合
+には， Unicode オブジェクトを指定します．ただし:
+
+    * ``pubdate`` は `Python datetime 型オブジェクト`_ にします．
+    * ``enclosure`` は ``feedgenerator.Enclosure`` のインスタンスにします．
+    * ``categories`` は Unicode オブジェクトのシークエンスにします．
+
+``num_items()``
+
+item の数を返します．
+
+
+``write(outfile, encoding)``
+
+フィードを指定のエンコーディングでファイルライクオブジェクト outfile に
+出力します．
+
+``writeString(encoding)``
+
+フィードを指定のエンコーディングの文字列として返します．
+
+``latest_post_date``
+
+item のうち，もっとも新しいものの ``pubdate`` を返します．最新の
+``pubdate`` がなければ現在の日付／時刻を返します．
+
+使用例
+-------------
+
+以下の例では， Atom 1.0 フィードを生成して，標準出力に出力しています::
+
+    >>> from django.utils import feedgenerator
+    >>> f = feedgenerator.Atom1Feed(
+    ...     title=u"My Weblog",
+    ...     link=u"http://www.example.com/",
+    ...     description=u"In which I write about what I ate today.",
+    ...     language=u"en"),
+    >>> f.add_item(title=u"Hot dog today",
+    ...     link=u"http://www.example.com/entries/1/",
+    ...     description=u"<p>Today I had a Vienna Beef hot dog. It was pink, plump and perfect.</p>")
+    >>> print f.writeString('utf8')
+    <?xml version="1.0" encoding="utf8"?>
+    <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><title>My Weblog</title>
+    <link href="http://www.example.com/"></link><id>http://www.example.com/</id>
+    <updated>Sat, 12 Nov 2005 00:28:43 -0000</updated><entry><title>Hot dog today</title>
+    <link>http://www.example.com/entries/1/</link><id>tag:www.example.com/entries/1/</id>
+    <summary type="html">&lt;p&gt;Today I had a Vienna Beef hot dog. It was pink, plump and perfect.&lt;/p&gt;</summary>
+    </entry></feed>
+
+.. _django/utils/feedgenerator.py: http://code.djangoproject.com/browser/django/trunk/django/utils/feedgenerator.py
+.. _`Python datetime 型オブジェクト`: http://www.python.jp/doc/release/lib/module-datetime.html

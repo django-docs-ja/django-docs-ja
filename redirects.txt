@@ -1,0 +1,92 @@
+==========================
+redirects アプリケーション
+==========================
+
+:revision-up-to: 3491 (release 0.95)
+
+Django にはオプションとして redirects アプリケーションがついてきます．この
+アプリケーションを使うと，リダイレクト先をデータベースに保存し，適切なリダ
+イレクト処理をおこなってくれます．
+
+.. _Installation:
+
+インストール
+============
+
+redirects アプリケーションをインストールするには，以下の 3 ステップの操作を
+行います:
+
+    1. INSTALLED_APPS_ 設定に ``"django.contrib.redirects"`` を追加します．
+    2. MIDDLEWARE_CLASSES_ 設定に
+       ``"django.contrib.redirects.middleware.RedirectFallbackMiddleware"``
+       を追加します．
+    3. ``manage.py syncdb`` を実行します．
+
+.. _INSTALLED_APPS: settings.html#installed-apps
+.. _MIDDLEWARE_CLASSES: settings.html#middleware-classes
+.. INSTALLED_APPS: http://www.djangoproject.com/documentation/settings/#installed-apps
+.. MIDDLEWARE_CLASSES: http://www.djangoproject.com/documentation/settings/#middleware-classes
+
+.. _How it works:
+
+動作の仕組み
+============
+
+``manage.py syncdb`` を実行すると，データベースに ``django_redirects`` とい
+う名のテーブルを作成します．このテーブルは ``site_id``, ``old_path`` および
+``new_path`` というフィールドを持った検索テーブルです．
+
+全ての処理は ``RedirectFallbackMiddleware`` で行われます． Django アプリケー
+ション内で 404 エラーが送出されると，このミドルウェアは最後の手段として
+redirects データベースにリクエスト URL がないか調べます．特に，SITE_ID_ 設
+定に対応するサイト ID を持った ``old_path`` を探します．
+
+    * 一致するエントリが見つかり，かつ ``new_path`` が空でなければ
+      ``new_path`` にリダイレクトします．
+    * 一致するエントリは見つかったが ``new_path`` が空の場合には， 410
+      ("Gone") HTTP ヘッダと空の (コンテンツのない) 応答を送信します．
+    * 一致するエントリがなければ，リクエストを通常通りに処理します．
+
+ミドルウェアが起動されるのは 404 エラーに対してだけで， 500 やその他の状態
+コードでは起動されません．
+
+``MIDDLEWARE_CLASSES`` の設定順には注意が必要です．一般に，
+``RedirectFallbackMiddleware`` はリクエスト処理の最終手段なので，リストの末
+尾に指定します．
+
+ミドルウェアについての詳しい情報は `ミドルウェアのドキュメント`_ を参照して
+ください．
+
+.. _SITE_ID: http://www.djangoproject.com/documentation/settings/#site-id
+.. _`ミドルウェアのドキュメント`: middleware.html
+.. _middleware docs: http://www.djangoproject.com/documentation/middleware/
+
+.. _How to add, change and delete redirects:
+
+リダイレクトの追加，変更，削除
+==============================
+
+.. _Via the admin interface:
+
+admin インタフェースから
+------------------------
+
+Django の自動 admin インタフェースを有効にしていれば， "Redirects" という名
+前のセクションが admin のインデクスページに表示されているはずです．Django
+の他のオブジェクトと同じように編集してください．
+
+.. _Via the Python API:
+
+Python API から
+---------------
+
+リダイレクトは標準の `Django モデル`_ で表現されており，
+`django/contrib/redirects/models.py`_ におさめられています．
+`Django データベース API`_ を使ってリダイレクトオブジェクトにアクセスできま
+す．
+
+.. _Django モデル: model-api.html
+.. _Django model: http://www.djangoproject.com/documentation/model_api/
+.. _django/contrib/redirects/models.py: http://code.djangoproject.com/browser/django/branches/magic-removal/django/contrib/redirects/models.py
+.. _Django データベース API: db-api.html
+.. _Django database API: http://www.djangoproject.com/documentation/db_api/
