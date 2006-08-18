@@ -2,7 +2,7 @@
 ミドルウェア
 ============
 
-:revision-up-to: 3491 (release 0.95)
+:revision-up-to: 3602 (release 0.95+)
 
 ミドルゥェア (Middleware) とは， Django のリクエスト/レスポンス処理に対する
 フックの集まりです．ミドルウェアは Django の入出力を操作するための軽量かつ
@@ -108,6 +108,25 @@ django.middleware.http.ConditionalGetMiddleware
 
 また， HEAD リクエストに対する応答から本体部分を除去し， ``Date`` および
 ``Content-Length`` 応答ヘッダを設定します．
+
+django.middleware.http.SetRemoteAddrFromForwardedFor
+----------------------------------------------------
+
+**開発版の Django で新たに追加された機能です**
+
+``request.['HTTP_X_FORWARDED_FOR']`` が設定されていた場合，その値に基づいて
+``request['REMOTE_ADDR']`` をセットします．サーバがリバースプロキシの向こう
+にあるためにリクエストの ``REMOTE_ADDR`` が ``127.0.0.1`` にセットされてし
+まう場合に便利です．
+
+**注意事項:** このミドルウェアは ``HTTP_X_FORWARDED_FOR`` を検証 
+**しません** ``HTTP_X_FORWARDED_FOR`` を自動的に設定するリバースプロキシ
+を経由していない場合には，このミドルウェアを使ってはなりません．なぜなら，
+``HTTP_X_FORWARDED_FOR`` の値はだれでも簡単に偽装できるので，このミドルウェ
+アが ``REMOTE_ADDR`` に基づいて ``HTTP_X_FORWARDED_FOR`` を設定すると，誰も
+が "偽の" IP アドレスを名乗れてしまうからです．このミドルウェアを使ってよい
+のは， ``HTTP_X_FORWARDED_FOR`` の値を完全に信用できる場合だけです．
+
 
 django.contrib.sessions.middleware.SessionMiddleware
 ----------------------------------------------------

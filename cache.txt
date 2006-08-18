@@ -2,7 +2,7 @@
 Django のキャッシュフレームワーク
 =================================
 
-:revision-up-to: 3491 (release 0.95)
+:revision-up-to: 3608 (release 0.95+)
 
 動的な Web サイトの根本的なトレードオフ要因とは，まさに動的であるということ
 そのものです．ユーザがページをリクエストするたびに，サーバはデータベースへ
@@ -267,7 +267,9 @@ In this example, ``timeout`` is ``30`` and ``max_entries`` is ``400``::
 設定を ``True`` にすると，匿名のリクエスト (すなわちログインユーザ以外から
 のリクエスト) だけをキャッシュするようになります．これは (Django の admin
 インタフェースを含む) ユーザ固有のページに対するキャッシュを無効化する際に
-便利です．
+便利です．ただし， ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` を使う場合は，必ず
+``AuthenticationMiddleware`` を有効にして， ``MIDDLEWARE_CLASSES`` の中で
+``AuthenticationMiddleware`` が ``CacheMiddleware`` よりも前にくるようにしてください．
 
 加えて， ``CacheMiddleware`` は自動的に以下のヘッダを ``HttpResponse`` に追
 加します:

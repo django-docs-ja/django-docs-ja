@@ -2,7 +2,7 @@
 国際化
 ====================
 
-:revision-up-to: 3491 (release 0.95)
+:revision-up-to: 3608 (release 0.95+)
 
 Django はコードとテンプレートの双方で国際化をフルサポートしています．このド
 キュメントでは国際化の仕組みについて説明します．
@@ -53,9 +53,11 @@ Django の国際化フックはデフォルトで有効になっているので，フレームワークの一
 部で i18n がらみのわずかなオーバヘッドが生じています．国際化の機能を使いた
 くなければ，設定ファイルで ``USE_I18N = False`` を設定してください．
 ``USE_I18N`` を ``False`` に設定すると， Django は国際化機構をロードしない
-よう最適化を行います．
+よう最適化を行います． `USE_I18N のドキュメント`_ を参照してください．
 
-`USE_I18N のドキュメント`_ を参照してください．
+この場合， ``TEMPLATE_CONTEXT_PROCESSORS`` からも
+``'django.core.context_processors.i18n'`` を外すことになるでしょう．
+
 
 .. _`USE_I18N のドキュメント`: settings.html#use-i18n
 .. _documentation for USE_I18N: http://www.djangoproject.com/documentation/settings/#use-i18n
