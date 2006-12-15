@@ -2,7 +2,7 @@
 汎用ビュー
 ==========
 
-:revision-up-to: 3953 (release 0.95+)
+:revision-up-to: 4210 (release 0.95+)
 
 Web アプリケーションの作成は，同じパターンを何度も何度も繰り返し書くことに
 なるため，退屈なものです． Django では，そんなパターンに共通する部分のほと
@@ -977,7 +977,7 @@ Django モデルに付属の自動マニピュレータを使います．
 ります:
 
     * ``form``: オブジェクトを編集するためのフォームを表現する
-      ``django.forms.FormWrapper`` インスタンスです． ``FormWrapper`` イン
+      ``django.oldforms.FormWrapper`` インスタンスです． ``FormWrapper`` イン
       スタンスを使うと，テンプレートシステム中でフォームフィールドを簡単に
       参照できます．
 
@@ -1068,7 +1068,7 @@ Django モデルに付属の自動マニピュレータを使います．
 ります:
 
     * ``form``: オブジェクトを編集するためのフォームを表現する
-      ``django.forms.FormWrapper`` インスタンスです． ``FormWrapper`` イン
+      ``django.oldforms.FormWrapper`` インスタンスです． ``FormWrapper`` イン
       スタンスを使うと，テンプレートシステム中でフォームフィールドを簡単に
       参照できます．
 
