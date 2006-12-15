@@ -2,6 +2,8 @@
 Django オブジェクトのシリアライズ
 =================================
 
+:revision-up-to: 3871 (release 0.95+)
+
 .. note::
     
     この API は現在まだ開発のまっただなかにあり，おそらく将来劇的に変化する
@@ -106,6 +108,23 @@ Django には各種形式のシリアライザが付属しています:
 
 .. _json: http://json.org/
 .. _simplejson: http://undefined.org/python/#simplejson
+
+.. _Notes For specific serialization formats:
+
+各シリアライズ形式についての注意
+--------------------------------
+
+json
+~~~~
+
+UTF-8 (や，非 ASCII エンコーディング) でエンコードされたデータを JSON シリ
+アライザで扱うには， ``serialize()`` のパラメタに ``ensure_ascii=False`` を
+指定してください．さもないと，出力のエンコードがおかしくなってしまいます．
+
+例::
+
+    json_serializer = serializers.get_serializer("json")
+    json_serializer.serialize(queryset, ensure_ascii=False, stream=response)
 
 .. _Writing custom serializers:
 

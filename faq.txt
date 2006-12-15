@@ -2,7 +2,7 @@
 Django についてよくある質問
 ===========================
 
-:revision-up-to: 3541 (release 0.95+)
+:revision-up-to: 3918 (release 0.95+)
 
 .. contents::
 
@@ -27,10 +27,17 @@ WorldOnline では，効果的な Web アプリケーションを，ジャーナリズムとして成立
 
 こうした理由から Django は Web アプリケーションをただ素早く作れるだけではな
 く，Web 開発の *王道* に従って作成できるように設計されているのです．
+2003 年，WorldOnline の開発者 (Adrian Holovaty と Simon Willison) は PHP に
+見切りをつけ， Python による Web 開発に取り組みはじめました．集約的で高い双
+方向性を備えた Lawrence.com のようなサイト開発の中で，彼らは Web アプリケー
+ションをより迅速に開発できるように，サイトのコードから汎用の Web 開発フレー
+ムワークを切り出し， 2 年近くの間ずっと改良を加えながら使い込んできました．
 
-Django は `Apache`_, `Python`_, そして `PostgreSQL`_ をはじめとする様々なオー
-プンソースプロジェクトなしでは実現しませんでした．そして今，私達はオープン
-ソースコミュニティに多少なりともお返しできることにワクワクしているのです．
+2005 年の夏， World Online はこれまでの開発の成果を Django としてオープンソー
+ス化する決定を下しました． Django は `Apache`_, `Python`_, そして
+`PostgreSQL`_ をはじめとする様々なオープンソースプロジェクトなしでは実現し
+ませんでした．そして今，私達はオープンソースコミュニティに多少なりともお返
+しできることにワクワクしているのです．
 
 .. _Apache: http://httpd.apache.org/
 .. _Python: http://www.python.org/
@@ -60,7 +67,7 @@ Django は **JANG**-oh ('a' は伸ばす) と発音します．韻は FANG-oh と
 Django は安定していますか？
 ---------------------------
 
-はい． World Online は私達は 2 年以上にわたって Django を使ってきました．
+はい． World Online は私達は 3 年以上にわたって Django を使ってきました．
 Django で構築したサイトは，これまでに 100 万ヒット／時を超えるトラフィック
 スパイクに見舞われたことがあり，何度もスラッシュドット効果を喰らっています．
 そうですね．きわめて安定です．
@@ -125,13 +132,14 @@ Web 部門である `World Online`_ で開発されました．
     IRC では ``SimonW`` と名乗っています．
 
 `Wilson Miner`_
-    Wilson のデザイン術は，私達をロックスターに仕立てあげてしまいます．アパー
-    トにあるスイミングプールに潜っていないときは，彼は World Online のコマー
-    シャル開発部長です．つまりは私達みんなの給料を払うためのお金を作ってい
-    るわけです．カンザス州ローレンス在住です．
+    Wilson のデザイン術は，私達をロックスターに仕立てあげてしまいます．日中
+    は `Apple`_ のインタラクティブデザイナを勤めています．でも Apple で何を
+    やっているか聞いてはいけません．そんなことをしたら，彼にシメられちゃい
+    ますよ．サンフランシスコ在住です．
 
     IRC では ``wilsonian`` と名乗っています．
 
+.. _`Apple`: http://www.apple.com/
 .. _`World Online`: http://code.djangoproject.com/wiki/WorldOnline
 .. _`Adrian Holovaty`: http://www.holovaty.com/
 .. _`washingtonpost.com`: http://www.washingtonpost.com/
@@ -232,7 +240,7 @@ Django を書き始めた約 2 年前， Adrian と Simon は少し時間を取って当時利用で
 ----------------------------------------------------
 
 現在進行中だということだけは断言できます．がしかし，私達はまだ Django を改
-良している真最中なので，現状ではなく Django 1.0 になったときの最終的な状態
+良している真最中なので，現状ではなく， Django 1.0 になったときの最終的な状態
 を反映させたいと思っています．言い方を変えれば， Django API はまだ変化する
 かもしれないので，それまではスクリーンキャストにまださほどエネルギーを使い
 たくないということです．
@@ -270,10 +278,8 @@ Django はコンテンツ管理システム (CMS) なのでしょうか?
 いつになったら Django 1.0 をリリースするのですか？
 --------------------------------------------------
 
-短い答え: Django API に満足し， "1.0" になるのに必要と思われる全ての機能を
-追加し，以前のバージョンとの互換性を維持できるようになりはじめた時点，です．
-これには 2 ヵ月ばかりかかりますが，もう少し早くなるかも知れません．
-そうすると，2006 年夏ということになるでしょうか．
+短い答え: Django の API 構成に問題がなくなり， "1.0" に必要と考えている全て
+の機能を追加し，以前のバージョンとの互換性を維持できるようになった時点，です．
 
 Django の `magic-removal ブランチ`_ のマージにより，Django 1.0 への道のりは
 大分進みました．
@@ -337,7 +343,7 @@ Django 開発者はどこで雇えますか？
 .. _`コードをダウンロード`: http://www.djangoproject.com/download/
 .. _`インストールガイド`: install.html
 .. _`チュートリアル`:  tutorial01.html
-.. _`ドキュメント`: index.html
+.. _`ドキュメント`: ./index.html
 .. _`質問`: http://www.djangoproject.com/community/
 
 .. _`Download the code`: http://www.djangoproject.com/download/
@@ -379,6 +385,20 @@ Django をデータベースと合わせて使うならデータベースエンジンも必要です．
 .. _MySQL: http://www.mysql.com/
 .. _`SQLite 3`: http://www.sqlite.org/
 
+
+.. _Do I lose anything by using Python 2.3 versus newer Python versions, such as Python 2.5?:
+
+Python 2.3 を使うのは， 2.5 のような新しいバージョンを使うよりも不利ですか？
+----------------------------------------------------------------------------
+
+いいえ． Django 自体は 2.3 以降全てのバージョンの Python で動作保証されてい
+ます．
+
+もちろん， 2.3 よりも新しい Python を使っていれば，自分のコードに新しい
+Python の機能を取り込めますし，Python 自体の改良によってもたらされた高速化
+や最適化の恩恵を受けられます．ただし， Django フレームワーク自体は， 2.3 で
+も 2.4 や 2.5 でも同じように動作します．
+
 .. _Do I have to use mod_python?:
 
 mod_python を使わねばならないのでしょうか？
@@ -416,8 +436,8 @@ Windows への mod_python のインストール方法は？
     * また， (Windows に限らず) `guide to getting mod_python
       working`_ を読んで下さい．
 
-+.. _`Python 2.4 向け mod_python の win32 ビルド`: http://www.lehuen.com/nicolas/index.php/2005/02/21/39-win32-build-of-mod_python-314-for-python-24
-+.. _`Windows での Django HOWTO`: http://thinkhole.org/wp/2006/04/03/django-on-windows-howto/
+.. _`Python 2.4 向け mod_python の win32 ビルド`: http://www.lehuen.com/nicolas/index.php/2005/02/21/39-win32-build-of-mod_python-314-for-python-24
+.. _`Windows での Django HOWTO`: http://thinkhole.org/wp/2006/04/03/django-on-windows-howto/
 .. _`guide to mod_python & Python 2.3`: http://www.lehuen.com/nicolas/index.php/2005/02/21/39-win32-build-of-mod_python-314-for-python-24
 .. _`Running mod_python on Apache on Windows2000`: http://groups-beta.google.com/group/comp.lang.python/msg/139af8c83a5a9d4f
 .. _`guide to getting mod_python working`: http://www.dscpl.com.au/articles/modpython-001.html
@@ -777,6 +797,17 @@ admin サイトでユーザを作成したいのなら， Django の開発版を使ってください．
 
 コードへの貢献
 ==============
+
+.. _How can I get started contributing code to Django?:
+
+Django プロジェクトにコードを寄贈したいんですが，どうすればよいですか？
+-----------------------------------------------------------------------
+
+よくぞ聞いてくれました！まさにこの質問に答えるためのドキュメントを用意して
+あります． `Django プロジェクトへの貢献`_ という文書です．
+
+.. _`Django プロジェクトへの貢献`: contributing.html
+.. _Contributing do Django: http://www.djangoproject.com/documentation/contributing/
 
 .. _I submitted a bug fix in the ticket system several weeks ago. Why are you ignoring my patch?:
 

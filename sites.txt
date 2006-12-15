@@ -2,7 +2,7 @@
 "sites" フレームワーク
 ======================
 
-:revision-up-to: 3491 (release 0.95)
+:revision-up-to: 3687 (release 0.95+)
 
 Django にはオプションとして使える "sites" フレームワークが付属しています．
 "sites" はオブジェクトや機能を特定の Web サイトに関連付けるためのフックであ
@@ -286,7 +286,19 @@ Django の ``get_absolute_url()`` は，オブジェクトの URL をドメイン名なしで
 ``CurrentSiteManager`` を使って，存在しないフィールド名を渡そうとすると，
 Django は ``ValueError`` を送出します．
 
+``CurrentSiteManager`` を使っていたとしても，結局は (サイト固有でない) 通常
+の ``Manager`` をモデル内に持っておく必要に迫られるでしょう．
+`マネジャのドキュメント`_ でも説明しましたが，手動でマネジャを定義すると，
+Django は ``objects = models.Manager()`` を使った自動マネジャ生成を行わなく
+なるからです．また， Django の一部 (例えば admin サイトや汎用ビュー) では，
+モデル内で *最初に定義されている* マネジャを常に使うようになっています．そ
+のため， admin サイトから全てのオブジェクトにアクセスしたい (サイト固有のフィ
+ルタリングを行わない) 場合には，モデル内で ``objects = models.Manager()``
+を ``CurrentSiteManager`` の定義より前に配置しておかねばなりません．
+
+
 .. _`マネジャ`: model_api.html#managers
+.. _`マネジャのドキュメント`: model_api.html#managers
 .. _manager: http://www.djangoproject.com/documentation/model_api/#managers
 
 .. _How Django uses the sites framework:

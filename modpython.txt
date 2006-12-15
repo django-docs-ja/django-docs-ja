@@ -2,7 +2,7 @@
 mod_python で Django を動かす
 =============================
 
-:revision-up-to: 3491 (release 0.95)
+:revision-up-to: 3943 (release 0.95+)
 
 Django をプロダクションサーバ上で動かす設定として，現状では Apache_ と
 `mod_python`_ の組み合わせを推奨しています．
@@ -47,6 +47,11 @@ mod_python モジュールが有効になっていることを確かめます．
 処理には Django mod_python ハンドラを使うように」命令します．また，
 ``DJANGO_SETTINGS_MODULE`` を渡して， mod_python にどこに設定ファイルがある
 のか教えます．
+
+上の例では ``<Directory>``  ではなく ``<Location>`` ディレクティブを使って
+います．前者はファイルシステム上の場所を指定するのに使い，後者はウェブサイ
+トのURL 構造上の場所を指定するのに使います．従って， ``<Directory>`` を使っ
+た指定は意味をなさないのです．
 
 また， Django プロジェクトを ``PYTHONPATH`` に追加するよう設定している場合
 には，以下のような設定を mod_python に教えておく必要があります::

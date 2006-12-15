@@ -2,7 +2,7 @@
 "contrib" 下のアドオン
 =========================
 
-:revision-up-to: 3541 (release 0.95+)
+:revision-up-to: 4168 (release 0.95+)
 
 Django は Python の `"batteries included" 哲学`_ を目指しています． Django
 には Web 開発における課題を解くための様々な外部オプションツールがついてきま
@@ -52,6 +52,24 @@ csrf
 
 .. _`csrf のドキュメント`: csrf.html
 .. _csrf documentation: http://www.djangoproject.com/documentation/csrf/
+
+formtools
+=========
+
+**開発版の Django で新たに追加された機能です**
+
+Django の新しいフォーム (django.newforms) に対する高水準の抽象化インタフェー
+スです．
+
+django.contrib.formtools.preview
+--------------------------------
+
+「 HTML フォームを表示し，必ずプレビューを行ってからフォームデータを提出す
+る」というワークフローを抽象化したものです．
+
+この機能に関するドキュメントはまだありませんが，
+``django/contrib/formtools/preview.py`` のコードや docstring を手引きすると
+よいでしょう．
 
 humanize
 ========
@@ -177,6 +195,16 @@ sites
 
 .. _`sites のドキュメント`: sites.txt
 .. _sites documentation: http://www.djangoproject.com/documentation/sites/
+
+sitemaps
+========
+
+Google サイトマップ XML ファイルを生成するためのフレームワークです．
+
+`sitemaps のドキュメント`_ を参照してください．
+
+.. _sitemaps documentation: http://www.djangoproject.com/documentation/sitemaps/
+.. _`sitemaps のドキュメント`: sitemaps.html
 
 
 syndication

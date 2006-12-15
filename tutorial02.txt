@@ -2,10 +2,10 @@
 はじめての Django アプリ作成，その 2
 =====================================
 
-:revision-up-to: 3491 (release 0.95)
+:revision-up-to: 3936 (release 0.95+)
 
 このチュートリアルは `チュートリアルその 1`_ の続きです．ここでは，引続き
-Web 投票アプリケーションの開発を例にして，Djang が自動生成する管理サイト
+Web 投票アプリケーションの開発を例にして，Django が自動生成する管理サイト
 (admin サイト) を焦点に解説します．
 
 .. _`チュートリアルその 1`: tutorial01.html
@@ -13,9 +13,9 @@ Web 投票アプリケーションの開発を例にして，Djang が自動生成する管理サイト
 
 .. admonition:: 設計哲学
 
-    コンテンツの追加や変更，削除を行うための admin サイトをスタッフや顧客向
-    けに作る作業は，創造性の欠けた退屈なものです．そこで， Django ではモデ
-    ルを管理するための admin インタフェースを完全に自動化しています． 
+    コンテンツの追加や変更，削除を行うためのスタッフや顧客向けの admin サイ
+    ト構築は，創造性の欠けた退屈なものです．そこで， Django ではモデルを管
+    理するための admin インタフェースを完全に自動化しています．
 
     Django はニュースルーム環境で開発されました．ニュースルーム環境では，
     「コンテンツの作成者 (content publisher)用」と「公開用 (public) 」サイ
@@ -24,7 +24,7 @@ Web 投票アプリケーションの開発を例にして，Djang が自動生成する管理サイト
     ます． Django は，サイト管理者向けの一元化されたコンテンツ編集インタフェー
     スの提供という問題を解決しているのです．
 
-    admin は必ずしもサイトを訪れる人に使ってもらうためのものではありません．
+    admin は一般のサイトを訪問者に使ってもらうためのものではなく，
     サイト管理者のためのものなのです．
 
 .. _Activate the admin site:
@@ -435,16 +435,17 @@ admin サイトは，それ自身 Django で作られているので，インタフェースは Django
 Django に自作テンプレートの置き場所を教えましょう::
 
     TEMPLATE_DIRS = (
-        "/home/mytemplates", # 自分の環境に合わせて変更してください．
+        "/home/my_username/mytemplates", # 自分の環境に合わせて変更してください．
     )
 
 デフォルトの Django admin サイト用テンプレート置場
 (``django/contrib/admin/templates``) から， ``admin/base_site.html`` という
 テンプレートをコピーして， ``TEMPLATE_DIRS`` 上の ``admin`` というディレク
-トリ下に置きます．例えば， ``TEMPLATE_DIRS`` に ``"/home/mytemplates"`` と
-設定していれば， ``django/contrib/admin/templates/admin/base_site.html`` を
-``/home/mytemplates/admin/base_site.html`` にコピーします． ``admin`` とい
-うサブディレクトリを作るのを忘れないようにして下さい．
+トリ下に置きます．例えば， ``TEMPLATE_DIRS`` に 
+``"/home/my_username/mytemplates"`` と 設定していれば， 
+``django/contrib/admin/templates/admin/base_site.html`` を
+``/home/my_username/mytemplates/admin/base_site.html`` にコピーします． 
+``admin`` というサブディレクトリを作るのを忘れないようにして下さい．
 
 ファイルを編集して， Django と書かれた部分を自分のサイト名に変え， URL もふ
 さわしいものに変更してください．

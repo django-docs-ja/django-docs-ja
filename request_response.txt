@@ -2,7 +2,7 @@
 リクエストオブジェクトとレスポンスオブジェクト
 ==============================================
 
-:revision-up-to: 3562 (release 0.95+)
+:revision-up-to: 3918 (release 0.95+)
 
 .. _`Quick overview`:
 
@@ -365,9 +365,9 @@ Django によって自動生成される ``HttpRequest`` オブジェクトとは対象的に，
 メソッド
 --------
 
-``__init__(content='', mimetype=DEFAULT_MIME_TYPE)``
+``__init__(content='', mimetype=DEFAULT_CONTENT_TYPE)``
     指定のページコンテンツ (文字列) と MIME タイプで ``HttpResponse`` オブ
-    ジェクトをインスタンス化します． ``DEFAULT_MIME_TYPE`` は
+    ジェクトをインスタンス化します． ``DEFAULT_CONTENT_TYPE`` は
     ``'text/html'`` です．
 
     ``content`` はイテレータまたは文字列にできます．イテレータにする場合，

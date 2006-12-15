@@ -2,7 +2,7 @@
 Django でのユーザ認証
 =============================
 
-:revision-up-to: 3491 (release 0.95)
+:revision-up-to: 3962 (release 0.95+)
 
 Django にはユーザ認証システムがついてきます． Django のユーザ認証システムは，
 ユーザアカウント，グループ，パーミッションとクッキーベースのユーザセッショ
@@ -76,8 +76,8 @@ API リファレンス
       `パスワード`_ の節を参照して下さい． 
     * ``is_staff`` -- Bool 値です．この値が真なら，ユーザは admin サイトに
       アクセスできます．
-    * ``is_active`` -- Bool 値です．この値が真なら，ユーザは admin サイトに
-      ログインできます．アカウントを削除する代わりに，この値を ``False`` に
+    * ``is_active`` -- Bool 値です．この値が真なら，ログインにこのアカウン
+      トを使えます．アカウントを削除する代わりに，この値を ``False`` に
       設定してください． 
     * ``is_superuser`` -- Bool 値です．この値が真なら，ユーザは明示的な指定
       がなくても全てのパーミッションを得ます．
@@ -94,14 +94,14 @@ API リファレンス
 の `Django モデル`_ と同じようにして，関連づけされたオブジェクトにアクセス
 できます::
 
-    myuser.objects.groups = [group_list]
-    myuser.objects.groups.add(group, group,...)
-    myuser.objects.groups.remove(group, group,...)
-    myuser.objects.groups.clear()
-    myuser.objects.permissions = [permission_list]
-    myuser.objects.permissions.add(permission, permission, ...)
-    myuser.objects.permissions.remove(permission, permission, ...]
-    myuser.objects.permissions.clear()
+    myuser.groups = [group_list]
+    myuser.groups.add(group, group,...)
+    myuser.groups.remove(group, group,...)
+    myuser.groups.clear()
+    myuser.permissions = [permission_list]
+    myuser.permissions.add(permission, permission, ...)
+    myuser.permissions.remove(permission, permission, ...]
+    myuser.permissions.clear()
 
 自動的に生成されるこれらの API に加え， ``User`` オブジェクトには以下のカス
 タムメソッドがあります:
@@ -111,7 +111,10 @@ API リファレンス
       ``is_authenticated()`` メソッドを使うようにしてください．
 
     * ``is_authenticated()`` -- 常に ``True`` を返します．ユーザを認証済み
-      かどうかを調べる一つの方法です．
+      かどうかを調べる一つの方法です．このメソッドの戻り値は，ユーザが正し
+      いパーミッションを持っているか，あるいはアクティブなユーザであるかど
+      うかに関係なく，ユーザが正しいユーザ名とパスワードを入力したことだけ
+      を示します．
 
     * ``get_full_name()`` -- ``first_name`` と ``last_name`` をスペースでつ
       なげた文字列を返します． 
@@ -132,14 +135,17 @@ API リファレンス
     * ``has_perm(perm)`` -- ユーザが特定のパーミッションを持っている場合に
       ``True`` を返します． パーミッション名 perm は ``"package.codename"``
       のような形式で表します．
+      ユーザがアクティブでない場合，このメソッドは常に ``False`` を返します．
 
     * ``has_perms(perm_list)`` -- ユーザが perm_list 内のパーミッションのい
       ずれかを持っている場合に ``True`` を返します．各々のパーミッション名
       は ``"package.codename"`` のような形式で表します． 
+      ユーザがアクティブでない場合，このメソッドは常に ``False`` を返します．
 
     * ``has_module_perms(package_name)`` -- ユーザが指定のパッケージ名
       (Django アプリケーションラベル: Django app label) の何らかのパーミッ
       ションを持っていれば ``True`` を返します．
+      ユーザがアクティブでない場合，このメソッドは常に ``False`` を返します．
 
     * ``get_and_delete_messages()`` -- ユーザのキューに入っているメッセージ
       を返し，入っていたメッセージをキューから取り除きます．
@@ -326,7 +332,10 @@ Django では， ``django.contrib.auth`` の中で， ``authenticat()`` と
     from django.contrib.auth import authenticate
     user = authenticate(username='john', password='secret')
     if user is not None:
-        print "You provided a correct username and password!"
+        if user.is_active:
+            print "You provided a correct username and password!"
+        else:
+            print "Your account has been disabled!"
     else:
         print "Your username and password were incorrect."
 
@@ -346,18 +355,20 @@ Django では， ``django.contrib.auth`` の中で， ``authenticat()`` と
         password = request.POST['password']
         user = authenticate(username=username, password=password)
         if user is not None:
-            login(request, user)
-            # Redirect to a success page.
+            if user.is_active:
+                login(request, user)
+                # Redirect to a success page.
+            else:
+                # Return a 'disabled account' error message
         else:
             # Return an error message.
-
 
 .. _How to log a user out:
 
 ユーザをログアウトさせる
 ------------------------
 
-``django.contrib.auth.login()`` でログインすたユーザをログアウトさせるには，
+``django.contrib.auth.login()`` でログインしたユーザをログアウトさせるには，
 ビューの中で ``django.contrib.auth.logout()`` を使ってください．この関数は，
 ``HttpRequest`` オブジェクトを引数に取り，戻り値を持ちません．例を以下に示
 します::
@@ -373,8 +384,8 @@ Django では， ``django.contrib.auth`` の中で， ``authenticat()`` と
 
 .. _Limiting access to logged-in users:
 
-アクセスをログインユーザだけに制限する
----------------------------------------
+ログインユーザだけがアクセスできるように制限をかける
+----------------------------------------------------
 
 .. _The raw way:
 
@@ -498,8 +509,8 @@ Python 2.4 で登場したよりコンパクトなデコレータ構文を使った例を以下に示しま
 
 .. _Limiting access to logged-in users that pass a test:
 
-アクセスをテストにパスしたログインユーザだけに制限する
----------------------------------------------------------
+テストにパスしたログインユーザだけがアクセスできるように制限をかける
+--------------------------------------------------------------------
 
 特定のパーミッションやその他のテストの結果に応じたアクセスの制限には，前節
 で説明したの本質的に同じことをします．
@@ -521,6 +532,10 @@ Python 2.4 で登場したよりコンパクトなデコレータ構文を使った例を以下に示しま
     def my_view(request):
         # ...
     my_view = user_passes_test(lambda u: u.has_perm('polls.can_vote'))(my_view)
+
+ここでは，簡単な例としてパーミッションのテストに ``user_passes_test`` を使っ
+ていますが，単にあるユーザがあるパーミッションを有しているかをテストしたい
+だけなら，後で解説する ``permission_required()`` デコレータを使えます．
 
 Python 2.4 のデコレータ構文ならこうなります::
 
@@ -555,6 +570,36 @@ Python 2.4 風の構文で例を書くと以下のようになります::
     def my_view(request):
         # ...
 
+.. _The permission_required decorator:
+
+permission_required デコレータ
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+あるユーザが特定のパーミッションを有しているかのチェックは，比較的よくある
+操作なので， Django はショートカットとして ``permission_required()`` という
+デコレータを用意しています．このデコレータを使うと，上の例は以下のように書
+き直せます::
+
+    from django.contrib.auth.decorators import permission_required
+     
+    def my_view(request):
+        # ...
+     
+    my_view = permission_required('polls.can_vote')(my_view)
+
+``permission_required()`` もまた， ``login_url`` を引数に取れます．例えば::
+
+    from django.contrib.auth.decorators import permission_required
+
+    def my_view(request):
+        # ...
+    my_view = permission_required('polls.can_vote', login_url='/loginpage/')(my_view)
+
+``login_required`` デコレータと同様， ``login_url`` のデフォルト値は
+``'/accounts/login/'`` です．
+
+
+.. _Limiting access to generic views:
 
 アクセスを汎用ビューに制限する
 ------------------------------
@@ -807,7 +852,7 @@ API リファレンス
     {% if messages %}
     <ul>
         {% for message in messages %}
-        <li>{{ message.message }}</li>
+        <li>{{ message }}</li>
         {% endfor %}
     </ul>
     {% endif %}

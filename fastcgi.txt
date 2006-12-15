@@ -2,7 +2,7 @@
 FastCGI で Django を使う
 ========================
 
-:revision-up-to: 3491 (release 0.95)
+:revision-up-to: 3761 (release 0.95+)
 
 Django を動作させる構成として `現在推奨されている`_ のは， Apache_ と
 `mod_python`_ の組合せですが，多くの人々が共有ホスティングサービスを使って
@@ -207,7 +207,7 @@ URL を ``mysite.fcgi`` (または ``FastCGIExternalServer`` ディレクティブに指
       RewriteEngine On
       RewriteRule ^/(media.*)$ /$1 [QSA,L]
       RewriteCond %{REQUEST_FILENAME} !-f
-      RewriteRule ^/(.*)$ /mysite.fcgi/$1 [QSA,L]
+      RewriteRule ^(.*)$ mysite.fcgi/$1 [QSA,L]
     </VirtualHost>
 
 .. _mod_rewrite: http://httpd.apache.org/docs/2.0/mod/mod_rewrite.html
@@ -322,7 +322,7 @@ Web コンテンツのルートディレクトリ下に，以下のような内容のファイルを
     os.environ['DJANGO_SETTINGS_MODULE'] = "myproject.settings"
 
     from django.core.servers.fastcgi import runfastcgi
-    runfastcgi(["method=threaded", "daemonize=false"])
+    runfastcgi(method="threaded", daemonize="false")
 
 起動中のサーバを際起動する
 --------------------------

@@ -2,7 +2,7 @@
 フォームとフィールド，マニピュレータ
 ====================================
 
-:revision-up-to: 3491 (release 0.95)
+:revision-up-to: 4084 (release 0.95+)
 
 Django の admin インタフェースをいじってみたことがあるなら， admin インタ
 フェースで使われている素敵なフォーム検証フレームワークをユーザコードでも使
@@ -228,7 +228,7 @@ POST されたデータを受け取って新たな ``Place`` オブジェクトを生成する，非常
     def create_place(request):
         manipulator = Place.AddManipulator()
 
-        if request.POST:
+        if request.method == 'POST':
             # If data was POSTed, we're trying to create a new Place.
             new_data = request.POST.copy()
 
@@ -329,7 +329,7 @@ POST されたデータを受け取って新たな ``Place`` オブジェクトを生成する，非常
         # Grab the Place object in question for future use.
         place = manipulator.original_object
 
-        if request.POST:
+        if request.method == 'POST':
             new_data = request.POST.copy()
             errors = manipulator.get_validation_errors(new_data)
             if not errors:
@@ -341,7 +341,7 @@ POST されたデータを受け取って新たな ``Place`` オブジェクトを生成する，非常
         else:
             errors = {}
             # This makes sure the form accurate represents the fields of the place.
-            new_data = place.__dict__
+            new_data = manipulator.flatten_data()
 
         form = forms.FormWrapper(manipulator, new_data, errors)
         return render_to_response('places/edit_form.html', {'form': form, 'place': place})
@@ -355,10 +355,10 @@ POST されたデータを受け取って新たな ``Place`` オブジェクトを生成する，非常
     * ``ChangeManipulator.original_object`` には編集対象のオブジェクトのイ
       ンスタンスが入っています．
 
-    * 元のオブジェクトの ``__dict__`` を ``new_data`` に設定します．これに
-      よって，フォームの各フィールドにはオブジェクトの現在の値が入ります．
-      ``FormWrapper`` もテンプレートも ``new_data`` を一切変更しないので，
-      極めて安全です．
+    * マニピュレータの ``flatten_data()`` を使って ``new_data`` を設定しま
+      す． ``flatten_data()`` はマニピュレーション中の元のオブジェクトから
+      データを取り出し，辞書データ型に変換して，フォームの各フィールドにオ
+      ブジェクトの現在の値を入れられるようにします．
 
     * 上の例では別のテンプレートを使っているので，オブジェクトの生成と編集
       は必要なら別の「スキン」にできます．しかしフォームを生成するためのチャ
@@ -412,7 +412,7 @@ Django のモデルとの類似性が見て取れます．自作のマニピュレータで必要なメソッ
 
     def contact_form(request):
         manipulator = ContactManipulator()
-        if request.POST:
+        if request.method == 'POST':
             new_data = request.POST.copy()
             errors = manipulator.get_validation_errors(new_data)
             if not errors:
@@ -509,6 +509,37 @@ Django のモデルとの類似性が見て取れます．自作のマニピュレータで必要なメソッ
 また，ユーザインタフェースの一貫性を保つため，バリデーションメッセージの末
 尾には読点を入れておくよう強く勧めます．
 
+.. _When Are validators Called?:
+
+バリデータはいつ呼び出されるのか
+--------------------------------
+
+ユーザがフォームを提出すると， Django はまず必須のフィールドのデータが存在
+し，なおかつ空になっていないか調べます．次に，最初のテストにパスしたフィー
+ルドで， *提出されたフォームのデータに，フィールドのデータが入っている場合*
+，そのフィールドの全てのバリデータを順に実行します．繰り返し強調すると，
+フォーム中のあるフィールドが提出されなかった場合 (データが入っていなかった
+場合，通常はそうなります)，そのフィールドに対するバリデータは実行されないの
+です．
+
+この仕様は， ``models.BooleanField`` を使ってモデルを作成する場合や，
+``forms.CheckBoxField`` のようなフォームを使ってカスタムのマニピュレータを
+作成する場合にはとりわけ重要な問題です．というのも，チェックボックスを
+選択しなければ，そのフィールドの情報は提出されたフォーム内に含まれないから
+です．
+
+フィールドにデータが入っているかどうかに関わらず， *常に* バリデータを実行
+したいのなら，バリデータ関数に ``always_test`` 属性を設定してください．例え
+ば::
+
+    def my_custom_validator(field_data, all_data):
+        # ...
+
+    my_custom_validator.always_test = True
+
+このように書いておくと，このバリデータを使っているフォームでは，常にこのバ
+リデータによるチェックが実行されます．
+
 .. _Ready-made Validators:
 
 既成のバリデータ
@@ -584,7 +615,7 @@ Django のモデルとの類似性が見て取れます．自作のマニピュレータで必要なメソッ
 
 ``ValidateIfOtherFieldEquals``
     三つのパラメタ， ``other_field``, ``other_value`` および 
-    ``validator_list`` をとります． ``other_field`` の値が ``other_vaue``
+    ``validator_list`` をとります． ``other_field`` の値が ``other_value``
     の場合，現在のフィールドに対して  ``validator_list`` に指定した全ての
     バリデータを適用します．
 
@@ -615,6 +646,16 @@ Django のモデルとの類似性が見て取れます．自作のマニピュレータで必要なメソッ
     較を行う場合には注意して下さい．例えば， "123" という文字列は "2" より
     も小さいとみなされます．文字列比較をしたくないのなら，自分でバリデータ
     を実装せねばなりません．
+
+``NumberIsInRange``
+    二つの境界値  ``lower`` と ``upper`` を引数にとり，フィールドの値が
+    ``lower`` より大きく ``upper`` より小さいかどうか検証します．
+    
+    値の範囲は包含的 (inclusive) です．従って，
+    ``NumberIsInRange(10, 20)`` は 10 や 20 といった値を正しい値とみなしま
+    す．このバリデータは数値型のフィールド (浮動小数や整数のフィールド) で
+    しか使えません．
+
 
 ``IsAPowerOf``
     整数の引数をとり，フィールドの値が指定値のべき乗であるか検証します．

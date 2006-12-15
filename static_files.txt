@@ -2,7 +2,7 @@
 静的なファイルの提供方法
 ========================
 
-:revision-up-to: 3491 (release 0.95)
+:revision-up-to: 3953 (release 0.95+)
 
 Django 自体では，画像やスタイルシート，ビデオといった静的な (メディア) ファ
 イルを提供しません．通常， Django はメディアファイルの提供を使っている Web
@@ -39,7 +39,7 @@ Django 自体では，画像やスタイルシート，ビデオといった静的な (メディア) ファ
 
 URLconf_ に以下の設定を入れます::
 
-    (r'^site_media/(.*)$', 'django.views.static.serve', 
+    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', 
      {'document_root': '/path/to/media'}),
 
 ``site_media`` はメディアファイル置場のルートの URL にします．
@@ -74,7 +74,7 @@ Django はディレクトリに対して内容リストを表示します．
 
 例::
 
-    (r'^site_media/(.*)$', 'django.views.static.serve', 
+    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', 
      {'document_root': '/path/to/media', 'show_indexes': True}),
 
 ``static/directory_index`` テンプレートを変更すれば， index ビューをカスタ

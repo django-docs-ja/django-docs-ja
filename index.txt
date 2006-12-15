@@ -7,7 +7,7 @@ Django オンラインドキュメント和訳
 底本
     SVN trunk (release 0.95+)
 追従済みリビジョン
-    3608
+    4203 (2006/12/15)
 
 必読
 ----------
@@ -60,6 +60,8 @@ Django オンラインドキュメント和訳
 `フォームとマニピュレータ
 (Forms, fields, and manipulators) <forms.html>`__
 
+`newforms ライブラリ <newforms.html>`__ **preliminary**
+
 `セッション (Sessions) <sessions.html>`__
 
 `キャッシュ (Django's Cache Framework) <cache.html>`__
@@ -91,6 +93,8 @@ Django オンラインドキュメント和訳
 
   `サイト (Sites) <sites.html>`__
 
+  `サイトマップ (Sitemaps) <sitemaps.html>`__
+
 
 運用関連
 --------
@@ -102,7 +106,7 @@ Django オンラインドキュメント和訳
 特殊な話題
 ----------
 
-`Apache から Django のユーザデータベースに対する認証を行う
+`Apache での認証に Django ユーザデータベースを使う
 (Authenticating against Django's user database from Apache) <apache_auth.html>`__
 
 `静的ファイルの提供方法 (Serving static/media files) <static_files.html>`__
@@ -117,6 +121,8 @@ Django オンラインドキュメント和訳
 `動的な CSV の生成 (Outputting CSV dynamically) <outputting_csv.html>`__
 
 `Django オブジェクトのシリアライズ (Serializing Django objects) <serialization.html>`__
+
+`Django アプリケーションのテスト (Writing tests for Django applications) <testing.html>`__
 
 その他
 ------

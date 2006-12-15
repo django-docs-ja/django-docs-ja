@@ -2,7 +2,7 @@
 Django の概要
 =============
 
-:revision-up-to: 3491 (release 0.95)
+:revision-up-to: 3676 (release 0.95+)
 
 Django は変転の激しいニュースルーム環境で開発された経緯から，よくある
 Web 開発タスクを迅速かつ簡単化するように設計されました．ここでは Django に
@@ -177,7 +177,7 @@ admin インタフェースの作成は簡単で，モデルクラスに一行書き加えるだけです::
 URL のパターンを Python のコールバック関数に対応づけています． URLconf はま
 た， URL を Python コードと脱カップリングする働きを持っています．
 
-上の ``Reporter``/``Article`` の例では， URLconf は以下のようになります::
+``Reporter``/``Article`` の例では， URLconf は以下のようになります::
 
     from django.conf.urls.defaults import *
 

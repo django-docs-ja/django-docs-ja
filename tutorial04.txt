@@ -2,7 +2,7 @@
 はじめての Django アプリ作成，その 4
 =====================================
 
-:revision-up-to: 3491 (release 0.95)
+:revision-up-to: 3953 (release 0.95+)
 
 このチュートリアルは `チュートリアルその 3`_ の続きです．ここでは，引続き
 Web 投票アプリケーションの開発を例にして，簡単なフォーム処理とコードの縮小
@@ -55,7 +55,7 @@ URLconf に入れたことを思い出しましょう::
 
     from django.shortcuts import get_object_or_404, render_to_response
     from django.http import HttpResponseRedirect
-    from mysite.polls.models. import Choice, Poll
+    from mysite.polls.models import Choice, Poll
     #...
     def vote(request, poll_id):
         p = get_object_or_404(Poll, pk=poll_id)
@@ -217,9 +217,9 @@ URLconf に入れたことを思い出しましょう::
 デフォルトでは， ``object_detail`` 汎用ビューは 
 ``<app name>/<model name>_detail.html`` という名前のテンプレートを使います．
 私達のアプリケーションでは，テンプレートの名前は
-``"polls/poll_detail.html"`` になります．そこで ``polls/detail.html`` テン
-プレートを  ``polls/poll_detail.html`` に変更し， ``render_to_response()``
-の行を ``vote()`` に変更します．
+``"polls/poll_detail.html"`` になります．そこで， ``vote()`` の
+``render_to_response()`` の行に書かれている ``polls/detail.html`` テンプレー
+トを  ``polls/poll_detail.html`` に変更します．
 
 同様に， ``object_list`` 汎用ビューも ``<app name>/<model name>_list.html``
 という名前のテンプレートを使うので， ``polls/index.html`` を

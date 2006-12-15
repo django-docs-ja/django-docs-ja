@@ -2,11 +2,11 @@
 Django の設定
 =============
 
-:revision-up-to: 3570 (release 0.95+)
+:revision-up-to: 4203 (release 0.95+)
 
 Django の設定ファイルには，インストールした Django の使う全ての設定が入って
 います．このドキュメントでは，各設定の役割と，どのような設定を利用できるか
-説明します．
+について説明します．
 
 .. _The basics:
 
@@ -296,6 +296,14 @@ DATABASE_NAME
 データベースの名前です． SQLite の場合は，データベースファイルへのフルパス
 です．
 
+DATABASE_OPTIONS
+----------------
+
+デフォルト値: ``{}`` (空の辞書)
+
+データベースに接続するときの追加のパラメタです．利用できるキーワードは個々
+のバックエンドモジュールのドキュメントを参照してください．
+
 DATABASE_PASSWORD
 -----------------
 
@@ -439,16 +447,6 @@ EMAIL_SUBJECT_PREFIX
 信するメールの題名に使われるプレフィクスです．末尾にはスペースを入れておいた
 方がよいでしょう．
 
-ENABLE_PSYCO
-------------
-
-デフォルト値: ``False``
-
-Python コードの最適化を行う Psyco を有効にするかどうかを決めます．この設定
-を行うには Psyco_ が必要です．
-
-.. _Psyco: http://psyco.sourceforge.net/
-
 IGNORABLE_404_ENDS
 ------------------
 
@@ -518,25 +516,36 @@ LANGUAGES
 ています::
 
     LANGUAGES = (
+        ('ar', _('Arabic')),
         ('bn', _('Bengali')),
         ('cs', _('Czech')),
         ('cy', _('Welsh')),
         ('da', _('Danish')),
         ('de', _('German')),
+        ('el', _('Greek')),
         ('en', _('English')),
         ('es', _('Spanish')),
+        ('es_AR', _('Argentinean Spanish')),
         ('fr', _('French')),
         ('gl', _('Galician')),
+        ('hu', _('Hungarian')),
+        ('he', _('Hebrew')),
         ('is', _('Icelandic')),
         ('it', _('Italian')),
+        ('ja', _('Japanese')),
+        ('nl', _('Dutch')),
         ('no', _('Norwegian')),
         ('pt-br', _('Brazilian')),
         ('ro', _('Romanian')),
         ('ru', _('Russian')),
         ('sk', _('Slovak')),
+        ('sl', _('Slovenian')),
         ('sr', _('Serbian')),
         ('sv', _('Swedish')),
+        ('ta', _('Tamil')),
+        ('uk', _('Ukrainian')),
         ('zh-cn', _('Simplified Chinese')),
+        ('zh-tw', _('Traditional Chinese')),
     )
 
 (言語コード, 言語名) の形式のタプルからなるタプルです．選択可能な言語を指定
@@ -571,7 +580,7 @@ import を引き起こしてしまうからです．
 MANAGERS
 --------
 
-デフォルト値: ``ADMINS`` (Whatever ``ADMINS`` is set to)
+デフォルト値: ``()`` (空のタプル)
 
 ``ADMINS`` と同じ形式のタプルで， ``SEND_BROKEN_LINK_EMAILS=True`` の時に壊
 れたリンクの通知を受けるメンバを指定します．
@@ -635,6 +644,17 @@ URL にサブドメイン名 "www." が付いていない場合に付加するかどうかを決めます．
 ``CommonMiddleware`` がインストールされている場合にのみ使われる設定です
 (`ミドルウェアのドキュメント`_ を参照してください)． ``APPEND_SLASH`` も参
 照してください．
+
+PROFANITIES_LIST
+----------------
+
+**開発バージョンの Django で新たに追加されました．**
+
+非道徳的な言葉 (profanity) のタプルです． ``hasNoProfanities`` バリデータが
+呼び出された際に，エラーを引き起こす単語のリストに使われます．
+
+デフォルト値はここでは示しません．不道徳な言葉が入っているからです．デフォ
+ルト値を見たければ， ``django/conf/global_settings.py`` を参照してください．
 
 ROOT_URLCONF
 ------------
@@ -811,6 +831,33 @@ TEMPLATE_STRING_IF_INVALID
 .. _`無効な変数の扱い`: templates_python.html#how-invalid-variables-are-handled
 .. _How invalid variables are handled: http://www.djangoproject.com/documentation/templates_python/#how-invalid-variables-are-handled
 
+TEST_RUNNER
+-----------
+
+**開発バージョンの Django で新たに追加されました．**
+
+デフォルト値: ``'django.test.simple.run_tests'``
+
+テストスイートを起動するためのメソッドの名前です．
+`Django アプリケーションのテスト`_ を参照してください．
+
+.. _Testing Django Applications: ../testing/
+.. _`Django アプリケーションのテスト`: ../testing.html
+
+
+TEST_DATABASE_NAME
+------------------
+
+**開発バージョンの Django で新たに追加されました．**
+
+デフォルト値: ``None``
+
+テストスイートを実行するときに使うデータベースの名前です． ``None`` にする
+と，データベースの名前は ``'test_'`` + ``settings.DATABASE_NAME`` になりま
+す． `Django アプリケーションのテスト`_ を参照してください．
+
+.. _Testing Django Applications: ../testing/
+
 
 TIME_FORMAT
 -----------
@@ -867,6 +914,18 @@ Django は ``TZ`` 環境変数を *操作しない* ので，ユーザは自分の責任でプロセス
 
 .. _`トランザクションのドキュメント`: transactions.html#how-to-globally-deactivate-transaction-management
 
+
+URL_VALIDATOR_USER_AGENT
+------------------------
+
+デフォルト値: ``Django/<version> (http://www.djangoproject.com/)``
+
+特定の URL が実在するかを Django が調べにゆく際に使う ``User-Agent`` ヘッダ
+の値です． (URLField_ の ``verify_exists`` を参照してください．)
+
+.. _URLField: ../model_api.html#urlfield
+
+
 USE_ETAGS
 ---------
 
@@ -916,7 +975,7 @@ MONTH_DAY_FORMAT も参照してください．
 .. _cache docs: http://www.djangoproject.com/documentation/cache/
 .. _middleware docs: http://www.djangoproject.com/documentation/middleware/
 .. _session docs: http://www.djangoproject.com/documentation/sessions/
-.. _`利用可能な選択肢`: http://www.postgresql.org/docs/current/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
+.. _`利用可能な選択肢`: http://www.postgresql.org/docs/8.1/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
 .. _See available choices: http://www.postgresql.org/docs/current/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
 .. _`テンプレートのドキュメント`: templates_python.html
 .. _template documentation: http://www.djangoproject.com/documentation/templates_python/
@@ -993,7 +1052,7 @@ Django は十分に扱いやすい設定値をデフォルト値にしていて，ほぼ問題なく利用で
 きます．新たなデフォルトモジュールを渡すと，そのモジュールは Django のデフォ
 ルトを *完全に* 置き換えてしまうため， import している側のコードで必要な全
 ての設定値を指定せねばならないので注意して下さい．設定の完全なリストは
-``django.conf.settings.global_settings`` にあります．
+``django.conf.global_settings`` にあります．
 
 .. _Either configure() or DJANGO_SETTINGS_MODULE is required:
 

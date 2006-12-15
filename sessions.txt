@@ -2,7 +2,7 @@
 セッションの使い方
 ===================
 
-:revision-up-to: 3570 (release 0.95+)
+:revision-up-to: 4127 (release 0.95+)
 
 Django では匿名セッション (anonymous session) を完全にサポートしています．
 セッションフレームワークを使うと，任意のデータをサイト訪問者単位
@@ -165,7 +165,7 @@ Django では匿名セッション (anonymous session) を完全にサポートしています．
 典型的な使用例を以下に示します::
 
     def login(request):
-        if request.POST:
+        if request.method == 'POST':
             if request.session.test_cookie_worked():
                 request.session.delete_test_cookie()
                 return HttpResponse("You're logged in.")
@@ -291,7 +291,7 @@ SESSION_COOKIE_SECURE
 セッションクッキーにセキュアなクッキーを使うかどうかを決めます．この値を
 ``True`` に設定すると，クッキーは "セキュア" にマークされます．クッキーがセ
 キュアにマークされると，ブラウザによっては HTTPS 接続でのみクッキーを転送す
-るようになります．詳しくは `セッションのドキュメント`_ を参照してください．
+るようになります．
 
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE
@@ -300,7 +300,6 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE
 Default: ``False``
 
 ブラウザを閉じたときにセッションを期限切れにするかどうかを決めます．
-`セッションのドキュメント`_ を参照してください．
 
 
 SESSION_SAVE_EVERY_REQUEST

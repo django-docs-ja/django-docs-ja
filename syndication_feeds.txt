@@ -2,7 +2,7 @@
 配信フィードフレームワーク
 ==========================
 
-:revision-up-to: 3491 (release 0.95)
+:revision-up-to: 4049 (release 0.95+)
 
 Django には高水準の配信フィード (syndication feed) 生成フレームワークがつい
 てきます．このフレームワークを使えば， RSS_ 形式や Atom_ 形式のフィードを簡
@@ -105,7 +105,7 @@ Feed クラス
     from django.contrib.syndication.feeds import Feed
     from chicagocrime.models import NewsItem
 
-    class SiteNewsFeed(Feed):
+    class LatestEntries(Feed):
         title = "Chicagocrime.org site news"
         link = "/sitenews/"
         description = "Updates on changes and additions to chicagocrime.org."
@@ -132,9 +132,9 @@ Feed クラス
 必要があります．
 
     * ``<title>`` や ``<description>`` の中身を指定するには，
-      ``feeds/sitenews_title.html`` または 
-      ``feeds/sitenews_description.html`` という名前の
-      `Django テンプレート`_ を作成します． ``sitenews`` は URLconf 中に指
+      ``feeds/latest_title.html`` または 
+      ``feeds/latest_description.html`` という名前の
+      `Django テンプレート`_ を作成します． ``latest`` は URLconf 中に指
       定しておいた，フィードの ``slug`` です．  ``.html`` 拡張子が必要なこ
       とに注意して下さい． RSS システムはこれらのテンプレートを各要素に対し
       てレンダリングします．このとき，二つのテンプレートコンテキスト変数を
@@ -159,6 +159,18 @@ Feed クラス
       のとき，メソッドにはオブジェクト自体を引数 ``item`` として渡します．
       ``get_absolute_url()`` や ``item_link()`` は，いずれも通常の Python
       文字列で URL を返さねばなりません．
+
+    * 上の LatestEntries の例では，以下のような簡単なフィードテンプレートに
+      できます::
+
+          * latest_title.html::
+
+             {{ obj.title }}
+
+          * latest_description.html::
+
+             {{ obj.description }}
+
 
 .. _chicagocrime.org: http://www.chicagocrime.org/
 .. _`Object-Relational マッパ`: db-api.html
@@ -747,7 +759,7 @@ item のうち，もっとも新しいものの ``pubdate`` を返します．最新の
     ...     title=u"My Weblog",
     ...     link=u"http://www.example.com/",
     ...     description=u"In which I write about what I ate today.",
-    ...     language=u"en"),
+    ...     language=u"en")
     >>> f.add_item(title=u"Hot dog today",
     ...     link=u"http://www.example.com/entries/1/",
     ...     description=u"<p>Today I had a Vienna Beef hot dog. It was pink, plump and perfect.</p>")

@@ -2,7 +2,7 @@
 Python プログラマのための Django テンプレート言語ガイド
 =======================================================
 
-:revision-up-to: 3608 (release 0.95+)
+:revision-up-to: 4084 (release 0.95+)
 
 このドキュメントでは， Django のテンプレートシステムを技術的な側面，すなわ
 ちどのように動作し，どうやって拡張するかという観点から解説します．テンプレー
@@ -99,7 +99,7 @@ Python でテンプレートを使うには，以下の 2 段階のプロセスを踏みます:
 ``django.template.Context`` にあります．コンテキストクラスのコンストラクタ
 は単一の (省略可能な) 引数として，変数名を変数の値に対応づける辞書をとりま
 す．コンテキストの値でテンプレートを「埋める」には， ``Template``  オブジェ
-クトの``render()`` メソッドを使います::
+クトの ``render()`` メソッドを使います::
 
     >>> from django.template import Context, Template
     >>> t = Template("My name is {{ my_name }}.")
@@ -219,9 +219,32 @@ Python でテンプレートを使うには，以下の 2 段階のプロセスを踏みます:
 無効な値の扱い
 ~~~~~~~~~~~~~~
 
-変数が存在しなければ， テンプレートシステムは
+基本的に，変数が存在しなければ， テンプレートシステムは
 ``TEMPLATE_STRING_IF_INVALID`` の設定値を挿入します．この値のデフォルトは
 ``''`` (空文字列) です．
+
+無効な値に対してフィルタが適用されるのは， ``TEMPLATE_STRING_IF_INVALID``
+の値が ``''`` に設定されている場合だけです． ``TEMPLATE_STRING_IF_INVALID``
+が ``''`` 以外の値になっていると，フィルタは無視されます．
+
+ただし， ``if``, ``for``, ``regroup`` といったテンプレートタグの中では，少
+し違った挙動になります．これらのテンプレートタグ中では，無効な値は ``None``
+であると解釈されます．また，これらのテンプレートタグ中のフィルタは，無効な
+値に対しも常に適用されます．
+
+.. admonition:: デバッグ専用です!
+
+    ``TEMPLATE_STRING_IF_INVALID`` はデバッグには便利ですが，「開発時のデフォ
+    ルトの設定」としてオンにするのはよい考えではありません．
+    
+    Admin サイトのテンプレートをはじめとする多くのテンプレートは，実在し
+    ない値を呼び出しても何も出力しないという動作を前提に作られています．
+    ``''`` 以外の値を ``TEMPLATE_STRING_IF_INVALID`` に指定した場合，こうし
+    たテンプレートやサイトのレンダリングで問題が生じるかもしれません．
+    
+    一般に， ``TEMPLATE_STRING_IF_INVALID`` を有効にするのは特定のテンプレー
+    トに対する問題を解決したいときだけにして，デバッグが終わったらすぐに無
+    効にしておくべきです．
 
 .. _Playing with Context objects:
 
@@ -269,13 +292,14 @@ Python でテンプレートを使うには，以下の 2 段階のプロセスを踏みます:
 
 .. _`Subclassing Context: RequestContext`:
 
-コンテキストのサブクラス化: RequestContext
--------------------------------------------
+コンテキストのサブクラス: RequestContext
+----------------------------------------
 
-Django には ``django.core.extensions.RequestContext`` という特別なコンテキス
-トクラスがあります．このクラスは通常の ``django.template.Context`` とは少し
-異なる部分があります．まず， ``RequestContext`` は第一引数に
+Django には ``django.template.RequestContext`` という特別なコンテキストクラ
+スがあります．このクラスは通常の ``django.template.Context`` とは少し異なる
+部分があります．まず， ``RequestContext`` は第一引数に
 `HttpRequest オブジェクト`_ をとります．例えば::
+
 
     c = RequestContext(request, {
         'foo': 'bar',
@@ -312,6 +336,21 @@ Django には ``django.core.extensions.RequestContext`` という特別なコンテキス
             'foo': 'bar',
         }, [ip_address_processor])
 
+.. Note:: 
+
+  Django の ``render_to_response()`` ショートカットを使っていて，辞書オブジェ
+  クトを渡してコンテキストの変数を追加している場合，テンプレートはデフォル
+  トで (``RequestContext`` ではなく) ``Context`` になります．テンプレートの
+  レンダリングに ``RequestContext`` を使うには， ``render_to_response()``
+  の 3 つめの引数に ``RequestContext`` インスタンスを指定します．コードは以
+  下のようになるでしょう::
+
+      def some_view(request):
+          # ...
+          return render_to_response('my_template.html',
+                                     my_data_dictionary,
+                                     context_instance=RequestContext(request))
+
 各プロセッサの動作は以下のようになっています:
 
 .. _HttpRequest オブジェクト: request_response.html#httprequest-objects
@@ -328,15 +367,25 @@ django.core.context_processors.auth
     * ``user`` -- 現在ログインしているユーザを表す ``auth.User`` インスタン
       ス (クライアントがログインしていない場合には ``AnonymousUser`` インス
       タンス) です． `ユーザ認証のドキュメント`_ を参照してください．
-    * ``messages`` -- 現在ログインしているユーザの ``auth.Message`` オブジェ
-      クトです．
+
+    * ``messages`` -- 現在ログインしているユーザ宛の (文字列の) メッセージ
+      のリストです．舞台裏では，この変数を参照するたびに
+      ``request.user.get_and_delete_messaages()`` を呼び出しています．
+      ``request.user.get_and_delete_messaages()`` は，ユーザ宛の全メッセー
+      ジを集めて返し， ``Message`` オブジェクトを削除します．
+
+      メッセージは ``user.add_message()`` で設定されます．詳しくは 
+      `メッセージのドキュメント`_ を参照してください．
+
     * ``perms`` -- 現在ログインしているユーザが有しているパーミッションを表
-      す ``django.core.context_processors.PermWrapper`` インスタンスです．
-      `パーミッションのドキュメント`_ を参照してください．
+      す， ``django.core.context_processors.PermWrapper`` のインスタンスで
+      す． `パーミッションのドキュメント`_ を参照してください．
 
 .. _`ユーザ認証のドキュメント`: authentication.html#users
 .. _`パーミッションのドキュメント`: authentication.html#permissions
+.. _`メッセージのドキュメント`: authentication.html#messages
 .. _user authentication docs: http://www.djangoproject.com/documentation/models/authentication/#users
+.. _message docs: http://www.djangoproject.com/documentation/authentication/#messages
 .. _permissions docs: http://www.djangoproject.com/documentation/models/authentication/#permissions
 
 django.core.context_processors.debug
@@ -379,6 +428,20 @@ django.core.context_processors.request
 ``request`` が ``RequestContext`` に入ります．この変数は現在の
 `HttpRequest オブジェクト`_ を表現します．このプロセッサはデフォルトでは有
 効でないので注意してください．利用したければ有効にせねばなりません．
+
+.. _Writing your own context processors:
+
+コンテキストプロセッサを自作する
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+コンテキストプロセッサのインタフェースはとても簡単です．コンテキストプロセッ
+サは単なる Python の関数で， ``HttpRequest`` オブジェクトを引数にとり，
+テンプレートコンテキストに追加できるような辞書を返します．コンテキストプロ
+セッサは， **必ず** 辞書型を返さねばなりません．
+
+自分のコードベースに自作のコンテキストプロセッサを入れてもかまいません．
+Django 側からは，自作のコンテキストプロセッサを
+``TEMPLATE_CONTEXT_PROCESSORS`` 設定で指定するようにしてください．
 
 .. _Loading templates:
 
@@ -846,12 +909,18 @@ Python 2.4 からは，デコレータ構文もうまく動作します::
     def current_time(token):
         ...
 
-``simple_tag`` ヘルパー関数については，以下の点に注意してください:
+``simple_tag`` ヘルパ関数については，以下の点に注意してください:
     * ラップ対象の関数には単一の引数 (だけ) しか渡せません．
     * 引数の個数チェックなどは関数の呼び出しの際に行われるので，わざわざ自
       分でチェックしなくてもかまいません． 
     * 関数に渡される引数がクオートされている場合，クオートは自動的に取り去
       られます．従って，関数は通常の文字列を受け取ることになります．
+    * 引数がテンプレート変数なら，関数に渡されるのは変数自体ではなく，
+      変数の現在値になります．
+
+テンプレートタグが現在のコンテキストにアクセスしなくてもよいのなら，
+入力値を引数に取るような関数を定義し， ``simple_tag`` ヘルパ関数を使うのが
+一番簡単です．
 
 .. _Inclusion tags:
 
@@ -1079,7 +1148,7 @@ Python 2.4 からは，デコレータ構文もうまく動作します::
 
 .. _`Parsing until another block tag, and saving contents`:
 
-他のブロックタグまでパージングして，内容を保存する
+次のブロックタグまでパージングして，内容を保存する
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 前節の例では， ``do_comment()`` は ``{% comment %}`` から
