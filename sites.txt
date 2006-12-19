@@ -2,7 +2,7 @@
 "sites" フレームワーク
 ======================
 
-:revision-up-to: 3687 (release 0.95+)
+:revision-up-to: 3687 (0.96-pre SVN)
 
 Django にはオプションとして使える "sites" フレームワークが付属しています．
 "sites" はオブジェクトや機能を特定の Web サイトに関連付けるためのフックであ

@@ -2,7 +2,7 @@
 Django で CSV を出力する
 ==========================
 
-:revision-up-to: 3491 (release 0.95)
+:revision-up-to: 3491 (0.96-pre SVN)
 
 このドキュメントでは， Django のビューを使って動的に CSV (Comma Separated
 Values: カンマ区切りのフィールドデータ) ファイルを生成する方法について説明

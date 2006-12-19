@@ -2,7 +2,7 @@
 "contrib" 下のアドオン
 =========================
 
-:revision-up-to: 4168 (release 0.95+)
+:revision-up-to: 4168 (0.96-pre SVN)
 
 Django は Python の `"batteries included" 哲学`_ を目指しています． Django
 には Web 開発における課題を解くための様々な外部オプションツールがついてきま

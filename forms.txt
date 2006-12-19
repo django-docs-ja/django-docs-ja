@@ -2,7 +2,7 @@
 フォームとフィールド，マニピュレータ
 ====================================
 
-:revision-up-to: 4210 (release 0.95+)
+:revision-up-to: 4210 (0.96-pre SVN)
 
 .. _Forwards-compatibility note:
 
