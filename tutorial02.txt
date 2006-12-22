@@ -237,7 +237,7 @@ admin フォームのカスタマイズ
 リレーションを張ったオブジェクトの追加
 ======================================
 
-OK， Poll の admin ページはできました．しかしs ``Poll`` は複数の ``Choice``
+OK， Poll の admin ページはできました．しかし ``Poll`` は複数の ``Choice``
 を持つのに， admin ページには表示されていませんね．
 
 今のところは．
@@ -316,8 +316,8 @@ Poll を変更するときに，常に Choice フィールドを 3 つ余分に追加したい場合に
     poll = models.ForeignKey(Poll, edit_inline=models.TABULAR, 
                              num_in_admin=3)
 
-``models.STACKED`` から ``edit_inline=models.TABULAR`` に変更すると，リレー
-ション相手のオブジェクトはよりコンパクトなテーブル形式で表示されます:
+``edit_inline`` を ``models.STACKED`` から ``models.TABULAR`` に変更すると，
+リレーション相手のオブジェクトはよりコンパクトなテーブル形式で表示されます:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin12.png
    :alt: Add poll page now has more compact choices
