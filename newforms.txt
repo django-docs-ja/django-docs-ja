@@ -1,0 +1,369 @@
+===================
+newforms ライブラリ
+===================
+
+:revision-up-to: 4269 (0.96-pre SVN)
+
+``django.newforms`` は，これまでの Django フォーム/マニピュレータ/検証フレー
+ムワークである ``django.forms`` に代わる新たなフォームフレームワークです．
+newforms は Django の開発版で新たに登場した機能です．このドキュメントでは，
+新たなフォームライブラリの使い方を解説します．
+
+.. _Migration plan:
+
+移行の計画
+==========
+
+``django.newforms`` は開発版の Django のみの機能で， 0.95 リリースでは利用
+できません．次のリリースに向けて，我々は以下のような移行計画を立てています:
+
+    * リビジョン [4208] で，現在の ``django.forms`` を ``django.oldforms``
+      にコピーしました．これで，互換性のない変更を座して待つことなく，
+      *今すぐ* コードの修正に取り掛かれます．修正は，各アプリケーションのコー
+      ドを以下のように書き換えるだけです::
+
+          from django import forms             # 移行前
+          from django import oldforms as forms # 移行後
+
+    * まだ具体的な日程は決まっていませんが，現在の ``django.newforms`` を
+      ``django.forms`` に移動します．これは互換性のない変更なので，以前の
+      ``django.forms`` を使い続けたい人は，上記に従って import 文を変更する
+      必要があります．
+
+    * 次の Django リリース，すなわち新たな ``django.forms`` が導入されたリ
+      リースの *後に* ， ``django.oldforms`` をコードから除去します．
+
+この移行計画を念頭に， ``django.newforms`` を使う場合には以下のような
+import 文を使うように勧めます::
+
+    from django import newforms as forms
+
+こうしておけば，フォームライブラリを ``forms`` モジュールとして参照でき，
+``django.newforms`` が ``django.forms`` になったときに ``import`` 文を書き
+換えるだけで済みます．
+
+「 ``import *`` 」構文を使いたければ以下のようにできます::
+
+    from django.newforms import *
+
+上の命令は，全てのフィールド，ウィジェット，フォームクラスと検証のためのユー
+ティリティをローカルな名前空間に import します．便利と考える人も，美しくな
+いと考える人もいるでしょう．
+
+.. _Overview:
+
+概要
+====
+
+``django.newforms`` は，以前の ``django.forms`` (「マニピュレータ」) システ
+ムと同じく， HTML フォームを表示し，検証を行って再表示するためのライブラリ
+です．HTML フォームをサーバ側で検証する場合に使います．
+
+例えば， Web サイトに連絡用フォームを設置し，訪問者が電子メールでメッセージ
+を送信できるようにしたいなら，このライブラリを使って HTML フォームフィール
+ドを表示し，フォームの値を検証できます．このライブラリは， HTML の
+``<form>`` タグが必要になるような状況で利用できるわけです．
+
+このライブラリでは，以下のような概念を扱います:
+
+    * **ウィジェット (Widget)** -- ``<input type="text">`` や
+      ``<textarea>`` のような， HTML フォームウィジェットに対応するクラスで
+      す．ウィジェットから HTML へのレンダリングもこのクラスで行われます．
+
+    * **フィールド (Field)** -- データの検証を行うためのクラスです．例えば，
+      ``EmailField`` はデータが有効な電子メールアドレスかどうか検証します．
+
+    * **フォーム (Form)** -- フィールドの集まりで，データの検証や HTML への
+      表示方法が実装されたものです．
+
+このライブラリは，データベースレイヤやビュー，テンプレートといった他の
+Django コンポーネントに対してカップリングしていません． newforms ライブラリ
+が依存しているのは settings と ``django.utils`` の二つのヘルパ関数，そして
+国際化システムだけです．
+
+.. _Form objects:
+
+フォームオブジェクト
+====================
+
+``newforms`` ライブラリの第一の用途はフォームオブジェクト (form object) の
+作成にあります．フォームオブジェクトは， ``django.newforms.Form`` クラスを
+サブクラス化して，フォームのフィールドを定義して作成します．フォームのフィー
+ルド定義は Django のデータベースモデルで親しんでいるあの記述方法で行えます．
+この節では，自分のウェブサイトに「連絡フォーム (contact me)」の機能を実装す
+るためのフォームオブジェクトを逐次開発してゆきます．
+
+まずは ``ContactForm`` という名前で ``Form`` のサブクラスを作成するところか
+らはじめましょう::
+
+    from django import newforms as forms
+
+    class ContactForm(forms.Form):
+        subject = forms.CharField(max_length=100)
+        message = forms.CharField()
+        sender = forms.EmailField()
+        cc_myself = forms.BooleanField()
+
+フォームは ``Field`` オブジェクトの組み合わせでできています．今回の例では，
+``subject`` (題名)， ``message`` (メッセージ)， ``sender`` (送信者)，そして
+``cc_myself`` (自分に CC する)，の 4 つのフィールドをフォームに持たせます．
+``CharField`` や ``EmailField`` といったフィールド型については，また後で説
+明する予定です．
+
+.. _Outputting forms as HTML:
+
+フォームを HTML として出力する
+------------------------------
+
+フォームを定義したら， HTML に出力できます．フォームを HTML として出力する
+には，フォームをインスタンス化して， ``print`` で出力します::
+
+    >>> f = ContactForm()
+    >>> print f
+    <tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" /></td></tr>
+    <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" /></td></tr>
+    <tr><th><label for="id_sender">Sender:</label></th><td><input type="text" name="sender" id="id_sender" /></td></tr>
+    <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>
+
+デフォルトの出力は 2 カラムの HTML テーブルになり，各フィールドが一つの
+``<tr>`` タグの中に収まります．以下の点に注意してください:
+
+    * 柔軟性をもたせるために，出力中には ``<table>`` と ``</table>`` タグが
+      入っていません．また， ``<form>`` と ``</form>`` や， 
+      ``<input type="submit">`` もありません．これらのタグは自分で入れる必
+      要があります．
+
+    * 各フィールドタイプには，それぞれデフォルトの HTML 表現があります．
+      ``CharField`` や ``EmailField`` は ``<input type="text">`` で表され，
+      ``BooleanField`` は ``<input type="checkbox">`` になります．とはいえ，
+      これらは便利なデフォルト値にすぎません．ウィジェット (``widget``) を
+      使えば，フィールドの表現にどのような HTML を使うかを指定できます．こ
+      れについては後で説明する予定です．
+
+    * 各タグの ``name`` 属性は ``ContactForm`` クラスの属性名から直接取り出
+      して使われます．
+
+    * ``'Subject:'``, ``'Message:'``, ``'CC myself:'``  といった各フィール
+      ドのテキストラベルは，フィールド名のアンダースコアを全てスペースに変
+      換し，先頭の文字を大文字にして生成します．これもまたデフォルト値にす
+      ぎず，手動でもラベルを設定できるようになっています．
+
+    * 各テキストラベルは HTML の ``<label>`` タグで囲われています．このタグ
+      には ``for`` 属性が付いていて，対応するフォームフィールドの ``id`` 属
+      性に対応しています．属性の値はフィールド名の前に ``'id_'`` を付けたも
+      のになります． ``id`` 属性や ``<label>`` タグはフォーム生成の定石に従っ
+      て組み込まれているものですが，この振舞は自分で変更できます．
+
+テーブル組みによる出力は ``print`` した時に出力されるデフォルトで，他にもい
+くつか出力スタイルがあります．各スタイルはフォームオブジェクトのメソッドと
+して利用でき，各々のレンダリングメソッドは Unicode オブジェクトを返すように
+なっています．
+
+``as_p()``
+~~~~~~~~~~
+
+``Form.as_p()`` はフォームを一連の ``<p>`` タグの集まりで組みます．各
+``<p>`` タグの中に一つのフィールドが入ります::
+
+    >>> f = ContactForm()
+    >>> f.as_p()
+    u'<p><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" /></p>\n<p><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" /></p>\n<p><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" /></p>\n<p><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>'
+    >>> print f.as_p()
+    <p><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" /></p>
+    <p><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" /></p>
+    <p><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" /></p>
+    <p><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>
+
+``as_ul()``
+~~~~~~~~~~~
+
+``Form.as_ul()`` はフォームを一連の ``<li>`` タグで組みます．各 ``<li>`` タ
+グの中に一つのフィールドが入ります． ``as_ul()`` は ``<ul>`` や ``</ul>``
+を出力に *含めません* ．これは，ユーザが ``<ul>`` タグの HTML 属性を好きに
+指定できるようにするためです::
+
+    >>> f = ContactForm()
+    >>> f.as_ul()
+    u'<li><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" /></li>\n<li><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" /></li>\n<li><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" /></li>\n<li><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></li>'
+    >>> print f.as_ul()
+    <li><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" /></li>
+    <li><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" /></li>
+    <li><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" /></li>
+    <li><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></li>
+
+``as_table()``
+~~~~~~~~~~~~~~
+
+最後に， ``Form.as_table()`` はフォームを ``<table>`` で組みます．これは
+``print`` で出力したときに使われる形式と同じです．実際，フォームオブジェク
+トを ``print`` すると，背後では ``as_table()`` が呼び出されるようになってい
+ます::
+
+    >>> f = ContactForm()
+    >>> f.as_table()
+    u'<tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" /></td></tr>\n<tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" /></td></tr>\n<tr><th><label for="id_sender">Sender:</label></th><td><input type="text" name="sender" id="id_sender" /></td></tr>\n<tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>'
+    >>> print f.as_table()
+    <tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" /></td></tr>
+    <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" /></td></tr>
+    <tr><th><label for="id_sender">Sender:</label></th><td><input type="text" name="sender" id="id_sender" /></td></tr>
+    <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>
+
+.. _Configuring HTML ``<label>`` tags:
+
+``<label>`` タグの出力設定
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``<label>`` タグは，あるラベルテキストがどのフォーム要素に対応づけられてい
+るかを知らせるタグです． ``<label>`` タグがあると，フォームの利便性が増し，
+入力補助デバイスで操作しやすくなります． ``<label>`` タグは常に使うようにし
+ておくよう勧めます．
+
+デフォルトでは，フォームのレンダリングメソッドを呼び出すと，各フォーム要素
+に ``id`` 属性が追加され，ラベルを ``<label>`` タグで囲って出力します．
+``id`` 属性の値はフォームのフィールド名の前に ``id_`` を付けたものになりま
+す．とはいえ， ``id`` 属性の命名規則を変えたり，そもそも ``<label>`` を出力
+したくない人のために，この仕様は設定変更できるようになっています．
+
+``<label>`` タグや ``id`` の挙動を変更するには， ``Form`` コンストラクタの
+``auto_id`` 引数を使います．この引数は ``True`` ， ``False`` ，文字列のいず
+れかで指定せねばなりません．
+
+``auto_id`` を ``False`` にすると，フォーム出力に ``<label>`` タグや
+``id`` 属性が含まれなくなります::
+
+    >>> f = ContactForm(auto_id=False)
+    >>> print f.as_table()
+    <tr><th>Subject:</th><td><input type="text" name="subject" maxlength="100" /></td></tr>
+    <tr><th>Message:</th><td><input type="text" name="message" /></td></tr>
+    <tr><th>Sender:</th><td><input type="text" name="sender" /></td></tr>
+    <tr><th>Cc myself:</th><td><input type="checkbox" name="cc_myself" /></td></tr>
+    >>> print f.as_ul()
+    <li>Subject: <input type="text" name="subject" maxlength="100" /></li>
+    <li>Message: <input type="text" name="message" /></li>
+    <li>Sender: <input type="text" name="sender" /></li>
+    <li>Cc myself: <input type="checkbox" name="cc_myself" /></li>
+    >>> print f.as_p()
+    <p>Subject: <input type="text" name="subject" maxlength="100" /></p>
+    <p>Message: <input type="text" name="message" /></p>
+    <p>Sender: <input type="text" name="sender" /></p>
+    <p>Cc myself: <input type="checkbox" name="cc_myself" /></p>
+
+``auto_id`` が ``True`` の場合，フォームの出力には ``<label>`` タグが入り，
+各フォームフィールドの ``id`` 属性の値にはフィールド名をそのまま使います::
+
+    >>> f = ContactForm(auto_id=True)
+    >>> print f.as_table()
+    <tr><th><label for="subject">Subject:</label></th><td><input id="subject" type="text" name="subject" maxlength="100" /></td></tr>
+    <tr><th><label for="message">Message:</label></th><td><input type="text" name="message" id="message" /></td></tr>
+    <tr><th><label for="sender">Sender:</label></th><td><input type="text" name="sender" id="sender" /></td></tr>
+    <tr><th><label for="cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="cc_myself" /></td></tr>
+    >>> print f.as_ul()
+    <li><label for="subject">Subject:</label> <input id="subject" type="text" name="subject" maxlength="100" /></li>
+    <li><label for="message">Message:</label> <input type="text" name="message" id="message" /></li>
+    <li><label for="sender">Sender:</label> <input type="text" name="sender" id="sender" /></li>
+    <li><label for="cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="cc_myself" /></li>
+    >>> print f.as_p()
+    <p><label for="subject">Subject:</label> <input id="subject" type="text" name="subject" maxlength="100" /></p>
+    <p><label for="message">Message:</label> <input type="text" name="message" id="message" /></p>
+    <p><label for="sender">Sender:</label> <input type="text" name="sender" id="sender" /></p>
+    <p><label for="cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="cc_myself" /></p>
+
+``auto_id`` がフォーマット文字 ``'%s'`` を含む文字列になっている場合，フォー
+ム出力は ``<label>`` タグを含むようになり，タグの ``id`` 属性はフォーマット
+文字列に従って生成されます．例えば，フォーマット文字列が ``field_%s`` の場
+合， ``subject`` という名前のフィールドの ``id`` は ``'field_subject'`` に
+なります．出力例は以下のようになります::
+
+    >>> f = ContactForm(auto_id='id_for_%s')
+    >>> print f.as_table()
+    <tr><th><label for="id_for_subject">Subject:</label></th><td><input id="id_for_subject" type="text" name="subject" maxlength="100" /></td></tr>
+    <tr><th><label for="id_for_message">Message:</label></th><td><input type="text" name="message" id="id_for_message" /></td></tr>
+    <tr><th><label for="id_for_sender">Sender:</label></th><td><input type="text" name="sender" id="id_for_sender" /></td></tr>
+    <tr><th><label for="id_for_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_for_cc_myself" /></td></tr>
+    >>> print f.as_ul()
+    <li><label for="id_for_subject">Subject:</label> <input id="id_for_subject" type="text" name="subject" maxlength="100" /></li>
+    <li><label for="id_for_message">Message:</label> <input type="text" name="message" id="id_for_message" /></li>
+    <li><label for="id_for_sender">Sender:</label> <input type="text" name="sender" id="id_for_sender" /></li>
+    <li><label for="id_for_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_for_cc_myself" /></li>
+    >>> print f.as_p()
+    <p><label for="id_for_subject">Subject:</label> <input id="id_for_subject" type="text" name="subject" maxlength="100" /></p>
+    <p><label for="id_for_message">Message:</label> <input type="text" name="message" id="id_for_message" /></p>
+    <p><label for="id_for_sender">Sender:</label> <input type="text" name="sender" id="id_for_sender" /></p>
+    <p><label for="id_for_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_for_cc_myself" /></p>
+
+``auto_id`` がこれ以外の偽でない値，つまり ``%s`` を含まない文字列のような
+値の場合， ``auto_id`` は ``True`` に設定されたものとみなされます．
+
+デフォルトでは， ``auto_id`` は ``'id_%s'`` に設定されています．
+
+.. _Notes on field ordering:
+
+フィールドの並び順について
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``as_p()`` や ``as_ul()``, ``as_table()`` ショートカットを使うと，各フィー
+ルドは Form クラス内で定義された順に出力されます．例えば，上の
+``ContactForm`` の例では，フィールドの並び順は ``subject``, ``message``,
+``sender``, ``cc_myself`` になります． HTML 出力の中でフィールドの並び順を
+変更したければ，クラス定義内でのフィールドの並び順を変更してください．
+
+.. _More granular output:
+
+より細かな出力調整
+~~~~~~~~~~~~~~~~~~
+
+``as_p()`` や ``as_ul()``, ``as_table()`` といったメソッドは，単に面倒臭が
+りの開発者むけに用意されているショートカットでしかなく，他のやり方でもフォー
+ムを表示できます．
+
+フォーム中のあるフィールドの HTML を表示するには，フォームを辞書のように扱
+い，フィールドの名前をキーにして参照し，その値を出力します::
+
+    >>> f = ContactForm()
+    >>> print f['subject']
+    <input id="id_subject" type="text" name="subject" maxlength="100" />
+    >>> print f['message']
+    <input type="text" name="message" id="id_message" />
+    >>> print f['sender']
+    <input type="text" name="sender" id="id_sender" />
+    >>> print f['cc_myself']
+    <input type="checkbox" name="cc_myself" id="id_cc_myself" />
+
+フィールドを引数にして ``str()`` や ``unicode()`` を呼び出すと，レンダ結果
+の HTML をそれぞれ string 型や Unicode 型のオブジェクトで返します::
+
+    >>> str(f['subject'])
+    '<input id="id_subject" type="text" name="subject" maxlength="100" />'
+    >>> unicode(f['subject'])
+    u'<input id="id_subject" type="text" name="subject" maxlength="100" />'
+
+フィールド固有の出力を行った場合でも，フォームオブジェクトの ``auto_id`` 設
+定は有効です::
+
+    >>> f = ContactForm(auto_id=False)
+    >>> print f['message']
+    <input type="text" name="message" />
+    >>> f = ContactForm(auto_id='id_%s')
+    >>> print f['message']
+    <input type="text" name="message" id="id_message" />
+
+.. _More coming soon:
+
+つづく
+======
+
+現時点でのドキュメントはこれだけです．詳しくは ``django.newforms`` のユニッ
+トテストである
+http://code.djangoproject.com/browser/django/trunk/tests/regressiontests/forms/tests.py
+を参照してください． newforms でできることをよく理解できるはずです．
+
+このライブラリを使ってみたくてうずうずしているなら，もう少しだけ我慢してく
+ださいね．今，コードとドキュメントの仕上げにかかっているところなんです．
+
+.. _Using forms with templates:
+
+form とテンプレートを組み合わせる
+=================================
+
+form をビュー内で使う
+=====================
