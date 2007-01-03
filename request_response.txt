@@ -131,14 +131,14 @@ HttpRequest オブジェクト
     ``AuthenticationMiddleware`` を有効にした場合だけです．詳しくは
     `Web リクエストの認証`_ を参照してください．
 
-    .. _`Web リクエストの認証`: authentication.html#authentication-in-web-requests
+.. _`Web リクエストの認証`: ../authentication/#authentication-in-web-requests
 
 ``session``
     読み書き可能な辞書ライクオブジェクトで，現在のセッションを表現しています．
     この辞書はインストールされている Django でセッションが有効な場合にのみ
     利用できます．詳しくは `セッションのドキュメント`_ を参照してください．
 
-    .. _`セッションのドキュメント`: sessions.html
+    .. _`セッションのドキュメント`: ../sessions/
     .. _`session documentation`: http://www.djangoproject.com/documentation/sessions/
 
 ``raw_post_data``

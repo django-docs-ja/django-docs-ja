@@ -49,7 +49,7 @@ Django を使った PDF 動的生成の鍵は，ファイル ReportLab の API がファイルラ
     ``HttpResponse`` の詳細は 
     `リクエストオブジェクトとレスポンスオブジェクト`_ を参照してください．
 
-    .. _`リクエストオブジェクトとレスポンスオブジェクト`: request_response.html
+.. _`リクエストオブジェクトとレスポンスオブジェクト`: ../request_response/
 
 いわゆる "Hello World" サンプルを示します::
 

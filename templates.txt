@@ -837,7 +837,7 @@ ssi
 
 See also: ``{% include %}``.
 
-.. _ALLOWED_INCLUDE_ROOTS: settings.html#allowed-include-roots
+.. _ALLOWED_INCLUDE_ROOTS: ../settings/#allowed-include-roots
 .. ALLOWED_INCLUDE_ROOTS: http://www.djangoproject.com/documentation/settings/#allowed-include-roots
 
 templatetag

@@ -29,7 +29,7 @@ Django 自体では，画像やスタイルシート，ビデオといった静的な (メディア) ファ
 運用環境における静的ファイルの提供方法は， `Django mod_python ドキュメント`_
 を参照してください．
 
-.. _`Django mod_python ドキュメント`: modpython.html#serving-media-files
+.. _`Django mod_python ドキュメント`: ../modpython/#serving-media-files
 .. _Django mod_python documentation: http://www.djangoproject.com/documentation/modpython/#serving-media-files
 
 .. _How to do it:
@@ -145,5 +145,5 @@ URLconf は単なる Python モジュールに過ぎないので，静的メディアビューを開発
 という前提が必要ですが，何にせよ運用環境では ``DEBUG=False`` を設定すべきで
 す．
 
-.. _`DEBUG 設定`: settings.html#debug
+.. _`DEBUG 設定`: ../settings/#debug
 .. _DEBUG setting: http://www.djangoproject.com/documentation/settings/#debug

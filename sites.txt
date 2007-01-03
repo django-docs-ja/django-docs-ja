@@ -297,8 +297,8 @@ Django は ``objects = models.Manager()`` を使った自動マネジャ生成を行わなく
 を ``CurrentSiteManager`` の定義より前に配置しておかねばなりません．
 
 
-.. _`マネジャ`: model_api.html#managers
-.. _`マネジャのドキュメント`: model_api.html#managers
+.. _`マネジャ`: ../model_api/#managers
+.. _`マネジャのドキュメント`: ../model_api/#managers
 .. _manager: http://www.djangoproject.com/documentation/model_api/#managers
 
 .. _How Django uses the sites framework:
@@ -344,10 +344,10 @@ Django における sites フレームワークの役割は以下の通りです:
       ジェクトの URL のドメイン部を計算する際に現在の ``Site`` オブジェクト
       を使います．
 
-.. _`リダイレクションフレームワーク`: redirects.html
-.. _`フラットページフレームワーク`: flatpages.html
-.. _`配信フレームワーク`: syndication.html
-.. _`認証フレームワーク`: authentication.html
+.. _`リダイレクションフレームワーク`: ../redirects/
+.. _`フラットページフレームワーク`: ../flatpages/
+.. _`配信フレームワーク`: ../syndication/
+.. _`認証フレームワーク`: ../authentication/
 .. _redirects framework: http://www.djangoproject.com/documentation/redirects/
 .. _flatpages framework: http://www.djangoproject.com/documentation/flatpages/
 .. _syndication framework: http://www.djangoproject.com/documentation/syndication/

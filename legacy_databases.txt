@@ -11,7 +11,7 @@ Django が最も得意とするのは新たなアプリケーションですが，古いデータベースの
 このドキュメントでは，読者は `公式チュートリアル`_ でカバーされている
 Django の基礎を良く知っているものと仮定しています．
 
-.. _`公式チュートリアル`: tutorial01.html
+.. _`公式チュートリアル`: ../tutorial01/
 .. _official tutorial: http://www.djangoproject.com/documentation/tutorial1/
 
 .. _Give Django your database parameters:
@@ -29,13 +29,13 @@ Django にデータベースパラメタを指定する
     * `DATABASE_HOST`_
     * `DATABASE_PORT`_
 
-.. _`設定ファイル`: settings.html
-.. _DATABASE_NAME: settings.html#database-name
-.. _DATABASE_ENGINE: settings.html#database-engine
-.. _DATABASE_USER: settings.html#database-user
-.. _DATABASE_PASSWORD: settings.html#database-password
-.. _DATABASE_HOST: settings.html#database-host
-.. _DATABASE_PORT: settings.html#database-port
+.. _`設定ファイル`: ../settings/
+.. _DATABASE_NAME: ../settings/#database-name
+.. _DATABASE_ENGINE: ../settings/#database-engine
+.. _DATABASE_USER: ../settings/#database-user
+.. _DATABASE_PASSWORD: ../settings/#database-password
+.. _DATABASE_HOST: ../settings/#database-host
+.. _DATABASE_PORT: ../settings/#database-port
 
 .. _settings file: 
     http://www.djangoproject.com/documentation/settings/
@@ -75,7 +75,7 @@ Django には，既存のデータベースにイントロスペクションを行ってモデルを生成で
 に入れ，アプリケーションを収めているパッケージ内に配置し，
 ``INSTALLED_APPS`` 設定にアプリケーションを追加しておきます．
 
-.. _django-admin.py のドキュメント: django-admin.html
+.. _django-admin.py のドキュメント: ../django-admin/
 .. _django-admin.py documentation: http://www.djangoproject.com/documentation/django_admin/
 
 .. _Install the core Django tables:

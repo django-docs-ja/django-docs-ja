@@ -35,8 +35,8 @@ flatpages アプリケーションをインストールするには，以下の手順に従って下さい:
        を `MIDDLEWARE_CLASSES`_ に加えます．
     3. ``python manage.py syncdb`` を実行します．
 
-.. _`INSTALLED_APPS`: settings.html#installed-apps
-.. _`MIDDLEWARE_CLASSES`: settings.html#middleware-classes
+.. _`INSTALLED_APPS`: ../settings/#installed-apps
+.. _`MIDDLEWARE_CLASSES`: ../settings/#middleware-classes
 .. INSTALLED_APPS: http://www.djangoproject.com/documentation/settings/#installed-apps
 .. MIDDLEWARE_CLASSES: http://www.djangoproject.com/documentation/settings/#middleware-classes
 
@@ -79,12 +79,12 @@ HTTP 状態コードでは有効になりません．
 
 ミドルウェアの詳細は `ミドルウェアのドキュメント`_ を参照してください．
 
-.. _`SITE_ID 設定`: settings.html#site-id
+.. _`SITE_ID 設定`: ../settings/#site-id
 .. _SITE_ID: http://www.djangoproject.com/documentation/settings/#site-id
 .. _`RequestContext オブジェクト`: 
-    templates_python.html#subclassing-context-requestcontext
+    ../templates_python/#subclassing-context-requestcontext
 .. _RequestContext: http://www.djangoproject.com/documentation/templates_python/#subclassing-context-djangocontext
-.. _`ミドルウェアのドキュメント`: middleware.html
+.. _`ミドルウェアのドキュメント`: ../middleware/
 .. _middleware docs: http://www.djangoproject.com/documentation/middleware/
 
 flatpage の追加，変更，削除
@@ -105,10 +105,10 @@ flatpage は標準の `Django モデル`_ で表現されており，コードは
 `django/contrib/flatpages/models.py`_ にあります． flatpage オブジェクトに
 は `Django データベース API`_  を介してアクセスできます．
 
-.. _`Django モデル`: model-api.html
+.. _`Django モデル`: ../model-api/
 .. _Django model: http://www.djangoproject.com/documentation/model_api/
 .. _django/contrib/flatpages/models.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/flatpages/models.py
-.. _`Django データベース API`: db-api.html
+.. _`Django データベース API`: ../db-api/
 .. _Django database API: http://www.djangoproject.com/documentation/db_api/
 
 flatpage のテンプレート

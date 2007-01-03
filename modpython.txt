@@ -23,7 +23,7 @@ Django を mod_python で動かす場合， Apache 2.x と mod_python 3.x が必要です．
 .. _mod_perl: http://perl.apache.org/
 .. _prefork MPM: http://httpd.apache.org/docs/2.2/mod/prefork.html
 .. _worker MPM: http://httpd.apache.org/docs/2.2/mod/worker.html
-.. _`FastCGI で Django を動かす`: fastcgi.html
+.. _`FastCGI で Django を動かす`: ../fastcgi/
 
 基本的な設定
 ============

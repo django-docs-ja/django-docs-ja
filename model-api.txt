@@ -27,7 +27,7 @@
 
 .. _`モデル例の公式リポジトリ`: 
     http://www.djangoproject.com/documentation/models/
-.. _`データベース API リファレンス`: db-api.html
+.. _`データベース API リファレンス`: ../db-api/
 
 .. _Quick example:
 
@@ -66,7 +66,7 @@
       が， Django は `設定ファイル`_ に指定されたデータベースバックエンド向
       けの SQL を使います．
 
-.. _`設定ファイル`: settings.html
+.. _`設定ファイル`: ../settings/
 .. _settings file: http://www.djangoproject.com/documentation/settings/
 
 
@@ -657,7 +657,7 @@ Django は必要に応じてカラム名やテーブル名をクオートします．
 Django にはほんの少しだけバリデータがついてきます．バリデータは
 ``django.core.validators`` に収められています．
 
-.. _`バリデータのドキュメント`: forms.html#validators
+.. _`バリデータのドキュメント`: ../forms/#validators
 
 .. _Verbose field names:
 
@@ -846,10 +846,10 @@ Django は必要なときに先頭の文字を自動的に大文字にします．
     ======================= =================================================
 
 
-.. _`データベース API のリファレンス`: db-api.html
+.. _`データベース API のリファレンス`: ../db-api/
 .. _`Database API reference`: http://www.djangoproject.com/documentation/db_api/
 .. _`オブジェクトのリレーションに関する解説`:
-    db-api.html#related-objects
+    ../db-api/#related-objects
 .. _related objects documentation: 
     http://www.djangoproject.com/documentation/db_api/#related-objects
 
@@ -1458,7 +1458,7 @@ admin 変更リストをページ分割 (paginate) で表示するときに，各ページに何個の
 してください．
 
 .. _`select_related() のドキュメント`:
-    db-api.html#select-related
+    ../db-api/#select-related
 
 ``ordering``
 ------------
@@ -1563,7 +1563,7 @@ SQL に等価な検索を実行します::
 `オブジェクトの取得`_ の節で説明していますが，この節ではマネジャの挙動をカ
 スタマイズするためのモデルオプションについて具体的に触れます．
 
-.. _`オブジェクトの取得`: db-api.html#retrieving-objects
+.. _`オブジェクトの取得`: ../db-api/#retrieving-objects
 
 .. _Manager names:
 
@@ -1872,7 +1872,7 @@ Python DB-API に詳しくないのなら，上の SQL 文の ``cursor.execute()`` でパラ
 
 .. _Python DB-API: http://www.python.org/peps/pep-0249.html
 .. _`extra() のドキュメント`: 
-    db-api.html#extra-select-none-where-none-params-none-tables-none
+    ../db-api/#extra-select-none-where-none-params-none-tables-none
 .. _Other lookup options: http://www.djangoproject.com/documentation/db_api/#other-lookup-options
 
 .. _Overriding default model methods:
@@ -1908,7 +1908,7 @@ Python DB-API に詳しくないのなら，上の SQL 文の ``cursor.execute()`` でパラ
             else:
                 super(Blog, self).save() # 「実際の」save() を呼び出します．
 
-.. _`データベース API のドキュメント`: db-api.html
+.. _`データベース API のドキュメント`: ../db-api/
 .. _database API docs: http://www.djangoproject.com/documentation/db_api/
 
 
@@ -1981,7 +1981,7 @@ SQL ファイルは ``manage.py`` の ``sqlinitialdata``, ``sqlreset``,
 イルを実行する前に，必ずデータベーステーブルは作成されているということだけ
 です．
 
-.. _`manage.py のドキュメント`: django_admin.html#sqlinitialdata-appname-appname
+.. _`manage.py のドキュメント`: ../django_admin/#sqlinitialdata-appname-appname
 .. _`manage.py documentation`: http://www.djangoproject.com/documentation/django_admin/#sqlinitialdata-appname-appname
 
 .. _Database-backend-specific SQL data:

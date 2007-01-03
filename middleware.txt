@@ -53,7 +53,7 @@ django.middleware.cache.CacheMiddleware
 Django の管理下にあるページは ``CACHE_MIDDLEWARE_SECONDS`` 設定に定義した時
 間のキャッシュされます．`キャッシュのドキュメント`_ を参照してください．
 
-.. _`キャッシュのドキュメント`: cache.html#the-per-site-cache
+.. _`キャッシュのドキュメント`: ../cache/#the-per-site-cache
 .. _`cache documentation`: http://www.djangoproject.com/documentation/cache/#the-per-site-cache
 
 django.middleware.common.CommonMiddleware
@@ -134,7 +134,7 @@ django.contrib.sessions.middleware.SessionMiddleware
 セッションのサポートを有効にします． `セッションのドキュメント`_ も参照して
 ください．
 
-.. _`セッションのドキュメント`: sessions.html
+.. _`セッションのドキュメント`: ../sessions/
 .. _`session documentation`: 
     http://www.djangoproject.com/documentation/sessions/
 
@@ -145,7 +145,7 @@ django.contrib.auth.middleware.AuthenticationMiddleware
 表す ``user`` 属性を追加します． `Web リクエストの認証`_ を参照してください．
 
 .. _`Web リクエストの認証`:
-    authentication.html#authentication-in-web-requests
+    ../authentication/#authentication-in-web-requests
 .. _Authentication in Web requests: 
     http://www.djangoproject.com/documentation/authentication/#authentication-in-web-requests
 
@@ -165,7 +165,7 @@ django.middleware.transaction.TransactionMiddleware
 
 `トランザクション管理のドキュメント`_ を参照してください．
 
-.. _`トランザクション管理のドキュメント`: transactions.html
+.. _`トランザクション管理のドキュメント`: ../transactions/
 .. _`transaction management documentation`: http://www.djangoproject.com/documentation/transactions/
 
 

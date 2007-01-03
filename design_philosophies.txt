@@ -240,7 +240,7 @@ URL ははっきりと
 
 これは `テンプレートの継承`_ の根底にある考え方です．
 
-.. _`テンプレートの継承`: templates.html#template-inheritance
+.. _`テンプレートの継承`: ../templates/#template-inheritance
 .. _template inheritance: http://www.djangoproject.com/documentation/templates/#template-inheritance
 
 .. _Be decoupled from HTML:

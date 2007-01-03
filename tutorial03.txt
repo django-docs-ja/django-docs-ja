@@ -8,7 +8,7 @@
 Web 投票アプリケーションの開発を例にして，公開用のインタフェース，ビュー
 (view) の作成を焦点に解説します．
 
-.. _`チュートリアルその 2`: tutorial02.html
+.. _`チュートリアルその 2`: ../tutorial02/
 .. _Tutorial 2: http://www.djangoproject.com/documentation/tutorial2/
 
 .. _Philosophy:
@@ -134,8 +134,8 @@ URL パターンは正規表現なので，正規表現で実現できる限り無制限の URL を表現で
 .. _`Python のドキュメント`: http://www.python.jp/doc/release/lib/module-re.html
 .. _Wikipedia's entry: http://en.wikipedia.org/wiki/Regular_expression
 .. _Python documentation: http://www.python.org/doc/current/lib/module-re.html
-.. _`リクエストオブジェクトとレスポンスオブジェクトのドキュメント`: request_response.html
-.. _`URLconf のドキュメント`: url_dispatch.html
+.. _`リクエストオブジェクトとレスポンスオブジェクトのドキュメント`: ../request_response/
+.. _`URLconf のドキュメント`: ../url_dispatch/
 .. _request and response documentation: http://www.djangoproject.com/documentation/request_response/
 .. _URLconf documentation: http://www.djangoproject.com/documentation/url_dispatch/
 
@@ -423,7 +423,7 @@ Django は poll オブジェクトの ``question()`` というメソッドを呼び出そうとし
 
 テンプレートの詳しい動作については `テンプレートガイド`_ を参照してください．
 
-.. _`テンプレートガイド`: templates.html
+.. _`テンプレートガイド`: ../templates/
 .. _template guide: http://www.djangoproject.com/documentation/templates/
 
 .. _Simplifying the URLconfs:
@@ -518,5 +518,5 @@ polls アプリケーションは絶対 URL ではなく相対 URL だけに注意しているわけで
 ビューの作成に慣れたら， `チュートリアルその 4`_ に進んで，簡単なフォーム処
 理と汎用ビュー (generic view) の使い方を学びましょう．
 
-.. _`チュートリアルその 4`: tutorial04.html
+.. _`チュートリアルその 4`: ../tutorial04/
 .. _part 4 of this tutorial: http://www.djangoproject.com/documentation/tutorial4/

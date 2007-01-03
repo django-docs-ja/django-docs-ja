@@ -130,26 +130,26 @@ Django はまだリリース 1.0 に到達していませんが， Django の公開 API の大半は
 .. _serialization: http://www.djangoproject.com/documentation/serialization/
 .. _authentication: http://www.djangoproject.com/documentation/authentication/
 
-.. _`キャッシュ`: cache.html
-.. _`カスタムテンプレートタグとライブラリ`: templates_python.html
-.. _`データベース照合`: db_api.html
-.. _`django-admin ユーティリティ`: django_admin.html
-.. _`FastCGI の組み込み`: fastcgi.html
-.. _`フラットページ`: flatpages.html
-.. _`汎用ビュー`: generic_views.html
-.. _`国際化`: i18n.html
-.. _`古いデータベースの組み込み`: legacy_databases.html
-.. _`モデル定義`: model_api.html
-.. _`mod_python の組み込み`: modpython.html
-.. _`リダイレクション`: redirects.html
-.. _`リクエスト／レスポンスオブジェクト`: request_response.html
-.. _`メールの送信`: email.html
-.. _`セッション`: sessions.html
-.. _`設定ファイル`: settings.html
-.. _`配信フィード`: syndication.html
-.. _`テンプレート言語`: templates.html
-.. _`トランザクション`: transactions.html
-.. _`URL のディスパッチ`: url_dispatch.html
-.. _`フォームとバリデータ`: forms.html
-.. _`シリアライゼーション`: serialization.html
-.. _`認証`: authentication.html
+.. _`キャッシュ`: ../cache/
+.. _`カスタムテンプレートタグとライブラリ`: ../templates_python/
+.. _`データベース照合`: ../db_api/
+.. _`django-admin ユーティリティ`: ../django_admin/
+.. _`FastCGI の組み込み`: ../fastcgi/
+.. _`フラットページ`: ../flatpages/
+.. _`汎用ビュー`: ../generic_views/
+.. _`国際化`: ../i18n/
+.. _`古いデータベースの組み込み`: ../legacy_databases/
+.. _`モデル定義`: ../model_api/
+.. _`mod_python の組み込み`: ../modpython/
+.. _`リダイレクション`: ../redirects/
+.. _`リクエスト／レスポンスオブジェクト`: ../request_response/
+.. _`メールの送信`: ../email/
+.. _`セッション`: ../sessions/
+.. _`設定ファイル`: ../settings/
+.. _`配信フィード`: ../syndication/
+.. _`テンプレート言語`: ../templates/
+.. _`トランザクション`: ../transactions/
+.. _`URL のディスパッチ`: ../url_dispatch/
+.. _`フォームとバリデータ`: ../forms/
+.. _`シリアライゼーション`: ../serialization/
+.. _`認証`: ../authentication/

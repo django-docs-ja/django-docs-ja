@@ -159,9 +159,8 @@ API リファレンス
       ``django.contrib.auth.models.SiteProfileNotAvailable`` を送出します．
 
 .. _Django model: http://www.djangoproject.com/documentation/model_api/
-.. _Django モデル: model-api.html
-.. _DEFAULT_FROM_EMAIL: 
-    settings.html#default-from-email
+.. _Django モデル: ../model-api/
+.. _DEFAULT_FROM_EMAIL: ../settings/#default-from-email
 .. DEFAULT_FROM_EMAIL: 
     http://www.djangoproject.com/documentation/settings/#default-from-email
 
@@ -310,8 +309,8 @@ API について扱ってきました．より高水準の API では， Django はこれらの認証フ
     else:
         # Do something for anonymous users.
 
-.. _`リクエストオブジェクト`: request_response.html#httprequest-objects
-.. _`セッションのドキュメント`: sessions.html
+.. _`リクエストオブジェクト`: ../request_response/#httprequest-objects
+.. _`セッションのドキュメント`: ../sessions/
 .. _request objects: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
 .. _session documentation: http://www.djangoproject.com/documentation/sessions/
 
@@ -501,8 +500,8 @@ Python 2.4 で登場したよりコンパクトなデコレータ構文を使った例を以下に示しま
 
     {% endblock %}
 
-.. _`forms のドキュメント`: forms.html
-.. _`site フレームワークのドキュメント`: sites.html
+.. _`forms のドキュメント`: ../forms/
+.. _`site フレームワークのドキュメント`: ../sites/
 .. _forms documentation: http://www.djangoproject.com/documentation/forms/
 .. _site framework docs: http://www.djangoproject.com/documentation/sites/
 
@@ -614,7 +613,7 @@ URLconf を変更して，ジェネリックビュー自体ではなくラッパコードを指すように
     def limited_object_detail(*args, **kwargs):
         return object_detail(*args, **kwargs)
 
-.. _`汎用ビュー`: generic_views.html
+.. _`汎用ビュー`: ../generic_views/
 .. _generic view: http://www.djangoproject.com/documentation/generic_views/
 
 .. _Permissions:
@@ -687,8 +686,9 @@ Django の admin サイトでは，以下のようなパーミッションを使っています:
 することだけです．
 
 
-.. _`モデルのメタ属性`: model-api.html#meta-options
-.. _model Meta attribute: http://www.djangoproject.com/documentation/model_api/#meta-options
+.. _`モデルのメタ属性`: ../model-api/#meta-options
+.. _model Meta attribute: 
+    http://www.djangoproject.com/documentation/model_api/#meta-options
 
 API リファレンス
 -----------------
@@ -696,7 +696,8 @@ API リファレンス
 ユーザと同様，パーミッションは Django モデルとして実装されています．実装は
 `django/contrib/auth/models.py`_ にあります．
 
-.. _django/contrib/auth/models.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/auth/models.py
+.. _django/contrib/auth/models.py: 
+    http://code.djangoproject.com/browser/django/trunk/django/contrib/auth/models.py
 
 フィールド
 ~~~~~~~~~~~~
@@ -729,7 +730,7 @@ API リファレンス
    `RequestContext のドキュメント`_ を参照してください．
 
    .. _`RequestContext のドキュメント`:
-       templates_python.html#subclassing-context-requestcontext
+       ../templates_python/#subclassing-context-requestcontext
    .. _RequestContext docs: 
        http://www.djangoproject.com/documentation/templates_python/#subclassing-context-requestcontext
 
@@ -786,7 +787,7 @@ API リファレンス
         <p>You don't have permission to do anything in the foo app.</p>
     {% endif %}
 
-.. _`テンプレートコンテキスト`: templates_python.html
+.. _`テンプレートコンテキスト`: ../templates_python/
 .. _template context: http://www.djangoproject.com/documentation/templates_python/
 
 .. _Groups:
@@ -864,7 +865,7 @@ API リファレンス
 ザに対してしか動作しないことに注意して下さい．匿名ユーザにメッセージを送る
 には， `セッションフレームワーク`_ を使って下さい．
 
-.. _`セッションフレームワーク`: sessions.html
+.. _`セッションフレームワーク`: ../sessions/
 .. _session framework: http://www.djangoproject.com/documentation/sessions/
 
 

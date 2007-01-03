@@ -74,7 +74,7 @@ Django の汎用ビューには以下のようなものがあります:
 QuerySet を常に最新の状態にしておきたい場合には，関数やラムダ表記を使って
 QuerySet を返させるようにせねばなりません．
 
-.. _`データベース API のドキュメント`: db-api.html
+.. _`データベース API のドキュメント`: ../db-api/
 
 .. _"Simple" generic views:
 
@@ -241,7 +241,7 @@ URL に ``Nune`` を指定すると， ``HttpResponseGone`` (410) を発行します．
       ``queryset`` 内のオブジェクトのうち，最新の 10 個からなるリストです．
 
 .. _`RequestContext のドキュメント`: 
-    templates_python.html#subclassing-context-requestcontext
+    ../templates_python/#subclassing-context-requestcontext
 .. _RequestContext docs: 
     http://www.djangoproject.com/documentation/templates_python/#subclassing-context-requestcontext
 
@@ -992,9 +992,9 @@ Django モデルに付属の自動マニピュレータを使います．
       ``FormWrapper`` オブジェクトをテンプレート内で使うための詳しい情報は，
       `マニピュレータとフォームフィールドのドキュメント`_ を参照してください．
 
-.. _`認証システム`: authentication.html
+.. _`認証システム`: ../authentication/
 .. _authentication system: http://www.djangoproject.com/documentation/authentication/
-.. _`マニピュレータとフォームフィールドのドキュメント`: forms.html
+.. _`マニピュレータとフォームフィールドのドキュメント`: ../forms/
 .. _manipulator and formfield documentation: http://www.djangoproject.com/documentation/forms/
 
 ``django.views.generic.create_update.update_object``

@@ -59,7 +59,7 @@ Django の国際化フックはデフォルトで有効になっているので，フレームワークの一
 ``'django.core.context_processors.i18n'`` を外すことになるでしょう．
 
 
-.. _`USE_I18N のドキュメント`: settings.html#use-i18n
+.. _`USE_I18N のドキュメント`: ../settings/#use-i18n
 .. _documentation for USE_I18N: http://www.djangoproject.com/documentation/settings/#use-i18n
 
 .. _How to specify translation strings:
@@ -193,7 +193,7 @@ import する必要はありません．
             verbose_name = _('my thing')
             verbose_name_plural = _('mythings')
 
-.. _`Django モデル`: model-api.html
+.. _`Django モデル`: ../model-api/
 .. _Django models: http://www.djangoproject.com/documentation/model_api/
 
 .. _Pluralization:
@@ -298,7 +298,7 @@ Python コードとは少し違った方法で行います．テンプレートで翻訳用のタグを使え
 このばあい，タグとフィルタの両方は翻訳済みの文字列を扱うことになるので，翻
 訳の有無について気を配る必要がなくなります．
 
-.. _`Django テンプレート`: templates_python.html
+.. _`Django テンプレート`: ../templates_python/
 .. _Django templates: http://www.djangoproject.com/documentation/templates_python/
 
 .. _How to create language files:
@@ -425,7 +425,7 @@ Django には ``bin/make-messages.py`` というツールが付属しています．このツー
     い! 手順は `翻訳の提出と維持`_ にあります．
 
 .. _`翻訳の提出と維持`: 
-    contributing.html#submitting-and-maintaining-translations
+    ../contributing/#submitting-and-maintaining-translations
 .. _Submitting and maintaining translations: 
     http://www.djangoproject.com/documentation/
 
@@ -504,7 +504,7 @@ Django をネイティブの言語で動かしたいだけで，かつ自分の言語に対する言語ファ
       この例では，自動生成されるメニューで利用可能な言語をドイツ語:de と
       英語:en (および de-ch や en-us のような副言語) に制限しています．
 
-      .. _`LANGUAGES 設定`: settings.html#languages
+      .. _`LANGUAGES 設定`: ../settings/#languages
       .. _LANGUAGES setting: 
           http://www.djangoproject.com/documentation/settings/#languages
 
@@ -565,12 +565,12 @@ Django をネイティブの言語で動かしたいだけで，かつ自分の言語に対する言語ファ
 ``settings.LANGUAGE_CODE`` の値になり，動的な (ミドルウェアを使った) 翻訳で
 は，言語設定は ``request.LANGUAGE_CODE`` の値になるので注意してください．
 
-.. _`設定ファイル`: settings.html
+.. _`設定ファイル`: ../settings/
 .. _settings file: http://www.djangoproject.com/documentation/settings/
-.. _`ミドルウェアのドキュメント`: middleware.html
+.. _`ミドルウェアのドキュメント`: ../middleware/
 .. _middleware documentation: http://www.djangoproject.com/documentation/middleware/
-.. _`セッション`: sessions.html
-.. _`リクエストオブジェクト`: request_response.html#httprequest-objects
+.. _`セッション`: ../sessions/
+.. _`リクエストオブジェクト`: ../request_response/#httprequest-objects
 .. _session: http://www.djangoproject.com/documentation/sessions/
 .. _request object: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
 
@@ -645,7 +645,8 @@ Django は以下のアルゴリズムに従って翻訳を探します:
     イルのある場所を基準に ``locale`` ディレクトリの場所を調べますが，手動
     で設定を行うと設定ファイルが存在しなくなってしまうからです)．
 
-.. _`settings のドキュメント`: settings.html#using-settings-without-the-django-settings-module-environment-variable
+.. _`settings のドキュメント`: 
+    ../settings/#using-settings-without-the-django-settings-module-environment-variable
 .. _settings documentation: http://www.djangoproject.com/documentation/settings/#using-settings-without-the-django-settings-module-environment-variable
 
 

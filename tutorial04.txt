@@ -133,7 +133,7 @@ URLconf に入れたことを思い出しましょう::
 ムを提出すると，エラーメッセージを表示するはずです．
 
 .. _`リクエストオブジェクトとレスポンスオブジェクトのドキュメント`: 
-    request_response.html
+    ../request_response/
 .. _request and response documentation: 
     http://www.djangoproject.com/documentation/request_response/
 
@@ -253,7 +253,7 @@ URLconf に入れたことを思い出しましょう::
 
 汎用ビューの詳細は `汎用ビューのドキュメント`_ を参照してください．
 
-.. _`汎用ビューのドキュメント`: generic_views.html
+.. _`汎用ビューのドキュメント`: ../generic_views/
 
 .. _Coming soon:
 
@@ -270,5 +270,5 @@ URLconf に入れたことを思い出しましょう::
     * 高度な admin 機能: パーミッション
     * 高度な admin 機能: カスタム JavaScript
 
-.. _`チュートリアルその 3`: tutorial03.html
+.. _`チュートリアルその 3`: ../tutorial03/
 .. _Tutorial 3: http://www.djangoproject.com/documentation/tutorial3/

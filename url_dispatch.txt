@@ -53,9 +53,9 @@ Django のリクエスト処理
        数の第一引数には `リクエストオブジェクト`_ が，それ以降の引数には正
        規表現でキャプチャした値が渡されます．
 
-.. _`設定ファイル`: settings.html
+.. _`設定ファイル`: ../settings/
 .. _settings file: http://www.djangoproject.com/documentation/settings/
-.. _`リクエストオブジェクト`: request_response.html#httprequest-objects
+.. _`リクエストオブジェクト`: ../request_response/#httprequest-objects
 .. _request object: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
 
 .. _Examples:
@@ -319,7 +319,7 @@ Python 文字列型になります．例えば，下のような URLconf の行::
 プレフィクスには末尾のドット (``"."``) を入れていないことに注意してください．
 Django はドットを自動的に入れます．
 
-.. _`Django の概要`: overview.html
+.. _`Django の概要`: ../overview/
 .. _Django overview: http://www.djangoproject.com/documentation/overview/
 
 
@@ -433,9 +433,9 @@ URLconf タプルにはオプションとして 3 つめの要素を指定できます．この要素は
 このテクニックは `汎用ビュー`_ や `配信フィードフレームワーク`_ で，メタデー
 タやビューへのオプションを渡すために使われています．
 
-.. _`汎用ビュー`: generic_views.html
+.. _`汎用ビュー`: ../generic_views/
 .. _generic views: http://www.djangoproject.com/documentation/generic_views/
-.. _`配信フィードフレームワーク`: syndication_feeds.html
+.. _`配信フィードフレームワーク`: ../syndication_feeds/
 .. _syndication framework: http://www.djangoproject.com/documentation/syndication/
 
 .. _`Passing extra options to include()`:

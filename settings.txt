@@ -66,7 +66,7 @@ django-admin.py ユーティリティ
 
     django-admin.py runserver --settings=mysite.settings
 
-.. _django-admin.py: django-admin.html
+.. _django-admin.py: ../django-admin/
 .. django-admin.py: http://www.djangoproject.com/documentation/django_admin/
 
 .. _On the server (mod_python):
@@ -86,7 +86,7 @@ django-admin.py ユーティリティ
 詳しくは `mod_python で Django を使うためのドキュメント`_ を参照してくださ
 い．
 
-.. _`mod_python で Django を使うためのドキュメント`: modpython.html
+.. _`mod_python で Django を使うためのドキュメント`: ../modpython/
 .. _Django mod_python documentation: http://www.djangoproject.com/documentation/modpython/
 
 .. _Default settings:
@@ -117,7 +117,7 @@ Django が設定をコンパイルする際には，以下のようなアルゴリズムを使います:
 ルト設定との違いを表示します．詳しくは `diffsettings のドキュメント`_ を参
 照してください．
 
-.. _`diffsettings のドキュメント`: django-admin.html#diffsettings
+.. _`diffsettings のドキュメント`: ../django-admin/#diffsettings
 .. _diffsettings documentation: http://www.djangoproject.com/documentation/django_admin/#diffsettings
 
 
@@ -339,7 +339,7 @@ DATETIME_FORMAT_ , TIME_FORMAT_ , YEAR_MONTH_FORMAT_ および
 MONTH_DAY_FORMAT も参照してください．
 
 
-.. _`利用可能な日付フォーマット文字`: templates.html#now
+.. _`利用可能な日付フォーマット文字`: ../templates/#now
 .. _allowed date format strings: http://www.djangoproject.com/documentation/templates/#now
 
 DATETIME_FORMAT
@@ -354,7 +354,7 @@ Django の admin サイトの変更履歴ページ (や，システムの他の部分で) 日時フィー
 DATETIME_FORMAT_ , TIME_FORMAT_ , YEAR_MONTH_FORMAT_ および
 MONTH_DAY_FORMAT も参照してください．
 
-.. _`利用可能な日時フォーマット文字`: templates.html#now
+.. _`利用可能な日時フォーマット文字`: ../templates/#now
 .. _allowed date format strings: http://www.djangoproject.com/documentation/templates/#now
 
 DEBUG
@@ -473,7 +473,7 @@ INSTALLED_APPS
 アプリケーションの入った Python パッケージを示す完全な Python パスでなけれ
 ばなりません．
 
-.. _django-admin.py startapp: django-admin.html#startapp-appname
+.. _django-admin.py startapp: ../django-admin/#startapp-appname
 .. django-admin.py startapp: http://www.djangoproject.com/documentation/django_admin/#startapp-appname
 
 INTERNAL_IPS
@@ -506,7 +506,7 @@ LANGUAGE_CODE
 指定形式にせねばなりません．たとえば U.S. English は ``"en-us"`` にします．
 `国際化のドキュメント`_ も参照してください．
 
-.. _国際化のドキュメント: i18n.html
+.. _国際化のドキュメント: ../i18n/
 .. _internationalization docs: http://www.djangoproject.com/documentation/i18n/
 
 LANGUAGES
@@ -665,7 +665,7 @@ ROOT_URLCONF
 ``"mydjangoapps.urls"`` です． `Django のリクエスト処理`_ を参照してくださ
 い．
 
-.. _`Django のリクエスト処理`: url_dispatch.html#how-django-processes-a-request
+.. _`Django のリクエスト処理`: ../url_dispatch/#how-django-processes-a-request
 .. _How Django processes a request: http://www.djangoproject.com/documentation/url_dispatch/#how-django-processes-a-request
 
 SECRET_KEY
@@ -828,7 +828,7 @@ TEMPLATE_STRING_IF_INVALID
 誤った (スペルを間違えたなど) 変数名に対してテンプレートシステムが出力する
 文字列です． `無効な変数の扱い`_ を参照してください．
 
-.. _`無効な変数の扱い`: templates_python.html#how-invalid-variables-are-handled
+.. _`無効な変数の扱い`: ../templates_python/#how-invalid-variables-are-handled
 .. _How invalid variables are handled: http://www.djangoproject.com/documentation/templates_python/#how-invalid-variables-are-handled
 
 TEST_RUNNER
@@ -842,7 +842,7 @@ TEST_RUNNER
 `Django アプリケーションのテスト`_ を参照してください．
 
 .. _Testing Django Applications: ../testing/
-.. _`Django アプリケーションのテスト`: ../testing.html
+.. _`Django アプリケーションのテスト`: ../testing/
 
 
 TEST_DATABASE_NAME
@@ -871,7 +871,7 @@ Django の admin サイトの変更履歴ページ (や，システムの他の部分で) 時刻フィー
 DATETIME_FORMAT_ , TIME_FORMAT_ , YEAR_MONTH_FORMAT_ および
 MONTH_DAY_FORMAT も参照してください．
 
-.. _`利用可能な時刻フォーマット文字`: templates.html#now
+.. _`利用可能な時刻フォーマット文字`: ../templates/#now
 
 .. _allowed date format strings: http://www.djangoproject.com/documentation/templates/#now
 
@@ -912,7 +912,8 @@ Django は ``TZ`` 環境変数を *操作しない* ので，ユーザは自分の責任でプロセス
   を手動で操作できるようになります．通常，トランザクションを手動で行う必要は
   ありません．詳しくは `トランザクションのドキュメント`_ を参照してください．
 
-.. _`トランザクションのドキュメント`: transactions.html#how-to-globally-deactivate-transaction-management
+.. _`トランザクションのドキュメント`: 
+    ../transactions/#how-to-globally-deactivate-transaction-management
 
 
 URL_VALIDATOR_USER_AGENT
@@ -923,7 +924,7 @@ URL_VALIDATOR_USER_AGENT
 特定の URL が実在するかを Django が調べにゆく際に使う ``User-Agent`` ヘッダ
 の値です． (URLField_ の ``verify_exists`` を参照してください．)
 
-.. _URLField: ../model_api.html#urlfield
+.. _URLField: ../model_api/#urlfield
 
 
 USE_ETAGS
@@ -967,17 +968,16 @@ DATETIME_FORMAT_ , TIME_FORMAT_ , YEAR_MONTH_FORMAT_ および
 MONTH_DAY_FORMAT も参照してください．
 
 
-.. _`キャッシュのドキュメント`: cache.html
-.. _`ミドルウェアのドキュメント`: middleware.html
-.. _`セッションのドキュメント`: sessions.html
+.. _`キャッシュのドキュメント`: ../cache/
+.. _`ミドルウェアのドキュメント`: ../middleware/
+.. _`セッションのドキュメント`: ../sessions/
+.. _`テンプレートのドキュメント`: ../templates_python/
+.. _`利用可能な選択肢`: 
+    http://www.postgresql.org/docs/8.1/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
 .. _middleware docs: http://www.djangoproject.com/documentation/middleware/
 .. _session docs: http://www.djangoproject.com/documentation/sessions/
 .. _cache docs: http://www.djangoproject.com/documentation/cache/
-.. _middleware docs: http://www.djangoproject.com/documentation/middleware/
-.. _session docs: http://www.djangoproject.com/documentation/sessions/
-.. _`利用可能な選択肢`: http://www.postgresql.org/docs/8.1/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
 .. _See available choices: http://www.postgresql.org/docs/current/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
-.. _`テンプレートのドキュメント`: templates_python.html
 .. _template documentation: http://www.djangoproject.com/documentation/templates_python/
 
 設定項目を自作する

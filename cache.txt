@@ -283,7 +283,7 @@ In this example, ``timeout`` is ``30`` and ``max_entries`` is ``400``::
 
 ミドルウェアの詳細は `ミドルウェアのドキュメント`_ を参照してください．
 
-.. _`ミドルウェアのドキュメント`: middleware.html
+.. _`ミドルウェアのドキュメント`: ../middleware/
 .. _`middleware documentation`: http://www.djangoproject.com/documentation/middleware/
 
 .. _The per-view cache:
@@ -569,7 +569,8 @@ Cache-Control HTTP ディレクティブの説明は `Cache-Control の仕様`_ を参照し
 タムの ``max_age`` を ``cache_control`` デコレータで使うと，デコレータの設
 定が優先され，ヘッダの値は正しくマージされます．)
 
-.. _`Cache-Control の仕様`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
+.. _`Cache-Control の仕様`: 
+    http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
 
 .. _Other optimizations:
 

@@ -63,7 +63,7 @@ admin-index テンプレート断片は， admin のインデクスページのルック&フイー
 ルをカスタマイズしたい場合に使って下さい．詳しくは
 `チュートリアルその 2`_ を参照してください．
 
-.. _`チュートリアルその 2`: tutorial02.html
+.. _`チュートリアルその 2`: ../tutorial02/
 
 createcachetable [tablename]
 ----------------------------
@@ -72,7 +72,7 @@ createcachetable [tablename]
 名前のキャッシュテーブルを生成します．詳しくは
 `cache のドキュメント`_ を参照してください．
 
-.. _`cache のドキュメント`: cache.html
+.. _`cache のドキュメント`: ../cache/
 
 dbshell
 -------
@@ -199,10 +199,10 @@ IP アドレス 1.2.3.4，ポート番号 7000::
 
 デフォルトでは，開発用サーバはサイト用の静的ファイル (CSSファイル，画像，
 ``MEDIA_ROOT_URL`` 下のファイルなど) を全く提供しません． Django に静的メディ
-アを提供させたければ， `静的ファイルの提供のドキュメント`_ を参照してくださ
+アを提供させたければ， `静的なファイルの提供方法`_ を参照してくださ
 い．
 
-.. _`静的ファイルの提供のドキュメント`: static_files.html
+.. _`静的なファイルの提供方法`: ../static_files/
 .. _serving static files: http://www.djangoproject.com/documentation/static_files/
 
 .. _Turning off auto-reload:

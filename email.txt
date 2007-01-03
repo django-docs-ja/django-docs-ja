@@ -31,7 +31,7 @@ Python の `smtplib ライブラリ`_ を使えば，比較的簡単に電子メールを送信でき
     ``django.core.mail`` で送信される電子メールの文字セットは
     `DEFAULT_CHARSET 設定`_ の値に設定されます．
     
-.. _`DEFAULT_CHARSET 設定`: settings.html#default-charset
+.. _`DEFAULT_CHARSET 設定`: ../settings/#default-charset
 .. _DEFAULT_CHARSET setting: ../settings/#DEFAULT_CHARSET
 
 
@@ -118,9 +118,9 @@ mail_admins()
 
 このメソッドは利便性と可読性のために用意されています．
 
-.. _ADMINS 設定: settings.html#admins
-.. _EMAIL_SUBJECT_PREFIX 設定: settings.html#email-subject-prefix
-.. _SERVER_EMAIL 設定: settings.html#server-email
+.. _ADMINS 設定: ../settings/#admins
+.. _EMAIL_SUBJECT_PREFIX 設定: ../settings/#email-subject-prefix
+.. _SERVER_EMAIL 設定: ../settings/#server-email
 .. _ADMINS setting: 
    http://www.djangoproject.com/documentation/settings/#admins
 .. _EMAIL_SUBJECT_PREFIX setting: 
@@ -138,7 +138,7 @@ mail_managers()
 
     mail_managers(subject, message, fail_silently=False)
 
-.. _`MANAGERS 設定`: settings.html#managers
+.. _`MANAGERS 設定`: ../settings/#managers
 .. _MANAGERS setting: 
    http://www.djangoproject.com/documentation/settings/#managers
 

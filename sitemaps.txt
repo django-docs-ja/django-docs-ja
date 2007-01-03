@@ -29,10 +29,10 @@ sitemaps は Django の `配信フレームワーク`_ によく似ています．サイトマップ
 の生成は簡単で，ただ ``Sitemap`` クラスを書いて， URLconf_ に指定するだけで
 す．
 
-.. _`配信フレームワーク`: syndication.html
-.. _URLconf: url_dispatch.html
-.. _syndication framework: http://www.djangoproject.com/documentation/syndication/
-.. URLconf: http://www.djangoproject.com/documentation/url_dispatch/
+.. _`配信フレームワーク`: ../syndication/
+.. _URLconf: ../url_dispatch/
+.. .. _syndication framework: http://www.djangoproject.com/documentation/syndication/
+.. .. _URLconf: http://www.djangoproject.com/documentation/url_dispatch/
 
 .. _Installation:
 
@@ -53,12 +53,12 @@ sitemaps アプリケーションは以下の手順でインストールします:
 ``load_template_source`` テンプレートローダがデフォルトのテンプレートを捜し
 出せるようにするためです．)
 
-.. INSTALLED_APPS: http://www.djangoproject.com/documentation/settings/#installed-apps
-.. TEMPLATE_LOADERS: http://www.djangoproject.com/documentation/settings/#template-loaders
-.. _sites framework: http://www.djangoproject.com/documentation/sites/
-.. _INSTALLED_APPS: settings.html#installed-apps
-.. _TEMPLATE_LOADERS: settings.html#template-loaders
-.. _`sites フレームワーク`: sites.html
+.. _INSTALLED_APPS: ../settings#installed-apps
+.. _TEMPLATE_LOADERS: ../settings#template-loaders
+.. _`sites フレームワーク`: ../sites
+.. .. _INSTALLED_APPS: http://www.djangoproject.com/documentation/settings/#installed-apps
+.. .. _TEMPLATE_LOADERS: http://www.djangoproject.com/documentation/settings/#template-loaders
+.. .. _sites framework: http://www.djangoproject.com/documentation/sites/
 
 .. _Initialization:
 
@@ -255,8 +255,8 @@ sitemaps フレームワークでは，よく使われる状況向けに，二つの便宜クラスを用意
 
 .. _flatpages: http://www.djangoproject.com/documentation/flatpages/
 .. _sites documentation: http://www.djangoproject.com/documentation/sites/
-.. _`フラットページ`: flatpages.html
-.. _`sites のドキュメント`: sites.html
+.. _`フラットページ`: ../flatpages/
+.. _`sites のドキュメント`: ../sites/
 
 ``GenericSitemap``
 ------------------
@@ -272,7 +272,7 @@ sitemaps フレームワークでは，よく使われる状況向けに，二つの便宜クラスを用意
 これらの引数の値は，全ての URL に共通の属性になります．
 
 .. _generic views: http://www.djangoproject.com/documentation/generic_views/
-.. _`汎用ビュー`: generic_views.html
+.. _`汎用ビュー`: ../generic_views/
 
 .. _Example:
 

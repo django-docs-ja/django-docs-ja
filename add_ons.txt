@@ -19,7 +19,7 @@ admin
 Django の自動化管理インタフェースです．詳しくは `チュートリアルその 2`_ を
 参照してください．
 
-.. _`チュートリアルその 2`: tutorial02.html
+.. _`チュートリアルその 2`: ../tutorial02/
 .. _Tutorial 2: http://www.djangoproject.com/documentation/tutorial2/
 
 auth
@@ -28,7 +28,7 @@ auth
 Django の認証フレームワークです．詳しくは `認証のドキュメント`_ を参照して
 下さい．
 
-.. _`認証のドキュメント`: authentication.html
+.. _`認証のドキュメント`: ../authentication/
 
 comments
 ========
@@ -50,7 +50,7 @@ csrf
 
 `csrf のドキュメント`_ を参照してください．
 
-.. _`csrf のドキュメント`: csrf.html
+.. _`csrf のドキュメント`: ../csrf/
 .. _csrf documentation: http://www.djangoproject.com/documentation/csrf/
 
 formtools
@@ -146,7 +146,7 @@ flatpages
 
 `flatpages のドキュメント`_ を参照してください．
 
-.. _`flatpages のドキュメント`: flatpages.html
+.. _`flatpages のドキュメント`: ../flatpages/
 .. _flatpages documentation: http://www.djangoproject.com/documentation/flatpages/
 
 
@@ -171,7 +171,7 @@ redirects
 
 `redirects のドキュメント`_ を参照してください．
 
-.. _`redirects のドキュメント`: redirects.html
+.. _`redirects のドキュメント`: ../redirects/
 .. _redirects documentation: http://www.djangoproject.com/documentation/redirects/
 
 
@@ -182,7 +182,7 @@ sessions
 
 `セッションのドキュメント`_ を参照してください．
 
-.. _`セッションのドキュメント`: sessions.html
+.. _`セッションのドキュメント`: ../sessions/
 
 sites
 =====
@@ -193,7 +193,7 @@ sites
 
 `sites のドキュメント`_ を参照してください．
 
-.. _`sites のドキュメント`: sites.txt
+.. _`sites のドキュメント`: ../sites/
 .. _sites documentation: http://www.djangoproject.com/documentation/sites/
 
 sitemaps
@@ -204,7 +204,7 @@ Google サイトマップ XML ファイルを生成するためのフレームワークです．
 `sitemaps のドキュメント`_ を参照してください．
 
 .. _sitemaps documentation: http://www.djangoproject.com/documentation/sitemaps/
-.. _`sitemaps のドキュメント`: sitemaps.html
+.. _`sitemaps のドキュメント`: ../sitemaps/
 
 
 syndication
@@ -215,7 +215,7 @@ RSS および Atom 形式の配信フィード (syndication feed) をごく簡単に生成する
 
 `配信フィードフレームワークのドキュメント`_ を参照してください．
 
-.. _`配信フィードフレームワークのドキュメント`: syndication_feeds.html
+.. _`配信フィードフレームワークのドキュメント`: ../syndication_feeds/
 .. _syndication documentation: http://www.djangoproject.com/documentation/syndication/
 
 

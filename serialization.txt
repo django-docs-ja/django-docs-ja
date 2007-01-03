@@ -31,7 +31,7 @@ Django の整列化フレームワークを使うと， Django オブジェクトを他の形式に「翻
 (実際には，第二引数は Django オブジェクトを返す任意のイテレータにできますが，
 大抵の場合は QuerySet を使うことになるでしょう)．
 
-.. _QuerySet: ../db_api.html#retrieving-objects
+.. _QuerySet: ../db_api/#retrieving-objects
 
 シリアライザオブジェクトを直接使ってもかまいません::
 
@@ -46,7 +46,7 @@ Django の整列化フレームワークを使うと， Django オブジェクトを他の形式に「翻
     out = open("file.xml", "w")
     xml_serializer.serialize(SomeModel.objects.all(), stream=out)
 
-.. _HTTPResponse: ../request_response.html#httpresponse-objects
+.. _HTTPResponse: ../request_response/#httpresponse-objects
 
 .. _Deserializing data:
 

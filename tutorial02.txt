@@ -8,7 +8,7 @@
 Web 投票アプリケーションの開発を例にして，Django が自動生成する管理サイト
 (admin サイト) を焦点に解説します．
 
-.. _`チュートリアルその 1`: tutorial01.html
+.. _`チュートリアルその 1`: ../tutorial01/
 .. _Tutorial 1: http://www.djangoproject.com/documentation/tutorial1/
 
 .. admonition:: 設計哲学
@@ -81,7 +81,7 @@ admin サイトに入る
 
 (`ログインできない場合はこちらを参照してください`_)
 
-.. _`ログインできない場合はこちらを参照してください`: faq.html#the-admin-site
+.. _`ログインできない場合はこちらを参照してください`: ../faq/#the-admin-site
 .. _"I can't log in" questions: http://www.djangoproject.com/documentation/faq/#the-admin-site
 
 .. _Make the poll app modifiable in the admin:
@@ -112,7 +112,7 @@ Django admin ページをリロードして，どんな変化が起きたか見てみましょう．
 開発サーバはプロジェクトを自動的にリロードしてくれるので，コードに加えた変
 更はただちにブラウザで確認できます．
 
-.. _`メタデータ`: model_api.html#meta-options
+.. _`メタデータ`: ../model_api/#meta-options
 .. _non-field metadata: http://www.djangoproject.com/documentation/model_api/#meta-options
 
 .. _Explore the free admin functionality:
@@ -462,7 +462,7 @@ Django のデフォルトの admin テンプレートはどれもオーバライド可能です．テン
 トリ下を探すようフォールバックるようになっている」です．詳しくは
 `テンプレートローダタイプの解説`_ を参照してください．
 
-.. _`テンプレートローダタイプの解説`: templates_python.html#loader-types
+.. _`テンプレートローダタイプの解説`: ../templates_python/#loader-types
 .. _loader types documentation: http://www.djangoproject.com/documentation/templates_python.html/#loader-types
 
 .. _Customize the admin index page:
@@ -498,7 +498,7 @@ Django  admin サイトのルック & フィールをカスタマイズする詳しい方法について
 admin サイトを使いこなせるようになったら， `チュートリアルその 3`_ に進んで，
 poll アプリケーションの公開用ビュー作成にとりかかりましょう．
 
-.. _`Django admin CSS ガイド`: admin_css.html
-.. _`チュートリアルその 3`: tutorial03.html
+.. _`Django admin CSS ガイド`: ../admin_css/
+.. _`チュートリアルその 3`: ../tutorial03/
 .. _Django admin CSS guide: http://www.djangoproject.com/documentation/admin_css/
 .. _part 3 of this tutorial: http://www.djangoproject.com/documentation/tutorial3/

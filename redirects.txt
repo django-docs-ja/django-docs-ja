@@ -22,8 +22,8 @@ redirects アプリケーションをインストールするには，以下の 3 ステップの操作を
        を追加します．
     3. ``manage.py syncdb`` を実行します．
 
-.. _INSTALLED_APPS: settings.html#installed-apps
-.. _MIDDLEWARE_CLASSES: settings.html#middleware-classes
+.. _INSTALLED_APPS: ../settings/#installed-apps
+.. _MIDDLEWARE_CLASSES: ../settings/#middleware-classes
 .. INSTALLED_APPS: http://www.djangoproject.com/documentation/settings/#installed-apps
 .. MIDDLEWARE_CLASSES: http://www.djangoproject.com/documentation/settings/#middleware-classes
 
@@ -57,8 +57,9 @@ redirects データベースにリクエスト URL がないか調べます．特に，SITE_ID_ 設
 ミドルウェアについての詳しい情報は `ミドルウェアのドキュメント`_ を参照して
 ください．
 
-.. _SITE_ID: http://www.djangoproject.com/documentation/settings/#site-id
-.. _`ミドルウェアのドキュメント`: middleware.html
+.. .. _SITE_ID: http://www.djangoproject.com/documentation/settings/#site-id
+.. _SITE_ID: ../settings/#site-id
+.. _`ミドルウェアのドキュメント`: ../middleware/
 .. _middleware docs: http://www.djangoproject.com/documentation/middleware/
 
 .. _How to add, change and delete redirects:
@@ -85,8 +86,8 @@ Python API から
 `Django データベース API`_ を使ってリダイレクトオブジェクトにアクセスできま
 す．
 
-.. _Django モデル: model-api.html
+.. _Django モデル: ../model-api/
 .. _Django model: http://www.djangoproject.com/documentation/model_api/
 .. _django/contrib/redirects/models.py: http://code.djangoproject.com/browser/django/branches/magic-removal/django/contrib/redirects/models.py
-.. _Django データベース API: db-api.html
+.. _Django データベース API: ../db-api/
 .. _Django database API: http://www.djangoproject.com/documentation/db_api/

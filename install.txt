@@ -44,7 +44,7 @@ WSGI_ 仕様に従っているので，様々なサーバプラットフォームで動作させられます．
 .. _Apache: http://httpd.apache.org/
 .. _mod_python: http://www.modpython.org/
 .. _WSGI: http://www.python.org/peps/pep-0333.html
-.. _`mod_python で Django を動かす`: modpython.html
+.. _`mod_python で Django を動かす`: ../modpython/
 .. _`サーバ構成に関する wiki ページ`: http://code.djangoproject.com/wiki/ServerArrangements
 .. _How to use Django with mod_python: http://www.djangoproject.com/documentation/modpython/
 .. _server-arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements

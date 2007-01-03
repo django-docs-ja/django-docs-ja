@@ -13,13 +13,14 @@
 では別のシステムに置き換えられる予定です．スクラッチで新たなアプリケーショ
 ンを開発するつもりなら，このシステムを学ぶために時間を浪費しないよう強く勧
 めます．その代わりに，新たなフォームシステムである ``django.newforms`` の使
-い方を学んで利用しましょう． `newforms のドキュメント <newwforms.html>`_
-は，現在整備中です．
+い方を学んで利用しましょう． `newforms のドキュメント`_ は現在整備中です．
 
 すでに旧来のフォーム／マニピュレータを使ってコードを書いているなら，
-`newforms のドキュメント <newwforms.html>`_ の「移行計画」の節に目を通して，
-我々がどのようにフォームシステムを切替えるかを理解してください．
+`newforms のドキュメント`_ の「移行計画」の節に目を通して，我々がどのように
+フォームシステムを切替えるかを理解してください．
 
+
+.. _newforms のドキュメント: ../newforms/
 .. _newforms documentation: http://www.djangoproject.com/documentation/newforms/
 
 .. _Introduction:
@@ -706,9 +707,9 @@ Django のモデルとの類似性が見て取れます．自作のマニピュレータで必要なメソッ
     て， XML フラグメントがスキーマにしたがっているか検証します．
 
 .. _`generic views`: http://www.djangoproject.com/documentation/generic_views/
-.. _`汎用ビュー`: generic_views.html
+.. _`汎用ビュー`: ../generic_views/
 .. _`models API`: http://www.djangoproject.com/documentation/model_api/
-.. _`モデル API`: model_api.html
+.. _`モデル API`: ../model_api/
 .. _settings: http://www.djangoproject.com/documentation/settings/
-.. _`Django 設定ファイル`: settings.html
+.. _`Django 設定ファイル`: ../settings/
 

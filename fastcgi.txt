@@ -21,7 +21,7 @@ mod_python と同様， FastCGI はコードをメモリ上に残して，起動時間なしでリク
 FastCGI プロセスは Web サーバプロセスの中ではなく，別の永続的プロセスの中で
 実行されるということです．
 
-.. _`現在推奨されている`: modpython.html
+.. _`現在推奨されている`: ../modpython/
 .. _current preferred setup: http://www.djangoproject.com/documentation/modpython/
 .. _Apache: http://httpd.apache.org/
 .. _mod_python: http://www.modpython.org/

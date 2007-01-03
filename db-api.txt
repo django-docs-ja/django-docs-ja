@@ -8,7 +8,7 @@
 ります．このドキュメントでは，モデルから利用できるデータベース抽象化 API と，
 オブジェクトを生成，取得，更新する方法について説明します．
 
-.. _`データモデル`: model-api.html
+.. _`データモデル`: ../model-api/
 .. _`data models`: http://www.djangoproject.com/documentation/model_api/
 
 このリファレンスでは，以下のような Poll アプリケーションを参考に話を進めま
@@ -93,7 +93,7 @@ ID の値は Django ではなくデータベースによって計算されるので， ``save()`` を
 いかぎり，デフォルトでは各モデルに ``id`` という名前の ``AutoField``
 が追加されます．詳しくは `AutoField のドキュメント`_ を参照してください．)
 
-.. _`AutoField のドキュメント`: model-api.html#autofield
+.. _`AutoField のドキュメント`: ../model-api/#autofield
 .. _AutoField documentation: http://www.djangoproject.com/documentation/model_api/#autofield
 
 .. _Explicitly specifying auto-primary-key values:
@@ -1847,5 +1847,5 @@ Django のデータベースマッパで扱うには複雑すぎる SQL 文を書かねばならないよ
 プログラム言語，データベースフレームワークを介してアクセスできます．データ
 ベースについて Django 固有の何かがあるわけではないのです．
 
-.. _`カスタム SQL 文の実行`: model_api.html#executing-custom-sql
+.. _`カスタム SQL 文の実行`: ../model_api/#executing-custom-sql
 .. _Executing custom SQL: http://www.djangoproject.com/documentation/model_api/#executing-custom-sql

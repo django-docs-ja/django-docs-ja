@@ -31,10 +31,10 @@ Python には CSV ライブラリモジュール ``csv`` がついてきます．Django で
     CSV ライブラリの詳細は `CSV ライブラリのドキュメント`_ を参照してくださ
     い．
 
-    .. _`リクエストオブジェクトとレスポンスオブジェクト`: request_response.html
-    .. _`CSV ライブラリのドキュメント`: http://www.python.jp/doc/release/lib/module-csv.html
-    .. _Request and response objects: http://www.djangoproject.com/documentation/request_response/
-    .. _CSV library docs: http://www.python.org/doc/current/lib/module-csv.html
+.. _`リクエストオブジェクトとレスポンスオブジェクト`: ../request_response/
+.. _`CSV ライブラリのドキュメント`: http://www.python.jp/doc/release/lib/module-csv.html
+.. _Request and response objects: http://www.djangoproject.com/documentation/request_response/
+.. _CSV library docs: http://www.python.org/doc/current/lib/module-csv.html
 
 一例を示します::
 
@@ -127,7 +127,7 @@ Python には CSV ライブラリモジュール ``csv`` がついてきます．Django で
 重の両方) が入っていないと保証できる場合は ``addslashes`` フィルタを外して
 もかまいません．
 
-.. _`Django テンプレートシステム`: templates.html
-.. _`addslashes テンプレートフィルタ`: templates.html#addslashes
+.. _`Django テンプレートシステム`: ../templates/
+.. _`addslashes テンプレートフィルタ`: ../templates/#addslashes
 .. _Django template system: http://www.djangoproject.com/documentation/templates/
 .. _addslashes template filter: http://www.djangoproject.com/documentation/templates/#addslashes

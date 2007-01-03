@@ -201,7 +201,7 @@ admin サイトやバリデータのエラーメッセージなど，Django は様々な部分で国際化
     * `i18n のドキュメント` に従って翻訳を作成し，提出してください．
 
 .. _`Django i18n メーリングリスト`: http://groups.google.com/group/django-i18n/
-.. _`i18n のドキュメント`: i18n.html
+.. _`i18n のドキュメント`: ../i18n/
 
 .. _Coding style:
 
@@ -343,7 +343,7 @@ Django のテストは全て， Django に付属のアプリケーションテストインフラを使っ
 ています．テストの書き方の詳細は `Django アプリケーションのテスト`_ を参照
 してください．
 
-.. _`Django アプリケーションのテスト`: testing.html
+.. _`Django アプリケーションのテスト`: ../testing/
 
 .. _Running the unit tests:
 

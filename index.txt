@@ -12,133 +12,133 @@ Django オンラインドキュメント和訳
 必読
 ----------
 
-`Django の概要 (Django overview) <overview.html>`__
+`Django の概要 (Django overview) <../overview/>`__
 
-`インストールガイド <install.html>`__
+`インストールガイド <../install/>`__
 
 チュートリアル
 ~~~~~~~~~~~~~~
 
 `はじめての Django アプリ作成，その 1: 
-初期化，モデル作成，データベース API <tutorial01.html>`__  
+初期化，モデル作成，データベース API <../tutorial01/>`__  
 
 `はじめての Django アプリ作成，その 2: 
-自動生成の admin サイトを探究する <tutorial02.html>`__ 
+自動生成の admin サイトを探究する <../tutorial02/>`__ 
 
 `はじめての Django アプリ作成，その 3: 
-公開用のインタフェースビューを作成する <tutorial03.html>`__ 
+公開用のインタフェースビューを作成する <../tutorial03/>`__ 
 
 `はじめての Django アプリ作成，その 4: 
-簡単なフォームデータ処理と汎用ビュー <tutorial04.html>`__ 
+簡単なフォームデータ処理と汎用ビュー <../tutorial04/>`__ 
 
-`Django についてよくある質問 (Django FAQ) <faq.html>`__ 
+`Django についてよくある質問 (Django FAQ) <../faq/>`__ 
 
 
 リファレンス
 ---------------
 
-`django-admin.py と manage.py (django-admin.py and manage.py) <django-admin.html>`__
+`django-admin.py と manage.py (django-admin.py and manage.py) <../django-admin/>`__
 
 モデル
 ~~~~~~
 
-`モデルの作成 (Creating models) <model-api.html>`__ 
+`モデルの作成 (Creating models) <../model-api/>`__ 
 
-`データベース API (The database API) <db-api.html>`__
+`データベース API (The database API) <../db-api/>`__
 
-`トランザクション (Managing database transactions) <transactions.html>`__
+`トランザクション (Managing database transactions) <../transactions/>`__
 
 テンプレート
 ~~~~~~~~~~~~
 
 `テンプレート作者のための Django テンプレート言語ガイド
-(Guide for HTMLauthors)  <templates.html>`__
+(Guide for HTMLauthors)  <../templates/>`__
 
 `Python プログラマのための Django テンプレート言語ガイド
-(Guide for Python programmers)  <templates_python.html>`__
+(Guide for Python programmers)  <../templates_python/>`__
 
 `フォームとマニピュレータ
-(Forms, fields, and manipulators) <forms.html>`__
+(Forms, fields, and manipulators) <../forms/>`__
 
-`newforms ライブラリ <newforms.html>`__
+`newforms ライブラリ <../newforms/>`__
 
-`セッション (Sessions) <sessions.html>`__
+`セッション (Sessions) <../sessions/>`__
 
-`キャッシュ (Django's Cache Framework) <cache.html>`__
+`キャッシュ (Django's Cache Framework) <../cache/>`__
 
-`国際化 (Internationalization) <i18n.html>`__
+`国際化 (Internationalization) <../i18n/>`__
 
-`ミドルウェア (Middlewares) <middleware.html>`__
+`ミドルウェア (Middlewares) <../middleware/>`__
 
-`設定ファイル (Settings files) <settings.html>`__
+`設定ファイル (Settings files) <../settings/>`__
 
-`URL の設定 (URL configuration) <url_dispatch.html>`__
+`URL の設定 (URL configuration) <../url_dispatch/>`__
 
 `リクエストオブジェクトとレスポンスオブジェクト
-(Request and response objects) <request_response.html>`__
+(Request and response objects) <../request_response/>`__
 
-`汎用ビュー (Generic views) <generic_views.html>`__
+`汎用ビュー (Generic views) <../generic_views/>`__
 
-`認証 (Authentication) <authentication.html>`__
+`認証 (Authentication) <../authentication/>`__
 
-`アドオン (Add-on applications (contrib)) <add_ons.html>`__
+`アドオン (Add-on applications (contrib)) <../add_ons/>`__
 
-  `配信フィード (Syndication feeds (RSS and Atom)) <syndication_feeds.html>`__
+  `配信フィード (Syndication feeds (RSS and Atom)) <../syndication_feeds/>`__
 
-  `flatpages アプリケーション <flatpages.html>`__
+  `flatpages アプリケーション <../flatpages/>`__
 
-  `リダイレクト (Redirects) <redirects.html>`__
+  `リダイレクト (Redirects) <../redirects/>`__
 
-  `クロスサイトリクエストフォージェリ (CSRF) の阻止 <csrf.html>`__
+  `クロスサイトリクエストフォージェリ (CSRF) の阻止 <../csrf/>`__
 
-  `サイト (Sites) <sites.html>`__
+  `サイト (Sites) <../sites/>`__
 
-  `サイトマップ (Sitemaps) <sitemaps.html>`__
+  `サイトマップ (Sitemaps) <../sitemaps/>`__
 
 
 運用関連
 --------
 
-`mod_python で Django を使う (Using Django with mod_python) <modpython.html>`__
+`mod_python で Django を使う (Using Django with mod_python) <../modpython/>`__
 
-`FastCGI で Django を使う (Using Django with FastCGI) <fastcgi.html>`__
+`FastCGI で Django を使う (Using Django with FastCGI) <../fastcgi/>`__
 
 特殊な話題
 ----------
 
 `Apache での認証に Django ユーザデータベースを使う
-(Authenticating against Django's user database from Apache) <apache_auth.html>`__
+(Authenticating against Django's user database from Apache) <../apache_auth/>`__
 
-`静的ファイルの提供方法 (Serving static/media files) <static_files.html>`__
+`静的ファイルの提供方法 (Serving static/media files) <../static_files/>`__
 
-`e-mail の送信 (Sending e-mail) <email.html>`__
+`e-mail の送信 (Sending e-mail) <../email/>`__
 
 `古いデータベースの組み込み 
-(Integrating with (introspecting) a legacy database) <legacy_databases.html>`__
+(Integrating with (introspecting) a legacy database) <../legacy_databases/>`__
 
-`動的な PDF の生成 (Outputting PDFs dynamically) <outputting_pdf.html>`__
+`動的な PDF の生成 (Outputting PDFs dynamically) <../outputting_pdf/>`__
 
-`動的な CSV の生成 (Outputting CSV dynamically) <outputting_csv.html>`__
+`動的な CSV の生成 (Outputting CSV dynamically) <../outputting_csv/>`__
 
-`Django オブジェクトのシリアライズ (Serializing Django objects) <serialization.html>`__
+`Django オブジェクトのシリアライズ (Serializing Django objects) <../serialization/>`__
 
-`Django アプリケーションのテスト (Writing tests for Django applications) <testing.html>`__
+`Django アプリケーションのテスト (Writing tests for Django applications) <../testing/>`__
 
 その他
 ------
 
-`Django の設計思想 (Design philosophies) <design_philosophies.html>`__
+`Django の設計思想 (Design philosophies) <../design_philosophies/>`__
 
 `Django プロジェクトに協力するために
-(How to contribute to Django) <contributing.html>`__
+(How to contribute to Django) <../contributing/>`__
 
-`Django admin CSS guide <admin_css.html>`__
+`Django admin CSS guide <../admin_css/>`__
 
-`API の安定性 <api_stability.html>`__
+`API の安定性 <../api_stability/>`__
 
 
 リリースノート
 --------------
 
-`バージョン 0.95 リリースノート <release_notes_0.95.html>`__
+`バージョン 0.95 リリースノート <../release_notes_0.95/>`__
 
