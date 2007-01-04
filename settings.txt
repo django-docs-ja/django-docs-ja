@@ -2,7 +2,7 @@
 Django の設定
 =============
 
-:revision-up-to: 4203 (0.96-pre SVN)
+:revision-up-to: 4282 (0.96-pre SVN)
 
 Django の設定ファイルには，インストールした Django の使う全ての設定が入って
 います．このドキュメントでは，各設定の役割と，どのような設定を利用できるか
@@ -184,14 +184,14 @@ ABSOLUTE_URL_OVERRIDES
 
 デフォルト値: ``{}`` (空の辞書)
 
-モデルオブジェクトのパスを表す文字列 ``"app_label.module_name"`` から，モデ
+モデルオブジェクトのパスを表す文字列 ``"app_label.model_name"`` から，モデ
 ルオブジェクトを引数にとり URL を返すような関数への対応づけを行うための辞書
 です．インストールごとに ``get_absolute_url()`` メソッドを上書きするのに役
 立ちます．例えば::
 
     ABSOLUTE_URL_OVERRIDES = {
-        'blogs.blogs': lambda o: "/blogs/%s/" % o.slug,
-        'news.stories': lambda o: "/stories/%s/%s/" % (o.pub_year, o.slug),
+        'blogs.Weblog': lambda o: "/blogs/%s/" % o.slug,
+        'news.Story': lambda o: "/stories/%s/%s/" % (o.pub_year, o.slug),
     }
 
 ADMIN_FOR
