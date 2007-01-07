@@ -2,12 +2,12 @@
 newforms ライブラリ
 ===================
 
-:revision-up-to: 4269 (0.96-pre SVN)
+:revision-up-to: 4293 (0.96-pre SVN)
 
-``django.newforms`` は，これまでの Django フォーム/マニピュレータ/検証フレー
-ムワークである ``django.forms`` に代わる新たなフォームフレームワークです．
-newforms は Django の開発版で新たに登場した機能です．このドキュメントでは，
-新たなフォームライブラリの使い方を解説します．
+``django.newforms`` は， Django に新たに導入された画期的なフォーム処理ライ
+ブラリで，従来のフォーム／マニピュレータ／バリデータフレームワークである
+``django.forms`` を置き換えるものです．このドキュメントでは，新たなフォーム
+ライブラリの使い方について解説します．
 
 .. _Migration plan:
 
@@ -79,7 +79,8 @@ import 文を使うように勧めます::
 このライブラリは，データベースレイヤやビュー，テンプレートといった他の
 Django コンポーネントに対してカップリングしていません． newforms ライブラリ
 が依存しているのは settings と ``django.utils`` の二つのヘルパ関数，そして
-国際化システムだけです．
+国際化のためのフック (ただし，このライブラリを使うために国際化の機能を使わ
+ねばならないわけではありません) だけです．
 
 .. _Form objects:
 
@@ -110,13 +111,194 @@ Django コンポーネントに対してカップリングしていません． newforms ライブラリ
 ``CharField`` や ``EmailField`` といったフィールド型については，また後で説
 明する予定です．
 
+.. _Creating Form instances:
+
+``Form`` のインスタンスを生成する
+---------------------------------
+
+``Form`` のインスタンスには，何らかのデータの集まりと結び付いたもの
+(**束縛 (bound) フォーム**) と，そうでないもの
+(**非束縛 (unbound) フォーム**) があります．
+
+    * データと **結び付いている** フォームは，データを検証機能する機能と， 
+      フォームを HTML にレンダリングするときにデータを HTML 形式で表示する
+      機能をあわせ持っています．
+
+    * データと **結び付いていない** フォームには検証機能はありません (検証
+      すべきデータがないから当然ですね!) が，空のフォームを HTML としてレン
+      ダリングする機能は備えています．
+
+非束縛フォームのインスタンスを生成するには，単にフォームクラスのインスタン
+ス化を行います::
+
+    >>> f = ContactForm()
+
+フォームにデータを結び付けるには，データの入った辞書をフォームクラスのコン
+ストラクタの第一引数に渡します::
+
+    >>> data = {'subject': 'hello',
+    ...         'message': 'Hi there',
+    ...         'sender': 'foo@example.com',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(data)
+
+この辞書の中では，キーは各フィールドの名前であり，フォームクラスの各属性に
+対応しています．値は検証すべきデータです．通常，値は文字列にしますが，必ず
+しも文字列でなくてかまいません．値にどんなデータ型を指定指定できるかは，フィー
+ルドの型に依存します．
+
+実行時に束縛フォームと非束縛フォームを区別したければ，フォームの
+``is_bound`` 属性を調べてください::
+
+    >>> f = ContactForm()
+    >>> f.is_bound
+    False
+    >>> f = ContactForm({'subject': 'hello'})
+    >>> f.is_bound
+    True
+
+空の辞書を渡すと，空のデータの入った *束縛フォーム* を返します::
+
+    >>> f = ContactForm({})
+    >>> f.is_bound
+    True
+
+束縛フォームのインスタンスに入っているデータに何らかの変更を加えたい場合や，
+束縛フォームを変換して，何らかのデータの入った非束縛フォームにしたい場合に
+は，新たにフォームインスタンスを生成してください．フォームインスタンス内の
+データを変更する方法はありません．一度フォームインスタンスを生成したら，デー
+タの有無に関わらず，インスタンス内のデータは変更不能だと考えてください．
+
+.. _Using forms to validate data:
+
+フォームを使ってデータを検証する
+--------------------------------
+
+フォームオブジェクトの主要な役割はデータの検証です．束縛フォームのインスタ
+ンスに対して ``is_valid()`` メソッドを呼び出すと，データの検証を行って，そ
+の結果をブール値で返します::
+
+    >>> data = {'subject': 'hello',
+    ...         'message': 'Hi there',
+    ...         'sender': 'foo@example.com',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(data)
+    >>> f.is_valid()
+    True
+
+無効なデータを入れてみましょう．例えば， ``subject`` を空にしてみます
+(フィールドは全てデフォルトで必須なためエラーになります)．また，
+``sender`` に不正なメールアドレス情報を入れてみます::
+
+    >>> data = {'subject': '',
+    ...         'message': 'Hi there',
+    ...         'sender': 'invalid e-mail address',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(data)
+    >>> f.is_valid()
+    False
+
+``Form`` の ``errors`` という属性にアクセスすると，エラーメッセージの入った
+辞書を参照できます::
+
+    >>> f.errors
+    {'sender': [u'Enter a valid e-mail address.'], 'subject': [u'This field is required.']}
+
+この辞書は，フィールド名がキーに，エラーメッセージを表す Unicode 文字列のリ
+ストが値になっています．エラーメッセージがリストになっているのは，一つのフィー
+ルドに対して複数のエラーが存在し得るからです．
+
+``is_valid()`` を呼ばなくても ``errors`` にはアクセスできます．
+``is_valid()`` を呼び出すか， ``errors`` にアクセスすると，フォームのデータ
+は自動的に検証されます．
+
+.. _Behavior of unbound forms:
+
+非束縛フォームの動作
+~~~~~~~~~~~~~~~~~~~~
+
+データを含まないようなフォームの検証は無意味でしかありませんが，参考までに
+非束縛フォームに対する検証を行ったときの動作を示しておきます::
+
+    >>> f = ContactForm()
+    >>> f.is_valid()
+    False
+    >>> f.errors
+    {}
+
+.. _Accessing "clean" data:
+
+「クリーニング済み」のデータにアクセスする
+------------------------------------------
+
+フォームクラスの各フィールドには，データの検証だけでなく，「クリーニング」
+を行う役割もあります．データのクリーニングとは，データを一貫性のある書式に
+正規化することです．データのクリーニングはとても素晴らしい機能で，クリーニ
+ングを行うと，ユーザがフィールドに色々な形式でデータを入力しても，常に一貫
+性を持った出力を得られます．
+
+例えば， ``DateField`` はデータを Python の ``datetime.date`` オブジェクト
+に正規化します．フィールドの値は， ``'1994-07-15'`` のような形式の文字列で
+も， ``datetime.date`` オブジェクトでも，その他の形式でも， ``DateField``
+は有効なデータであるかぎり，常に出力を ``datetime.date`` オブジェクトで正規
+化します．
+
+データセットの入ったフォームインスタンスを生成して検証を行うと， 
+``clean_data`` 属性を介してクリーニング済みのデータにアクセスできるようにな
+ります::
+
+    >>> data = {'subject': 'hello',
+    ...         'message': 'Hi there',
+    ...         'sender': 'foo@example.com',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(data)
+    >>> f.is_valid()
+    True
+    >>> f.clean_data
+    {'cc_myself': True, 'message': u'Hi there', 'sender': u'foo@example.com', 'subject': u'hello'}
+
+``CharField`` や ``EmailField`` のようなテキストベースのフィールドは，常に
+入力を Unicode 文字列に変換します．エンコーディングに関する解説は，このドキュ
+メントの後の方でカバーする予定です．
+
+データが *まだ検証されていない* 場合，フォームインスタンスには
+``clean_data`` 属性がありません::
+
+    >>> data = {'subject': '',
+    ...         'message': 'Hi there',
+    ...         'sender': 'invalid e-mail address',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(data)
+    >>> f.is_valid()
+    False
+    >>> f.clean_data
+    Traceback (most recent call last):
+    ...
+    AttributeError: 'ContactForm' object has no attribute 'clean_data'
+
+.. _Behavior of unbound forms:
+
+非束縛フォームの動作
+~~~~~~~~~~~~~~~~~~~~
+
+データの入っていないフォームをクリーニングしても無意味ですが，参考までに非
+束縛フォームでの挙動を示します::
+
+    >>> f = ContactForm()
+    >>> f.clean_data
+    Traceback (most recent call last):
+    ...
+    AttributeError: 'ContactForm' object has no attribute 'clean_data'
+
+
 .. _Outputting forms as HTML:
 
 フォームを HTML として出力する
 ------------------------------
 
-フォームを定義したら， HTML に出力できます．フォームを HTML として出力する
-には，フォームをインスタンス化して， ``print`` で出力します::
+フォームオブジェクトの二つ目の仕事は，フォームの HTML へのレンダリングです．
+フォームを HTML として出力するには，フォームをインスタンス化して，
+``print`` で出力します::
 
     >>> f = ContactForm()
     >>> print f
@@ -124,6 +306,22 @@ Django コンポーネントに対してカップリングしていません． newforms ライブラリ
     <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" /></td></tr>
     <tr><th><label for="id_sender">Sender:</label></th><td><input type="text" name="sender" id="id_sender" /></td></tr>
     <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>
+
+束縛フォームの場合，フォームのデータは適切な形で HTML 出力されます．例えば，
+フィールドが ``<input type="text">`` で表される場合，データは ``value`` 属
+性の中に出力されます．フィールドが ``<input type="checkbox">`` であれば，
+必要に応じて ``checked="checked"`` が入ります::
+
+    >>> data = {'subject': 'hello',
+    ...         'message': 'Hi there',
+    ...         'sender': 'foo@example.com',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(data)
+    >>> print f
+    <tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" value="hello" /></td></tr>
+    <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" value="Hi there" /></td></tr>
+    <tr><th><label for="id_sender">Sender:</label></th><td><input type="text" name="sender" id="id_sender" value="foo@example.com" /></td></tr>
+    <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" checked="checked" /></td></tr>
 
 デフォルトの出力は 2 カラムの HTML テーブルになり，各フィールドが一つの
 ``<tr>`` タグの中に収まります．以下の点に注意してください:
@@ -136,14 +334,14 @@ Django コンポーネントに対してカップリングしていません． newforms ライブラリ
     * 各フィールドタイプには，それぞれデフォルトの HTML 表現があります．
       ``CharField`` や ``EmailField`` は ``<input type="text">`` で表され，
       ``BooleanField`` は ``<input type="checkbox">`` になります．とはいえ，
-      これらは便利なデフォルト値にすぎません．ウィジェット (``widget``) を
-      使えば，フィールドの表現にどのような HTML を使うかを指定できます．こ
-      れについては後で説明する予定です．
+      これらは便利なデフォルト値にすぎません．ウィジェット (widget) を使え
+      ば，フィールドの表現にどのような HTML を使うかを指定できます．これに
+      ついては後で説明する予定です．
 
     * 各タグの ``name`` 属性は ``ContactForm`` クラスの属性名から直接取り出
       して使われます．
 
-    * ``'Subject:'``, ``'Message:'``, ``'CC myself:'``  といった各フィール
+    * ``'Subject:'``, ``'Message:'``, ``'Cc myself:'``  といった各フィール
       ドのテキストラベルは，フィールド名のアンダースコアを全てスペースに変
       換し，先頭の文字を大文字にして生成します．これもまたデフォルト値にす
       ぎず，手動でもラベルを設定できるようになっています．
@@ -307,6 +505,39 @@ Django コンポーネントに対してカップリングしていません． newforms ライブラリ
 ``sender``, ``cc_myself`` になります． HTML 出力の中でフィールドの並び順を
 変更したければ，クラス定義内でのフィールドの並び順を変更してください．
 
+.. _How errors are displayed:
+
+エラーの出力方法
+~~~~~~~~~~~~~~~~
+
+束縛フォームオブジェクトをレンダすると，フォームの検証がまだであればレンダ
+リング操作の中で自動的に検証が行われ，エラーがあれば HTML 出力中の該当フィー
+ルドの付近に ``<ul>`` でエラー内容が表示されます．エラーメッセージ中の具体
+的なエラー表示位置は，どのメソッドでフォームをレンダしているかによります::
+
+    >>> data = {'subject': '',
+    ...         'message': 'Hi there',
+    ...         'sender': 'invalid e-mail address',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(data, auto_id=False)
+    >>> print f.as_table()
+    <tr><th>Subject:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="subject" maxlength="100" /></td></tr>
+    <tr><th>Message:</th><td><input type="text" name="message" value="Hi there" /></td></tr>
+    <tr><th>Sender:</th><td><ul class="errorlist"><li>Enter a valid e-mail address.</li></ul><input type="text" name="sender" value="invalid e-mail address" /></td></tr>
+    <tr><th>Cc myself:</th><td><input checked="checked" type="checkbox" name="cc_myself" /></td></tr>
+    >>> print f.as_ul()
+    <li><ul class="errorlist"><li>This field is required.</li></ul>Subject: <input type="text" name="subject" maxlength="100" /></li>
+    <li>Message: <input type="text" name="message" value="Hi there" /></li>
+    <li><ul class="errorlist"><li>Enter a valid e-mail address.</li></ul>Sender: <input type="text" name="sender" value="invalid e-mail address" /></li>
+    <li>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></li>
+    >>> print f.as_p()
+    <p><ul class="errorlist"><li>This field is required.</li></ul></p>
+    <p>Subject: <input type="text" name="subject" maxlength="100" /></p>
+    <p>Message: <input type="text" name="message" value="Hi there" /></p>
+    <p><ul class="errorlist"><li>Enter a valid e-mail address.</li></ul></p>
+    <p>Sender: <input type="text" name="sender" value="invalid e-mail address" /></p>
+    <p>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></p>
+
 .. _More granular output:
 
 より細かな出力調整
@@ -347,6 +578,200 @@ Django コンポーネントに対してカップリングしていません． newforms ライブラリ
     >>> print f['message']
     <input type="text" name="message" id="id_message" />
 
+あるフィールドに関するエラーのリストを取得するには，フィールドの ``errors``
+属性にアクセスします．このフィールドはリストライクなオブジェクトで， HTML
+として出力すると ``<ul>`` のリストになります::
+
+    >>> data = {'subject': 'hi', 'message': '', 'sender': '', 'cc_myself': ''}
+    >>> f = ContactForm(data, auto_id=False)
+    >>> print f['message']
+    <input type="text" name="message" />
+    >>> f['message'].errors
+    [u'This field is required.']
+    >>> print f['message'].errors
+    <ul class="errorlist"><li>This field is required.</li></ul>
+    >>> f['subject'].errors
+    []
+    >>> print f['subject'].errors
+
+    >>> str(f['subject'].errors)
+    ''
+
+.. _Fields:
+
+フィールド
+==========
+
+フォームクラスの作成で一番重要なのは，フォームの各フィールドの定義です．各
+フィールドは固有のデータ検証ロジックと，いくつかのフックが備わっています．
+
+フィールドクラスの主な用途はフォームクラスにおけるフィールド定義ですが，フィー
+ルドクラスは直接インスタンス化して使えるので，フィールドの動作を理解する役
+に立つはずです．各フィールドインスタンスは ``clean()`` メソッドを備えており，
+単一の引数を取って検証を行い，その結果に応じて
+``django.newforms.ValidationError`` を送出するか，クリーニング済みの値を返
+します::
+
+    >>> f = forms.EmailField()
+    >>> f.clean('foo@example.com')
+    u'foo@example.com'
+    >>> f.clean(u'foo@example.com')
+    u'foo@example.com'
+    >>> f.clean('invalid e-mail address')
+    Traceback (most recent call last):
+    ...
+    ValidationError: [u'Enter a valid e-mail address.']
+
+Django の古いフォーム／検証フレームワークを使ったことがある人は，この
+``VaridationError`` が以前の ``VaridationError`` とは別の例外であることに注
+意してください．以前の例外は ``django.core.validators.ValidationError`` で
+すが，新たな例外は ``django.newforms.ValidationError`` です．
+
+.. _Core field arguments:
+
+フィールドの主な引数
+--------------------
+
+各フィールドクラスのコンストラクタは，少なくとも以下に示す引数を取ります．
+フィールドクラスによっては他にもフィールド固有の引数をとりますが．ここに示
+す引数はどのフィールドクラスでも *常に* 指定できる引数です:
+
+``required``
+~~~~~~~~~~~~
+
+デフォルトでは，フィールドクラスはフィールドが必須 (reqired) であると仮定し
+ています．従って，フィールドに空の値，すなわち ``None`` や空文字列 (``""``)
+を渡すと， ``clean()`` は ``VaridationError`` 例外を送出します::
+
+    >>> f = forms.CharField()
+    >>> f.clean('foo')
+    u'foo'
+    >>> f.clean('')
+    Traceback (most recent call last):
+    ...
+    ValidationError: [u'This field is required.']
+    >>> f.clean(None)
+    Traceback (most recent call last):
+    ...
+    ValidationError: [u'This field is required.']
+    >>> f.clean(' ')
+    u' '
+    >>> f.clean(0)
+    u'0'
+    >>> f.clean(True)
+    u'True'
+    >>> f.clean(False)
+    u'False'
+
+必須で *ない* フィールドにするには，フィールドのコンストラクタに
+``required=False`` を指定します::
+
+    >>> f = forms.CharField(required=False)
+    >>> f.clean('foo')
+    u'foo'
+    >>> f.clean('')
+    u''
+    >>> f.clean(None)
+    u''
+    >>> f.clean(0)
+    u'0'
+    >>> f.clean(True)
+    u'True'
+    >>> f.clean(False)
+    u'False'
+
+``required=False`` のフィールドの ``clean()`` に空の値を渡して呼び出すと，
+``clean()`` は ``VaridationError`` を送出する代わりに *正規化された* 空の値
+を返します．例えば ``CharField`` の場合なら， Unicode の空文字列になります．
+その他のフィールドクラスでは ``None`` になるはずです (フィールドによって異
+なります)．
+
+``label``
+~~~~~~~~~
+
+``label`` 引数を使うと，フィールドに「人間に優しい」ラベルを指定できます．
+このラベルはフォーム内でフィールドを表示するときに使われます．
+
+上の `フォームを HTML として出力する <#outputting_forms_as_html>`_ で説明し
+たように，フィールドのデフォルトのラベルはフィールド名のアンダースコアを除
+去して，頭文字を大文字にしたものです．デフォルトのラベル命名規則が期待通り
+のラベルを出力しない場合には，この引数を指定してください．
+
+``label`` を指定したフォームの例を以下に示します．出力を短くするために
+``auto_id=False`` にしています::
+
+    >>> class CommentForm(forms.Form):
+    ...     name = forms.CharField(label='Your name')
+    ...     url = forms.URLField(label='Your Web site', required=False)
+    ...     comment = forms.CharField()
+    >>> f = CommentForm(auto_id=False)
+    >>> print f
+    <tr><th>Your name:</th><td><input type="text" name="name" /></td></tr>
+    <tr><th>Your Web site:</th><td><input type="text" name="url" /></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
+
+``initial``
+~~~~~~~~~~~
+
+``initial`` 引数を使うと，非束縛フォーム内でフィールドをレンダするときの初
+期値を指定できます．
+
+この引数を使うケースは，例えば以下のように，「空の」フォームの各フィールド
+を特定の値で初期化して表示したい場合です::
+
+    >>> class CommentForm(forms.Form):
+    ...     name = forms.CharField(initial='Your name')
+    ...     url = forms.URLField(initial='http://')
+    ...     comment = forms.CharField()
+    >>> f = CommentForm(auto_id=False)
+    >>> print f
+    <tr><th>Name:</th><td><input type="text" name="name" value="Your name" /></td></tr>
+    <tr><th>Url:</th><td><input type="text" name="url" value="http://" /></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
+
+こんなことをしなくても，フォームに初期データの入った辞書を渡せばいいのにと
+思うかもしれませんね．しかし，フォームにデータを渡して束縛フォームにすると，
+データを表示する際に検証がトリガされてしまい， HTML 出力にバリデーションエ
+ラーが入ってしまいます::
+
+    >>> class CommentForm(forms.Form):
+    ...     name = forms.CharField()
+    ...     url = forms.URLField()
+    ...     comment = forms.CharField()
+    >>> default_data = {'name': 'Your name', 'url': 'http://'}
+    >>> f = CommentForm(default_data, auto_id=False)
+    >>> print f
+    <tr><th>Name:</th><td><input type="text" name="name" value="Your name" /></td></tr>
+    <tr><th>Url:</th><td><ul class="errorlist"><li>Enter a valid URL.</li></ul><input type="text" name="url" value="http://" /></td></tr>
+    <tr><th>Comment:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="comment" /></td></tr>
+
+このため，非束縛フォームの場合に限って ``initial`` に指定した値が出力される
+ようになっているのです．束縛フォームの場合，出力は常に束縛済みのデータにな
+ります．
+
+また， ``initial`` の指定値は，フィールドの値が指定されなかった場合の
+「フォールバック用の」値には *ならない* ので注意が必要です．
+``initial`` の値は初期値の入ったフォームの表示 *だけ* に用いられます::
+
+    >>> class CommentForm(forms.Form):
+    ...     name = forms.CharField(initial='Your name')
+    ...     url = forms.URLField(initial='http://')
+    ...     comment = forms.CharField()
+    >>> data = {'name': '', 'url': '', 'comment': 'Foo'}
+    >>> f = CommentForm(data)
+    >>> f.is_valid()
+    False
+    # フォームの値は初期値にフォールバック *しません．*
+    >>> f.errors
+    {'url': [u'This field is required.'], 'name': [u'This field is required.']}
+
+``widget``
+~~~~~~~~~~
+
+``widget`` 引数を使うと，フィールドをレンダリングするときの ``Widget`` クラ
+スを指定できます．詳しくは後述の `ウィジェット <#widgets>`_ を参照してくだ
+さい．
+
 .. _More coming soon:
 
 つづく
@@ -360,10 +785,9 @@ http://code.djangoproject.com/browser/django/trunk/tests/regressiontests/forms/t
 このライブラリを使ってみたくてうずうずしているなら，もう少しだけ我慢してく
 ださいね．今，コードとドキュメントの仕上げにかかっているところなんです．
 
-.. _Using forms with templates:
+.. _Widgets:
 
-form とテンプレートを組み合わせる
-=================================
+ウィジェット
+============
 
-form をビュー内で使う
-=====================
+(この部分はまだ未完成です [4293], 2007/1/7.)
