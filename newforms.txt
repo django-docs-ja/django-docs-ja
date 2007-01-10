@@ -772,6 +772,56 @@ Django の古いフォーム／検証フレームワークを使ったことがある人は，この
 スを指定できます．詳しくは後述の `ウィジェット <#widgets>`_ を参照してくだ
 さい．
 
+.. _Dynamic initial values:
+
+初期値を動的に決定する
+----------------------
+
+フィールドオブジェクトの ``initial`` 引数を使えばフィールドの初期値をハード
+コードできます．では，初期値を動的に決めたい場合はどうすればよいのでしょう．
+例えば，現在ログインしているユーザで ``username`` フィールドを埋めたいよう
+な場合です．
+
+動的に初期値を決めるには，フォームオブジェクトの ``initial`` 引数を使います．
+この引数はフィールド名と初期値を対応づけた辞書として指定します．全てのフィー
+ルドを含める必要はなく，初期値を設定したいフィールドだけでかまいません．例
+を示しましょう::
+
+    >>> class CommentForm(forms.Form):
+    ...     name = forms.CharField()
+    ...     url = forms.URLField()
+    ...     comment = forms.CharField()
+    >>> f = CommentForm(initial={'name': 'your username'}, auto_id=False)
+    >>> print f
+    <tr><th>Name:</th><td><input type="text" name="name" value="your username" /></td></tr>
+    <tr><th>Url:</th><td><input type="text" name="url" /></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
+    >>> f = CommentForm(initial={'name': 'another username'}, auto_id=False)
+    >>> print f
+    <tr><th>Name:</th><td><input type="text" name="name" value="another username" /></td></tr>
+    <tr><th>Url:</th><td><input type="text" name="url" /></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
+
+フィールドの ``initial`` パラメタと同じく，フォームの初期値が表示されるのは
+非束縛フォームだけであり，ユーザが特定のフィールドに値を入力しなかったとき
+のフォールバックとしては使われません．
+
+最後に，フィールドに ``initial`` が定義されていて， *かつ* フォームの初期化
+時にも ``initial`` を指定した場合，後者の ``initial`` が優先されるので気を
+付けてください．例えば，以下のように，フィールドとフォームの両方に
+``initial`` を指定した場合，フォームの値の方が使われます::
+
+    >>> class CommentForm(forms.Form):
+    ...     name = forms.CharField(initial='class')
+    ...     url = forms.URLField()
+    ...     comment = forms.CharField()
+    >>> f = CommentForm(initial={'name': 'instance'}, auto_id=False)
+    >>> print f
+    <tr><th>Name:</th><td><input type="text" name="name" value="instance" /></td></tr>
+    <tr><th>Url:</th><td><input type="text" name="url" /></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
+
+
 .. _More coming soon:
 
 つづく

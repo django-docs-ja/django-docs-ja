@@ -10,7 +10,7 @@ Django オンラインドキュメント和訳
     4293 (2007/01/08)
 
 必読
-----------
+----
 
 `Django の概要 (Django overview) <../overview/>`__
 
@@ -35,7 +35,7 @@ Django オンラインドキュメント和訳
 
 
 リファレンス
----------------
+------------
 
 `django-admin.py と manage.py (django-admin.py and manage.py) <../django-admin/>`__
 
