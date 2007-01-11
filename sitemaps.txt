@@ -231,7 +231,7 @@ Sitempa クラスリファレンス
 ません．
 
 ``priority`` の値は ``0.4`` や ``1.0`` のようにします．デフォルトの重要度は
-``0.5`` です．重要度の詳細は `sitemaps.org ののドキュメント`_ を参照してく
+``0.5`` です．重要度の詳細は `sitemaps.org のドキュメント`_ を参照してく
 ださい．
 
 .. _sitemaps.org documentation: http://www.sitemaps.org/protocol.html#prioritydef

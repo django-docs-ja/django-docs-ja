@@ -2,7 +2,7 @@
 newforms ライブラリ
 ===================
 
-:revision-up-to: 4293 (0.96-pre SVN)
+:revision-up-to: 4306 (0.96-pre SVN)
 
 ``django.newforms`` は， Django に新たに導入された画期的なフォーム処理ライ
 ブラリで，従来のフォーム／マニピュレータ／バリデータフレームワークである
@@ -276,7 +276,27 @@ Django コンポーネントに対してカップリングしていません． newforms ライブラリ
     ...
     AttributeError: 'ContactForm' object has no attribute 'clean_data'
 
-.. _Behavior of unbound forms:
+フォームを生成するときに追加の値を渡した場合でも， ``clean_data`` の中に入
+るキーは，フォーム内で定義されているフィールド *だけ* です．以下の例でも，
+``ContactForm`` のコンストラクタに追加のフィールドデータを渡していますが，
+``clean_data`` が返すのは ``ContactForm`` で定義されているフィールドだけで
+す::
+
+    >>> data = {'subject': 'hello',
+    ...         'message': 'Hi there',
+    ...         'sender': 'foo@example.com',
+    ...         'cc_myself': True,
+    ...         'extra_field_1': 'foo',
+    ...         'extra_field_2': 'bar',
+    ...         'extra_field_3': 'baz'}
+    >>> f = ContactForm(data)
+    >>> f.is_valid()
+    True
+    >>> f.clean_data # Doesn't contain extra_field_1, etc.
+    {'cc_myself': True, 'message': u'Hi there', 'sender': u'foo@example.com', 'subject': u'hello'}
+
+
+.. .. _Behavior of unbound forms:
 
 非束縛フォームの動作
 ~~~~~~~~~~~~~~~~~~~~

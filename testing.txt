@@ -2,7 +2,7 @@
 Djangoアプリケーションのテスト
 ==============================
 
-:revision-up-to: 4168 (0.96-pre SVN)
+:revision-up-to: 4306 (0.96-pre SVN)
 
 **開発版の Django で新たに追加された機能です．**
 
@@ -254,7 +254,7 @@ Django は，アプリケーションの様々な機能に対するテストを補助するために，テス
 
     は，以下のような GET リクエストの送信と同じです::
 
-        http://yoursite.com/customers/details/?name='fred'&age=7
+        http://yoursite.com/customers/details/?name=fred&age=7
 
 ``post(path, data={})``
     ``path`` に対する POST リクエストを行います．引数 ``data`` は辞書オブジェ
@@ -474,7 +474,7 @@ Django は他のテストフレームワークを明にサポートしているわけではありませんが，
   ``django.db.models.get_apps()`` が返すのと同じフォーマットです．
 
   ``verbosity`` には，コンソールに出力される通知情報やデバッグ情報の量を指
-  定します．  '0' にすると何も出力しません． '1' は通常の出力， '2' は多め
+  定します．  `0` にすると何も出力しません． `1` は通常の出力， `2` は多め
   の出力です．
 
 .. _Testing utilities:
