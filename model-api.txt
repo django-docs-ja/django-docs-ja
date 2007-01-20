@@ -2,7 +2,7 @@
 モデル API リファレンス
 =======================
 
-:revision-up-to: 4282 (0.96-pre SVN)
+:revision-up-to: 4362 (0.96-pre SVN)
 
 モデルとは，サイトを構成するデータの，ただ一つかつ最終的なデータソースを指
 します．モデルには，保存したいデータに不可欠なデータフィールドと，その振舞
@@ -1369,6 +1369,24 @@ admin の変更リストページに表示するフィールドを制御するには ``list_display``
                   return '<span style="color: #%s;">%s %s</span>' % \
                       (self.color_code, self.first_name, self.last_name)
               colored_name.allow_tags = True
+
+    * 渡された文字列がモデルのあるメソッドを指しており，メソッドが True か
+      False を返す場合，メソッドの ``boolean`` 属性を ``True`` に設定してお
+      くと，Django は "on" や "off" のアイコンを表示します．
+
+      以下に最終的なモデルの例を示します::
+
+          class Person(models.Model):
+              first_name = models.CharField(maxlength=50)
+              birthday = models.DateField()
+
+              class Admin:
+                  list_display = ('name', 'born_in_fifties')
+
+              def born_in_fifties(self):
+                  return self.birthday.strftime('%Y')[:3] == 5
+              born_in_fifties.boolean = True
+
 
     * ``__str__()`` メソッドは他のモデルメソッドと同じように
       ``list_display`` に入れられるので，以下のように書いても全く問題ありま

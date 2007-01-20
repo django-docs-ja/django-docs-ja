@@ -2,7 +2,7 @@
 Django プロジェクトに協力するために
 ===================================
 
-:revision-up-to: 4203 (0.96-pre SVN)
+:revision-up-to: 4362 (0.96-pre SVN)
 
 Django を *使う* のを楽しいと思ってもらえたなら， *使い続ける* 前にすこし待っ
 てください．私達は多大な情熱をかけて，ユーザがコミュニティのメンバに貢献で
@@ -133,10 +133,10 @@ Django のコードに対するパッチはつねに大歓迎です．実際，パッチつきのバグ報告
     * パッチファイルの名前には ``.diff`` 拡張子をつけて下さい．そうすること
       で，チケットトラッカは構文のハイライト強調を正しく行うので助かります．
 
-    * チケットのタイトルの先頭に "[patch] " をつけて下さい． "[patch]" がつ
-      くことでチケットにパッチが入っていることが分かりやすくなり，チケット
-      システムがそのチケットを `パッチつきのチケットのリスト`_ に追加してく
-      れます．
+    * チケットの詳細情報欄にある「パッチ付き」("Has patch") ボックスにチェッ
+      クを入れてください．チケットがパッチつきであることが分かりやすくなり，
+      チケットシステムがそのチケットを `パッチつきのチケットのリスト`_ に追
+      加してくれます．
 
     * 問題を解決したり機能を追加するためのコードはパッチの重要な部分ですが，
       それだけではいけません．よいパッチというものには必ず回帰テストが付属
@@ -169,22 +169,73 @@ Django のコードに対するパッチはつねに大歓迎です．実際，パッチつきのバグ報告
 `よいパッチ <#patch-style>`_ の要件を満たしているわけでもありません．
 
 こうした状況の打開を手助けする一つの方法に，他のユーザが報告したバグのトリ
-アージ (選別) 作業があります．オープン中のチケットから，前に述べた要件の不
-足しているものを取り上げ，問題を再現してみてください．必要なら不足の部分を
-補い，チケットにパッチが付属していなければ作成してください．
+アージ (選別) 作業があります．この作業には献身的なボランティア 2 名が常時携
+わっていますが，手助けをしてくれる人は常に歓迎です．
 
-チケットに対して不足の部分を全て補い，要件を全て満たしたパッチを作成したら，
-`django-developers`_ にメールしてください．チケットをトリアージした旨と，
-そのチケットの扱い方について推奨する案を記載してください．
+トリアージ作業のワークフローの大半は，チケットの「トリアージ段階 (triage
+stage)」というフィールドに関わる作業です．このステージとは，あるチケットが
+ライフサイクルのどの段階にあるかを示す指標です．ステージフラグやその他のフ
+ラグによって，誰のどんなチケットが処理待ちになっているかがわかります．
 
-トリアージ作業にまず必要なのは根気強さです．自分がトリアージしたチケットが
-依然として注意を引かないようであれば，自分のチケットに目を通してもらえるよ
-う時おりやんわりと問い合わせる必要もあるでしょう．とはいえ，トリアージ作業
-の手腕に定評を得るにつれて，より開発者たちの注意を引きやすくなるはずです．
+百聞は一見にしかずですから，例を挙げて説明しましょう:
+
+.. image:: http://media.djangoproject.com/img/doc/djangotickets.png
+   :height: 451
+   :width: 590
+   :alt: Django のチケットワークフロー図
+
+まず，チケット処理に関わる人たちには 2 種類の役割があります:
+
+    * コア開発者: コミット権限を持ち，コードに関する決定や，大部分のコード
+      作成を行う人です．
+
+    * トリアージ作業者: 個々チケットを追跡して，チケットが正しく分別された
+      状態になるよう作業する人です．
+
+次に，トリアージ作業には以下の 4 つのステージがあります:
+
+    1. チケットは「未レビュー(unreviewed)」の状態からスタートします．この状
+       態のチケットはまだトリアージ作業者によって検査されておらず，トリアー
+       ジ作業が開始されていません．
+
+    2. 「設計判断待ち(design decision needed)」は，「このコンセプトには設計
+       上の判断が必要」であり，チケットのコメント欄か， django-developers
+       上で議論すべきであることを示しています．
+
+    3. チケットの内容に従った修正が受け入れられた場合，「承認 (accepted)」
+       ステージに移行します．このステージは全ての作業が終わった状態です．
+
+    4. チケットにパッチが関連づけられている場合 (下記参照)，トリアージ作業
+       者はパッチをレビューします．パッチの内容が完璧なら，「チェックイン可
+       (ready for checkin)」にマークされ，コア開発者にパッチをレビューし
+       てチェックすべきであることを知らせます．
+
+ワークフローにはもう 1 つ，一連のフラグがあります．フラグは各チケットを
+「チェックイン可」にするために必要な条件のうち，何が満たされていて何が必要
+かを示します:
+
+    「パッチあり (has patch)」
+        チケットに `パッチ <#patch_style>`_ が添付されていることを示します．
+        このフラグのついたパッチは，「よいパッチ」であるかレビューされます．
+
+    「ドキュメント不足 (needs documentation)」
+        パッチつきのチケットに対して，ドキュメントが必要であることを示しま
+        す．コードベースに修正をチェックインする条件として，完全なドキュメ
+        ントが必要です．
+
+    「テスト不足 (needs tests)」
+        パッチに単位テストが必要であることを示します．上ど同様，条件として
+        有効なパッチが必要です．
+
+    「パッチに改良の余地あり (patch needs improvement)」
+        チケットにパッチが *付属している* が，チェックインするには修正の余
+        地があることを示します．パッチが古くてきれいに当てられなくなってし
+        まっている場合や，コードがコーディング基準に従っていないことを示し
+        ます．
 
 .. _required details: `Reporting bugs`_
 .. _good patch: `Patch style`_
-
+.. _patch: `Submitting patches`_
 
 .. _Submitting and maintaining translations:
 
@@ -604,7 +655,7 @@ Django プロジェクトには二種類のコミッタがいます:
 .. _`コミュニティのページ`: http://www.djangoproject.com/community/
 .. _`チケットトラッカ`: http://code.djangoproject.com/newticket
 .. _`トラッカを検索`: http://code.djangoproject.com/search
-.. _`パッチつきのチケットのリスト`: http://code.djangoproject.com/report/12
+.. _`パッチつきのチケットのリスト`: http://code.djangoproject.com/query?status=new&status=assigned&status=reopened&has_patch=1&order=priority
 .. _`i18n ドキュメント`: http://www.djangoproject.com/documentation/i18n/
 .. _`i18n ブランチ`: http://code.djangoproject.com/browser/django/branches/i18n
 
@@ -615,7 +666,7 @@ Django プロジェクトには二種類のコミッタがいます:
 .. _search the tracker: http://code.djangoproject.com/search
 .. _django-users: http://groups.google.com/group/django-users
 .. _`#django`: irc://irc.freenode.net/django
-.. _list of tickets with patches: http://code.djangoproject.com/report/12
+.. _list of tickets with patches: http://code.djangoproject.com/query?status=new&status=assigned&status=reopened&has_patch=1&order=priority
 .. _PEP 8: http://www.python.org/peps/pep-0008.html
 .. _i18n documentation: http://www.djangoproject.com/documentation/i18n/
 .. _i18n branch: http://code.djangoproject.com/browser/django/branches/i18n
