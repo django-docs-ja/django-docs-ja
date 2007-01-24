@@ -2,7 +2,7 @@
 Djangoアプリケーションのテスト
 ==============================
 
-:revision-up-to: 4362 (0.96-pre SVN)
+:revision-up-to: 4410 (0.96-pre SVN)
 
 **開発版の Django で新たに追加された機能です．**
 

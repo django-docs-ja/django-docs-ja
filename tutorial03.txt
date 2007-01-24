@@ -2,7 +2,7 @@
 はじめての Django アプリ作成，その 3
 =====================================
 
-:revision-up-to: 4282 (0.96-pre SVN)
+:revision-up-to: 4410 (0.96-pre SVN)
 
 このチュートリアルは `チュートリアルその 2`_ の続きです．ここでは，引続き
 Web 投票アプリケーションの開発を例にして，公開用のインタフェース，ビュー
@@ -292,8 +292,8 @@ Django がアクセス出来る場所にディレクトリを作成します (Django はサーバを実
                                   {'latest_poll_list': latest_poll_list})
 
 
-``loader`` や ``Context`` ， ``HttpResponse`` を import しなくてもよくなっ
-たことに注意して下さい．
+この作業によって， ``loader`` や ``Context`` ， ``HttpResponse`` を import
+する必要はなくなりました．
 
 ``render_to_response()`` 関数は第一引数にテンプレートの名前をとり，オプショ
 ンの第二引数に辞書をとります． ``render_to_response()`` はテンプレートを指

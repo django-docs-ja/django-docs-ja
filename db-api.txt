@@ -2,7 +2,7 @@
 データベース API リファレンス
 =============================
 
-:revision-up-to: 4282 (0.96-pre SVN)
+:revision-up-to: 4410 (0.96-pre SVN)
 
 `データモデル`_ を作成したら，次はデータベースからデータを取り出す必要があ
 ります．このドキュメントでは，モデルから利用できるデータベース抽象化 API と，
@@ -568,6 +568,23 @@ Django の作者たちは，全ての SQL 関係のメソッドを先に配置し，その後に (必要
     [datetime.datetime(2005, 3, 20), datetime.datetime(2005, 2, 20)]
     >>> Entry.objects.filter(headline__contains='Lennon').dates('pub_date', 'day')
     [datetime.datetime(2005, 3, 20)]
+
+    
+``none()``
+~~~~~~~~~~
+
+**開発版の Django で新たに追加された機能です**
+
+``EmptyQuerySet`` を返します． ``EmptyQuerySet`` とは，評価結果が常に空の
+リストになるクエリセットです．関数の戻り値などで空の照合結果を返したいが，
+呼び出し側が (空のリストなどではなく) クエリセットオブジェクトの戻り値を期
+待している場合に便利です．
+
+例::
+    
+    >>> Entry.objects.none()
+    []
+
 
 ``select_related()``
 ~~~~~~~~~~~~~~~~~~~~

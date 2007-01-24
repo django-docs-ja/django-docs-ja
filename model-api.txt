@@ -2,7 +2,7 @@
 モデル API リファレンス
 =======================
 
-:revision-up-to: 4362 (0.96-pre SVN)
+:revision-up-to: 4410 (0.96-pre SVN)
 
 モデルとは，サイトを構成するデータの，ただ一つかつ最終的なデータソースを指
 します．モデルには，保存したいデータに不可欠なデータフィールドと，その振舞
@@ -1435,7 +1435,7 @@ admin の変更リストページに表示するフィールドを制御するには ``list_display``
 
 admin の変更リストページの右側のサイドバーにあるフィルタを有効にするには，
 ``list_filter`` を設定します．この値はフィールド名のリストにします．各フィー
-ルド名は `BooleanField``, ``DateField``, ``DateTimeField``, `ForeignKey``
+ルド名は ``BooleanField``, ``DateField``, ``DateTimeField``, ``ForeignKey``
 のいずれかでなければなりません．
 
 以下の例は ``django.contrib.auth.models.User`` モデルからとったもので，
@@ -1518,7 +1518,10 @@ ID を持った) 別のオブジェクトとして保存することです．
 ときに検索の対象になるフィールド名のリストです．
 
 フィー ルドは ``CharField`` や ``TextField`` のような何らかのテキストフィー
-ルドでなければなりません．
+ルドでなければなりません． DB 照合 API の「リレーション追跡」表記を使えば，
+``ForeignKey`` を介したフィールドの指定も行えます::
+
+    search_fields = ['foreign_key__related_fieldname']
 
 admin の検索ボックスで検索を実行すると， Django は検索クエリを単語に分解し
 て，各単語を含むような全てのオブジェクトを返します．検索は大小文字を区別せ

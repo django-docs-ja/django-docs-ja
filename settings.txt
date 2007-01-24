@@ -2,7 +2,7 @@
 Django の設定
 =============
 
-:revision-up-to: 4282 (0.96-pre SVN)
+:revision-up-to: 4410 (0.96-pre SVN)
 
 Django の設定ファイルには，インストールした Django の使う全ての設定が入って
 います．このドキュメントでは，各設定の役割と，どのような設定を利用できるか
@@ -601,6 +601,12 @@ MEDIA_URL
 
 ``MEDIA_ROOT`` で提供されているメディアファイルを扱う URL です．例えば
 ``"http://media.lawrence.com"`` です．
+
+URL にパス部を含める場合，末尾はスラッシュにせねばなりません．
+
+良い例: ``"http://www.example.com/static/"``
+悪い例: ``"http://www.example.com/static"``
+
 
 MIDDLEWARE_CLASSES
 ------------------
