@@ -2,7 +2,7 @@
 静的なファイルの提供方法
 ========================
 
-:revision-up-to: 3953 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 Django 自体では，画像やスタイルシート，ビデオといった静的な (メディア) ファ
 イルを提供しません．通常， Django はメディアファイルの提供を使っている Web
@@ -30,7 +30,7 @@ Django 自体では，画像やスタイルシート，ビデオといった静的な (メディア) ファ
 を参照してください．
 
 .. _`Django mod_python ドキュメント`: ../modpython/#serving-media-files
-.. _Django mod_python documentation: http://www.djangoproject.com/documentation/modpython/#serving-media-files
+.. _Django mod_python documentation: ../modpython/#serving-media-files
 
 .. _How to do it:
 
@@ -60,7 +60,7 @@ URLconf_ に以下の設定を入れます::
     * ``/path/bar.jpg`` というファイルはドキュメントルート下にないのでアク
       セスできません．
 
-.. _URLconf: http://www.djangoproject.com/documentation/url_dispatch/
+.. _URLconf: ../url_dispatch/
 
 
 .. _Directory listings:
@@ -146,4 +146,4 @@ URLconf は単なる Python モジュールに過ぎないので，静的メディアビューを開発
 す．
 
 .. _`DEBUG 設定`: ../settings/#debug
-.. _DEBUG setting: http://www.djangoproject.com/documentation/settings/#debug
+.. _DEBUG setting: ../settings/#debug

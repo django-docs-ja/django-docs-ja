@@ -2,7 +2,7 @@
 汎用ビュー
 ==========
 
-:revision-up-to: 4410 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 Web アプリケーションの作成は，同じパターンを何度も何度も繰り返し書くことに
 なるため，退屈なものです． Django では，そんなパターンに共通する部分のほと
@@ -21,8 +21,8 @@ Django の汎用ビューには以下のようなものがあります:
 
     * オブジェクトの生成，編集，削除を行うためのビュー．
 
-.. _`documentation index`: http://www.djangoproject.com/documentation/
-.. _`detail pages`: http://www.djangoproject.com/documentation/faq/
+.. _`documentation index`: ../
+.. _`detail pages`: ../faq/
 .. _year: http://www.djangoproject.com/weblog/2005/
 .. _month: http://www.djangoproject.com/weblog/2005/jul/
 .. _day: http://www.djangoproject.com/weblog/2005/jul/20/
@@ -243,7 +243,7 @@ URL に ``Nune`` を指定すると， ``HttpResponseGone`` (410) を発行します．
 .. _`RequestContext のドキュメント`: 
     ../templates_python/#subclassing-context-requestcontext
 .. _RequestContext docs: 
-    http://www.djangoproject.com/documentation/templates_python/#subclassing-context-requestcontext
+    ../templates_python/#subclassing-context-requestcontext
 
 
 ``django.views.generic.date_based.archive_year``
@@ -993,9 +993,9 @@ Django モデルに付属の自動マニピュレータを使います．
       `マニピュレータとフォームフィールドのドキュメント`_ を参照してください．
 
 .. _`認証システム`: ../authentication/
-.. _authentication system: http://www.djangoproject.com/documentation/authentication/
+.. _authentication system: ../authentication/
 .. _`マニピュレータとフォームフィールドのドキュメント`: ../forms/
-.. _manipulator and formfield documentation: http://www.djangoproject.com/documentation/forms/
+.. _manipulator and formfield documentation: ../forms/
 
 ``django.views.generic.create_update.update_object``
 ----------------------------------------------------

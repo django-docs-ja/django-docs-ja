@@ -2,7 +2,7 @@
 Django のインストール
 =====================
 
-:revision-up-to: 4293 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 このドキュメントを読めば Django を動かせるようになります．
 
@@ -46,7 +46,7 @@ WSGI_ 仕様に従っているので，様々なサーバプラットフォームで動作させられます．
 .. _WSGI: http://www.python.org/peps/pep-0333.html
 .. _`mod_python で Django を動かす`: ../modpython/
 .. _`サーバ構成に関する wiki ページ`: http://code.djangoproject.com/wiki/ServerArrangements
-.. _How to use Django with mod_python: http://www.djangoproject.com/documentation/modpython/
+.. _How to use Django with mod_python: ../modpython/
 .. _server-arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
 
 .. _Get your database running:

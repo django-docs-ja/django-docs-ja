@@ -2,7 +2,7 @@
 モデル API リファレンス
 =======================
 
-:revision-up-to: 4410 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 モデルとは，サイトを構成するデータの，ただ一つかつ最終的なデータソースを指
 します．モデルには，保存したいデータに不可欠なデータフィールドと，その振舞
@@ -26,7 +26,7 @@
 ``tests/modeltests`` ディレクトリに収められています．)
 
 .. _`モデル例の公式リポジトリ`: 
-    http://www.djangoproject.com/documentation/models/
+    ../models/
 .. _`データベース API リファレンス`: ../db-api/
 
 .. _Quick example:
@@ -67,7 +67,7 @@
       けの SQL を使います．
 
 .. _`設定ファイル`: ../settings/
-.. _settings file: http://www.djangoproject.com/documentation/settings/
+.. _settings file: ../settings/
 
 
 .. _Fields:
@@ -756,7 +756,7 @@ Django は必要なときに先頭の文字を自動的に大文字にします．
 
 完全な使用例は `多対一のリレーションモデルの例`_ を参照してください．
 
-.. _`多対一のリレーションモデルの例`: http://www.djangoproject.com/documentation/models/many_to_one/
+.. _`多対一のリレーションモデルの例`: ../models/many_to_one/
 
 ``ForeignKey`` フィールドはリレーションの動作を定義するための引数をいくつか
 とれます．これらは全てオプションです:
@@ -846,11 +846,11 @@ Django は必要なときに先頭の文字を自動的に大文字にします．
 
 
 .. _`データベース API のリファレンス`: ../db-api/
-.. _`Database API reference`: http://www.djangoproject.com/documentation/db_api/
+.. _`Database API reference`: ../db_api/
 .. _`オブジェクトのリレーションに関する解説`:
     ../db-api/#related-objects
 .. _related objects documentation: 
-    http://www.djangoproject.com/documentation/db_api/#related-objects
+    ../db_api/#related-objects
 
 .. _Many-to-many relationships:
 
@@ -902,7 +902,7 @@ Django は必要なときに先頭の文字を自動的に大文字にします．
 
 完全な例は `Many-to-many relationship model example`_ を参照してください．
 
-.. _Many-to-many relationship model example: http://www.djangoproject.com/documentation/models/many_to_many/
+.. _Many-to-many relationship model example: ../models/many_to_many/
 
 ``ManyToManyField`` フィールドはリレーションの動作を定義するための引数を
 いくつかとれます．これらは全てオプションです:
@@ -984,7 +984,7 @@ Django は必要なときに先頭の文字を自動的に大文字にします．
 
 完全な例は `One-to-one relationship model example`_ を参照してください．
 
-.. _One-to-one relationship model example: http://www.djangoproject.com/documentation/models/one_to_one/
+.. _One-to-one relationship model example: ../models/one_to_one/
 
 .. _Meta options:
 
@@ -1036,7 +1036,7 @@ Django は背後でカラム名とテーブル名をクオートします．
 
 完全な例は `latest() のドキュメント`_ を参照してください．
 
-.. _`latest() のドキュメント`: http://www.djangoproject.com/documentation/models/get_latest/
+.. _`latest() のドキュメント`: ../models/get_latest/
 
 
 ``order_with_respect_to``
@@ -1087,7 +1087,7 @@ Django は背後でカラム名とテーブル名をクオートします．
 しか使わないので注意してください．
 
 .. _Specifying ordering:
-   http://www.djangoproject.com/documentation/models/ordering/
+   ../models/ordering/
 
 ``permissions``
 ---------------
@@ -1893,7 +1893,7 @@ Python DB-API に詳しくないのなら，上の SQL 文の ``cursor.execute()`` でパラ
 .. _Python DB-API: http://www.python.org/peps/pep-0249.html
 .. _`extra() のドキュメント`: 
     ../db-api/#extra-select-none-where-none-params-none-tables-none
-.. _Other lookup options: http://www.djangoproject.com/documentation/db_api/#other-lookup-options
+.. _Other lookup options: ../db_api/#other-lookup-options
 
 .. _Overriding default model methods:
 
@@ -1929,7 +1929,7 @@ Python DB-API に詳しくないのなら，上の SQL 文の ``cursor.execute()`` でパラ
                 super(Blog, self).save() # 「実際の」save() を呼び出します．
 
 .. _`データベース API のドキュメント`: ../db-api/
-.. _database API docs: http://www.djangoproject.com/documentation/db_api/
+.. _database API docs: ../db_api/
 
 
 .. _Models across files:
@@ -2002,7 +2002,7 @@ SQL ファイルは ``manage.py`` の ``sqlinitialdata``, ``sqlreset``,
 です．
 
 .. _`manage.py のドキュメント`: ../django_admin/#sqlinitialdata-appname-appname
-.. _`manage.py documentation`: http://www.djangoproject.com/documentation/django_admin/#sqlinitialdata-appname-appname
+.. _`manage.py documentation`: ../django_admin/#sqlinitialdata-appname-appname
 
 .. _Database-backend-specific SQL data:
 

@@ -2,14 +2,14 @@
 データベース API リファレンス
 =============================
 
-:revision-up-to: 4410 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 `データモデル`_ を作成したら，次はデータベースからデータを取り出す必要があ
 ります．このドキュメントでは，モデルから利用できるデータベース抽象化 API と，
 オブジェクトを生成，取得，更新する方法について説明します．
 
 .. _`データモデル`: ../model-api/
-.. _`data models`: http://www.djangoproject.com/documentation/model_api/
+.. _`data models`: ../model_api/
 
 このリファレンスでは，以下のような Poll アプリケーションを参考に話を進めま
 す::
@@ -94,7 +94,7 @@ ID の値は Django ではなくデータベースによって計算されるので， ``save()`` を
 が追加されます．詳しくは `AutoField のドキュメント`_ を参照してください．)
 
 .. _`AutoField のドキュメント`: ../model-api/#autofield
-.. _AutoField documentation: http://www.djangoproject.com/documentation/model_api/#autofield
+.. _AutoField documentation: ../model_api/#autofield
 
 .. _Explicitly specifying auto-primary-key values:
 
@@ -1440,7 +1440,7 @@ Q オブジェクトを使った複雑な照合
 
 `OR lookups examples page`_ の例も参照してください．
 
-.. _OR lookups examples page: http://www.djangoproject.com/documentation/models/or_lookups/
+.. _OR lookups examples page: ../models/or_lookups/
 
 .. _Related objects:
 
@@ -1799,8 +1799,8 @@ get_next_by_FOO(\**kwargs) and get_previous_by_FOO(\**kwargs)
 いことが保証されています．完全なコードの例は `照合 API のサンプルモデル`_
 を参照してください．
 
-.. _`照合 API のサンプルモデル`: http://www.djangoproject.com/documentation/models/lookup/
-.. _lookup API sample model: http://www.djangoproject.com/documentation/models/lookup/
+.. _`照合 API のサンプルモデル`: ../models/lookup/
+.. _lookup API sample model: ../models/lookup/
 
 get_FOO_filename()
 ------------------
@@ -1908,4 +1908,4 @@ Django のデータベースマッパで扱うには複雑すぎる SQL 文を書かねばならないよ
 ベースについて Django 固有の何かがあるわけではないのです．
 
 .. _`カスタム SQL 文の実行`: ../model_api/#executing-custom-sql
-.. _Executing custom SQL: http://www.djangoproject.com/documentation/model_api/#executing-custom-sql
+.. _Executing custom SQL: ../model_api/#executing-custom-sql

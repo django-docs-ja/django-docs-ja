@@ -2,7 +2,7 @@
 テンプレート作者のための Django テンプレート言語ガイド
 =======================================================
 
-:revision-up-to: 4274 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 Django のテンプレート言語は，釣合いの取れたパワーと簡便さを実現するように，
 また HTML を扱いなれた人にとっては快適になるように設計されています．
@@ -838,7 +838,7 @@ ssi
 See also: ``{% include %}``.
 
 .. _ALLOWED_INCLUDE_ROOTS: ../settings/#allowed-include-roots
-.. ALLOWED_INCLUDE_ROOTS: http://www.djangoproject.com/documentation/settings/#allowed-include-roots
+.. ALLOWED_INCLUDE_ROOTS: ../settings/#allowed-include-roots
 
 templatetag
 ~~~~~~~~~~~
@@ -1282,8 +1282,8 @@ django.contrib.humanize
 データを「ヒトにやさしい」表現にする上で便利な Django テンプレートフィルタ
 です． `humanize のドキュメント`_ を参照してください．
 
-.. _humanize documentation: http://www.djangoproject.com/documentation/add_ons/#humanize
-.. _`humanize のドキュメント`: http://www.djangoproject.com/documentation/add_ons/#humanize
+.. _humanize documentation: ../add_ons/#humanize
+.. _`humanize のドキュメント`: ../add_ons/#humanize
 
 django.contrib.markup
 ---------------------

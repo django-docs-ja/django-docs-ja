@@ -2,7 +2,7 @@
 Apache での認証に Django のユーザデータベースを使う
 ===================================================
 
-:revision-up-to: 3871 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 Apache を使っていると，同期を保ちながら複数の認証データベースを維持するとい
 う問題によくぶつかります．そこで， Django の `認証システム`_ に対して直接
@@ -74,8 +74,8 @@ mod_python の標準の ``Auth*`` および ``Require`` ディレクティブと共に，
 
 
 .. _`認証システム`: ../authentication/
-.. _authentication system: http://www.djangoproject.com/documentation/authentication/
+.. _authentication system: ../authentication/
 .. _Subversion: http://subversion.tigris.org/
 .. _mod_dav: http://httpd.apache.org/docs/2.0/mod/mod_dav.html
 .. _`カスタムのパーミッション`: ../authentication/#custom-permissions
-.. _custom permissions: http://www.djangoproject.com/documentation/authentication/#custom-permissions
+.. _custom permissions: ../authentication/#custom-permissions

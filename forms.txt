@@ -2,7 +2,7 @@
 フォームとフィールド，マニピュレータ
 ====================================
 
-:revision-up-to: 4210 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 .. _Forwards-compatibility note:
 
@@ -21,7 +21,7 @@
 
 
 .. _newforms のドキュメント: ../newforms/
-.. _newforms documentation: http://www.djangoproject.com/documentation/newforms/
+.. _newforms documentation: ../newforms/
 
 .. _Introduction:
 
@@ -706,10 +706,10 @@ Django のモデルとの類似性が見て取れます．自作のマニピュレータで必要なメソッ
     `Django 設定ファイル`_ を参照してください) に指定されたプログラムを使っ
     て， XML フラグメントがスキーマにしたがっているか検証します．
 
-.. _`generic views`: http://www.djangoproject.com/documentation/generic_views/
+.. _`generic views`: ../generic_views/
 .. _`汎用ビュー`: ../generic_views/
-.. _`models API`: http://www.djangoproject.com/documentation/model_api/
+.. _`models API`: ../model_api/
 .. _`モデル API`: ../model_api/
-.. _settings: http://www.djangoproject.com/documentation/settings/
+.. _settings: ../settings/
 .. _`Django 設定ファイル`: ../settings/
 

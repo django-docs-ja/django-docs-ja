@@ -2,7 +2,7 @@
 django-admin.py と manage.py
 ============================
 
-:revision-up-to: 3871 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 ``django-admin.py`` は Django の管理タスクを行うためのコマンドライン
 ユーティリティです．このドキュメントでは ``django-admin.py`` の全ての
@@ -203,7 +203,7 @@ IP アドレス 1.2.3.4，ポート番号 7000::
 い．
 
 .. _`静的なファイルの提供方法`: ../static_files/
-.. _serving static files: http://www.djangoproject.com/documentation/static_files/
+.. _serving static files: ../static_files/
 
 .. _Turning off auto-reload:
 

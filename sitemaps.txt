@@ -2,7 +2,7 @@
 sitemaps フレームワーク
 =======================
 
-:revision-up-to: 4094 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 **開発版の Django で新たに追加された機能です．**
 
@@ -31,8 +31,8 @@ sitemaps は Django の `配信フレームワーク`_ によく似ています．サイトマップ
 
 .. _`配信フレームワーク`: ../syndication/
 .. _URLconf: ../url_dispatch/
-.. .. _syndication framework: http://www.djangoproject.com/documentation/syndication/
-.. .. _URLconf: http://www.djangoproject.com/documentation/url_dispatch/
+.. .. _syndication framework: ../syndication/
+.. .. _URLconf: ../url_dispatch/
 
 .. _Installation:
 
@@ -56,9 +56,9 @@ sitemaps アプリケーションは以下の手順でインストールします:
 .. _INSTALLED_APPS: ../settings#installed-apps
 .. _TEMPLATE_LOADERS: ../settings#template-loaders
 .. _`sites フレームワーク`: ../sites
-.. .. _INSTALLED_APPS: http://www.djangoproject.com/documentation/settings/#installed-apps
-.. .. _TEMPLATE_LOADERS: http://www.djangoproject.com/documentation/settings/#template-loaders
-.. .. _sites framework: http://www.djangoproject.com/documentation/sites/
+.. .. _INSTALLED_APPS: ../settings/#installed-apps
+.. .. _TEMPLATE_LOADERS: ../settings/#template-loaders
+.. .. _sites framework: ../sites/
 
 .. _Initialization:
 
@@ -87,7 +87,7 @@ URL を参照します．一方，サイトマップの場所が ``/content/sitemap.xml`` であ
 辞書にします．あるいは， ``Sitemap`` クラスの *インスタンス* (例えば
 ``BlogSitemap(some_bar)``) でもかまいません．
 
-.. URLconf: http://www.djangoproject.com/documentation/url_dispatch/
+.. URLconf: ../url_dispatch/
 
 .. _Sitemap classes:
 
@@ -253,8 +253,8 @@ sitemaps フレームワークでは，よく使われる状況向けに，二つの便宜クラスを用意
 イトマップのエントリを生成します．各エントリには ``location`` 属性だけが設
 定され， ``lastmod``, ``changefreq``, ``priority`` は設定されません．
 
-.. _flatpages: http://www.djangoproject.com/documentation/flatpages/
-.. _sites documentation: http://www.djangoproject.com/documentation/sites/
+.. _flatpages: ../flatpages/
+.. _sites documentation: ../sites/
 .. _`フラットページ`: ../flatpages/
 .. _`sites のドキュメント`: ../sites/
 
@@ -271,7 +271,7 @@ sitemaps フレームワークでは，よく使われる状況向けに，二つの便宜クラスを用意
 ``priority`` や ``changefreq`` といったキーワード引数も指定できます．
 これらの引数の値は，全ての URL に共通の属性になります．
 
-.. _generic views: http://www.djangoproject.com/documentation/generic_views/
+.. _generic views: ../generic_views/
 .. _`汎用ビュー`: ../generic_views/
 
 .. _Example:
@@ -305,7 +305,7 @@ sitemaps フレームワークでは，よく使われる状況向けに，二つの便宜クラスを用意
             {'sitemaps': sitemaps})
     )
 
-.. URLconf: http://www.djangoproject.com/documentation/url_dispatch/
+.. URLconf: ../url_dispatch/
 
 .. _Creating a sitemap index:
 

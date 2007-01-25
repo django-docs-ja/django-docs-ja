@@ -2,7 +2,7 @@
 国際化
 ======
 
-:revision-up-to: 3608 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 Django はコードとテンプレートの双方で国際化をフルサポートしています．このド
 キュメントでは国際化の仕組みについて説明します．
@@ -60,7 +60,7 @@ Django の国際化フックはデフォルトで有効になっているので，フレームワークの一
 
 
 .. _`USE_I18N のドキュメント`: ../settings/#use-i18n
-.. _documentation for USE_I18N: http://www.djangoproject.com/documentation/settings/#use-i18n
+.. _documentation for USE_I18N: ../settings/#use-i18n
 
 .. _How to specify translation strings:
 
@@ -194,7 +194,7 @@ import する必要はありません．
             verbose_name_plural = _('mythings')
 
 .. _`Django モデル`: ../model-api/
-.. _Django models: http://www.djangoproject.com/documentation/model_api/
+.. _Django models: ../model_api/
 
 .. _Pluralization:
 
@@ -299,7 +299,7 @@ Python コードとは少し違った方法で行います．テンプレートで翻訳用のタグを使え
 訳の有無について気を配る必要がなくなります．
 
 .. _`Django テンプレート`: ../templates_python/
-.. _Django templates: http://www.djangoproject.com/documentation/templates_python/
+.. _Django templates: ../templates_python/
 
 .. _How to create language files:
 
@@ -427,7 +427,7 @@ Django には ``bin/make-messages.py`` というツールが付属しています．このツー
 .. _`翻訳の提出と維持`: 
     ../contributing/#submitting-and-maintaining-translations
 .. _Submitting and maintaining translations: 
-    http://www.djangoproject.com/documentation/
+    ../
 
 .. _How Django discovers language preference:
 
@@ -506,7 +506,7 @@ Django をネイティブの言語で動かしたいだけで，かつ自分の言語に対する言語ファ
 
       .. _`LANGUAGES 設定`: ../settings/#languages
       .. _LANGUAGES setting: 
-          http://www.djangoproject.com/documentation/settings/#languages
+          ../settings/#languages
 
     * 上の項で説明したように，カスタムの ``LANGUAGES`` 設定を行った場合，そ
       の言語を翻訳対象文字列に含めても構いません．ただし，
@@ -566,13 +566,13 @@ Django をネイティブの言語で動かしたいだけで，かつ自分の言語に対する言語ファ
 は，言語設定は ``request.LANGUAGE_CODE`` の値になるので注意してください．
 
 .. _`設定ファイル`: ../settings/
-.. _settings file: http://www.djangoproject.com/documentation/settings/
+.. _settings file: ../settings/
 .. _`ミドルウェアのドキュメント`: ../middleware/
-.. _middleware documentation: http://www.djangoproject.com/documentation/middleware/
+.. _middleware documentation: ../middleware/
 .. _`セッション`: ../sessions/
 .. _`リクエストオブジェクト`: ../request_response/#httprequest-objects
-.. _session: http://www.djangoproject.com/documentation/sessions/
-.. _request object: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
+.. _session: ../sessions/
+.. _request object: ../request_response/#httprequest-objects
 
 .. The set_language redirect view:
 
@@ -647,7 +647,7 @@ Django は以下のアルゴリズムに従って翻訳を探します:
 
 .. _`settings のドキュメント`: 
     ../settings/#using-settings-without-the-django-settings-module-environment-variable
-.. _settings documentation: http://www.djangoproject.com/documentation/settings/#using-settings-without-the-django-settings-module-environment-variable
+.. _settings documentation: ../settings/#using-settings-without-the-django-settings-module-environment-variable
 
 
 メッセージファイルリポジトリも同じような構成になっています:

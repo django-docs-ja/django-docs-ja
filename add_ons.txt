@@ -2,7 +2,7 @@
 "contrib" 下のアドオン
 =========================
 
-:revision-up-to: 4168 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 Django は Python の `"batteries included" 哲学`_ を目指しています． Django
 には Web 開発における課題を解くための様々な外部オプションツールがついてきま
@@ -20,7 +20,7 @@ Django の自動化管理インタフェースです．詳しくは `チュートリアルその 2`_ を
 参照してください．
 
 .. _`チュートリアルその 2`: ../tutorial02/
-.. _Tutorial 2: http://www.djangoproject.com/documentation/tutorial2/
+.. _Tutorial 2: ../tutorial2/
 
 auth
 ====
@@ -51,7 +51,7 @@ csrf
 `csrf のドキュメント`_ を参照してください．
 
 .. _`csrf のドキュメント`: ../csrf/
-.. _csrf documentation: http://www.djangoproject.com/documentation/csrf/
+.. _csrf documentation: ../csrf/
 
 formtools
 =========
@@ -147,7 +147,7 @@ flatpages
 `flatpages のドキュメント`_ を参照してください．
 
 .. _`flatpages のドキュメント`: ../flatpages/
-.. _flatpages documentation: http://www.djangoproject.com/documentation/flatpages/
+.. _flatpages documentation: ../flatpages/
 
 
 
@@ -172,7 +172,7 @@ redirects
 `redirects のドキュメント`_ を参照してください．
 
 .. _`redirects のドキュメント`: ../redirects/
-.. _redirects documentation: http://www.djangoproject.com/documentation/redirects/
+.. _redirects documentation: ../redirects/
 
 
 sessions
@@ -194,7 +194,7 @@ sites
 `sites のドキュメント`_ を参照してください．
 
 .. _`sites のドキュメント`: ../sites/
-.. _sites documentation: http://www.djangoproject.com/documentation/sites/
+.. _sites documentation: ../sites/
 
 sitemaps
 ========
@@ -203,7 +203,7 @@ Google サイトマップ XML ファイルを生成するためのフレームワークです．
 
 `sitemaps のドキュメント`_ を参照してください．
 
-.. _sitemaps documentation: http://www.djangoproject.com/documentation/sitemaps/
+.. _sitemaps documentation: ../sitemaps/
 .. _`sitemaps のドキュメント`: ../sitemaps/
 
 
@@ -216,7 +216,7 @@ RSS および Atom 形式の配信フィード (syndication feed) をごく簡単に生成する
 `配信フィードフレームワークのドキュメント`_ を参照してください．
 
 .. _`配信フィードフレームワークのドキュメント`: ../syndication_feeds/
-.. _syndication documentation: http://www.djangoproject.com/documentation/syndication/
+.. _syndication documentation: ../syndication/
 
 
 

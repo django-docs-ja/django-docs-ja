@@ -2,7 +2,7 @@
 古いデータベースの組み込み
 ==================================
 
-:revision-up-to: 4269 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 Django が最も得意とするのは新たなアプリケーションですが，古いデータベースの
 組み込みも可能です． Django には組み込み作業を可能な限り自動化するための二
@@ -12,7 +12,7 @@ Django が最も得意とするのは新たなアプリケーションですが，古いデータベースの
 Django の基礎を良く知っているものと仮定しています．
 
 .. _`公式チュートリアル`: ../tutorial01/
-.. _official tutorial: http://www.djangoproject.com/documentation/tutorial1/
+.. _official tutorial: ../tutorial1/
 
 .. _Give Django your database parameters:
 
@@ -38,19 +38,19 @@ Django にデータベースパラメタを指定する
 .. _DATABASE_PORT: ../settings/#database-port
 
 .. _settings file: 
-    http://www.djangoproject.com/documentation/settings/
+    ../settings/
 .. DATABASE_NAME: 
-    http://www.djangoproject.com/documentation/settings/#database-name
+    ../settings/#database-name
 .. DATABASE_ENGINE: 
-    http://www.djangoproject.com/documentation/settings/#database-engine
+    ../settings/#database-engine
 .. DATABASE_USER: 
-    http://www.djangoproject.com/documentation/settings/#database-user
+    ../settings/#database-user
 .. DATABASE_PASSWORD: 
-    http://www.djangoproject.com/documentation/settings/#database-password
+    ../settings/#database-password
 .. DATABASE_HOST: 
-    http://www.djangoproject.com/documentation/settings/#database-host
+    ../settings/#database-host
 .. DATABASE_PORT: 
-    http://www.djangoproject.com/documentation/settings/#database-port
+    ../settings/#database-port
 
 .. _Auto-generate the models:
 
@@ -76,7 +76,7 @@ Django には，既存のデータベースにイントロスペクションを行ってモデルを生成で
 ``INSTALLED_APPS`` 設定にアプリケーションを追加しておきます．
 
 .. _django-admin.py のドキュメント: ../django-admin/
-.. _django-admin.py documentation: http://www.djangoproject.com/documentation/django_admin/
+.. _django-admin.py documentation: ../django_admin/
 
 .. _Install the core Django tables:
 

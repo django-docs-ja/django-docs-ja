@@ -2,7 +2,7 @@
 Django の概要
 =============
 
-:revision-up-to: 3676 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 Django は変転の激しいニュースルーム環境で開発された経緯から，よくある
 Web 開発タスクを迅速かつ簡単化するように設計されました．ここでは Django に
@@ -327,5 +327,5 @@ API を使う必然性もありません．別のデータベース抽象化レイヤを使っても構いま
 .. _`チュートリアル`: ../tutorial01/
 .. _`コミュニティ`: http://www.djangoproject.com/community/
 .. _download Django: http://www.djangoproject.com/download/
-.. _the tutorial: http://www.djangoproject.com/documentation/tutorial1/
+.. _the tutorial: ../tutorial1/
 .. _the community: http://www.djangoproject.com/community/

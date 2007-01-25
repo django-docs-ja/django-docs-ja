@@ -2,7 +2,7 @@
 配信フィードフレームワーク
 ==========================
 
-:revision-up-to: 4049 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 Django には高水準の配信フィード (syndication feed) 生成フレームワークがつい
 てきます．このフレームワークを使えば， RSS_ 形式や Atom_ 形式のフィードを簡
@@ -32,7 +32,7 @@ Django には低水準のフィード生成 API もついてきます． Web コンテキストの外で
 ように設定するだけでできます． 
 (`URLConf のドキュメント <../url_dispatch/>`__) 
 
-.. _URLconf: http://www.djangoproject.com/documentation/url_dispatch/
+.. _URLconf: ../url_dispatch/
 
 初期化
 --------------
@@ -82,8 +82,8 @@ Django サイトで配信フィードを使うには， `URLconf <../url_dispatch/>`__ に
 
 セットアップしたら，あとは ``Feed`` クラス自体を定義するだけです．
 
-.. _URLconf: http://www.djangoproject.com/documentation/url_dispatch/
-.. _settings file: http://www.djangoproject.com/documentation/settings/
+.. _URLconf: ../url_dispatch/
+.. _settings file: ../settings/
 
 Feed クラス
 ------------
@@ -175,8 +175,8 @@ Feed クラス
 .. _chicagocrime.org: http://www.chicagocrime.org/
 .. _`Object-Relational マッパ`: ../db-api/
 .. _`Django テンプレート`: ../templates/
-.. _object-relational mapper: http://www.djangoproject.com/documentation/db_api/
-.. _Django templates: http://www.djangoproject.com/documentation/templates/
+.. _object-relational mapper: ../db_api/
+.. _Django templates: ../templates/
 
 複雑な例
 -----------------
@@ -303,7 +303,7 @@ podcast のフィードを生成するときなどに使われるエンクロージャ (enclusure) の
 これらの値には `LANGUAGE_CODE setting`_ を直接使います．
 
 .. _`LANGUAGE_CODE 設定`: ../settings/#language-code
-.. _LANGUAGE_CODE setting: http://www.djangoproject.com/documentation/settings/#language-code
+.. _LANGUAGE_CODE setting: ../settings/#language-code
 
 URL
 ----
@@ -317,7 +317,7 @@ Atom フィードにはフィードの現在の場所を定義する ``<link rel="self">`` が必
 した値を自動的に入れるようになっています．
 
 .. _SITE_ID の設定: ../settings/#site-id
-.. _SITE_ID setting: http://www.djangoproject.com/documentation/settings/#site-id
+.. _SITE_ID setting: ../settings/#site-id
 
 Atom フィードと RSS フィードを並行出力する
 ---------------------------------------------

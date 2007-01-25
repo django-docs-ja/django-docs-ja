@@ -2,7 +2,7 @@
 Django の設計思想
 ===================
 
-:revision-up-to: 3491 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 このドキュメントでは， Django の開発者たちがフレームワークの構築に取り入れ
 ている根本的な設計思想についていくつか解説します．それによって， Django の
@@ -241,7 +241,7 @@ URL ははっきりと
 これは `テンプレートの継承`_ の根底にある考え方です．
 
 .. _`テンプレートの継承`: ../templates/#template-inheritance
-.. _template inheritance: http://www.djangoproject.com/documentation/templates/#template-inheritance
+.. _template inheritance: ../templates/#template-inheritance
 
 .. _Be decoupled from HTML:
 

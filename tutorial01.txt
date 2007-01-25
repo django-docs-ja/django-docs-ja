@@ -2,7 +2,7 @@
 はじめての Django アプリ作成，その 1 
 =====================================
 
-:revision-up-to: 3491 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 さあ，例を交えながら学んでゆきましょう．
 
@@ -20,7 +20,7 @@ Python 対話シェルを起動して ``import django`` を実行してみればわかります．
 エラーなく import できるなら， Django はインストールされています．
 
 .. _`Django は既にインストール済み`: ../install/
-.. _`Django installed`: http://www.djangoproject.com/documentation/install/
+.. _`Django installed`: ../install/
 
 .. _Creating a project:
 
@@ -420,7 +420,7 @@ Django では，こうした概念を簡単な Python クラスで表現できます．
 `django-admin.py のドキュメント`_ を読んで下さい．
 
 .. _`django-admin.py のドキュメント`: ../django-admin/
-.. _django-admin.py documentation: http://www.djangoproject.com/documentation/django_admin/
+.. _django-admin.py documentation: ../django_admin/
 
 API で遊んでみる
 ================
@@ -606,5 +606,5 @@ Django の自動 admin を動かしてみましょう．
 
 .. _`データベース API リファレンス`: ../db-api/
 .. _`チュートリアル第 2 部`: ../tutorial02/
-.. _Database API reference: http://www.djangoproject.com/documentation/db_api/
-.. _part 2 of this tutorial: http://www.djangoproject.com/documentation/tutorial02/
+.. _Database API reference: ../db_api/
+.. _part 2 of this tutorial: ../tutorial02/

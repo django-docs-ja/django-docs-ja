@@ -2,7 +2,7 @@
 Django についてよくある質問
 ===========================
 
-:revision-up-to: 3918 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 .. contents::
 
@@ -89,7 +89,7 @@ Django はアプリケーションレイヤからのデータベースレイヤを分離し，シン
 プルながら強力な `キャッシュフレームワーク`_ を備えています．
 
 .. _`キャッシュフレームワーク`: ../cache/
-.. _`cache framework`: http://www.djangoproject.com/documentation/cache/
+.. _`cache framework`: ../cache/
 
 .. _Who's behind this?:
 
@@ -232,7 +232,7 @@ Django を書き始めた約 2 年前， Adrian と Simon は少し時間を取って当時利用で
 私達の設計哲学は `設計哲学のページ`_ に詳しく書いてあります．
 
 .. _`設計哲学のページ`: ../design_philosophies/
-.. _design philosophies page: http://www.djangoproject.com/documentation/design_philosophies/
+.. _design philosophies page: ../design_philosophies/
 
 .. _Do you have any of those nifty "screencast" things?:
 
@@ -347,9 +347,9 @@ Django 開発者はどこで雇えますか？
 .. _`質問`: http://www.djangoproject.com/community/
 
 .. _`Download the code`: http://www.djangoproject.com/download/
-.. _`installation guide`: http://www.djangoproject.com/documentation/install/
-.. _tutorial:  http://www.djangoproject.com/documentation/tutorial1/
-.. _documentation: http://www.djangoproject.com/documentation/
+.. _`installation guide`: ../install/
+.. _tutorial:  ../tutorial1/
+.. _documentation: ../
 .. _ask questions: http://www.djangoproject.com/community/
 
 .. _How do I fix the "install a later version of setuptools" error?:
@@ -577,7 +577,7 @@ Django が実行している生の SQL クエリを見られますか？
 使えます． `古いデータベースの組み込み`_ を参照してください．
 
 .. _`古いデータベースの組み込み`: ../legacy_databases/
-.. _`Integrating with a legacy database`: http://www.djangoproject.com/documentation/legacy_databases/
+.. _`Integrating with a legacy database`: ../legacy_databases/
 
 
 .. _If I make changes to a model, how do I update the database?:
@@ -631,7 +631,7 @@ Django のコードに特殊なケースを追加したくないと考えています．こうしたオプショ
 SQL コードを入れられるので，SQL で行なえる変更なら何でも実現できます．
 
 .. _`SQL の初期データファイル`: ../model_api/#providing-initial-sql-data
-.. _SQL initial data file: http://www.djangoproject.com/documentation/model_api/#providing-initial-sql-data
+.. _SQL initial data file: ../model_api/#providing-initial-sql-data
 
 Django がメモリリークを起こしているのですが，なぜですか？
 ---------------------------------------------------------
@@ -731,7 +731,7 @@ admin で，オブジェクトを作成したユーザだけがオブジェクトを編集できるようにアクセ
 「mod_python で Django を使う」というドキュメントの `admin ファイルの提供`_
 
 .. _`admin ファイルの提供`: ../modpython/#serving-the-admin-files
-.. _serving the admin files: http://www.djangoproject.com/documentation/modpython/#serving-the-admin-files
+.. _serving the admin files: ../modpython/#serving-the-admin-files
 
 .. _My "list_filter" contains a ManyToManyField, but the filter doesn't display.:
 
@@ -775,7 +775,7 @@ admin のルック & フィールをカスタマイズしたいのなら，次の質問に進んで下さい．
 を用意してあります．
 
 .. _`admin で使われているCSS のガイド`: ../admin_css/
-.. _`guide to the CSS used in the admin`: http://www.djangoproject.com/documentation/admin_css/
+.. _`guide to the CSS used in the admin`: ../admin_css/
 
 
 .. _How do I create users without having to edit password hashes?:
@@ -791,7 +791,7 @@ admin サイトでユーザを作成したいのなら， Django の開発版を使ってください．
 してください．
 
 .. _`ユーザの作成`: ../authentication/#creating-users
-.. _creating users: http://www.djangoproject.com/documentation/authentication/#creating-users
+.. _creating users: ../authentication/#creating-users
 
 .. _Contributing code:
 
@@ -807,7 +807,7 @@ Django プロジェクトにコードを寄贈したいんですが，どうすればよいですか？
 あります． `Django プロジェクトへの貢献`_ という文書です．
 
 .. _`Django プロジェクトへの貢献`: ../contributing/
-.. _Contributing do Django: http://www.djangoproject.com/documentation/contributing/
+.. _Contributing do Django: ../contributing/
 
 .. _I submitted a bug fix in the ticket system several weeks ago. Why are you ignoring my patch?:
 

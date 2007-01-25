@@ -2,7 +2,7 @@
 FastCGI で Django を使う
 ========================
 
-:revision-up-to: 3761 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 Django を動作させる構成として `現在推奨されている`_ のは， Apache_ と
 `mod_python`_ の組合せですが，多くの人々が共有ホスティングサービスを使って
@@ -22,7 +22,7 @@ FastCGI プロセスは Web サーバプロセスの中ではなく，別の永続的プロセスの中で
 実行されるということです．
 
 .. _`現在推奨されている`: ../modpython/
-.. _current preferred setup: http://www.djangoproject.com/documentation/modpython/
+.. _current preferred setup: ../modpython/
 .. _Apache: http://httpd.apache.org/
 .. _mod_python: http://www.modpython.org/
 .. _mod_perl: http://perl.apache.org/

@@ -2,7 +2,7 @@
 Django で CSV を出力する
 ==========================
 
-:revision-up-to: 3491 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 このドキュメントでは， Django のビューを使って動的に CSV (Comma Separated
 Values: カンマ区切りのフィールドデータ) ファイルを生成する方法について説明
@@ -33,7 +33,7 @@ Python には CSV ライブラリモジュール ``csv`` がついてきます．Django で
 
 .. _`リクエストオブジェクトとレスポンスオブジェクト`: ../request_response/
 .. _`CSV ライブラリのドキュメント`: http://www.python.jp/doc/release/lib/module-csv.html
-.. _Request and response objects: http://www.djangoproject.com/documentation/request_response/
+.. _Request and response objects: ../request_response/
 .. _CSV library docs: http://www.python.org/doc/current/lib/module-csv.html
 
 一例を示します::
@@ -129,5 +129,5 @@ Python には CSV ライブラリモジュール ``csv`` がついてきます．Django で
 
 .. _`Django テンプレートシステム`: ../templates/
 .. _`addslashes テンプレートフィルタ`: ../templates/#addslashes
-.. _Django template system: http://www.djangoproject.com/documentation/templates/
-.. _addslashes template filter: http://www.djangoproject.com/documentation/templates/#addslashes
+.. _Django template system: ../templates/
+.. _addslashes template filter: ../templates/#addslashes

@@ -2,7 +2,7 @@
 リクエストオブジェクトとレスポンスオブジェクト
 ==============================================
 
-:revision-up-to: 3918 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 .. _`Quick overview`:
 
@@ -139,7 +139,7 @@ HttpRequest オブジェクト
     利用できます．詳しくは `セッションのドキュメント`_ を参照してください．
 
     .. _`セッションのドキュメント`: ../sessions/
-    .. _`session documentation`: http://www.djangoproject.com/documentation/sessions/
+    .. _`session documentation`: ../sessions/
 
 ``raw_post_data``
     HTTP POST データそのものです．高度な処理を行いたいときに便利です．普段

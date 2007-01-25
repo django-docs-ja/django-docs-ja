@@ -2,7 +2,7 @@
 "sites" フレームワーク
 ======================
 
-:revision-up-to: 3687 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 Django にはオプションとして使える "sites" フレームワークが付属しています．
 "sites" はオブジェクトや機能を特定の Web サイトに関連付けるためのフックであ
@@ -299,7 +299,7 @@ Django は ``objects = models.Manager()`` を使った自動マネジャ生成を行わなく
 
 .. _`マネジャ`: ../model_api/#managers
 .. _`マネジャのドキュメント`: ../model_api/#managers
-.. _manager: http://www.djangoproject.com/documentation/model_api/#managers
+.. _manager: ../model_api/#managers
 
 .. _How Django uses the sites framework:
 
@@ -348,7 +348,7 @@ Django における sites フレームワークの役割は以下の通りです:
 .. _`フラットページフレームワーク`: ../flatpages/
 .. _`配信フレームワーク`: ../syndication/
 .. _`認証フレームワーク`: ../authentication/
-.. _redirects framework: http://www.djangoproject.com/documentation/redirects/
-.. _flatpages framework: http://www.djangoproject.com/documentation/flatpages/
-.. _syndication framework: http://www.djangoproject.com/documentation/syndication/
-.. _authentication framework: http://www.djangoproject.com/documentation/authentication/
+.. _redirects framework: ../redirects/
+.. _flatpages framework: ../flatpages/
+.. _syndication framework: ../syndication/
+.. _authentication framework: ../authentication/

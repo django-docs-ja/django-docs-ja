@@ -2,7 +2,7 @@
 URL ディスパッチャ
 ==================
 
-:revision-up-to: 4410 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 すっきりした，簡潔で明解な URL スキームの設計は，高品質の Web アプリケーショ
 ンでは重要な要素です．Django では，フレームワークの制限なしに，望み通りの
@@ -54,9 +54,9 @@ Django のリクエスト処理
        規表現でキャプチャした値が渡されます．
 
 .. _`設定ファイル`: ../settings/
-.. _settings file: http://www.djangoproject.com/documentation/settings/
+.. _settings file: ../settings/
 .. _`リクエストオブジェクト`: ../request_response/#httprequest-objects
-.. _request object: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
+.. _request object: ../request_response/#httprequest-objects
 
 .. _Examples:
 
@@ -320,7 +320,7 @@ Python 文字列型になります．例えば，下のような URLconf の行::
 Django はドットを自動的に入れます．
 
 .. _`Django の概要`: ../overview/
-.. _Django overview: http://www.djangoproject.com/documentation/overview/
+.. _Django overview: ../overview/
 
 
 .. _Multiple view prefixes:
@@ -434,9 +434,9 @@ URLconf タプルにはオプションとして 3 つめの要素を指定できます．この要素は
 タやビューへのオプションを渡すために使われています．
 
 .. _`汎用ビュー`: ../generic_views/
-.. _generic views: http://www.djangoproject.com/documentation/generic_views/
+.. _generic views: ../generic_views/
 .. _`配信フィードフレームワーク`: ../syndication_feeds/
-.. _syndication framework: http://www.djangoproject.com/documentation/syndication/
+.. _syndication framework: ../syndication/
 
 .. _`Passing extra options to include()`:
 

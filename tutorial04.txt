@@ -2,7 +2,7 @@
 はじめての Django アプリ作成，その 4
 =====================================
 
-:revision-up-to: 3953 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 このチュートリアルは `チュートリアルその 3`_ の続きです．ここでは，引続き
 Web 投票アプリケーションの開発を例にして，簡単なフォーム処理とコードの縮小
@@ -135,7 +135,7 @@ URLconf に入れたことを思い出しましょう::
 .. _`リクエストオブジェクトとレスポンスオブジェクトのドキュメント`: 
     ../request_response/
 .. _request and response documentation: 
-    http://www.djangoproject.com/documentation/request_response/
+    ../request_response/
 
 .. _Use generic views: Less code is better:
 
@@ -271,4 +271,4 @@ URLconf に入れたことを思い出しましょう::
     * 高度な admin 機能: カスタム JavaScript
 
 .. _`チュートリアルその 3`: ../tutorial03/
-.. _Tutorial 3: http://www.djangoproject.com/documentation/tutorial3/
+.. _Tutorial 3: ../tutorial3/

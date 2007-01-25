@@ -2,7 +2,7 @@
 Django プロジェクトに協力するために
 ===================================
 
-:revision-up-to: 4362 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 Django を *使う* のを楽しいと思ってもらえたなら， *使い続ける* 前にすこし待っ
 てください．私達は多大な情熱をかけて，ユーザがコミュニティのメンバに貢献で
@@ -656,18 +656,18 @@ Django プロジェクトには二種類のコミッタがいます:
 .. _`チケットトラッカ`: http://code.djangoproject.com/newticket
 .. _`トラッカを検索`: http://code.djangoproject.com/search
 .. _`パッチつきのチケットのリスト`: http://code.djangoproject.com/query?status=new&status=assigned&status=reopened&has_patch=1&order=priority
-.. _`i18n ドキュメント`: http://www.djangoproject.com/documentation/i18n/
+.. _`i18n ドキュメント`: ../i18n/
 .. _`i18n ブランチ`: http://code.djangoproject.com/browser/django/branches/i18n
 
 .. _community page: http://www.djangoproject.com/community/
 .. _ticket tracker: http://code.djangoproject.com/newticket
 .. _django-developers: http://groups.google.com/group/django-developers
-.. _FAQ: http://www.djangoproject.com/documentation/faq/
+.. _FAQ: ../faq/
 .. _search the tracker: http://code.djangoproject.com/search
 .. _django-users: http://groups.google.com/group/django-users
 .. _`#django`: irc://irc.freenode.net/django
 .. _list of tickets with patches: http://code.djangoproject.com/query?status=new&status=assigned&status=reopened&has_patch=1&order=priority
 .. _PEP 8: http://www.python.org/peps/pep-0008.html
-.. _i18n documentation: http://www.djangoproject.com/documentation/i18n/
+.. _i18n documentation: ../i18n/
 .. _i18n branch: http://code.djangoproject.com/browser/django/branches/i18n
 .. _`tags/releases`: http://code.djangoproject.com/browser/django/tags/releases

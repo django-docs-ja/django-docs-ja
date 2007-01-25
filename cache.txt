@@ -2,7 +2,7 @@
 Django のキャッシュフレームワーク
 =================================
 
-:revision-up-to: 3608 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 動的な Web サイトの根本的なトレードオフ要因とは，まさに動的であるということ
 そのものです．ユーザがページをリクエストするたびに，サーバはデータベースへ
@@ -284,7 +284,7 @@ In this example, ``timeout`` is ``30`` and ``max_entries`` is ``400``::
 ミドルウェアの詳細は `ミドルウェアのドキュメント`_ を参照してください．
 
 .. _`ミドルウェアのドキュメント`: ../middleware/
-.. _`middleware documentation`: http://www.djangoproject.com/documentation/middleware/
+.. _`middleware documentation`: ../middleware/
 
 .. _The per-view cache:
 

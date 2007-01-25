@@ -2,7 +2,7 @@
 Django でのユーザ認証
 =============================
 
-:revision-up-to: 3962 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 Django にはユーザ認証システムがついてきます． Django のユーザ認証システムは，
 ユーザアカウント，グループ，パーミッションとクッキーベースのユーザセッショ
@@ -158,11 +158,11 @@ API リファレンス
       profile) を返します．プロファイルを使えないサイトでは 
       ``django.contrib.auth.models.SiteProfileNotAvailable`` を送出します．
 
-.. _Django model: http://www.djangoproject.com/documentation/model_api/
+.. _Django model: ../model_api/
 .. _Django モデル: ../model-api/
 .. _DEFAULT_FROM_EMAIL: ../settings/#default-from-email
 .. DEFAULT_FROM_EMAIL: 
-    http://www.djangoproject.com/documentation/settings/#default-from-email
+    ../settings/#default-from-email
 
 .. _Manager functions:
 
@@ -311,8 +311,8 @@ API について扱ってきました．より高水準の API では， Django はこれらの認証フ
 
 .. _`リクエストオブジェクト`: ../request_response/#httprequest-objects
 .. _`セッションのドキュメント`: ../sessions/
-.. _request objects: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
-.. _session documentation: http://www.djangoproject.com/documentation/sessions/
+.. _request objects: ../request_response/#httprequest-objects
+.. _session documentation: ../sessions/
 
 .. _How to log a user in:
 
@@ -502,8 +502,8 @@ Python 2.4 で登場したよりコンパクトなデコレータ構文を使った例を以下に示しま
 
 .. _`forms のドキュメント`: ../forms/
 .. _`site フレームワークのドキュメント`: ../sites/
-.. _forms documentation: http://www.djangoproject.com/documentation/forms/
-.. _site framework docs: http://www.djangoproject.com/documentation/sites/
+.. _forms documentation: ../forms/
+.. _site framework docs: ../sites/
 
 
 .. _Limiting access to logged-in users that pass a test:
@@ -614,7 +614,7 @@ URLconf を変更して，ジェネリックビュー自体ではなくラッパコードを指すように
         return object_detail(*args, **kwargs)
 
 .. _`汎用ビュー`: ../generic_views/
-.. _generic view: http://www.djangoproject.com/documentation/generic_views/
+.. _generic view: ../generic_views/
 
 .. _Permissions:
 
@@ -688,7 +688,7 @@ Django の admin サイトでは，以下のようなパーミッションを使っています:
 
 .. _`モデルのメタ属性`: ../model-api/#meta-options
 .. _model Meta attribute: 
-    http://www.djangoproject.com/documentation/model_api/#meta-options
+    ../model_api/#meta-options
 
 API リファレンス
 -----------------
@@ -732,7 +732,7 @@ API リファレンス
    .. _`RequestContext のドキュメント`:
        ../templates_python/#subclassing-context-requestcontext
    .. _RequestContext docs: 
-       http://www.djangoproject.com/documentation/templates_python/#subclassing-context-requestcontext
+       ../templates_python/#subclassing-context-requestcontext
 
 
 .. Users:
@@ -788,7 +788,7 @@ API リファレンス
     {% endif %}
 
 .. _`テンプレートコンテキスト`: ../templates_python/
-.. _template context: http://www.djangoproject.com/documentation/templates_python/
+.. _template context: ../templates_python/
 
 .. _Groups:
 
@@ -866,7 +866,7 @@ API リファレンス
 には， `セッションフレームワーク`_ を使って下さい．
 
 .. _`セッションフレームワーク`: ../sessions/
-.. _session framework: http://www.djangoproject.com/documentation/sessions/
+.. _session framework: ../sessions/
 
 
 .. _Other authentication sources:

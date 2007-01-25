@@ -2,7 +2,7 @@
 Django の設定
 =============
 
-:revision-up-to: 4410 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 Django の設定ファイルには，インストールした Django の使う全ての設定が入って
 います．このドキュメントでは，各設定の役割と，どのような設定を利用できるか
@@ -67,7 +67,7 @@ django-admin.py ユーティリティ
     django-admin.py runserver --settings=mysite.settings
 
 .. _django-admin.py: ../django-admin/
-.. django-admin.py: http://www.djangoproject.com/documentation/django_admin/
+.. django-admin.py: ../django_admin/
 
 .. _On the server (mod_python):
 
@@ -87,7 +87,7 @@ django-admin.py ユーティリティ
 い．
 
 .. _`mod_python で Django を使うためのドキュメント`: ../modpython/
-.. _Django mod_python documentation: http://www.djangoproject.com/documentation/modpython/
+.. _Django mod_python documentation: ../modpython/
 
 .. _Default settings:
 
@@ -118,7 +118,7 @@ Django が設定をコンパイルする際には，以下のようなアルゴリズムを使います:
 照してください．
 
 .. _`diffsettings のドキュメント`: ../django-admin/#diffsettings
-.. _diffsettings documentation: http://www.djangoproject.com/documentation/django_admin/#diffsettings
+.. _diffsettings documentation: ../django_admin/#diffsettings
 
 
 .. _`Using settings in Python code`:
@@ -340,7 +340,7 @@ MONTH_DAY_FORMAT も参照してください．
 
 
 .. _`利用可能な日付フォーマット文字`: ../templates/#now
-.. _allowed date format strings: http://www.djangoproject.com/documentation/templates/#now
+.. _allowed date format strings: ../templates/#now
 
 DATETIME_FORMAT
 ---------------
@@ -355,7 +355,7 @@ DATETIME_FORMAT_ , TIME_FORMAT_ , YEAR_MONTH_FORMAT_ および
 MONTH_DAY_FORMAT も参照してください．
 
 .. _`利用可能な日時フォーマット文字`: ../templates/#now
-.. _allowed date format strings: http://www.djangoproject.com/documentation/templates/#now
+.. _allowed date format strings: ../templates/#now
 
 DEBUG
 -----
@@ -474,7 +474,7 @@ INSTALLED_APPS
 ばなりません．
 
 .. _django-admin.py startapp: ../django-admin/#startapp-appname
-.. django-admin.py startapp: http://www.djangoproject.com/documentation/django_admin/#startapp-appname
+.. django-admin.py startapp: ../django_admin/#startapp-appname
 
 INTERNAL_IPS
 ------------
@@ -507,7 +507,7 @@ LANGUAGE_CODE
 `国際化のドキュメント`_ も参照してください．
 
 .. _国際化のドキュメント: ../i18n/
-.. _internationalization docs: http://www.djangoproject.com/documentation/i18n/
+.. _internationalization docs: ../i18n/
 
 LANGUAGES
 ---------
@@ -672,7 +672,7 @@ ROOT_URLCONF
 い．
 
 .. _`Django のリクエスト処理`: ../url_dispatch/#how-django-processes-a-request
-.. _How Django processes a request: http://www.djangoproject.com/documentation/url_dispatch/#how-django-processes-a-request
+.. _How Django processes a request: ../url_dispatch/#how-django-processes-a-request
 
 SECRET_KEY
 ----------
@@ -773,7 +773,7 @@ SITE_ID
 `sites のドキュメント`_ を参照してください．
 
 .. _`sites のドキュメント`: sites.txt
-.. _sites documentation: http://www.djangoproject.com/documentation/sites/
+.. _sites documentation: ../sites/
 
 TEMPLATE_CONTEXT_PROCESSORS
 ---------------------------
@@ -835,7 +835,7 @@ TEMPLATE_STRING_IF_INVALID
 文字列です． `無効な変数の扱い`_ を参照してください．
 
 .. _`無効な変数の扱い`: ../templates_python/#how-invalid-variables-are-handled
-.. _How invalid variables are handled: http://www.djangoproject.com/documentation/templates_python/#how-invalid-variables-are-handled
+.. _How invalid variables are handled: ../templates_python/#how-invalid-variables-are-handled
 
 TEST_RUNNER
 -----------
@@ -879,7 +879,7 @@ MONTH_DAY_FORMAT も参照してください．
 
 .. _`利用可能な時刻フォーマット文字`: ../templates/#now
 
-.. _allowed date format strings: http://www.djangoproject.com/documentation/templates/#now
+.. _allowed date format strings: ../templates/#now
 
 TIME_ZONE
 ---------
@@ -980,11 +980,11 @@ MONTH_DAY_FORMAT も参照してください．
 .. _`テンプレートのドキュメント`: ../templates_python/
 .. _`利用可能な選択肢`: 
     http://www.postgresql.org/docs/8.1/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
-.. _middleware docs: http://www.djangoproject.com/documentation/middleware/
-.. _session docs: http://www.djangoproject.com/documentation/sessions/
-.. _cache docs: http://www.djangoproject.com/documentation/cache/
+.. _middleware docs: ../middleware/
+.. _session docs: ../sessions/
+.. _cache docs: ../cache/
 .. _See available choices: http://www.postgresql.org/docs/current/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
-.. _template documentation: http://www.djangoproject.com/documentation/templates_python/
+.. _template documentation: ../templates_python/
 
 設定項目を自作する
 ==================

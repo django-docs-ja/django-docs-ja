@@ -2,7 +2,7 @@
 ミドルウェア
 ============
 
-:revision-up-to: 4282 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 ミドルゥェア (Middleware) とは， Django のリクエスト/レスポンス処理に対する
 フックの集まりです．ミドルウェアは Django の入出力を操作するための軽量かつ
@@ -54,7 +54,7 @@ Django の管理下にあるページは ``CACHE_MIDDLEWARE_SECONDS`` 設定に定義した時
 間のキャッシュされます．`キャッシュのドキュメント`_ を参照してください．
 
 .. _`キャッシュのドキュメント`: ../cache/#the-per-site-cache
-.. _`cache documentation`: http://www.djangoproject.com/documentation/cache/#the-per-site-cache
+.. _`cache documentation`: ../cache/#the-per-site-cache
 
 django.middleware.common.CommonMiddleware
 -----------------------------------------
@@ -136,7 +136,7 @@ django.contrib.sessions.middleware.SessionMiddleware
 
 .. _`セッションのドキュメント`: ../sessions/
 .. _`session documentation`: 
-    http://www.djangoproject.com/documentation/sessions/
+    ../sessions/
 
 django.contrib.auth.middleware.AuthenticationMiddleware
 -------------------------------------------------------
@@ -147,7 +147,7 @@ django.contrib.auth.middleware.AuthenticationMiddleware
 .. _`Web リクエストの認証`:
     ../authentication/#authentication-in-web-requests
 .. _Authentication in Web requests: 
-    http://www.djangoproject.com/documentation/authentication/#authentication-in-web-requests
+    ../authentication/#authentication-in-web-requests
 
 
 django.middleware.transaction.TransactionMiddleware
@@ -166,7 +166,7 @@ django.middleware.transaction.TransactionMiddleware
 `トランザクション管理のドキュメント`_ を参照してください．
 
 .. _`トランザクション管理のドキュメント`: ../transactions/
-.. _`transaction management documentation`: http://www.djangoproject.com/documentation/transactions/
+.. _`transaction management documentation`: ../transactions/
 
 
 .. _Writing your own middleware:

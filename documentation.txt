@@ -2,7 +2,7 @@
 Django ドキュメントの読み方
 ===========================
 
-:revision-up-to: 3562 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 私達は， Django のドキュメントが，有用で読みやすくできるだけ詳細であるよう
 多大な努力を投じています．ここでは，ドキュメントを活用するコツと，ドキュメ
@@ -46,7 +46,7 @@ Django のドキュメントを入手するにはいくつか方法があります．おすすめの順に以
 Web から
 --------
 
-Django ドキュメントの最新版は http://www.djangoproject.com/documentation/
+Django ドキュメントの最新版は ../
 にあります．ここにある HTML ページは，ソースコード管理システム上のテキスト
 ファイルから 15 分毎に自動生成されているものです．従って，これらのファイル
 は「最新最良の」 Django に対応しています．つまり，最近の修正や追加事項を反
@@ -154,6 +154,6 @@ Python コードの更新と同様， ``svn update`` を実行してください．
     * `Web のドキュメントメインページ`_ には，以前の全てのバージョンのドキュ
       メントに対するリンクがあります．
 
-.. _main documentation Web page: http://www.djangoproject.com/documentation/
-.. _`Web のドキュメントメインページ`: http://www.djangoproject.com/documentation/
+.. _main documentation Web page: ../
+.. _`Web のドキュメントメインページ`: ../
 

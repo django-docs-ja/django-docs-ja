@@ -2,7 +2,7 @@
 e-mail の送信
 ==============
 
-:revision-up-to: 3491 (0.96-pre SVN)
+:revision-up-to: 4427 (0.96-pre SVN)
 
 Python の `smtplib ライブラリ`_ を使えば，比較的簡単に電子メールを送信でき
 ますが， Django ではこのライブラリへの軽量ラッパを二つ用意して，電子メール
@@ -122,11 +122,11 @@ mail_admins()
 .. _EMAIL_SUBJECT_PREFIX 設定: ../settings/#email-subject-prefix
 .. _SERVER_EMAIL 設定: ../settings/#server-email
 .. _ADMINS setting: 
-   http://www.djangoproject.com/documentation/settings/#admins
+   ../settings/#admins
 .. _EMAIL_SUBJECT_PREFIX setting: 
-   http://www.djangoproject.com/documentation/settings/#email-subject-prefix
+   ../settings/#email-subject-prefix
 .. _SERVER_EMAIL setting: 
-   http://www.djangoproject.com/documentation/settings/#server-email
+   ../settings/#server-email
 
 
 mail_managers()
@@ -140,7 +140,7 @@ mail_managers()
 
 .. _`MANAGERS 設定`: ../settings/#managers
 .. _MANAGERS setting: 
-   http://www.djangoproject.com/documentation/settings/#managers
+   ../settings/#managers
 
 .. _Examples:
 
