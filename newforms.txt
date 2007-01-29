@@ -792,6 +792,39 @@ Django の古いフォーム／検証フレームワークを使ったことがある人は，この
 スを指定できます．詳しくは後述の `ウィジェット <#widgets>`_ を参照してくだ
 さい．
 
+``help_text``
+~~~~~~~~~~~~~
+
+``help_text`` 引数を使うと，フィールドに説明文をつけられます．
+``help_text`` を指定した場合，その内容がフォームをレンダした時に該当フィー
+ルドの隣に表示されます．
+
+以下に， ``help_text`` を使ったフォームの例を示します．この例では，フォーム
+の二つのフィールドに ``help_text`` を指定しています．出力を単純にするために，
+``auto_id=False`` を指定しています::
+
+    >>> class HelpTextContactForm(forms.Form):
+    ...     subject = forms.CharField(max_length=100, help_text='100 characters max.')
+    ...     message = forms.CharField()
+    ...     sender = forms.EmailField(help_text='A valid e-mail address, please.')
+    ...     cc_myself = forms.BooleanField()
+    >>> f = HelpTextContactForm(auto_id=False)
+    >>> print f.as_table()
+    <tr><th>Subject:</th><td><input type="text" name="subject" maxlength="100" /><br />100 characters max.</td></tr>
+    <tr><th>Message:</th><td><input type="text" name="message" /></td></tr>
+    <tr><th>Sender:</th><td><input type="text" name="sender" /><br />A valid e-mail address, please.</td></tr>
+    <tr><th>Cc myself:</th><td><input type="checkbox" name="cc_myself" /></td></tr>
+    >>> print f.as_ul()
+    <li>Subject: <input type="text" name="subject" maxlength="100" /> 100 characters max.</li>
+    <li>Message: <input type="text" name="message" /></li>
+    <li>Sender: <input type="text" name="sender" /> A valid e-mail address, please.</li>
+    <li>Cc myself: <input type="checkbox" name="cc_myself" /></li>
+    >>> print f.as_p()
+    <p>Subject: <input type="text" name="subject" maxlength="100" /> 100 characters max.</p>
+    <p>Message: <input type="text" name="message" /></p>
+    <p>Sender: <input type="text" name="sender" /> A valid e-mail address, please.</p>
+    <p>Cc myself: <input type="checkbox" name="cc_myself" /></p>
+
 .. _Dynamic initial values:
 
 初期値を動的に決定する
