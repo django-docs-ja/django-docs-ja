@@ -44,6 +44,7 @@ Smarty_ や CheetahTemplate_ のようなテキストベースのテンプレート言語を経験
     {% endfor %}
     {% endblock %}
 
+.. class:: philosophy
 .. admonition:: 設計哲学
 
     なぜ (Zope における TAL のような) XML ベースのテキストベースのテンプレー

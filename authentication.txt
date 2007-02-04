@@ -721,6 +721,7 @@ API リファレンス
 ``RequestContext`` を使っている場合，ログインユーザとそのパーミッションに
 `テンプレートコンテキスト`_ (template context) を使ってアクセスできます．
 
+.. class:: tips
 .. admonition:: 技術的な話題
 
    デフォルトの設定では，テンプレートコンテキストに ``RequestContext`` を使

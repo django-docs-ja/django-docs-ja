@@ -54,7 +54,11 @@ Django の *プロジェクト (project)* を構成するコードを自動生成します．プロジェ
     コードはドキュメントルートの **外** ，例えば ``/home/mycode`` のような
     場所に置きましょう．
 
-``startproject`` が何を作成したかをみてみましょう::
+``startproject`` が何を作成したかをみてみましょう:
+
+.. class:: python-code
+
+::
 
     mysite/
         __init__.py
@@ -236,6 +240,7 @@ Django でデータベース Web アプリケーションを書くための最初のステップは，モ
 デルの定義です．本質的には，データベースのレイアウトと，追加のメタデータの
 定義です．
 
+.. class:: admonition-philosophy
 .. admonition:: 設計哲学
 
    モデルは，手持ちのデータに対する唯一 (single) の決定的な (definitive) ソー
@@ -315,6 +320,7 @@ Django では，こうした概念を簡単な Python クラスで表現できます．
 ただし，その前に ``polls`` アプリケーションをインストールしたことをプロジェ
 クトに教えてやる必要があります．
 
+.. class:: admonition-philosophy
 .. admonition:: 設計哲学
 
     Django アプリケーションは「プラグ可能 (pluggable)」です．アプリケーショ

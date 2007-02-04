@@ -38,7 +38,7 @@ Django が行っているのは，本質的には以下の二つの作業です:
     2. サポートしたい言語に対して翻訳カタログを作成します．
     3. Django 設定ファイルで locale ミドルウェアを有効にします．
 
-
+.. class:: behind-the-scenes
 .. admonition:: 舞台裏
 
     Django の翻訳機構は Python に付属の標準の ``gettext`` モジュールを使っ
