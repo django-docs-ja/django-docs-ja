@@ -2,7 +2,7 @@
 Python プログラマのための Django テンプレート言語ガイド
 =======================================================
 
-:revision-up-to: 4427 (0.96-pre SVN)
+:revision-up-to: 4484 (0.96-pre SVN)
 
 このドキュメントでは， Django のテンプレートシステムを技術的な側面，すなわ
 ちどのように動作し，どうやって拡張するかという観点から解説します．テンプレー
@@ -879,6 +879,70 @@ Notes:
 
 上の例の下の定義のようにして ``name`` 引数を省略すると， Django は関数名を
 そのままフィルタ名として使います．
+
+.. _Passing template variables to the tag:
+
+テンプレート変数をタグに渡す
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``token.split_contents()`` を使えば，テンプレートタグにいくつでも引数を渡せ
+ますが，引数はすべて文字列リテラルになってしまいます．そのため，テンプレー
+トタグの引数に動的なコンテンツ (テンプレート変数) を渡すには，もうひと工夫
+必要です．先に挙げた例では，現在時刻を文字列にフォーマットして文字列で値を
+返していましたが，今度は以下のように ``DateTimeField`` の値を渡してテンプレー
+トタグに日付と時刻をフォーマットさせたいとしましょう::
+
+    <p>この投稿が最後に更新された時刻:{% format_time blog_entry.date_updated "%Y-%m-%d %I:%M %p" %}</p>
+
+まず， ``token.split_contents()`` は以下の 3 つの値を返します:
+
+    1. タグ名である ``format_time`` ．
+    2. ``blog_entry.date_updated`` という *文字列* ．
+    3. フォーマット文字列 "%Y-%m-%d %I:%M %p" ． ``split_contents()`` は，
+       文字列リテラルの先頭と末尾にあるクオート文字を除去しません．
+
+今度は，タグの定義は以下のようになります::
+
+    from django import template
+    def do_format_time(parser, token):
+        try:
+            # split_contents() はクオート付き文字列を分解しない
+            tag_name, date_to_format, format_string = token.split_contents()
+        except ValueError:
+            raise template.TemplateSyntaxError, "%r tag requires exactly two arguments" % token.contents[0]
+        if not (format_string[0] == format_string[-1] and format_string[0] in ('"', "'")):
+            raise template.TemplateSyntaxError, "%r tag's argument should be in quotes" % tag_name
+        return FormatTimeNode(date_to_format, format_string[1:-1])
+
+レンダラの方も変更して， ``blog_entry`` オブジェクトの ``date_updated`` プ
+ロパティの実際の中身を取り出せるようにせねばなりません．これは
+``django.template`` の ``resolve_varialbe()`` で実現します．
+``resolve_variable()`` には，変数名と ``render`` メソッドを介して渡される現
+在のコンテキストを指定します::
+
+    from django import template
+    from django.template import resolve_variable
+    import datetime
+    class FormatTimeNode(template.Node):
+        def __init__(self, date_to_format, format_string):
+            self.date_to_format = date_to_format
+            self.format_string = format_string
+        
+        def render(self, context):
+            try:
+                actual_date = resolve_variable(self.date_to_format, context)
+                return actual_date.strftime(self.format_string)
+            except VariableDoesNotExist:
+                return ''
+
+これで， ``resolve_variable`` は ``blog_entry.date_updated`` の値を解決して，
+その値にしたがってフォーマット処理を行います．
+
+.. note::
+    ``resolve_variable()`` は，渡された文字列の表す値をページの現在のコンテ
+    キストから解決できなかった場合に ``VariableDoesNotExist`` 例外を送出し
+    ます．
+
 
 .. _Shortcut for simple tags:
 

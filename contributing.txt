@@ -2,7 +2,7 @@
 Django プロジェクトに協力するために
 ===================================
 
-:revision-up-to: 4427 (0.96-pre SVN)
+:revision-up-to: 4484 (0.96-pre SVN)
 
 Django を *使う* のを楽しいと思ってもらえたなら， *使い続ける* 前にすこし待っ
 てください．私達は多大な情熱をかけて，ユーザがコミュニティのメンバに貢献で
@@ -541,12 +541,41 @@ Python に別のバージョンの Django を使わせる
 したい場合には，シンボリックリンクが元のコードを指すように変更しなおすだけ
 です．
 
+第三の方法は， 
+`パスファイル <http://python.jp/doc/release/lib/module-site.html>`_
+(``<something>.pth``) を使うというものです．この方法は， (シンボリックリン
+クを使えない Windows を含む) 全てのシステムで利用できます．まず， 
+``site-packages`` ディレクトリに， ``django`` という名前のファイルやディレ
+クトリ，シンボリックリンクがない状態にしてください．次に， ``django.pth``
+という名前のテキストファイルを作成して， ``site-packages`` ディレクトリの直
+下に保存します．このファイルには，使いたい Django の置かれているパスを一行
+で記述します．コメントを追加しても構いません．複数のブランチを指定できるよ
+うにしたパスファイルの例を以下似示します．特定のブランチ (例えば 'trunk')
+を使いたい場合，その行のコメントを解除して，他の行を全てコメント化します::
+
+    # トランク (trunk): svn リポジトリの
+    #   http://code.djangoproject.com/svn/django/trunk/
+    # からチェックアウトしたもの
+    #
+    /path/to/trunk
+    
+    # ブランチ (branch): ブランチ名 <branch> を svn リポジトリの
+    #   http://code.djangoproject.com/svn/django/branches/<branch>/
+    # からチェックアウトしたもの
+    #
+    #/path/to/<branch>
+    
+    # Windows の場合は以下のような形式にします:
+    # C:/path/to/<branch>
+
 Django 0.95 やそれ以前のバージョンをインストールしていて，インストールに
 ``python setup.py install`` を使った場合， ``django`` ではなく
 ``Django-0.95-py2.4.egg`` といった名前のディレクトリになっているでしょう．
 この場合， ``setuptools.pth`` を編集して，該当する Django の ``.egg``
 の書かれた行を削除してから， ``django`` のブランチを ``site-packages`` にコ
 ピーします．
+
+.. _path file: http://docs.python.org/lib/module-site.html
 
 .. _Official releases:
 

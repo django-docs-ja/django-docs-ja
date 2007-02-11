@@ -2,7 +2,7 @@
 配信フィードフレームワーク
 ==========================
 
-:revision-up-to: 4427 (0.96-pre SVN)
+:revision-up-to: 4484 (0.96-pre SVN)
 
 Django には高水準の配信フィード (syndication feed) 生成フレームワークがつい
 てきます．このフレームワークを使えば， RSS_ 形式や Atom_ 形式のフィードを簡
@@ -503,7 +503,25 @@ Feed クラスリファレンス
 	    フィードのカテゴリを表す文字列を返すイテレータを返します．
             """
 
-        categories = ("python", "django") # ハードコード形式のカテゴリリストです．
+        # カテゴリリストのハードコード表現です．
+        categories = ("python", "django") 
+
+        # COPYRIGHT NOTICE -- 以下の三つの形式はいずれも省略可能です．
+        # フレームワークは以下に示した順番で値を探します．
+
+        def copyright(self, obj):
+            """
+            get_object() が返すようなオブジェクトを引数 obj にとり，
+	    フィードの著作権表示を通常の Python 文字列型で返します．
+            """
+
+        def copyright(self):
+            """
+	    フィードの著作権表示を通常の Python 文字列型で返します．
+            """
+
+        # 著作権表示のハードコード表現です．
+        copyright = 'Copyright (c) 2007, Sally Smith'
 
         # ITEMS -- 以下の三つの形式の少なくともいずれか一つが必要です．配信
         # フレームワークは以下の順に値を探します．
@@ -652,7 +670,8 @@ Feed クラスリファレンス
 
         item_enclosure_mime_type = "audio/mpeg" # ハードコード形式の mime-type です．
 
-        # ITEM PUBDATE -- 以下の三つの形式のいずれか一つを指定できます．省略可能です．
+        # ITEM PUBDATE -- 以下の三つの形式のいずれか一つを指定できます．
+        # 省略可能です．
         # このメソッドは指定の要素に対する公開日を取得するためのフックです．
         # どのケースでも，メソッドや属性は Python の datetime.datetime 
         # オブジェクトを返さねばなりません．
@@ -687,6 +706,26 @@ Feed クラスリファレンス
 
         item_categories = ("python", "django") # ハードコード形式のカテゴリです．
 
+        # ITEM COPYRIGHT NOTICE (Atom フィードにのみ適用されます) 
+        # 以下の三つの形式のいずれか一つを指定できます．配信フレームワーク
+        # は以下の順に値を探します．省略可能です．
+
+        def item_copyright(self, obj):
+            """
+            items() の返す item を引数にとり， item の著作権表示を
+	    通常の Python 文字列型で返します．
+            """
+
+        def item_copyright(self):
+            """
+	    全 item の著作権表示を通常の Python 文字列型で返します．
+            """
+
+        # 著作権表示をハードコードする場合の指定方法です．
+        item_copyright = 'Copyright (c) 2007, Sally Smith'
+
+
+.. _The low-level framework:
 
 低水準フレームワーク
 ====================

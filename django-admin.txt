@@ -2,7 +2,7 @@
 django-admin.py と manage.py
 ============================
 
-:revision-up-to: 4427 (0.96-pre SVN)
+:revision-up-to: 4484 (0.96-pre SVN)
 
 ``django-admin.py`` は Django の管理タスクを行うためのコマンドライン
 ユーティリティです．このドキュメントでは ``django-admin.py`` の全ての
@@ -23,6 +23,12 @@ Django を ``setup.py`` ユーティリティでインストールしていれば，
 ``site-packages/django/bin`` を探せば見つかるでしょう．
 ``/usr/local/bin`` のようなパス上のどこかにシンボリックリンクを張って
 おくように勧めます．
+
+Windows を使っていて，シンボリックリンクを張れない場合には，パスの通った場
+所に ``django-admin.py`` をコピーするか， ``PATH`` の設定値を (
+``マイコンピュータ(右クリック)`` - ``プロパティ`` - ``詳細設定`` - 
+``環境変数`` - ``システム環境変数`` で) django-admin.py のインストールされ
+ている場所を指すように変更してください．
 
 一般論として，一つの Django プロジェクトだけで作業しているなら，
 ``manage.py`` を使う方が簡単といえるでしょう． ``django-admin.py`` と
