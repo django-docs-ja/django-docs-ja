@@ -2,7 +2,7 @@
 Python プログラマのための Django テンプレート言語ガイド
 =======================================================
 
-:revision-up-to: 4484 (0.96-pre SVN)
+:revision-up-to: 4637 (0.96-pre SVN)
 
 このドキュメントでは， Django のテンプレートシステムを技術的な側面，すなわ
 ちどのように動作し，どうやって拡張するかという観点から解説します．テンプレー
@@ -717,6 +717,22 @@ Python モジュールを作成したら，実現したいフィルタやタグに応じて Python コー
 上の例の下の定義のようにして ``name`` 引数を省略すると， Django は関数名を
 そのままフィルタ名として使います．
 
+.. _Template filters which expect strings:
+
+文字列を引数に取るテンプレートフィルタ
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+第一引数として文字列をとるだけのテンプレートフィルタを書くために，
+``stringfilter`` というデコレータがあります．このデコレータは，引数に指定し
+たオブジェクトを，デコレーション対象の関数に渡す前に文字列に変換してくれま
+す::
+
+    from django import template
+
+    @template.stringfilter
+    def lower(value):
+    	return value.lower()
+
+
 .. _Writing custom template tags:
 
 カスタムテンプレートタグを書く
@@ -907,12 +923,12 @@ Notes:
     def do_format_time(parser, token):
         try:
             # split_contents() はクオート付き文字列を分解しない
-            tag_name, date_to_format, format_string = token.split_contents()
+            tag_name, date_to_be_formatted, format_string = token.split_contents()
         except ValueError:
             raise template.TemplateSyntaxError, "%r tag requires exactly two arguments" % token.contents[0]
         if not (format_string[0] == format_string[-1] and format_string[0] in ('"', "'")):
             raise template.TemplateSyntaxError, "%r tag's argument should be in quotes" % tag_name
-        return FormatTimeNode(date_to_format, format_string[1:-1])
+        return FormatTimeNode(date_to_be_formatted, format_string[1:-1])
 
 レンダラの方も変更して， ``blog_entry`` オブジェクトの ``date_updated`` プ
 ロパティの実際の中身を取り出せるようにせねばなりません．これは
@@ -924,13 +940,13 @@ Notes:
     from django.template import resolve_variable
     import datetime
     class FormatTimeNode(template.Node):
-        def __init__(self, date_to_format, format_string):
-            self.date_to_format = date_to_format
+        def __init__(self, date_to_be_formatted, format_string):
+            self.date_to_be_formatted = date_to_be_formatted
             self.format_string = format_string
         
         def render(self, context):
             try:
-                actual_date = resolve_variable(self.date_to_format, context)
+                actual_date = resolve_variable(self.date_to_be_formatted, context)
                 return actual_date.strftime(self.format_string)
             except VariableDoesNotExist:
                 return ''

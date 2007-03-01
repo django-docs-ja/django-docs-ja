@@ -2,7 +2,7 @@
 newforms ライブラリ
 ===================
 
-:revision-up-to: 4410 (0.96-pre SVN)
+:revision-up-to: 4637 (0.96-pre SVN)
 
 ``django.newforms`` は， Django に新たに導入された画期的なフォーム処理ライ
 ブラリで，従来のフォーム／マニピュレータ／バリデータフレームワークである
@@ -56,8 +56,8 @@ import 文を使うように勧めます::
 ====
 
 ``django.newforms`` は，以前の ``django.forms`` (「マニピュレータ」) システ
-ムと同じく， HTML フォームを表示し，検証を行って再表示するためのライブラリ
-です．HTML フォームをサーバ側で検証する場合に使います．
+ムと同じく， HTML フォームを表示し，データ処理 (検証) を行って再表示するた
+めのライブラリです．HTML フォームをサーバ側で検証する場合に使います．
 
 例えば， Web サイトに連絡用フォームを設置し，訪問者が電子メールでメッセージ
 を送信できるようにしたいなら，このライブラリを使って HTML フォームフィール
@@ -616,6 +616,50 @@ Django コンポーネントに対してカップリングしていません． newforms ライブラリ
 
     >>> str(f['subject'].errors)
     ''
+
+.. _Subclassing forms:
+
+フォームのサブクラス化
+----------------------
+
+フォームクラスをサブクラス化して自作する場合，できたフォームクラスには親ク
+ラスの全てのフィールドが入っています．サブクラスで定義したフィールドは親ク
+ラスのフィールドの後に続きます．
+
+以下の例では， ``ContactFormWithPriority`` には ``ContactForm`` の全てのフィー
+ルドと， ``priority`` という追加のフィールドが入っています．
+``ContactForm`` のフィールドは先に表示されます::
+
+    >>> class ContactFormWithPriority(ContactForm):
+    ...     priority = forms.CharField()
+    >>> f = ContactFormWithPriority(auto_id=False)
+    >>> print f.as_ul()
+    <li>Subject: <input type="text" name="subject" maxlength="100" /></li>
+    <li>Message: <input type="text" name="message" /></li>
+    <li>Sender: <input type="text" name="sender" /></li>
+    <li>Cc myself: <input type="checkbox" name="cc_myself" /></li>
+    <li>Priority: <input type="text" name="priority" /></li>
+
+複数のフォームを親クラスにしたサブクラス化も可能です．この場合，親クラスの
+フォームは「混ぜ込み (mix-in)」クラスのように扱われます．以下の例では，
+``BeatleForm`` が ``PersonForm`` と ``InstrumentForm`` を (この順番で)
+サブクラス化しています．フィールドのリストには，親クラスのフィールドが順番
+に表示されます::
+
+    >>> class PersonForm(Form):
+    ...     first_name = CharField()
+    ...     last_name = CharField()
+    >>> class InstrumentForm(Form):
+    ...     instrument = CharField()
+    >>> class BeatleForm(PersonForm, InstrumentForm):
+    ...     haircut_type = CharField()
+    >>> b = BeatleForm(auto_id=False)
+    >>> print b.as_ul()
+    <li>First name: <input type="text" name="first_name" /></li>
+    <li>Last name: <input type="text" name="last_name" /></li>
+    <li>Instrument: <input type="text" name="instrument" /></li>
+    <li>Haircut type: <input type="text" name="haircut_type" /></li>
+
 
 .. _Fields:
 

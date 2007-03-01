@@ -2,7 +2,7 @@
 Django のインストール
 =====================
 
-:revision-up-to: 4427 (0.96-pre SVN)
+:revision-up-to: 4657 (0.96-pre SVN)
 
 このドキュメントを読めば Django を動かせるようになります．
 
@@ -61,17 +61,18 @@ Django のデータベース API 機能を使うのなら，データベースサーバを動かす必要
 さらに，各データベースの Python バインディングをインストールしておく必要が
 あります．
 
-* PostgreSQL を使う場合， psycopg_ パッケージ (1.0 やベータ版のバージョン 2
-  ではなく，バージョン 1.1 を使って下さい) が必要です．Windows 環境なら， 
+* PostgreSQL を使う場合， psycopg_ パッケージ (バージョン 2 の
+  ``postgresql_psycopg2`` バックエンドを推奨します．バージョン 1.1 の
+  ``postgresql`` バックエンドも使えます) が必要です．Windows 環境なら， 
   非公式の `Windows むけコンパイル済みパッケージ`_ を使って下さい．
-* MySQL を使う場合は MySQLdb_ が必要です．
+* MySQL を使う場合は，バージョン 1.2.1p2 以降の MySQLdb_ が必要です．
 * SQLite を使う場合は pysqlite_ が必要です．バージョン 2.0.3 以上を使って下
   さい．
 
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
 .. _Django's ticket system: http://code.djangoproject.com/report/1
-.. _psycopg: http://initd.org/projects/psycopg1
+.. _psycopg: http://initd.org/projects/psycopg
 .. _`Windows むけコンパイル済みパッケージ`: http://stickpeople.com/projects/python/win-psycopg/
 .. _compiled Windows version: http://stickpeople.com/projects/python/win-psycopg/
 .. _MySQLdb: http://sourceforge.net/projects/mysql-python
@@ -93,12 +94,20 @@ Django コードのインストール
 公式リリースのインストール
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. `ダウンロードページ`_ から， Django-0.95.tar.gz をダウンロードします．
-   (アーカイブへの URL:
-   `<http://www.djangoproject.com/download/0.95/tarball/>`__)
-2. ``tar xzvf Django-0.95.tar.gz``
-3. ``cd Django-0.95``
-4. ``sudo python setup.py install``
+    1. `ディストリビューション固有の注意 <../distributions/>`_ を調べて，自
+       分のプラットフォーム/ディストリビューションで公式の Django パッケー
+       ジやインストーラが提供されていないか調べます．ディストリビューション
+       固有の配布パッケージは，たいてい依存関係のあるパッケージを自動的にイ
+       ンストールしてくれたり，パスの更新を行ってくれたりします．
+
+    2. `ダウンロードページ`_ から， Django-0.95.tar.gz をダウンロードします．
+
+    3. ``tar xzvf Django-0.95.tar.gz``
+
+    4. ``cd Django-0.95``
+
+    5. ``sudo python setup.py install``
+
 
 setuptools_ がインストールされていない場合，最後のコマンドを実行すると
 setuptools_ を自動的にダウンロードしてインストールします．この作業にはイン
@@ -111,6 +120,7 @@ setuptools_ を自動的にダウンロードしてインストールします．この作業にはイン
 ``site-packages`` ディレクトリ下にインストールされます．
 
 .. _setuptools: http://peak.telecommunity.com/DevCenter/setuptools
+.. _distribution specific notes: ../distributions/
 
 .. _Installing the development version:
 

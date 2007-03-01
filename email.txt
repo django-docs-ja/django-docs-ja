@@ -2,7 +2,7 @@
 e-mail の送信
 ==============
 
-:revision-up-to: 4427 (0.96-pre SVN)
+:revision-up-to: 4637 (0.96-pre SVN)
 
 Python の `smtplib ライブラリ`_ を使えば，比較的簡単に電子メールを送信でき
 ますが， Django ではこのライブラリへの軽量ラッパを二つ用意して，電子メール
@@ -43,8 +43,8 @@ send_mail()
 関数です．この関数の定義は以下のようになっています::
 
     send_mail(subject, message, from_email, recipient_list,
-        fail_silently=False, auth_user=EMAIL_HOST_USER,
-        auth_password=EMAIL_HOST_PASSWORD)
+        fail_silently=False, auth_user=None,
+        auth_password=None)
 
 ``subject``, ``message``, ``from_email`` および ``recipient_list`` は必須の
 パラメタです．
@@ -78,7 +78,7 @@ send_mass_mail()
 用の関数です．この関数の定義は以下のようになっています::
 
     send_mass_mail(datatuple, fail_silently=False,
-        auth_user=EMAIL_HOST_USER, auth_password=EMAIL_HOST_PASSWORD):
+        auth_user=None, auth_password=None):
 
 ``datatuple`` はタプルで，各要素は以下の形式になっています::
 

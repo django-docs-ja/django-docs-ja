@@ -2,7 +2,7 @@
 "contrib" 下のアドオン
 =========================
 
-:revision-up-to: 4427 (0.96-pre SVN)
+:revision-up-to: 4637 (0.96-pre SVN)
 
 Django は Python の `"batteries included" 哲学`_ を目指しています． Django
 には Web 開発における課題を解くための様々な外部オプションツールがついてきま
@@ -149,6 +149,14 @@ flatpages
 .. _`flatpages のドキュメント`: ../flatpages/
 .. _flatpages documentation: ../flatpages/
 
+localflavor
+===========
+
+**開発版の Django で新たに追加された機能**
+
+特定の国や文化でのみ有用な Django の短いコード (snippet) を集めたものです．
+例えば， ``django.contrib.localflavor.usa.forms`` には，米国の郵便番号
+(U.S. zip code) を検証するための ``USZipCodeField`` が入っています．
 
 
 markup

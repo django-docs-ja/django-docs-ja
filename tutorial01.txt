@@ -4,7 +4,7 @@
 
 .. contents::
 
-:revision-up-to: 4427 (0.96-pre SVN)
+:revision-up-to: 4637 (0.96-pre SVN)
 
 さあ，例を交えながら学んでゆきましょう．
 
@@ -24,6 +24,16 @@ Python 対話シェルを起動して ``import django`` を実行してみればわかります．
 .. _`Django は既にインストール済み`: ../install/
 .. _`Django installed`: ../install/
 
+.. admonition:: 困ったときは:
+
+    このチュートリアルを進めてゆく上で困ったことがあったら， 
+    `django-users`_ や  ``irc.freenode.net`` の `#django`_ チャネルで質問し
+    てみてください．
+
+.. _django-users: http://groups.google.com/group/django-users 
+.. _#django: irc://irc.freenode.net/django
+
+
 .. _Creating a project:
 
 プロジェクトの作成
@@ -37,6 +47,13 @@ Django の *プロジェクト (project)* を構成するコードを自動生成します．プロジェ
 コマンドラインから，コードを置きたい場所に ``cd`` して，
 ``django-admin.py startproject mysite`` を実行してください．現在のディレク
 トリに ``mysite`` ディレクトリが作成されます．
+
+.. note::
+    
+    プロジェクトの名前を付けるとき，組み込みの Python モジュールや Django
+    のコンポーネントの名前を使わないようにしてください．とりわけ， 
+    ``django`` (Django 自体と被ってしまいます) や ``site`` (組み込みの
+    Python パッケージ名と被ります) を使わないようにしましょう．
 
 (``python setup.py`` ユーティリティで Django をインストールしたのなら，
 ``django-admin.py`` がシステムパスのどこかにあるはずです．パス上になければ，

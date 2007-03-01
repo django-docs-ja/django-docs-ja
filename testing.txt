@@ -2,7 +2,7 @@
 Djangoアプリケーションのテスト
 ==============================
 
-:revision-up-to: 4484 (0.96-pre SVN)
+:revision-up-to: 4637 (0.96-pre SVN)
 
 **開発版の Django で新たに追加された機能です．**
 
@@ -249,10 +249,17 @@ Django は，アプリケーションの様々な機能に対するテストを補助するために，テス
 
         http://yoursite.com/customers/details/?name=fred&age=7
 
-``post(path, data={})``
-    ``path`` に対する POST リクエストを行います．引数 ``data`` は辞書オブジェ
-    クトで，キー／値のペアが POST データのペイロードの生成に使われます．こ
-    のペイロードは，MIMEタイプ ``multipart/form-data`` で送信されます．
+``post(path, data={}, content_type=MULTIPART_CONTENT)``
+    ``path`` に対する POST リクエストを行います． ``content_type`` を
+    指定した場合 (例えば XML ペイロードの場合には ``text/xml``)，引数
+    ``data`` の中身は POST リクエストそのままで送信され， 
+    ``Content-Type`` ヘッダの値は ``content_type`` の値になります．
+
+    ``content_type`` を指定しなければ， ``data`` の中身は
+    ``multipart/form-data`` で送信されます．
+
+    ``data`` の中のキー／値のペアは，マルチパートメッセージにエンコードされ，
+    POST データのペイロードになります．
 
     ただし，ファイルの送信は特別な扱いが必要です．ファイルの POST を行う場
     合，ファイル名フィールドの名前をキーに，アップロードしたいファイルのファ
@@ -340,6 +347,10 @@ Response オブジェクトを返します． Response オブジェクトには以下のようなプロ
 はテストケース内でアクセスできます．例外のテストを行うには，通常の
 ``try...catch`` ブロックか， ``unittest.TestCase.assertRaises()`` を使いま
 す．
+
+ただし， ``Http404`` や ``PermissionDenied``, ``SystemExit`` といった例外は
+テストケースからアクセスできません． Django はこれらの例外を内部的に捕捉し
+て，対応する適切な HTTP 応答コードに変換してしまうからです．
 
 .. _Persistent state:
 
@@ -466,7 +477,8 @@ Response オブジェクトを返します． Response オブジェクトには以下のようなプロ
 
     FAILED (failures=1)
     
-テストを全て実行し終えると，テストデータベースは消去されます．
+スクリプトの戻り値コードは失敗したテストの数です．テストにパスしたか否かに
+関係なく，テストを全て実行し終えると，テストデータベースは消去されます．
 
 .. _Using a different testing framework:
 
@@ -514,6 +526,8 @@ Django は他のテストフレームワークを明にサポートしているわけではありませんが，
   ``verbosity`` には，コンソールに出力される通知情報やデバッグ情報の量を指
   定します．  `0` にすると何も出力しません． `1` は通常の出力， `2` は多め
   の出力です．
+
+  このメソッドは失敗したテストの数を返さねばなりません．
 
 .. _Testing utilities:
 

@@ -2,7 +2,7 @@
 リクエストオブジェクトとレスポンスオブジェクト
 ==============================================
 
-:revision-up-to: 4427 (0.96-pre SVN)
+:revision-up-to: 4637 (0.96-pre SVN)
 
 .. _`Quick overview`:
 
@@ -464,3 +464,134 @@ Django には，様々なタイプの HTTP レスポンスを扱うための ``HttpResponse`` の
 
 ``HttpResponseServerError``
     ``HttpResponse`` と同じですが，状態コード 500 を使います．
+
+
+.. _Returning errors:
+
+エラーを返す
+============
+
+Django では，簡単に HTTP エラーコードを返せます．エラー応答は，すでに述べた
+``HttpResponseNotFound``, ``HttpResponseForbidden``,
+``HttpResponseServerError`` といったサブクラスのインスタンスを作成して，以
+下の例のように通常の ``HttpResponse`` の代わりに返すだけです::
+
+    def my_view(request):
+        # ...
+        if foo:
+            return HttpResponseNotFound('<h1>Page not found</h1>')
+        else:
+            return HttpResponse('<h1>Page was found</h1>')
+
+ただし， 404 エラーは他の HTTP エラーよりはるかに良く使われるエラーなので，
+もっと簡単に扱う方法を提供しています．
+
+.. _The Http404 exception:
+
+Http404 例外
+------------
+
+``HttpResponseNotFound`` のようなエラーを返す場合，以下のように，エラーペー
+ジの中身になる HTML を指定せねばなりません::
+
+    return HttpResponseNotFound('<h1>Page not found</h1>')
+
+これはちょっと不便ですね．それに，サイト全体で一貫した 404 エラーページを用
+意しておく方が賢明です．そこで， Django には ``Http404`` 例外があります．
+ビュー関数のどこかで ``Http404`` 例外を送出すると， Django はこのエラーを捕
+捉して，サイト標準のエラーページを HTTP エラーコード 404 で返します．
+
+例を示しましょう::
+
+    from django.http import Http404
+
+    def detail(request, poll_id):
+        try:
+            p = Poll.objects.get(pk=poll_id)
+        except Poll.DoesNotExist:
+            raise Http404
+        return render_to_response('polls/detail.html', {'poll': p})
+
+``Http404`` 例外を使うには， 404 エラーの送出時に表示されるテンプレートを作
+成しておかねばなりません．このテンプレートの名前は ``404.html`` で，テンプ
+レートツリーの一番上に配置せねばなりません．
+
+.. _Customing error views:
+
+エラービューのカスタマイズ
+--------------------------
+
+.. _The 404 (page not found) view:
+
+404 (ページが見つかりません) ビュー
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``Http404`` 例外を送出すると， Django は 404 エラー処理用の特殊なビューをロー
+ドします．デフォルトでは，このビューは
+``django.views.defaults.page_not_found`` に設定されています．
+``django.views.defaults.page_not_found`` は ``404.html`` という名前のテンプ
+レートをロードしてレンダします．
+
+このため，テンプレートディレクトリの再上階層に ``404.html`` という名前のテ
+ンプレートを作成しておかねばなりません．このテンプレートは全ての 404 エラー
+に対して用いられます．
+
+``page_not_found`` ビューは 99% の Web アプリケーションの要求を満たすはずで
+ すが， 404 ビューを自作したい場合には，URLconf で以下のようにして
+ ``handler404`` を指定します::
+
+    handler404 = 'mysite.views.my_custom_404_view'
+
+舞台裏では， Django は ``handler404`` を介して 404 ビューを捜し出します．デ
+フォルトでは， URLconf の以下の行::
+
+    from django.conf.urls.defaults import *
+
+によって， ``handler404`` が現在のモジュールに取り込まれます．
+``django/conf/urls/defaults.py`` を見れば分かりますが， ``handler404`` のデ
+フォルト値は ``'django.views.defaults.page_not_found'`` に設定されています．
+
+404 ビューについて，知っておかねばならないことが 3 つあります:
+
+    * 404 ビューは，リクエストされた URL に対して， Django が URLconf の全
+      ての正規表現を調べた結果，一致するものをみつけられなかった場合にも呼
+      び出されます．
+
+    * 404 ビューを自作せず，ただデフォルトのビューを使う場合でも，一つだけ
+      やらねばならないこととして， ``404.html`` という名前のテンプレートを
+      作成せねばなりません．デフォルトの 404 ビューは全ての 404 エラーに対
+      して同じテンプレートを使います．
+
+    * (settings モジュールで) ``DEBUG`` を ``True`` にすると， 404 ビューは
+      呼び出されず，代わりにトレースバックが表示されます．
+
+.. _The 500 (server error) view:
+
+500 (サーバエラー) ビュー
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+404 エラーと同様に， Django はビューのコード上で実行時エラーに遭遇した場合
+の挙動も特別扱いしています．ビューを実行した結果，例外が送出されると，
+Django はデフォルトで ``django.views.defaults.server_error`` というビューを
+呼び出します．このビューは ``500.html`` というテンプレートをロードしてレン
+ダします．
+
+このため，テンプレートディレクトリの再上階層に ``500.html`` という名前のテ
+ンプレートを作成しておかねばなりません．このテンプレートは全ての 500 エラー
+に対して用いられます．
+
+``server_error`` ビューは 99% の Web アプリケーションの要求を満たすはずです
+が， 500 ビューを自作したい場合には，URLconf で以下のようにして
+ ``handler500`` を指定します::
+
+    handler500 = 'mysite.views.my_custom_error_view'
+
+舞台裏では， Django は ``handler500`` を介して 500 ビューを捜し出します．デ
+フォルトでは， URLconf の以下の行::
+
+    from django.conf.urls.defaults import *
+
+によって， ``handler500`` が現在のモジュールに取り込まれます．
+``django/conf/urls/defaults.py`` を見れば分かりますが， ``handler500`` のデ
+フォルト値は ``'django.views.defaults.server_error'`` に設定されています．
+

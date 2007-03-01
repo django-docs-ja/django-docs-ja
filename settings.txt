@@ -2,7 +2,7 @@
 Django の設定
 =============
 
-:revision-up-to: 4427 (0.96-pre SVN)
+:revision-up-to: 4657 (0.96-pre SVN)
 
 Django の設定ファイルには，インストールした Django の使う全ての設定が入って
 います．このドキュメントでは，各設定の役割と，どのような設定を利用できるか
@@ -226,6 +226,11 @@ ADMINS
 
     (('John', 'john@example.com'), ('Mary', 'mary@example.com'))
 
+Django はエラーが生じたときに，このリストに登録されている *全ての* 宛先にメー
+ルを送信します．詳しくは 
+`電子メールによるエラー通知 <#error-reporting-via-e-mail>`_ 
+を参照してください．
+
 ALLOWED_INCLUDE_ROOTS
 ---------------------
 
@@ -269,8 +274,9 @@ DATABASE_ENGINE
 
 デフォルト値: ``''`` (空文字列)
 
-どのデータベースバックエンドを使うかを指定します． ``'postgresql'``,
-``'mysql'``, ``'sqlite3'`` あるいは ``'ado_mssql'`` のいずれかにします．
+どのデータベースバックエンドを使うかを指定します． 
+``'postgresql_psycopg2'``, ``'postgresql'``, ``'mysql'``, ``'sqlite3'`` あ
+るいは ``'ado_mssql'`` のいずれかにします．
 
 DATABASE_HOST
 -------------
@@ -364,6 +370,18 @@ DEBUG
 
 デバッグモードのオンオフを切替えるブール値です．
 
+settings に自作の設定項目を追加する場合，django/views/debug.py の
+``HIDDEN_SETTINGS`` に注意してください．この変数は正規表現になっていて，デ
+フォルトでは ``SECRET``, ``PASSWORD``, ``PROFANITIES`` といった文字列を含む
+全ての設定の DEBUG ビューへの表示を抑制して，信頼されていないユーザがバック
+トレースから重要な (あるいは攻撃的な) 設定項目を見なくてすむようにしている
+からです．
+
+また，デバッグ出力の様々な情報は，いついかなる状況でも衆目に晒すべきもので
+はないということを心得ておきましょう．ファイルパス，各設定項目などは，攻撃
+者に対してサーバの様々な情報を与えてしまいます．決して ``DEBUG`` をオンにし
+たままサーバを運用しないでください．
+
 DEFAULT_CHARSET
 ---------------
 
@@ -452,7 +470,9 @@ IGNORABLE_404_ENDS
 
 デフォルト値: ``('mail.pl', 'mailform.pl', 'mail.cgi', 'mailform.cgi', 'favicon.ico', '.php')``
 
-``IGNORABLE_404_STARTS`` を参照してください．
+``IGNORABLE_404_STARTS`` と
+`電子メールによるエラー通知 <#error-reporting-via-e-mail>`_ も参照してくだ
+さい．
 
 IGNORABLE_404_STARTS
 --------------------
@@ -460,8 +480,9 @@ IGNORABLE_404_STARTS
 デフォルト値: ``('/cgi-bin/', '/_vti_bin', '/_vti_inf')``
 
 404 通知 e-mail を使っている場合，このタプルに指定した文字列から始まる URL
-は無視されます． ``SEND_BROKEN_LINK_EMAILS`` および ``IGNORABLE_404_ENDS``
-を参照してください．
+は無視されます． ``SEND_BROKEN_LINK_EMAILS``, ``IGNORABLE_404_ENDS`` および
+`電子メールによるエラー通知 <#error-reporting-via-e-mail>`_ も参照してくだ
+さい．
 
 INSTALLED_APPS
 --------------
@@ -693,8 +714,9 @@ Django で作られたページに訪問した人が，リファラが空でないにも関わらず 404
 に遭遇した (すなわち，リンクが壊れていた) 場合に，``MANAGERS`` に e-mail を
 送信するかどうかを決めます．この設定は ``CommonMiddleware`` がインストール
 されている場合にしか使われません．(`ミドルウェアのドキュメント`_ を参照して
-ください．) ``IGNORABLE_404_STARTS`` および ``IGNORABLE_404_ENDS`` も参照し
-てください．
+ください．) ``IGNORABLE_404_STARTS``, ``IGNORABLE_404_ENDS`` および
+`電子メールによるエラー通知 <#error-reporting-via-e-mail>`_ も参照してくだ
+さい．
 
 SERVER_EMAIL
 ------------
@@ -904,22 +926,10 @@ TIME_ZONE
 Django は ``TZ`` 環境変数を *操作しない* ので，ユーザは自分の責任でプロセス
 を正しい環境の下で動作させねばなりません．
 
-.. :: comment 
-
-  TRANSACTIONS_MANAGED
-  --------------------
-
-  デフォルト値: ``False``
-
-  トランザクションを手動で行うかどうかを決めるブール値です．デフォルトでは，
-  Django はトランザクションを自動的に管理して，必要に応じてデータベースの変
-  更を行います． ``TRANSACTIONS_MANAGED`` を  ``True`` に設定すると，自動的
-  なトランザクション管理を全く行わなくなり， commit や rollback のタイミング
-  を手動で操作できるようになります．通常，トランザクションを手動で行う必要は
-  ありません．詳しくは `トランザクションのドキュメント`_ を参照してください．
-
-.. _`トランザクションのドキュメント`: 
-    ../transactions/#how-to-globally-deactivate-transaction-management
+.. note::
+    Windows 環境では， Django は信頼性のある方法でタイムゾーンを変更できま
+    せん． Windows で Django を動作させる場合，この変数はシステムのタイムゾー
+    ンと一致させねばなりません．
 
 
 URL_VALIDATOR_USER_AGENT
@@ -1083,3 +1093,46 @@ configure() または DJANGO_SETTINGS_MODULE のいずれかが必要です
 つまりは，「 ``configure()`` と ``DJANGO_SETTINGS_MODULE`` のどちらかを設定
 してください」ということです．両方設定してはなりませんし，両方とも忘れても
 なりません．
+
+
+.. _Error reporting via e-mail:
+
+電子メールによるエラー通知
+==========================
+
+.. _Server errors:
+
+サーバのエラー
+--------------
+
+``DEBUG`` を ``False`` にすると，コードが例外を送出し，その例外が捕捉されず，
+結果的に 500 エラーになった場合に， Django は ``ADMINS`` 設定にリストされて
+いる全てのユーザにメールを送信します．これは，管理者が何らかのエラーにすぐ
+に気づけるようにするためです．
+
+この機能を無効にするには， ``ADMINS`` 設定から全てのユーザを削除してくださ
+い．
+
+
+.. _404 errors:
+
+404 エラー
+----------
+
+``DEBUG`` が ``False`` で ``MIDDLEWARE_CLASSES`` に ``CommonMiddleware`` を
+登録していると，コードが何らかの 404 例外を送出して，リクエストにリファラが
+ついている場合，Django は ``MANAGERS`` 設定に登録された全てのユーザにメール
+を送信します (リファラ付きが条件なのは，リファラのないリクエストに対する
+404 エラーで管理者を煩わせないためです)．
+
+``IGNORABLE_404_ENDS`` や ``IGNORABLE_404_STARTS`` を使えば，特定の 404 に
+対するレポート送信を抑制できます．例えば::
+
+    IGNORABLE_404_ENDS = ('.php', '.cgi')
+    IGNORABLE_404_STARTS = ('/phpmyadmin/')
+
+のようにすると， URL が ``.php`` や ``.cgi`` で終わるような URL や
+``/phpmyadmin/`` で始まる URL に対する 404 は報告 *されません* ．
+
+この機能を無効にするには， ``MANAGERS`` 設定から全てのエントリを削除してく
+ださい．

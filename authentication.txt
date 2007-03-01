@@ -2,7 +2,7 @@
 Django でのユーザ認証
 =============================
 
-:revision-up-to: 4427 (0.96-pre SVN)
+:revision-up-to: 4657 (0.96-pre SVN)
 
 Django にはユーザ認証システムがついてきます． Django のユーザ認証システムは，
 ユーザアカウント，グループ，パーミッションとクッキーベースのユーザセッショ
@@ -98,10 +98,10 @@ API リファレンス
     myuser.groups.add(group, group,...)
     myuser.groups.remove(group, group,...)
     myuser.groups.clear()
-    myuser.permissions = [permission_list]
-    myuser.permissions.add(permission, permission, ...)
-    myuser.permissions.remove(permission, permission, ...]
-    myuser.permissions.clear()
+    myuser.user_permissions = [permission_list]
+    myuser.user_permissions.add(permission, permission, ...)
+    myuser.user_permissions.remove(permission, permission, ...]
+    myuser.user_permissions.clear()
 
 自動的に生成されるこれらの API に加え， ``User`` オブジェクトには以下のカス
 タムメソッドがあります:
@@ -314,6 +314,17 @@ API について扱ってきました．より高水準の API では， Django はこれらの認証フ
 .. _request objects: ../request_response/#httprequest-objects
 .. _session documentation: ../sessions/
 
+.. _Manually checking a user's password:
+
+ユーザのパスワードを手動で調べる
+--------------------------------
+
+ユーザ認証を手動で行うために平文パスワードとデータベース上のハッシュ化パス
+ワードを比較したい場合には， ``django.contrib.auth.models.check_password``
+という便宜関数を使えます．この関数は，調べたい平文パスワードと，比較対象の
+データベースに格納されているユーザの ``password`` フィールド全体の二つの引
+数をとり，二つが一致すれば ``True`` を，そうでなければ ``False`` を返します．
+
 .. _How to log a user in:
 
 ユーザをログインさせる
@@ -446,7 +457,7 @@ Python 2.4 で登場したよりコンパクトなデコレータ構文を使った例を以下に示しま
     (r'^accounts/login/$', 'django.contrib.auth.views.login'),
 
 こうしておくと， ``django.contrib.auth.views.login`` は以下のような処理を行
-います::
+います:
 
     * ``GET`` で呼び出されると，同じ URL に対して POST を行うためのログイン
       フォームを表示します．これについては後でもう少し説明します．
@@ -504,6 +515,150 @@ Python 2.4 で登場したよりコンパクトなデコレータ構文を使った例を以下に示しま
 .. _`site フレームワークのドキュメント`: ../sites/
 .. _forms documentation: ../forms/
 .. _site framework docs: ../sites/
+
+.. _Other built-in views:
+
+その他の組み込みビュー
+-----------------------
+
+認証システムでは， ``login`` ビューの他にも便利なビューをいくつか提供してい
+ます:
+
+``django.contrib.auth.views.logout``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**説明:**
+
+ユーザをログアウトさせます．
+
+**オプション引数:**
+
+    * ``template_name``: ログアウトページのテンプレートの完全な名前です．
+      この引数を省略すると，デフォルト値の ``registration/logged_out.html`` 
+      を使います．
+      
+
+**テンプレートコンテキスト:**
+
+    * ``title``: "Logged out" という文字列を翻訳した値になります．
+
+``django.contrib.auth.views.logout_then_login``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**説明:**
+
+ユーザをログアウトさせてから，ログインページにリダイレクトします．
+
+**オプション引数:**
+
+    * ``login_url``: ログインページへのリダイレクト先です．
+      この引数を省略すると，デフォルト値の ``/accounts/login/`` を使います．
+
+``django.contrib.auth.views.password_change``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**説明:**
+
+ユーザがパスワードを変更できるようにします．
+
+**オプション引数:**
+
+    * ``template_name``: パスワード変更ページのテンプレートの完全な名前です．
+      この引数を省略すると，デフォルト値の
+      ``registration/password_change_form.html`` を使います．
+
+**テンプレートコンテキスト:**
+
+    * ``form``: パスワード変更のためのフォームです．
+
+``django.contrib.auth.views.password_change_done``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**説明:**
+
+ユーザがパスワードを変更した後のページを表示するためのビューです．
+
+**オプション引数:**
+
+    * ``template_name``: パスワード変更完了ページのテンプレートの完全な名前
+      です．この引数を省略すると，デフォルト値の
+      ``registration/password_change_done.html`` を使います．
+
+``django.contrib.auth.views.password_reset``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**説明:**
+
+ユーザがパスワードをリセットできるようにします．また，新たなパスワードをメー
+ルで送信します．
+
+**オプション引数:**
+
+    * ``template_name``: パスワードリセットページのテンプレートの完全な名前
+      です．この引数を省略すると，デフォルト値の
+      ``registration/password_reset_form.html`` を使います．
+
+    * ``email_template_name``: 新しいパスワードを e-mail で送信する際に使う
+      テンプレートの完全な名前です．この引数を省略すると，デフォルト値の
+      ``registration/password_reset_email.html`` を使います．
+
+**テンプレートコンテキスト:**
+
+    * ``form``: パスワードリセットのためのフォームです．
+
+``django.contrib.auth.views.password_reset_done``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**説明:**
+
+ユーザがパスワードをリセットした後のページを表示するためのビューです．
+
+**オプション引数:**
+
+    * ``template_name``: パスワードリセット完了ページのテンプレートの完全な
+      名前です．この引数を省略すると，デフォルト値の
+      ``registration/password_reset_done.html`` を使います．
+
+``django.contrib.auth.views.redirect_to_login``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**説明:**
+
+ログインページにリダイレクトし，ログインに成功したら別の URL に戻れるように
+するためのビューです．
+
+**必須の引数:**
+
+    * ``next``: ログイン成功後のリダイレクト先 URL です．
+
+**オプション引数:**
+
+    * ``login_url``: ログインページへのリダイレクト先です．
+      この引数を省略すると，デフォルト値の ``/accounts/login/`` を使います．
+
+.. _Built-in manipulators:
+
+組み込みマニピュレータ
+----------------------
+
+組み込みビューを使いたくないけれども，マニピュレータを書かずに済ませたい場
+合のために，認証システムでは組み込みのマニピュレータをいくつか提供していま
+す:
+
+    * ``django.contrib.auth.forms.AdminPasswordChangeForm``: Admin インタ
+      フェースでユーザのパスワード変更に使われているマニピュレータです．
+
+    * ``django.contrib.auth.forms.AuthenticationForm``: ユーザをログインさ
+      せるためのマニピュレータです．
+
+    * ``django.contrib.auth.forms.PasswordChangeForm``: ユーザにパスワード
+      変更させるためのマニピュレータです．
+
+    * ``django.contrib.auth.forms.PasswordResetForm``: パスワードをリセット
+      し，新たなパスワードを送信するためのマニピュレータです．
+
+    * ``django.contrib.auth.forms.UserCreationForm``: 新たなユーザを作成す
+      るためのマニピュレータです．
 
 
 .. _Limiting access to logged-in users that pass a test:
@@ -933,13 +1088,13 @@ API リファレンス
 ワード引数の形で受け取ります．ほとんどの場合，以下のような形式をとります::
 
     class MyBackend:
-        def authenticate(username=None, password=None):
+        def authenticate(self, username=None, password=None):
             # Check the username/password and return a User.
 
 以下のようにトークンに対する認証を行うようにも書けます::
 
     class MyBackend:
-        def authenticate(token=None):
+        def authenticate(self, token=None):
             # Check the token and return a User.
 
 どちらの方法でも， ``authenticate`` は受け取った証明情報をチェックし，証明

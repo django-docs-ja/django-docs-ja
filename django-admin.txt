@@ -2,7 +2,7 @@
 django-admin.py と manage.py
 ============================
 
-:revision-up-to: 4484 (0.96-pre SVN)
+:revision-up-to: 4637 (0.96-pre SVN)
 
 ``django-admin.py`` は Django の管理タスクを行うためのコマンドライン
 ユーティリティです．このドキュメントでは ``django-admin.py`` の全ての
@@ -152,6 +152,21 @@ install [appname appname ...]
 -------------------------------------
 
 指定した appname に対して ``sqlall`` と同じ操作を実行します．
+
+reset [appname appname ...]
+---------------------------
+
+指定した appname に対して ``sqlreset`` と同じ操作を実行します．
+
+runfcgi [options]
+-----------------
+
+FastCGI プロトコルをサポートする Web サーバ向けの一連の FastCGI プロセス群
+を起動します．詳しくは `FastCGI による運用 <../fastcgi/>`_ を参照してくださ
+い． Python の FastCGI インタフェースモジュールである `flup`_ が必要です．
+
+.. _FastCGI deployment documentation: ../fastcgi/
+.. _flup: http://www.saddi.com/software/flup/
 
 runserver [optional port number, or ipaddr:port]
 ------------------------------------------------

@@ -438,6 +438,13 @@ URLconf タプルにはオプションとして 3 つめの要素を指定できます．この要素は
 .. _`配信フィードフレームワーク`: ../syndication_feeds/
 .. _syndication framework: ../syndication/
 
+.. admonition:: 衝突を避ける
+
+    URLconf を書くとき，名前付きのキーワード引数をキャプチャさせ，同時に追
+    加引数の辞書に同名の項目を追加するような書き方ができてしまいます．この
+    場合，辞書に設定した内容が優先されます．
+
+
 .. _`Passing extra options to include()`:
 
 ``include()`` に追加のオプションを渡す
