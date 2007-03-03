@@ -2,7 +2,7 @@
 Django の設定
 =============
 
-:revision-up-to: 4657 (0.96-pre SVN)
+:revision-up-to: 4664 (0.96-pre SVN)
 
 Django の設定ファイルには，インストールした Django の使う全ての設定が入って
 います．このドキュメントでは，各設定の役割と，どのような設定を利用できるか
@@ -465,6 +465,20 @@ EMAIL_SUBJECT_PREFIX
 信するメールの題名に使われるプレフィクスです．末尾にはスペースを入れておいた
 方がよいでしょう．
 
+FIXTURE_DIRS
+-------------
+
+**開発バージョンの Django で新たに追加された機能です**
+
+デフォルト値: ``()`` (空のタプル)
+
+フィクスチャデータファイルの検索対象ディレクトリを順に挙げたリストです．
+パスの表記は (Windows 環境でも) Unix 形式の前向きスラッシュにせねばなりませ
+ん． `Django アプリケーションのテスト <../testing/>`_ も参照してください．
+
+.. _Testing Django Applications: ../testing/
+
+
 IGNORABLE_404_ENDS
 ------------------
 
@@ -717,6 +731,18 @@ Django で作られたページに訪問した人が，リファラが空でないにも関わらず 404
 ください．) ``IGNORABLE_404_STARTS``, ``IGNORABLE_404_ENDS`` および
 `電子メールによるエラー通知 <#error-reporting-via-e-mail>`_ も参照してくだ
 さい．
+
+SERIALIZATION_MODULES
+---------------------
+
+デフォルト値: 定義されていません
+
+シリアライザのモジュールパスを (文字列) 指定した辞書です．辞書のキーはシリ
+アライザの識別名にします．例えば， YAML のシリアライザを定義するには以下の
+ようにします::
+
+    SERIALIZATION_MODULES = { 'yaml' : 'path.to.yaml_serializer' }
+
 
 SERVER_EMAIL
 ------------
