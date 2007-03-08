@@ -186,13 +186,16 @@ ABSOLUTE_URL_OVERRIDES
 
 モデルオブジェクトのパスを表す文字列 ``"app_label.model_name"`` から，モデ
 ルオブジェクトを引数にとり URL を返すような関数への対応づけを行うための辞書
-です．インストールごとに ``get_absolute_url()`` メソッドを上書きするのに役
-立ちます．例えば::
+です． Django で作成したプロジェクトのインストール先ごとに
+``get_absolute_url()`` メソッドを上書きするのに役立ちます．例えば::
 
     ABSOLUTE_URL_OVERRIDES = {
-        'blogs.Weblog': lambda o: "/blogs/%s/" % o.slug,
-        'news.Story': lambda o: "/stories/%s/%s/" % (o.pub_year, o.slug),
+        'blogs.weblog': lambda o: "/blogs/%s/" % o.slug,
+        'news.story': lambda o: "/stories/%s/%s/" % (o.pub_year, o.slug),
     }
+
+もとのモデルクラス名で使っている文字ケースに関係なく，モデル名は小文字にせ
+ねばならないので注意してください．
 
 ADMIN_FOR
 ---------
