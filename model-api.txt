@@ -1318,6 +1318,10 @@ JavaScript ファイルの URL を表す文字列のリストです． JavaScript は admin ス
 の admin ページを JavaScript で操作したり，特定のフィールドにデフォルト値を
 埋めるための "quick link" を提供したりするために使えます．
 
+相対 URL を使うと， Django の admin はリンクに
+``settings.ADMIN_MEDIA_PREFIX`` をプレフィクスします．
+
+
 ``list_display``
 ----------------
 
