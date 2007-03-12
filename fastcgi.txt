@@ -324,7 +324,9 @@ Web コンテンツのルートディレクトリ下に，以下のような内容のファイルを
     from django.core.servers.fastcgi import runfastcgi
     runfastcgi(method="threaded", daemonize="false")
 
-起動中のサーバを際起動する
+.. _Restarting the spawned server:
+
+起動中のサーバを再起動する
 --------------------------
 
 サイトを構成する Python コードを変更した場合， FastCGI にコードが変更された
@@ -338,3 +340,16 @@ Unix システムでコマンドラインシェルへのアクセスが許されているなら，
 ``touch`` コマンドを使えば簡単にタイムスタンプを更新できます::
 
     touch mysite.fcgi
+
+
+.. _Serving admin media files:
+
+Admin メディアファイルの提供
+============================
+
+サーバやその設定がどうあれ，何らかの形で admin メディアファイルを提供する方
+法を考えておかねばなりません． modpython_ での運用に関するドキュメントには，
+上記の構成でも使えるアドバイスがあります．
+
+.. _modpython: ../modpython/#serving-the-admin-files
+

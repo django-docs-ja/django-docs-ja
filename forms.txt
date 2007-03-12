@@ -446,6 +446,29 @@ Django のモデルとの類似性が見て取れます．自作のマニピュレータで必要なメソッ
         return render_to_response('contact_form.html', {'form': form})
 
         
+.. _Implementing flatten_data for custom manipulators:
+
+自作のマニピュレータ用に ``flatten_data`` を実装する
+----------------------------------------------------
+
+デフォルトで自動生成されるマニピュレータは，(必要な場合はごくまれですが) 自
+作のマニピュレータで置き換えられます．マニピュレータを置き換えた場合，汎用
+ビューでもそのマニピュレータを使うことになるので，置き換えた
+``ChangeManipulator`` の ``flatten_data`` メソッドを定義せねばなりません．
+自作の ``flatten_data`` は，デフォルトの ``flatten_data`` と同じく，以下の
+ようにフィールド名を値に対応づける辞書を返さねばなりません::
+
+    def flatten_data(self):
+        obj = self.original_object
+        return dict(
+            from = obj.from,
+            subject = obj.subject,
+            ...
+        )
+
+こうしておけば， ``ChangeManipulator`` はデフォルトのマニピュレータと同じよ
+うに動作します．
+
 .. _`FileField and ImageField special cases`:
 
 ``FileField`` と ``ImageField`` の特殊な例
