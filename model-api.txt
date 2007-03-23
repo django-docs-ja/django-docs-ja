@@ -2,7 +2,7 @@
 モデル API リファレンス
 =======================
 
-:revision-up-to: 4637 (0.96-pre SVN)
+:revision-up-to: 4781 (0.96-pre SVN)
 
 モデルとは，サイトを構成するデータの，ただ一つかつ最終的なデータソースを指
 します．モデルには，保存したいデータに不可欠なデータフィールドと，その振舞
@@ -1318,8 +1318,8 @@ JavaScript ファイルの URL を表す文字列のリストです． JavaScript は admin ス
 の admin ページを JavaScript で操作したり，特定のフィールドにデフォルト値を
 埋めるための "quick link" を提供したりするために使えます．
 
-相対 URL を使うと， Django の admin はリンクに
-``settings.ADMIN_MEDIA_PREFIX`` をプレフィクスします．
+``http://`` や ``/`` で始まらない相対 URL を使うと， Django の admin はリン
+クに ``settings.ADMIN_MEDIA_PREFIX`` をプレフィクスします．
 
 
 ``list_display``

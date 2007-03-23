@@ -1,8 +1,8 @@
-=========================
-"contrib" 下のアドオン
-=========================
+=============================
+"django.contrib" 下のアドオン
+=============================
 
-:revision-up-to: 4637 (0.96-pre SVN)
+:revision-up-to: 4781 (0.96-pre SVN)
 
 Django は Python の `"batteries included" 哲学`_ を目指しています． Django
 には Web 開発における課題を解くための様々な外部オプションツールがついてきま
@@ -165,12 +165,16 @@ markup
 テンプレートフィルタの集まりです．以下の 3 つのマークアップ言語に対するフィ
 ルタを実装しています:
 
-    * Textile
-    * Markdown
-    * ReST (ReStructured Text)
+    * `Textile`_
+    * `Markdown`_
+    * `ReST (ReStructured Text)`_
 
 詳しくは、 django/contrib/markup/templatetags/markup.py のソースコードを参
 照してください。
+
+.. _Textile: http://en.wikipedia.org/wiki/Textile_%28markup_language%29
+.. _Markdown: http://en.wikipedia.org/wiki/Markdown
+.. _ReST (ReStructured Text): http://en.wikipedia.org/wiki/ReStructuredText
 
 redirects
 =========

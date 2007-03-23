@@ -2,7 +2,7 @@
 Django オブジェクトのシリアライズ
 =================================
 
-:revision-up-to: 3871 (0.96-pre SVN)
+:revision-up-to: 4781 (0.96-pre SVN)
 
 .. note::
     
@@ -35,7 +35,8 @@ Django の整列化フレームワークを使うと， Django オブジェクトを他の形式に「翻
 
 シリアライザオブジェクトを直接使ってもかまいません::
 
-    xml_serializer = serializers.get_serializer("xml")
+    XMLSerializer = serializers.get_serializer("xml")
+    xml_serializer = XMLSerializer()
     xml_serializer.serialize(queryset)
     data = xml_serializer.getvalue()
     
