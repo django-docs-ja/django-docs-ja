@@ -149,7 +149,7 @@ Sitemap クラス
 
 .. _Sitemap class reference:
 
-Sitempa クラスリファレンス
+Sitemap クラスリファレンス
 ==========================
 
 ``Sitemap`` クラスのサブクラスでは，以下のメソッドや属性を定義できます:

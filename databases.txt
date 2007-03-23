@@ -55,7 +55,7 @@ MySQL 5.0
 ------------------
 
 MySQL は複数の 
-`ストレージエンジン <http://dev.mysql.com/doc/refman/5.0/en/storage-engines.html>`_ 
+`ストレージエンジン`_
 (以前はテーブルタイプ: table type と呼ばれていたもの) を選択できます．
 デフォルトのストレージエンジンはサーバ設定で変更できます．
 
@@ -73,7 +73,8 @@ BDB_ エンジンは InnoDB と同様，完全なトランザクション機能を外部キー参照をサ
 SolidDB_ や Falcon_ といった `その他のストレージエンジン <http://dev.mysql.com/doc/refman/5.1/en/storage-engines-other.htm>`_ 
 まだまだ圏外の話です．現状では，おそらく InnoDB が最良の選択でしょう．
 
-.. _storage engines: http://dev.mysql.com/doc/refman/5.0/en/storage-engines.html
+.. _storage_engines: http://dev.mysql.com/doc/refman/5.0/en/storage-engines.html
+.. _ストレージエンジン: storage_engines_
 .. _MyISAM: http://dev.mysql.com/doc/refman/5.0/en/myisam-storage-engine.html
 .. _BDB: http://dev.mysql.com/doc/refman/5.0/en/bdb-storage-engine.html
 .. _InnoDB: http://dev.mysql.com/doc/refman/5.0/en/innodb.html
@@ -123,7 +124,7 @@ MySQLdb はバージョン 1.2.1 から MySQL-4.1 以降をサポートするようになりまし
 別の言い方をするなら， ``DATABASE_OPTIONS`` 内にデータベースの名前を設定す
 ると，その内容は ``DATABASE_NAME`` よりも優先順位が高くなり，さらに
 ``DATABASE_NAME`` は 
-`MySQL のオプション設定ファイル <http://dev.mysql.com/doc/refman/5.0/en/option-files.htm>l`_
+`MySQL のオプション設定ファイル <http://dev.mysql.com/doc/refman/5.0/en/option-files.html>`_
 の内容をオーバライドするということです．
 
 MySQL のオプション設定ファイルを使う例を以下に示します::

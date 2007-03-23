@@ -7,7 +7,7 @@ Django オンラインドキュメント和訳
 底本
     SVN trunk (0.96-pre)
 追従済みリビジョン
-    4362 (2007/01/20)
+    4781 (2007/03/23)
 
 必読
 ----
@@ -15,6 +15,10 @@ Django オンラインドキュメント和訳
 `Django の概要 (Django overview) <../overview/>`__
 
 `インストールガイド <../install/>`__
+
+`サードパーティによる Django ディストリビューション (Third-party distributions of Django) <../distributions/>`__
+
+`Django ドキュメントの読み方 (How to read the Django documentation) <../documentation/>`__
 
 チュートリアル
 ~~~~~~~~~~~~~~
@@ -113,8 +117,12 @@ Django オンラインドキュメント和訳
 
 `e-mail の送信 (Sending e-mail) <../email/>`__
 
+`データベースのサポート状況 (Notes about supported databases) <../databases/>`__
+
 `古いデータベースの組み込み 
 (Integrating with (introspecting) a legacy database) <../legacy_databases/>`__
+
+`複数のデータベースを使う (Using Multiple Databases (in multi-db branch)) <../multiple_database_support/>`__
 
 `動的な PDF の生成 (Outputting PDFs dynamically) <../outputting_pdf/>`__
 

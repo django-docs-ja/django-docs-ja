@@ -581,8 +581,8 @@ Django はデフォルトで ``django.views.defaults.server_error`` というビューを
 に対して用いられます．
 
 ``server_error`` ビューは 99% の Web アプリケーションの要求を満たすはずです
-が， 500 ビューを自作したい場合には，URLconf で以下のようにして
- ``handler500`` を指定します::
+が， 500 ビューを自作したい場合には，URLconf で以下のようにして 
+``handler500`` を指定します::
 
     handler500 = 'mysite.views.my_custom_error_view'
 
