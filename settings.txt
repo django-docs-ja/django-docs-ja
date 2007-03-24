@@ -2,7 +2,7 @@
 Django の設定
 =============
 
-:revision-up-to: 4781 (0.96-pre SVN)
+:revision-up-to: 4805 (0.96)
 
 Django の設定ファイルには，インストールした Django の使う全ての設定が入って
 います．このドキュメントでは，各設定の役割と，どのような設定を利用できるか
@@ -471,8 +471,6 @@ EMAIL_SUBJECT_PREFIX
 FIXTURE_DIRS
 -------------
 
-**開発バージョンの Django で新たに追加された機能です**
-
 デフォルト値: ``()`` (空のタプル)
 
 フィクスチャデータファイルの検索対象ディレクトリを順に挙げたリストです．
@@ -692,8 +690,6 @@ URL にサブドメイン名 "www." が付いていない場合に付加するかどうかを決めます．
 PROFANITIES_LIST
 ----------------
 
-**開発バージョンの Django で新たに追加されました．**
-
 非道徳的な言葉 (profanity) のタプルです． ``hasNoProfanities`` バリデータが
 呼び出された際に，エラーを引き起こす単語のリストに使われます．
 
@@ -783,8 +779,6 @@ SESSION_COOKIE_NAME
 
 SESSION_COOKIE_SECURE
 ---------------------
-
-**開発バージョンの Django で新たに追加されました．**
 
 デフォルト値: ``False``
 
@@ -890,8 +884,6 @@ TEMPLATE_STRING_IF_INVALID
 
 TEST_RUNNER
 -----------
-
-**開発バージョンの Django で新たに追加されました．**
 
 デフォルト値: ``'django.test.simple.run_tests'``
 

@@ -2,7 +2,7 @@
 Django のインストール
 =====================
 
-:revision-up-to: 4657 (0.96-pre SVN)
+:revision-up-to: 4815 (0.96)
 
 このドキュメントを読めば Django を動かせるようになります．
 
@@ -100,26 +100,19 @@ Django コードのインストール
        固有の配布パッケージは，たいてい依存関係のあるパッケージを自動的にイ
        ンストールしてくれたり，パスの更新を行ってくれたりします．
 
-    2. `ダウンロードページ`_ から， Django-0.95.tar.gz をダウンロードします．
+    2. `ダウンロードページ`_ から，最新版の Django をダウンロードします．
 
-    3. ``tar xzvf Django-0.95.tar.gz``
+    3. ダウンロードしたファイルを展開します 
+       (例: ``tar xzvf Django-NNN.tar.gz`` 
 
-    4. ``cd Django-0.95``
+    4. 展開先のディレクトリに移ります (例: ``cd Django-NNN``)
 
-    5. ``sudo python setup.py install``
+    5. ``sudo python setup.py install`` を実行します．
 
-
-setuptools_ がインストールされていない場合，最後のコマンドを実行すると
-setuptools_ を自動的にダウンロードしてインストールします．この作業にはイン
-ターネットへの接続が必要です．また，Python 2.5 を使っている場合にはうまく動
-作しないでしょう．その場合には，後で説明する方法に従って開発版をインストー
-ルしてください．開発版は setuptools を使っておらず，インストール時にインター
-ネットに接続しません．
 
 上のコマンドを実行すると， Django は Python インストールディレクトリの
 ``site-packages`` ディレクトリ下にインストールされます．
 
-.. _setuptools: http://peak.telecommunity.com/DevCenter/setuptools
 .. _distribution specific notes: ../distributions/
 
 .. _Installing the development version:

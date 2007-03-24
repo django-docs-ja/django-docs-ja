@@ -2,7 +2,7 @@
 セッションの使い方
 ===================
 
-:revision-up-to: 4427 (0.96-pre SVN)
+:revision-up-to: 4805 (0.96)
 
 Django では匿名セッション (anonymous session) を完全にサポートしています．
 セッションフレームワークを使うと，任意のデータをサイト訪問者単位
@@ -307,8 +307,6 @@ Default: ``'sessionid'``
 SESSION_COOKIE_SECURE
 ---------------------
 
-**開発バージョンの Django で新たに追加されました．**
-
 デフォルト値: ``False``
 
 セッションクッキーにセキュアなクッキーを使うかどうかを決めます．この値を
@@ -343,14 +341,14 @@ SESSION_SAVE_EVERY_REQUEST
 技術的な詳細
 ============
 
-    * セッション辞書には pickle 化可能な全てのオブジェクトを使えます．詳し
-      くは `pickle モジュールのドキュメント`_ を参照してください．
+  * セッション辞書には pickle 化可能な全てのオブジェクトを使えます．詳し
+    くは `pickle モジュールのドキュメント`_ を参照してください．
 
-    * セッション情報は ``django_session`` という名前のデータベーステーブルに
-      保存されます．
+  * セッション情報は ``django_session`` という名前のデータベーステーブルに
+    保存されます．
 
-    * Django は必要なときにしかクッキーを送信しません．従って，セッション情
-      報を設定しない限り，セッションクッキーの送信を行いません．
+  * Django は必要なときにしかクッキーを送信しません．従って，セッション情
+    報を設定しない限り，セッションクッキーの送信を行いません．
 
 .. _`pickle モジュールのドキュメント`: http://www.python.jp/doc/nightly/lib/module-pickle.html
 .. _`the pickle module`: http://www.python.org/doc/current/lib/module-pickle.html

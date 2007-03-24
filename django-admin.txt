@@ -2,7 +2,7 @@
 django-admin.py と manage.py
 ============================
 
-:revision-up-to: 4664 (0.96-pre SVN)
+:revision-up-to: 4805 (0.96)
 
 ``django-admin.py`` は Django の管理タスクを行うためのコマンドライン
 ユーティリティです．このドキュメントでは ``django-admin.py`` の全ての
@@ -111,8 +111,6 @@ diffsettings
 dumpdata [appname appname ...]
 ------------------------------
 
-**開発バージョンの Django で新たに登場した機能です**
-
 指定したアプリケーション (複数指定可) に関係した全てのデータをデータベース
 から取り出し，標準出力に出力します．
 
@@ -128,8 +126,6 @@ dumpdata [appname appname ...]
 
 flush
 -----
-
-**開発バージョンの Django で新たに登場した機能です**
 
 データベースを syncdb 直後の状態に戻します．全てのデータがデータベースから
 除去され，同期直後に呼び出される全てのハンドラが再度実行されます．また，
@@ -175,17 +171,8 @@ PostgreSQL や MySQL を使っている場合，イントロスペクションで主キーを自動的
 ``inspectdb`` は PostgreSQL, MySQL および SQLite で動作します．外部キー
 の検出は PostgreSQL と一部の MySQL テーブル形式でのみ有効です．
 
-install [appname appname ...]
--------------------------------------
-
-**この機能は開発バージョンの Django では削除されています**
-
-指定した appname に対して ``sqlall`` と同じ操作を実行します．
-
 loaddata [fixture fixture ...]
 ------------------------------
-
-**開発バージョンの Django で新たに登場した機能です**
 
 名前付きのフィクスチャを探し，その中身をデータベースにロードします．
 
@@ -372,8 +359,6 @@ sqlindexes [appname appname ...]
 sqlcustom [appname appname ...]
 --------------------------------------------
 
-**開発バージョンの Django で新たに登場した機能です**
-
 指定した appname のカスタム SQL 文を出力します．
 
 このコマンドは，指定した各アプリケーションのモデルについて， ``<appname>``
@@ -392,15 +377,6 @@ sqlindexes [appname appname ...]
 ----------------------------------------
 
 指定したアプリケーションに対する CREATE INDEX SQL 文を出力します．
-
-sqlinitialdata [appname appname ...]
---------------------------------------------
-
-**この機能は開発バージョンの Django では削除されています**
-
-開発バージョンの django では，このメソッドの名前は ``sqlcustom`` に変更され
-ました．
-
 
 sqlreset [appname appname ...]
 --------------------------------------
@@ -450,8 +426,6 @@ syncdb
 
 test
 ----
-
-**開発バージョンの Django で新たに登場した機能です**
 
 インストールされている全てのモデルからテストを捜し出して実行します．
 詳しくは `Django アプリケーションのテスト <testing.html>`_ を参照してくださ
@@ -507,8 +481,6 @@ IPython をインストールしている場合，対話シェルの起動に IPython ではなく通常
 --format
 --------
 
-**開発バージョンの Django で新たに登場した機能です**
-
 使用例::
 
     django-admin.py dumpdata --format=xml
@@ -526,8 +498,6 @@ IPython をインストールしている場合，対話シェルの起動に IPython ではなく通常
 --indent
 --------
 
-**開発バージョンの Django で新たに登場した機能です**
-
 使用例::
 
     django-admin.py dumpdata --indent=4
@@ -538,8 +508,6 @@ IPython をインストールしている場合，対話シェルの起動に IPython ではなく通常
 
 --noinput
 ---------
-
-**開発バージョンの Django で新たに登場した機能です**
 
 django-admin の実行中に，ユーザに入力を促さないようにさせます．
 django-admin スクリプトを自動的に実行したい場合に便利です．
@@ -562,8 +530,6 @@ django-admin スクリプトを自動的に実行したい場合に便利です．
 --verbosity
 -----------
 
-**開発バージョンの Django で新たに登場した機能です**
-
 使用例::
 
     django-admin.py syncdb --verbosity=2
@@ -573,8 +539,6 @@ django-admin スクリプトを自動的に実行したい場合に便利です．
 
 --adminmedia
 ------------
-
-**開発バージョンの Django で新たに登場した機能です**
 
 使用例::
 

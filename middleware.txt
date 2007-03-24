@@ -2,7 +2,7 @@
 ミドルウェア
 ============
 
-:revision-up-to: 4427 (0.96-pre SVN)
+:revision-up-to: 4805 (0.96)
 
 ミドルゥェア (Middleware) とは， Django のリクエスト/レスポンス処理に対する
 フックの集まりです．ミドルウェアは Django の入出力を操作するための軽量かつ
@@ -111,8 +111,6 @@ django.middleware.http.ConditionalGetMiddleware
 
 django.middleware.http.SetRemoteAddrFromForwardedFor
 ----------------------------------------------------
-
-**開発版の Django で新たに追加された機能です**
 
 ``request.META['HTTP_X_FORWARDED_FOR']`` が設定されていた場合，その値に基づ
 いて ``request.META['REMOTE_ADDR']`` をセットします．サーバがリバースプロキ
