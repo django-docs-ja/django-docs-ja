@@ -1,0 +1,827 @@
+===========================
+Django についてよくある質問
+===========================
+
+:revision-up-to: 4805 (release 0.96)
+
+.. contents::
+
+.. _General questions:
+
+一般的な質問
+============
+
+.. _Why does this project exist?:
+
+なぜこんなプロジェクトがあるのですか？
+--------------------------------------
+
+Django は極めて実践的な要請のもとで成長してきました．Web 新聞を発行している
+WorldOnline では，効果的な Web アプリケーションを，ジャーナリズムとして成立
+する締め切りに間に合うように構築せねばなりません．変転の激しいニュースルー
+ムにおいて， WorldOnline は複雑な Web アプリケーションをコンセプトから立ち
+上げ公開にもっていくまでの時間を唯一の課題としているのです．
+
+同時に， WorldOnline の Web 開発者たちは，こと Web 開発の王道に関しては一貫
+して完璧主義者です．
+
+こうした理由から Django は Web アプリケーションをただ素早く作れるだけではな
+く，Web 開発の *王道* に従って作成できるように設計されているのです．
+2003 年，WorldOnline の開発者 (Adrian Holovaty と Simon Willison) は PHP に
+見切りをつけ， Python による Web 開発に取り組みはじめました．集約的で高い双
+方向性を備えた Lawrence.com のようなサイト開発の中で，彼らは Web アプリケー
+ションをより迅速に開発できるように，サイトのコードから汎用の Web 開発フレー
+ムワークを切り出し， 2 年近くの間ずっと改良を加えながら使い込んできました．
+
+2005 年の夏， World Online はこれまでの開発の成果を Django としてオープンソー
+ス化する決定を下しました． Django は `Apache`_, `Python`_, そして
+`PostgreSQL`_ をはじめとする様々なオープンソースプロジェクトなしでは実現し
+ませんでした．そして今，私達はオープンソースコミュニティに多少なりともお返
+しできることにワクワクしているのです．
+
+.. _Apache: http://httpd.apache.org/
+.. _Python: http://www.python.org/
+.. _PostgreSQL: http://www.postgresql.org/
+
+.. _What does "Django" mean, and how do you pronounce it?:
+
+"Django" とはどういう意味で，どのように発音するのですか？
+---------------------------------------------------------
+
+Django は 1930 年代から 1950 年代初期にかけて活躍したジプシージャズのギタリ
+スト， `ジャンゴ・ラインハルト`_ (`Django Reinhardt`_) にちなんで名付けられ
+ました．今日では，ジャンゴは歴史上最も優れたギタリストの一人に数えられてい
+ます．
+
+彼の曲を聞いてみてください．きっと気に入ることでしょう．
+
+Django は **JANG**-oh ('a' は伸ばす) と発音します．韻は FANG-oh と
+同じです． "D" は発音しません。
+
+.. _`ジャンゴ・ラインハルト`: http://ja.wikipedia.org/wiki/%E3%82%B8%E3%83%A3%E3%83%B3%E3%82%B4%E3%83%BB%E3%83%A9%E3%82%A4%E3%83%B3%E3%83%8F%E3%83%AB%E3%83%88
+.. _Django Reinhardt: http://en.wikipedia.org/wiki/Django_Reinhardt
+
+
+.. _Is Django stable?:
+
+Django は安定していますか？
+---------------------------
+
+はい． World Online は私達は 3 年以上にわたって Django を使ってきました．
+Django で構築したサイトは，これまでに 100 万ヒット／時を超えるトラフィック
+スパイクに見舞われたことがあり，何度もスラッシュドット効果を喰らっています．
+そうですね．きわめて安定です．
+
+.. _Does Django scale?:
+
+Django はスケールしますか？
+---------------------------
+
+はい．ハードウェアというものは，開発時間に比べて安いものですし，それゆえ
+Django はユーザが投入可能なハードウェアをできるだけ活用するべく設計されてい
+ます．
+
+Django は「レイヤ間で何も共有しない (shared-nothing)」アーキテクチャなので，
+データベースサーバ，キャッシュサーバ， Web/アプリケーションサーバのどのレベ
+ルにハードウェアを追加してもかまいません．
+
+Django はアプリケーションレイヤからのデータベースレイヤを分離し，シン
+プルながら強力な `キャッシュフレームワーク`_ を備えています．
+
+.. _`キャッシュフレームワーク`: ../cache/
+.. _`cache framework`: ../cache/
+
+.. _Who's behind this?:
+
+Django の舞台裏には誰がいるのですか？
+-------------------------------------
+
+Django は米国カンザス州ローレンス (Lawrence, Kansas, USA) のとある新聞の
+Web 部門である `World Online`_ で開発されました．
+
+`Adrian Holovaty`_
+    Adrian はジャーナリズムのバックグラウンドを持った Web 開発者です．彼は
+    2 年半の間 World Online のリードプログラマを勤め，その間に Django を開
+    発して World Online サイトを実装しました．現在彼は washingtonpost.com
+    で働いており，データベースをバックエンドにしたリッチな情報サイトの構築
+    に携わるかたわら， Django の開発も継続して監督しています． Adrian は
+    (Django Reinhardt スタイルの) ギター演奏や， `chicagocrime.org`_ のよう
+    なサイドプロジェクトのハッキング中が好きです．シカゴ在住です．
+
+    IRC では， ``adrian_h`` と名乗っています．
+
+`Jacob Kaplan-Moss`_
+    Jacob はカリフォルニアから来た男で，コーディングと料理に同じだけ時間を
+    割くという生意気野郎です．彼は World Online の開発を指揮しており，
+    同時に様々な優れたサイドプロジェクトを積極的にハックしています．彼は
+    Python-ObjC バインディングに貢献したことがあり， Python で Tivo アプリ
+    ケーションを書く方法を見つけた最初の男でもあります．最近彼は PSP で動く
+    Python にどっぷりはまっています．カンザス州ローレンス在住です．
+
+    IRC では ``jacobkm`` と名乗っています．
+
+`Simon Willison`_
+    Simon はイングランドから来た尊敬すべき Web 開発者です．彼は World
+    Online で 1 年間のインターンシップを過ごし，その間に Adrian とともに
+    Djang をスクラッチから開発しました．彼はまれに見る情熱家の英国人で，
+    Web 開発の王道について確固たる信念を持っており，多くの読者をもつ Web 開
+    発に関する blog, http://simon.incutio.com を何年もの間運営してきました．
+    Simon は現在 Yahoo UK で働いており，「Hacker Liason」の称号を得ています．
+    イングランド在住です．
+
+    IRC では ``SimonW`` と名乗っています．
+
+`Wilson Miner`_
+    Wilson のデザイン術は，私達をロックスターに仕立てあげてしまいます．日中
+    は `Apple`_ のインタラクティブデザイナを勤めています．でも Apple で何を
+    やっているか聞いてはいけません．そんなことをしたら，彼にシメられちゃい
+    ますよ．サンフランシスコ在住です．
+
+    IRC では ``wilsonian`` と名乗っています．
+
+.. _`Apple`: http://www.apple.com/
+.. _`World Online`: http://code.djangoproject.com/wiki/WorldOnline
+.. _`Adrian Holovaty`: http://www.holovaty.com/
+.. _`washingtonpost.com`: http://www.washingtonpost.com/
+.. _`chicagocrime.org`: http://www.chicagocrime.org/
+.. _`Simon Willison`: http://simon.incutio.com/
+.. _`simon.incutio.com`: http://simon.incutio.com/
+.. _`Jacob Kaplan-Moss`: http://www.jacobian.org/
+.. _`Wilson Miner`: http://www.wilsonminer.com/
+
+.. _Which sites use Django?:
+
+どんなサイトが Django を使っているのですか？
+--------------------------------------------
+
+Django wiki には `Django で作られたサイト一覧`_ という特集ページがあり，
+日々内容が増えています．自分の Django サイトもどうぞ自由に追加してください．
+
+.. _`Django で作られたサイト一覧`: http://code.djangoproject.com/wiki/DjangoPoweredSites
+.. _list of Django-powered sites: http://code.djangoproject.com/wiki/DjangoPoweredSites
+
+
+.. _Django appears to be a MVC framework, but you call the Controller the "view", and the View the "template". How come you don't use the standard names?:
+
+Django は MVC フレームワークのようですが，コントローラ (Controller) を「ビュー (view)」と呼び，ビュー (View) を「テンプレート (template)」と呼んでいます．どうして標準的な呼び方をしないのですか？
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+そうですね，呼び名には議論の余地があるでしょう．
+
+我々の MVC の解釈では，「ビュー」とはユーザに提示されるデータのことをいいま
+す．つまり，データが *どのように見えるか* ということではなく，むしろ *どの
+データを提示するか* です．ビューは *どのデータを見せるか* であり，
+*どう見せるか* ではありません．この二つは明らかに違います．
+
+というわけで，我々のケースでは，「ビュー」は特定の URL に対する Python コー
+ルバック関数になります．なぜなら，コールバック関数はどのデータを提示するか
+を決めているからです．
+
+さらに，テンプレートによってコンテンツとプレゼンテーションの分離がはっきり
+しています．Django では，ビューはどのデータを提示するかを決めていますが，
+ビューは通常， *どのように* データを提示するかをテンプレートに委ねます．
+
+では，「コントローラ」はどこに入るのでしょうか． Django の場合，おそらくフ
+レームワーク，すなわち URL 設定にしたがってリクエストを適切なビューに送信す
+る機構自体がコントローラにあたるといえるでしょう．
+
+略語がお好みなら， Django を "MTV" フレームワークと呼んでもよいでしょう．つ
+まり，モデル (Model)，テンプレート (Template)，そしてビュー (View) です．
+こっちの方がよりしっくりきます．
+
+最後に，結局重要なのは問題を解決することです．そして，呼び方は何であれ，
+Django はわれわれにとって最も理にかなった方法で問題を解決しているのです．
+
+.. _<Framework X> does <feature Y> -- why doesn't Django?:
+
+<フレームワーク X> には <機能 Y> があります -- どうして Django にないのですか？
+-------------------------------------------------------------------------------
+
+世の中には他にも素晴らしい Web フレームワークがあるのは良く知っていますし，
+必要であればそこからアイデアを借りるのにやぶさかではありません．とはいえ，
+Django はまさに私達が旧態然の Web フレームワークに不満だったからこそ開発さ
+れたのであって，「<Framework X> ができるから」という理由は Django に機能を
+追加する十分な理由にはならないということに注意して下さい．
+
+.. _Why did you write all of Django from scratch, instead of using other Python libraries?:
+
+なぜ既存の Python ライブラリを使わずスクラッチで Django を作ったのですか？
+--------------------------------------------------------------------------
+
+Django を書き始めた約 2 年前， Adrian と Simon は少し時間を取って当時利用で
+きた様々な Python ウェブフレームワークを試してみました．
+
+その結果，十分な出来具合のものは一つもないという結論に達したのです．
+
+私達は好みにうるさいのです．(締め切りを守る) 完璧主義者と呼んでもいいでしょ
+う．
+
+これまでずっと，私達は自分たちがすでに実装済みの機能を実現するオープンソー
+スライブラリに出会ってきました．そうしたライブラリに，他の人達が同じ問題を
+同じ方法で解決しようとしているのを見ては元気づけられる思いでしたが，自分た
+ちのコードの外側に組み込むにはもう遅すぎました．私達はすでにいくつもの運用
+環境で独自のフレームワークを書き上げ，テストし，実装してきており，できたコー
+ドは快適なまでに要求を満たしていたのです．
+
+一方，ほとんどの場合，既存のフレームワークやツールは明らかにある主の根本的，
+致命的な欠陥があり，私達を神経質にさせました．結局，私達の哲学に 100% 合う
+ものはなかったのです．
+
+繰り返していいますが，私達は好みにうるさいのです．
+
+私達の設計哲学は `設計哲学のページ`_ に詳しく書いてあります．
+
+.. _`設計哲学のページ`: ../design_philosophies/
+.. _design philosophies page: ../design_philosophies/
+
+.. _Do you have any of those nifty "screencast" things?:
+
+かっこいい「スクリーンキャスト」か何かがありますか？
+----------------------------------------------------
+
+現在進行中だということだけは断言できます．がしかし，私達はまだ Django を改
+良している真最中なので，現状ではなく， Django 1.0 になったときの最終的な状態
+を反映させたいと思っています．言い方を変えれば， Django API はまだ変化する
+かもしれないので，それまではスクリーンキャストにまださほどエネルギーを使い
+たくないということです．
+
+とはいいながら， `非公式の Django スクリーンキャスト`_ はあるのでチェックし
+てみてください．
+
+.. _`非公式の Django スクリーンキャスト`: http://www.throwingbeans.org/django_screencasts.html
+.. _unofficial Django screencast: http://www.throwingbeans.org/django_screencasts.html
+
+
+.. _Is Django a content-management-system (CMS)?:
+
+Django はコンテンツ管理システム (CMS) なのでしょうか?
+-----------------------------------------------------
+
+いいえ。 Django は CMS ではありませんし、いわゆる「ターンキーシステム」のよ
+うなものでもありません。 Django は Web フレームワークであり、 Web サイトを
+構築する際に使えるプログラミングツールにすぎません。
+
+例えば、 Django を Drupal_ のようなシステムと比較するのは無意味です。という
+のも、 Django はまさに Drupal のようなシステムを *作る* ためのものだからで
+す。
+
+もちろん、 Django の自動 admin サイトはすばらしく、開発時間の節約になります。
+しかし、 admin サイトは Django というフレームワークのいちモジュールに過ぎま
+せん。もっと言うなら、 Django が「 CMS 的な」アプリケーションを作成する上で
+とりわけ便利な点を持ってはいますが、そのことが「 CMS 的でない」アプリケーショ
+ンの開発に向いていない、なんてことにつながったりはしないのです。
+
+.. _Drupal: http://drupal.org/
+
+.. _When will you release Django 1.0?:
+
+いつになったら Django 1.0 をリリースするのですか？
+--------------------------------------------------
+
+短い答え: Django の API 構成に問題がなくなり， "1.0" に必要と考えている全て
+の機能を追加し，以前のバージョンとの互換性を維持できるようになった時点，です．
+
+Django の `magic-removal ブランチ`_ のマージにより，Django 1.0 への道のりは
+大分進みました．
+
+1.0 になっていないからといってがっかりしないで下さいね．
+
+.. _magic-removal ブランチ: http://code.djangoproject.com/wiki/RemovingTheMagic
+.. _quite a few production sites: http://code.djangoproject.com/wiki/DjangoPoweredSites
+
+.. How can I download the Django documentation to read it offline?:
+
+どうやれば Django のドキュメントをダウンロードしてオフラインで読めますか？
+--------------------------------------------------------------------------
+
+Django のドキュメントは Django tarball リリースの ``docs`` ディレクトリに
+あります．これらのドキュメントは ReST (ReStructuredText) 形式で書かれており，
+各テキストファイルが Django 公式サイトのページに対応しています．
+
+ドキュメントは `バージョン管理システム下にある`_ ので，コードの変更状況を閲
+覧するのと同じようにしてドキュメントの変更状況を閲覧できます．
+
+技術的には， Django サイトのドキュメントは最新の開発版の ReST ドキュメント
+から生成されます，従って， Django サイトにあるドキュメントの方が，最新の
+Django リリースのドキュメントよりも多くの情報を提供していることがあります．
+
+.. _`バージョン管理システム下にある`: http://code.djangoproject.com/browser/django/trunk/docs
+.. _stored in revision control: http://code.djangoproject.com/browser/django/trunk/docs
+
+
+.. _Where can I find Django developers for hire?:
+
+Django 開発者はどこで雇えますか？
+---------------------------------
+
+`求職中の開発者リスト`_ には，喜んであなたの力になってくれる Django 開発者
+のリストがあります．
+
+また，求人を http://www.gypsyjobs.com/ に出してみてもよいかもしれません．
+
+.. _`求職中の開発者リスト`: http://code.djangoproject.com/wiki/DevelopersForHire
+.. _developers for hire page: http://code.djangoproject.com/wiki/DevelopersForHire
+
+
+.. _Installation questions:
+
+インストールに関する質問
+========================
+
+.. _How do I get started?:
+
+どこから始めたらいいですか？
+----------------------------
+
+    #. `コードをダウンロード`_ してください．
+    #. Django をインストールしてください (`インストールガイド`_ を読んで下
+       さい)．
+    #. `チュートリアル`_ をやってみてください．
+    #. 他の `ドキュメント`_ にも目を通して下さい．何かトラブルに出会ったら，
+       `質問`_ してみましょう．
+
+.. _`コードをダウンロード`: http://www.djangoproject.com/download/
+.. _`インストールガイド`: ../install/
+.. _`チュートリアル`:  ../tutorial01/
+.. _`ドキュメント`: ../index/
+.. _`質問`: http://www.djangoproject.com/community/
+
+.. _`Download the code`: http://www.djangoproject.com/download/
+.. _`installation guide`: ../install/
+.. _tutorial:  ../tutorial1/
+.. _documentation: ../
+.. _ask questions: http://www.djangoproject.com/community/
+
+.. _How do I fix the "install a later version of setuptools" error?:
+
+"install a later version of setuptools" の解決方法は？
+------------------------------------------------------
+
+Django 配布物に入っている ``ez_setup.py`` を実行してください．
+
+.. _What are Django's prerequisites?:
+
+Django を動かすには何が必要？
+-----------------------------
+
+Django を動かすには Python_ 2.3 以降が必要です．Django の初歩的な利用では、
+それ以外の Python ライブラリは不要です．
+
+開発環境を使う場合，つまり Django を試したいだけの場合は， Web サーバを別に
+インストールしておく必要はありません． Django には軽量な開発用サーバがつい
+てきます．
+運用環境には `Apache 2`_ と mod_python_ を勧めますが， Django は WSGI_ 仕様
+に従っているので，様々なサーバフラットフォームで動作します．
+
+Django をデータベースと合わせて使うならデータベースエンジンも必要です．
+我々は PostgreSQL_ ファンなので PostgreSQL をお勧めしますが， MySQL_ や
+`SQLite 3`_ もサポートしています．
+
+.. _Python: http://www.python.org/
+.. _Apache 2: http://httpd.apache.org/
+.. _mod_python: http://www.modpython.org/
+.. _WSGI: http://www.python.org/peps/pep-0333.html
+.. _PostgreSQL: http://www.postgresql.org/
+.. _MySQL: http://www.mysql.com/
+.. _`SQLite 3`: http://www.sqlite.org/
+
+
+.. _Do I lose anything by using Python 2.3 versus newer Python versions, such as Python 2.5?:
+
+Python 2.3 を使うのは， 2.5 のような新しいバージョンを使うよりも不利ですか？
+----------------------------------------------------------------------------
+
+いいえ． Django 自体は 2.3 以降全てのバージョンの Python で動作保証されてい
+ます．
+
+もちろん， 2.3 よりも新しい Python を使っていれば，自分のコードに新しい
+Python の機能を取り込めますし，Python 自体の改良によってもたらされた高速化
+や最適化の恩恵を受けられます．ただし， Django フレームワーク自体は， 2.3 で
+も 2.4 や 2.5 でも同じように動作します．
+
+.. _Do I have to use mod_python?:
+
+mod_python を使わねばならないのでしょうか？
+-------------------------------------------
+
+実際に運用する上では mod_python を使うよう勧めていますが， Django は WSGI_
+と呼ばれる構成を使っているため，必ずしも mod_python を使わねばならないわけ
+ではありません． Django は WSGI を有効化したサーバと通信できます．
+mod_python を使わない構成で最もよく使われる運用方式は FastCGI によるもので
+す．詳しい情報は `FastCGI で Django を使う`_ を参照してください．
+
+また，その他の運用方法については `サーバ構成に関する wikiページ`_ を参照し
+てください．
+
+Django を試してみたり，ローカルのコンピュータ上で開発するだけなら， Django
+に付いてくる開発用 Web サーバを使ってください．
+
+
+.. _`FastCGI で Django を使う`: ../fastcgi/
+.. _`サーバ構成に関する wikiページ`: http://code.djangoproject.com/wiki/ServerArrangements
+.. _WSGI: http://www.python.org/peps/pep-0333.html
+.. _`サーバ設定に関する wiki ページ`: http://code.djangoproject.com/wiki/ServerArrangements
+.. _server arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
+
+.. _How do I install mod_python on Windows?:
+
+Windows への mod_python のインストール方法は？
+----------------------------------------------
+
+    * Python 2.4 を使っているなら
+      `Python 2.4 向け mod_python の win32 ビルド`_ を入手してください．
+    * Python 2.4 の場合， `Windows での Django HOWTO`_ も参照してください．
+    * Python 2.3 なら， http://www.modpython.org/ から mod_python を取って
+      来て， `Running mod_python on Apache on Windows2000`_ を読んで下さい．
+    * また， (Windows に限らず) `guide to getting mod_python
+      working`_ を読んで下さい．
+
+.. _`Python 2.4 向け mod_python の win32 ビルド`: http://www.lehuen.com/nicolas/index.php/2005/02/21/39-win32-build-of-mod_python-314-for-python-24
+.. _`Windows での Django HOWTO`: http://thinkhole.org/wp/2006/04/03/django-on-windows-howto/
+.. _`guide to mod_python & Python 2.3`: http://www.lehuen.com/nicolas/index.php/2005/02/21/39-win32-build-of-mod_python-314-for-python-24
+.. _`Running mod_python on Apache on Windows2000`: http://groups-beta.google.com/group/comp.lang.python/msg/139af8c83a5a9d4f
+.. _`guide to getting mod_python working`: http://www.dscpl.com.au/articles/modpython-001.html
+
+.. _Will Django run under shared hosting (like TextDrive or Dreamhost)?:
+
+Django は共有ホスティングサービス (TextDrive や Dreamhost) で動きますか？
+-------------------------------------------------------------------------
+
+`Django を使える Web ホスト`_ のページをごらん下さい．
+
+.. _`Django を使える Web ホスト`: http://code.djangoproject.com/wiki/DjangoFriendlyWebHosts
+.. _`Django-friendly Web hosts`: http://code.djangoproject.com/wiki/DjangoFriendlyWebHosts
+
+.. _Should I use the official version or development version?:
+
+公式リリースと開発版のどちらを使うべきなのでしょうか？
+------------------------------------------------------
+
+Django の開発者達は毎日 Django 改良を重ねており，壊れたコードをチェックイン
+しないよう上手く計らっています．私達は自分のサーバに (Subversion レポジトリ
+上の) 開発中のコードを直接使っており，安定に運用できています．このことを考
+えると，一般論として．「公式の」リリースよりはより多くの機能と少ないバグを
+持つ最新の開発版を使うように勧めます．
+
+.. _Using Django:
+
+Django を使う上での質問
+=======================
+
+.. _Why do I get an error about importing DJANGO_SETTINGS_MODULE?:
+
+DJANGO_SETTINGS_MODULE の import がらみのエラーがでるのはなぜ？
+---------------------------------------------------------------
+
+以下の点を確認してください:
+
+    * 環境変数 DJANGO_SETTINGS_MODULE が完全指定の Python モジュール名になっ
+      ていますか (たとえば "mysite.settings.main")．
+
+    * 設定モジュールは ``sys.path`` の上にありますか (``import
+      mysite.settings.main`` はうまくいきますか)．
+
+    * (言うまでもなく) モジュールに構文エラーはありませんか．
+
+    * mod_python を使っていて，Django リクエストハンドラは *使っていない*
+      のなら， ``SetEnv`` に関わる mod_python のバグを回避する必要がありま
+      す． Django から何らかのモジュールを import する前に，以下のコードを
+      実行してください::
+
+            os.environ.update(req.subprocess_env)
+
+      (``req`` は mod_python のリクエストオブジェクトです)．
+
+.. _I can't stand your template language. Do I have to use it?:
+
+テンプレート言語を好きになれません．どうしても使わないとだめですか？
+--------------------------------------------------------------------
+
+私達はこのテンプレートエンジンを chunky bacon 以来の傑作だと思っているんで
+すが，テンプレート言語の選択というものは宗教に近いものがあるということは認
+識しています． Django では，テンプレート言語に対する制限はなんらありません．
+ですから， ZPT や Cheetah などを使いたいのなら，それは自由です．
+
+.. _Do I have to use your model/database layer?:
+
+付属のモデル／データベースレイヤを使わねばならないのですか？
+------------------------------------------------------------
+
+いいえ，テンプレートシステムと同様，モデル／データベースレイヤはフレームワー
+クの他の部分と脱カップリングしています．
+
+唯一の例外: 別のデータベースライブラリを使った場合には， Django の自動生成
+admin サイトを利用できなくなります． admin だけは Django のデータベースレイ
+ヤとカップリングしています．
+
+
+.. _How do I use image and file fields?:
+
+画像やファイルのフィールドの使い方は？
+--------------------------------------
+
+モデルで ``FileField`` や ``ImageField`` を使うには，いくつかのステップを踏
+む必要があります:
+
+    #. 設定ファイル内で ``MEDIA_ROOT`` を指定します．この値は，Django がアッ
+       プロードされたファイルを置く場所にします (パフォーマンス上の理由から，
+       ファイルをデータベースに置くことはありません)． ``MEDIA_URL`` をその
+       ディレクトリの公開 URL にします．ディレクトリは Web サーバのユーザア
+       カウントに対して書き込み可能にしておかねばなりません．
+
+    #. モデルに ``FileField`` や ``ImageField`` を追加し， ``upload_to`` オ
+       プションを定義して， ``MEDIA_ROOT`` のどのサブディレクトリにファイル
+       をアップロードさせるのかを Django に教えます．
+
+    #. データベースにい保存されるのは，ファイルの (``MEDIA_ROOT`` からの相
+       対で表した) パスだけです． Django の提供している便宜関数
+       ``get_<filename>_url`` を使うことになるでしょう．例えば，
+       ``mug_shot`` という名前の ``ImageField`` があるとすると，テンプレー
+       トで画像の URL を指定するには ``{{ object.get_mug_shot_url }}`` のよ
+       うにします．
+
+.. _Databases and models:
+
+データベースとモデルに関する質問
+================================
+
+.. _How can I see the raw SQL queries Django is running?:
+
+Django が実行している生の SQL クエリを見られますか？
+----------------------------------------------------
+
+まず， ``DEBUG`` 設定を ``True`` にして  Django を動かしているか確認してく
+ださい．次に，以下のコードを実行します::
+
+    >>> from django.db import connection
+    >>> connection.queries
+    [{'sql': 'SELECT polls_polls.id,polls_polls.question,polls_polls.pub_date FROM polls_polls',
+    'time': '0.002'}]
+
+``connection.queries`` を使えるのは ``DEBUG`` が ``True`` の時だけです．こ
+の値は，クエリの実行順に辞書を並べたものです．各辞書には以下の値が入ってい
+ます::
+
+    ``sql`` -- 生の SQL 文
+    ``time`` -- SQL 文の実行にかかった時間を秒で表したもの
+
+``connection.queries`` には， INSERT, UPDATE, SELECT といった全ての SQL 文
+が入ります．クエリはアプリケーションがデータベースを操作する度に記録され
+てゆきます．
+
+.. _Can I use Django with a pre-existing database?:
+
+既存のデータベースで Django を使えますか？
+------------------------------------------
+
+使えます． `古いデータベースの組み込み`_ を参照してください．
+
+.. _`古いデータベースの組み込み`: ../legacy_databases/
+.. _`Integrating with a legacy database`: ../legacy_databases/
+
+
+.. _If I make changes to a model, how do I update the database?:
+
+モデルを変更した場合のデータベースの更新方法は？
+------------------------------------------------
+
+データが消えてもかまわないのなら， ``manage.py`` ユーティリティを使って，特
+定のアプリケーションをリセットする SQL を発行できます::
+
+    manage.py reset appname
+
+この操作で， ``appname`` に関係したテーブルが削除され，再度作成されます．
+
+データを削除したくないのなら，手作業で ``ALTER TABLE`` 文を実行せねばなりま
+せん．私達はいつもこの方法でやっています．というのも，データの扱いはとても
+慎重にせねばならないので，私達は自動化を避けたいのです．とはいえ，データベー
+スの更新を部分的に自動化する機能を追加すべく現在作業中です．
+
+.. _Do Django models support multiple-column primary keys?:
+
+Django のモデルは複数カラムにわたる主キーをサポートしていますか？
+-----------------------------------------------------------------
+
+いいえ．サポートしているのは単カラムの主キーだけです．
+
+しかし，実践的には問題にはなりません．というのは，(``unique_together`` モデ
+ルオプションを指定したり，直接データベースに制約を作ったりして) 他の制約を
+課し，モデルレベルで一意性を強制できるからです．単カラムの主キーは admin イ
+ンタフェースをうまく稼働させるため，例えば編集や削除対象のオブジェクトを指
+定する簡潔な手段として必要なのです．
+
+
+.. _How do I add database-specific options to my CREATE TABLE statements, such as specifying MyISAM as the table type?:
+
+テーブル形式を MyISAM に指定するなど，データベース固有のオプションを CREATE TABLE 文に追加したいのですが，どうすればよいですか？
+--------------------------------------------------------------------------------------------------------------------------------
+
+私達は，テーブルの形式のようなデータベース固有のオプションに対応するために
+Django のコードに特殊なケースを追加したくないと考えています．こうしたオプショ
+ンを使いたければ， `SQL の初期データファイル`_ を作成して，その中で
+``ALTER TABLE`` 文を使って自分の目的を実現してください．初期データファイル
+はデータベースの中で ``CREATE TABLE`` 文の後に実行されます．
+
+例えば， MySQL を使っていて， MyISAM テーブルタイプを使いたい場合には，初期
+データファイルを作成して，以下のような行を挿入します::
+
+    ALTER TABLE myapp_mytable ENGINE=MyISAM;
+
+`SQL の初期データファイル`_ でも説明していますが， SQL ファイルには任意の
+SQL コードを入れられるので，SQL で行なえる変更なら何でも実現できます．
+
+.. _`SQL の初期データファイル`: ../model_api/#providing-initial-sql-data
+.. _SQL initial data file: ../model_api/#providing-initial-sql-data
+
+Django がメモリリークを起こしているのですが，なぜですか？
+---------------------------------------------------------
+
+Django に既知のメモリリークはありません． Django プロセスがメモリをどんどん
+消費して，いっこうに開放する気配がない場合， ``DEBUG`` が ``True`` になって
+いないか調べてみてください． ``DEBUG`` を ``True`` にすると， Django は実行
+した SQL 文の全てのコピーを保存するようになるからです．
+
+(クエリは ``django.db.connection.queries`` で保存されます．
+`Django が実行している生の SQL クエリを見られますか？`_ を参照してください．)
+
+問題を解決するには， ``DEBUG`` を ``False`` にしてください．
+
+クエリリストを手動で消去するには，以下のように ``reset_queries()`` を呼び出
+してください::
+
+    from django import db
+    db.reset_queries()
+
+
+admin サイトに関する質問
+========================
+
+.. _`I can't log in. When I enter a valid username and password, it just brings up the login page again, with no error messages.`:
+
+ログインできません．正しいユーザ名とパスワードを入力したのに，エラーメッセージも出ず再度ログインページが表示されるのです．
+--------------------------------------------------------------------------------------------------------------------------
+
+
+Django の発行するクッキーのドメインと，ブラウザに格納されたドメインが一致し
+ていないため，ログインクッキーが正しく設定されないからです．以下の二つの対
+策を試してみて下さい:
+
+    * admin 設定ファイルの ``SESSION_COOKIE_DOMAIN`` とお使いのドメインが一
+      致するように設定してください．例えば，ブラウザで
+      "http://www.mysite.com/admin/" にアクセスするようになっているのなら，
+      "myproject.settings" には ``SESSION_COOKIE_DOMAIN = 'www.mysite.com'``
+      と設定せねばなりません．
+
+    * ブラウザによっては (Firefox?) ドットの入っていないドメインからのクッ
+      キーを受け取ろうとしないようです．admin を "localhost" などのようなドッ
+      トを含まないドメインで実行しているのなら，"localhost.localdomain" や
+      "127.0.0.1" のように指定してアクセスしてください．また，
+      ``SESSION_COOKIE_DOMAIN`` もそれに合わせて変更してください．
+
+.. _`I can't log in. When I enter a valid username and password, it brings up the login page again, with a "Please enter a correct username and password" error.`:
+
+ログインできません．正しいユーザ名とパスワードを入力したところ，「正しいユーザ名とパスワードを入力してください」というエラーメッセージの表示されたログインページが表示されます．
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ユーザネームとパスワードが本当に正しいのなら，ユーザアカウントが
+``is_active`` で，かつ ``is_staff`` が ``True`` になっているか確かめて下さ
+い． admin サイトにアクセスできるのは，これら二つのフィールドが共に
+``True`` であるユーザだけです．
+
+.. _How can I prevent the cache middleware from caching the admin site?:
+
+キャッシュミドルウェアに admin サイトをキャッシュさせなくするにはどうすればよいですか？
+---------------------------------------------------------------------------------------
+
+``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` 設定を ``True`` にしてください．詳しく
+は `キャッシュのドキュメント`_ を参照してください．
+
+.. _`キャッシュのドキュメント`: ../cache/#the-per-site-cache
+
+.. _How do I automatically set a field's value to the user who last edited the object in the admin?:
+
+admin で，フィールドの値を，オブジェクトを最後に編集したユーザの指定した値と同じにする方法は？
+----------------------------------------------------------------------------------------------
+
+現時点では， Django はこの操作を行う正規の方法を提供していません．しかしこ
+の要望はよく出ているので，どうやって実装するかを議論しているところです．問
+題は，(現在のユーザを判定するのに) モデルレイヤと admin レイヤとリクエスト
+レイヤをカップリングしたくないという点にあります．これは難しい問題です．
+
+`solution that doesn't require patching Django`_ というハックを提供している
+人もいますが，これは正規の方法ではなく，将来うまく働かなくなる可能性があり
+ます．
+
+.. _solution that doesn't require patching Django: http://lukeplant.me.uk/blog.php?id=1107301634
+
+
+
+.. _How do I limit admin access so that objects can only be edited by the users who created them?:
+
+admin で，オブジェクトを作成したユーザだけがオブジェクトを編集できるようにアクセスを制限する方法は？
+----------------------------------------------------------------------------------------------------
+
+一つ前の質問の答えを見て下さい．
+
+.. _My admin-site CSS and images showed up fine using the development server, but they're not displaying when using mod_python.:
+
+開発サーバでは admin サイトの CSS や画像がうまく表示されるのに， mod_python を使うと表示されません．
+----------------------------------------------------------------------------------------------------
+
+「mod_python で Django を使う」というドキュメントの `admin ファイルの提供`_
+
+.. _`admin ファイルの提供`: ../modpython/#serving-the-admin-files
+.. _serving the admin files: ../modpython/#serving-the-admin-files
+
+.. _My "list_filter" contains a ManyToManyField, but the filter doesn't display.:
+
+"list_filter" に ManyToManyField を入れたのに，フィルタが表示されません．
+-------------------------------------------------------------------------
+
+Django が ``ManyToManyField`` に対してフィルタを表示するのはオブジェクトが
+二つ以上のときだけです．
+
+例えば， ``list_filter`` に ``sites`` が入っており，データベースにたった一
+つしかサイトが登録されていなければ， "Site" フィルタは表示されません．
+この状況では，サイトによるフィルタは無意味だからです．
+
+.. _How can I customize the functionality of the admin interface?:
+
+admin インタフェースの機能をカスタマイズする方法は？
+----------------------------------------------------
+
+方法はいくつかあります．Django が自動生成する add/change フォームを利用して
+楽をしたければ，モデルの ``class Admin`` の ``js`` パラメタを使ってページに
+任意の JavaScript モジュールを貼り付けてください．パラメタは文字列で表した
+URL からなるリストで， admin フォームに <script> タグを使って取り込む
+JavaScript モジュールを指しています．
+
+単に自動生成されるフォームをいじる以上の柔軟さが必要な場合には， admin 用の
+カスタムビューを書いて下さい． admin はそれ自体 Django で作られており，カス
+タムのビューを書いて認証システムやパーミッションのチェックにフックを掛け，
+必要な処理を行えます．
+
+admin のルック & フィールをカスタマイズしたいのなら，次の質問に進んで下さい．
+
+.. _The dynamically-generated admin site is ugly! How can I change it?:
+
+動的に生成される admin サイトがみっともありません！変更方法は？
+---------------------------------------------------------------
+
+私達は好きなんですが，そうは思わないのなら， CSS スタイルシートや画像ファイ
+ルを編集して， admin サイトのプレゼンテーションを変更できます．サイトはセマ
+ンティックな HTML を使って書かれているので，やりたい変更は全て CSS スタイル
+シートの編集で実現できます．てほどきに `admin で使われているCSS のガイド`_ 
+を用意してあります．
+
+.. _`admin で使われているCSS のガイド`: ../admin_css/
+.. _`guide to the CSS used in the admin`: ../admin_css/
+
+
+.. _How do I create users without having to edit password hashes?:
+
+パスワードハッシュを編集せずにユーザを作成する方法は？
+------------------------------------------------------
+
+admin サイトでユーザを作成したいのなら， Django の開発版を使ってください．
+この問題は 2006 年 8 月 4 日に修正されたので，それ以降のバージョンが必要で
+す．
+
+ユーザの作成には Python API も利用できます．詳しくは `ユーザの作成`_ を参照
+してください．
+
+.. _`ユーザの作成`: ../authentication/#creating-users
+.. _creating users: ../authentication/#creating-users
+
+.. _Contributing code:
+
+コードへの貢献
+==============
+
+.. _How can I get started contributing code to Django?:
+
+Django プロジェクトにコードを寄贈したいんですが，どうすればよいですか？
+-----------------------------------------------------------------------
+
+よくぞ聞いてくれました！まさにこの質問に答えるためのドキュメントを用意して
+あります． `Django プロジェクトへの貢献`_ という文書です．
+
+.. _`Django プロジェクトへの貢献`: ../contributing/
+.. _Contributing do Django: ../contributing/
+
+.. _I submitted a bug fix in the ticket system several weeks ago. Why are you ignoring my patch?:
+
+何週間も前にチケットシステムにバグフィクスを提出したんですが．何で私のパッチを無視するんですか？
+------------------------------------------------------------------------------------------------
+
+心配しないでください．無視しているわけではないんですよ！
+
+まずは「チケットを無視する」ことと「まだチケットを検討していない」ことの違
+いを御理解ください． Django のチケットシステムにはオープン状態のチケットが
+何百もあり，エンドユーザの使い勝手に与えるインパクトも様々です．そのため，
+Django の開発者達はチケットをレビューして，優先順位を決めねばならないのです．
+
+また，あなたのリクエストを Django に取り込まないとはっきりした場合，チケッ
+トを無視したりはせず，必ずクローズします．従って，チケットがまだオープンの
+状態なら，リクエストは無視されているのではなく，いま一時的にリクエストに目
+を通す時間を取れないということにすぎないのです．

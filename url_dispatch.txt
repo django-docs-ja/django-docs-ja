@@ -1,0 +1,533 @@
+==================
+URL ディスパッチャ
+==================
+
+:revision-up-to: 4805 (release 0.96)
+
+すっきりした，簡潔で明解な URL スキームの設計は，高品質の Web アプリケーショ
+ンでは重要な要素です．Django では，フレームワークの制限なしに，望み通りの
+URL を設計できます．
+
+``.php`` や ``.cgi`` といった拡張子は必要なく， ``0,2097,1-1-1928,00`` のよ
+うな意味不明の URL にする必要もありません．
+
+URL はすっきりした扱いやすいものにすべきであるという主張については，ワール
+ドワイドウェブの産みの親である Tim Berners-Lee の優れた解説，
+`Cool URIs don't change`_ を参照してください． 
+
+.. _Cool URIs don't change: http://www.w3.org/Provider/Style/URI
+
+.. _Overview:
+
+概要
+====
+
+あるアプリケーション向けの URL を設計するには， **URLconf** (URL 設定: URL
+configuration) と呼びならわされている Python モジュールを作成します．このモ
+ジュールは pure Python のコードで，中にはただ URL パターン (単純な正規表現)
+から Python のコールバック関数 (自作のビュー) へのマッピングが入っているだ
+けです．
+
+このマッピングは短くもできますし，必要なだけ長くもできます．他のマッピング
+も参照できます．また， pure Python コードなので，動的に生成できます．
+
+
+.. _How Django processes a request:
+
+Django のリクエスト処理
+=======================
+
+ユーザが Django で作られたサイト上のページをリクエストした時に，どの Python
+コードが実行されるかは以下のアルゴリズムで決定されます:
+
+    1. Django は `設定ファイル`_ の ``ROOT_URLCONF`` 設定を探します．この設
+       定は，例えば ``"mydjangoapps.urls"`` のように， URLconf を import す
+       るための完全な Python パスを表す文字列になっています．
+    2. Django は上記の Python モジュールをロードして， ``urlpatterns`` とい
+       う名前の変数を探します．この変数の値は Python のリストで，
+       ``django.conf.urls.defaults.patterns()`` が返すのと同じ形式です．
+    3. Django は URL パターンを順に調べて，リクエスト URL に最初にマッチし
+       たところで止まります．
+    4. 何らかの正規表現にマッチしたら， Django はマッピングされているビュー
+       を import して呼び出します．ビューは単純な Python 関数です．ビュー関
+       数の第一引数には `リクエストオブジェクト`_ が，それ以降の引数には正
+       規表現でキャプチャした値が渡されます．
+
+.. _`設定ファイル`: ../settings/
+.. _settings file: ../settings/
+.. _`リクエストオブジェクト`: ../request_response/#httprequest-objects
+.. _request object: ../request_response/#httprequest-objects
+
+.. _Examples:
+
+凡例
+====
+
+URLconf の一例を示します::
+
+    from django.conf.urls.defaults import *
+
+    urlpatterns = patterns('',
+        (r'^articles/2003/$', 'news.views.special_case_2003'),
+        (r'^articles/(\d{4})/$', 'news.views.year_archive'),
+        (r'^articles/(\d{4})/(\d{2})/$', 'news.views.month_archive'),
+        (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'news.views.article_detail'),
+    )
+
+注意:
+
+    * ``from django.conf.urls.defaults import *`` によって， ``patterns()``
+      関数を使えるようになります．
+
+    * URL 中の値を取り出すには，単に丸括弧で囲むだけです．
+
+    * 先頭のスラッシュは必要ありません．全ての URL に共通だからです．例えば，
+      ``^/articles`` ではなく ``^articles`` にします．
+
+    * 正規表現文字列のリテラルの前に ``'r'`` があります．これは必須ではあり
+      ませんが，付けた方がよいでしょう． ``r`` は，"raw" 文字列，すなわち文
+      字列中のいかなる文字もエスケープしないことを表します． 
+      `Dive Into Python's explanation`_ も参考にしてください．
+
+例のリクエストを挙げて説明しましょう:
+
+    * ``/articles/2005/03/`` へのリクエストは 3 つめのエントリにマッチしま
+      す． Django は ``news.views.month_archive(request, '2005', '03')`` を
+      呼び出します．
+
+    * ``/articles/2005/3/`` はどの UrL パターンにもマッチしません．リストの
+      3 つめのエントリでは月番号が 2 桁になるよう要求しているからです．
+
+    * ``/articles/2003/`` はリストの 2 番目ではなく，最初のパターンにマッチ
+      します．パターンは順番に調べられ，最初にテストにパスしたものが使われ
+      るからです．この法則を，特別扱いしたい URL の処理に使ってもかまいませ
+      ん．
+
+    * ``/articles/2003`` は URL がスラッシュで終わっていないので，どのパター
+      ンにもマッチしません．
+
+    * ``/articles/2003/03/3/`` は最後のパターンにマッチします． Django は
+      ``news.views.article_detail(request, '2003', '03', '3')`` を呼び出し
+      ます．
+
+.. _Dive Into Python's explanation: http://diveintopython.org/regular_expressions/street_addresses.html#re.matching.2.3
+
+.. _Named groups:
+
+名前つきグループ
+================
+
+上の例では， *名前なしの* 簡単な正規表現グループを (丸括弧表記で) 使って
+URL から情報を取り出し，ビュー関数に *固定引数* として渡していました．より
+高度な方法に， *名前つきの* 正規表現グループで URL から情報を取り出し，ビュー
+の *キーワード引数* に渡すものがあります．
+
+Python の正規表現では，名前つき正規表現グループは， ``name`` をグループの名
+前， ``pattern`` をマッチさせるパターンとして， ``(?P<name>pattern)`` で表
+されます．
+
+上の URLconf の例を書き換えて，名前つきグループにしたものを示します::
+
+    urlpatterns = patterns('',
+        (r'^articles/2003/$', 'news.views.special_case_2003'),
+        (r'^articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
+        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'news.views.month_archive'),
+        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'news.views.article_detail'),
+    )
+
+この URLconf は前の例と全く同じ機能を実現しますが，一つだけはっきり違うのは，
+取り出した値を固定引数ではなくキーワード引数としてビュー関数に渡すという点
+です．例えば:
+
+    * ``/articles/2005/03/`` へのリクエストは，
+      ``news.views.month_archive(request, year='2005', month='03')`` ではな
+      く ``news.views.month_archive(request, '2005', '03')`` を呼び出します．
+
+    * ``/articles/2003/03/3/`` へのリクエストは
+      ``news.views.article_detail(request, year='2003', month='03', day='3')``
+      を呼び出します．
+
+実際には，このような名前つきグループを使うと URLconf が少しだけ明示的な書き
+方になり，引数の順番に起因するバグを起こしにくくなります -- それに，自作ビュー
+の関数定義で引数順を変更できます．いうまでもなく，こうした恩恵は簡潔さの犠
+牲の上に成り立っています: 開発者の中には，名前つきグループの構文が醜くて冗
+長だと感じる人もいます．
+
+.. _The matching/grouping algorithm:
+
+マッチ/グルーピングのメカニズム
+-------------------------------
+
+URLconf パーザが正規表現中の名前つきグループと名前なしグループを扱う際のア
+ルゴリズムを以下に示します:
+
+名前つきの引数があればそれを使います．名前なし引数は無視します．名前つきの
+引数がなければ，すべての名前なし引数を固定引数として使います．
+
+どちらの場合でも，追加のキーワード引数を指定できます．後述の「ビュー関数に
+追加のオプションを渡す」を参照してください．
+
+.. _What the URLconf searches against:
+
+URLconf の検索対象
+==================
+
+URLconf はリクエストされた URL を通常の Python 文字列として検索します．この
+文字列には GET や POST のパラメタも，ドメイン名も入りません．
+
+例えば， ``http://www.example.com/myapp/`` URLconf が検索対象にするのは
+``/myapp/`` です．
+
+``http://www.example.com/myapp/?page=3`` へのリクエストの場合にも
+``/myapp/`` になります．
+
+URLconf はリクエストメソッドを調べません．換言すれば，同じ URL に対する
+``POST``, ``GET``, ``HEAD`` といった全てのリクエストメソッドは同じビュー関
+数に送られます．
+
+
+.. _Syntax of the urlpatterns variable:
+
+urlpatterns 変数の構文
+======================
+
+``urlpatterns`` は ``django.conf.urls.defaults.patterns()`` の返す形式の
+Python リストになります． ``urlpatterns`` 変数の値を作るときには，常に 
+``patterns()`` を使うようにして下さい．
+
+慣習的に，URLconf の先頭には ``from django.conf.urls.defaults import *`` を
+書くことになっています．これによって，以下のようなオブジェクトにアクセスで
+きるようになります:
+
+patterns
+--------
+
+プレフィクス (prefix) 引数，および任意の個数の URL パターンをとり，Django
+で必要な形式の URL パターンのリストを返す関数です．
+
+``patterns()`` の最初の引数は ``プレフィクス (prefix)`` 文字列です．後述の
+「ビュープレフィクス」 を参照してください．
+
+残りの引数は以下の形式のタプルにします::
+
+    (regular expression, Python callback function [, optional dictionary])
+
+``dictionary_of_extra_arguments`` はオプションです (後述の「 
+`ビュー関数に追加のオプションを渡す`_ 」を参照してください)．
+
+handler404
+----------
+
+マッチする URL パターンがない場合に呼び出されるビュー関数への，完全な
+Python の import パスが入った文字列です．
+
+デフォルト値は， ``'django.views.defaults.page_not_found'`` です．普通はこ
+のデフォルト値で十分のはずです．
+
+
+handler500
+----------
+
+サーバエラーが生じた場合に呼び出されるビュー関数への，完全な Python の
+import パスが入った文字列です．サーバエラーはビュー関数のコード中で実行時エ
+ラーが生じたときに起きます．
+
+デフォルト値は， ``'django.views.defaults.page_not_found'`` です．普通はこ
+のデフォルト値で十分のはずです．
+
+include
+-------
+
+現在の URLconf に「取り込む」別の URLconf への完全な Python の import パス
+が入った文字列です．後述の「 `他の URLconf を取り込む`_ 」を参照してくださ
+い．
+
+.. _Notes on capturing text in URLs:
+
+URL 中のテキストを取り出す際の注意
+==================================
+
+引数として取り出したテキストは，正規表現が何にマッチするかに関係なく通常の
+Python 文字列型になります．例えば，下のような URLconf の行::
+
+    (r'^articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
+
+では， ``news.views.year_archive()`` に渡される ``year`` 引数は，整数ではな
+くあくまでも文字列になります． ``\d{4}`` が整数を表す文字列にしかマッチしな
+いことは関係ありません．
+
+よく使うトリックとして，ビュー関数の引数にデフォルトパラメタを指定しておく
+という方法があります． URLconf とビューの一例をあげて説明しましょう::
+
+    # URLconf
+    urlpatterns = patterns('',
+        (r'^blog/$', 'blog.views.page'),
+        (r'^blog/page(?P<num>\d+)/$', 'blog.views.page'),
+    )
+
+    # View (in blog/views.py)
+    def page(request, num="1"):
+        # Output the appropriate page of blog entries, according to num.
+
+上の例では， URL パターンはどちらも同じビュー， ``blog.views.page`` を指し
+ています．しかし，最初のパターンでは， URL から何の情報も取り出しません．最
+初のパターンがマッチすると， ``page()`` 関数は ``num`` の値として，デフォル
+トの ``"1"`` を使います．二つめのパターンがマッチすると， ``page()`` は正規
+表現で取り出した ``num`` の値を使います．
+
+.. _Performance:
+
+パフォーマンス
+==============
+
+``urlpatterns`` 内の各正規表現は，最初にアクセスした際にコンパイルされます．
+これによって，システムは劇的に高速になります．
+
+.. _The view prefix:
+
+ビュープレフィクス
+==================
+
+コードを繰り返し書かなくてもよいように， ``patterns()`` 呼び出しの中で共通
+のプレフィクスを指定できます．
+
+`Django の概要`_ からとってきた URLconf の例を示します::
+
+    from django.conf.urls.defaults import *
+
+    urlpatterns = patterns('',
+        (r'^articles/(\d{4})/$', 'mysite.news.views.year_archive'),
+        (r'^articles/(\d{4})/(\d{2})/$', 'mysite.news.views.month_archive'),
+        (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'mysite.news.views.article_detail'),
+    )
+
+この例では，各ビューには共通のプレフィクス， ``'mysite.news.views'`` があり
+ます． ``urlpatterns`` の各エントリに繰り返し入力する代わりに，
+``patterns()`` 関数の最初の引数にプレフィクスを指定して，各ビュー関数に適用
+できます．
+
+このことを念頭に置いて，上記の例をもっと簡潔に書くと以下のようになります::
+
+    from django.conf.urls.defaults import *
+
+    urlpatterns = patterns('mysite.news.views',
+        (r'^articles/(\d{4})/$', 'year_archive'),
+        (r'^articles/(\d{4})/(\d{2})/$', 'month_archive'),
+        (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'article_detail'),
+    )
+
+プレフィクスには末尾のドット (``"."``) を入れていないことに注意してください．
+Django はドットを自動的に入れます．
+
+.. _`Django の概要`: ../overview/
+.. _Django overview: ../overview/
+
+
+.. _Multiple view prefixes:
+
+複数のビュープレフィクス
+------------------------
+
+現実的には，色々なビューを取り混ぜて使うことになり， ``urlpatterns`` に共通
+のプレフィクスを持たせられなくなることでしょう．しかし，パターンの重複を防
+ぐビュープレフィクスのショートカット機能には，もう一つの利用法があります．
+それは，以下のように複数の ``patterns()`` オブジェクトを足し合わせるという
+ものです:
+
+古い書き方::
+
+    from django.conf.urls.defaults import *
+
+    urlpatterns = patterns('',
+        (r'^/?$', 'django.views.generic.date_based.archive_index'),
+        (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/$', 'django.views.generic.date_based.archive_month'),
+        (r'^tag/(?P<tag>\w+)/$', 'weblog.views.tag'),
+    )
+
+は，以下のような書き方に改められます::
+
+    from django.conf.urls.defaults import *
+
+    urlpatterns = patterns('django.views.generic.date_based',
+        (r'^/?$', 'archive_index'),
+        (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/$','archive_month'),
+    )
+
+    urlpatterns += patterns('weblog.views',
+        (r'^tag/(?P<tag>\w+)/$', 'tag'),
+    )
+
+
+.. _Including other URLconfs:
+
+他の URLconf を取り込む
+=======================
+
+``urlpatterns`` 好きな場所で，他の URLconf モジュール上の定義を取り込めます．
+この操作は，本質的には一連の URL を他の URLconf の下に「すげかえる(root)」
+操作になります．
+
+例として， `Django ウェブサイト`_ 自体の URLconf を示します．この URLconf
+は他の URLconf をいくつも取り込んでいます::
+
+    from django.conf.urls.defaults import *
+
+    urlpatterns = patterns('',
+        (r'^weblog/',        include('django_website.apps.blog.urls.blog')),
+        (r'^documentation/', include('django_website.apps.docs.urls.docs')),
+        (r'^comments/',      include('django.contrib.comments.urls.comments')),
+    )
+
+この例の正規表現が，``$`` (行末にマッチする文字) を使っておらず，末尾にスラッ
+シュを付けていることに注意しましょう． Django が ``include()`` をみつけると，
+URL からマッチした部分を取り去り，残りの文字列を include された URLconf に
+送って続きの処理を行わせます．
+
+.. _`Django ウェブサイト`: http://www.djangoproject.com/
+
+.. _Captured parameters:
+
+Captured parameters
+-------------------
+
+include された側の URLconf は，親となる URLconf で取り出された全てのパラメ
+タを受け継ぎます．従って，以下のような例はうまく動作します::
+
+    # In settings/urls/main.py
+    urlpatterns = patterns('',
+        (r'^(?P<username>\w+)/blog/', include('foo.urls.blog')),
+    )
+
+    # In foo/urls/blog.py
+    urlpatterns = patterns('foo.views',
+        (r'^$', 'blog.index'),
+        (r'^archive/$', 'blog.archive'),
+    )
+
+上の例では， include された側にも ``"username"`` 変数が期待どおりに渡されま
+す．
+
+.. _Passing extra options to view functions:
+
+ビュー関数に追加のオプションを渡す
+==================================
+
+URLconf には，ビュー関数に追加の引数を Python の辞書型で渡せるようにするた
+めのフックがあります．
+
+URLconf タプルにはオプションとして 3 つめの要素を指定できます．この要素は
+ビューに渡したい追加の引数からなる辞書にします．
+
+例えば::
+
+    urlpatterns = patterns('blog.views',
+        (r'^/blog/(?P<year>\d{4})/$', 'year_archive', {'foo': 'bar'}),
+    )
+
+この例では， ``/blog/2005/`` というリクエストに対し， Django は
+``blog.views.year_archive()`` ビューを呼び出し，以下のキーワード引数を渡し
+ます::
+
+    year='2005', foo='bar'
+
+このテクニックは `汎用ビュー`_ や `配信フィードフレームワーク`_ で，メタデー
+タやビューへのオプションを渡すために使われています．
+
+.. _`汎用ビュー`: ../generic_views/
+.. _generic views: ../generic_views/
+.. _`配信フィードフレームワーク`: ../syndication_feeds/
+.. _syndication framework: ../syndication/
+
+.. admonition:: 衝突を避ける
+
+    URLconf を書くとき，名前付きのキーワード引数をキャプチャさせ，同時に追
+    加引数の辞書に同名の項目を追加するような書き方ができてしまいます．この
+    場合，辞書に設定した内容が優先されます．
+
+
+.. _`Passing extra options to include()`:
+
+``include()`` に追加のオプションを渡す
+--------------------------------------
+
+``include()`` にも追加のオプションを渡せます． ``include()`` に追加のオプショ
+ンを渡すと，そのオプションは include された側の URLconf の 
+*全ての URL 設定* に適用されます．
+
+例えば，以下の二つの URLconf は機能的に全く同じです:
+
+その 1::
+
+    # main.py: include する側
+    urlpatterns = patterns('',
+        (r'^blog/', include('inner'), {'blogid': 3}),
+    )
+
+    # inner.py: include される側
+    urlpatterns = patterns('',
+        (r'^archive/$', 'mysite.views.archive'),
+        (r'^about/$', 'mysite.views.about'),
+    )
+
+その 2::
+
+    # main.py: include する側
+    urlpatterns = patterns('',
+        (r'^blog/', include('inner')),
+    )
+
+    # inner.py: include される側
+    urlpatterns = patterns('',
+        (r'^archive/$', 'mysite.views.archive', {'blogid': 3}),
+        (r'^about/$', 'mysite.views.about', {'blogid': 3}),
+    )
+
+追加オプションは，ビューがオプションを実際に有効なオプションとして受け取る
+かどうかに関わらず， *常に* include される側の URLconf の *全ての* 行に渡さ
+れるので注意してください．このため， include に追加オプションを渡すテクニッ
+クが有効なのは，include される側の URLconf に入っている全てのビューが，追加
+のオプションを受け取れるとはっきりしている場合だけです．
+
+.. _Passing callable objects instead of strings:
+
+文字列の代わりに呼び出し可能オブジェクトを渡す
+==============================================
+
+開発者の中には，ビューのパスが入った文字列の代わりに，ビューそのものを表す
+Python 関数オブジェクトを渡す方が自然だと考えている者もいます．この代替案も
+サポートされており，任意の呼び出し可能オブジェクトをビューに渡せます．
+
+例えば， 以下のような「文字列の」URLconf があったとします::
+
+    urlpatterns = patterns('',
+        (r'^archive/$', 'mysite.views.archive'),
+        (r'^about/$', 'mysite.views.about'),
+        (r'^contact/$', 'mysite.views.contact'),
+    )
+
+文字列の代わりにオブジェクトを渡して，同じ機能の URLconf を実現できます．オ
+ブジェクトを忘れず import してください::
+
+    from mysite.views import archive, about, contact
+
+    urlpatterns = patterns('',
+        (r'^archive/$', archive),
+        (r'^about/$', about),
+        (r'^contact/$', contact),
+    )
+
+以下の例も機能的に全く同じです．個々のビューを個別に import する代わりにビュー
+の入ったモジュールを import すると，すこしだけすっきり書けます::
+
+    from mysite import views
+
+    urlpatterns = patterns('',
+        (r'^archive/$', views.archive),
+        (r'^about/$', views.about),
+        (r'^contact/$', views.contact),
+    )
+
+どのスタイルを使うかは自由です．
+
+このテクニックを使った場合 (文字列の代わりにオブジェクトを渡した場合)
+(上で説明した) `ビュープレフィクス`_ は効果を及ぼさないので注意してください．

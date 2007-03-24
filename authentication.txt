@@ -1,0 +1,1149 @@
+=============================
+Django でのユーザ認証
+=============================
+
+:revision-up-to: 4805 (release 0.96)
+
+Django にはユーザ認証システムがついてきます． Django のユーザ認証システムは，
+ユーザアカウント，グループ，パーミッションとクッキーベースのユーザセッショ
+ンを扱えます．このドキュメントでは，ユーザ認証の仕組みについて説明します．
+
+.. _Overview:
+
+概要
+====
+
+認証システムは以下の要素から成り立っています:
+
+    * ユーザ (Users)
+    * パーミッション: あるユーザが特定のタスクを実行してよいかどうかを決め
+      る，バイナリ (yes/no) のフラグです．
+    * グループ (Groups): 複数のユーザに対してラベル付したり，認証を設定した
+      りするための一般的な方法です．
+    * メッセージ (Messages): 指定のユーザ(達) に対するメッセージをキューす
+      るための簡単な方法です．
+
+.. _Installation:
+
+インストール
+============
+
+認証のサポートは Django アプリケーションとして ``django.contrib.auth`` にバ
+ンドルされています．インストールするには，以下のようにします:
+
+    1. ``INSTALLED_APPS`` 設定に ``'django.contrib.auth'`` を加えます．
+    2. ``manage.py syncdb`` を実行します．
+
+``django-admin.py startproject`` が生成するデフォルトの ``settings.py`` ファ
+イルの ``INSTALLED_APPS`` には，簡便のため ``'django.contrib.auth'`` が最初
+から入っています．この場合は，単に ``manage.py syncdb`` するだけでかまいま
+せん． ``manage.py syncdb`` はその都度必要なものだけをインストールするので，
+何度実行してもかまいません．
+
+``syncdb`` コマンドは必要なデータベーステーブルを作成し，インストール済みの
+アプリケーションで必要な全てのパーミッションオブジェクトを作成します．また，
+最初に実行したときには，ユーザにスーパユーザアカウントを作成するよう促しま
+す．
+
+これだけで，認証サポートを使えるようになります．
+
+.. _Users:
+
+ユーザ (User)
+===============
+
+ユーザは標準的な Django のモデル (model) として表現されています．ユーザのモ
+デルは `django/contrib/auth/models.py`_ にあります．
+
+.. _django/contrib/auth/models.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/auth/models.py
+
+API リファレンス
+------------------
+
+フィールド
+~~~~~~~~~~~
+
+``User`` オブジェクトには以下のフィールドがあります:
+
+    * ``username`` -- 必須です．30 文字以下の文字列で，英数字 (アルファベッ
+      ト，数字，アンダースコア) だけを使えます．
+    * ``first_name`` -- オプションです．30 文字以下です．
+    * ``last_name`` -- オプションです． 30 文字以下です．
+    * ``email`` -- オプションです． E-mail アドレスです．
+    * ``password`` -- 必須です．パスワードのメタデータであるハッシュ値です
+      (Django では生のパスワードを保存しません)．生のパスワードは任意の長さ
+      でよく，どんな文字が入っていても構いません．詳しくは以下の
+      `パスワード`_ の節を参照して下さい． 
+    * ``is_staff`` -- Bool 値です．この値が真なら，ユーザは admin サイトに
+      アクセスできます．
+    * ``is_active`` -- Bool 値です．この値が真なら，ログインにこのアカウン
+      トを使えます．アカウントを削除する代わりに，この値を ``False`` に
+      設定してください． 
+    * ``is_superuser`` -- Bool 値です．この値が真なら，ユーザは明示的な指定
+      がなくても全てのパーミッションを得ます．
+    * ``last_login`` -- ユーザが最後にログインした時刻を表す datetime オブ
+      ジェクトです．デフォルトではログイン時現在の日付/時刻になります．
+    * ``date_joined`` -- アカウントの作成された時刻を表す datetime オブジェ
+      クトです．デフォルトではアカウント作成時現在の日付/時刻になります．
+
+メソッド
+~~~~~~~~~~
+
+``User`` オブジェクトには ``groups`` と ``user_permissions`` という二つの多
+対多のフィールドがあります．この関係性のために， ``User`` オブジェクトは他
+の `Django モデル`_ と同じようにして，関連づけされたオブジェクトにアクセス
+できます::
+
+    myuser.groups = [group_list]
+    myuser.groups.add(group, group,...)
+    myuser.groups.remove(group, group,...)
+    myuser.groups.clear()
+    myuser.user_permissions = [permission_list]
+    myuser.user_permissions.add(permission, permission, ...)
+    myuser.user_permissions.remove(permission, permission, ...]
+    myuser.user_permissions.clear()
+
+自動的に生成されるこれらの API に加え， ``User`` オブジェクトには以下のカス
+タムメソッドがあります:
+
+    * ``is_anonymous()`` -- 常に ``False`` を返します． ``User`` オブジェク
+      トを ``AnonymousUser`` オブジェクトと区別する手段の一つです． 通常は，
+      ``is_authenticated()`` メソッドを使うようにしてください．
+
+    * ``is_authenticated()`` -- 常に ``True`` を返します．ユーザを認証済み
+      かどうかを調べる一つの方法です．このメソッドの戻り値は，ユーザが正し
+      いパーミッションを持っているか，あるいはアクティブなユーザであるかど
+      うかに関係なく，ユーザが正しいユーザ名とパスワードを入力したことだけ
+      を示します．
+
+    * ``get_full_name()`` -- ``first_name`` と ``last_name`` をスペースでつ
+      なげた文字列を返します． 
+
+    * ``set_password(raw_password)`` -- 渡された文字列をハッシュ化し，ユー
+      ザのパスワードに設定します． ``User`` オブジェクトの保存は行いません．
+
+    * ``check_password(raw_password)`` -- 渡された文字列がこのユーザの正し
+      い文字列ならば ``True`` を返します．(このメソッドは比較時にパスワード
+      のハッシュ処理を行います)
+
+    * ``get_group_permissions()`` -- ユーザが自分の属するグループから得てい
+      るパーミッションを表す文字列からなるリストを返します．
+
+    * ``get_all_permissions()`` -- ユーザ自身のもつパーミッションと，ユーザ
+      の属するグループのパーミッションの両方からなるリストを返します．
+
+    * ``has_perm(perm)`` -- ユーザが特定のパーミッションを持っている場合に
+      ``True`` を返します． パーミッション名 perm は ``"package.codename"``
+      のような形式で表します．
+      ユーザがアクティブでない場合，このメソッドは常に ``False`` を返します．
+
+    * ``has_perms(perm_list)`` -- ユーザが perm_list 内のパーミッションのい
+      ずれかを持っている場合に ``True`` を返します．各々のパーミッション名
+      は ``"package.codename"`` のような形式で表します． 
+      ユーザがアクティブでない場合，このメソッドは常に ``False`` を返します．
+
+    * ``has_module_perms(package_name)`` -- ユーザが指定のパッケージ名
+      (Django アプリケーションラベル: Django app label) の何らかのパーミッ
+      ションを持っていれば ``True`` を返します．
+      ユーザがアクティブでない場合，このメソッドは常に ``False`` を返します．
+
+    * ``get_and_delete_messages()`` -- ユーザのキューに入っているメッセージ
+      を返し，入っていたメッセージをキューから取り除きます．
+
+    * ``email_user(subject, message, from_email=None)`` -- ユーザに e-mail
+      を送信します． ``from_email`` が ``None`` の場合， Django は
+      `DEFAULT_FROM_EMAIL`_ 設定を使います．
+
+    * ``get_profile()`` -- ユーザのサイト固有のプロファイル (site-specific
+      profile) を返します．プロファイルを使えないサイトでは 
+      ``django.contrib.auth.models.SiteProfileNotAvailable`` を送出します．
+
+.. _Django model: ../model_api/
+.. _Django モデル: ../model-api/
+.. _DEFAULT_FROM_EMAIL: ../settings/#default-from-email
+.. DEFAULT_FROM_EMAIL: 
+    ../settings/#default-from-email
+
+.. _Manager functions:
+
+マネジャ関数
+~~~~~~~~~~~~
+
+``User`` オブジェクトの ``objects`` 属性は ``models.Manager`` クラスのサブ
+クラス ``UserManager`` クラスで実装されています． ``UserManager`` クラスは
+通常のモデルが ``objects`` 属性を介してできること (``get`` や ``filter`` の
+ようなデータベースへのアクセス) に加えて，以下のヘルパー関数を提供していま
+す:
+
+    * ``create_user(username, email, password)`` -- ユーザを生成して保存し，
+      生成された ``User`` を返します． ``username``, ``email`` および
+      ``password`` は指定した値になり， ``is_active`` は ``True`` に設定さ
+      れます．
+
+    使用例は `ユーザの作成`_ を参照してください．
+
+    * ``make_random_password(length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')``
+      指定した長さのランダムなパスワードを生成して返します．パスワードに使
+      える文字は文字列で指定します．(``allowed_chars`` のデフォルト値は，ユー
+      ザの見間違いを防ぐため ``"I"`` と ``"I"`` に似た文字を除いてあります．)
+
+基本的な使い方
+--------------
+
+ユーザの作成
+~~~~~~~~~~~~~~
+
+ユーザを作成する一番基本的な方法は，オブジェクトマネージャの
+``create_user`` ヘルパー関数を使う方法です::
+
+    >>> from django.contrib.auth.models import User
+    >>> user = User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
+    # この操作で，User オブジェクト user を保存できるようになります．
+    # 他のフィールドを変更したければ，属性を変更します．
+    >>> user.is_staff = True
+    >>> user.save()
+
+パスワードの変更
+~~~~~~~~~~~~~~~~~~
+
+パスワードの変更には ``set_password()`` を使います::
+
+    >>> from django.contrib.auth.models import User
+    >>> u = User.objects.get(username__exact='john')
+    >>> u.set_password('new password')
+    >>> u.save()
+
+特別な意図のない限り， ``password`` 属性を直接設定しないでください．これに
+ついては次節で説明します．
+
+
+.. _Passwords:
+
+パスワード
+-------------
+
+``User`` オブジェクトの ``password`` フィールドは::
+
+    hashtype$salt$hash
+
+のような形式の文字列，すなわちハッシュ方式 (hashtype)，ハッシュソルト
+(salt)，そしてハッシュ値 (hash) をドル記号 (``"$"``) で分割した文字列になり
+ます．
+
+ハッシュ形式は ``sha1`` (デフォルト) または ``md5`` であり，それぞれパスワー
+ドの一方向ハッシュ化アルゴリズムを表します．ソルトは生のパスワード文字列か
+らハッシュを生成するときに味付け (salt) しておくためのランダムな文字列です．
+
+例えば::
+
+    sha1$a1976$a36cc8cbf81742a8fb52e221aaeab48ed7f58ab4
+
+``User.set_password()`` および ``User.check_password()`` 関数は，これらの値
+の設定やチェックを背後で行っています．
+
+バージョン 0.90 のような以前の Django では，パスワードソルトなしの単純な
+MD5 ハッシュを使っていました．この形式は，以前のバージョンとの互換性を持た
+せるためにまだサポートしています．ただし，古いパスワードのユーザに対して
+``check_passwword()`` が成功した時に自動的に新しい形式に変換します．
+
+.. _Anonymous users:
+
+匿名ユーザ (Anonymous users)
+-------------------------------
+
+``django.contrib.auth.models.AnonymousUser`` は
+``django.contrib.auth.models.User`` インタフェースを実装したクラスですが，
+以下の点で ``User`` と異なります:
+
+    * ``id`` は常に ``None`` です．
+    * ``is_anonymous()`` は ``False`` ではなく ``True`` を返します．
+    * ``is_authenticated()`` は ``True`` ではなく ``False`` を返します．
+    * ``has_perm()`` は常に ``False`` を返します．
+    * ``set_password()``, ``check_password()``, ``save()``, ``delete``,
+      ``set_groups()`` および ``set_permissions()`` は 
+      ``NotImplementedError`` を送出します．
+
+おそらく，実践上意識して ``AnonymousUser`` オブジェクトを使う必要はないはず
+です．とはいえ，匿名ユーザは次節で述べるような形で Web リクエストで使われて
+います．
+
+.. _Creating superusers:
+
+スーパユーザの作成
+------------------
+
+``INSTALLED_APPS`` に ``'django.contrib.auth'`` を追加した直後の
+``manage.py syncdb`` では，スーパユーザの作成を促すプロンプトを表示します．
+また，後でスーパユーザを作成したい場合には， ``creater_superuser.py`` ユー
+ティリティを使えます．以下のコマンドを実行してください::
+
+    python /path/to/django/contrib/auth/create_superuser.py
+
+``/path/to/`` は自分のシステムの Django コードベースへのパスに応じて読み変
+えて下さい．
+
+
+.. _Authentication in Web requests:
+
+Web リクエストに対する認証
+==============================
+
+ここまでのドキュメントは，認証関連のオブジェクトを操作するための低水準の
+API について扱ってきました．より高水準の API では， Django はこれらの認証フ
+レームワークを `リクエストオブジェクト`_ システム内にフックできます．
+
+
+まず， ``SessionMiddleware`` および ``AuthenticationMiddleware`` を
+``MIDDLEWARE_CLASSES`` 設定に追加して，これらのミドルウェアをインストールし
+ます．詳しくは `セッションのドキュメント`_ を参照してください．
+
+ミドルウェアをインストールしたら，ビューから ``request.user`` にアクセスで
+きるようになります． ``request.user`` は現在ログインしているユーザの
+``User`` オブジェクトを表します．ユーザがログインしていなければ，
+``request.user`` は ``AnonymousUser`` のインスタンスになります(前節を参照し
+てください)．ログインユーザと匿名ユーザは， ``is_authenticated()`` で以下の
+ように区別できます::
+
+    if request.user.is_authenticated():
+        # Do something for authenticated users.
+    else:
+        # Do something for anonymous users.
+
+.. _`リクエストオブジェクト`: ../request_response/#httprequest-objects
+.. _`セッションのドキュメント`: ../sessions/
+.. _request objects: ../request_response/#httprequest-objects
+.. _session documentation: ../sessions/
+
+.. _Manually checking a user's password:
+
+ユーザのパスワードを手動で調べる
+--------------------------------
+
+ユーザ認証を手動で行うために平文パスワードとデータベース上のハッシュ化パス
+ワードを比較したい場合には， ``django.contrib.auth.models.check_password``
+という便宜関数を使えます．この関数は，調べたい平文パスワードと，比較対象の
+データベースに格納されているユーザの ``password`` フィールド全体の二つの引
+数をとり，二つが一致すれば ``True`` を，そうでなければ ``False`` を返します．
+
+.. _How to log a user in:
+
+ユーザをログインさせる
+-----------------------
+
+Django では， ``django.contrib.auth`` の中で， ``authenticat()`` と
+``login()`` という二つの関数を提供しています．
+
+あるユーザ名とパスワードに対する認証を行うには， ``authenticate()`` を使っ
+てください．この関数は二つのキーワード引数， ``username`` と ``password``
+をとり，ユーザ名に対してパスワードが有効であった場合に ``User`` オブジェク
+トを返します．パスワードが無効だった場合には， ``authenticate()`` は
+``None`` を返します．例えば::
+
+    from django.contrib.auth import authenticate
+    user = authenticate(username='john', password='secret')
+    if user is not None:
+        if user.is_active:
+            print "You provided a correct username and password!"
+        else:
+            print "Your account has been disabled!"
+    else:
+        print "Your username and password were incorrect."
+
+
+ユーザをログインさせるには，ビューの中で ``login()`` を使ってください．この
+関数は ``HttpRequest`` オブジェクトと ``User`` オブジェクトを引数にとります．
+``login()`` は Django のセッションフレームワークを使って，ユーザの ID をセッ
+ションに保存します．従って，上でも述べたように，セッションミドルウェアをイ
+ンストールしておかねばなりません．
+
+以下の例は ``authenticate()`` と ``login()`` の使い方を示しています::
+
+    from django.contrib.auth import authenticate, login
+
+    def my_view(request):
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                # Redirect to a success page.
+            else:
+                # Return a 'disabled account' error message
+        else:
+            # Return an error message.
+
+.. _How to log a user out:
+
+ユーザをログアウトさせる
+------------------------
+
+``django.contrib.auth.login()`` でログインしたユーザをログアウトさせるには，
+ビューの中で ``django.contrib.auth.logout()`` を使ってください．この関数は，
+``HttpRequest`` オブジェクトを引数に取り，戻り値を持ちません．例を以下に示
+します::
+
+    from django.contrib.auth import logout
+
+    def logout_view(request):
+        logout(request)
+        # Redirect to a success page.
+
+ユーザがログインしていなくても ``logout()`` はエラーを送出しないことに注意
+してください．
+
+.. _Limiting access to logged-in users:
+
+ログインユーザだけがアクセスできるように制限をかける
+----------------------------------------------------
+
+.. _The raw way:
+
+生真面目な方法
+~~~~~~~~~~~~~~~~~
+
+ページへのアクセスを制限する単純で生真面目な方法は，
+``request.user.is_authenticated()`` をチェックして，ログインページにリダイ
+レクトするというものです::
+
+    from django.http import HttpResponseRedirect
+
+    def my_view(request):
+        if not request.user.is_authenticated():
+            return HttpResponseRedirect('/login/?next=%s' % request.path)
+        # ...
+
+...あるいは，エラーメッセージを出しても構いません::
+
+    def my_view(request):
+        if not request.user.is_authenticated():
+            return render_to_response('myapp/login_error.html')
+        # ...
+
+.. _The login_required decorator:
+
+login_required デコレータ
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+手間を省くために， ``login_required`` デコレータを使えます::
+
+    from django.contrib.auth.decorators import login_required
+
+    def my_view(request):
+        # ...
+    my_view = login_required(my_view)
+
+Python 2.4 で登場したよりコンパクトなデコレータ構文を使った例を以下に示しま
+す::
+
+    from django.contrib.auth.decorators import login_required
+
+    @login_required
+    def my_view(request):
+        # ...
+
+``login_required`` が行うのは以下のような処理です:
+
+    * ユーザがログインしていなければ， ``/accounts/login/`` にリダイレクト
+      します．このとき，現在のクエリの絶対 URL を ``next`` に入れ，例えば
+      ``/accounts/login/?next=/polls/3/`` のようにします．
+    * ユーザがログインしていれば， ビューを普通に実行します．ビューコードの
+      中では，ユーザがログインしているものとみなして構いません．
+
+
+ただし，これを行うには ``/accounts/login/`` に適切な Django のビュー関数を
+対応づけておかねばなりません．例えば URLconf に以下のような行を設定します::
+
+    (r'^accounts/login/$', 'django.contrib.auth.views.login'),
+
+こうしておくと， ``django.contrib.auth.views.login`` は以下のような処理を行
+います:
+
+    * ``GET`` で呼び出されると，同じ URL に対して POST を行うためのログイン
+      フォームを表示します．これについては後でもう少し説明します．
+
+    * ``POST`` で呼び出されると，ユーザのログイン処理を試みます．ログインに
+      成功すると，ビューは ``next`` に示された URL にリダイレクトします
+      ``next`` を指定しない場合， ``/accounts/profile/`` にリダイレクトしま
+      す (現状ではハードコードされたページです)．ログインに失敗すると，ログ
+      インフォームを再度表示します．
+
+開発者は ``registration/login.html`` という名前のテンプレート上でログイン
+フォームを提供せねばなりません． Django はこのテンプレートに，以下の 3 つの
+テンプレートコンテキスト変数を渡します:
+
+    * ``form``: ログインフォームを表現する ``FormWrapper`` オブジェクトです．
+      ``FormWrapper`` オブジェクトの詳細は `forms のドキュメント`_ を参照し
+      てください．
+    * ``next``: ログイン成功後にリダイレクトされる先の URL です． URL には
+      クエリ文字列を含めてかまいません．
+    * ``site_name``: ``SITE_ID`` によって決定される現在の ``Site`` の名前で
+      す． `site フレームワークのドキュメント`_ を参照してください．
+
+``registration/login.html`` テンプレートを呼び出したくないのなら，URLconf
+を通じて外部パラメタ ``template_name`` をビューに渡してください．例えば，
+``myapp/login.html`` を使いたければ，URLconf の行は以下のようになります::
+
+    (r'^accounts/login/$', 'django.contrib.auth.views.login', 
+     {'template_name': 'myapp/login.html'}),
+
+編集の雛型にできるような ``registration/login.html`` テンプレートの例を以下
+に示します．このテンプレートは， ``content`` ブロックの定義された
+``base.html`` があるという前提で書かれています::
+
+    {% extends "base.html" %}
+
+    {% block content %}
+
+    {% if form.has_errors %}
+    <p>Your username and password didn't match. Please try again.</p>
+    {% endif %}
+
+    <form method="post" action=".">
+    <table>
+    <tr><td><label for="id_username">Username:</label></td><td>{{ form.username }}</td></tr>
+    <tr><td><label for="id_password">Password:</label></td><td>{{ form.password }}</td></tr>
+    </table>
+
+    <input type="submit" value="login" />
+    <input type="hidden" name="next" value="{{ next }}" />
+    </form>
+
+    {% endblock %}
+
+.. _`forms のドキュメント`: ../forms/
+.. _`site フレームワークのドキュメント`: ../sites/
+.. _forms documentation: ../forms/
+.. _site framework docs: ../sites/
+
+.. _Other built-in views:
+
+その他の組み込みビュー
+-----------------------
+
+認証システムでは， ``login`` ビューの他にも便利なビューをいくつか提供してい
+ます:
+
+``django.contrib.auth.views.logout``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**説明:**
+
+ユーザをログアウトさせます．
+
+**オプション引数:**
+
+    * ``template_name``: ログアウトページのテンプレートの完全な名前です．
+      この引数を省略すると，デフォルト値の ``registration/logged_out.html`` 
+      を使います．
+      
+
+**テンプレートコンテキスト:**
+
+    * ``title``: "Logged out" という文字列を翻訳した値になります．
+
+``django.contrib.auth.views.logout_then_login``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**説明:**
+
+ユーザをログアウトさせてから，ログインページにリダイレクトします．
+
+**オプション引数:**
+
+    * ``login_url``: ログインページへのリダイレクト先です．
+      この引数を省略すると，デフォルト値の ``/accounts/login/`` を使います．
+
+``django.contrib.auth.views.password_change``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**説明:**
+
+ユーザがパスワードを変更できるようにします．
+
+**オプション引数:**
+
+    * ``template_name``: パスワード変更ページのテンプレートの完全な名前です．
+      この引数を省略すると，デフォルト値の
+      ``registration/password_change_form.html`` を使います．
+
+**テンプレートコンテキスト:**
+
+    * ``form``: パスワード変更のためのフォームです．
+
+``django.contrib.auth.views.password_change_done``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**説明:**
+
+ユーザがパスワードを変更した後のページを表示するためのビューです．
+
+**オプション引数:**
+
+    * ``template_name``: パスワード変更完了ページのテンプレートの完全な名前
+      です．この引数を省略すると，デフォルト値の
+      ``registration/password_change_done.html`` を使います．
+
+``django.contrib.auth.views.password_reset``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**説明:**
+
+ユーザがパスワードをリセットできるようにします．また，新たなパスワードをメー
+ルで送信します．
+
+**オプション引数:**
+
+    * ``template_name``: パスワードリセットページのテンプレートの完全な名前
+      です．この引数を省略すると，デフォルト値の
+      ``registration/password_reset_form.html`` を使います．
+
+    * ``email_template_name``: 新しいパスワードを e-mail で送信する際に使う
+      テンプレートの完全な名前です．この引数を省略すると，デフォルト値の
+      ``registration/password_reset_email.html`` を使います．
+
+**テンプレートコンテキスト:**
+
+    * ``form``: パスワードリセットのためのフォームです．
+
+``django.contrib.auth.views.password_reset_done``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**説明:**
+
+ユーザがパスワードをリセットした後のページを表示するためのビューです．
+
+**オプション引数:**
+
+    * ``template_name``: パスワードリセット完了ページのテンプレートの完全な
+      名前です．この引数を省略すると，デフォルト値の
+      ``registration/password_reset_done.html`` を使います．
+
+``django.contrib.auth.views.redirect_to_login``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**説明:**
+
+ログインページにリダイレクトし，ログインに成功したら別の URL に戻れるように
+するためのビューです．
+
+**必須の引数:**
+
+    * ``next``: ログイン成功後のリダイレクト先 URL です．
+
+**オプション引数:**
+
+    * ``login_url``: ログインページへのリダイレクト先です．
+      この引数を省略すると，デフォルト値の ``/accounts/login/`` を使います．
+
+.. _Built-in manipulators:
+
+組み込みマニピュレータ
+----------------------
+
+組み込みビューを使いたくないけれども，マニピュレータを書かずに済ませたい場
+合のために，認証システムでは組み込みのマニピュレータをいくつか提供していま
+す:
+
+    * ``django.contrib.auth.forms.AdminPasswordChangeForm``: Admin インタ
+      フェースでユーザのパスワード変更に使われているマニピュレータです．
+
+    * ``django.contrib.auth.forms.AuthenticationForm``: ユーザをログインさ
+      せるためのマニピュレータです．
+
+    * ``django.contrib.auth.forms.PasswordChangeForm``: ユーザにパスワード
+      変更させるためのマニピュレータです．
+
+    * ``django.contrib.auth.forms.PasswordResetForm``: パスワードをリセット
+      し，新たなパスワードを送信するためのマニピュレータです．
+
+    * ``django.contrib.auth.forms.UserCreationForm``: 新たなユーザを作成す
+      るためのマニピュレータです．
+
+
+.. _Limiting access to logged-in users that pass a test:
+
+テストにパスしたログインユーザだけがアクセスできるように制限をかける
+--------------------------------------------------------------------
+
+特定のパーミッションやその他のテストの結果に応じたアクセスの制限には，前節
+で説明したの本質的に同じことをします．
+
+一番簡単な方法は，ビュー内で直接 ``request.user`` に対するテストを実行する
+というものです．例えば，以下のビューではユーザがログイン済みで，かつ
+``polls.can_vote`` というパーミッションを持っているかチェックします::
+
+    def my_view(request):
+        if not (request.user.is_authenticated() and \
+            request.user.has_perm('polls.can_vote')):
+            return HttpResponse("You can't vote in this poll.")
+        # ...
+
+``user_passes_test`` デコレータを使えば，手間を省けます::
+
+    from django.contrib.auth.decorators import user_passes_test
+
+    def my_view(request):
+        # ...
+    my_view = user_passes_test(lambda u: u.has_perm('polls.can_vote'))(my_view)
+
+ここでは，簡単な例としてパーミッションのテストに ``user_passes_test`` を使っ
+ていますが，単にあるユーザがあるパーミッションを有しているかをテストしたい
+だけなら，後で解説する ``permission_required()`` デコレータを使えます．
+
+Python 2.4 のデコレータ構文ならこうなります::
+
+    from django.contrib.auth.decorators import user_passes_test
+
+    @user_passes_test(lambda u: u.has_perm('polls.can_vote'))
+    def my_view(request):
+        # ...
+
+``user_passes_test`` には必須の引数が一つあります．この引数は， ``User`` を
+引数に取り，ユーザにページのビューを許可する場合には ``True`` を返す呼び出
+し可能オブジェクトでなければなりません． ``user_passes_test`` は ``User``
+が匿名かどうかを自動的に調べないので注意してください．
+
+``user_passes_test()`` はオプションの引数として ``login_url`` をとります．
+この引数を使うとログインページへの URL を指定できます (デフォルトでは
+``/accounts/login/`` になります)．
+
+Python 2.3 風の構文で書いた例を示します::
+
+    from django.contrib.auth.decorators import user_passes_test
+
+    def my_view(request):
+        # ...
+    my_view = user_passes_test(lambda u: u.has_perm('polls.can_vote'), login_url='/login/')(my_view)
+
+Python 2.4 風の構文で例を書くと以下のようになります::
+
+    from django.contrib.auth.decorators import user_passes_test
+
+    @user_passes_test(lambda u: u.has_perm('polls.can_vote'), login_url='/login/')
+    def my_view(request):
+        # ...
+
+.. _The permission_required decorator:
+
+permission_required デコレータ
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+あるユーザが特定のパーミッションを有しているかのチェックは，比較的よくある
+操作なので， Django はショートカットとして ``permission_required()`` という
+デコレータを用意しています．このデコレータを使うと，上の例は以下のように書
+き直せます::
+
+    from django.contrib.auth.decorators import permission_required
+     
+    def my_view(request):
+        # ...
+     
+    my_view = permission_required('polls.can_vote')(my_view)
+
+``permission_required()`` もまた， ``login_url`` を引数に取れます．例えば::
+
+    from django.contrib.auth.decorators import permission_required
+
+    def my_view(request):
+        # ...
+    my_view = permission_required('polls.can_vote', login_url='/loginpage/')(my_view)
+
+``login_required`` デコレータと同様， ``login_url`` のデフォルト値は
+``'/accounts/login/'`` です．
+
+
+.. _Limiting access to generic views:
+
+アクセスを汎用ビューに制限する
+------------------------------
+
+アクセスを `汎用ビュー`_ に制限するには，ビューを囲む薄いラッパコードを書き，
+URLconf を変更して，ジェネリックビュー自体ではなくラッパコードを指すように
+します．例えば::
+
+    from django.views.generic.date_based import object_detail
+
+    @login_required
+    def limited_object_detail(*args, **kwargs):
+        return object_detail(*args, **kwargs)
+
+.. _`汎用ビュー`: ../generic_views/
+.. _generic view: ../generic_views/
+
+.. _Permissions:
+
+パーミッション (Permission)
+===========================
+
+Django には単純なパーミッション機構がついてきます．このパーミッション機構は
+特定のユーザやユーザのグループに対してパーミッションを結びつける手段を提供
+します．
+
+パーミッション機構は Django の admin サイトでも使われていますが，自作のコー
+ド内でも自由に使えます．
+
+Django の admin サイトでは，以下のようなパーミッションを使っています:
+
+    * "add" フォームをビューし，オブジェクトを追加するためのアクセスを，そ
+      の型のオブジェクトの "add" パーミッションを持つユーザに制限しています．
+    * 変更リストをビューし，"change" フォームをビューしてオブジェクトを変更
+      するためのアクセスを，その型のオブジェクトの "change" パーミッション
+      を持つユーザに制限しています．
+    * あるオブジェクトを削除するためのアクセスを，その型のオブジェクトの
+      "delete" パーミッションを持つユーザに制限しています．
+
+パーミッションはオブジェクトインスタンスごとではなく，オブジェクトの型ごと
+にグローバルに設定されます．例えば，「Mary はニュース記事を変更できる」のよ
+うには書けますが，現状では，「Mary はニュース記事を変更できる．ただし彼女が
+書いた分だけ」とか，「Mary はある状態にある記事か，ある日時に出版されたか，
+ある ID の記事だけを変更できる」のようには書けません．後者の機能については
+は，現在 Django の開発者達が議論中です．
+
+.. _Default permissions:
+
+デフォルトのパーミッション
+--------------------------
+
+``class Admin`` セットを持つ Django モデルには，三つの基本的なパーミッショ
+ンである， add, create, delete が自動的に生成されます． 
+``manage.py syncdb`` を実行したとき，背後では，これらのパーミッションが自動
+的に ``auth_permission`` データベーステーブルに追加されます． 
+``django-admin.py sqlinitialdata [app]`` を実行すると，追加を行っている
+``INSERT`` 文そのものを閲覧できます．
+
+``manage.py syncdb`` を実行した際，モデルに ``class Admin`` セットがないと，
+パーミッションは生成されないので気を付けて下さい．この後でデータベースを初
+期化して ``class Admin`` をモデルに追加した場合， ``manage.py sycndb`` を再
+度実行せねばなりません．このコマンドは，インストール済みのアプリケーション
+に欠けているパーミッションを生成します．
+
+.. _Custom permissions:
+
+カスタムのパーミッション
+-------------------------
+
+カスタムのパーミッションを生成するには， ``permissions`` という
+`モデルのメタ属性`_ を使います．
+
+この例では，三つのカスタムパーミッションを生成しています::
+
+    class USCitizen(models.Model):
+        # ...
+        class Meta:
+            permissions = (
+                ("can_drive", "Can drive"),
+                ("can_vote", "Can vote in elections"),
+                ("can_drink", "Can drink alcohol"),
+            )
+
+この定義の役割は， ``syncdb`` を実行したときに追加のパーミッションを追加
+することだけです．
+
+
+.. _`モデルのメタ属性`: ../model-api/#meta-options
+.. _model Meta attribute: 
+    ../model_api/#meta-options
+
+API リファレンス
+-----------------
+
+ユーザと同様，パーミッションは Django モデルとして実装されています．実装は
+`django/contrib/auth/models.py`_ にあります．
+
+.. _django/contrib/auth/models.py: 
+    http://code.djangoproject.com/browser/django/trunk/django/contrib/auth/models.py
+
+フィールド
+~~~~~~~~~~~~
+
+``Permission`` オブジェクトには以下のフィールドがあります:
+
+    * ``name`` -- 必須です．50 文字以下です．例: ``'Can vote'``
+    * ``content_type`` -- 必須です．インストール済みの Django モデルのレコー
+      ドが入った ``django_content_type`` データベーステーブルへの参照です．
+    * ``codename`` -- 必須です． 100 文字以下です．例: ``'can_vote'``
+
+メソッド
+~~~~~~~~~
+
+``Permission`` オブジェクトは，他の `Django モデル`_ と同じく，標準的なデー
+タアクセスメソッドを備えています．
+
+認証データのテンプレート上での扱い
+=====================================
+
+``RequestContext`` を使っている場合，ログインユーザとそのパーミッションに
+`テンプレートコンテキスト`_ (template context) を使ってアクセスできます．
+
+.. class:: tips
+.. admonition:: 技術的な話題
+
+   デフォルトの設定では，テンプレートコンテキストに ``RequestContext`` を使
+   うようになっていて，*かつ*  ``TEMPLATE_CONTEXT_PROCESSORS`` の設定に
+   ``"django.core.context_processors.auth"`` が入っています．この場合にのみ，
+   上記の変数をテンプレートコンテキストの中で使えるようになります．詳しくは
+   `RequestContext のドキュメント`_ を参照してください．
+
+   .. _`RequestContext のドキュメント`:
+       ../templates_python/#subclassing-context-requestcontext
+   .. _RequestContext docs: 
+       ../templates_python/#subclassing-context-requestcontext
+
+
+.. Users:
+
+ユーザ
+------
+
+現在のログインユーザは， ``User`` インスタンスであっても ``AnonymousUser``
+インスタンスであっても，テンプレート変数 ``{{ user }}`` に入ります::
+
+    {% if user.is_authenticated %}
+        <p>Welcome, {{ user.username }}. Thanks for logging in.</p>
+    {% else %}
+        <p>Welcome, new user. Please log in.</p>
+    {% endif %}
+
+
+.. _Persmissions:
+
+パーミッション
+--------------
+
+現在のログインユーザのパーミッションはテンプレート変数 ``{{ perms }}`` に入っ
+ています．この変数はパーミッションオブジェクトをテンプレートで扱いやすくす
+るためのプロキシ (proxy) である， 
+``django.core.context_processors.PermWrapper`` のインスタンスです．
+
+``{{ perms }}`` オブジェクトに対して 1 段の属性参照を行うと，実際には
+``User.has_module_perms`` へのプロキシになっています．例えば下記の例は，ロ
+グインユーザが ``foo`` というアプリケーションへのパーミッションを持っている
+場合に  ``True`` を表示します::
+
+    {{ perms.foo }}
+
+2 段の属性参照は ``User.has_perm`` へのプロキシです．以下の例では，ログイン
+ユーザが ``foo.can_vote`` へのパーミッションを持つ場合に ``True`` を表示し
+ます::
+
+    {{ perms.foo.can_vote }}
+
+こうして，テンプレート内で ``{% if %}`` 文を使ってチェックを行えます::
+
+    {% if perms.foo %}
+        <p>You have permission to do something in the foo app.</p>
+        {% if perms.foo.can_vote %}
+            <p>You can vote!</p>
+        {% endif %}
+        {% if perms.foo.can_drive %}
+            <p>You can drive!</p>
+        {% endif %}
+    {% else %}
+        <p>You don't have permission to do anything in the foo app.</p>
+    {% endif %}
+
+.. _`テンプレートコンテキスト`: ../templates_python/
+.. _template context: ../templates_python/
+
+.. _Groups:
+
+グループ (Group)
+==================
+
+グループは，パーミッションを適用するユーザのカテゴリを作ったり，一連のユー
+ザに何らかのラベルを適用するための汎用的な手段です．あるユーザは複数のグルー
+プに所属できます．
+
+グループに所属したユーザは，そのグループに許可されているパーミッションを自
+動的に得ます．例えば， ``Site editors`` というグループに
+``can_edit_home_page`` というパーミッションをがあれば，そのグループに属する
+ユーザはみな,  ``can_edit_home_page`` のパーミッションを持ちます．
+
+パーミッションだけではなく，グループはユーザをカテゴリに分けてラベルを付け
+たり，機能を拡張したりできます．例えば， ``'特別なユーザ'`` のグループを作
+成して，そのグループのユーザ向けに，例えばサイト内のメンバー限定エリアへの
+アクセスを提供したり，メンバーだけに e-mail メッセージを送るといった，特別
+な処理を行うコードを書けます．
+
+.. _Messages:
+
+メッセージ (Message)
+====================
+
+メッセージシステムは，任意のユーザ宛のメッセージをキューしておく軽量な方法
+です．
+
+メッセージは ``User`` に関連づけられます．メッセージには有効期限やタイムス
+タンプの概念はありません．
+
+メッセージは Django admin で何らかの処理の成功を知らせる際に使われています．
+例えば， ``"The poll Foo was created successfully."`` はメッセージで実現さ
+れています．
+
+メッセージの API は単純です:
+
+    * メッセージの追加には， 
+      ``user_obj.message_set.create(message='message_text')`` 
+      を使います．
+    * メッセージの取得と削除には，``user_obj.get_and_delete_messages()``
+      を使います．このメソッドは，該当ユーザのキューに溜っている
+      ``Message`` オブジェクトがあれば，リストにして返し，キュー内の
+      メッセージを削除します．
+
+このビューの例では，システムはプレイリストの作成後に表示されるメッセージを
+保存します::
+
+    def create_playlist(request, songs):
+        # Create the playlist with the given songs.
+        # ...
+        request.user.message_set.create(
+            message="Your playlist was added successfully.")
+        return render_to_response("playlists/create", 
+            context_instance=RequestContext(request))
+
+``RequestContext`` を使うと，現在のログインユーザとそのメッセージをテンプレー
+ト変数 ``{{ messages }}`` として使えます．メッセージを表示するためのテンプ
+レートコード例を示します::
+
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+``RequestContext`` は ``get_and_delete_messages`` を背後で呼び出すので，メッ
+セージは表示されなくても消去されることに注意してください．
+
+最後に，このメッセージフレームワークはユーザデータベースに登録されているユー
+ザに対してしか動作しないことに注意して下さい．匿名ユーザにメッセージを送る
+には， `セッションフレームワーク`_ を使って下さい．
+
+.. _`セッションフレームワーク`: ../sessions/
+.. _session framework: ../sessions/
+
+
+.. _Other authentication sources:
+
+他の認証データソースを使う
+==========================
+
+ほとんどのケースでは， Django についてくる認証メカニズムで十分のはずですが，
+場合によっては別の認証データソース (authentication source) をフックしたい，
+すなわち，Django 外のユーザ名やパスワードデータや認証メソッドを使いたいよう
+なケースもあることでしょう．
+
+例えば，会社が LDAP 構成を使って社員のユーザ名やパスワードを管理していると
+しましょう．ネットワーク管理者にとっても，またユーザ自身にとっても， LDAP
+とDjango ベースのアプリケーションの双方で別々のアカウントを維持するのはいさ
+さか骨の折れる作業です．
+
+こうした状況を扱うために， Django の認証システムは別の認証ソースをプラグイ
+ンできるようになっています． Django がデフォルトで使っているデータベースの
+スキームをオーバライドしたり，デフォルトのシステムを他のシステムと並列して
+動作させたりできます．
+
+.. _Specifying authentication backends:
+
+他の認証バックエンドを指定する
+------------------------------
+
+舞台裏では， Django は認証に使う「認証バックエンド」のリストを維持していま
+す．前述の「ユーザをログインさせる」で説明したように
+``django.contrib.auth.authenticate()`` を呼び出すと，Django は全ての認証バッ
+クエンドにわたって認証テストを試みます．最初の認証メソッドに失敗すると次の
+認証バックエンド，という具合にして，認証に成功しない限り，全てのバックエン
+ドを試すまで続けます．
+
+認証に使うバックエンドのリストは ``AUTHENTICATION_BACKENDS`` 設定に指定しま
+す．この値は Python モジュールパス名からなるタプルで，認証方法を実装したク
+ラスの名前を指定します．認証クラスは Python パス上のどこにあってもかまいま
+せん．
+
+デフォルトでは， ``AUTHENTICATION_BACKENDS`` の値は::
+
+    ('django.contrib.auth.backends.ModelBackend',)
+
+に設定されています．このクラスは， Django のユーザデータベースをチェックす
+る認証スキームです．
+
+``AUTHENTICATION_BACKENDS`` の順番には意味があり，同じユーザ名とパスワード
+が複数のバックエンドで有効な値であったとしても， Django は最初にユーザ名と
+パスワードがマッチした時点で認証処理を停止します．
+
+.. _Writing an authentication backend:
+
+認証バックエンドを作成する
+--------------------------
+
+認証バックエンドの実体は， ``get_user(id)`` と
+``authenticate(**credentials)`` という二つのメソッドを実装したクラスです．
+
+``get_user`` メソッドはユーザ名，データベース ID などを表す引数 ``id`` とり，
+対応する ``User`` オブジェクトを返します．
+
+``authenticate`` メソッドは証明情報，すなわちユーザ名とパスワードなどをキー
+ワード引数の形で受け取ります．ほとんどの場合，以下のような形式をとります::
+
+    class MyBackend:
+        def authenticate(self, username=None, password=None):
+            # Check the username/password and return a User.
+
+以下のようにトークンに対する認証を行うようにも書けます::
+
+    class MyBackend:
+        def authenticate(self, token=None):
+            # Check the token and return a User.
+
+どちらの方法でも， ``authenticate`` は受け取った証明情報をチェックし，証明
+情報が有効な場合，対応する ``User`` オブジェクトを返さねばなりません．証明
+情報が無効なら， ``None`` を返します．
+
+Django の admin システムは，冒頭で説明した Django の ``User`` オブジェクト
+と強くカップリングしています．従って，今のところ自作の認証バックエンドを扱
+うには， (LDAP ディレクトリや外部の SQL データベースなどのような) 別のバッ
+クエンド上のユーザに対して Django の ``User`` オブジェクトを生成するのがベ
+ストです．あらかじめスクリプトを書いておいてもよいですし，ユーザが最初にロ
+グインした際に， ``authenticate`` メソッドでその処理を行うようにしてもよい
+でしょう．
+
+以下に示すバックエンドの例では， ``settings.py`` ファイルに定義されたユーザ
+名とパスワードに対して認証を行い，ユーザが最初に認証を行ったときに ``User``
+オブジェクトを生成します::
+
+    from django.conf import settings
+    from django.contrib.auth.models import User, check_password
+
+    class SettingsBackend:
+        """
+        Authenticate against the settings ADMIN_LOGIN and ADMIN_PASSWORD.
+
+        Use the login name, and a hash of the password. For example:
+
+        ADMIN_LOGIN = 'admin'
+        ADMIN_PASSWORD = 'sha1$4e987$afbcf42e21bd417fb71db8c66b321e9fc33051de'
+        """
+        def authenticate(self, username=None, password=None):
+            login_valid = (settings.ADMIN_LOGIN == username)
+            pwd_valid = check_password(password, settings.ADMIN_PASSWORD)
+            if login_valid and pwd_valid:
+                try:
+                    user = User.objects.get(username=username)
+                except User.DoesNotExist:
+                    # Create a new user. Note that we can set password
+                    # to anything, because it won't be checked; the password
+                    # from settings.py will.
+                    user = User(username=username, password='get from settings.py')
+                    user.is_staff = True
+                    user.is_superuser = True
+                    user.save()
+                return user
+            return None
+
+        def get_user(self, user_id):
+            try:
+                return User.objects.get(pk=user_id)
+            except User.DoesNotExist:
+                return None

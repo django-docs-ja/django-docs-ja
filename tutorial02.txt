@@ -1,0 +1,501 @@
+=====================================
+はじめての Django アプリ作成，その 2
+=====================================
+
+:revision-up-to: 4805 (release 0.96)
+
+このチュートリアルは `チュートリアルその 1`_ の続きです．ここでは，引続き
+Web 投票アプリケーションの開発を例にして，Django が自動生成する管理サイト
+(admin サイト) を焦点に解説します．
+
+.. _`チュートリアルその 1`: ../tutorial01/
+.. _Tutorial 1: ../tutorial1/
+
+.. admonition:: 設計哲学
+
+    コンテンツの追加や変更，削除を行うためのスタッフや顧客向けの admin サイ
+    ト構築は，創造性の欠けた退屈なものです．そこで， Django ではモデルを管
+    理するための admin インタフェースを完全に自動化しています．
+
+    Django はニュースルーム環境で開発されました．ニュースルーム環境では，
+    「コンテンツの作成者 (content publisher)用」と「公開用 (public) 」サイ
+    トをきわめて明確に区別しています．サイト管理者は新たな話題やイベント，
+    スポーツのスコアなどの入力に使い，コンテンツは公開用サイト上で表示され
+    ます． Django は，サイト管理者向けの一元化されたコンテンツ編集インタフェー
+    スの提供という問題を解決しているのです．
+
+    admin は一般のサイトを訪問者に使ってもらうためのものではなく，
+    サイト管理者のためのものなのです．
+
+.. _Activate the admin site:
+
+admin サイトの有効化
+====================
+
+デフォルトでは， Django の admin サイトは有効ではなく，自分で選択して有効に
+せねばなりません． admin サイトを有効にするには，以下の 3 つの作業が必要で
+す:
+
+    * ``INSTALLED_APPS`` 設定に ``"django.contrib.admin"`` を追加します．
+    * ``python manage.py syncdb`` を実行します．新たなアプリケーションを
+      ``INSTALLED_APPS`` に追加したので，データベースを更新せねばなりません．
+    * ``mysite/urls.py`` ファイルを編集し， "Uncomment this for admin:" と
+      書かれた行の次の行のコメントアウトを解除します．このファイルは
+      URLconf といいます． URLconf についてはチュートリアルの次の部で解説し
+      ます．今はただ，この設定が URL をアプリケーションに対応づけていること
+      だけを覚えておきましょう．
+
+開発サーバの起動
+================
+
+開発用サーバを起動して， admin サイトを探検してみましょう．
+
+チュートリアルその 1 で，開発サーバを以下のように起動したのを思い出してくだ
+さい::
+
+    python manage.py runserver
+
+次はブラウザを起動して，ローカルドメインの "/admin/" ，つまり
+http://127.0.0.1:8000/admin/ にアクセスします．以下のような admin のログイ
+ン画面が表示されるはずです:
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin01.png
+   :alt: Django admin login screen
+
+.. _Enter the admin site:
+
+admin サイトに入る
+==================
+
+さあログインしてみましょう．(チュートリアルその 1 で，スーパユーザのアカウ
+ントを作成したはずです．覚えていますか?) ログインしたら， Django の admin
+インデクスページが表示されるはずです:
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin02t.png
+   :alt: Django admin index page
+   :target: http://media.djangoproject.com/img/doc/tutorial/admin02.png
+
+デフォルトでは，「グループ (Groups)」と「ユーザ (Users)」という 2 つのタイ
+プの編集可能なコンテンツが表示されるはずです．これらはデフォルトで Django
+に付属しているコアの機能です．
+
+(`ログインできない場合はこちらを参照してください`_)
+
+.. _`ログインできない場合はこちらを参照してください`: ../faq/#the-admin-site
+.. _"I can't log in" questions: ../faq/#the-admin-site
+
+.. _Make the poll app modifiable in the admin:
+
+Poll モデルを admin で編集できるようにする
+==========================================
+
+ところで， polls アプリケーションはどこにあるんでしょう？ admin のインデク
+スページを見ても表示されていませんね．
+
+実は，まだ一つやるべきことが残っていました． ``Poll`` モデルの中で，
+``Poll`` オブジェクトに admin インタフェースを持たせるよう指定する必要があ
+るのです． ``mysite/polls/models.py`` ファイルを編集して，モデルの中に
+``Admin`` という名前のクラスを作ります． クラスの定義には ``pass`` と書いて
+空にしておきます::
+
+    class Poll(models.Model):
+        # ...
+        class Admin:
+            pass
+
+``class Admin`` の中には，このモデルが Django admin でどのように表示される
+かを制御するための設定をいれます．とはいえ，設定は全て省略可能なので，空の
+クラスをつくっておくだけで「デフォルトの設定でオブジェクトの admin インタ
+フェースを作成」できます．
+
+Django admin ページをリロードして，どんな変化が起きたか見てみましょう．
+開発サーバはプロジェクトを自動的にリロードしてくれるので，コードに加えた変
+更はただちにブラウザで確認できます．
+
+.. _Explore the free admin functionality:
+
+admin の機能を探究してみる
+==========================
+
+``Poll`` に内部クラス ``Admin`` を持たせたことで， Django は ``Poll`` を
+admin ページに表示するようになります:
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin03t.png
+   :alt: Django admin index page, now with polls displayed
+   :target: http://media.djangoproject.com/img/doc/tutorial/admin03.png
+
+「Polls」 をクリックしてみてください． 変更リスト (change list) のページ
+に入ります．このページはデータベース上の全ての ``Poll`` オブジェクトを表示
+し，オブジェクトを選択して変更できるようになっています．前のチュートリアル
+で作成した 「What's up」という ``Poll`` オブジェクトがありますね．
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin04t.png
+   :alt: Polls change list page
+   :target: http://media.djangoproject.com/img/doc/tutorial/admin04.png
+
+「What's up?」をクリックして編集してみましょう:
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin05t.png
+   :alt: Editing form for poll object
+   :target: http://media.djangoproject.com/img/doc/tutorial/admin05.png
+
+以下の点に注意してください:
+
+* フォームは Poll モデルをもとに自動的に生成されています．
+* モデルのフィールドの型によって (``models.DateTimeField``, 
+  ``models.CharField`` などの) 適切な HTML 入力ウィジェットが対応しています．
+  各タイプのフィールドは， Django admin でデータをどのように表示するかを知っ
+  ています．
+* ``DateTimeField`` には JavaScript のショートカットがついています．日付
+  (Date) のカラムには「今日 (Today)」へのショートカットと，カレンダーのポッ
+  プアップボタンがあります．時刻 (Time) のカラムには「現在 (Now)」へのショー
+  トカットと，よく入力される時間のリストを表示するポップアップボタンがあり
+  ます．
+
+ページの末尾の部分には操作ボタンがいくつか表示されています:
+
+* 保存 (Save) -- 変更を保存して，このモデルの変更リストのページに戻ります．
+* 保存して編集を続ける (Save and continue editing) -- 変更を保存して，この
+  オブジェクトの編集ページをリロードします．
+* 保存してもう一つ追加 (Save and add another) -- 変更を保存して，このモデル
+  のオブジェクトを新規追加するための空の編集ページをロードします．
+* 削除 (Delete) -- 削除確認ページを表示します．
+
+「今日」や「現在」ショートカットをクリックして，「Date published」を変更し
+てみましょう．変更したら，「保存して編集を続ける」を押します．次に，右上に
+ある「履歴 (History)」をクリックしてみましょう．ユーザが Django admin 上で
+このオブジェクトに対して行った全ての変更履歴を，変更時刻と変更を行ったユー
+ザの名前つきでリストにしたページを表示します:
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin06t.png
+   :alt: History page for poll object
+   :target: http://media.djangoproject.com/img/doc/tutorial/admin06.png
+
+.. _Customize the admin form:
+
+admin フォームのカスタマイズ
+============================
+
+しばらく操作してみて，これだけの機能をコードを全然書かずに実現したことに驚
+嘆しましょう．
+
+少しカスタマイズしてみましょう． 内部クラス ``Admin`` の ``fields`` という
+クラス属性を追加すると，フィールドの並び順を明示的に変更できます::
+
+        # ...
+        class Admin:
+            fields = (
+                (None, {'fields': ('pub_date', 'question')}),
+            )
+
+これで，「Publication date」フィールドの表示位置が， 2 番目から先頭になりま
+す:
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin07.png
+   :alt: Fields have been reordered
+
+二つしかフィールドがないので，あまりぱっとした変化ではありませんね．しかし
+何ダースものフィールドを操作するような admin フォームでは，直感的なフィール
+ドの並び順というものはユーザビリティの重要な要素です．
+
+同じく何ダースもフィールドがある場合，フォームを複数のフィールドセットに分
+割したいこともあるでしょう::
+
+        class Admin:
+            fields = (
+                (None, {'fields': ('question',)}),
+                ('Date information', {'fields': ('pub_date',)}),
+            )
+
+``fields`` の各タプルの先頭の要素はフィールドセットのタイトルになります．
+フォームは以下のようになります:
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin08t.png
+   :alt: Form has fieldsets now
+   :target: http://media.djangoproject.com/img/doc/tutorial/admin08.png
+
+各フィールドセットには任意の HTML クラスを指定できます． Django では
+``"collapse"`` というクラスを提供していますが，このクラスを指定すると，フィー
+ルドセットは最初折り畳まれた状態で表示されます．これは普段は使わないフィー
+ルドがたくさんあるようなフォームを使っている場合に便利です::
+
+        class Admin:
+            fields = (
+                (None, {'fields': ('question',)}),
+                ('Date information', {'fields': ('pub_date',), 
+                                      'classes': 'collapse'}),
+            )
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin09.png
+   :alt: Fieldset is initially collapsed
+
+.. _Adding related objects:
+
+リレーションを張ったオブジェクトの追加
+======================================
+
+OK， Poll の admin ページはできました．しかし ``Poll`` は複数の ``Choice``
+を持つのに， admin ページには表示されていませんね．
+
+今のところは．
+
+この問題の解決法は二つあります．一つ目は， ``Choice`` モデルに ``Poll`` と
+同じように ``Admin`` クラスを指定するという方法です．その場合，コードは以下
+のようになるでしょう::
+
+    class Choice(models.Model):
+        # ...
+        class Admin:
+            pass
+
+これで Django admin サイトで「Choice」 を選べるようになります．「Choice の
+追加」フォームは以下のようになります:
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin10.png
+   :alt: Choice admin page
+
+このフォームでは「Poll」フィールドは選択ボックスになり，データベース上の全
+ての Poll オブジェクトを選べるようになります． Django は ``ForeignKey`` を
+表示する時には ``<select>`` ボックスを使わねばならないということを知ってい
+るのです．今の時点では， Poll はデータベース上に一つしかないはずですね．
+
+Poll フィールドの隣に「もう一つ追加 (Add Another)」リンクがあるのに注意して
+ください． ForeignKey の関係にあるオブジェクトなら，何もしなくてもこのリン
+クが表示されます．「もう一つ追加」をクリックすると，「Poll を追加 (Add
+Poll)」というポップアップウィンドウを表示します．このウィンドウで Poll を追
+加して「保存」を押すと， Django は Poll をデータベースに保存して，もとの
+「Choice の追加」フォームに選択済みの項目として動的に追加します．
+
+しかし，この方法は Choice オブジェクトをシステムに追加するには効率的ではあ
+りません．むしろ， Poll オブジェクトを追加する時に Choice をひと揃い追加出
+来た方が便利ですよね．そうしてみましょう．
+
+Choice モデルから ``Admin`` を削除して， ``ForeignKey(Poll)`` フィールドを
+以下のように編集してください::
+
+    poll = models.ForeignKey(Poll, edit_inline=models.STACKED, 
+                             num_in_admin=3)
+
+この行は Django に対して，「Choice オブジェクトは Poll の admin ページから
+編集する．デフォルトでは， 3 つの Choice を表示するのに十分なフィールドを用
+意すること」と指示します．
+
+次に， ``Choice`` の他のフィールドを変更して， ``core=True`` を指定します::
+
+    choice = models.CharField(maxlength=200, core=True)
+    votes = models.IntegerField(core=True)
+
+Django の受ける指示はこうなります: 「Choice を Poll の admin ページで編集す
+る時には， 'choice' フィールドと 'votes' フィールドの指定が必要．これらの
+フィールドのうちすくなくとも一つが指定されていれば，新たな Choice オブジェ
+クトを作成し，どちらのフィールドの値も削除したらその Choice オブジェクトを
+削除すること」
+
+「Poll を追加」ページをロードして，どんな表示になったか見てみましょう:
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin11t.png
+   :alt: Add poll page now has choices on it
+   :target: http://media.djangoproject.com/img/doc/tutorial/admin11.png
+
+変わった点をみてみましょう: リレーション相手である Choice を表示するために
+3 つのスロットがあります (``num_in_admin`` に指定した数ですね)．ただし，す
+でに作成したオブジェクトを「変更する (Change)」ページを開いた場合には，
+Choice の数よりも一つ余分のスロットを表示します． (つまり，追加できるリレー
+ション相手のオブジェクトの上限はハードコードされていません．) ちなみに，
+Poll を変更するときに，常に Choice フィールドを 3 つ余分に追加したい場合に
+は ``num_extra_on_change=3`` のようにします．
+
+ところで，これはちょっと問題になりそうです． Choice オブジェクトを入力する
+ためのフィールドを全部表示しようとすると，相当な広さのスクリーンが必要です．
+というわけで， Django にはインラインでリレーション相手のオブジェクトを表示
+する方法をもう一つ提供しています::
+
+    poll = models.ForeignKey(Poll, edit_inline=models.TABULAR, 
+                             num_in_admin=3)
+
+``edit_inline`` を ``models.STACKED`` から ``models.TABULAR`` に変更すると，
+リレーション相手のオブジェクトはよりコンパクトなテーブル形式で表示されます:
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin12.png
+   :alt: Add poll page now has more compact choices
+
+.. _Customize the admin change list:
+
+admin の変更リストページをカスタマイズする
+===========================================
+
+さあ，これで Poll の admin ページはだいぶよくなってきました．今度は「変更リ
+スト」ページをすこしいじりましょう．このページはシステム上の全ての Poll を
+表示します．
+
+作業前の change list ページは以下のようになっています:
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin04t.png
+   :alt: Polls change list page
+   :target: http://media.djangoproject.com/img/doc/tutorial/admin04.png
+
+デフォルトでは， Django はオブジェクトの ``str()`` を表示しますが，各フィー
+ルドの値も表示されていると便利でしょう．表示させるには ``list_display`` オ
+プションを使います． このオプションには，カラム表示したいフィールドの名前を
+タプルにして指定します::
+
+    class Poll(models.Model):
+        # ...
+        class Admin:
+            # ...
+            list_display = ('question', 'pub_date')
+
+おまけとして，チュートリアル 1 で定義したカスタムメソッド
+``was_published_today`` も追加してみましょう::
+
+    list_display = ('question', 'pub_date', 'was_published_today')
+
+これで， Poll の変更リストのページは以下のようになります:
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin13t.png
+   :alt: Polls change list page, updated
+   :target: http://media.djangoproject.com/img/doc/tutorial/admin13.png
+
+カラムのヘッダをクリックすると，カラムの値に応じてエントリを並べ換えできま
+す．ただし ``was_published_today`` ヘッダは例外で，これはメソッドの戻り値を
+使った並べ換えをサポートしていないからです． ``was_published_today`` のカラ
+ムヘッダのデフォルト値がメソッドの名前になっている (アンダースコアは空白に
+置き換わっている) ことにも注意して下さい．メソッドに ``short_description``
+属性を指定すればカラム名を変更できます::
+
+    def was_published_today(self):
+        return self.pub_date.date() == datetime.date.today()
+    was_published_today.short_description = 'Published today?'
+
+
+もう一点， Poll の変更リストを改良して，フィルタをを加えましょう． 
+以下の行を ``class Admin`` の中に入れます::
+
+    list_filter = ['pub_date']
+
+これで，「フィルタ (Filter)」サイドバーができ，変更リストを ``pub_date``
+フィールドの値に従ってフィルタできるようになります:
+
+.. image:: http://media.djangoproject.com/img/doc/tutorial/admin14t.png
+   :alt: Polls change list page, updated
+   :target: http://media.djangoproject.com/img/doc/tutorial/admin14.png
+
+表示されるフィルタのタイプは，フィルタに使うフィールドのタイプによって変わ
+ります． ``pub_date`` は ``DateTimeField`` なので， Django はデフォルトの
+フィルタのオプションが「すべての日 (Any date)」，「今日 (Today)」，「過去 7
+日間 (Past 7 days)」，「今月 (This month)」そして「今年 (This year)」である
+と考えます．
+
+細工は隆々ですね．検索機能を追加してみましょう::
+
+    search_fields = ['question']
+
+これで変更リストの上部に検索ボックスが表示されます．ユーザが検索語を入力
+すると， Django は ``question`` フィールドを検索します．フィールドはいくつ
+でも使えますが，舞台裏では ``LIKE`` クエリを使っているので，データベースに
+負荷をかけないためには常識的な検索語を指定しましょう．
+
+最後に， Poll オブジェクトには日付データがあるので，日付を使って絞り込める
+と便利なはずです．以下の一行を追加しましょう::
+
+    date_hierarchy = 'pub_date'
+
+これで，日付を使った階層的なナビゲーションが変更リストページの上部に追加さ
+れます．トップレベルでは，エントリのある年を表示します．その下は月になって
+いて，最後は日ごとにエントリを表示します．
+
+さて，変更リストには何もしなくてもページ分割機能がある，ということをここで
+お知らせしておいた方がよいでしょう．デフォルトではページあたり 50 個の要素
+を表示します．ページ分割，検索ボックス，フィルタ，日付による階層化，カラム
+ヘッダを使った並べ換えといった変更リストの機能は，すべてが協調して思いのま
+まに動作するのです．
+
+.. _Customize the admin look and feel:
+
+admin のルック & フィールをカスタマイズする
+===========================================
+
+「Django 管理 (Django adminstration)」とか "example.com" といったテキストが
+admin ページの上部に表示されていますが，これはいささか滑稽ですね．ただし，
+これは単なるプレースホルダテキストにすぎません．
+
+変更するのは簡単で， Django のテンプレートシステムを使います． Django の
+admin サイトは，それ自身 Django で作られているので，インタフェースは Django
+のテンプレートシステムを使っているのです (なんてメタな！)
+
+設定ファイル (``mysite/settings.py`` でしたよね) を開いて，
+``TEMPLATE_DIRS`` という設定を探して下さい． ``TEMPLATE_DIRS`` はファイルシ
+ステム上のディレクトリ名からなるタプルで， Django テンプレートをロードする
+ときに探す場所を指定します．つまり検索パスです．
+
+デフォルトでは， ``TEMPLATE_DIRS`` には何も指定されていません．一行追加して，
+Django に自作テンプレートの置き場所を教えましょう::
+
+    TEMPLATE_DIRS = (
+        "/home/my_username/mytemplates", # 自分の環境に合わせて変更してください．
+    )
+
+デフォルトの Django admin サイト用テンプレート置場
+(``django/contrib/admin/templates``) から， ``admin/base_site.html`` という
+テンプレートをコピーして， ``TEMPLATE_DIRS`` 上の ``admin`` というディレク
+トリ下に置きます．例えば， ``TEMPLATE_DIRS`` に 
+``"/home/my_username/mytemplates"`` と 設定していれば， 
+``django/contrib/admin/templates/admin/base_site.html`` を
+``/home/my_username/mytemplates/admin/base_site.html`` にコピーします． 
+``admin`` というサブディレクトリを作るのを忘れないようにして下さい．
+
+ファイルを編集して， Django と書かれた部分を自分のサイト名に変え， URL もふ
+さわしいものに変更してください．
+
+Django のデフォルトの admin テンプレートはどれもオーバライド可能です．テン
+プレートをオーバライドするには， ``base_site.html`` と同じ，つまりデフォル
+トのディレクトリからカスタムディレクトリにコピーして編集するという手順をとっ
+てください．
+
+賢明な読者はこう疑問に思うでしょう:「``TEMPLATE_DIRS`` はデフォルトで何も指
+定していないのに， Django はどうしてデフォルトのテンプレートを捜し当てられ
+るのだろう？」答えは，「デフォルトでは， Django はテンプレートが見つからな
+い場合，自動的に各アプリケーションパッケージの ``templates/`` サブディレク
+トリ下を探すようフォールバックるようになっている」です．詳しくは
+`テンプレートローダタイプの解説`_ を参照してください．
+
+.. _`テンプレートローダタイプの解説`: ../templates_python/#loader-types
+.. _loader types documentation: ../templates_python.html/#loader-types
+
+.. _Customize the admin index page:
+
+admin インデクスページのカスタマイズ
+====================================
+
+もしかすると，同じようにして Django admin サイトのインデクスページのルック
+& フィールをカスタマイズしたくなるかもしれませんね．
+
+デフォルトでは，インデクスページは ``INSTALLED_APPS`` 設定に従って全てのア
+プリケーションを表示します．しかし表示の順番はランダムですし，もしかすると
+レイアウトを全然違うものに変えたいと思うかも知れません．なんにせよ，インデ
+クスページというものは admin で最も重要なページであり，簡単に使えなければな
+らないはずです．
+
+カスタマイズすべきテンプレートは ``admin/index.html`` です (前節の
+``admin/base_site.html`` の場合と同じように，デフォルトのディレクトリからカ
+スタムテンプレート置場のディレクトリにコピーしてください)．ファイルを編集す
+ると， ``{% get_admin_app_list as app_list %}`` というテンプレートタグが見
+つかるはずです．ここがインストールされたアプリケーションを表示しているミソ
+の部分です．このタグの代りに，特定のオブジェクトの admin ページのリンクだけ
+をハードコードして，自分が最良と思う形にできます．
+
+この手の作業について， Django はもう一つショートカットを提供しています．
+``python manage.py adminindex polls`` を実行すると， admin インデクスページ
+に取り込んで使えるようなひとまとまりのテンプレートコードを出力します．作業
+の足掛かりにすると便利でしょう．
+
+Django  admin サイトのルック & フィールをカスタマイズする詳しい方法について
+は， `Django admin CSS ガイド`_ を参照してください．
+
+admin サイトを使いこなせるようになったら， `チュートリアルその 3`_ に進んで，
+poll アプリケーションの公開用ビュー作成にとりかかりましょう．
+
+.. _`Django admin CSS ガイド`: ../admin_css/
+.. _`チュートリアルその 3`: ../tutorial03/
+.. _ Django admin CSS guide: ../admin_css/
+.. _part 3 of this tutorial: ../tutorial3/

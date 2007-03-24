@@ -1,0 +1,193 @@
+==========================
+データベースのサポート状況
+==========================
+
+:revision-up-to: 4805 (release 0.96)
+
+Django は可能な限り全てのデータベースバックエンドをサポートしようとしていま
+すが，残念ながら全てのサーバが全く同じ仕様というわけではないので，どの機能
+をサポートすべきか，どういった仕様を仮定するかといった設計上の判断を下して
+います．
+
+このドキュメントでは，このドキュメントでは， Django を使う上で関係のあるデー
+タベース機能について説明します．ただし，このドキュメントは特定のデータベー
+スサーバ向けのドキュメントとして書かれたものではなく，リファレンスマニュア
+ルでもありません．
+
+.. _MySQL Notes:
+
+MySQL に関する注意
+==================
+
+Django はデータベースがトランザクションや参照の一貫性 (referential
+integrity)， Unicode (UTF-8 エンコーディング) をサポートしていることを想定
+して書かれています．好運なことに， MySQL_ バージョン 3.23 以降でこれらの機
+能全てをサポートしています．従って， 3.23 や 4.0 をバックエンドとして使うの
+は可能なのですが， 4.1 や 5.0 を使った方がトラブルに巻き込まれにくいでしょ
+う．
+
+MySQL 4.1
+---------
+
+`MySQL 4.1`_ では，文字セットのサポートを大幅に改良しています． 4.1 では，
+データベース全体から，テーブル毎，カラム毎にいたるまで個別にデフォルトの文
+字セットを指定できます．以前のバージョンでは，サーバ全体に対する文字セット
+の設定しかできませんでした．また， 4.1 になってはじめてオンザフライで文字セッ
+トを変更できるようになりました． 4.1 にはビューのサポートもありますが，
+Django はまだこの機能をサポートしていません．
+
+MySQL 5.0
+---------
+
+`MySQL 5.0`_ では，全てのデータベーススキーマに関する詳細なデータの入った
+``information_schema`` というデータベースが追加されました． 
+``information_schema`` が存在すると， Django はこのデータベースに対して
+``inspectdb`` 機能を適用します． 5.0 ではまた，ストアドプロシジャのサポート
+も追加されましたが， Django はまだこの機能をサポートしていません．
+
+.. _MySQL: http://www.mysql.com/
+.. _`MySQL 4.1`: http://dev.mysql.com/doc/refman/4.1/en/index.html
+.. _`MySQL 5.0`: http://dev.mysql.com/doc/refman/5.0/en/index.html
+
+.. _Storage Engines:
+
+ストレージエンジン
+------------------
+
+MySQL は複数の 
+`ストレージエンジン`_
+(以前はテーブルタイプ: table type と呼ばれていたもの) を選択できます．
+デフォルトのストレージエンジンはサーバ設定で変更できます．
+
+デフォルトのストレージエンジンは MyISAM_ です． MyISAM の短所は，現状ではト
+ランザクションや外部キーをサポートしていないという点です．一方， MyISAM は，
+現状で，全文インデクスの生成や全文検索をサポートしている唯一のストレージエ
+ンジンです．
+
+InnoDB_ エンジンは完全なトランザクション機能と外部キー参照をサポートしてい
+ます．
+
+BDB_ エンジンは InnoDB と同様，完全なトランザクション機能を外部キー参照をサ
+ポートしていますが，やや時代送れになりつつあるようです．
+
+SolidDB_ や Falcon_ といった `その他のストレージエンジン <http://dev.mysql.com/doc/refman/5.1/en/storage-engines-other.htm>`_ 
+まだまだ圏外の話です．現状では，おそらく InnoDB が最良の選択でしょう．
+
+.. _storage_engines: http://dev.mysql.com/doc/refman/5.0/en/storage-engines.html
+.. _ストレージエンジン: storage_engines_
+.. _MyISAM: http://dev.mysql.com/doc/refman/5.0/en/myisam-storage-engine.html
+.. _BDB: http://dev.mysql.com/doc/refman/5.0/en/bdb-storage-engine.html
+.. _InnoDB: http://dev.mysql.com/doc/refman/5.0/en/innodb.html
+.. _Other storage engines: http://dev.mysql.com/doc/refman/5.1/en/storage-engines-other.html
+.. _SolidDB: http://forge.mysql.com/projects/view.php?id=139
+.. _Falcon: http://dev.mysql.com/doc/falcon/en/index.html
+
+MySQLdb
+-------
+
+`MySQLdb`_ は Python から MySQL にアクセスするためのインタフェースです．
+MySQLdb はバージョン 1.2.1 から MySQL-4.1 以降をサポートするようになりまし
+た．4.1 以前のバージョンを使っているなら， *たぶん* 1.2.0 でも動作するでしょ
+う．
+
+.. _MySQLdb: http://sourceforge.net/projects/mysql-python
+
+.. _Creating your database:
+
+データベースを作成する
+----------------------
+
+コマンドラインツールを使って，以下の SQL を発行すれば 
+`データベースを作成 <http://dev.mysql.com/doc/refman/5.0/en/create-database.html>`_
+できます::
+
+  CREATE DATABASE <dbname> CHARACTER SET utf8;
+  
+これで，全てのテーブルとカラムがデフォルトで UTF-8 を使うようになります．
+  
+.. _create your database: http://dev.mysql.com/doc/refman/5.0/en/create-database.html
+
+.. _Connecting to the database:
+
+データベースに接続する
+----------------------
+
+`設定に関するドキュメント <settings/#database-engine>`_ も参照してください．
+
+接続に関する設定は，以下の順に適用されます:
+
+ 1. ``DATABASE_OPTIONS``
+ 2. ``DATABASE_NAME``, ``DATABASE_USER``, ``DATABASE_PASSWORD``, ``DATABASE_HOST``,
+    ``DATABASE_PORT``
+ 3. MySQL のオプション設定ファイル
+
+別の言い方をするなら， ``DATABASE_OPTIONS`` 内にデータベースの名前を設定す
+ると，その内容は ``DATABASE_NAME`` よりも優先順位が高くなり，さらに
+``DATABASE_NAME`` は 
+`MySQL のオプション設定ファイル <http://dev.mysql.com/doc/refman/5.0/en/option-files.html>`_
+の内容をオーバライドするということです．
+
+MySQL のオプション設定ファイルを使う例を以下に示します::
+
+  # settings.py
+  DATABASE_ENGINE = "mysql"
+  DATABASE_OPTIONS = {
+      'read_default_file': '/path/to/my.cnf',
+      }
+      
+  # my.cnf
+  [client]
+  database = DATABASE_NAME
+  user = DATABASE_USER
+  passwd = DATABASE_PASSWORD
+  default-character-set = utf8
+
+この他にも，MySQLdb の接続オプションには， ``ssl``, ``use_unicode``,
+``init_command``, ``sql_mode`` といった便利なものがあります．詳しくは
+`MySQLdb のドキュメント <http://mysql-python.sourceforge.net/>`_ を参照して
+ください．
+  
+.. _settings documentation: http://www.djangoproject.com/documentation/settings/#database-engine
+.. _MySQL option file: http://dev.mysql.com/doc/refman/5.0/en/option-files.html
+.. _MySQLdb documentation: http://mysql-python.sourceforge.net/
+
+.. _Creating your tables:
+
+テーブルを作成する
+------------------
+
+Django はスキーマを作成する際にストレージエンジンを指定しません．そのため，
+テーブルは常にサーバに設定されたデフォルトのストレージエンジンで作成されま
+す．作成されるテーブルを特定のタイプにしたければ，データベースサーバのデフォ
+ルトストレージエンジンを Django で使いたいストレージエンジンに合わせるのが
+一番簡単です．
+
+ホスティングサービスを使っていて，サーバのデフォルトのストレージエンジンを
+変更できない場合，二つの選択肢があります．
+
+  * テーブルが作成された後に，以下のようなクエリを発行して，ストレージ
+    エンジンを (InnoDB) などに変更します::
+  
+      ALTER TABLE <tablename> ENGINE=INNODB;
+
+    テーブルが沢山ある場合には，これは相当骨がおれることでしょう．
+
+  * あるいは，テーブルを作成する前に， MySQLdb の ``init_command`` オプショ
+    ンを使います::
+
+      DATABASE_OPTIONS = {
+        ...
+        "init_command": "SET storage_engine=INNODB",
+        ...
+        }
+
+    このように設定しておくと，接続時にデフォルトのストレージエンジンが変更
+    されます．ただし，テーブルが全て作成され，運用環境で動き始めたら，この
+    オプションを外しておかねばなりません．
+
+  * もう一つ， syncdb 時にストレージエンジンを変更する方法が， Wiki の
+    `AlterModelOnSyncDB <http://code.djangoproject.com/wiki/AlterModelOnSyncDB>`_
+    にあります．
+
+.. _AlterModelOnSyncDB: http://code.djangoproject.com/wiki/AlterModelOnSyncDB
+

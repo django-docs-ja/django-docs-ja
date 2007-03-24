@@ -1,0 +1,137 @@
+=================================
+Django オブジェクトのシリアライズ
+=================================
+
+:revision-up-to: 4805 (release 0.96)
+
+.. note::
+    
+    この API は現在まだ開発のまっただなかにあり，おそらく将来劇的に変化する
+    でしょう．
+    
+    注意してください．
+
+Django の整列化フレームワークを使うと， Django オブジェクトを他の形式に「翻
+訳」できます．通常，こうした形式はテキストベースで， Django オブジェクトを
+ネットワーク越しに伝送するために使われますが， Django のシリアライザは任意
+の形式 (テキストベースもそうでないものも) 扱えます．
+
+.. _Serializing data:
+
+データのシリアライズ
+--------------------
+
+高水準では，データのシリアライズは極めて簡単な操作です::
+
+    from django.core import serializers
+    data = serializers.serialize("xml", SomeModel.objects.all())
+
+``serialize`` 関数の引数には，データのシリアライズに使うフォーマット
+(`シリアライズの形式`_ 参照) と，シリアライズ対象の QuerySet_ を指定します
+(実際には，第二引数は Django オブジェクトを返す任意のイテレータにできますが，
+大抵の場合は QuerySet を使うことになるでしょう)．
+
+.. _QuerySet: ../db-api/#retrieving-objects
+
+シリアライザオブジェクトを直接使ってもかまいません::
+
+    XMLSerializer = serializers.get_serializer("xml")
+    xml_serializer = XMLSerializer()
+    xml_serializer.serialize(queryset)
+    data = xml_serializer.getvalue()
+    
+シリアライザオブジェクトを直接使うと，以下のようにファイルライクオブジェク
+ト (もちろん HTTPResponse_ も使えます) に対して直接シリアライズできるので便
+利です::
+
+    out = open("file.xml", "w")
+    xml_serializer.serialize(SomeModel.objects.all(), stream=out)
+
+.. _HTTPResponse: ../request_response/#httpresponse-objects
+
+.. _Deserializing data:
+
+データのデシリアライズ
+----------------------
+
+データのデシリアライズもまた，かなり単純な操作です::
+
+    for obj in serializers.deserialize("xml", data):
+        do_something_with(obj)
+
+見ての通り， ``deserialize`` 関数は ``serialize`` 関数と同様，文字列または
+データストリームを引数にとり，イテレータを返します．
+
+しかしながら，少しだけややこしい部分もあります． ``deserialize`` イテレータ
+の返すオブジェクトは単純な Django オブジェクト *ではなく* ，
+``DeserializedObject`` という特殊なインスタンスです．このインスタンスは
+作成されただけでまだ保存されていないデータであり，リレーションも張られてい
+ません．
+
+``DeserializedObject.save()`` を呼び出すと，データベースにオブジェクトを保
+存します．
+
+上のような仕様から，デシリアライズは，たとえシリアライズされていたデータの
+表現形式が現在のデータベースの構成と一致していなかったとしても非破壊的な操
+作になるよう保証されています．通常， ``DeserializedObject`` インスタンスの
+操作は以下のように行います::
+
+    for deserialized_object in serializers.deserialize("xml", data):
+        if object_should_be_saved(deserialized_object):
+            obj.save()
+            
+換言すれば，通常はデシリアライズしたオブジェクトを保存する場合，前もって保
+存に適しているかどうかを調べます．もちろん，データソースを信頼できるのなら，
+単にデータを保存してもかまいません．
+
+Django オブジェクト自体に対するインスペクションは，
+``deserialized_object.object`` で行えます．
+
+.. _Serialization formats:
+
+シリアライズの形式
+------------------
+
+Django には各種形式のシリアライザが付属しています:
+
+    ==========  ==============================================================
+    名前        情報
+    ==========  ==============================================================
+    ``xml``     単純な XML シリアライザです．
+
+    ``json``    JSON_ シリアライザ (Django に付属の simplejson_ を使ったも
+                の) です． 
+
+    ``python``  「単純な」Python オブジェクト (リスト，辞書，文字列など) の
+                シリアライザです．単体では取り立てて便利ではありませんが，
+                他のシリアライザのベースになっています．
+    ==========  ==============================================================
+
+.. _json: http://json.org/
+.. _simplejson: http://undefined.org/python/#simplejson
+
+.. _Notes For specific serialization formats:
+
+各シリアライズ形式についての注意
+--------------------------------
+
+json
+~~~~
+
+UTF-8 (や，非 ASCII エンコーディング) でエンコードされたデータを JSON シリ
+アライザで扱うには， ``serialize()`` のパラメタに ``ensure_ascii=False`` を
+指定してください．さもないと，出力のエンコードがおかしくなってしまいます．
+
+例::
+
+    json_serializer = serializers.get_serializer("json")
+    json_serializer.serialize(queryset, ensure_ascii=False, stream=response)
+
+.. _Writing custom serializers:
+
+.. XXX
+
+  シリアライザの自作
+  ``````````````````
+
+  XXX ...
