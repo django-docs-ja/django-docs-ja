@@ -2,7 +2,7 @@
 ミドルウェア
 ============
 
-:revision-up-to: 4805 (0.96)
+:revision-up-to: 4805 (release 0.96)
 
 ミドルゥェア (Middleware) とは， Django のリクエスト/レスポンス処理に対する
 フックの集まりです．ミドルウェアは Django の入出力を操作するための軽量かつ

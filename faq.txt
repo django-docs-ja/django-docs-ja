@@ -2,7 +2,7 @@
 Django についてよくある質問
 ===========================
 
-:revision-up-to: 4427 (0.96-pre SVN)
+:revision-up-to: 4805 (release 0.96)
 
 .. contents::
 

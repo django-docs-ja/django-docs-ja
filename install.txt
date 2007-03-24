@@ -2,7 +2,7 @@
 Django のインストール
 =====================
 
-:revision-up-to: 4815 (0.96)
+:revision-up-to: 4805 (release 0.96)
 
 このドキュメントを読めば Django を動かせるようになります．
 

@@ -2,7 +2,7 @@
 複数のデータベースを使う
 ========================
 
-:revision-up-to: 3738 (in multi-db branch)
+:revision-up-to: 4805 (release 0.96)
 
 .. warning:: このドキュメントは multi-db ブランチ
 
