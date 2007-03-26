@@ -2,7 +2,7 @@
 newforms ライブラリ
 ===================
 
-:revision-up-to: 4805 (release 0.96)
+:revision-up-to: 4828 (0.96+ SVN)
 
 ``django.newforms`` は， Django に新たに導入された画期的なフォーム処理ライ
 ブラリで，従来のフォーム／マニピュレータ／バリデータフレームワークである
@@ -919,6 +919,18 @@ Django の古いフォーム／検証フレームワークを使ったことがある人は，この
     <tr><th>Url:</th><td><input type="text" name="url" /></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
+
+.. _Creating custom fields:
+
+カスタムフィールドの作成
+------------------------
+
+組み込みのフィールドクラスが用途に合わなくても，カスタムのフィールドクラス
+は簡単に作成できるので大丈夫です．カスタムのフィールドクラスは
+``django.newforms.Field`` をサブクラス化します．
+フィールドクラスを定義する際の制約は， ``clean()`` メソッドを実装すること，
+``__init__()`` メソッドが前述のコアとなる引数 (``required``, ``label``,
+``initial``, ``widget``, ``help_text``) を持つことだけです．
 
 .. _More coming soon:
 

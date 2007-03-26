@@ -2,7 +2,7 @@
 Django のキャッシュフレームワーク
 =================================
 
-:revision-up-to: 4805 (release 0.96)
+:revision-up-to: 4828 (0.96+ SVN)
 
 動的な Web サイトの根本的なトレードオフ要因とは，まさに動的であるということ
 そのものです．ユーザがページをリクエストするたびに，サーバはデータベースへ
@@ -79,11 +79,19 @@ memcached は http://danga.com/memcached/ から無料で入手できます． memcached
 ステムの使用によるオーバヘッドがなくなります．
 
 memcached 本体のインストールの他に， memcached の Python バインディングをイ
-ンストールする必要があります． Python バインディングは単一のモジュール
-memcached.py で， ftp://ftp.tummy.com/pub/python-memcached/ から入手できま
-す．この URL が有効でなくなっているなら， memcached のウェブサイト
-(http://www.danga.com/memcached/) に行って， "Client API" セクションから
-Python バインディングを入手してください．
+ンストールする必要があります． memcached には二つのバージョンがあります．以
+下の *どちらかの* モジュールを選んでインストールしてください．
+
+  * 最も高速に memcached をドライブできる選択肢は，
+    http://gijsbert.org/cmemcache/ から入手できる ``cmemcache`` です． (こ
+    のモジュールは，開発版の Django でしか使えません． Django 0.96 とそれ以
+    前のバージョンは下の選択肢を使ってください)．
+
+  * ``cmemcache`` を使えないなら， ``python-memcached`` を使ってください．
+    ftp://ftp.tummy.com/pub/python-memcached/ で入手できます．この URL が有
+    効でなくなっていたら， memcached のウェブサイト
+    (http://www.danga.com/memcached/) に行って， "Client API" セクションか
+    らPython バインディングを入手してください．
 
 Django を memcached と組み合わせて使うには， ``CACHE_BACKEND`` を
 ``memcached://ip:port/`` に設定します． ``ip`` は memcached デーモンを動か

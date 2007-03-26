@@ -2,7 +2,7 @@
 セッションの使い方
 ===================
 
-:revision-up-to: 4805 (release 0.96)
+:revision-up-to: 4828 (0.96+ SVN)
 
 Django では匿名セッション (anonymous session) を完全にサポートしています．
 セッションフレームワークを使うと，任意のデータをサイト訪問者単位
@@ -186,7 +186,7 @@ Django では匿名セッション (anonymous session) を完全にサポートしています．
 
     >>> from django.contrib.sessions.models import Session
     >>> from django.contrib.sessions.models import Session
-    >>> s = Session.objects.get_object(pk='2b1189a188b44ad18c35e113ac6ceead')
+    >>> s = Session.objects.get(pk='2b1189a188b44ad18c35e113ac6ceead')
     datetime.datetime(2005, 8, 20, 13, 35, 12)
 
 セッション情報の辞書を取得するには ``get_decoded()`` を呼び出す必要があるの

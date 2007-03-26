@@ -2,7 +2,7 @@
 django-admin.py と manage.py
 ============================
 
-:revision-up-to: 4805 (release 0.96)
+:revision-up-to: 4828 (0.96+ SVN)
 
 ``django-admin.py`` は Django の管理タスクを行うためのコマンドライン
 ユーティリティです．このドキュメントでは ``django-admin.py`` の全ての
@@ -341,10 +341,10 @@ sql [appname appname ...]
 sqlall [appname appname ...]
 ----------------------------
 
-指定した appname の CREATE TABLE および初期データ入力のための
-SQL 文を出力します．
+指定した appname の CREATE TABLE および初期カスタム SQL の発行，データ入力
+のための SQL 文を出力します．
 
-初期データの指定方法は ``sqlinitialdata`` の説明を参照してください．
+初期カスタム SQL の指定方法は ``sqlcustom`` の説明を参照してください．
 
 sqlclear [appname appname ...]
 --------------------------------------
@@ -365,8 +365,8 @@ sqlcustom [appname appname ...]
 をアプリケーションの名前， ``<modelname>`` をモデルの名前を全て小文字にした
 文字列として， ``<appname>/sql/<modelname>.sql`` という名前のファイルを探し
 ます．例えば， ``news`` というアプリケーションで ``Story`` というモデルが定
-義されていれば， ``sqlinitialdata`` は ``news/sql/story.sql`` というファイ
-ルを探して読みだし，その内容をこのコマンドの出力の末尾に追加します．
+義されていれば， ``sqlcustom`` は ``news/sql/story.sql`` というファイルを探
+して読みだし，その内容をこのコマンドの出力の末尾に追加します．
 
 各 SQL ファイルには，有効な SQL を入れることになっています． SQL ファイルの
 内容は，モデルのテーブル生成文を全て実行した後に，データベースに直接パイプ
