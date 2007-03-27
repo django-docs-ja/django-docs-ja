@@ -3,7 +3,8 @@ Django オンラインドキュメント和訳
 =================================
 
 和訳
-    Yasushi Masuda (ymasuda at ethercube dot com)
+    Yasushi Masuda (ymasuda at ethercube dot com),
+    Takanao Endoh (takanao at endoh dot tk)
 底本
     SVN trunk (0.96+ SVN)
 追従済みリビジョン
