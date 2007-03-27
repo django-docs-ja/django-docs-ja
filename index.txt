@@ -5,7 +5,7 @@ Django オンラインドキュメント和訳
 和訳
     Yasushi Masuda (ymasuda at ethercube dot com)
 底本
-    SVN trunk (release 0.96)
+    SVN trunk (0.96+ SVN)
 追従済みリビジョン
     4828 (2007/03/27)
 
