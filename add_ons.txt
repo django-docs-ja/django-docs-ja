@@ -2,7 +2,7 @@
 "django.contrib" 下のアドオン
 =============================
 
-:revision-up-to: 4805 (release 0.96)
+:revision-up-to: 4843 (0.96+ SVN)
 
 Django は Python の `"batteries included" 哲学`_ を目指しています． Django
 には Web 開発における課題を解くための様々な外部オプションツールがついてきま
@@ -10,6 +10,13 @@ Django は Python の `"batteries included" 哲学`_ を目指しています． Django
 
 これらのコードは Django 配布物中の ``django/contrib`` にあります．
 ``contrib`` 下のパッケージの概要を以下に示します:
+
+.. admonition:: Note
+
+    これらのアドオンの大半，特にモデルやテンプレートタグの定義が入っている
+    アドオンを使うには，パッケージ名 (例えば ``'django.contrib.admin'``) を
+    ``INSTALLED_APPS`` 設定に追加して， ``manage.py syncdb`` を再度実行する
+    必要があります．
 
 .. _`"batteries included" 哲学`: http://python.jp/doc/release/tut/node12.html#batteries-included                                                
 
@@ -158,15 +165,23 @@ localflavor
 markup
 ======
 
-テンプレートフィルタの集まりです．以下の 3 つのマークアップ言語に対するフィ
-ルタを実装しています:
+テンプレートフィルタのコレクションです．以下の 3 つのマークアップ言語に対す
+るフィルタを実装しています:
 
-    * `Textile`_
-    * `Markdown`_
-    * `ReST (ReStructured Text)`_
+    * ``textile`` -- `Textile`_ 用の実装です
+    * ``markdown``  -- `Markdown`_ 用の実装です
+    * ``restructuredtext`` -- `ReST (ReStructured Text)`_ 用の実装です
 
-詳しくは、 django/contrib/markup/templatetags/markup.py のソースコードを参
-照してください。
+どのフィルタも，各マークアップ言語で書かれたテキストの入った文字列を引数に
+とり，マークアップ処理済みのテキストの入った文字列を返します．例えば，
+``textile`` フィルタは Textile フォーマットで書かれたテキストを HTML に変換
+します．
+
+フィルタを有効にするには， ``'django.contrib.markup'`` を
+``INSTALLED_APPS`` 設定に追加します．その上で ``{% load markup %}`` をテン
+プレートに追加すれば，フィルタを使えるようになります．詳細は
+``django/contrib/markup/templatetags/markup.py`` のソースコードを参
+照してください．
 
 .. _Textile: http://en.wikipedia.org/wiki/Textile_%28markup_language%29
 .. _Markdown: http://en.wikipedia.org/wiki/Markdown
