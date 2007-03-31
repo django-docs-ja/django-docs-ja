@@ -2,7 +2,7 @@
 mod_python で Django を動かす
 =============================
 
-:revision-up-to: 4805 (release 0.96)
+:revision-up-to: 4884 (0.96+ SVN)
 
 Django をプロダクションサーバ上で動かす設定として，現状では Apache_ と
 `mod_python`_ の組み合わせを推奨しています．
@@ -40,8 +40,8 @@ mod_python モジュールが有効になっていることを確かめます．
         PythonDebug On
     </Location>
 
-``mysite.settings`` は自分の環境での設定ファイルを指す Python のモジュール
-検索パスになるよう置き換えて下さい．
+``mysite.settings`` は， Django プロジェクトの設定ファイルを指す Python
+import パスになるよう，自分の環境に合わせて置き換えて下さい．
 
 この設定は， Apache に 「/mysite/ の下の全ての URL は mod_python で処理し，
 処理には Django mod_python ハンドラを使うように」命令します．また，
@@ -57,6 +57,20 @@ mod_python モジュールが有効になっていることを確かめます．
 には，以下のような設定を mod_python に教えておく必要があります::
 
     PythonPath "['/path/to/project'] + sys.path"
+
+.. caution::
+
+    Windows を使っているなら，パスにバックスラッシュが入ることに注意しましょ
+    う． PythonPath の文字列は Python の文字列パーザで 2 回処理されるので，
+    バックスラッシュは **二重に** エスケープせねばなりません::
+
+        PythonPath "['c:\\\\path\\\\to\\\\project'] + sys.path"
+
+    あるいは， raw 文字列を使ってください::
+
+        PythonPath "[r'c:\\path\\to\\project'] + sys.path"
+
+
 
 また， ``PythonAutoReload Off`` のようなディレクティブを設定して，パフォー
 マンスを向上させられます．使えるオプションのリストは

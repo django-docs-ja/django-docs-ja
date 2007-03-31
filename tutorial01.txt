@@ -4,7 +4,7 @@
 
 .. contents::
 
-:revision-up-to: 4805 (release 0.96)
+:revision-up-to: 4884 (0.96+ SVN)
 
 さあ，例を交えながら学んでゆきましょう．
 
@@ -152,7 +152,7 @@ Database の設定
 タベースへの接続パラメタに合わせましょう:
 
     * ``DATABASE_ENGINE`` -- 'postgresql', 'mysql' または 'sqlite3'
-      のいずれかです．他のデータベースもじきにサポートします．
+      のいずれかです．他にも `いくつか <../settings/>`_ あります．
     * ``DATABASE_NAME`` -- データベースの名前です． SQLite を使っている場合
       にはデータベースファイルのフルパス (絶対パス) にします．
     * ``DATABASE_USER`` -- データベースのユーザ名です (SQLite では使いませ
@@ -381,6 +381,8 @@ Django では，こうした概念を簡単な Python クラスで表現できます．
 
 以下の点に注意してください:
 
+    * 実際に出力される SQL 文は，使っているデータベースによって変わります．
+
     * テーブル名はアプリケーションの名前 (``polls``) とモデルの小文字表記
       (``poll`` および ``choice``) を使って自動的に生成されます (この挙動は
       オーバライドできます．)
@@ -413,8 +415,9 @@ Django では，こうした概念を簡単な Python クラスで表現できます．
     * ``python manage.py validate polls`` -- モデルの構成にエラーがないか調
       べます．
 
-    * ``python manage.py sqlinitialdata polls`` -- Django の admin フレーム
-      ワークとモデルで必要な全ての初期データを出力します．
+    * ``python manage.py sqlcustom polls`` -- 各アプリケーション向けに定義
+      しておいた，カスタマイズ (テーブル形式の変更や制約) 用の SQL 文を出力
+      します．
 
     * ``python manage.py sqlclear polls`` -- アプリケーション用のテーブルの
       うち，データベース上に存在するものについて必要に応じて ``DROP TABLE``

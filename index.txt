@@ -8,7 +8,7 @@ Django オンラインドキュメント和訳
 底本
     SVN trunk (0.96+ SVN)
 追従済みリビジョン
-    4843 (2007/03/29)
+    4884 (2007/04/01)
 
 必読
 ----
@@ -67,6 +67,8 @@ Django オンラインドキュメント和訳
 
 `newforms ライブラリ <../newforms/>`__
 
+`Django アプリケーションのテスト (Writing tests for Django applications) <../testing/>`__
+
 `セッション (Sessions) <../sessions/>`__
 
 `キャッシュ (Django's Cache Framework) <../cache/>`__
@@ -100,6 +102,8 @@ Django オンラインドキュメント和訳
 
   `サイトマップ (Sitemaps) <../sitemaps/>`__
 
+  `Web デザイナーのための補助機能 (Web design helpers) <../webdesign/>`__
+
 
 運用関連
 --------
@@ -130,8 +134,6 @@ Django オンラインドキュメント和訳
 `動的な CSV の生成 (Outputting CSV dynamically) <../outputting_csv/>`__
 
 `Django オブジェクトのシリアライズ (Serializing Django objects) <../serialization/>`__
-
-`Django アプリケーションのテスト (Writing tests for Django applications) <../testing/>`__
 
 その他
 ------

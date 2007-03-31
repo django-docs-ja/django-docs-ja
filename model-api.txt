@@ -2,7 +2,7 @@
 モデル API リファレンス
 =======================
 
-:revision-up-to: 4805 (release 0.96)
+:revision-up-to: 4884 (release 0.96)
 
 モデルとは，サイトを構成するデータの，ただ一つかつ最終的なデータソースを指
 します．モデルには，保存したいデータに不可欠なデータフィールドと，その振舞
@@ -1908,19 +1908,42 @@ DRY 則には反してい
 なわち URLconf とモデルの両方で URL が定義されているという点です．
 
 ``permalink`` デコレータを使うと， URLconf からモデルを脱カップリングできま
-す．このデコレータには，ビュー関数と，モデルのインスタンスに直接アクセスす
-る際に必要なパラメタを指定します．そうすると， Django は URLconf を使って完
-全な URL パスを計算します．例えば::
+す．このデコレータには，ビュー関数，引数のリスト，そして (オプションとして)
+名前つきパラメタの入った辞書を指定します．これらの情報から， Django は
+指定したパラメタで URLconf を置き換えて完全な URL パスを計算します．例えば，
+以下のような URLconf が定義されていたとしましょう::
+
+    (r'^/people/(\d+)/$', 'people.views.details'),
+
+また，モデルの ``get_absolute_url`` メソッドは以下のように定義できます::
 
     from django.db.models import permalink
 
     def get_absolute_url(self):
-        return ('people.views.details', str(self.id))
+        return ('people.views.details', [str(self.id)])
     get_absolute_url = permalink(get_absolute_url)
 
-こうしておけば，URL に関する情報を繰り返すことなく，モデルの絶対 URL と表示
-に使ったビューを結びつけられます．以前と同様， ``get_absolute_url`` はテン
-プレート中でも使えます．
+
+また，以下のような URLconf のエントリがあったとします::
+
+    (r'/archive/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$',
+        archive_view)
+
+``permalink`` は以下のように使えます::
+
+    def get_absolute_url(self):
+        return ('archive_view', (), {
+            'year': self.created.year,
+            'month': self.created.month,
+            'day': self.created.day})
+    get_absolute_url = permalink(get_absolute_url)
+
+この例では，第 2 引数に空の配列 (空のタプル) を指定していますが，これは引数
+リストを渡さず，キーワード引数だけを渡したいからです．
+
+``permalink`` を使えば， URL に関する情報を繰り返すことなく，モデルの絶対
+URL と表示に使ったビューを結びつけられます．以前と同様，
+``get_absolute_url`` はテンプレート中でも使えます．
 
 .. _Executing custom SQL:
 
