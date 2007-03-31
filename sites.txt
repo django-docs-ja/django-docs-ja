@@ -1,52 +1,52 @@
 ======================
-"sites" �ե졼����
+"sites" フレームワーク
 ======================
 
 :revision-up-to: 4805 (release 0.96)
 
-Django �ˤϥ��ץ����Ȥ��ƻȤ��� "sites" �ե졼��������°���Ƥ��ޤ���
-"sites" �ϥ��֥������Ȥ䵡ǽ������� Web �����Ȥ˴�Ϣ�դ��뤿��Υեå��Ǥ�
-���Ʊ���ˡ� Django �Ǻ������������ȤΥɥᥤ��̾�ȡ�ʬ����䤹��̾��
-verbose name�פ���¸���Ƥ��ޤ���
+Django にはオプションとして使える "sites" フレームワークが付属しています．
+"sites" はオブジェクトや機能を特定の Web サイトに関連付けるためのフックであ
+ると同時に， Django で作成したサイトのドメイン名と「分かりやすい名前
+verbose name」を保存しています．
 
-��Ĥ� Django ��ʣ���Υ����Ȥ�������Ƥ��ơ������ȴ֤˰㤤��������������
-�˻ȤäƤ���������
+一つの Django で複数のサイトを管理していて，サイト間に違いを持たせたい場合
+に使ってください．
 
-sites �ե졼�����ϡ��ʲ�����Ĥδ�ñ�ʥ��󥻥ץȤ˴�Ť��Ƥ��ޤ�:
+sites フレームワークは，以下の二つの簡単なコンセプトに基づいています:
 
-    * ``django.contrib.sites`` �� ``Site`` ��ǥ�ˤϡ� ``domain`` ��
-      ``name`` �ե�����ɤ�����ޤ���
-    * ���륵���Ȥ�����ե������ ``SITE_ID`` ����ˤϡ����Υ����Ȥ�ɽ��
-      ``Site`` ���֥������ȤΥǡ����١�����Ǥ� ID ����ꤷ�ޤ���
+    * ``django.contrib.sites`` の ``Site`` モデルには， ``domain`` と
+      ``name`` フィールドがあります．
+    * あるサイトの設定ファイルの ``SITE_ID`` 設定には，そのサイトを表す
+      ``Site`` オブジェクトのデータベース上での ID を指定します．
 
-site �λȤ�ƻ�ϼ�ͳ�Ǥ����� Django �Ǥϴ�ñ�ʸƤӽФ�����Ǽ�ưŪ�� sites
-��Ȥ�����ˡ�� 2 �����󶡤��Ƥ��ޤ���
+site の使い道は自由ですが， Django では簡単な呼び出し規約で自動的に sites
+を使える方法を 2 種類提供しています．
 
 .. _Example usage:
 
-������
+使用例
 ======
 
-�ɤ����������� sites ��Ȥ��ΤǤ��礦�������󤲤��������ޤ��礦��
+どういう状況で sites を使うのでしょうか？例を挙げて説明しましょう．
 
 .. _Associating content with multiple sites:
 
-����ƥ�Ĥ�ʣ���Υ����Ȥ˴�Ϣ�Ť���
+コンテンツを複数のサイトに関連づける
 ------------------------------------
 
-LJWorld.com_ �� Lawrence.com_ ��Ʊ���˥塼���ȿ���Kansaz �� Lawrence �ˤ���
-Lawrence Journal-World newspaper ���������Ƥ��ޤ��� LJWorld.com �ϥ˥塼��
-�ˡ� Lawrence.com ���ϰ�θ�ھ���˥ե����������Ƥ��ޤ������Խ��Ԥ� 
-*ξ����* �����Ȥ�Ʊ���˥塼��������������ȹͤ�����⤢��ޤ���
+LJWorld.com_ と Lawrence.com_ は同じニュース組織，Kansaz 州 Lawrence にある
+Lawrence Journal-World newspaper が管理しています． LJWorld.com はニュース
+に， Lawrence.com は地域の娯楽情報にフォーカスしていますが，編集者は 
+*両方の* サイトで同じニュースを公開したいと考える場合もあります．
 
-��������򲿤�ͤ����˽�������ʤ顤�����ȹ���ô���Ԥ��Ф��ơ� LJWorld.com
-�� Lawrence.com ��Ʊ��������Ф��褦 2 �ٰ��ꤹ�뤳�Ȥˤʤ�ޤ�������������
-�ϥ����ȹ���ô���ˤȤä����ΨŪ�Ǥ�����Ʊ�������Υ��ԡ���ʣ���ǡ����١���
-�����뤳�ȤˤʤäƤ��ޤ��ޤ���
+この問題を何も考えずに処理するなら，サイト構築担当者に対して， LJWorld.com
+と Lawrence.com に同じ記事を出すよう 2 度依頼することになります．しかしこれ
+はサイト構築担当にとって非効率的ですし，同じ記事のコピーが複数データベース
+に入ることになってしまいます．
 
-��äȤޤ��Ǵ�ñ����ˡ��������ޤ�: �ɤ���Υ����Ȥ�Ʊ���ǡ����١�����Ȥ���
-1 �Ĥε�����ʣ���Υ����Ȥ˴�Ϣ�Ť���Ȥ�����ΤǤ������δط��ϡ� Django ��
-�ǥ���Ѹ�Ǹ����� ``Article`` ��ǥ�� ``ManyToManyField`` ��ɽ������ޤ�::
+もっとましで簡単な方法ががあります: どちらのサイトも同じデータベースを使い，
+1 つの記事を複数のサイトに関連づけるというものです．この関係は， Django モ
+デルの用語で言えば ``Article`` モデルの ``ManyToManyField`` で表現されます::
 
     from django.db import models
     from django.contrib.sites.models import Site
@@ -56,17 +56,17 @@ Lawrence Journal-World newspaper ���������Ƥ��ޤ��� LJWorld.com �ϥ˥塼��
         # ...
         sites = models.ManyToManyField(Site)
 
-���Υ�ǥ�ϡ��ʲ��Τ褦�ˤ����Ĥ�������ͥ��Ƥ��ޤ�:
+このモデルは，以下のようにいくつかの点で優れています:
 
-    * site ����ô���� 1 �ĤΥ��󥿥ե����� (Django admin ������) ��ξ���Υ�
-      ���Ȥˤ������ƤΥ���ƥ�Ĥ��Խ��Ǥ��ޤ���
+    * site 構築担当が 1 つのインタフェース (Django admin サイト) で両方のサ
+      イトにある全てのコンテンツを編集できます．
 
-    * Ʊ��������ǡ����١�����˲��٤�񤭹��ޤʤ��ƺѤߡ���ĤΥ쥳���ɤ�
-      ������¸�Ǥ��ޤ���
+    * 同じ記事をデータベース上に何度も書き込まなくて済み，一つのレコードと
+      して保存できます．
 
-    * �����ȳ�ȯ�Ԥ�Ʊ���ӥ塼�����ɤ�ξ���Υ����ȤǻȤ��ޤ����ӥ塼������
-      �Ǥϡ��ꥯ�����Ȥ���Ƥ��뵭�������ߤΥ������ѤΤ�Τ������å����ޤ���
-      �㤨�аʲ��Τ褦�ʥ����ɤˤʤ�Ǥ��礦::
+    * サイト開発者は同じビューコードを両方のサイトで使えます．ビューコード
+      では，リクエストされている記事が現在のサイト用のものかチェックします．
+      例えば以下のようなコードになるでしょう::
 
           from django.conf import settings
 
@@ -82,14 +82,14 @@ Lawrence Journal-World newspaper ���������Ƥ��ޤ��� LJWorld.com �ϥ˥塼��
 
 .. _Associating content with a single site:
 
-����ƥ�Ĥ�ñ��Υ����Ȥ˴�Ϣ�Ť���
+コンテンツを単一のサイトに関連づける
 ------------------------------------
 
-�����ǥ�� ``ForeignKey`` ��Ȥä�¾�а�δط��� ``Site`` �˴�Ϣ�Ť��Ƥ�
-�����ޤ���
+あるモデルを ``ForeignKey`` を使って他対一の関係で ``Site`` に関連づけても
+構いません．
 
-�㤨�С����뵭���򤢤륵���Ȥ�����ɽ���Ǥ���褦�ˤ�������С���ǥ�ϰʲ�
-�Τ褦�˽񤭤ޤ�::
+例えば，ある記事をあるサイトだけで表示できるようにしたければ，モデルは以下
+のように書きます::
 
     from django.db import models
     from django.contrib.sites.models import Site
@@ -99,17 +99,17 @@ Lawrence Journal-World newspaper ���������Ƥ��ޤ��� LJWorld.com �ϥ˥塼��
         # ...
         site = models.ForeignKey(Site)
 
-������ˡ�Ǥ⡤����ǽҤ٤��Τ�Ʊ���褦�ʲ��ä������ޤ���
+この方法でも，前節で述べたのと同じような恩恵を得られます．
 
 .. _Hooking into the current site from views:
 
-�ӥ塼��Ǹ��ߤΥ����Ȥ�եå��˻Ȥ�
+ビュー内で現在のサイトをフックに使う
 ------------------------------------
 
-����Ǥϡ� Django �ӥ塼����� sites �ե졼������Ȥäơ��ӥ塼��Ƥ�
-�Ф��Ƥ��륵���Ȥ��Ȥ˸�ͭ�ν�����¹ԤǤ��ޤ���
+低水準では， Django ビューの中で sites フレームワークを使って，ビューを呼び
+出しているサイトごとに固有の処理を実行できます．
 
-�㤨��::
+例えば::
 
     from django.conf import settings
 
@@ -119,10 +119,10 @@ Lawrence Journal-World newspaper ���������Ƥ��ޤ��� LJWorld.com �ϥ˥塼��
         else:
             # Do something else.
 
-������󡤾�Τ褦�˥����� ID ��ϡ��ɥ����ɤ���Τϸ��ɤ��褯����ޤ���
-���μ�Υϡ��ɥ����ɲ��ϡ������˼¹Ԥ��ʤ���Фʤ�ʤ��ϥå��ΤȤ��ˤϥ٥�
-�ȤǤ��礦��Ʊ�����Ȥ��ꥯ�꡼��˼¸�����ˤϡ������ȤΥɥᥤ��̾�������
-�����ޤ�::
+もちろん，上のようにサイト ID をハードコードするのは見栄えよくありません．
+この種のハードコード化は，すぐに実行しなければならないハックのときにはベス
+トでしょう．同じことをよりクリーンに実現するには，サイトのドメイン名をチェッ
+クします::
 
     from django.conf import settings
     from django.contrib.sites.models import Site
@@ -134,9 +134,9 @@ Lawrence Journal-World newspaper ���������Ƥ��ޤ��� LJWorld.com �ϥ˥塼��
         else:
             # Do something else.
 
-``settings.SITE_ID`` ���ͤ��� ``Site`` ���֥������Ȥ��������Ȥ������ǥ���
-��Ϥ褯�Ȥ���Τǡ� ``Site`` �Υ�ǥ�ޥͥ���ˤ� ``get_current()`` �᥽��
-�ɤ�����ޤ����ʲ�����Ͼ�����Ʊ���ˤʤ�ޤ�::
+``settings.SITE_ID`` の値から ``Site`` オブジェクトを取得するというイディオ
+ムはよく使われるので， ``Site`` のモデルマネジャには ``get_current()`` メソッ
+ドがあります．以下の例は上の例と同じになります::
 
     from django.contrib.sites.models import Site
 
@@ -149,21 +149,21 @@ Lawrence Journal-World newspaper ���������Ƥ��ޤ��� LJWorld.com �ϥ˥塼��
 
 .. _Getting the current domain for display:
 
-���ߤΥɥᥤ���ǥ����ץ쥤�Ѥ˼�������
+現在のドメインをディスプレイ用に取得する
 ----------------------------------------
 
-LJWorld.com �� Lawrence.com �ˤ� e-mail �ˤ�����ε�ǽ�����ꡤ�ɼԤ���Ͽ��
-�Ƥ����ȥ˥塼�����Ϥ����Ȥ������Υ᡼����������褦�ˤʤäƤ��ޤ�����
-�Τ��餯��ϴ�ñ�ǡ� Web �ե����फ����Ͽ����ȡ��֤���Ͽ���꤬�Ȥ���������
-�����פȤ������ƤΥ᡼���������ޤ���
+LJWorld.com と Lawrence.com には e-mail による通知機能があり，読者が登録し
+ておくとニュースが届いたときに通知メールを受け取れるようになっています．こ
+のからくりは簡単で， Web フォームから登録すると，「ご登録ありがとうございま
+した」という内容のメールを受け取ります．
 
-��Ͽ������Ԥ������ɤ����ٳ�ȯ����Τ����ΨŪ�Ǿ�Ĺ�ʤΤǡ�����΢�Ǥ�ʣ��
-�����Ȥ�Ʊ�������ɤ�Ȥ��褦�ˤ��ޤ������������֤���Ͽ���꤬�Ȥ��������ޤ���
-���Τϥ����Ȥ��Ȥ��Ѥ��ʤ���Фʤ�ޤ��� ``Site`` ���֥������Ȥ�Ȥ��С�
-���ߤΥ����Ȥ� ``name`` �� ``domain`` ���ͤ�Ȥäơ֤��꤬�Ȥ��������ޤ���
-��å���������ݲ��Ǥ��ޤ���
+登録処理を行うコードを二度開発するのは非効率的で冗長なので，舞台裏では複数
+サイトで同じコードを使うようにします．ただし，「ご登録ありがとうございます」
+通知はサイトごとに変えなければなりません． ``Site`` オブジェクトを使えば，
+現在のサイトの ``name`` と ``domain`` の値を使って「ありがとうございます」
+メッセージを抽象化できます．
 
-�ե���������ӥ塼����ϰʲ��Τ褦�ˤʤ�ޤ�::
+フォーム処理ビューの例は以下のようになります::
 
     from django.contrib.sites.models import Site
     from django.core.mail import send_mail
@@ -180,14 +180,14 @@ LJWorld.com �� Lawrence.com �ˤ� e-mail �ˤ�����ε�ǽ�����ꡤ�ɼԤ���Ͽ��
 
         # ...
 
-Lawrence.com �Ǥϡ� e-mail �η�̾�� "Thanks for subscribing to lawrence.com
-alerts." �Ǥ��� LJWorld.com �Ǥϡ���̾�� "Thanks for subscribing to
-LJWorld.com alerts." �ǡ��᡼�����Τ�Ʊ�ͤǤ���
+Lawrence.com では， e-mail の件名は "Thanks for subscribing to lawrence.com
+alerts." です． LJWorld.com では，件名は "Thanks for subscribing to
+LJWorld.com alerts." で，メール本体も同様です．
 
-������ (�ǡ����̤�) ��ˡ�Ȥ��ơ� Django �ƥ�ץ졼�ȥ����ƥ��Ȥä���ˡ
-����Ӥ��Ƥߤޤ��礦�� Lawrence.com �� LJWorld.com ���̡��Υƥ�ץ졼�ȥǥ�
-�쥯�ȥ� (``TEMPLATE_DIRS``) ����äƤ���Τǡ��ʲ��Τ褦�ˤ���Х����ȴ֤�
-�㤤��ƥ�ץ졼�ȥ����ƥ���ɤ��Ф��ޤ�::
+より柔軟 (で，重量な) 方法として， Django テンプレートシステムを使った方法
+と比較してみましょう． Lawrence.com と LJWorld.com は別々のテンプレートディ
+レクトリ (``TEMPLATE_DIRS``) を持っているので，以下のようにすればサイト間の
+違いをテンプレートシステムに追い出せます::
 
     from django.core.mail import send_mail
     from django.template import loader, Context
@@ -202,22 +202,22 @@ LJWorld.com alerts." �ǡ��᡼�����Τ�Ʊ�ͤǤ���
 
         # ...
 
-���ξ�硤 LJWorld.com �� Lawrence.com �Υƥ�ץ졼�ȥǥ��쥯�ȥ겼��
-``subject.txt`` �� ``message.txt`` ����ĤΥƥ�ץ졼�Ȥ�������뤳�Ȥˤʤ�
-�ޤ�������������������Ф�����ˤϤʤ�ޤ�����ʣ�����������ޤ���
+この場合， LJWorld.com と Lawrence.com のテンプレートディレクトリ下に
+``subject.txt`` と ``message.txt`` の二つのテンプレートを作成することになり
+ます．ただし，こうすればより柔軟にはなりますが，複雑さは増します．
 
-���פ�ʣ�����Ⱦ�Ĺ�����ӽ����뤿��ˤϡ� ``Site`` ���֥������Ȥ��ǽ�ʸ¤�
-�Ȥ��Ȥ褤�Ǥ��礦��
+不要な複雑さと冗長性を排除するためには， ``Site`` オブジェクトを可能な限り
+使うとよいでしょう．
 
 .. _Getting the current domain for full URLs:
 
-���ߤΥɥᥤ��δ����� URL ���������
+現在のドメインの完全な URL を取得する
 -------------------------------------
 
-Django �� ``get_absolute_url()`` �ϡ����֥������Ȥ� URL ��ɥᥤ��̾�ʤ���
-��������ݤˤ������Ǥ��������ˤ�äƤϡ������� URL�����ʤ�� ``http://``
-�ȥɥᥤ��̾������¾���Ƥ�ɽ�����������Ȥ⤢��Ǥ��礦������ˤ� sites �ե졼
-������Ȥ��ޤ�����ñ����򼨤��ޤ�::
+Django の ``get_absolute_url()`` は，オブジェクトの URL をドメイン名なしで
+取得する際には便利ですが，場合によっては，完全な URL，すなわち ``http://``
+とドメイン名，その他全てを表示したいこともあるでしょう．これには sites フレー
+ムワークを使います．簡単な例を示します::
 
     >>> from django.contrib.sites.models import Site
     >>> obj = MyModel.objects.get(id=3)
@@ -233,13 +233,13 @@ Django �� ``get_absolute_url()`` �ϡ����֥������Ȥ� URL ��ɥᥤ��̾�ʤ���
 ``CurrentSiteManager``
 ======================
 
-���ץꥱ���������� ``Site`` �����פ�Ư������äƤ����硤
-``CurrentSiteManager`` �Ȥ��������ʥ��饹��Ȥ��褦��Ƥ���ƤߤƤ���������
-``CurrentSiteManager`` �ϥ�ǥ�� `�ޥͥ���`_ ���饹�ǡ��������̤򸽺ߤ�
-``Site`` �˴�Ϣ�Ť���줿���֥������Ȥ����˼�ưŪ�˥ե��륿���ޤ���
+アプリケーション内で ``Site`` が重要な働きを持っている場合，
+``CurrentSiteManager`` という便利なクラスを使うよう検討してみてください．
+``CurrentSiteManager`` はモデルの `マネジャ`_ クラスで，クエリ結果を現在の
+``Site`` に関連づけられたオブジェクトだけに自動的にフィルタします．
 
-``CurrentSiteManager`` ��Ȥ��ˤϡ���ǥ���������Ū���ɲä��ޤ�����򼨤�
-�ޤ�::
+``CurrentSiteManager`` を使うには，モデルの中に明示的に追加します．例を示し
+ます::
 
     from django.db import models
     from django.contrib.sites.models import Site
@@ -253,23 +253,23 @@ Django �� ``get_absolute_url()`` �ϡ����֥������Ȥ� URL ��ɥᥤ��̾�ʤ���
         objects = models.Manager()
         on_site = CurrentSiteManager()
 
-���Υ�ǥ�Ǥϡ� ``Photo.objects.all()`` ��Ȥ��ȥǡ������١���������Ƥ�
-``Photo`` ���֥������Ȥ��֤��ޤ����� ``Photo.on_site.all()`` ��Ȥ��ȡ�
-``SITE_ID`` ����˽��äơ����ߤΥ����Ȥ˴�Ϣ�Ť���줿  ``Photo`` ���֥���
-���Ȥ������֤��ޤ���
+このモデルでは， ``Photo.objects.all()`` を使うとデーターベース上の全ての
+``Photo`` オブジェクトを返しますが， ``Photo.on_site.all()`` を使うと，
+``SITE_ID`` 設定に従って，現在のサイトに関連づけられた  ``Photo`` オブジェ
+クトだけを返します．
 
-�Ĥޤꡤ�ʲ�����Ĥ�ʸ�������ˤʤ�ޤ�::
+つまり，以下の二つの文は等価になります::
 
     Photo.objects.filter(site=settings.SITE_ID)
     Photo.on_site.all()
 
-``CurrentSiteManager`` �� ``Photo`` �ΤɤΥե�����ɤ� ``Site`` �ʤΤ����
-����äƸ��դ���ΤǤ��礦�� ``CurrentSiteManager`` �ϥǥե���ȤǤ�
-``site`` �Ȥ���̾���Υե�����ɤ�õ���ޤ�����ǥ���� ``site`` *�ʳ���*
-̾���� ``ForeignKey`` �� ``ManyToManyField`` ��������Ƥ����硤
-``CurrentSiteManager`` ������Ū�˥ե������̾���Ϥ�ɬ�פ�����ޤ���
-�ʲ��Υ�ǥ�Ǥϡ� ``publish_on`` �Ȥ���̾���Υե�����ɤ�������ˤʤäƤ�
-�ޤ�::
+``CurrentSiteManager`` は ``Photo`` のどのフィールドが ``Site`` なのかをど
+うやって見付けるのでしょう？ ``CurrentSiteManager`` はデフォルトでは
+``site`` という名前のフィールドを探します．モデル内で ``site`` *以外の*
+名前の ``ForeignKey`` や ``ManyToManyField`` を定義している場合，
+``CurrentSiteManager`` に明示的にフィールド名を渡す必要があります．
+以下のモデルでは， ``publish_on`` という名前のフィールドがその例になってい
+ます::
 
     from django.db import models
     from django.contrib.sites.models import Site
@@ -283,71 +283,71 @@ Django �� ``get_absolute_url()`` �ϡ����֥������Ȥ� URL ��ɥᥤ��̾�ʤ���
         objects = models.Manager()
         on_site = CurrentSiteManager('publish_on')
 
-``CurrentSiteManager`` ��Ȥäơ�¸�ߤ��ʤ��ե������̾���Ϥ����Ȥ���ȡ�
-Django �� ``ValueError`` �����Ф��ޤ���
+``CurrentSiteManager`` を使って，存在しないフィールド名を渡そうとすると，
+Django は ``ValueError`` を送出します．
 
-``CurrentSiteManager`` ��ȤäƤ����Ȥ��Ƥ⡤��ɤ� (�����ȸ�ͭ�Ǥʤ�) �̾�
-�� ``Manager`` ���ǥ���˻��äƤ���ɬ�פ�������Ǥ��礦��
-`�ޥͥ���Υɥ������`_ �Ǥ��������ޤ���������ư�ǥޥͥ�����������ȡ�
-Django �� ``objects = models.Manager()`` ��Ȥä���ư�ޥͥ���������Ԥ�ʤ�
-�ʤ뤫��Ǥ����ޤ��� Django �ΰ��� (�㤨�� admin �����Ȥ����ѥӥ塼) �Ǥϡ�
-��ǥ���� *�ǽ���������Ƥ���* �ޥͥ�����˻Ȥ��褦�ˤʤäƤ��ޤ�����
-�Τ��ᡤ admin �����Ȥ������ƤΥ��֥������Ȥ˥������������� (�����ȸ�ͭ�Υե�
-�륿��󥰤�Ԥ�ʤ�) ���ˤϡ���ǥ���� ``objects = models.Manager()``
-�� ``CurrentSiteManager`` ���������������֤��Ƥ����ͤФʤ�ޤ���
+``CurrentSiteManager`` を使っていたとしても，結局は (サイト固有でない) 通常
+の ``Manager`` をモデル内に持っておく必要に迫られるでしょう．
+`マネジャのドキュメント`_ でも説明しましたが，手動でマネジャを定義すると，
+Django は ``objects = models.Manager()`` を使った自動マネジャ生成を行わなく
+なるからです．また， Django の一部 (例えば admin サイトや汎用ビュー) では，
+モデル内で *最初に定義されている* マネジャを常に使うようになっています．そ
+のため， admin サイトから全てのオブジェクトにアクセスしたい (サイト固有のフィ
+ルタリングを行わない) 場合には，モデル内で ``objects = models.Manager()``
+を ``CurrentSiteManager`` の定義より前に配置しておかねばなりません．
 
 
-.. _`�ޥͥ���`: ../model_api/#managers
-.. _`�ޥͥ���Υɥ������`: ../model_api/#managers
+.. _`マネジャ`: ../model_api/#managers
+.. _`マネジャのドキュメント`: ../model_api/#managers
 .. _manager: ../model_api/#managers
 
 .. _How Django uses the sites framework:
 
-Django ��Ǥ� site �ե졼���������
+Django 内での site フレームワークの役割
 =======================================
 
-Django ��Ȥ��ݡ�ɬ������ sites �ե졼������Ȥ�ͤФʤ�ʤ��Ȥ����櫓
-�ǤϤ���ޤ��󡥤ȤϤ����� Django �Ϥ����Ĥ��ξ��� sites �β��ä����ѤǤ�
-��Τǡ����ҤȤ� sites ����Ѥ���褦����ޤ��� Django ��ñ��Υ����Ȥ��ư
-���뤿������˻ȤäƤ���Ȥ��Ƥ⡤�Ҥȼ�֤����ƥ����ȥ��֥������Ȥ��������
-``domain`` �� ``name`` ����ꤷ�ơ����� ID �� ``SITE_ID`` ����˻��ꤷ�Ƥ�
-�Ƥ���������
+Django を使う際，必ずしも sites フレームワークを使わねばならないというわけ
+ではありません．とはいえ， Django はいくつかの場所で sites の恩恵を利用でき
+るので，ぜひとも sites を活用するよう勧めます． Django を単一のサイトを駆動
+するためだけに使っているとしても，ひと手間かけてサイトオブジェクトを作成し，
+``domain`` と ``name`` を指定して，その ID を ``SITE_ID`` 設定に指定してみ
+てください．
 
-Django �ˤ����� sites �ե졼���������ϰʲ����̤�Ǥ�:
+Django における sites フレームワークの役割は以下の通りです:
 
-    * `������쥯�����ե졼����`_ �Ǥϡ��ƥ�����쥯�ȥ��֥������Ȥ������
-      �����Ȥ˴�Ϣ�Ť����Ƥ��ޤ��� Django ��������쥯�����õ���Ȥ�����
-      �졼�����ϸ��ߤ� ``SITE_ID`` ���θ���ޤ���
+    * `リダイレクションフレームワーク`_ では，各リダイレクトオブジェクトが特定の
+      サイトに関連づけられています． Django がリダイレクト先を探すとき，フ
+      レームワークは現在の ``SITE_ID`` を考慮します．
 
-    * �����ȥե졼�����Ǥϡ��ƥ����Ȥ�����Υ����Ȥ˴�Ϣ�Ť�����
-      ���ޤ��������Ȥ���Ƥ����ȡ� ``site`` �ϸ��ߤ� ``SITE_ID`` ������
-      ����ޤ��������Ȥ򲿤餫�Υƥ�ץ졼�ȥ����ǥꥹ��ɽ�������硤��
-      �ߤΥ����Ȥ˴ؤ��륳���Ȥ�����ɽ������ޤ���
+    * コメントフレームワークでは，各コメントが特定のサイトに関連づけられて
+      います．コメントが投稿されると， ``site`` は現在の ``SITE_ID`` に設定
+      されます．コメントを何らかのテンプレートタグでリスト表示する場合，現
+      在のサイトに関するコメントだけが表示されます．
 
-    * `�ե�åȥڡ����ե졼����`_ �Ǥϡ��ƥե�åȥڡ���������Υ�����
-      �˴�Ϣ�Ť����Ƥ��ޤ����ե�åȥڡ������������ݤˤϡ� ``site`` ��
-      ���ꤻ�ͤФʤ�ޤ��� ``FlatpageFallbackMiddleware`` �ϸ��ߤ�
-      ``SITE_ID`` ������å����ơ�ɽ�����٤��ե�åȥڡ�����������ޤ���
+    * `フラットページフレームワーク`_ では，各フラットページは特定のサイト
+      に関連づけられています．フラットページを作成する際には， ``site`` を
+      指定せねばなりません． ``FlatpageFallbackMiddleware`` は現在の
+      ``SITE_ID`` をチェックして，表示すべきフラットページを取得します．
 
-    * `�ۿ��ե졼����`_ �Ǥϡ� ``title`` ����� ``description`` �Υƥ�
-      �ץ졼�Ȥ��鼫ưŪ�� ``{{{ site }}}`` �˥��������Ǥ���褦�ˤʤ�ޤ���
-      ``{{{ site }}}`` �� ``Site`` ���֥������Ȥǡ����ߤ� site ��ɽ�����ޤ���
-      �ޤ����ե����ɹ��ܤ� URL ���󶡤��뤿��Υեå��Ǥϡ���������
-      (full-qualified) �Υɥᥤ�����ꤷ�Ƥ��ʤ���硤���ߤ� ``Site``
-      ���֥������Ȥ� ``domain`` ��Ȥ��ޤ���
+    * `配信フレームワーク`_ では， ``title`` および ``description`` のテン
+      プレートから自動的に ``{{{ site }}}`` にアクセスできるようになります．
+      ``{{{ site }}}`` は ``Site`` オブジェクトで，現在の site を表現します．
+      また，フィード項目の URL を提供するためのフックでは，完全指定
+      (full-qualified) のドメインを指定していない場合，現在の ``Site``
+      オブジェクトの ``domain`` を使います．
 
-    * `ǧ�ڥե졼����`_ �Ǥϡ� ``django.contrib.auth.views.login`` �ӥ塼
-      �����ߤ� ``Site`` ̾�� ``{{{ site_name }}}``` �Ȥ������ǥƥ�ץ졼��
-      ���Ϥ��Ƥ��ޤ���
+    * `認証フレームワーク`_ では， ``django.contrib.auth.views.login`` ビュー
+      が現在の ``Site`` 名を ``{{{ site_name }}}``` という形でテンプレート
+      に渡しています．
 
-    * ���硼�ȥ��åȥӥ塼 (``django.views.defaults.shortcut``) �Ǥϡ�����
-      �������Ȥ� URL �Υɥᥤ������׻�����ݤ˸��ߤ� ``Site`` ���֥�������
-      ��Ȥ��ޤ���
+    * ショートカットビュー (``django.views.defaults.shortcut``) では，オブ
+      ジェクトの URL のドメイン部を計算する際に現在の ``Site`` オブジェクト
+      を使います．
 
-.. _`������쥯�����ե졼����`: ../redirects/
-.. _`�ե�åȥڡ����ե졼����`: ../flatpages/
-.. _`�ۿ��ե졼����`: ../syndication/
-.. _`ǧ�ڥե졼����`: ../authentication/
+.. _`リダイレクションフレームワーク`: ../redirects/
+.. _`フラットページフレームワーク`: ../flatpages/
+.. _`配信フレームワーク`: ../syndication/
+.. _`認証フレームワーク`: ../authentication/
 .. _redirects framework: ../redirects/
 .. _flatpages framework: ../flatpages/
 .. _syndication framework: ../syndication/

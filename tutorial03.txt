@@ -1,83 +1,83 @@
 =====================================
-�Ϥ���Ƥ� Django ���ץ���������� 3
+はじめての Django アプリ作成，その 3
 =====================================
 
 :revision-up-to: 4805 (release 0.96)
 
-���Υ��塼�ȥꥢ��� `���塼�ȥꥢ�뤽�� 2`_ ��³���Ǥ��������Ǥϡ���³��
-Web ��ɼ���ץꥱ�������γ�ȯ����ˤ��ơ������ѤΥ��󥿥ե��������ӥ塼
-(view) �κ���������˲��⤷�ޤ���
+このチュートリアルは `チュートリアルその 2`_ の続きです．ここでは，引続き
+Web 投票アプリケーションの開発を例にして，公開用のインタフェース，ビュー
+(view) の作成を焦点に解説します．
 
-.. _`���塼�ȥꥢ�뤽�� 2`: ../tutorial02/
+.. _`チュートリアルその 2`: ../tutorial02/
 .. _Tutorial 2: ../tutorial2/
 
 .. _Philosophy:
 
-�ӥ塼���߷�ů��
+ビューの設計哲学
 ================
 
-�ӥ塼�Ȥϡ� Django �Υ��ץꥱ�������ˤ���������ε�ǽ���󶡤��륦���֥ڡ�
-���Ρַ� (type)�פǤ��ꡤ�ȼ��Υƥ�ץ졼�Ȥ���äƤ��ޤ����㤨�Х֥�������
-�ꥱ�������ʤ顤�ʲ��Τ褦�ʥӥ塼������Ǥ��礦:
+ビューとは， Django のアプリケーションにおいて特定の機能を提供するウェブペー
+ジの「型 (type)」であり，独自のテンプレートを持っています．例えばブログアプ
+リケーションなら，以下のようなビューがあるでしょう:
 
-    * Blog �ۡ���ڡ��� -- �ǿ��Υ���ȥ�򤤤��Ĥ�ɽ�����ޤ���
-    * ����ȥ�Ρ־ܺ١ץڡ��� -- ��ĤΥ���ȥ�ؤι��ץ�� (permalink)
-      �ڡ����Ǥ���
-    * ǯ���ȤΥ��������֥ڡ��� -- ����ȥ�Τ���ǯ��ɽ�����ޤ���
-    * ��ȤΥ��������֥ڡ��� -- ����ǯ�Υ���ȥ�Τ�����ɽ�����ޤ���
-    * �����ȤΥ��������֥ڡ��� -- �����Υ���ȥ�Τ�������ɽ�����ޤ���
-    * ��������� -- ���륨��ȥ���Ф��륳���Ȥ���Ƥ�����դ��ޤ���
+    * Blog ホームページ -- 最新のエントリをいくつか表示します．
+    * エントリの「詳細」ページ -- 一つのエントリへの恒久リンク (permalink)
+      ページです．
+    * 年ごとのアーカイブページ -- エントリのある年を表示します．
+    * 月ごとのアーカイブページ -- ある年のエントリのある月を表示します．
+    * 日ごとのアーカイブページ -- ある月のエントリのある日を表示します．
+    * コメント投稿 -- あるエントリに対するコメントの投稿を受け付けます．
 
-Poll ���ץꥱ�������ξ��ˤϡ��ʲ��� 4 �ĤΥӥ塼��������ޤ�:
+Poll アプリケーションの場合には，以下の 4 つのビューを作成します:
 
-    * Poll �Ρ֥��������֡ץڡ��� -- �ǿ���Ĵ������ (poll) �򤤤��Ĥ�ɽ����
-      �ޤ��� 
-    * Poll �Ρ־ܺ١ץڡ��� -- Ĵ�����ܤ���ɼ�ѥե������ɽ�����ޤ�����ɼ��
-      �̤�ɽ�����ޤ���
-    * Poll �Ρֳ�ɼ��̡ץڡ��� -- ����Ĵ�����ܤ��Ф����̤�ɽ�����ޤ���
-    * ��ɼ�ڡ��� -- ����Ĵ�����ܤΤ����������Ф�����ɼ������դ��ޤ���
+    * Poll の「アーカイブ」ページ -- 最新の調査項目 (poll) をいくつか表示し
+      ます． 
+    * Poll の「詳細」ページ -- 調査項目と投票用フォームを表示します．開票結
+      果は表示しません．
+    * Poll の「開票結果」ページ -- ある調査項目に対する結果を表示します．
+    * 投票ページ -- ある調査項目のある選択肢に対する投票を受け付けます．
 
-Django �Ǥϡ��ƥӥ塼�ϴ�ñ�� Python �δؿ��Ȥ���ɽ������ޤ���
+Django では，各ビューは簡単な Python の関数として表現されます．
 
 .. _Design your URLs:
 
-URL ����������߷�
+URL スキームの設計
 ==================
 
-�ӥ塼��񤯾�Ǥκǽ�Υ��ƥåפϡ� URL ��¤���߷פǤ��� URL ��¤�������
-��ˤϡ� URLconf �ȸƤФ�� Python �⥸�塼���������ޤ��� Django ��
-URLconf ��ȤäƤɤ� URL ��ɤ� Python �����ɤ˴�Ϣ�Ť��뤫����Ƥ��ޤ���
+ビューを書く上での最初のステップは， URL 構造の設計です． URL 構造を定義す
+るには， URLconf と呼ばれる Python モジュールを作成します． Django は
+URLconf を使ってどの URL をどの Python コードに関連づけるかを決めています．
 
-�桼���� Django �Ǻ��줿�ڡ�����ꥯ�����Ȥ���ȡ������ƥ��
-``ROOT_URLCONF`` �����õ���ޤ�����������ˤ� Python �⥸�塼���ɥå�ɽ��
-��ɽ����ʸ�������äƤ��ޤ��� Django �ϻ��ꤵ�줿�⥸�塼�������ɤ��ơ�
-``urlpatterns`` �Ȥ���̾���Υ⥸�塼���٥��ѿ���õ���ޤ���
-``urlpatterns`` �ϰʲ��Τ褦�ʷ����Υ��ץ뤫��ʤ륷�����󥹤Ǥ�::
+ユーザが Django で作られたページをリクエストすると，システムは
+``ROOT_URLCONF`` 設定を探します．この設定には Python モジュールをドット表記
+で表した文字列が入っています． Django は指定されたモジュールをロードして，
+``urlpatterns`` という名前のモジュールレベル変数を探します．
+``urlpatterns`` は以下のような形式のタプルからなるシーケンスです::
 
-    (����ɽ��, Python�Υ�����Хå��ؿ�,  [, ���ץ����μ��񥪥֥�������])
+    (正規表現, Pythonのコールバック関数,  [, オプションの辞書オブジェクト])
 
-Django ����Ƭ�Υ��ץ뤫���ˡ��ꥯ�����Ȥ��줿 URL �ȥ��ץ��������ɽ����
-�ޥå�����ޤǥƥ��Ȥ��Ƥ椭�ޤ���
+Django は先頭のタプルから順に，リクエストされた URL とタプル内の正規表現が
+マッチするまでテストしてゆきます．
 
-�ޥå���������ɽ�������Ĥ���ȡ�Django �ϳ������륿�ץ�˻��ꤵ��Ƥ��륳��
-��Хå��ؿ���ƤӽФ��ޤ���������Хå��ؿ��ˤ� ``HTTPRequest`` ���֥�����
-�Ȥ��������Ȥ����Ϥ��ޤ�������ˡ�����ɽ����ǡ֥���ץ��㤷�� (captured)��
-�ͤ򥭡���ɰ����Ȥ����Ϥ��ޤ���(���ץ�λ����ܤ����ǤǤ���) ���ץ�����
-���񥪥֥������Ȥ����ꤵ��Ƥ���С��������Ƥ��ɲäΥ�����ɰ����Ȥ�����
-���ޤ���
+マッチする正規表現が見つかると，Django は該当するタプルに指定されているコー
+ルバック関数を呼び出します．コールバック関数には ``HTTPRequest`` オブジェク
+トを第一引数として渡します．さらに，正規表現内で「キャプチャした (captured)」
+値をキーワード引数として渡します．(タプルの三番目の要素である) オプションの
+辞書オブジェクトが指定されていれば，その内容も追加のキーワード引数として渡
+します．
 
-``HTTPRequest`` ���֥������Ȥξܺ٤� 
-`�ꥯ�����ȥ��֥������Ȥȥ쥹�ݥ󥹥��֥������ȤΥɥ������`_ �򻲾Ȥ���
-���������� URLconf �ξܺ٤� `URLconf �Υɥ������`_ �򻲾Ȥ��Ƥ���������
+``HTTPRequest`` オブジェクトの詳細は 
+`リクエストオブジェクトとレスポンスオブジェクトのドキュメント`_ を参照して
+ください． URLconf の詳細は `URLconf のドキュメント`_ を参照してください．
 
-���塼�ȥꥢ�뤽�� 1 ����Ƭ�� ``python manage.py startproject mysite``
-��¹Ԥ��Ƥ���С�URLconf �� ``mysite/urls.py`` �ˤǤ��Ƥ���Ϥ��Ǥ���
-�ޤ��� ``ROOT_URLCONF`` ����ˤ⡤��ưŪ���ͤ�����ޤ�::
+チュートリアルその 1 の冒頭で ``python manage.py startproject mysite``
+を実行していれば，URLconf が ``mysite/urls.py`` にできているはずです．
+また， ``ROOT_URLCONF`` 設定にも，自動的に値が入ります::
 
     ROOT_URLCONF = 'mysite.urls'
 
-���ơ������Ȥä��������������ޤ����� ``mysite/urls.py`` ���Խ����ơ�
-�ʲ��Τ褦�����Ƥˤ��ޤ��礦::
+さて，例題を使って練習する時が来ました． ``mysite/urls.py`` を編集して，
+以下のような内容にしましょう::
 
     from django.conf.urls.defaults import *
 
@@ -88,125 +88,125 @@ Django ����Ƭ�Υ��ץ뤫���ˡ��ꥯ�����Ȥ��줿 URL �ȥ��ץ��������ɽ����
         (r'^polls/(?P<poll_id>\d+)/vote/$', 'mysite.polls.views.vote'),
     )
 
-�������Ƥ����ޤ��礦�����줫�� Web �����ȤΤ���ڡ������㤨�� "/polls/23"
-��ꥯ�����Ȥ���ȡ� Django �� ``ROOT_URLCONF`` �˽񤫤�Ƥ��뤳�� Python
-�⥸�塼�������ɤ��ޤ���Django �ϥ⥸�塼����� ``urlpatterns`` �Ȥ�����
-����ߤĤ�������ɽ�����˸������Ƥ椭�ޤ����ޥå���������ɽ�������Ĥ��ä�
-(``r'^polls/(?P<poll_id>\d+)/$'`` �Ǥ���) �Ȥ����ǡ� Django �Ϥ�������ɽ��
-�˴�Ϣ�Ť����Ƥ��� Python �ѥå��������⥸�塼��Ǥ���
-``mysite.polls.views.detail`` ������ɤ��ޤ��������
-``mysite.polls.views.py`` �ե�������������Ƥ��� ``detail()`` �Ȥ����ؿ�
-���б����ޤ����Ǹ�ˡ� Django �ϰʲ��Τ褦�ʰ����� ``detail()`` ��ƤӽФ�
-�ޤ�::
+復習しておきましょう．だれかが Web サイトのあるページ，例えば "/polls/23"
+をリクエストすると， Django は ``ROOT_URLCONF`` に書かれているこの Python
+モジュールをロードします．Django はモジュール内に ``urlpatterns`` という変
+数をみつけ，正規表現を順に検査してゆきます．マッチする正規表現が見つかった
+(``r'^polls/(?P<poll_id>\d+)/$'`` ですね) ところで， Django はこの正規表現
+に関連づけられている Python パッケージ／モジュールである
+``mysite.polls.views.detail`` をロードします．これは
+``mysite.polls.views.py`` ファイルに定義されている ``detail()`` という関数
+に対応します．最後に， Django は以下のような引数で ``detail()`` を呼び出し
+ます::
 
     detail(request=<HttpRequest object>, poll_id='23')
 
-``poll_id='23'`` ����ʬ�ϡ� ``(?P<poll_id>\d+)`` ���餭�Ƥ��ޤ����ѥ������
-�ݳ�̤ǰϤ��ȡ��ѥ�����˥ޥå������ƥ����Ȥ�֥���ץ���פ��ơ��ӥ塼��
-���ΰ����Ȥ���������ߤޤ��� ``?P<poll_id>`` �ϥޥå������ѥ�������̤���
-�����̾����Ĥ��Ƥ��ޤ��� ``\d+`` �Ͽ������� (���ʤ���ֹ�) �˥ޥå�������
-��ɽ���Ǥ���
+``poll_id='23'`` の部分は， ``(?P<poll_id>\d+)`` からきています．パターンを
+丸括弧で囲うと，パターンにマッチしたテキストを「キャプチャ」して，ビュー関
+数の引数として送り込みます． ``?P<poll_id>`` はマッチしたパターンを識別する
+ための名前をつけています． ``\d+`` は数字の列 (すなわち番号) にマッチする正
+規表現です．
 
-URL �ѥ����������ɽ���ʤΤǡ�����ɽ���Ǽ¸��Ǥ���¤�̵���¤� URL ��ɽ����
-���ޤ����ޤ��� ``.php`` �Τ褦�ʤ�����ʤ�ʸ����� URL ���ɲä���ɬ�פ⤢��
-�ޤ��󡥤���������Ū�ʥ桼�⥢�λ�����Τ���ˡ��ʲ��Τ褦�ˤ���м¸��Ǥ�
-�뤳�Ȥϼ����Ƥ����ޤ��礦::
+URL パターンは正規表現なので，正規表現で実現できる限り無制限の URL を表現で
+きます．また， ``.php`` のようなくだらない文字列を URL に追加する必要もあり
+ません．ただし，病的なユーモアの持ち主のために，以下のようにすれば実現でき
+ることは示しておきましょう::
 
     (r'^polls/latest\.php$', 'mysite.polls.views.index'),
 
-�ȤϤ���������ʰ���ʤ��ȤϤ��ޤ��礦��
+とはいえ，こんな阿呆なことはやめましょう．
 
-����������ɽ���Ǥ� GET �� POST �Υѥ�᥿���ޤ��ɥᥤ��̾�򸡺����ʤ�����
-�����դ��Ƥ����������㤨�С� ``http://www.example.com/myapp/`` �Ȥ����ꥯ��
-���Ȥ����ȡ� URLconf �� ``/myapp/`` ��õ���ޤ���
-``http://www.example.com/myapp/?page=3`` �ξ��ˤ⡤ URLconf ��
-``/myapp/`` ��õ���ޤ���
+これらの正規表現では GET や POST のパラメタ，またドメイン名を検索しないこと
+に注意してください．例えば， ``http://www.example.com/myapp/`` というリクエ
+ストが来ると， URLconf は ``/myapp/`` を探します．
+``http://www.example.com/myapp/?page=3`` の場合にも， URLconf は
+``/myapp/`` を探します．
 
-����ɽ����褯����Ǥ��ʤ��ʤ顤 `Wikipedia �Υ���ȥ�`_ ��
-`Python �Υɥ������`_ �򻲾Ȥ��Ƥ����������ޤ������饤�꡼������Ǥ����
-�����ܡ��־��� ����ɽ���� (Jeffrey Friedl ���� **����: ���� �� ��**) �˽���
-�ʲ��⤬����ޤ���
+正規表現をよく理解できないなら， `Wikipedia のエントリ`_ や
+`Python のドキュメント`_ を参照してください．また，オライリーから出版されて
+いる本，「詳説 正規表現」 (Jeffrey Friedl 著， **訳注: 田和 勝 訳**) に秀逸
+な解説があります．
 
-�Ǹ�ˡ��ѥե����ޥ󥹤ˤĤ��Ƥ����դǤ�: ����ɽ���� URLconf �⥸�塼������
-�ɤ�����˥���ѥ��뤵�졤�ˤ�ƹ�®��ư��ޤ���
+最後に，パフォーマンスについての注意です: 正規表現は URLconf モジュールをロー
+ドする時にコンパイルされ，極めて高速に動作します．
 
-.. _`Wikipedia �Υ���ȥ�`: http://ja.wikipedia.org/wiki/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE
-.. _`Python �Υɥ������`: http://www.python.jp/doc/release/lib/module-re.html
+.. _`Wikipedia のエントリ`: http://ja.wikipedia.org/wiki/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE
+.. _`Python のドキュメント`: http://www.python.jp/doc/release/lib/module-re.html
 .. _Wikipedia's entry: http://en.wikipedia.org/wiki/Regular_expression
 .. _Python documentation: http://www.python.org/doc/current/lib/module-re.html
-.. _`�ꥯ�����ȥ��֥������Ȥȥ쥹�ݥ󥹥��֥������ȤΥɥ������`: ../request_response/
-.. _`URLconf �Υɥ������`: ../url_dispatch/
+.. _`リクエストオブジェクトとレスポンスオブジェクトのドキュメント`: ../request_response/
+.. _`URLconf のドキュメント`: ../url_dispatch/
 .. _request and response documentation: ../request_response/
 .. _URLconf documentation: ../url_dispatch/
 
 .. _Write your first view:
 
-�Ϥ���ƤΥӥ塼����
+はじめてのビュー作成
 =====================
 
-���Ƥȡ��ޤ��ӥ塼���äƤ��ޤ���͡��ޤ� URLconf ��������ޤ��󡥤�������
-�ޤ��� Django �� URLconf ������������Ǥ��Ƥ��뤫Ĵ�٤Ƥ����ޤ��礦��
+さてと，まだビューを作っていませんね．まだ URLconf しかありません．しかし，
+まずは Django が URLconf を正しく理解できているか調べておきましょう．
 
-Django ��ȯ�����Ф�ư���Ƥ�������::
+Django 開発サーバを起動してください::
 
     python manage.py runserver
 
-Web �֥饦���� "http://localhost:8000/polls/" �˹ԤäƤߤޤ��礦���ʲ��Τ�
-���ʥ�å����������ä����˺̤�줿���顼�ڡ�����ɽ�������Ϥ��Ǥ�::
+Web ブラウザで "http://localhost:8000/polls/" に行ってみましょう．以下のよ
+うなメッセージの入った綺麗に彩られたエラーページが表示されるはずです::
 
     ViewDoesNotExist at /polls/
 
     Tried index in module mysite.polls.views. Error was: 'module'
     object has no attribute 'index'
 
-���Υ��顼�ϡ��ޤ� ``index()`` �Ȥ����ؿ��� ``mysite/polls/views.py`` �˽�
-���Ƥ��ʤ������ȯ�����Ƥ��ޤ���
+このエラーは，まだ ``index()`` という関数を ``mysite/polls/views.py`` に書
+いていないために発生しています．
 
-"/polls/23/" �� "/polls/23/results/" �� "/polls/23/vote/" ���Ʋ�������
-���顼��å��������顤 Django ���ɤΥӥ塼���� (�����Ƥޤ��ӥ塼���
-�Ƥ��ʤ��ΤǼ��Ԥ���) �����狼��ޤ���
+"/polls/23/" や "/polls/23/results/" ， "/polls/23/vote/" も試して下さい．
+エラーメッセージから， Django がどのビューを試した (そしてまだビューを書い
+ていないので失敗した) かがわかります．
 
-���褤��ǽ�Υӥ塼��񤭤ޤ��礦�� ``mysite/polls/views.py`` �Ȥ����ե���
-��򳫤��ơ��ʲ��Τ褦�� Python �����ɤ�񤤤Ƥ�������::
+いよいよ最初のビューを書きましょう． ``mysite/polls/views.py`` というファイ
+ルを開いて，以下のような Python コードを書いてください::
 
     from django.http import HttpResponse
 
     def index(request):
         return HttpResponse("Hello, world. You're at the poll index.")
 
-�Ǥ�ñ��ʥӥ塼�Ǥ����֥饦���� "/polls/" �˥�����������ȡ��ƥ����Ȥ�ɽ��
-�����Ϥ��Ǥ���
+最も単純なビューです．ブラウザで "/polls/" にアクセスすると，テキストが表示
+されるはずです．
 
-���٤ϰʲ��Τ褦�ʥӥ塼���ɲä��ޤ��������ۤɤȾ�����äơ�������Ȥ�ޤ�
-(���ΰ����ˤϡ�URLconf ������ɽ����ǥ���ץ��㤵�줿��Τ��Ϥ���ޤ�)::
+今度は以下のようなビューを追加します．さきほどと少し違って，引数をとります
+(この引数には，URLconf の正規表現内でキャプチャされたものが渡されます)::
 
     def detail(request, poll_id):
         return HttpResponse("You're looking at poll %s." % poll_id)
 
-�֥饦����Ȥä� "/polls/34/" �򸫤Ƥ������������Υӥ塼�� URL �˻��ꤷ��
-ID ��ɽ�����ޤ���
+ブラウザを使って "/polls/34/" を見てください．このビューは URL に指定した
+ID を表示します．
 
 .. _Write views that actually do something:
 
-�ºݤ�ư���ӥ塼���������
+実際に動くビューを作成する
 ==========================
 
-�ƥӥ塼�ϡ��ꥯ�����Ȥ��줿�ڡ����Υ���ƥ�Ĥ����ä� ``HttpResponse`` ��
-�֥������Ȥ��֤����� ``Http404`` �Τ褦���㳰�����Ф��뤫�� 2 �Ĥ�ư��Τ�
-���������줫��¹Ԥ��ͤФʤ�ޤ��󡥤���ʳ��ν��������ƥ桼���ˤ���ͤ��
-�Ƥ��ޤ���
+各ビューは，リクエストされたページのコンテンツが入った ``HttpResponse`` オ
+ブジェクトを返すか， ``Http404`` のような例外を送出するかの 2 つの動作のう
+ち，いずれかを実行せねばなりません．それ以外の処理は全てユーザにゆだねられ
+ています．
 
-�ӥ塼�ϥǡ����١�������쥳���ɤ��ɤߤ����Ƥ⡤�ɤ߽Ф��ʤ��Ƥ⤫�ޤ��ޤ�
-�� Django �Υƥ�ץ졼�ȥ����ƥ� (���뤤�ϥ����ɥѡ��ƥ��� Python �ƥ��
-�졼�ȥ����ƥ�) ��ȤäƤ�褤�Ǥ������Ȥ�ʤ��Ƥ⤫�ޤ��ޤ��� PDF �ե���
-����������Ƥ⡤ XML ����Ϥ��Ƥ⡤ ZIP �ե�����򥪥󥶥ե饤���������Ƥ�
-���ޤ��ޤ��� Python �饤�֥���ȤäƤ�ꤿ�����Ȥ򲿤Ǥ�¸��Ǥ��ޤ���
+ビューはデータベースからレコードを読みだしても，読み出さなくてもかまいませ
+ん． Django のテンプレートシステム (あるいはサードパーティの Python テンプ
+レートシステム) を使ってもよいですし，使わなくてもかまいません． PDF ファイ
+ルを生成しても， XML を出力しても， ZIP ファイルをオンザフライで生成しても
+かまいません． Python ライブラリを使ってやりたいことを何でも実現できます．
 
-Django �ˤȤä�ɬ�פʤΤ� ``HttpResponse`` �Ǥ������뤤���㳰�Ǥ���
+Django にとって必要なのは ``HttpResponse`` です．あるいは例外です．
 
-��ñ�Τ��ᡤ���塼�ȥꥢ�뤽�� 1 �ǲ��⤷�� Django �Υǡ����١��� API ��Ȥ�
-�Ƥߤޤ��礦�� ``index()`` �ӥ塼�򡤥����ƥ��ˤ���ǿ��� 5 ��μ������
-�򥫥�ޤǶ��ڤꡤ���ս��ɽ������褦�ˤ��Ƥߤޤ�::
+簡単のため，チュートリアルその 1 で解説した Django のデータベース API を使っ
+てみましょう． ``index()`` ビューを，システム上にある最新の 5 件の質問項目
+をカンマで区切り，日付順に表示するようにしてみます::
 
     from mysite.polls.models import Poll
     from django.http import HttpResponse
@@ -216,10 +216,10 @@ Django �ˤȤä�ɬ�פʤΤ� ``HttpResponse`` �Ǥ������뤤���㳰�Ǥ���
         output = ', '.join([p.question for p in latest_poll_list])
         return HttpResponse(output)
 
-��ǰ�ʤ��餳�Υ����ɤˤ����꤬����ޤ����ڡ����Υǥ����󤬥ӥ塼��˥ϡ���
-�����ɤ���Ƥ���ΤǤ�������Ǥϡ��ڡ����θ��ɤ����Ѥ������ʤ뤿�Ӥ� Python
-�����ɤ򤤤���ͤФʤ�ޤ��󡥤Ȥ����櫓�ǡ� Django �Υƥ�ץ졼�ȥ����ƥ�
-��Ȥäơ��ǥ������ Python �����ɤ�ʬΥ���ޤ��礦::
+残念ながらこのコードには問題があります．ページのデザインがビュー中にハード
+コードされているのです．これでは，ページの見栄えを変えたくなるたびに Python
+コードをいじらねばなりません．というわけで， Django のテンプレートシステム
+を使って，デザインと Python コードを分離しましょう::
 
     from django.template import Context, loader
     from mysite.polls.models import Poll
@@ -233,32 +233,32 @@ Django �ˤȤä�ɬ�פʤΤ� ``HttpResponse`` �Ǥ������뤤���㳰�Ǥ���
         })
         return HttpResponse(t.render(c))
 
-���Υ����ɤ� "polls/index.html" �Ȥ�̾���Υƥ�ץ졼�Ȥ�����ɤ����ƥ�ץ졼
-�Ȥ˥���ƥ����Ȥ��Ϥ��ޤ�������ƥ����ȤȤϡ��ƥ�ץ졼���ѿ�̾�� Python
-�Υ��֥������Ȥ��б��Ť��Ƥ��뼭��Ǥ���
+このコードは "polls/index.html" とい名前のテンプレートをロードし，テンプレー
+トにコンテキストを渡します．コンテキストとは，テンプレート変数名を Python
+のオブジェクトに対応づけている辞書です．
 
-�ڡ����������ɤ��ޤ��礦�����顼���Ф�褦�ˤʤä��Ϥ��Ǥ�::
+ページをリロードしましょう．エラーが出るようになったはずです::
 
     TemplateDoesNotExist at /polls/
     polls/index.html
 
-�����������ޤ��ƥ�ץ졼�Ȥ��äƤޤ���͡��ޤ����ե����륷���ƥ���
-Django �����������������˥ǥ��쥯�ȥ��������ޤ� (Django �ϥ����Ф��
-�Ԥ��Ƥ���桼����Ʊ���桼�����¤�ư��ޤ�)����������Web �����ФΥɥ����
-��ȥ롼�Ȥˤ��֤��ʤ��褦�ˤ��ޤ��礦���������ƥ��ؤ���θ�Ȥ��ơ��ƥ��
-�졼�Ȥ��������٤��ǤϤʤ��Ȼפ��ޤ���
+そうそう，まだテンプレートを作ってませんね．まず，ファイルシステム上の
+Django がアクセス出来る場所にディレクトリを作成します (Django はサーバを実
+行しているユーザと同じユーザ権限で動作します)．ただし，Web サーバのドキュメ
+ントルートには置かないようにしましょう．セキュリティへの配慮として，テンプ
+レートを公開するべきではないと思います．
 
-���ˡ� ``settings.py`` �� ``TEMPLATE_DIRS`` ���Խ����ơ��ɤ��ǥƥ�ץ졼��
-��õ���Ф褤�� Django �˶����ޤ������塼�ȥꥢ�뤽�� 2 �Ρ�admin �����ȤΥ��
-�� & �ե�����򥫥����ޥ�������פǤ�ä��Τ�Ʊ����ȤǤ���
+次に， ``settings.py`` の ``TEMPLATE_DIRS`` を編集して，どこでテンプレート
+を探せばよいか Django に教えます．チュートリアルその 2 の「admin サイトのルッ
+ク & フィールをカスタマイズする」でやったのと同じ作業です．
 
-���꤬����ä��顤�ƥ�ץ졼�ȥǥ��쥯�ȥ�� ``polls`` �Ȥ����ǥ��쥯�ȥ��
-�������ޤ������Υǥ��쥯�ȥ����ˡ� ``index.html`` �Ȥ���̾���Υե������
-�������Ƥ��������� ``loader.get_template('polls/index.html')`` �Ȥ���������
-�ϡ��ե����륷���ƥ��� "[template_directory]/polls/index.html" ���б�����
-���Ȥ����դ��Ʋ�������
+設定がおわったら，テンプレートディレクトリに ``polls`` というディレクトリを
+作成します．このディレクトリの中に， ``index.html`` という名前のファイルを
+作成してください． ``loader.get_template('polls/index.html')`` というコード
+は，ファイルシステム上の "[template_directory]/polls/index.html" に対応する
+ことに注意して下さい．
 
-�ƥ�ץ졼�Ȥˤϰʲ��Τ褦�ʥ����ɤ�񤭤ޤ�::
+テンプレートには以下のようなコードを書きます::
 
     {% if latest_poll_list %}
         <ul>
@@ -270,18 +270,18 @@ Django �����������������˥ǥ��쥯�ȥ��������ޤ� (Django �ϥ����Ф��
         <p>No polls are available.</p>
     {% endif %}
 
-�֥饦���ǥڡ���������ɤ���ȡ����塼�ȥꥢ�� 1 �Ǻ�ä� "What's up" �Ȥ�
-����ɼ���ܤ����ä��֥�åȥꥹ�Ȥ�ɽ�����ޤ���
+ブラウザでページをロードすると，チュートリアル 1 で作った "What's up" とい
+う投票項目の入ったブリットリストを表示します．
 
 .. _A shortcut: render_to_response():
 
-���硼�ȥ��å�: render_to_response()
+ショートカット: render_to_response()
 ------------------------------------
 
-�ƥ�ץ졼�Ȥ�����ɤ��ƥ���ƥ����Ȥ��ͤ����졤�ƥ�ץ졼�Ȥ�������
-������̤� ``HttpResponse`` ���֥������Ȥ��֤����Ȥ�����Ȥ����ˤ褯�Ȥ�
-��륤�ǥ�����Ǥ��� Django �Ϥ��Υ��ǥ�����Τ���Υ��硼�ȥ��åȤ��󶡤�
-�Ƥ��ޤ������硼�ȥ��åȤ�Ȥä� ``index()`` �ӥ塼��񤭴����Ƥߤޤ��礦::
+テンプレートをロードしてコンテキストに値を入れ，テンプレートをレンダリング
+した結果を ``HttpResponse`` オブジェクトで返す，という作業は非常によく使わ
+れるイディオムです． Django はこのイディオムのためのショートカットを提供し
+ています．ショートカットを使って ``index()`` ビューを書き換えてみましょう::
 
     from django.shortcuts import render_to_response
     from mysite.polls.models import Poll
@@ -292,21 +292,21 @@ Django �����������������˥ǥ��쥯�ȥ��������ޤ� (Django �ϥ����Ф��
                                   {'latest_poll_list': latest_poll_list})
 
 
-���κ�Ȥˤ�äơ� ``loader`` �� ``Context`` �� ``HttpResponse`` �� import
-����ɬ�פϤʤ��ʤ�ޤ�����
+この作業によって， ``loader`` や ``Context`` ， ``HttpResponse`` を import
+する必要はなくなりました．
 
-``render_to_response()`` �ؿ����������˥ƥ�ץ졼�Ȥ�̾����Ȥꡤ���ץ���
-�����������˼����Ȥ�ޤ��� ``render_to_response()`` �ϥƥ�ץ졼�Ȥ��
-��Υ���ƥ����Ȥǥ�����󥰤��� ``HttpResponse`` ���֥������Ȥˤ����֤�
-�ޤ���
+``render_to_response()`` 関数は第一引数にテンプレートの名前をとり，オプショ
+ンの第二引数に辞書をとります． ``render_to_response()`` はテンプレートを指
+定のコンテキストでレンダリングし， ``HttpResponse`` オブジェクトにして返し
+ます．
 
 .. _Raising 404:
 
-404 ������
+404 の送出
 ===========
 
-���ơ����٤� Poll �ξܺ٥ڡ��������դ��ޤ��礦�����Υڡ����� Poll �μ���ʸ
-(question �ե������) ��ɽ�����ޤ����ӥ塼�ϰʲ��Τ褦�ˤʤ�ޤ�::
+さて，今度は Poll の詳細ページを片付けましょう．このページは Poll の質問文
+(question フィールド) を表示します．ビューは以下のようになります::
 
     from django.http import Http404
     # ...
@@ -317,18 +317,18 @@ Django �����������������˥ǥ��쥯�ȥ��������ޤ� (Django �ϥ����Ф��
             raise Http404
         return render_to_response('polls/detail.html', {'poll': p})
 
-��������ǰ���Ǥ���ޤ��������Υӥ塼�ϥꥯ�����Ȥ��� ID ����� Poll ��¸��
-���ʤ��Ȥ��� ``django.http.Http404`` �����Ф��ޤ���
+新しい概念がでて来ました．このビューはリクエストした ID を持つ Poll が存在
+しないときに ``django.http.Http404`` を送出します．
 
 .. _`A shortcut: get_object_or_404()`:
 
-���硼�ȥ��å�: get_object_or_404()
+ショートカット: get_object_or_404()
 -----------------------------------
 
-``get()`` ��¹Ԥ����������֥������Ȥ��ʤ����ˤ� ``Http404`` ���֤����Ȥ�
-����Ȥ����ˤ褯�Ȥ��륤�ǥ�����Ǥ��� Django �Ϥ��Υ��ǥ�����Τ����
-���硼�ȥ��åȤ��󶡤��Ƥ��ޤ������硼�ȥ��åȤ�Ȥä� ``detail()`` �ӥ塼
-��񤭴����Ƥߤޤ��礦::
+``get()`` を実行し，該当オブジェクトがない場合には ``Http404`` を返す，とい
+う作業は非常によく使われるイディオムです． Django はこのイディオムのための
+ショートカットを提供しています．ショートカットを使って ``detail()`` ビュー
+を書き換えてみましょう::
 
     from django.shortcuts import render_to_response, get_object_or_404
     # ...
@@ -336,71 +336,71 @@ Django �����������������˥ǥ��쥯�ȥ��������ޤ� (Django �ϥ����Ф��
         p = get_object_or_404(Poll, pk=poll_id)
         return render_to_response('polls/detail.html', {'poll': p})
 
-``get_object_or_404()`` �� Django �Υ�ǥ륯�饹���������ˤȤꡤǤ�դθ�
-���Υ�����ɰ�����Ȥ�ޤ���������ɰ����Ϥ��Τޤ� ``get()`` �᥽�å�
-���Ϥ�ޤ������֥������Ȥ�¸�ߤ��ʤ���� ``Http404`` �����Ф��ޤ���
+``get_object_or_404()`` は Django のモデルクラスを第一引数にとり，任意の個
+数のキーワード引数をとります．キーワード引数はそのまま ``get()`` メソッド
+に渡ります．オブジェクトが存在しなければ ``Http404`` を送出します．
 
-.. admonition:: �߷�ů��
+.. admonition:: 設計哲学
 
-    �ʤ� ``DoesNotExist`` �㳰�����Ǽ�ưŪ�˥���å��������إ�ѡ��ؿ�
-    ``get_object_or_404()`` ��Ȥ��ΤǤ��礦�����ޤ����ʤ���ǥ�API ��
-    ``DoesNotExist`` �ǤϤʤ� ``Http404`` �����Ф�����ΤǤ��礦����
+    なぜ ``DoesNotExist`` 例外を高水準で自動的にキャッチせず，ヘルパー関数
+    ``get_object_or_404()`` を使うのでしょうか，また，なぜモデルAPI に
+    ``DoesNotExist`` ではなく ``Http404`` を送出させるのでしょうか？
 
-    �����ϡ��֥�ǥ�쥤��ȥӥ塼�쥤��򥫥åץ�󥰤��Ƥ��ޤ�����פǤ���
-    Django �κǤ��礭����ɸ�ΰ�Ĥϡ��롼�����åץ�󥰤ΰݻ��ˤ���ޤ���
+    答えは，「モデルレイヤとビューレイヤをカップリングしてしまうから」です．
+    Django の最も大きな目標の一つは，ルーズカップリングの維持にあります．
 
-``get_list_or_404()`` �Ȥ����ؿ��⤢��ޤ������δؿ���
-``get_object_or_404()`` ��Ʊ���褦��Ư���ޤ����� ``get()`` �ǤϤʤ�
-``filter()`` ��Ȥ��ޤ����ꥹ�Ȥ����ξ��� ``Http404`` �����Ф��ޤ���
+``get_list_or_404()`` という関数もあります．この関数は
+``get_object_or_404()`` と同じように働きますが， ``get()`` ではなく
+``filter()`` を使います．リストが空の場合に ``Http404`` を送出します．
 
 .. _Write a 404 (page not found) view:
 
-404 ���� (�ڡ����򸫤Ĥ����ޤ���) �ѤΥӥ塼����
+404 応答 (ページを見つけられません) 用のビューを作る
 =====================================================
 
-�ӥ塼��� ``Http404`` �����Ф���ȡ� Django �� 404 ���顼�����Ѥ��ü�ʥӥ塼
-������ɤ��ޤ������Υӥ塼�� ``handler404`` �Ȥ����ѿ��򻲾Ȥ��Ƹ��Ĥ��ޤ���
-�ѿ��� URLconf �Υ�����Хå��ǻȤäƤ���Τ�Ʊ���� Python �Υɥå�ɽ��ˡ��
-ɽ�����ؿ�̾��ʸ����Ǥ��� 404 �ӥ塼���Τ��ü�ʤȤ����Ϥ���ޤ���ñ�ʤ�
-���̤Υӥ塼�Ǥ���
+ビュー内で ``Http404`` を送出すると， Django は 404 エラー処理用の特殊なビュー
+をロードします．このビューは ``handler404`` という変数を参照して見つけます．
+変数は URLconf のコールバックで使っているのと同じ， Python のドット表記法で
+表した関数名の文字列です． 404 ビュー自体に特殊なところはありません．単なる
+普通のビューです．
 
-���̤Ϥ虜�虜��ϫ���� 404 �ӥ塼���ɬ�פϤ���ޤ��󡥥ǥե���Ȥ�
-URLconf ������ΰ��־�ˤϰʲ��Τ褦�ʹԤ�����Ϥ��Ǥ�::
+普通はわざわざ苦労して 404 ビューを書く必要はありません．デフォルトの
+URLconf の設定の一番上には以下のような行があるはずです::
 
     from django.conf.urls.defaults import *
 
-``handler404`` ������Ϥ��� import �Ǹ��ߤΥ⥸�塼��˼����ޤ�Ƥ��ޤ���
-``django/conf/urls/defaults.py`` �򸫤��ʬ����ޤ����� ``handler404`` �Υ�
-�ե�����ͤ� ``'django.views.defaults.page_not_found'`` �����ꤵ��Ƥ��ޤ���
+``handler404`` の設定はこの import で現在のモジュールに取り込まれています．
+``django/conf/urls/defaults.py`` を見れば分かりますが， ``handler404`` のデ
+フォルト値は ``'django.views.defaults.page_not_found'`` に設定されています．
 
-404 �ӥ塼�ˤϡ����� 3 �����դ��٤���������ޤ�:
+404 ビューには，あと 3 つ注意すべき点があります:
 
-    * 404 �ӥ塼�ϡ� Django �� URLconf �����Ƥ�����ɽ��������å����ơ�����
-      �����Τ��ʤ��ä����ˤ�ƤӽФ���ޤ���
-    * ��ʬ�� 404 �ӥ塼�����������ñ�˥ǥե���Ȥ������Ȥ� (��������褦
-      ����ޤ�) ���ˤ⡤��Ĥ������ͤФʤ�ʤ����Ȥ�����ޤ�:
-      ``404.html`` �ƥ�ץ졼�Ȥ�ƥ�ץ졼�ȥǥ��쥯�ȥ�Υ롼�Ȥ˺�������
-      �Фʤ�ޤ��󡥥ǥե���Ȥ� 404 �ӥ塼�ϡ����Υƥ�ץ졼�Ȥ����Ƥ� 404
-      ���顼ɽ���˻Ȥ��ޤ���
-    * (����⥸�塼���) ``DEBUG`` �� ``True`` �����ꤷ�Ƥ����硤 Django
-      �� 404 �ӥ塼��Ȥ鷺���ȥ졼���Хå���ɽ�����ޤ���
+    * 404 ビューは， Django が URLconf の全ての正規表現をチェックして，一致
+      するものがなかった場合にも呼び出されます．
+    * 自分で 404 ビューを定義せず，単にデフォルトの設定を使う (そうするよう
+      勧めます) 場合にも，一つだけやらねばならないことがあります:
+      ``404.html`` テンプレートをテンプレートディレクトリのルートに作成せね
+      ばなりません．デフォルトの 404 ビューは，このテンプレートを全ての 404
+      エラー表示に使います．
+    * (設定モジュールで) ``DEBUG`` を ``True`` に設定している場合， Django
+      は 404 ビューを使わず，トレースバックを表示します．
 
 .. _Write a 500 (server error) view:
 
-500 ���� (�����Х��顼) �ѤΥӥ塼����
+500 応答 (サーバエラー) 用のビューを作る
 ========================================
 
-404 ��Ʊ���褦�ˡ� URLconf �� ``handler500`` ������Ǥ��ޤ���
-``handler500`` �ϥ����Х��顼���������Ȥ��˸ƤӽФ����ӥ塼��ؤ��ޤ�������
-�Х��顼�ˤʤ�Τϡ��ӥ塼�����ɤ˼¹Ի����顼�����������Ǥ���
+404 と同じように， URLconf で ``handler500`` を定義できます．
+``handler500`` はサーバエラーが生じたときに呼び出されるビューを指します．サー
+バエラーになるのは，ビューコードに実行時エラーが生じた場合です．
 
 .. _Use the template system:
 
-�ƥ�ץ졼�ȥ����ƥ��Ȥ�
+テンプレートシステムを使う
 ==========================
 
-``polls.views.detail`` �ӥ塼�����ޤ��礦������ƥ������ѿ��� ``poll`` ��
-����ȡ��ƥ�ץ졼�Ȥϰʲ��Τ褦�ˤʤ�ޤ�::
+``polls.views.detail`` ビューに戻りましょう．コンテキスト変数を ``poll`` と
+すると，テンプレートは以下のようになります::
 
     <h1>{{ poll.question }}</h1>
     <ul>
@@ -409,30 +409,30 @@ URLconf ������ΰ��־�ˤϰʲ��Τ褦�ʹԤ�����Ϥ��Ǥ�::
     {% endfor %}
     </ul>
 
-�ƥ�ץ졼�ȥ����ƥ�ϥɥåȤ�Ȥä�ɽ��ˡ���ѿ���°���˥����������ޤ���
-``{{ poll.question }}`` ����ˤȤ�ȡ��ޤ� Django �� ``poll`` ���֥�������
-�򼭽�Ȥߤʤ��� ``question`` ���ͤ�õ���ޤ�������ˤϼ��Ԥ���Τǡ����٤�
-°���Ȥ��ƾȹ��Ԥ������ξ����������ޤ�������°���ξȹ�˼��Ԥ���ȡ�
-Django �� poll ���֥������Ȥ� ``question()`` �Ȥ����᥽�åɤ�ƤӽФ����Ȥ�
-�ޤ���
+テンプレートシステムはドットを使った表記法で変数の属性にアクセスします．
+``{{ poll.question }}`` を例にとると，まず Django は ``poll`` オブジェクト
+を辞書とみなして ``question`` の値を探します．これには失敗するので，今度は
+属性として照合を行い，この場合は成功します．仮に属性の照合に失敗すると，
+Django は poll オブジェクトの ``question()`` というメソッドを呼び出そうとし
+ます．
 
-�᥽�åɸƤӽФ��� ``{% for %}`` �롼�פ���ǹԤ��Ƥ��ޤ���
-``poll.choice_set.all`` �ϡ� Python �Υ����� ``poll.choice_set.all()`` �˲�
-�ᤵ��ޤ������η�̡� Choice ���֥������Ȥ���ʤ륤�ƥ졼������ǽ���֥���
-���Ȥ��֤� ``{% for %}`` �����ǻȤ���褦�ˤʤ�ޤ���
+メソッド呼び出しは ``{% for %}`` ループの中で行われています．
+``poll.choice_set.all`` は， Python のコード ``poll.choice_set.all()`` に解
+釈されます．その結果， Choice オブジェクトからなるイテレーション可能オブジェ
+クトを返し ``{% for %}`` タグで使えるようになります．
 
-�ƥ�ץ졼�Ȥξܤ���ư��ˤĤ��Ƥ� `�ƥ�ץ졼�ȥ�����`_ �򻲾Ȥ��Ƥ���������
+テンプレートの詳しい動作については `テンプレートガイド`_ を参照してください．
 
-.. _`�ƥ�ץ졼�ȥ�����`: ../templates/
+.. _`テンプレートガイド`: ../templates/
 .. _template guide: ../templates/
 
 .. _Simplifying the URLconfs:
 
-URLconf ��ñ�㲽
+URLconf の単純化
 ================
 
-���Ф餯�ӥ塼�ȥƥ�ץ졼�ȥ����ƥ�򤤤��äƤߤƤ��������� URLconf ���Խ�
-���Ƥ��������ˡ��¤Ϥ��ʤ��Ĺ����ʬ�����뤳�Ȥ˵��Ť����⤷��ޤ���::
+しばらくビューとテンプレートシステムをいじってみてください． URLconf を編集
+していくうちに，実はかなり冗長な部分があることに気づくかもしれません::
 
     urlpatterns = patterns('',
         (r'^polls/$', 'mysite.polls.views.index'),
@@ -441,11 +441,11 @@ URLconf ��ñ�㲽
         (r'^polls/(?P<poll_id>\d+)/vote/$', 'mysite.polls.views.vote'),
     )
 
-���餫�ˡ��ɤΥ�����Хå��ˤ� ``mysite.polls.views`` �����äƤ��ޤ���
+明らかに，どのコールバックにも ``mysite.polls.views`` が入っています．
 
-����Ϥ褯���뤳�ȤʤΤǡ� URLconf �ե졼�����Ǥϥץ�ե�������ͭ����
-����Υ��硼�ȥ��åȤ�����ޤ������̤Υץ�ե��������ڤ�Ф��ơ��ʲ��Τ褦
-�� ``patterns()`` �κǽ�ΰ������ɲä��Ƥ�������::
+これはよくあることなので， URLconf フレームワークではプレフィクスを共有する
+ためのショートカットがあります．共通のプレフィクスを切り出して，以下のよう
+に ``patterns()`` の最初の引数に追加してください::
 
     urlpatterns = patterns('mysite.polls.views',
         (r'^polls/$', 'index'),
@@ -454,50 +454,50 @@ URLconf ��ñ�㲽
         (r'^polls/(?P<poll_id>\d+)/vote/$', 'vote'),
     )
 
-��ǽŪ�ˤ����η���������Ʊ���Ǥ����Ǥ�ȤƤ⤹�ä��ꤷ�ޤ����͡�
+機能的には前の形式と全く同じです．でもとてもすっきりしましたね．
 
 .. _Decoupling the URLconfs:
 
-URLconf ��æ���åץ��
+URLconf の脱カップリング
 ========================
 
-�Ȥ����ǡ����������֤�䤤�� polls ���ץꥱ�������� URL ����� Django ��
-���������Ȥ����꤫���ڤ�Υ���ޤ��礦�� Django ���ץꥱ�������ϥץ饰��ǽ��
-�Ĥޤꤢ�줳�����ꤷ�ʤ��Ƥ⡤����Υ��ץꥱ���������̤� Django ���󥹥ȡ�
-��˰�ư�Ǥ���褦�ˤʤäƤ��ޤ���
+ところで，すこし時間を割いて polls アプリケーションの URL 設定を Django プ
+ロジェクトの設定から切り離しましょう． Django アプリケーションはプラグ可能，
+つまりあれこれ設定しなくても，特定のアプリケーションを別の Django インストー
+ルに移動できるようになっています．
 
-���ΤȤ����� ``python manage.py startapp`` �Ǻ���������̩�ʥǥ��쥯�ȥ깽��
-�Τ������� polls ���ץꥱ�������Ϥ��ʤꤦ�ޤ�æ���åץ�󥰤Ǥ��Ƥ��ޤ�����
-�����������ߤ� Django ������ȥ��åץ�󥰤��Ƥ����꤬����ޤ�: �����
-URLconf �Ǥ���
+今のところ， ``python manage.py startapp`` で作成した厳密なディレクトリ構成
+のおかげで polls アプリケーションはかなりうまく脱カップリングできていますが，
+一点だけ現在の Django の設定とカップリングしている場所があります: それは
+URLconf です．
 
-����ޤǤ� URL ����� ``mysite/urls.py`` ���Խ����Ƥ��ޤ����������襢�ץꥱ��
-������ URL �߷פϥ��ץꥱ��������ͭ�Τ�ΤǤ��äơ������ Django ����
-�ȡ���Ȥϴط��Τʤ���ΤǤ��������ǡ� URL ����򥢥ץꥱ�������ǥ��쥯��
-����ˤ�äƤ��ޤ��礦��
+これまでは URL 設定を ``mysite/urls.py`` で編集してきましたが，本来アプリケー
+ションの URL 設計はアプリケーション固有のものであって，特定の Django インス
+トールとは関係のないものです．そこで， URL 設定をアプリケーションディレクト
+リ内にもってきましょう．
 
-``mysite/urls.py`` �ե������ ``mysite/polls/urls.py`` �˥��ԡ����Ƥ���������
-���� ``mysite/urls.py`` ���� polls �˴ؤ��� URL ��������ƺ�������ʲ���
-``include()`` ���Ĥ����񤭤ޤ�::
+``mysite/urls.py`` ファイルを ``mysite/polls/urls.py`` にコピーしてください．
+次に ``mysite/urls.py`` から polls に関する URL 設定を全て削除し，以下の
+``include()`` を一つだけ書きます::
 
     (r'^polls/', include('mysite.polls.urls')),
 
-��ñ����������ȡ� ``include()`` ���̤� URLconf �ؤλ��ȤǤ�������ɽ����
-``$`` (ʸ����������˥ޥå�����) ���դ��Ƥ��餺�����˥���å��夬�Ĥ��Ƥ�
-�뤳�Ȥ����դ��Ƥ��������� Django �� ``include()`` �򸫤Ĥ���ȡ��ꥯ������
-URL ��Υޥå�������ʬ���ڤ�Υ�����Ĥ����ʬ�� ``include()`` ���Ƥ���
-URLconf �����äƽ��������ޤ���
+簡単に説明すると， ``include()`` は別の URLconf への参照です．正規表現に
+``$`` (文字列の末尾にマッチする) が付いておらず，代りにスラッシュがついてい
+ることに注意してください． Django は ``include()`` を見つけると，リクエスト
+URL 中のマッチした部分を切り離し，残りの部分を ``include()`` している
+URLconf に送って処理させます．
 
-���äơ����Υ����ƥ�ǥ桼���� "/polls/34/" �˥�����������ȡ����Τ褦�˽�
-������ޤ�:
+従って，このシステムでユーザが "/polls/34/" にアクセスすると，次のように処
+理されます:
 
-* Django �� ``'^polls/'`` �˥ޥå����뤳�Ȥ�ȯ�����ޤ���
-* Django �ϥޥå���ʬ�Υƥ����� (``"polls/"``) �����ꡤ�Ĥ�Υƥ����Ȥ�
-  ���� ``"34/"`` �� 'mysite.polls.urls' �Ȥ��� URLconf �����ꡤ���������ޤ���
+* Django が ``'^polls/'`` にマッチすることを発見します．
+* Django はマッチ部分のテキスト (``"polls/"``) を取り去り，残りのテキストで
+  ある ``"34/"`` を 'mysite.polls.urls' という URLconf に送り，処理させます．
 
-����ǥץ���������¦��æ���åץ�󥰤ϤǤ��ޤ��������٤�
-'mysite.polls.urls' ¦��æ���åץ�󥰤��뤿��ˡ� URLconf �γƹԤ��顤
-��Ƭ�� "polls/" �������Ƥ�������::
+これでプロジェクト側の脱カップリングはできました．今度は
+'mysite.polls.urls' 側を脱カップリングするために， URLconf の各行から，
+先頭の "polls/" を削除してください::
 
     urlpatterns = patterns('mysite.polls.views',
         (r'^$', 'index'),
@@ -506,17 +506,17 @@ URLconf �����äƽ��������ޤ���
         (r'^(?P<poll_id>\d+)/vote/$', 'vote'),
     )
 
-``include()`` �� URLconf ��æ���åץ�󥰤��طʤˤϡ� URL �Υץ饰 & �ץ쥤
-���ñ�ˤ��褦�Ȥ���ȯ�ۤ�����ޤ������� polls ���ȼ��� URLconf ����Ĥ褦
-�ˤʤä��Τǡ��֤����� "/polls/" �� "/fun_polls/" ��"/content/polls/" ��
-����¾�ɤ�� URL �롼�Ȳ��ˤ��֤���褦�ˤʤꡤ�ɤ����֤��Ƥ⤭�����ư�
-��褦�ˤʤ�ޤ�����
+``include()`` と URLconf の脱カップリングの背景には， URL のプラグ & プレイ
+を簡単にしようという発想があります．今や polls は独自の URLconf を持つよう
+になったので，置き場所は "/polls/" や "/fun_polls/" ，"/content/polls/" ，
+その他どんな URL ルート下にも置けるようになり，どこに置いてもきちんと動作す
+るようになりました．
 
-polls ���ץꥱ������������ URL �ǤϤʤ����� URL ���������դ��Ƥ���櫓��
-����
+polls アプリケーションは絶対 URL ではなく相対 URL だけに注意しているわけで
+す．
 
-�ӥ塼�κ����˴��줿�顤 `���塼�ȥꥢ�뤽�� 4`_ �˿ʤ�ǡ���ñ�ʥե������
-�������ѥӥ塼 (generic view) �λȤ�����ؤӤޤ��礦��
+ビューの作成に慣れたら， `チュートリアルその 4`_ に進んで，簡単なフォーム処
+理と汎用ビュー (generic view) の使い方を学びましょう．
 
-.. _`���塼�ȥꥢ�뤽�� 4`: ../tutorial04/
+.. _`チュートリアルその 4`: ../tutorial04/
 .. _part 4 of this tutorial: ../tutorial4/

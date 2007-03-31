@@ -1,157 +1,157 @@
 =================================
-Django ¥ª¥ó¥é¥¤¥ó¥É¥­¥å¥á¥ó¥ÈÏÂÌõ
+Django ã‚ªãƒ³ãƒ©ã‚¤ãƒ³ãƒ‰ã‚­ãƒ¥ãƒ¡ãƒ³ãƒˆå’Œè¨³
 =================================
 
-ÏÂÌõ
+å’Œè¨³
     Yasushi Masuda (ymasuda at ethercube dot com),
     Takanao Endoh (takanao at endoh dot tk)
-ÄìËÜ
+åº•æœ¬
     SVN trunk (0.96+ SVN)
-ÄÉ½¾ºÑ¤ß¥ê¥Ó¥¸¥ç¥ó
+è¿½å¾“æ¸ˆã¿ãƒªãƒ“ã‚¸ãƒ§ãƒ³
     4884 (2007/04/01)
 
-É¬ÆÉ
+å¿…èª­
 ----
 
-`Django ¤Î³µÍ× (Django overview) <../overview/>`__
+`Django ã®æ¦‚è¦ (Django overview) <../overview/>`__
 
-`¥¤¥ó¥¹¥È¡¼¥ë¥¬¥¤¥É <../install/>`__
+`ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã‚¬ã‚¤ãƒ‰ <../install/>`__
 
-`¥µ¡¼¥É¥Ñ¡¼¥Æ¥£¤Ë¤è¤ë Django ¥Ç¥£¥¹¥È¥ê¥Ó¥å¡¼¥·¥ç¥ó (Third-party distributions of Django) <../distributions/>`__
+`ã‚µãƒ¼ãƒ‰ãƒ‘ãƒ¼ãƒ†ã‚£ã«ã‚ˆã‚‹ Django ãƒ‡ã‚£ã‚¹ãƒˆãƒªãƒ“ãƒ¥ãƒ¼ã‚·ãƒ§ãƒ³ (Third-party distributions of Django) <../distributions/>`__
 
-`Django ¥É¥­¥å¥á¥ó¥È¤ÎÆÉ¤ßÊı (How to read the Django documentation) <../documentation/>`__
+`Django ãƒ‰ã‚­ãƒ¥ãƒ¡ãƒ³ãƒˆã®èª­ã¿æ–¹ (How to read the Django documentation) <../documentation/>`__
 
-¥Á¥å¡¼¥È¥ê¥¢¥ë
+ãƒãƒ¥ãƒ¼ãƒˆãƒªã‚¢ãƒ«
 ~~~~~~~~~~~~~~
 
-`¤Ï¤¸¤á¤Æ¤Î Django ¥¢¥×¥êºîÀ®¡¤¤½¤Î 1: 
-½é´ü²½¡¤¥â¥Ç¥ëºîÀ®¡¤¥Ç¡¼¥¿¥Ù¡¼¥¹ API <../tutorial01/>`__  
+`ã¯ã˜ã‚ã¦ã® Django ã‚¢ãƒ—ãƒªä½œæˆï¼Œãã® 1: 
+åˆæœŸåŒ–ï¼Œãƒ¢ãƒ‡ãƒ«ä½œæˆï¼Œãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹ API <../tutorial01/>`__  
 
-`¤Ï¤¸¤á¤Æ¤Î Django ¥¢¥×¥êºîÀ®¡¤¤½¤Î 2: 
-¼«Æ°À¸À®¤Î admin ¥µ¥¤¥È¤òÃµµæ¤¹¤ë <../tutorial02/>`__ 
+`ã¯ã˜ã‚ã¦ã® Django ã‚¢ãƒ—ãƒªä½œæˆï¼Œãã® 2: 
+è‡ªå‹•ç”Ÿæˆã® admin ã‚µã‚¤ãƒˆã‚’æ¢ç©¶ã™ã‚‹ <../tutorial02/>`__ 
 
-`¤Ï¤¸¤á¤Æ¤Î Django ¥¢¥×¥êºîÀ®¡¤¤½¤Î 3: 
-¸ø³«ÍÑ¤Î¥¤¥ó¥¿¥Õ¥§¡¼¥¹¥Ó¥å¡¼¤òºîÀ®¤¹¤ë <../tutorial03/>`__ 
+`ã¯ã˜ã‚ã¦ã® Django ã‚¢ãƒ—ãƒªä½œæˆï¼Œãã® 3: 
+å…¬é–‹ç”¨ã®ã‚¤ãƒ³ã‚¿ãƒ•ã‚§ãƒ¼ã‚¹ãƒ“ãƒ¥ãƒ¼ã‚’ä½œæˆã™ã‚‹ <../tutorial03/>`__ 
 
-`¤Ï¤¸¤á¤Æ¤Î Django ¥¢¥×¥êºîÀ®¡¤¤½¤Î 4: 
-´ÊÃ±¤Ê¥Õ¥©¡¼¥à¥Ç¡¼¥¿½èÍı¤ÈÈÆÍÑ¥Ó¥å¡¼ <../tutorial04/>`__ 
+`ã¯ã˜ã‚ã¦ã® Django ã‚¢ãƒ—ãƒªä½œæˆï¼Œãã® 4: 
+ç°¡å˜ãªãƒ•ã‚©ãƒ¼ãƒ ãƒ‡ãƒ¼ã‚¿å‡¦ç†ã¨æ±ç”¨ãƒ“ãƒ¥ãƒ¼ <../tutorial04/>`__ 
 
-`Django ¤Ë¤Ä¤¤¤Æ¤è¤¯¤¢¤ë¼ÁÌä (Django FAQ) <../faq/>`__ 
+`Django ã«ã¤ã„ã¦ã‚ˆãã‚ã‚‹è³ªå• (Django FAQ) <../faq/>`__ 
 
 
-¥ê¥Õ¥¡¥ì¥ó¥¹
+ãƒªãƒ•ã‚¡ãƒ¬ãƒ³ã‚¹
 ------------
 
-`django-admin.py ¤È manage.py (django-admin.py and manage.py) <../django-admin/>`__
+`django-admin.py ã¨ manage.py (django-admin.py and manage.py) <../django-admin/>`__
 
-¥â¥Ç¥ë
+ãƒ¢ãƒ‡ãƒ«
 ~~~~~~
 
-`¥â¥Ç¥ë¤ÎºîÀ® (Creating models) <../model-api/>`__ 
+`ãƒ¢ãƒ‡ãƒ«ã®ä½œæˆ (Creating models) <../model-api/>`__ 
 
-`¥Ç¡¼¥¿¥Ù¡¼¥¹ API (The database API) <../db-api/>`__
+`ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹ API (The database API) <../db-api/>`__
 
-`¥È¥é¥ó¥¶¥¯¥·¥ç¥ó (Managing database transactions) <../transactions/>`__
+`ãƒˆãƒ©ãƒ³ã‚¶ã‚¯ã‚·ãƒ§ãƒ³ (Managing database transactions) <../transactions/>`__
 
-¥Æ¥ó¥×¥ì¡¼¥È
+ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆ
 ~~~~~~~~~~~~
 
-`¥Æ¥ó¥×¥ì¡¼¥Èºî¼Ô¤Î¤¿¤á¤Î Django ¥Æ¥ó¥×¥ì¡¼¥È¸À¸ì¥¬¥¤¥É
+`ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆä½œè€…ã®ãŸã‚ã® Django ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆè¨€èªã‚¬ã‚¤ãƒ‰
 (Guide for HTMLauthors)  <../templates/>`__
 
-`Python ¥×¥í¥°¥é¥Ş¤Î¤¿¤á¤Î Django ¥Æ¥ó¥×¥ì¡¼¥È¸À¸ì¥¬¥¤¥É
+`Python ãƒ—ãƒ­ã‚°ãƒ©ãƒã®ãŸã‚ã® Django ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆè¨€èªã‚¬ã‚¤ãƒ‰
 (Guide for Python programmers)  <../templates_python/>`__
 
-`¥Õ¥©¡¼¥à¤È¥Ş¥Ë¥Ô¥å¥ì¡¼¥¿
+`ãƒ•ã‚©ãƒ¼ãƒ ã¨ãƒãƒ‹ãƒ”ãƒ¥ãƒ¬ãƒ¼ã‚¿
 (Forms, fields, and manipulators) <../forms/>`__
 
-`newforms ¥é¥¤¥Ö¥é¥ê <../newforms/>`__
+`newforms ãƒ©ã‚¤ãƒ–ãƒ©ãƒª <../newforms/>`__
 
-`Django ¥¢¥×¥ê¥±¡¼¥·¥ç¥ó¤Î¥Æ¥¹¥È (Writing tests for Django applications) <../testing/>`__
+`Django ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã®ãƒ†ã‚¹ãƒˆ (Writing tests for Django applications) <../testing/>`__
 
-`¥»¥Ã¥·¥ç¥ó (Sessions) <../sessions/>`__
+`ã‚»ãƒƒã‚·ãƒ§ãƒ³ (Sessions) <../sessions/>`__
 
-`¥­¥ã¥Ã¥·¥å (Django's Cache Framework) <../cache/>`__
+`ã‚­ãƒ£ãƒƒã‚·ãƒ¥ (Django's Cache Framework) <../cache/>`__
 
-`¹ñºİ²½ (Internationalization) <../i18n/>`__
+`å›½éš›åŒ– (Internationalization) <../i18n/>`__
 
-`¥ß¥É¥ë¥¦¥§¥¢ (Middlewares) <../middleware/>`__
+`ãƒŸãƒ‰ãƒ«ã‚¦ã‚§ã‚¢ (Middlewares) <../middleware/>`__
 
-`ÀßÄê¥Õ¥¡¥¤¥ë (Settings files) <../settings/>`__
+`è¨­å®šãƒ•ã‚¡ã‚¤ãƒ« (Settings files) <../settings/>`__
 
-`URL ¤ÎÀßÄê (URL configuration) <../url_dispatch/>`__
+`URL ã®è¨­å®š (URL configuration) <../url_dispatch/>`__
 
-`¥ê¥¯¥¨¥¹¥È¥ª¥Ö¥¸¥§¥¯¥È¤È¥ì¥¹¥İ¥ó¥¹¥ª¥Ö¥¸¥§¥¯¥È
+`ãƒªã‚¯ã‚¨ã‚¹ãƒˆã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¨ãƒ¬ã‚¹ãƒãƒ³ã‚¹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 (Request and response objects) <../request_response/>`__
 
-`ÈÆÍÑ¥Ó¥å¡¼ (Generic views) <../generic_views/>`__
+`æ±ç”¨ãƒ“ãƒ¥ãƒ¼ (Generic views) <../generic_views/>`__
 
-`Ç§¾Ú (Authentication) <../authentication/>`__
+`èªè¨¼ (Authentication) <../authentication/>`__
 
-`¥¢¥É¥ª¥ó (Add-on applications (contrib)) <../add_ons/>`__
+`ã‚¢ãƒ‰ã‚ªãƒ³ (Add-on applications (contrib)) <../add_ons/>`__
 
-  `ÇÛ¿®¥Õ¥£¡¼¥É (Syndication feeds (RSS and Atom)) <../syndication_feeds/>`__
+  `é…ä¿¡ãƒ•ã‚£ãƒ¼ãƒ‰ (Syndication feeds (RSS and Atom)) <../syndication_feeds/>`__
 
-  `flatpages ¥¢¥×¥ê¥±¡¼¥·¥ç¥ó <../flatpages/>`__
+  `flatpages ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ <../flatpages/>`__
 
-  `¥ê¥À¥¤¥ì¥¯¥È (Redirects) <../redirects/>`__
+  `ãƒªãƒ€ã‚¤ãƒ¬ã‚¯ãƒˆ (Redirects) <../redirects/>`__
 
-  `¥¯¥í¥¹¥µ¥¤¥È¥ê¥¯¥¨¥¹¥È¥Õ¥©¡¼¥¸¥§¥ê (CSRF) ¤ÎÁË»ß <../csrf/>`__
+  `ã‚¯ãƒ­ã‚¹ã‚µã‚¤ãƒˆãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ•ã‚©ãƒ¼ã‚¸ã‚§ãƒª (CSRF) ã®é˜»æ­¢ <../csrf/>`__
 
-  `¥µ¥¤¥È (Sites) <../sites/>`__
+  `ã‚µã‚¤ãƒˆ (Sites) <../sites/>`__
 
-  `¥µ¥¤¥È¥Ş¥Ã¥× (Sitemaps) <../sitemaps/>`__
+  `ã‚µã‚¤ãƒˆãƒãƒƒãƒ— (Sitemaps) <../sitemaps/>`__
 
-  `Web ¥Ç¥¶¥¤¥Ê¡¼¤Î¤¿¤á¤ÎÊä½õµ¡Ç½ (Web design helpers) <../webdesign/>`__
+  `Web ãƒ‡ã‚¶ã‚¤ãƒŠãƒ¼ã®ãŸã‚ã®è£œåŠ©æ©Ÿèƒ½ (Web design helpers) <../webdesign/>`__
 
 
-±¿ÍÑ´ØÏ¢
+é‹ç”¨é–¢é€£
 --------
 
-`mod_python ¤Ç Django ¤ò»È¤¦ (Using Django with mod_python) <../modpython/>`__
+`mod_python ã§ Django ã‚’ä½¿ã† (Using Django with mod_python) <../modpython/>`__
 
-`FastCGI ¤Ç Django ¤ò»È¤¦ (Using Django with FastCGI) <../fastcgi/>`__
+`FastCGI ã§ Django ã‚’ä½¿ã† (Using Django with FastCGI) <../fastcgi/>`__
 
-ÆÃ¼ì¤ÊÏÃÂê
+ç‰¹æ®Šãªè©±é¡Œ
 ----------
 
-`Apache ¤Ç¤ÎÇ§¾Ú¤Ë Django ¥æ¡¼¥¶¥Ç¡¼¥¿¥Ù¡¼¥¹¤ò»È¤¦
+`Apache ã§ã®èªè¨¼ã« Django ãƒ¦ãƒ¼ã‚¶ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹ã‚’ä½¿ã†
 (Authenticating against Django's user database from Apache) <../apache_auth/>`__
 
-`ÀÅÅª¥Õ¥¡¥¤¥ë¤ÎÄó¶¡ÊıË¡ (Serving static/media files) <../static_files/>`__
+`é™çš„ãƒ•ã‚¡ã‚¤ãƒ«ã®æä¾›æ–¹æ³• (Serving static/media files) <../static_files/>`__
 
-`e-mail ¤ÎÁ÷¿® (Sending e-mail) <../email/>`__
+`e-mail ã®é€ä¿¡ (Sending e-mail) <../email/>`__
 
-`¥Ç¡¼¥¿¥Ù¡¼¥¹¤Î¥µ¥İ¡¼¥È¾õ¶· (Notes about supported databases) <../databases/>`__
+`ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹ã®ã‚µãƒãƒ¼ãƒˆçŠ¶æ³ (Notes about supported databases) <../databases/>`__
 
-`¸Å¤¤¥Ç¡¼¥¿¥Ù¡¼¥¹¤ÎÁÈ¤ß¹ş¤ß 
+`å¤ã„ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹ã®çµ„ã¿è¾¼ã¿ 
 (Integrating with (introspecting) a legacy database) <../legacy_databases/>`__
 
-`Ê£¿ô¤Î¥Ç¡¼¥¿¥Ù¡¼¥¹¤ò»È¤¦ (Using Multiple Databases (in multi-db branch)) <../multiple_database_support/>`__
+`è¤‡æ•°ã®ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹ã‚’ä½¿ã† (Using Multiple Databases (in multi-db branch)) <../multiple_database_support/>`__
 
-`Æ°Åª¤Ê PDF ¤ÎÀ¸À® (Outputting PDFs dynamically) <../outputting_pdf/>`__
+`å‹•çš„ãª PDF ã®ç”Ÿæˆ (Outputting PDFs dynamically) <../outputting_pdf/>`__
 
-`Æ°Åª¤Ê CSV ¤ÎÀ¸À® (Outputting CSV dynamically) <../outputting_csv/>`__
+`å‹•çš„ãª CSV ã®ç”Ÿæˆ (Outputting CSV dynamically) <../outputting_csv/>`__
 
-`Django ¥ª¥Ö¥¸¥§¥¯¥È¤Î¥·¥ê¥¢¥é¥¤¥º (Serializing Django objects) <../serialization/>`__
+`Django ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚º (Serializing Django objects) <../serialization/>`__
 
-¤½¤ÎÂ¾
+ãã®ä»–
 ------
 
-`Django ¤ÎÀß·×»×ÁÛ (Design philosophies) <../design_philosophies/>`__
+`Django ã®è¨­è¨ˆæ€æƒ³ (Design philosophies) <../design_philosophies/>`__
 
-`Django ¥×¥í¥¸¥§¥¯¥È¤Ë¶¨ÎÏ¤¹¤ë¤¿¤á¤Ë
+`Django ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆã«å”åŠ›ã™ã‚‹ãŸã‚ã«
 (How to contribute to Django) <../contributing/>`__
 
 `Django admin CSS guide <../admin_css/>`__
 
-`API ¤Î°ÂÄêÀ­ <../api_stability/>`__
+`API ã®å®‰å®šæ€§ <../api_stability/>`__
 
 
-¥ê¥ê¡¼¥¹¥Î¡¼¥È
+ãƒªãƒªãƒ¼ã‚¹ãƒãƒ¼ãƒˆ
 --------------
 
-`¥Ğ¡¼¥¸¥ç¥ó 0.96 ¥ê¥ê¡¼¥¹¥Î¡¼¥È <../release_notes_0.96/>`__
+`ãƒãƒ¼ã‚¸ãƒ§ãƒ³ 0.96 ãƒªãƒªãƒ¼ã‚¹ãƒãƒ¼ãƒˆ <../release_notes_0.96/>`__
 
-`¥Ğ¡¼¥¸¥ç¥ó 0.95 ¥ê¥ê¡¼¥¹¥Î¡¼¥È <../release_notes_0.95/>`__
+`ãƒãƒ¼ã‚¸ãƒ§ãƒ³ 0.95 ãƒªãƒªãƒ¼ã‚¹ãƒãƒ¼ãƒˆ <../release_notes_0.95/>`__
 

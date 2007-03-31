@@ -1,32 +1,32 @@
 ========================
-ʣ���Υǡ����١�����Ȥ�
+複数のデータベースを使う
 ========================
 
 :revision-up-to: 4805 (release 0.96)
 
-.. warning:: ���Υɥ�����Ȥ� multi-db �֥���
+.. warning:: このドキュメントは multi-db ブランチ
 
-����Ū�� Django �λȤ����Ǥϡ����ƤΥ��ץꥱ���������ĤΥǡ����١�����
-³�ǰ����ޤ����ȤϤ�����Django �ϥ��ץꥱ�������ñ�̡���ǥ�ñ�̤ޤ��ϥ���
-�ۥå��˥ǡ����١�����³��ĥ��褦������⥵�ݡ��Ȥ��Ƥ��ޤ���ʣ���ǡ����١�
-���Υ��ݡ��Ȥϥ��ץ����Ǥ���
+一般的な Django の使い方では，全てのアプリケーションを一つのデータベース接
+続で扱います．とはいえ，Django はアプリケーション単位，モデル単位またはアド
+ホックにデータベース接続を張るような設定もサポートしています．複数データベー
+スのサポートはオプションです．
 
 .. _Configuring other database connections:
 
-ʣ���Υǡ����١�����³�����ꤹ��
+複数のデータベース接続を設定する
 ================================
 
-Django �Υǥե���ȤΥǡ����١�����³�ϡ�settings �⥸�塼���
+Django のデフォルトのデータベース接続は，settings モジュールの
 DATABASE_ENGINE, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD,
-DATABASE_HOST, ����� DATABASE_PORT �Ȥ��ä��ѿ������ꤷ�ޤ�������Ȥ��̤�
-�ǡ����١�������³����ˤϡ� OTHER_DATABASES �����Ȥ��ޤ���
-OTHER_DATABASES �ϼ���Ȥ������ꤷ�ޤ�������γƥ����ˤ���³���̤��뤿��
-��̾�������ͤˤ���������ä���������ޤ���OTEHER_DATABASES �γƥ���ȥ�
-(��̾���դ�����³(named connection)�פȤ����ޤ�)�ϡ��ǥե���ȤΥǡ����١�
-�����ץ����� DATABASE_ENGINE �Τ褦�������ѿ��򥭡��˻����ޤ����ɤΥ�����
-��ά��ǽ�ǡ���ά�������ˤϥǥե���Ȥ������ͤ�Ѿ����ޤ���
+DATABASE_HOST, および DATABASE_PORT といった変数で設定します．これとは別の
+データベースを接続するには， OTHER_DATABASES 設定を使います．
+OTHER_DATABASES は辞書として設定します．辞書の各キーには接続を識別するため
+の名前が，値には設定の入った辞書が入ります．OTEHER_DATABASES の各エントリ
+(「名前付きの接続(named connection)」といいます)は，デフォルトのデータベー
+スオプションの DATABASE_ENGINE のような設定変数をキーに持ちます．どのキーも
+省略可能で，省略した場合にはデフォルトの設定値を継承します．
 
-���ʲ��˼����ޤ�::
+例を以下に示します::
 
     DATABASE_ENGINE = 'postgresql'
     DATABASE_NAME = 'django_apps'
@@ -44,13 +44,13 @@ OTHER_DATABASES �ϼ���Ȥ������ꤷ�ޤ�������γƥ����ˤ���³���̤��뤿��
                      'DATABASE_PASSWORD': 'xxx' }
     }
 
-DATABASE_* ����˲ä��ơ� OTHER_DATABASES ��̾���դ���³�ˤ� MODELS �Ȥ���
-��ά��ǽ�������������ޤ��� Django ���ץꥱ���������ǥ�� Python ��
-��̾�Υꥹ�Ȥ�����ޤ���MODELS ����ꤹ��ȡ� MODELS �˵󤲤����ץꥱ������
-����ǥ�����ˤϡ��ǥե���Ȥ���³�����ä� OTHER_DATABASES �����ꤷ��
-��³��Ȥ��褦�ˤʤ�ޤ���
+DATABASE_* 設定に加えて， OTHER_DATABASES の名前付き接続には MODELS という
+省略可能な設定を入れられます． Django アプリケーションやモデルの Python パ
+ス名のリストを入れます．MODELS を指定すると， MODELS に挙げたアプリケーショ
+ンやモデルの操作には，デフォルトの接続に代わって OTHER_DATABASES で設定した
+接続を使うようになります．
 
-``MODELS`` ��ä�����򼨤��ޤ�::
+``MODELS`` を加えた例を示します::
 
     OTHER_DATABASES = {
         'local': { 'DATABASE_ENGINE': 'sqlite3',
@@ -74,7 +74,7 @@ DATABASE_* ����˲ä��ơ� OTHER_DATABASES ��̾���դ���³�ˤ� MODELS �Ȥ���
 
 .. _Accessing a model's connection:
 
-��ǥ����³�˥�����������
+モデルの接続にアクセスする
 ==============================
 
 Each manager has a ``db`` attribute that can be used to access the model's
@@ -116,7 +116,7 @@ connection configured for the model.
 
 .. _ConnectionInfo objects:
 
-ConnectionInfo ���֥�������
+ConnectionInfo オブジェクト
 ===========================
 
 FIXME Describe the ConnectionInfo object and each of its attributes.

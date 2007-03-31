@@ -1,252 +1,252 @@
 ============================
-django-admin.py �� manage.py
+django-admin.py と manage.py
 ============================
 
 :revision-up-to: 4828 (0.96+ SVN)
 
-``django-admin.py`` �� Django �δ�����������Ԥ�����Υ��ޥ�ɥ饤��
-�桼�ƥ���ƥ��Ǥ������Υɥ�����ȤǤ� ``django-admin.py`` �����Ƥ�
-��ǽ�ˤĤ����������ޤ���
+``django-admin.py`` は Django の管理タスクを行うためのコマンドライン
+ユーティリティです．このドキュメントでは ``django-admin.py`` の全ての
+機能について説明します．
 
-�ޤ����� Django �ץ��������Ȥˤ� ``manage.py`` ����ưŪ����������ޤ���
-``manage.py`` �� ``django-admin.py`` ���Ф���������åѤǡ�
-``django-admin.py`` �˻Ż�������Ϥ����˰ʲ�����Ĥν�����Ԥ��ޤ�:
+また，各 Django プロジェクトには ``manage.py`` が自動的に生成されます．
+``manage.py`` は ``django-admin.py`` に対する薄いラッパで，
+``django-admin.py`` に仕事を引き渡す前に以下の二つの処理を行います:
 
-    * �ץ��������ȤΥѥå������� ``sys.path`` ���ɲä��ޤ���
+    * プロジェクトのパッケージを ``sys.path`` に追加します．
 
-    * ``DJANGO_SETTINGS_MODULE`` �Ķ��ѿ����ץ��������Ȥ�
-      ``settings.py`` ��ؤ��褦�����ꤷ�ޤ���
+    * ``DJANGO_SETTINGS_MODULE`` 環境変数がプロジェクトの
+      ``settings.py`` を指すように設定します．
 
-Django �� ``setup.py`` �桼�ƥ���ƥ��ǥ��󥹥ȡ��뤷�Ƥ���С�
-``django-admin.py`` ������ץȤϥ����ƥ�ѥ���ˤ���Ϥ��Ǥ��������ƥ�
-�ѥ���ˤʤ���硤 Python ���󥹥ȡ���ǥ��쥯�ȥ��� 
-``site-packages/django/bin`` ��õ���и��Ĥ���Ǥ��礦��
-``/usr/local/bin`` �Τ褦�ʥѥ���Τɤ����˥���ܥ�å���󥯤�ĥ�ä�
-�����褦�˴���ޤ���
+Django を ``setup.py`` ユーティリティでインストールしていれば，
+``django-admin.py`` スクリプトはシステムパス上にあるはずです．システム
+パス上にない場合， Python インストールディレクトリ上の 
+``site-packages/django/bin`` を探せば見つかるでしょう．
+``/usr/local/bin`` のようなパス上のどこかにシンボリックリンクを張って
+おくように勧めます．
 
-Windows ��ȤäƤ��ơ�����ܥ�å���󥯤�ĥ��ʤ����ˤϡ��ѥ����̤ä���
-��� ``django-admin.py`` �򥳥ԡ����뤫�� ``PATH`` �������ͤ� (
-``�ޥ�����ԥ塼��(������å�)`` - ``�ץ��ѥƥ�`` - ``�ܺ�����`` - 
-``�Ķ��ѿ�`` - ``�����ƥ�Ķ��ѿ�`` ��) django-admin.py �Υ��󥹥ȡ��뤵��
-�Ƥ������ؤ��褦���ѹ����Ƥ���������
+Windows を使っていて，シンボリックリンクを張れない場合には，パスの通った場
+所に ``django-admin.py`` をコピーするか， ``PATH`` の設定値を (
+``マイコンピュータ(右クリック)`` - ``プロパティ`` - ``詳細設定`` - 
+``環境変数`` - ``システム環境変数`` で) django-admin.py のインストールされ
+ている場所を指すように変更してください．
 
-�������Ȥ��ơ���Ĥ� Django �ץ��������Ȥ����Ǻ�Ȥ��Ƥ���ʤ顤
-``manage.py`` ��Ȥ�������ñ�Ȥ�����Ǥ��礦�� ``django-admin.py`` ��
-``DJANGO_SETTINGS_MODULE`` �� ``--settings`` ���ޥ�ɥ饤�󥪥ץ����
-��Ȥ��С�ʣ���� Django ����ե���������ؤ������Ǥ��ޤ���
+一般論として，一つの Django プロジェクトだけで作業しているなら，
+``manage.py`` を使う方が簡単といえるでしょう． ``django-admin.py`` と
+``DJANGO_SETTINGS_MODULE`` や ``--settings`` コマンドラインオプション
+を使えば，複数の Django 設定ファイルを切替えて操作できます．
 
-�Ȥ���
+使い方
 ======
 
 ``django-admin.py action [options]``
 
 ``manage.py action [options]``
 
-``action`` �ˤϡ����Υɥ�����Ȥǵ󤲤Ƥ��뤤���줫�Υ��������
-����ꤷ�ޤ��� ``options`` �Ͼ�ά��ǽ�ǡ����Υɥ�����Ȥǵ󤲤Ƥ���
-�����Ĥ���ʣ���ĤΥ��ץ�������ꤷ�ޤ���
+``action`` には，このドキュメントで挙げているいずれかのアクション
+を指定します． ``options`` は省略可能で，このドキュメントで挙げている
+ゼロ個から複数個のオプションを指定します．
 
-``django-admin.py --help`` ��¹Ԥ���ȡ����ѤǤ������ƤΥ���������
-���ץ����ξܺ٤ʥꥹ�Ȥ����ä��إ�ץ�å���������Ϥ��ޤ���
+``django-admin.py --help`` を実行すると，利用できる全てのアクションと
+オプションの詳細なリストの入ったヘルプメッセージを出力します．
 
-�ۤȤ�ɤΥ��������� ``appname`` �Υꥹ�Ȥ�����ˤȤ�ޤ��� ``appname``
-�ϥ�ǥ�����ä��ѥå�������̾���Ǥ����㤨�� ``INSTALLED_APPS`` ��
-``mysite.blog`` ���ɲä��Ƥ����硤���Υ��ץꥱ�������� ``appname``
-�� ``blog`` �Ǥ���
+ほとんどのアクションは ``appname`` のリストを引数にとります． ``appname``
+はモデルの入ったパッケージの名前です．例えば ``INSTALLED_APPS`` に
+``mysite.blog`` を追加している場合，このアプリケーションの ``appname``
+は ``blog`` です．
 
 .. _Available actions:
 
-���Ѳ�ǽ�ʥ��������
+利用可能なアクション
 ====================
 
 adminindex [appname appname ...]
 ----------------------------------------
 
-���ꤷ�� appname ���Ф��� admin-index �ƥ�ץ졼������ (snippet) ����Ϥ�
-�ޤ���
+指定した appname に対する admin-index テンプレート断片 (snippet) を出力し
+ます．
 
-admin-index �ƥ�ץ졼�����Ҥϡ� admin �Υ���ǥ����ڡ����Υ�å�&�ե���
-��򥫥����ޥ������������˻ȤäƲ��������ܤ�����
-`���塼�ȥꥢ�뤽�� 2`_ �򻲾Ȥ��Ƥ���������
+admin-index テンプレート断片は， admin のインデクスページのルック&フイー
+ルをカスタマイズしたい場合に使って下さい．詳しくは
+`チュートリアルその 2`_ を参照してください．
 
-.. _`���塼�ȥꥢ�뤽�� 2`: ../tutorial02/
+.. _`チュートリアルその 2`: ../tutorial02/
 
 createcachetable [tablename]
 ----------------------------
 
-�ǡ����١�������å���Хå�����ɤǻȤ�����Ρ� ``tablename`` �Ȥ���
-̾���Υ���å���ơ��֥���������ޤ����ܤ�����
-`cache �Υɥ������`_ �򻲾Ȥ��Ƥ���������
+データベースキャッシュバックエンドで使うための， ``tablename`` という
+名前のキャッシュテーブルを生成します．詳しくは
+`cache のドキュメント`_ を参照してください．
 
-.. _`cache �Υɥ������`: ../cache/
+.. _`cache のドキュメント`: ../cache/
 
 dbshell
 -------
 
-``DATABASE_ENGINE`` ����˻��ꤵ�줿�ǡ����١������󥸥���Ф���
-``DATABASE_USER`` ����� ``DATABASE_PASSWORD`` ��������˽��äƥ��ޥ�ɥ饤
-�󥯥饤����Ȥ�ư���ޤ���
+``DATABASE_ENGINE`` 設定に指定されたデータベースエンジンに対し，
+``DATABASE_USER`` および ``DATABASE_PASSWORD`` 等の設定に従ってコマンドライ
+ンクライアントを起動します．
 
-    * PostgreSQL �ξ��ˤ� ``psql`` ��¹Ԥ��ޤ���
-    * MySQL �ξ��ˤ� ``mysql`` ��¹Ԥ��ޤ���
-    * SQLite �ξ��ˤ� ``sqlite3`` ��¹Ԥ��ޤ���
+    * PostgreSQL の場合には ``psql`` を実行します．
+    * MySQL の場合には ``mysql`` を実行します．
+    * SQLite の場合には ``sqlite3`` を実行します．
 
-���Υ��ޥ�ɤϥץ�����ब ``PATH`` ��ˤ�������ꤷ�Ƥ���Τǡ�ñ���
-�ץ������̾�ǸƤӽФ����Ȥ� (``psql``, ``mysql``, ``sqlite3``) �˸��Ĥ���
-�ץ�������Ȥ��ޤ����ץ������ξ����ư�ǻ��ꤹ����ˡ�Ϥ���ޤ���
+このコマンドはプログラムが ``PATH`` 上にあると想定しているので，単純に
+プログラム名で呼び出したとき (``psql``, ``mysql``, ``sqlite3``) に見つかる
+プログラムを使います．プログラムの場所を手動で指定する方法はありません．
 
 diffsettings
 ------------
 
-���ߤ�����ե������ Django �Υǥե��������Ȥκ�ʬ��ɽ�����ޤ���
+現在の設定ファイルと Django のデフォルト設定との差分を表示します．
 
-�ǥե��������ˤʤ�����������ˤ� ``"###"`` ���ɲä��ޤ����㤨�С�
-�ǥե��������ˤ� ``ROOT_URLCONF`` �ѿ����ʤ��Τǡ� ``diffsettings`` 
-�ν�����Ǥ� ``ROOT_URLCONF`` �������� ``"###"`` ���դ��ޤ���
+デフォルト設定にない設定の末尾には ``"###"`` を追加します．例えば，
+デフォルト設定には ``ROOT_URLCONF`` 変数がないので， ``diffsettings`` 
+の出力中では ``ROOT_URLCONF`` の末尾に ``"###"`` が付きます．
 
-�ǥե��������δ����ʥꥹ�Ȥ򸫤�����С�
-``django/conf/global_settings.py`` �ˤ��� Django �Υǥե��������򻲾Ȥ���
-����������
+デフォルト設定の完全なリストを見たければ，
+``django/conf/global_settings.py`` にある Django のデフォルト設定を参照して
+ください．
 
 dumpdata [appname appname ...]
 ------------------------------
 
-���ꤷ�����ץꥱ������� (ʣ�������) �˴ط��������ƤΥǡ�����ǡ����١���
-������Ф���ɸ����Ϥ˽��Ϥ��ޤ���
+指定したアプリケーション (複数指定可) に関係した全てのデータをデータベース
+から取り出し，標準出力に出力します．
 
-�ǥե���ȤǤϡ��ǡ����١��������Ƥ� JSON �����ǽ��Ϥ���ޤ������Ϥ�¾�η�
-���ˤ�������С� ``--format`` ���ץ���� (�㤨�� ``format=xml``) ��ȤäƤ�
-�������� ``--format`` �ˤϡ� (``SERIALIZATION_MODULES`` ����ǻ��ꤷ�����
-��ޤ�) Django �б��Υ��ꥢ�饤���������Хå�����ɤ����Ǥ��ޤ���
+デフォルトでは，データベースの内容は JSON 形式で出力されます．出力を他の形
+式にしたければ， ``--format`` オプション (例えば ``format=xml``) を使ってく
+ださい． ``--format`` には， (``SERIALIZATION_MODULES`` 設定で指定したもの
+を含む) Django 対応のシリアライゼーションバックエンドを指定できます．
 
-���ץꥱ�������̾����ꤷ�ʤ��ä���硤���󥹥ȡ���ѤߤΥ��ץꥱ�������
-���ƤΥǡ��������פ��ޤ���
+アプリケーション名を指定しなかった場合，インストール済みのアプリケーション
+全てのデータをダンプします．
 
-``dumpdata`` �ν��Ϥ� ``loaddata`` �����Ϥ˻Ȥ��ޤ���
+``dumpdata`` の出力は ``loaddata`` の入力に使えます．
 
 flush
 -----
 
-�ǡ����١����� syncdb ľ��ξ��֤��ᤷ�ޤ������ƤΥǡ������ǡ����١�������
-����졤Ʊ��ľ��˸ƤӽФ�������ƤΥϥ�ɥ餬���ټ¹Ԥ���ޤ����ޤ���
-``initial_data`` �ե����������ƥ��󥹥ȡ��뤵��ޤ���
+データベースを syncdb 直後の状態に戻します．全てのデータがデータベースから
+除去され，同期直後に呼び出される全てのハンドラが再度実行されます．また，
+``initial_data`` フィクスチャも再インストールされます．
 
 inspectdb [dbname]
 ------------------
 
-``DATABASE_NAME`` ����ǻ��ꤵ�줿�ǡ����١�����Υơ��֥���Ф��륤��ȥ�
-���ڥ�������Ԥ���Django ��ǥ�⥸�塼�� (``models.py``) ��ɸ����Ϥ˽�
-�Ϥ��ޤ���
+``DATABASE_NAME`` 設定で指定されたデータベース上のテーブルに対するイントロ
+スペクションを行い，Django モデルモジュール (``models.py``) を標準出力に出
+力します．
 
-�Ť��ǡ����١�������äƤ��ơ������ Django �ǻȤ��������˻ȤäƤ���
-������������ץȤϥǡ����١�����Ĵ�١��ǡ����١�����γƥơ��֥���Ф�
-���ǥ���������ޤ���
+古いデータベースを持っていて，それを Django で使いたい場合に使ってくだ
+さい．スクリプトはデータベースを調べ，データベース内の各テーブルに対す
+るモデルを生成します．
 
-�������̤ꡤ����������ǥ�ϡ��ơ��֥�γƥե������̾���б�����°��
-������ޤ���``inspectdb`` �ϥե������̾�ν��Ϥ˺ݤ��ưʲ��Τ褦�ʤ���
-�Ĥ����ü�ʥ���������äƤ���Τ����դ��Ʋ�����:
+想像の通り，生成されるモデルは，テーブルの各フィールド名に対応する属性
+を持ちます．``inspectdb`` はフィールド名の出力に際して以下のようないく
+つかの特殊なケースを持っているので注意して下さい:
 
-    * ``inspectdb`` �����륫���η����Ф���Ŭ�ڤʥ�ǥ�Υե�����ɷ�
-      �����Ǥ��ʤ��ä���硤 ``TextField`` ���Ȥ�졤�������줿���
-      ��γ�������ե������̾�μ��ιԤˡ�
-      ``'This field type is a guess.'`` �Ȥ��������Ȥ�����ޤ���
+    * ``inspectdb`` があるカラムの型に対して適切なモデルのフィールド型
+      を決定できなかった場合， ``TextField`` が使われ，生成されたモデ
+      ルの該当するフィールド名の次の行に，
+      ``'This field type is a guess.'`` というコメントが入ります．
 
-    * �ǡ����١����Υ����̾�� Python ��ͽ��� (``'pass'``, ``'class'``,
-      ``'for'`` �ʤ�) �ξ�硤 ``inspectdb`` ��°��̾�θ���� ``'_field'``
-      ���ɲä��ޤ����㤨�С��ơ��֥�� ``'for'`` �Ȥ���̾���Υե�����ɤ���
-      ��С�����������ǥ�� ``'for_field'`` �Ȥ���̾���Υե�����ɤ������
-      ���Υե�����ɤ� ``db_column`` °���� ``'for'`` �ˤʤ�ޤ���
-      ``inspectdb`` �ϥե������̾�μ��ιԤˡ�
-      ``'Field renamed because it was a Python reserved word.'`` �Ȥ�������
-      ��Ȥ��ɲä��ޤ���
+    * データベースのカラム名が Python の予約語 (``'pass'``, ``'class'``,
+      ``'for'`` など) の場合， ``inspectdb`` は属性名の後ろに ``'_field'``
+      を追加します．例えば，テーブルに ``'for'`` という名前のフィールドがあ
+      れば，生成されるモデルは ``'for_field'`` という名前のフィールドを持ち，
+      このフィールドの ``db_column`` 属性は ``'for'`` になります．
+      ``inspectdb`` はフィールド名の次の行に，
+      ``'Field renamed because it was a Python reserved word.'`` というコメ
+      ントを追加します．
 
-���ε�ǽ��ñ�˼�֤�ʤ�����Τ�Τǡ����ä��ꤷ����ǥ�������Ԥ�����
-�Τ�ΤǤϤ���ޤ��󡥼¹Ԥ�������������줿��ǥ��ʬ�ǳΤ���ƥ���
-���ޥ�����Ԥ����Ȥˤʤ�Ǥ��礦������Ū�ˤϡ�¾�Υ�ǥ�򻲾Ȥ��Ƥ���褦
-�ʥ�ǥ뤬���������֤��¤֤褦�ˤ��ޤ���
+この機能は単に手間を省くためのもので，しっかりしたモデル生成を行うため
+のものではありません．実行した後に生成されたモデルを自分で確かめてカス
+タマイズを行うことになるでしょう．具体的には，他のモデルを参照しているよう
+なモデルが正しい順番で並ぶようにします．
 
-PostgreSQL �� MySQL ��ȤäƤ����硤����ȥ����ڥ������Ǽ祭����ưŪ
-�˷��ꤷ��ɬ�פʾ��� ``primary_key=True`` ���ɲä��ޤ���
+PostgreSQL や MySQL を使っている場合，イントロスペクションで主キーを自動的
+に決定し，必要な場所に ``primary_key=True`` を追加します．
 
-``inspectdb`` �� PostgreSQL, MySQL ����� SQLite ��ư��ޤ�����������
-�θ��Ф� PostgreSQL �Ȱ����� MySQL �ơ��֥�����ǤΤ�ͭ���Ǥ���
+``inspectdb`` は PostgreSQL, MySQL および SQLite で動作します．外部キー
+の検出は PostgreSQL と一部の MySQL テーブル形式でのみ有効です．
 
 loaddata [fixture fixture ...]
 ------------------------------
 
-̾���դ��Υե����������õ����������Ȥ�ǡ����١����˥����ɤ��ޤ���
+名前付きのフィクスチャを探し，その中身をデータベースにロードします．
 
-*�ե���������* (fixture) �Ȥϡ��ǡ����١����������ǡ����򥷥ꥢ�饤������
-��Ǽ�����ե����뷲��ؤ��ޤ����ƥե���������ե�����ˤϸ�ͭ��̾�����դ���
-��ޤ���������̾���Υե����������ʣ���Υǥ��쥯�ȥ������Ƥ⹽���ޤ��󤷡�
-ʣ���Υ��ץꥱ�������������֤��Ƥ⤫�ޤ��ޤ���
+*フィクスチャ* (fixture) とは，データベースに入れるデータをシリアライズして
+格納したファイル群を指します．各フィクスチャファイルには固有の名前を付けら
+れますが，ある名前のフィクスチャを複数のディレクトリに入れても構いませんし，
+複数のアプリケーション内に配置してもかまいません．
 
-Django �ϰʲ��� 3 ����ξ�꤫��ե����������õ���ޤ�:
+Django は以下の 3 種類の場所からフィクスチャを探します:
 
-   1. ���󥹥ȡ���Ѥߤγƥ��ץꥱ�������� ``fixtures`` �ǥ��쥯�ȥ�
-   2. ``FIXTURE_DIRS`` ����˻��ꤷ���ǥ��쥯�ȥ�
-   3. fixture ��ľ�ܻ��ꤷ���ѥ�
+   1. インストール済みの各アプリケーションの ``fixtures`` ディレクトリ
+   2. ``FIXTURE_DIRS`` 設定に指定したディレクトリ
+   3. fixture に直接指定したパス
 
-Django �Ͼ嵭�ξ��˸��Ĥ��ä����ƤΥե���������ե�������椫�顤���ꤷ��
-�ե���������̾�Ȱ��פ���ե����������ɤ��ޤ���
+Django は上記の場所に見つかった全てのフィクスチャファイルの中から，指定した
+フィクスチャ名と一致するファイルをロードします．
 
-�ե���������̾�˥ե������ĥ�Ҥ���ꤹ��ȡ����ꤷ�����Υե��������������
-�����ɤ���ޤ����㤨��::
+フィクスチャ名にファイル拡張子を指定すると，指定した型のフィクスチャだけが
+ロードされます．例えば::
 
     django-admin.py loaddata mydata.json
 
-�Τ褦�ˤ���ȡ� ``mydata`` �Ȥ���̾���� JSON �ե�������������������ɤ���
-�ޤ����ե���������γ�ĥ�Ҥϡ� (``json`` �� ``xml`` �Τ褦��) ���ꥢ�饤��
-����Ͽ̾���б����Ƥ��ʤ���Фʤ�ޤ���
+のようにすると， ``mydata`` という名前の JSON フィクスチャだけがロードされ
+ます．フィクスチャの拡張子は， (``json`` や ``xml`` のように) シリアライザ
+の登録名に対応していなければなりません．
 
-��ĥ�Ҥ��ά����ȡ� Django �����Ƥη����˥ե�����������оݤ˥ե���������ե�����򸡺����ޤ����㤨��::
+拡張子を省略すると， Django は全ての形式にフィクスチャを対象にフィクスチャファイルを検索します．例えば::
 
     django-admin.py loaddata mydata
 
-�Τ褦�ˤ���ȡ� ``mydata`` �Ȥ���̾�������ƤΥե����������õ���ޤ����ե�
-��������ǥ��쥯�ȥ�� ``mudata.json`` �Ȥ���̾���Υե����뤬����С� JSON
-�����Υե���������Ȥ��ƥ����ɤ���ޤ���Ʊ��̾�����̤Υե�������������Τ�
-�Τ����Ĥ��ä���� (�㤨�С� ``mydata.json`` �� ``mydata.xml`` ��Ʊ���ǥ���
-���ȥ겼�ˤ��ä����)���ե���������Υ��󥹥ȡ������ߤ��졤����ޤǤ�
-``loaddata`` �ˤ�äƥ����ɤ��줿�ǡ��������ƥǡ����١�������������ޤ���
+のようにすると， ``mydata`` という名前の全てのフィクスチャを探します．フィ
+クスチャディレクトリに ``mudata.json`` という名前のファイルがあれば， JSON
+形式のフィクスチャとしてロードされます．同じ名前で別のフィクスチャ形式のも
+のが見つかった場合 (例えば， ``mydata.json`` と ``mydata.xml`` が同じディレ
+クトリ下にあった場合)，フィクスチャのインストールは中止され，それまでに
+``loaddata`` によってロードされたデータは全てデータベースから削除されます．
 
-�ե����������̾���ˤϥǥ��쥯�ȥ�̾������Ƥ⹽���ޤ��󡥥ǥ��쥯�ȥ���ʬ
-����ꤹ��ȡ��Ƹ����ѥ����ɲä���ޤ����㤨��::
+フィクスチャの名前にはディレクトリ名を入れても構いません．ディレクトリ部分
+を指定すると，各検索パスに追加されます．例えば::
 
     django-admin.py loaddata foo/bar/mydata.json
  
-�Ȥ���ȡ����󥹥ȡ���Ѥߤγƥ��ץꥱ�������Υǥ��쥯�ȥ� ``<appname>``
-�ˤĤ��� ``<appname>/fixtures/foo/bar/mydata.json`` �� ``FIXTURE_DIRS``
-�γƥǥ��쥯�ȥ� ``<dirname>`` �ˤĤ��� ``<dirname>/foo/bar/mydata.json``
-�򡤤��������Хѥ� ``foo/bar/mydata.json`` ��õ���ޤ���
+とすると，インストール済みの各アプリケーションのディレクトリ ``<appname>``
+について ``<appname>/fixtures/foo/bar/mydata.json`` を， ``FIXTURE_DIRS``
+の各ディレクトリ ``<dirname>`` について ``<dirname>/foo/bar/mydata.json``
+を，そして相対パス ``foo/bar/mydata.json`` を探します．
 
-�ե���������ե�����ν�����Ϸ�ޤäƤ��ޤ��󤬡����ƤΥե���������Υ���
-���ȡ����ñ��Υȥ�󥶥������ǹԤ��뤿�ᡤ����ե��������㤬�̤Υե�
-����������Ф��뻲�Ȥ���äƤ��Ƥ⤫�ޤ��ޤ��󡥥ǡ����١����Хå�����ɤ�
-�ԥ�٥������ (row-level constraint) �򥵥ݡ��Ȥ��Ƥ���Ф���������ϥȥ�
-�󥶥������κǸ�˥����å�����ޤ���
+フィクスチャファイルの処理順は決まっていませんが，全てのフィクスチャのイン
+ストールは単一のトランザクションで行われるため，あるフィクスチャが別のフィ
+クスチャに対する参照を持っていてもかまいません．データベースバックエンドが
+行レベルの制約 (row-level constraint) をサポートしているばあい，制約はトラ
+ンザクションの最後にチェックされます．
 
-.. admonition:: MySQL �ȥե���������
+.. admonition:: MySQL とフィクスチャ
 
-    ��ǰ�ʤ��顤MySQL �� Django �Υե���������˴ؤ������Ƥε�ǽ�����ѤǤ�
-    ��櫓�ǤϤ���ޤ��� MyISAM ��ȤäƤ����硤 MySQL �ϥȥ�󥶥�����
-    �������򥵥ݡ��Ȥ��Ƥ��ʤ��Τǡ�ʣ���Υե���������ե�������Ф������
-    ��Хå���Ԥ������ե���������ǡ����θ��ڤ�Ԥ��ޤ��󡥰����� InnoDB
-    ��ȤäƤ����硤�ǡ����ե�����֤��������Ȥ�Ԥ��ޤ��� MySQL �Ϲ���
-    ��Υ����å���ȥ�󥶥�����󥳥ߥå�ľ���ޤ��ٱ䤹�뤿��Υᥫ�˥���
-    �������Ƥ��ʤ�����Ǥ���
+    残念ながら，MySQL は Django のフィクスチャに関する全ての機能を利用でき
+    るわけではありません． MyISAM を使っている場合， MySQL はトランザクショ
+    ンや制約をサポートしていないので，複数のフィクスチャファイルに対するロー
+    ルバックを行えず，フィクスチャデータの検証も行えません．一方， InnoDB
+    を使っている場合，データファイル間で前方参照を行えません． MySQL は行制
+    約のチェックをトランザクションコミット直前まで遅延するためのメカニズム
+    を備えていないからです．
     
 reset [appname appname ...]
 ---------------------------
 
-���ꤷ�� appname ���Ф��� ``sqlreset`` ��Ʊ������¹Ԥ��ޤ���
+指定した appname に対して ``sqlreset`` と同じ操作を実行します．
 
 runfcgi [options]
 -----------------
 
-FastCGI �ץ��ȥ���򥵥ݡ��Ȥ��� Web �����и����ΰ�Ϣ�� FastCGI �ץ�������
-��ư���ޤ����ܤ����� `FastCGI �ˤ�뱿�� <../fastcgi/>`_ �򻲾Ȥ��Ƥ�����
-���� Python �� FastCGI ���󥿥ե������⥸�塼��Ǥ��� `flup`_ ��ɬ�פǤ���
+FastCGI プロトコルをサポートする Web サーバ向けの一連の FastCGI プロセス群
+を起動します．詳しくは `FastCGI による運用 <../fastcgi/>`_ を参照してくださ
+い． Python の FastCGI インタフェースモジュールである `flup`_ が必要です．
 
 .. _FastCGI deployment documentation: ../fastcgi/
 .. _flup: http://www.saddi.com/software/flup/
@@ -254,68 +254,68 @@ FastCGI �ץ��ȥ���򥵥ݡ��Ȥ��� Web �����и����ΰ�Ϣ�� FastCGI �ץ�������
 runserver [optional port number, or ipaddr:port]
 ------------------------------------------------
 
-��������ޥ����˷��̤ʳ�ȯ�ѥ����֥����Ф�Ω���夲�ޤ����ǥե���Ȥ�
-�ϡ������Ф� IP ���ɥ쥹 127.0.0.1���ݡ����ֹ� 8000 ��ư��ޤ���
-IP ���ɥ쥹��ݡ����ֹ������Ū�˻���Ǥ��ޤ���
+ローカルマシン上に軽量な開発用ウェブサーバを立ち上げます．デフォルトで
+は，サーバは IP アドレス 127.0.0.1，ポート番号 8000 で動作します．
+IP アドレスやポート番号は明示的に指定できます．
 
-���Υ�����ץȤ��̾�桼���θ��²��Ǽ¹Ԥ������ (��������褦�˴����
-��)���ݡ����ֹ���㤤�ͤˤǤ��ʤ����⤷��ޤ����ͤ��㤤�ݡ����ֹ��
-�����ѥ桼�� (root) �Ѥ�ͽ�󤵤�Ƥ��뤫��Ǥ���
+このスクリプトを通常ユーザの権限下で実行した場合 (そうするように勧めま
+す)，ポート番号を低い値にできないかもしれません．値の低いポート番号は
+スーパユーザ (root) 用に予約されているからです．
 
-**��ȯ�ѥ����Ф�ץ���������󥵡��ФȤ��ƻȤäƤϤʤ�ޤ���** 
-��ȯ�ѥ����Фϥ������ƥ�������ѥե����ޥ󥹥ƥ��Ȥ�Ԥ��Ƥ��ޤ���
-(�桹���ܻؤ��Ƥ���Τ� Web �ե졼�����γ�ȯ�Ǥ��ꡤ���Υ����Ф���ɤ�
-�Ʊ��ѴĶ��Ǥ����ѤǤ���褦�ˤ���Τ� Django �ץ��������Ȥ���Ū�Ȥ���Ȥ�
-���ǤϤ���ޤ���)
+**開発用サーバをプロダクションサーバとして使ってはなりません．** 
+開発用サーバはセキュリティ検査もパフォーマンステストも行われていません
+(我々が目指しているのは Web フレームワークの開発であり，このサーバを改良し
+て運用環境でも利用できるようにするのは Django プロジェクトの目的とするとこ
+ろではありません．)
 
-��ȯ�����Фϥꥯ�����Ȥ�����դ����٤ˡ�ɬ�פ˱����Ƽ�ưŪ�� Python ����
-�ɤ������ɤ��ޤ������Τ��ᡤ�����ɤ��ѹ���ȿ�Ǥ����뤿��ˤ�����������
-�Ф�ݵ�ư���ʤ��Ƥ�褯�ʤäƤ��ޤ���
+開発サーバはリクエストを受け付ける度に，必要に応じて自動的に Python コー
+ドをリロードします．このため，コードの変更を反映させるためにいちいちサー
+バを際起動しなくてもよくなっています．
 
-�����Фε�ư���䡤�����Фβ�Ư��� Python �����ɤ��ѹ�������硤��ȯ��
-�����Фϥ��󥹥ȡ��뤵��Ƥ������ƤΥ�ǥ��ưŪ�˸��ڤ��ޤ� (��Ҥ�
-``validate`` ���ץ����򻲾Ȥ��Ƥ�������)�����ڻ��˥��顼�����Ĥ��ä���
-�硤���顼��ɸ����Ϥ˽��Ϥ���ޤ����������Ф���ߤ��ޤ���
+サーバの起動時や，サーバの稼働中に Python コードを変更した場合，開発用
+サーバはインストールされている全てのモデルを自動的に検証します (後述の
+``validate`` オプションを参照してください)．検証時にエラーが見つかった場
+合，エラーは標準出力に出力されますが，サーバは停止しません．
 
-�ݡ����ֹ���̡��ˤ��Ƥ��뤫���ꤤ���ĤǤ⥵���Ф�ư�Ǥ��ޤ���
-``django-admin.py runserver`` ��ʣ����ư��������Ǥ���
+ポート番号を別々にしているかぎりいくつでもサーバを起動できます．
+``django-admin.py runserver`` を複数回起動するだけです．
 
-�ǥե���Ȥ� IP ���ɥ쥹�Ǥ��� 127.0.0.1 �ϡ��ͥåȥ�����¾�Υޥ�
-�󤫤�����ѤǤ��ޤ��󡥳�ȯ�����Ф�ͥåȥ�����¾�Υޥ��󤫤�
-������褦�ˤ���ˤϡ������Хۥ��ȸ�ͭ�� IP ���ɥ쥹 (�㤨��
-``192.168.2.1``) �ޤ��� ``0.0.0.0`` ��ȤäƲ�������
+デフォルトの IP アドレスである 127.0.0.1 は，ネットワーク上の他のマシ
+ンからは利用できません．開発サーバをネットワーク上の他のマシンから
+見えるようにするには，サーバホスト固有の IP アドレス (例えば
+``192.168.2.1``) または ``0.0.0.0`` を使って下さい．
 
-��:
+例:
 ~~~
 
-IP ���ɥ쥹 127.0.0.1���ݡ����ֹ� 7000::
+IP アドレス 127.0.0.1，ポート番号 7000::
 
     django-admin.py runserver 7000
 
-IP ���ɥ쥹 1.2.3.4���ݡ����ֹ� 7000::
+IP アドレス 1.2.3.4，ポート番号 7000::
 
     django-admin.py runserver 1.2.3.4:7000
 
 .. _Serving static files with the development server:
 
-��ȯ�ѥ����Ф���Ū�ʥե�������󶡤���
+開発用サーバで静的なファイルを提供する
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-�ǥե���ȤǤϡ���ȯ�ѥ����Фϥ������Ѥ���Ū�ե����� (CSS�ե����롤������
-``MEDIA_ROOT_URL`` ���Υե�����ʤ�) �������󶡤��ޤ��� Django ����Ū��ǥ�
-�����󶡤���������С� `��Ū�ʥե����������ˡ`_ �򻲾Ȥ��Ƥ�����
-����
+デフォルトでは，開発用サーバはサイト用の静的ファイル (CSSファイル，画像，
+``MEDIA_ROOT_URL`` 下のファイルなど) を全く提供しません． Django に静的メディ
+アを提供させたければ， `静的なファイルの提供方法`_ を参照してくださ
+い．
 
-.. _`��Ū�ʥե����������ˡ`: ../static_files/
+.. _`静的なファイルの提供方法`: ../static_files/
 .. _serving static files: ../static_files/
 
 .. _Turning off auto-reload:
 
-��ư������ɤ��ڤ�
+自動リロードを切る
 ~~~~~~~~~~~~~~~~~~
 
-��ȯ�����Ф˼¹���˥����ɤ�ư������ɤ��������ʤ���С��ʲ��Τ褦��
-``--noreload`` ���ץ�����ȤäƤ�������::
+開発サーバに実行中にコードを自動リロードさせたくなければ，以下のように
+``--noreload`` オプションを使ってください::
 
     django-admin.py runserver --noreload
 
@@ -323,11 +323,11 @@ IP ���ɥ쥹 1.2.3.4���ݡ����ֹ� 7000::
 shell
 -----
 
-Python �����å��󥿥ץ꥿��ư���ޤ���
+Python の対話インタプリタを起動します．
 
-IPython_ �����󥹥ȡ��뤵��Ƥ����硤Django �� IPython ��Ȥ����Ȥ��ޤ���
-IPython �����󥹥ȡ��뤵��Ƥ��ơ����ġ����̤Ρץ��󥿥ץ꥿��Ȥ������Τ�
-�顤�ʲ��Τ褦�� ``--plain`` ���ץ�����ȤäƲ�����::
+IPython_ がインストールされている場合，Django は IPython を使おうとします．
+IPython がインストールされていて，かつ「普通の」インタプリタを使いたいのな
+ら，以下のように ``--plain`` オプションを使って下さい::
 
     django-admin.py shell --plain
 
@@ -336,193 +336,193 @@ IPython �����󥹥ȡ��뤵��Ƥ��ơ����ġ����̤Ρץ��󥿥ץ꥿��Ȥ������Τ�
 sql [appname appname ...]
 -------------------------
 
-���ꤷ�� appname �� CREATE TABLE SQL ʸ����Ϥ��ޤ���
+指定した appname の CREATE TABLE SQL 文を出力します．
 
 sqlall [appname appname ...]
 ----------------------------
 
-���ꤷ�� appname �� CREATE TABLE ����ӽ���������� SQL ��ȯ�ԡ��ǡ�������
-�Τ���� SQL ʸ����Ϥ��ޤ���
+指定した appname の CREATE TABLE および初期カスタム SQL の発行，データ入力
+のための SQL 文を出力します．
 
-����������� SQL �λ�����ˡ�� ``sqlcustom`` �������򻲾Ȥ��Ƥ���������
+初期カスタム SQL の指定方法は ``sqlcustom`` の説明を参照してください．
 
 sqlclear [appname appname ...]
 --------------------------------------
 
-���ꤷ�� appname �� DROP TABLE SQL ʸ����Ϥ��ޤ���
+指定した appname の DROP TABLE SQL 文を出力します．
 
 sqlindexes [appname appname ...]
 ----------------------------------------
 
-���ꤷ�� appname �� CREATE INDEX SQL ʸ����Ϥ��ޤ���
+指定した appname の CREATE INDEX SQL 文を出力します．
 
 sqlcustom [appname appname ...]
 --------------------------------------------
 
-���ꤷ�� appname �Υ������� SQL ʸ����Ϥ��ޤ���
+指定した appname のカスタム SQL 文を出力します．
 
-���Υ��ޥ�ɤϡ����ꤷ���ƥ��ץꥱ�������Υ�ǥ�ˤĤ��ơ� ``<appname>``
-�򥢥ץꥱ��������̾���� ``<modelname>`` ���ǥ��̾�������ƾ�ʸ���ˤ���
-ʸ����Ȥ��ơ� ``<appname>/sql/<modelname>.sql`` �Ȥ���̾���Υե������õ��
-�ޤ����㤨�С� ``news`` �Ȥ������ץꥱ�������� ``Story`` �Ȥ�����ǥ뤬��
-������Ƥ���С� ``sqlcustom`` �� ``news/sql/story.sql`` �Ȥ����ե������õ
-�����ɤߤ������������Ƥ򤳤Υ��ޥ�ɤν��Ϥ��������ɲä��ޤ���
+このコマンドは，指定した各アプリケーションのモデルについて， ``<appname>``
+をアプリケーションの名前， ``<modelname>`` をモデルの名前を全て小文字にした
+文字列として， ``<appname>/sql/<modelname>.sql`` という名前のファイルを探し
+ます．例えば， ``news`` というアプリケーションで ``Story`` というモデルが定
+義されていれば， ``sqlcustom`` は ``news/sql/story.sql`` というファイルを探
+して読みだし，その内容をこのコマンドの出力の末尾に追加します．
 
-�� SQL �ե�����ˤϡ�ͭ���� SQL ������뤳�ȤˤʤäƤ��ޤ��� SQL �ե������
-���Ƥϡ���ǥ�Υơ��֥�����ʸ�����Ƽ¹Ԥ�����ˡ��ǡ����١�����ľ�ܥѥ���
-����ޤ����ơ��֥���Ф����ѹ���ä����ꡤ SQL �ؿ���ǡ����١������Ȥ߹���
-�ˤϡ����� SQL �եå���ȤäƤ���������
+各 SQL ファイルには，有効な SQL を入れることになっています． SQL ファイルの
+内容は，モデルのテーブル生成文を全て実行した後に，データベースに直接パイプ
+されます．テーブルに対して変更を加えたり， SQL 関数をデータベースに組み込む
+には，この SQL フックを使ってください．
 
 sqlindexes [appname appname ...]
 ----------------------------------------
 
-���ꤷ�����ץꥱ���������Ф��� CREATE INDEX SQL ʸ����Ϥ��ޤ���
+指定したアプリケーションに対する CREATE INDEX SQL 文を出力します．
 
 sqlreset [appname appname ...]
 --------------------------------------
 
-���ꤷ�� appname ���Ф��� DROP TABLE SQL ʸ����Ϥ���
-���θ�� CREATE TABLE SQL ʸ����Ϥ��ޤ���
+指定した appname に対する DROP TABLE SQL 文を出力し，
+その後で CREATE TABLE SQL 文を出力します．
 
 sqlsequencereset [appname appname ...]
 ----------------------------------------------
 
-���ꤷ�� appname �� PostgreSQL ���������󥹤�ꥻ�åȤ��뤿���
-SQL ʸ����Ϥ��ޤ���
+指定した appname の PostgreSQL シークエンスをリセットするための
+SQL 文を出力します．
 
-�ܤ����� http://simon.incutio.com/archive/2004/04/21/postgres �򻲾Ȥ�
-�Ƥ���������
+詳しくは http://simon.incutio.com/archive/2004/04/21/postgres を参照し
+てください．
 
 startapp [appname]
 ------------------
 
-���ߤΥǥ��쥯�ȥ�ˡ� appname �˻��ꤷ��̾���� Django ���ץꥱ������
-��ǥ��쥯�ȥ곬�ؤ�������ޤ���
+現在のディレクトリに， appname に指定した名前の Django アプリケーショ
+ンディレクトリ階層を作成します．
 
 startproject [projectname]
 --------------------------
 
-���ߤΥǥ��쥯�ȥ�ˡ� projectname �˻��ꤷ��̾���� Django �ץ�������
-�ȥǥ��쥯�ȥ곬�ؤ�������ޤ���
+現在のディレクトリに， projectname に指定した名前の Django プロジェク
+トディレクトリ階層を作成します．
 
 syncdb
 ------
 
-``INSTALLED_APPS`` ����Ͽ����Ƥ��ꡤ�ޤ��ơ��֥��������Ƥ��ʤ����ץꥱ��
-��������ƤΥơ��֥��������ޤ���
+``INSTALLED_APPS`` に登録されており，まだテーブルを作成していないアプリケー
+ション全てのテーブルを作成します．
 
-���Υ��ޥ�ɤϡ������ʥ��ץꥱ��������ץ��������Ȥ��ɲä����ǡ����١���
-�˥��󥹥ȡ��뤷�������˻ȤäƲ����������ץꥱ�������ˤϡ� Django ����
-°���Ƥ��륢�ץꥱ�������ǡ��ǥե���Ȥ� ``INSTALLED_APPS`` �����äƤ���
-��Τ�ޤߤޤ��������ʥץ��������Ȥ򳫻Ϥ���ݤˤϡ����Υ��ޥ�ɤ�¹Ԥ���
-�ǥե���ȤΥ��ץꥱ�������򥤥󥹥ȡ��뤹��ɬ�פ�����ޤ���
+このコマンドは，新たなアプリケーションをプロジェクトに追加し，データベース
+にインストールしたい場合に使って下さい．アプリケーションには， Django に付
+属しているアプリケーションで，デフォルトで ``INSTALLED_APPS`` に入っている
+ものも含みます．新たなプロジェクトを開始する際には，このコマンドを実行して
+デフォルトのアプリケーションをインストールする必要があります．
 
-``django.contrib.auth`` ���ץꥱ�������򥤥󥹥ȡ��뤷�����ˤϡ�
-``syncdb`` �ϥ����ѥ桼����������뤫�Ҥͤޤ���
+``django.contrib.auth`` アプリケーションをインストールした場合には，
+``syncdb`` はスーパユーザを作成するか尋ねます．
 
-``syncdb`` �Ϥޤ��� ``initial_data`` �Ȥ���̾���Υե����������õ���ƥ���
-�ȡ��뤷�ޤ����ե���������ǡ����ե�����ξܺ٤� ``loaddata`` �Υɥ�����
-�Ȥ򻲾Ȥ��Ƥ���������
+``syncdb`` はまた， ``initial_data`` という名前のフィクスチャを探してインス
+トールします．フィクスチャデータファイルの詳細は ``loaddata`` のドキュメン
+トを参照してください．
 
 test
 ----
 
-���󥹥ȡ��뤵��Ƥ������ƤΥ�ǥ뤫��ƥ��Ȥ��ܤ��Ф��Ƽ¹Ԥ��ޤ���
-�ܤ����� `Django ���ץꥱ�������Υƥ��� <testing.html>`_ �򻲾Ȥ��Ƥ�����
-����
+インストールされている全てのモデルからテストを捜し出して実行します．
+詳しくは `Django アプリケーションのテスト <testing.html>`_ を参照してくださ
+い．
 
 
 validate
 --------
 
-���󥹥ȡ��뤵��Ƥ��� (``INSTALLED_APPS`` ����Ͽ����Ƥ���) ���ƤΥ�
-�ǥ�򸡾� (validate) �������顼�������ɸ����Ϥ˽��Ϥ��ޤ���
+インストールされている (``INSTALLED_APPS`` に登録されている) 全てのモ
+デルを検証 (validate) し，エラーがあれば標準出力に出力します．
 
-���Ѳ�ǽ�ʥ��ץ����
+利用可能なオプション
 ====================
 
 --settings
 ----------
 
-������::
+使用例::
 
     django-admin.py init --settings=mysite.settings
 
-�����оݤΥץ��������Ȥ�����⥸�塼�������Ū�˻��ꤷ�ޤ�������⥸�塼
-��� Python �Υѥå�����ɽ����ʸ�����ʤ�� "mysite.settings" �Τ褦�ʷ�����
-���ꤷ�ޤ������Υ��ץ�������ꤷ�ʤ���硤``django-admin.py`` �ϴĶ��ѿ�
-``DJANGO_SETTINGS_MODULE`` ��Ȥ��ޤ���
+管理対象のプロジェクトの設定モジュールを明示的に指定します．設定モジュー
+ルは Python のパッケージ表現構文，すなわち "mysite.settings" のような形式で
+指定します．このオプションを指定しない場合，``django-admin.py`` は環境変数
+``DJANGO_SETTINGS_MODULE`` を使います．
 
-``manage.py`` �� ``DJANGO_SETTINGS_MODULE`` �򤭤�������ꤷ�Ƥ�����
-�ǡ����Υ��ץ�����ɬ�פ���ޤ���
+``manage.py`` は ``DJANGO_SETTINGS_MODULE`` をきちんと設定してくれるの
+で，このオプションは必要ありません．
 
 --pythonpath
 ------------
 
-������::
+使用例::
 
     django-admin.py syncdb --pythonpath='/home/djangoprojects/myproject'
 
-���ꤷ���ե����륷���ƥ�ѥ��� Python �� `import �����ѥ�`_ ���ɲ�
-���ޤ������Υ��ץ�������ꤷ�ʤ���硤 ``django-admin.py`` �ϴĶ���
-�� ``PYTHONPATH`` ��Ȥ��ޤ���
+指定したファイルシステムパスを Python の `import 検索パス`_ に追加
+します．このオプションを指定しない場合， ``django-admin.py`` は環境変
+数 ``PYTHONPATH`` を使います．
 
-``manage.py`` �� Python �ѥ��򤭤�������ꤷ�Ƥ����Τǡ����Υ��ץ����
-��ɬ�פ���ޤ���
+``manage.py`` は Python パスをきちんと設定してくれるので，このオプション
+は必要ありません．
 
-.. _`import �����ѥ�`: http://diveintopython.org/getting_to_know_python/everything_is_an_object.html
+.. _`import 検索パス`: http://diveintopython.org/getting_to_know_python/everything_is_an_object.html
 
 --plain
 -------
 
-IPython �򥤥󥹥ȡ��뤷�Ƥ����硤���å�����ε�ư�� IPython �ǤϤʤ��̾�
-�� Python ���å������Ȥ��ޤ���
+IPython をインストールしている場合，対話シェルの起動に IPython ではなく通常
+の Python 対話シェルを使います．
 
 --format
 --------
 
-������::
+使用例::
 
     django-admin.py dumpdata --format=xml
 
-����׽��Ϥ˻Ȥ���������ꤷ�ޤ������Ϸ�����̾���ϥ��ꥢ�饤������Ͽ̾�Ǥ�
-����Фʤ�ޤ���
+ダンプ出力に使う形式を指定します．出力形式の名前はシリアライザの登録名でな
+ければなりません．
 
 
 --help
 ------
 
-���ѤǤ������ƤΥ��������ȥ��ץ����ξܺ٤ʥꥹ�Ȥ����ä��إ�ץ��
-����������Ϥ��ޤ���
+利用できる全てのアクションとオプションの詳細なリストの入ったヘルプメッ
+セージを出力します．
 
 --indent
 --------
 
-������::
+使用例::
 
     django-admin.py dumpdata --indent=4
 
-���Ϥ��������뤿��Υ���ǥ�����򥹥ڡ����θĿ��ǻ��ꤷ�ޤ����ǥե���Ȥ�
-�ϡ����Ϥ����� *����ޤ���* �����Ϥ��������Ԥ���Τϡ����Υ��ץ������
-�ꤷ���Ȥ������Ǥ���
+出力を整形するためのインデント幅をスペースの個数で指定します．デフォルトで
+は，出力は整形 *されません* ．出力の整形が行われるのは，このオプションを指
+定したときだけです．
 
 --noinput
 ---------
 
-django-admin �μ¹���ˡ��桼�������Ϥ�¥���ʤ��褦�ˤ����ޤ���
-django-admin ������ץȤ�ưŪ�˼¹Ԥ��������������Ǥ���
+django-admin の実行中に，ユーザに入力を促さないようにさせます．
+django-admin スクリプトを自動的に実行したい場合に便利です．
 
 --noreload
 ----------
 
-��ȯ�����м¹���μ�ư������ɵ�ǽ��̵���ˤ��ޤ���
+開発サーバ実行中の自動リロード機能を無効にします．
 
 --version
 ---------
 
-���ߤ� Django �ΥС�������ɽ�����ޤ���
+現在の Django のバージョンを表示します．
 
-ɽ����::
+表示例::
 
     0.9.1
     0.9.1 (SVN)
@@ -530,49 +530,49 @@ django-admin ������ץȤ�ưŪ�˼¹Ԥ��������������Ǥ���
 --verbosity
 -----------
 
-������::
+使用例::
 
     django-admin.py syncdb --verbosity=2
 
-���󥽡���˽��Ϥ������ξ����ǥХå�������̤����椷�ޤ��� '0' �Ͻ��Ϥʤ���
-'1' ���̾�ν��ϡ� '2' ��¿��ν��ϤǤ���
+コンソールに出力する通知情報やデバッグ情報の量を制御します． '0' は出力なし，
+'1' は通常の出力， '2' は多めの出力です．
 
 --adminmedia
 ------------
 
-������::
+使用例::
 
     django-admin.py manage.py --adminmedia=/tmp/new-admin-style/
 
-��ȯ�����Ф�ư����ݤˡ� admin ���󥿥ե������Ѥ� CSS �� JavaScript �ե�
-�����õ������ Django �˶����ޤ����̾�����Υե������ Django �Υ���
-���ĥ꡼������Ф��ƻȤ��褦�ˤʤäƤ��ޤ��������Υ��ץ�����Ȥ��С���
-��Υ������Ѥ��ѹ���ä��Ƥ���ǥ����ʤ���������С������Υ������륷����
-�� JavaScript ��ƥ��ȤǤ���褦�ˤʤ�ޤ���
+開発サーバを起動する際に， admin インタフェース用の CSS や JavaScript ファ
+イルを探す場所を Django に教えます．通常，これらのファイルは Django のソー
+スツリーから取り出して使うようになっていますが，このオプションを使えば，自
+作のサイト用に変更を加えているデザイナがカスタムバージョンのスタイルシート
+や JavaScript をテストできるようになります．
 
 .. _Extra niceties:
 
-����¾�Τ��餯��
+その他のからくり
 ================
 
-���󥿥����ο��Ť�
+シンタクスの色づけ
 ------------------
 
-SQL ʸ��ɸ����Ϥ˽��Ϥ��� ``django-admin.py`` / ``manage.py`` ���ޥ�ɤϡ�
-ü���� ANSI ���顼���Ϥ򥵥ݡ��Ȥ�����ˤϥ����ɤ򿧤Ť�����ɽ�����ޤ���
-�����������Ϥ��̤Υץ������˥ѥ��פ��Ƥ�����ˤϿ��Ť���Ԥ��ޤ���
+SQL 文を標準出力に出力する ``django-admin.py`` / ``manage.py`` コマンドは，
+端末が ANSI カラー出力をサポートする場合にはコードを色づけして表示します．
+ただし，出力を別のプログラムにパイプしている場合には色づけを行いません．
 
-bash �Ǥ��䴰
+bash での補完
 -------------
 
-bash �������ȤäƤ���Τʤ顤 Django �� bash �䴰������ץȤΥ��󥹥ȡ���
-��Ƥ���ƤߤƤ���������������ץȤ� Django ����ʪ�� 
-``extras/django_bash_completion`` �ˤ���ޤ��� bash �䴰��ǽ��Ȥ��ȡ�
-``django-admin.py`` ����� ``manage.py`` ���ޥ�ɤ򥿥��䴰�Ǥ���褦�ˤʤ�
-�ޤ����㤨��:
+bash シェルを使っているのなら， Django の bash 補完スクリプトのインストール
+を検討してみてください．スクリプトは Django 配布物の 
+``extras/django_bash_completion`` にあります． bash 補完機能を使うと，
+``django-admin.py`` および ``manage.py`` コマンドをタブ補完できるようになり
+ます．例えば:
 
-    * ``django-admin.py`` �ȥ����פ��ޤ���
-    * [TAB] �򲡤��ȡ����Ѳ�ǽ�����ƤΥ��ץ�����ɽ�����ޤ���
-    * ``sql`` �ȥ����פ��� [TAB] �򲡤��ȡ� ``sql`` �ǻϤޤ����ƤΥ��ץ���
-      ���ɽ�����ޤ���
+    * ``django-admin.py`` とタイプします．
+    * [TAB] を押すと，利用可能な全てのオプションを表示します．
+    * ``sql`` とタイプして [TAB] を押すと， ``sql`` で始まる全てのオプショ
+      ンを表示します．
 

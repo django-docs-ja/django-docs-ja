@@ -1,187 +1,187 @@
 =============================
-"django.contrib" ���Υ��ɥ���
+"django.contrib" 下のアドオン
 =============================
 
 :revision-up-to: 4843 (0.96+ SVN)
 
-Django �� Python �� `"batteries included" ů��`_ ���ܻؤ��Ƥ��ޤ��� Django
-�ˤ� Web ��ȯ�ˤ���������򤯤�����͡��ʳ������ץ����ġ��뤬�Ĥ��Ƥ���
-����
+Django は Python の `"batteries included" 哲学`_ を目指しています． Django
+には Web 開発における課題を解くための様々な外部オプションツールがついてきま
+す．
 
-�����Υ����ɤ� Django ����ʪ��� ``django/contrib`` �ˤ���ޤ���
-``contrib`` ���Υѥå������γ��פ�ʲ��˼����ޤ�:
+これらのコードは Django 配布物中の ``django/contrib`` にあります．
+``contrib`` 下のパッケージの概要を以下に示します:
 
 .. admonition:: Note
 
-    �����Υ��ɥ������Ⱦ���ä˥�ǥ��ƥ�ץ졼�ȥ�������������äƤ���
-    ���ɥ����Ȥ��ˤϡ��ѥå�����̾ (�㤨�� ``'django.contrib.admin'``) ��
-    ``INSTALLED_APPS`` ������ɲä��ơ� ``manage.py syncdb`` ����ټ¹Ԥ���
-    ɬ�פ�����ޤ���
+    これらのアドオンの大半，特にモデルやテンプレートタグの定義が入っている
+    アドオンを使うには，パッケージ名 (例えば ``'django.contrib.admin'``) を
+    ``INSTALLED_APPS`` 設定に追加して， ``manage.py syncdb`` を再度実行する
+    必要があります．
 
-.. _`"batteries included" ů��`: http://python.jp/doc/release/tut/node12.html#batteries-included                                                
+.. _`"batteries included" 哲学`: http://python.jp/doc/release/tut/node12.html#batteries-included                                                
 
 admin
 =====
 
-Django �μ�ư���������󥿥ե������Ǥ����ܤ����� `���塼�ȥꥢ�뤽�� 2`_ ��
-���Ȥ��Ƥ���������
+Django の自動化管理インタフェースです．詳しくは `チュートリアルその 2`_ を
+参照してください．
 
-.. _`���塼�ȥꥢ�뤽�� 2`: ../tutorial02/
+.. _`チュートリアルその 2`: ../tutorial02/
 .. _Tutorial 2: ../tutorial2/
 
 auth
 ====
 
-Django ��ǧ�ڥե졼�����Ǥ����ܤ����� `ǧ�ڤΥɥ������`_ �򻲾Ȥ���
-��������
+Django の認証フレームワークです．詳しくは `認証のドキュメント`_ を参照して
+下さい．
 
-.. _`ǧ�ڤΥɥ������`: ../authentication/
+.. _`認証のドキュメント`: ../authentication/
 
 comments
 ========
 
-ñ�㤫�Ľ���ʥ����ȥ����ƥ�Ǥ����ޤ��ɥ�����ȤϤ���ޤ���
+単純かつ柔軟なコメントシステムです．まだドキュメントはありません．
 
 contenttypes
 ============
 
-����ƥ�ĤΡ֥����ספ�եå����뤿��η��̥ե졼�����Ǥ������󥹥ȡ�
-�뤷�� Django ��ǥ�Ϥ��줾���ͭ�Υ���ƥ�ĥ����פˤʤ�ޤ����ޤ��ɥ���
-���ȤϤ���ޤ���
+コンテンツの「タイプ」をフックするための軽量フレームワークです．インストー
+ルした Django モデルはそれぞれ固有のコンテンツタイプになります．まだドキュ
+メントはありません．
 
 csrf
 ====
 
-�����������ȥꥯ�����ȥե��������� (Cross Site Request Forgeries) ���˻ߤ�
-�뤿��Υߥɥ륦�����Ǥ���
+クロスサイトリクエストフォージェリ (Cross Site Request Forgeries) を阻止す
+るためのミドルウェアです．
 
-`csrf �Υɥ������`_ �򻲾Ȥ��Ƥ���������
+`csrf のドキュメント`_ を参照してください．
 
-.. _`csrf �Υɥ������`: ../csrf/
+.. _`csrf のドキュメント`: ../csrf/
 .. _csrf documentation: ../csrf/
 
 formtools
 =========
 
-Django �ο������ե����� (django.newforms) ���Ф���������ݲ����󥿥ե���
-���Ǥ���
+Django の新しいフォーム (django.newforms) に対する高水準の抽象化インタフェー
+スです．
 
 django.contrib.formtools.preview
 --------------------------------
 
-�� HTML �ե������ɽ������ɬ���ץ�ӥ塼��ԤäƤ���ե�����ǡ�������Ф�
-��פȤ�������ե�������ݲ�������ΤǤ���
+「 HTML フォームを表示し，必ずプレビューを行ってからフォームデータを提出す
+る」というワークフローを抽象化したものです．
 
-���ε�ǽ�˴ؤ���ɥ�����ȤϤޤ�����ޤ��󤬡�
-``django/contrib/formtools/preview.py`` �Υ����ɤ� docstring �����������
-�褤�Ǥ��礦��
+この機能に関するドキュメントはまだありませんが，
+``django/contrib/formtools/preview.py`` のコードや docstring を手引きすると
+よいでしょう．
 
 humanize
 ========
 
-�ǡ����ˡֿʹ֤����� (human touch)�פ�Ϳ���뤿��� Django �ƥ�ץ졼�ȥե�
-�륿�Ǥ��������Υե��륿��ͭ���ˤ���ˤϡ� ``INSTALLED_APPS`` �����
-``'django.contrib.humanize'`` ��ä��ޤ������󥹥ȡ���塢�ƥ�ץ졼�Ⱦ��
-``{% load humanize %}`` ��ƤӽФ��С��ʲ��Υե��륿�����ѤǤ���褦�ˤʤ�
-�ޤ�:
+データに「人間くささ (human touch)」を与えるための Django テンプレートフィ
+ルタです。これらのフィルタを有効にするには、 ``INSTALLED_APPS`` 設定に
+``'django.contrib.humanize'`` を加えます。インストール後、テンプレート上で
+``{% load humanize %}`` を呼び出せば、以下のフィルタを利用できるようになり
+ます:
 
 apnumber
 --------
 
-1-9 �ο������Ф��ơ����򥢥�ե��٥åȤ�ɽ���ޤ�������ʳ��ο��Ϥ��Τޤ޿�
-�����֤��ޤ�������� Associated Press �ν񼰤˽��äƤ��ޤ���
+1-9 の数字に対して、数をアルファベットで表します。それ以外の数はそのまま数
+字で返します。これは Associated Press の書式に従っています。
 
-��:
+例:
 
-    * ``1`` �� ``'one'`` �ˤʤ�ޤ�
-    * ``2`` �� ``'two'`` �ˤʤ�ޤ���
-    * ``10`` �� ``10`` �ˤʤ�ޤ���
+    * ``1`` は ``'one'`` になります
+    * ``2`` は ``'two'`` になります。
+    * ``10`` は ``10`` になります。
 
-�Ϥ��ͤ������Ǥ⡢������ʸ�����ɽ������ΤǤ⤫�ޤ��ޤ���
+渡す値は整数でも、整数を文字列で表したものでもかまいません。
 
 intcomma
 --------
 
-�����򻰷头�Ȥ˥���ޤǶ��ڤä�������ʸ������Ѵ����ޤ���
+整数を三桁ごとにカンマで区切った形式の文字列に変換します。
 
-��:
+例:
 
-    * ``4500`` �� ``'4,500'`` �ˤʤ�ޤ���
-    * ``45000`` �� ``'45,000'`` �ˤʤ�ޤ���
-    * ``450000`` �� ``'450,000'`` �ˤʤ�ޤ���
-    * ``4500000`` �� ``'4,500,000'`` �ˤʤ�ޤ���
+    * ``4500`` は ``'4,500'`` になります。
+    * ``45000`` は ``'45,000'`` になります。
+    * ``450000`` は ``'450,000'`` になります。
+    * ``4500000`` は ``'4,500,000'`` になります。
 
-�Ϥ��ͤ������Ǥ⡢������ʸ�����ɽ������ΤǤ⤫�ޤ��ޤ���
+渡す値は整数でも、整数を文字列で表したものでもかまいません。
 
 intword
 -------
 
-�礭���������ɤߤ䤹���ƥ�����ɽ�����Ѵ����ޤ���100 ����Ķ����褦���ͤ�
-�����������Ǥ���
+大きな整数を読みやすいテキスト表現に変換します。100 万を超えるような値を扱
+う場合に便利です。
 
-��:
+例:
 
-    * ``1000000`` �� ``'1.0 million'`` �ˤʤ�ޤ���
-    * ``1200000`` �� ``'1.2 million'``  �ˤʤ�ޤ���
-    * ``1200000000`` �� ``'1.2 billion'``  �ˤʤ�ޤ���
+    * ``1000000`` は ``'1.0 million'`` になります。
+    * ``1200000`` は ``'1.2 million'``  になります。
+    * ``1200000000`` は ``'1.2 billion'``  になります。
 
 Values up to 1000000000000000 (one quadrillion) are supported.
 
-�Ϥ��ͤ������Ǥ⡢������ʸ�����ɽ������ΤǤ⤫�ޤ��ޤ���
+渡す値は整数でも、整数を文字列で表したものでもかまいません。
 
 ordinal
 -------
 
-���������������ʸ������Ѵ����ޤ���
+整数を序数形式の文字列に変換します。
 
-��:
+例:
 
-    * ``1`` �� ``'1st'`` �ˤʤ�ޤ���
-    * ``2`` �� ``'2nd'`` �ˤʤ�ޤ���
-    * ``3`` �� ``'3rd'`` �ˤʤ�ޤ���
+    * ``1`` は ``'1st'`` になります。
+    * ``2`` は ``'2nd'`` になります。
+    * ``3`` は ``'3rd'`` になります。
 
-�Ϥ��ͤ������Ǥ⡢������ʸ�����ɽ������ΤǤ⤫�ޤ��ޤ���
+渡す値は整数でも、整数を文字列で表したものでもかまいません。
 
 
 flatpages
 =========
 
-�֥ե�å� (flat) �ʡ� HTML ����ƥ�Ĥ�ǡ����١����ǰ�������Υե졼��
-���Ǥ���
+「フラット (flat) な」 HTML コンテンツをデータベースで扱うためのフレームワー
+クです．
 
-`flatpages �Υɥ������`_ �򻲾Ȥ��Ƥ���������
+`flatpages のドキュメント`_ を参照してください．
 
-.. _`flatpages �Υɥ������`: ../flatpages/
+.. _`flatpages のドキュメント`: ../flatpages/
 .. _flatpages documentation: ../flatpages/
 
 localflavor
 ===========
 
-����ι��ʸ���ǤΤ�ͭ�Ѥ� Django ��û�������� (snippet) �򽸤᤿��ΤǤ���
-�㤨�С� ``django.contrib.localflavor.usa.forms`` �ˤϡ��ƹ��͹���ֹ�
-(U.S. zip code) �򸡾ڤ��뤿��� ``USZipCodeField`` �����äƤ��ޤ���
+特定の国や文化でのみ有用な Django の短いコード (snippet) を集めたものです．
+例えば， ``django.contrib.localflavor.usa.forms`` には，米国の郵便番号
+(U.S. zip code) を検証するための ``USZipCodeField`` が入っています．
 
 
 markup
 ======
 
-�ƥ�ץ졼�ȥե��륿�Υ��쥯�����Ǥ����ʲ��� 3 �ĤΥޡ������å׸�����Ф�
-��ե��륿��������Ƥ��ޤ�:
+テンプレートフィルタのコレクションです．以下の 3 つのマークアップ言語に対す
+るフィルタを実装しています:
 
-    * ``textile`` -- `Textile`_ �Ѥμ����Ǥ�
-    * ``markdown``  -- `Markdown`_ �Ѥμ����Ǥ�
-    * ``restructuredtext`` -- `ReST (ReStructured Text)`_ �Ѥμ����Ǥ�
+    * ``textile`` -- `Textile`_ 用の実装です
+    * ``markdown``  -- `Markdown`_ 用の実装です
+    * ``restructuredtext`` -- `ReST (ReStructured Text)`_ 用の実装です
 
-�ɤΥե��륿�⡤�ƥޡ������å׸���ǽ񤫤줿�ƥ����Ȥ����ä�ʸ����������
-�Ȥꡤ�ޡ������å׽����ѤߤΥƥ����Ȥ����ä�ʸ������֤��ޤ����㤨�С�
-``textile`` �ե��륿�� Textile �ե����ޥåȤǽ񤫤줿�ƥ����Ȥ� HTML ���Ѵ�
-���ޤ���
+どのフィルタも，各マークアップ言語で書かれたテキストの入った文字列を引数に
+とり，マークアップ処理済みのテキストの入った文字列を返します．例えば，
+``textile`` フィルタは Textile フォーマットで書かれたテキストを HTML に変換
+します．
 
-�ե��륿��ͭ���ˤ���ˤϡ� ``'django.contrib.markup'`` ��
-``INSTALLED_APPS`` ������ɲä��ޤ������ξ�� ``{% load markup %}`` ��ƥ�
-�ץ졼�Ȥ��ɲä���С��ե��륿��Ȥ���褦�ˤʤ�ޤ����ܺ٤�
-``django/contrib/markup/templatetags/markup.py`` �Υ����������ɤ�
-�Ȥ��Ƥ���������
+フィルタを有効にするには， ``'django.contrib.markup'`` を
+``INSTALLED_APPS`` 設定に追加します．その上で ``{% load markup %}`` をテン
+プレートに追加すれば，フィルタを使えるようになります．詳細は
+``django/contrib/markup/templatetags/markup.py`` のソースコードを参
+照してください．
 
 .. _Textile: http://en.wikipedia.org/wiki/Textile_%28markup_language%29
 .. _Markdown: http://en.wikipedia.org/wiki/Markdown
@@ -190,63 +190,63 @@ markup
 redirects
 =========
 
-������쥯�Ȥ�������뤿��Υե졼�����Ǥ���
+リダイレクトを管理するためのフレームワークです．
 
-`redirects �Υɥ������`_ �򻲾Ȥ��Ƥ���������
+`redirects のドキュメント`_ を参照してください．
 
-.. _`redirects �Υɥ������`: ../redirects/
+.. _`redirects のドキュメント`: ../redirects/
 .. _redirects documentation: ../redirects/
 
 
 sessions
 ========
 
-���å��������Τ���Υե졼�����Ǥ���
+セッション管理のためのフレームワークです．
 
-`���å����Υɥ������`_ �򻲾Ȥ��Ƥ���������
+`セッションのドキュメント`_ を参照してください．
 
-.. _`���å����Υɥ������`: ../sessions/
+.. _`セッションのドキュメント`: ../sessions/
 
 sites
 =====
 
-��ĤΥǡ����١����� Django ��Ȥä�ʣ���Υ����֥����Ȥ����Ǥ���褦�ˤ�
-�뤿��η��̥ե졼�����Ǥ������Υե졼������Ȥ��ȡ����֥������Ȥ�
-����� (��Ĥޤ���ʣ����) �����Ȥ˴�Ϣ�Ť��Ǥ��ޤ���
+一つのデータベースと Django を使って複数のウェブサイトを操作できるようにす
+るための軽量フレームワークです．このフレームワークを使うと，オブジェクトを
+特定の (一つまたは複数の) サイトに関連づけできます．
 
-`sites �Υɥ������`_ �򻲾Ȥ��Ƥ���������
+`sites のドキュメント`_ を参照してください．
 
-.. _`sites �Υɥ������`: ../sites/
+.. _`sites のドキュメント`: ../sites/
 .. _sites documentation: ../sites/
 
 sitemaps
 ========
 
-Google �����ȥޥå� XML �ե�������������뤿��Υե졼�����Ǥ���
+Google サイトマップ XML ファイルを生成するためのフレームワークです．
 
-`sitemaps �Υɥ������`_ �򻲾Ȥ��Ƥ���������
+`sitemaps のドキュメント`_ を参照してください．
 
 .. _sitemaps documentation: ../sitemaps/
-.. _`sitemaps �Υɥ������`: ../sitemaps/
+.. _`sitemaps のドキュメント`: ../sitemaps/
 
 
 syndication
 ===========
 
-RSS ����� Atom �������ۿ��ե����� (syndication feed) �򤴤���ñ����������
-����Υե졼�����Ǥ���
+RSS および Atom 形式の配信フィード (syndication feed) をごく簡単に生成する
+ためのフレームワークです．
 
-`�ۿ��ե����ɥե졼�����Υɥ������`_ �򻲾Ȥ��Ƥ���������
+`配信フィードフレームワークのドキュメント`_ を参照してください．
 
-.. _`�ۿ��ե����ɥե졼�����Υɥ������`: ../syndication_feeds/
+.. _`配信フィードフレームワークのドキュメント`: ../syndication_feeds/
 .. _syndication documentation: ../syndication/
 
 
 
-����¾�Υ��ɥ���
+その他のアドオン
 =================
 
-``contrib`` �����줿��褤�Ȼפ���ǽ�ˤĤ��Ʋ��������ǥ�������ʤ顤����
-���Ʋ�����! �����ɤ�񤤤ơ� `django-users mailing list`_ �����äƲ�������
+``contrib`` に入れたらよいと思う機能について何かアイデアがあるなら，是非教
+えて下さい! コードを書いて， `django-users mailing list`_ に送って下さい．
 
 .. _django-users mailing list: http://groups.google.com/group/django-users

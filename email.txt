@@ -1,25 +1,25 @@
 ==============
-e-mail ¤ÎÁ÷¿®
+e-mail ã®é€ä¿¡
 ==============
 
 :revision-up-to: 4805 (release 0.96)
 
-Python ¤Î `smtplib ¥é¥¤¥Ö¥é¥ê`_ ¤ò»È¤¨¤Ğ¡¤Èæ³ÓÅª´ÊÃ±¤ËÅÅ»Ò¥á¡¼¥ë¤òÁ÷¿®¤Ç¤­
-¤Ş¤¹¤¬¡¤ Django ¤Ç¤Ï¤³¤Î¥é¥¤¥Ö¥é¥ê¤Ø¤Î·ÚÎÌ¥é¥Ã¥Ñ¤òÆó¤ÄÍÑ°Õ¤·¤Æ¡¤ÅÅ»Ò¥á¡¼¥ë
-¤ÎÁ÷¿®¤ò¶Ë¤á¤ÆÁÇÁá¤¯¤ª¤³¤Ê¤¨¤ë¤è¤¦¤Ë¤·¤Æ¤¤¤Ş¤¹¡¥
+Python ã® `smtplib ãƒ©ã‚¤ãƒ–ãƒ©ãƒª`_ ã‚’ä½¿ãˆã°ï¼Œæ¯”è¼ƒçš„ç°¡å˜ã«é›»å­ãƒ¡ãƒ¼ãƒ«ã‚’é€ä¿¡ã§ã
+ã¾ã™ãŒï¼Œ Django ã§ã¯ã“ã®ãƒ©ã‚¤ãƒ–ãƒ©ãƒªã¸ã®è»½é‡ãƒ©ãƒƒãƒ‘ã‚’äºŒã¤ç”¨æ„ã—ã¦ï¼Œé›»å­ãƒ¡ãƒ¼ãƒ«
+ã®é€ä¿¡ã‚’æ¥µã‚ã¦ç´ æ—©ããŠã“ãªãˆã‚‹ã‚ˆã†ã«ã—ã¦ã„ã¾ã™ï¼
 
-¥³¡¼¥É¤Ï: ``django.core.mail`` ¤Ë¤¢¤ê¤Ş¤¹¡¥
+ã‚³ãƒ¼ãƒ‰ã¯: ``django.core.mail`` ã«ã‚ã‚Šã¾ã™ï¼
 
-.. _`smtplib ¥é¥¤¥Ö¥é¥ê`: http://www.python.jp/doc/release/lib/module-smtplib.html
+.. _`smtplib ãƒ©ã‚¤ãƒ–ãƒ©ãƒª`: http://www.python.jp/doc/release/lib/module-smtplib.html
 .. _smtplib library: http://www.python.org/doc/current/lib/module-smtplib.html
 
 
 .. _Quick example:
 
-¤ª¼ê·Ú¤ÊÎã
+ãŠæ‰‹è»½ãªä¾‹
 ==========
 
-Æó¹Ô¤À¤±¤Ç¤¹::
+äºŒè¡Œã ã‘ã§ã™::
 
     from django.core.mail import send_mail
 
@@ -28,10 +28,10 @@ Python ¤Î `smtplib ¥é¥¤¥Ö¥é¥ê`_ ¤ò»È¤¨¤Ğ¡¤Èæ³ÓÅª´ÊÃ±¤ËÅÅ»Ò¥á¡¼¥ë¤òÁ÷¿®¤Ç¤­
 
 .. note::
 
-    ``django.core.mail`` ¤ÇÁ÷¿®¤µ¤ì¤ëÅÅ»Ò¥á¡¼¥ë¤ÎÊ¸»ú¥»¥Ã¥È¤Ï
-    `DEFAULT_CHARSET ÀßÄê`_ ¤ÎÃÍ¤ËÀßÄê¤µ¤ì¤Ş¤¹¡¥
+    ``django.core.mail`` ã§é€ä¿¡ã•ã‚Œã‚‹é›»å­ãƒ¡ãƒ¼ãƒ«ã®æ–‡å­—ã‚»ãƒƒãƒˆã¯
+    `DEFAULT_CHARSET è¨­å®š`_ ã®å€¤ã«è¨­å®šã•ã‚Œã¾ã™ï¼
     
-.. _`DEFAULT_CHARSET ÀßÄê`: ../settings/#default-charset
+.. _`DEFAULT_CHARSET è¨­å®š`: ../settings/#default-charset
 .. _DEFAULT_CHARSET setting: ../settings/#DEFAULT_CHARSET
 
 
@@ -39,33 +39,33 @@ Python ¤Î `smtplib ¥é¥¤¥Ö¥é¥ê`_ ¤ò»È¤¨¤Ğ¡¤Èæ³ÓÅª´ÊÃ±¤ËÅÅ»Ò¥á¡¼¥ë¤òÁ÷¿®¤Ç¤­
 send_mail()
 ===========
 
-ÅÅ»Ò¥á¡¼¥ë¤òÁ÷¿®¤¹¤ëºÇ¤â´ÊÃ±¤ÊÊıË¡¤Ï ``django.core.mail.send_mail()``
-´Ø¿ô¤Ç¤¹¡¥¤³¤Î´Ø¿ô¤ÎÄêµÁ¤Ï°Ê²¼¤Î¤è¤¦¤Ë¤Ê¤Ã¤Æ¤¤¤Ş¤¹::
+é›»å­ãƒ¡ãƒ¼ãƒ«ã‚’é€ä¿¡ã™ã‚‹æœ€ã‚‚ç°¡å˜ãªæ–¹æ³•ã¯ ``django.core.mail.send_mail()``
+é–¢æ•°ã§ã™ï¼ã“ã®é–¢æ•°ã®å®šç¾©ã¯ä»¥ä¸‹ã®ã‚ˆã†ã«ãªã£ã¦ã„ã¾ã™::
 
     send_mail(subject, message, from_email, recipient_list,
         fail_silently=False, auth_user=None,
         auth_password=None)
 
-``subject``, ``message``, ``from_email`` ¤ª¤è¤Ó ``recipient_list`` ¤ÏÉ¬¿Ü¤Î
-¥Ñ¥é¥á¥¿¤Ç¤¹¡¥
+``subject``, ``message``, ``from_email`` ãŠã‚ˆã³ ``recipient_list`` ã¯å¿…é ˆã®
+ãƒ‘ãƒ©ãƒ¡ã‚¿ã§ã™ï¼
 
-    * ``subject``: Ê¸»úÎó¤Ç¤¹¡¥
-    * ``message``: Ê¸»úÎó¤Ç¤¹¡¥
-    * ``from_email``: Ê¸»úÎó¤Ç¤¹¡¥
-    * ``recipient_list``: Ê¸»úÎó¤«¤é¤Ê¤ë¥ê¥¹¥È¤Ç¡¤³Æ¡¹¤¬ÅÅ»Ò¥á¡¼¥ë¥¢¥É¥ì¥¹
-      ¤òÉ½¤·¤Ş¤¹¡¥ ``recipient_list`` ¤ËÆş¤Ã¤Æ¤¤¤ë¥æ¡¼¥¶¤Ï¡¤¤ª¸ß¤¤¤ËÂ¾¤Î¥æ¡¼
-      ¥¶¤ò¥á¡¼¥ë¤Î "To:" ¥Õ¥£¡¼¥ë¥É¤Ç¸«¤é¤ì¤Ş¤¹¡¥
-    * ``fail_silently``: ¥Ö¡¼¥ë·¿¤ÎÃÍ¤Ç¤¹¡¥ ``False`` ¤Ê¤é ``send_mail`` ¤Ï
-      ``smtplib.SMTPException`` Îã³°¤ò½Ğ¤¹¤è¤¦¤Ë¤Ê¤ê¤Ş¤¹¡¥ 
-      Á÷½Ğ¤µ¤ì¤¦¤ëÎã³°¤Î¥ê¥¹¥È¤Ï `smtplib ¤Î¥É¥­¥å¥á¥ó¥È`_ ¤ò»²¾È¤·¤Æ¤¯¤À¤µ
-      ¤¤¡¥¤¤¤º¤ì¤ÎÎã³°¤â ``SMTPException`` ¤Î¥µ¥Ö¥¯¥é¥¹¤Ç¤¹¡¥
-    * ``auth_user``: ¥ª¥×¥·¥ç¥ó¤Ç¤¹¡¥ SMTP ¥µ¡¼¥Ğ¤Ç¤ÎÇ§¾Ú¤Ë»È¤¦¥æ¡¼¥¶Ì¾¤Ç¤¹¡¥
-      ¤³¤ÎÃÍ¤ò»ØÄê¤·¤Ê¤±¤ì¤Ğ¡¤ Django ¤Ï ``EMAIL_HOST_USER`` ÀßÄê¤ò»È¤¤¤Ş¤¹¡¥
-    * ``auth_password``: ¥ª¥×¥·¥ç¥ó¤Ç¤¹¡¥ SMTP ¥µ¡¼¥Ğ¤Ç¤ÎÇ§¾Ú¤Ë»È¤¦¥Ñ¥¹¥ï¡¼
-      ¥É¤Ç¤¹¡¥¤³¤ÎÃÍ¤ò»ØÄê¤·¤Ê¤±¤ì¤Ğ¡¤ Django ¤Ï ``EMAIL_HOST_PASSWORD`` Àß
-      Äê¤ò»È¤¤¤Ş¤¹¡¥
+    * ``subject``: æ–‡å­—åˆ—ã§ã™ï¼
+    * ``message``: æ–‡å­—åˆ—ã§ã™ï¼
+    * ``from_email``: æ–‡å­—åˆ—ã§ã™ï¼
+    * ``recipient_list``: æ–‡å­—åˆ—ã‹ã‚‰ãªã‚‹ãƒªã‚¹ãƒˆã§ï¼Œå„ã€…ãŒé›»å­ãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹
+      ã‚’è¡¨ã—ã¾ã™ï¼ ``recipient_list`` ã«å…¥ã£ã¦ã„ã‚‹ãƒ¦ãƒ¼ã‚¶ã¯ï¼ŒãŠäº’ã„ã«ä»–ã®ãƒ¦ãƒ¼
+      ã‚¶ã‚’ãƒ¡ãƒ¼ãƒ«ã® "To:" ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã§è¦‹ã‚‰ã‚Œã¾ã™ï¼
+    * ``fail_silently``: ãƒ–ãƒ¼ãƒ«å‹ã®å€¤ã§ã™ï¼ ``False`` ãªã‚‰ ``send_mail`` ã¯
+      ``smtplib.SMTPException`` ä¾‹å¤–ã‚’å‡ºã™ã‚ˆã†ã«ãªã‚Šã¾ã™ï¼ 
+      é€å‡ºã•ã‚Œã†ã‚‹ä¾‹å¤–ã®ãƒªã‚¹ãƒˆã¯ `smtplib ã®ãƒ‰ã‚­ãƒ¥ãƒ¡ãƒ³ãƒˆ`_ ã‚’å‚ç…§ã—ã¦ãã ã•
+      ã„ï¼ã„ãšã‚Œã®ä¾‹å¤–ã‚‚ ``SMTPException`` ã®ã‚µãƒ–ã‚¯ãƒ©ã‚¹ã§ã™ï¼
+    * ``auth_user``: ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã§ã™ï¼ SMTP ã‚µãƒ¼ãƒã§ã®èªè¨¼ã«ä½¿ã†ãƒ¦ãƒ¼ã‚¶åã§ã™ï¼
+      ã“ã®å€¤ã‚’æŒ‡å®šã—ãªã‘ã‚Œã°ï¼Œ Django ã¯ ``EMAIL_HOST_USER`` è¨­å®šã‚’ä½¿ã„ã¾ã™ï¼
+    * ``auth_password``: ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã§ã™ï¼ SMTP ã‚µãƒ¼ãƒã§ã®èªè¨¼ã«ä½¿ã†ãƒ‘ã‚¹ãƒ¯ãƒ¼
+      ãƒ‰ã§ã™ï¼ã“ã®å€¤ã‚’æŒ‡å®šã—ãªã‘ã‚Œã°ï¼Œ Django ã¯ ``EMAIL_HOST_PASSWORD`` è¨­
+      å®šã‚’ä½¿ã„ã¾ã™ï¼
 
-.. _`smtplib ¤Î¥É¥­¥å¥á¥ó¥È`:
+.. _`smtplib ã®ãƒ‰ã‚­ãƒ¥ãƒ¡ãƒ³ãƒˆ`:
    http://www.python.jp/doc/release/lib/module-smtplib.html
 .. _smtplib docs:
    http://www.python.org/doc/current/lib/module-smtplib.html
@@ -74,53 +74,53 @@ send_mail()
 send_mass_mail()
 ================
 
-``django.core.mail.send_mass_mail()`` ¤Ï°ì³çÅÅ»Ò¥á¡¼¥ë (mass e-mail) ¤ÎÁ÷¿®
-ÍÑ¤Î´Ø¿ô¤Ç¤¹¡¥¤³¤Î´Ø¿ô¤ÎÄêµÁ¤Ï°Ê²¼¤Î¤è¤¦¤Ë¤Ê¤Ã¤Æ¤¤¤Ş¤¹::
+``django.core.mail.send_mass_mail()`` ã¯ä¸€æ‹¬é›»å­ãƒ¡ãƒ¼ãƒ« (mass e-mail) ã®é€ä¿¡
+ç”¨ã®é–¢æ•°ã§ã™ï¼ã“ã®é–¢æ•°ã®å®šç¾©ã¯ä»¥ä¸‹ã®ã‚ˆã†ã«ãªã£ã¦ã„ã¾ã™::
 
     send_mass_mail(datatuple, fail_silently=False,
         auth_user=None, auth_password=None):
 
-``datatuple`` ¤Ï¥¿¥×¥ë¤Ç¡¤³ÆÍ×ÁÇ¤Ï°Ê²¼¤Î·Á¼°¤Ë¤Ê¤Ã¤Æ¤¤¤Ş¤¹::
+``datatuple`` ã¯ã‚¿ãƒ—ãƒ«ã§ï¼Œå„è¦ç´ ã¯ä»¥ä¸‹ã®å½¢å¼ã«ãªã£ã¦ã„ã¾ã™::
 
     (subject, message, from_email, recipient_list)
 
-``fail_silently``, ``auth_user`` ¤ª¤è¤Ó ``auth_password`` ¤Ï
-``send_mail()`` ¤ÈÆ±¤¸¤Ç¤¹¡¥
+``fail_silently``, ``auth_user`` ãŠã‚ˆã³ ``auth_password`` ã¯
+``send_mail()`` ã¨åŒã˜ã§ã™ï¼
 
-``datatuple`` ¤Î³ÆÍ×ÁÇ¤´¤È¤Ë¸ÄÊÌ¤ÎÅÅ»Ò¥á¡¼¥ë¥á¥Ã¥»¡¼¥¸¤òºîÀ®¤·¤ÆÁ÷¿®¤·¤Ş¤¹¡¥
-``send_mail()`` ¤ÈÆ±ÍÍ¡¤Æ±¤¸ ``recipient_list`` ¤ËÆş¤Ã¤Æ¤¤¤ë¼õ¿®¼Ô¤Ï¡¤Â¾¤Î
-¼õ¿®¼Ô¤ò "To:" ¥Õ¥£¡¼¥ë¥É¤Ç¸«¤é¤ì¤Ş¤¹¡¥
+``datatuple`` ã®å„è¦ç´ ã”ã¨ã«å€‹åˆ¥ã®é›»å­ãƒ¡ãƒ¼ãƒ«ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ä½œæˆã—ã¦é€ä¿¡ã—ã¾ã™ï¼
+``send_mail()`` ã¨åŒæ§˜ï¼ŒåŒã˜ ``recipient_list`` ã«å…¥ã£ã¦ã„ã‚‹å—ä¿¡è€…ã¯ï¼Œä»–ã®
+å—ä¿¡è€…ã‚’ "To:" ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã§è¦‹ã‚‰ã‚Œã¾ã™ï¼
 
 .. _`send_mass_mail() vs. send_mail()`:
 
-send_mass_mail() ¤È send_mail()
+send_mass_mail() ã¨ send_mail()
 -------------------------------
 
-``send_mass_mail()`` ¤È ``send_mail()`` ¤ÎÂç¤­¤Ê°ã¤¤¤Ï¡¤ ``send_mail()``
-¤Ï¼Â¹Ô¤ÎÅÙ¤Ë¥á¡¼¥ë¥µ¡¼¥Ğ¤ËÀÜÂ³¤¹¤ë¤Î¤ËÂĞ¤·¡¤ ``send_mass_mail()`` ¤ÏÁ´¤Æ¤Î
-¥á¥Ã¥»¡¼¥¸¤ÎÁ÷¿®¤Ë°ì¤Ä¤ÎÀÜÂ³¤ò»È¤¦ÅÀ¤Ç¤¹¡¥¤³¤Î¤¿¤á¡¤ ``send_mass_mail()`` 
-¤ÎÊı¤¬¾¯¤·¤À¤±¸úÎ¨Åª¤Ç¤¹¡¥
+``send_mass_mail()`` ã¨ ``send_mail()`` ã®å¤§ããªé•ã„ã¯ï¼Œ ``send_mail()``
+ã¯å®Ÿè¡Œã®åº¦ã«ãƒ¡ãƒ¼ãƒ«ã‚µãƒ¼ãƒã«æ¥ç¶šã™ã‚‹ã®ã«å¯¾ã—ï¼Œ ``send_mass_mail()`` ã¯å…¨ã¦ã®
+ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®é€ä¿¡ã«ä¸€ã¤ã®æ¥ç¶šã‚’ä½¿ã†ç‚¹ã§ã™ï¼ã“ã®ãŸã‚ï¼Œ ``send_mass_mail()`` 
+ã®æ–¹ãŒå°‘ã—ã ã‘åŠ¹ç‡çš„ã§ã™ï¼
 
 .. _`mail_admins()`:
 
 mail_admins()
 =============
 
-``django.core.mail.mail_admins()`` ¤Ï `ADMINS ÀßÄê`_ ¤Ë½ñ¤«¤ì¤¿¥µ¥¤¥È´ÉÍı¼Ô¤Ø
-¤ÎÅÅ»Ò¥á¡¼¥ëÁ÷¿®¤ò¹Ô¤¦¤¿¤á¤Î¥·¥ç¡¼¥È¥«¥Ã¥È¤Ç¤¹¡¥´Ø¿ô¤ÎÄêµÁ¤Ï°Ê²¼¤ÎÄÌ¤ê¤Ç¤¹::
+``django.core.mail.mail_admins()`` ã¯ `ADMINS è¨­å®š`_ ã«æ›¸ã‹ã‚ŒãŸã‚µã‚¤ãƒˆç®¡ç†è€…ã¸
+ã®é›»å­ãƒ¡ãƒ¼ãƒ«é€ä¿¡ã‚’è¡Œã†ãŸã‚ã®ã‚·ãƒ§ãƒ¼ãƒˆã‚«ãƒƒãƒˆã§ã™ï¼é–¢æ•°ã®å®šç¾©ã¯ä»¥ä¸‹ã®é€šã‚Šã§ã™::
 
     mail_admins(subject, message, fail_silently=False)
 
-``mail_admins()`` ¤Ï¥µ¥Ö¥¸¥§¥¯¥È¤ÎÀèÆ¬¤Ë `EMAIL_SUBJECT_PREFIX ÀßÄê`_ ¤ÎÃÍ
-¤òÉÕ²Ã¤·¤Ş¤¹¡¥¥Ç¥Õ¥©¥ë¥È¤Ï ``"[Django] "`` ¤Ç¤¹¡¥
+``mail_admins()`` ã¯ã‚µãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®å…ˆé ­ã« `EMAIL_SUBJECT_PREFIX è¨­å®š`_ ã®å€¤
+ã‚’ä»˜åŠ ã—ã¾ã™ï¼ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ ``"[Django] "`` ã§ã™ï¼
 
-ÅÅ»Ò¥á¡¼¥ë¤Î "From:" ¥Ø¥Ã¥À¤Ï `SERVER_EMAIL ÀßÄê`_ ¤ÎÀßÄêÃÍ¤Ë¤Ê¤ê¤Ş¤¹¡¥
+é›»å­ãƒ¡ãƒ¼ãƒ«ã® "From:" ãƒ˜ãƒƒãƒ€ã¯ `SERVER_EMAIL è¨­å®š`_ ã®è¨­å®šå€¤ã«ãªã‚Šã¾ã™ï¼
 
-¤³¤Î¥á¥½¥Ã¥É¤ÏÍøÊØÀ­¤È²ÄÆÉÀ­¤Î¤¿¤á¤ËÍÑ°Õ¤µ¤ì¤Æ¤¤¤Ş¤¹¡¥
+ã“ã®ãƒ¡ã‚½ãƒƒãƒ‰ã¯åˆ©ä¾¿æ€§ã¨å¯èª­æ€§ã®ãŸã‚ã«ç”¨æ„ã•ã‚Œã¦ã„ã¾ã™ï¼
 
-.. _ADMINS ÀßÄê: ../settings/#admins
-.. _EMAIL_SUBJECT_PREFIX ÀßÄê: ../settings/#email-subject-prefix
-.. _SERVER_EMAIL ÀßÄê: ../settings/#server-email
+.. _ADMINS è¨­å®š: ../settings/#admins
+.. _EMAIL_SUBJECT_PREFIX è¨­å®š: ../settings/#email-subject-prefix
+.. _SERVER_EMAIL è¨­å®š: ../settings/#server-email
 .. _ADMINS setting: 
    ../settings/#admins
 .. _EMAIL_SUBJECT_PREFIX setting: 
@@ -132,29 +132,29 @@ mail_admins()
 mail_managers()
 ===============
 
-``django.core.mail.mail_managers()`` ¤Ï ``mail_admins`` ¤ÈÆ±¤¸¤Ç¤¹¤¬¡¤
-ÅÅ»Ò¥á¡¼¥ë¤ò `MANAGERS ÀßÄê`_ ¤Ë½ñ¤«¤ì¤¿¥µ¥¤¥È¥Ş¥Í¥¸¥ã¤ËÁ÷¿®¤·¤Ş¤¹
-´Ø¿ô¤Ï°Ê²¼¤Î¤è¤¦¤ËÄêµÁ¤µ¤ì¤Æ¤¤¤Ş¤¹::
+``django.core.mail.mail_managers()`` ã¯ ``mail_admins`` ã¨åŒã˜ã§ã™ãŒï¼Œ
+é›»å­ãƒ¡ãƒ¼ãƒ«ã‚’ `MANAGERS è¨­å®š`_ ã«æ›¸ã‹ã‚ŒãŸã‚µã‚¤ãƒˆãƒãƒã‚¸ãƒ£ã«é€ä¿¡ã—ã¾ã™
+é–¢æ•°ã¯ä»¥ä¸‹ã®ã‚ˆã†ã«å®šç¾©ã•ã‚Œã¦ã„ã¾ã™::
 
     mail_managers(subject, message, fail_silently=False)
 
-.. _`MANAGERS ÀßÄê`: ../settings/#managers
+.. _`MANAGERS è¨­å®š`: ../settings/#managers
 .. _MANAGERS setting: 
    ../settings/#managers
 
 .. _Examples:
 
-Îã
+ä¾‹
 ==
 
-°Ê²¼¤ÎÎã¤Ï¡¤Ã±°ì¤ÎÅÅ»Ò¥á¡¼¥ë¤ò john@example.com ¤È jane@example.com ¤ËÁ÷¿®
-¤·¤Ş¤¹¡¥Î¾Êı¤Î°¸Àè¤¬ "To:" ¤ËÉ½¼¨¤µ¤ì¤Ş¤¹::
+ä»¥ä¸‹ã®ä¾‹ã¯ï¼Œå˜ä¸€ã®é›»å­ãƒ¡ãƒ¼ãƒ«ã‚’ john@example.com ã¨ jane@example.com ã«é€ä¿¡
+ã—ã¾ã™ï¼ä¸¡æ–¹ã®å®›å…ˆãŒ "To:" ã«è¡¨ç¤ºã•ã‚Œã¾ã™::
 
     send_mail('Subject', 'Message.', 'from@example.com',
         ['john@example.com', 'jane@example.com'])
 
-°Ê²¼¤ÎÎã¤Ï¡¤Ã±°ì¤ÎÅÅ»Ò¥á¡¼¥ë¤ò john@example.com ¤È jane@example.com ¤ËÁ÷¿®
-¤·¤Ş¤¹¤¬¡¤¼õ¤±¼è¤ê¿Í¤Ï¤½¤ì¤¾¤ìÊÌ¡¹¤Î¥á¥Ã¥»¡¼¥¸¤ò¼õ¤±¼è¤ê¤Ş¤¹::
+ä»¥ä¸‹ã®ä¾‹ã¯ï¼Œå˜ä¸€ã®é›»å­ãƒ¡ãƒ¼ãƒ«ã‚’ john@example.com ã¨ jane@example.com ã«é€ä¿¡
+ã—ã¾ã™ãŒï¼Œå—ã‘å–ã‚Šäººã¯ãã‚Œãã‚Œåˆ¥ã€…ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å—ã‘å–ã‚Šã¾ã™::
 
     datatuple = (
         ('Subject', 'Message.', 'from@example.com', ['john@example.com']),
@@ -165,27 +165,27 @@ mail_managers()
 
 .. _Preventing header injection:
 
-¥Ø¥Ã¥À¥¤¥ó¥¸¥§¥¯¥·¥ç¥ó¤ÎÍŞÀ©
+ãƒ˜ãƒƒãƒ€ã‚¤ãƒ³ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³ã®æŠ‘åˆ¶
 ============================
 
-`¥Ø¥Ã¥À¥¤¥ó¥¸¥§¥¯¥·¥ç¥ó`_ ¤È¤Ï¡¤¥¹¥¯¥ê¥×¥È¤¬À¸À®¤·¤¿¥á¥Ã¥»¡¼¥¸¤Î "To:" ¤ä
-"From:" ¤Ë¡¤¹¶·â¼Ô¤¬Í¾Ê¬¤ÊÅÅ»Ò¥á¡¼¥ë¥Ø¥Ã¥À¤òÁŞÆş¤¹¤ë¤È¤¤¤¦¥»¥­¥å¥ê¥Æ¥£¿¯³²
-¤Ç¤¹¡¥
+`ãƒ˜ãƒƒãƒ€ã‚¤ãƒ³ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³`_ ã¨ã¯ï¼Œã‚¹ã‚¯ãƒªãƒ—ãƒˆãŒç”Ÿæˆã—ãŸãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã® "To:" ã‚„
+"From:" ã«ï¼Œæ”»æ’ƒè€…ãŒä½™åˆ†ãªé›»å­ãƒ¡ãƒ¼ãƒ«ãƒ˜ãƒƒãƒ€ã‚’æŒ¿å…¥ã™ã‚‹ã¨ã„ã†ã‚»ã‚­ãƒ¥ãƒªãƒ†ã‚£ä¾µå®³
+ã§ã™ï¼
 
-¾åµ­¤Ç²òÀâ¤·¤¿ Django ¤ÎÅÅ»Ò¥á¡¼¥ëµ¡Ç½¤Ç¤Ï¡¤¥Ø¥Ã¥À¤ÎÃÍ¤Ë²ş¹Ô¤ò»È¤¨¤Ê¤¤¤è¤¦
-¤Ë¤·¤Æ¥Ø¥Ã¥À¥¤¥ó¥¸¥§¥¯¥·¥ç¥ó¤òËÉ¸æ¤·¤Æ¤¤¤Ş¤¹¡¥ ``subject``, ``from_email`` 
-¤ª¤è¤Ó ``recipient_list`` ¤¬ (Unix, Windows ¤Ş¤¿¤Ï Mac ·Á¼°¤Î) ²ş¹Ô¤ò´Ş¤à¾ì
-¹ç¡¤ÅÅ»Ò¥á¡¼¥ëÁ÷¿®´Ø¿ô (``send_mail()`` ¤Ê¤É) ¤Ï
-``django.core.mail.BadHeaderError`` Îã³° (``ValueError`` ¤Î¥µ¥Ö¥¯¥é¥¹) ¤òÁ÷
-½Ğ¤·¤Ş¤¹¡¥¤³¤Î¤¿¤á¡¤ÅÅ»Ò¥á¡¼¥ë¤ÏÁ÷¿®¤µ¤ì¤Ş¤»¤ó¡¥ÅÅ»Ò¥á¡¼¥ëÁ÷¿®´Ø¿ô¤ËÅÏ¤¹¥Ç¡¼
-¥¿¤Î¸¡¾Ú¤Ï¥æ¡¼¥¶¤ËÇ¤¤µ¤ì¤Æ¤¤¤Ş¤¹¡¥
+ä¸Šè¨˜ã§è§£èª¬ã—ãŸ Django ã®é›»å­ãƒ¡ãƒ¼ãƒ«æ©Ÿèƒ½ã§ã¯ï¼Œãƒ˜ãƒƒãƒ€ã®å€¤ã«æ”¹è¡Œã‚’ä½¿ãˆãªã„ã‚ˆã†
+ã«ã—ã¦ãƒ˜ãƒƒãƒ€ã‚¤ãƒ³ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³ã‚’é˜²å¾¡ã—ã¦ã„ã¾ã™ï¼ ``subject``, ``from_email`` 
+ãŠã‚ˆã³ ``recipient_list`` ãŒ (Unix, Windows ã¾ãŸã¯ Mac å½¢å¼ã®) æ”¹è¡Œã‚’å«ã‚€å ´
+åˆï¼Œé›»å­ãƒ¡ãƒ¼ãƒ«é€ä¿¡é–¢æ•° (``send_mail()`` ãªã©) ã¯
+``django.core.mail.BadHeaderError`` ä¾‹å¤– (``ValueError`` ã®ã‚µãƒ–ã‚¯ãƒ©ã‚¹) ã‚’é€
+å‡ºã—ã¾ã™ï¼ã“ã®ãŸã‚ï¼Œé›»å­ãƒ¡ãƒ¼ãƒ«ã¯é€ä¿¡ã•ã‚Œã¾ã›ã‚“ï¼é›»å­ãƒ¡ãƒ¼ãƒ«é€ä¿¡é–¢æ•°ã«æ¸¡ã™ãƒ‡ãƒ¼
+ã‚¿ã®æ¤œè¨¼ã¯ãƒ¦ãƒ¼ã‚¶ã«ä»»ã•ã‚Œã¦ã„ã¾ã™ï¼
 
-``message`` ¤ÎÊ¸»úÎó¤ÎÀèÆ¬¤Ë¥Ø¥Ã¥À¤¬Æş¤Ã¤Æ¤¤¤ë¾ì¹ç¡¤¥Ø¥Ã¥À¤ÏÃ±¤ËÅÅ»Ò¥á¥Ã¥»¡¼
-¥¸ËÜÊ¸¤ÎÀèÆ¬ÉôÊ¬¤È¤·¤Æ½ĞÎÏ¤µ¤ì¤Ş¤¹¡¥
+``message`` ã®æ–‡å­—åˆ—ã®å…ˆé ­ã«ãƒ˜ãƒƒãƒ€ãŒå…¥ã£ã¦ã„ã‚‹å ´åˆï¼Œãƒ˜ãƒƒãƒ€ã¯å˜ã«é›»å­ãƒ¡ãƒƒã‚»ãƒ¼
+ã‚¸æœ¬æ–‡ã®å…ˆé ­éƒ¨åˆ†ã¨ã—ã¦å‡ºåŠ›ã•ã‚Œã¾ã™ï¼
 
-°Ê²¼¤Ë¼¨¤¹¤Î¤Ï¡¤  ``subject``, ``message`` ¤ª¤è¤Ó ``from_email`` ¤ò¥ê¥¯¥¨¥¹
-¥È¤Î POST ¥Ç¡¼¥¿¤«¤é¼õ¤±¼è¤ê¡¤¥á¡¼¥ë¤ò admin@example.com ¤ËÁ÷¿®¤·¡¤½ªÎ»¤·¤¿
-¤é "/contact/thanks/" ¤Ë¥ê¥À¥¤¥ì¥¯¥È¤¹¤ëÎã¤Ç¤¹::
+ä»¥ä¸‹ã«ç¤ºã™ã®ã¯ï¼Œ  ``subject``, ``message`` ãŠã‚ˆã³ ``from_email`` ã‚’ãƒªã‚¯ã‚¨ã‚¹
+ãƒˆã® POST ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰å—ã‘å–ã‚Šï¼Œãƒ¡ãƒ¼ãƒ«ã‚’ admin@example.com ã«é€ä¿¡ã—ï¼Œçµ‚äº†ã—ãŸ
+ã‚‰ "/contact/thanks/" ã«ãƒªãƒ€ã‚¤ãƒ¬ã‚¯ãƒˆã™ã‚‹ä¾‹ã§ã™::
 
     from django.core.mail import send_mail, BadHeaderError
 
@@ -200,9 +200,9 @@ mail_managers()
                 return HttpResponse('Invalid header found.')
             return HttpResponseRedirect('/contact/thanks/')
         else:
-            # ¼Âºİ¤Ë¤Ï¥Ş¥Ë¥Ô¥å¥ì¡¼¥¿¤ò»È¤Ã¤ÆÅ¬ÀÚ¤Ê¸¡¾Ú¥¨¥é¡¼¤ò
-            # ¼èÆÀ¤¹¤ë¤Ù¤­¤Ç¤·¤ç¤¦¡¥
+            # å®Ÿéš›ã«ã¯ãƒãƒ‹ãƒ”ãƒ¥ãƒ¬ãƒ¼ã‚¿ã‚’ä½¿ã£ã¦é©åˆ‡ãªæ¤œè¨¼ã‚¨ãƒ©ãƒ¼ã‚’
+            # å–å¾—ã™ã‚‹ã¹ãã§ã—ã‚‡ã†ï¼
             return HttpResponse('Make sure all fields are entered and valid.')
 
-.. _`¥Ø¥Ã¥À¥¤¥ó¥¸¥§¥¯¥·¥ç¥ó`: http://securephp.damonkohler.com/index.php/Email_Injection
+.. _`ãƒ˜ãƒƒãƒ€ã‚¤ãƒ³ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³`: http://securephp.damonkohler.com/index.php/Email_Injection
 .. _Header injection: http://securephp.damonkohler.com/index.php/Email_Injection

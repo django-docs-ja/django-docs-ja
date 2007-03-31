@@ -1,41 +1,41 @@
 =======================
-��ǥ� API ��ե����
+モデル API リファレンス
 =======================
 
 :revision-up-to: 4884 (release 0.96)
 
-��ǥ�Ȥϡ������Ȥ�������ǡ����Ρ�������Ĥ��ĺǽ�Ū�ʥǡ������������
-���ޤ�����ǥ�ˤϡ���¸�������ǡ������Բķ�ʥǡ����ե�����ɤȡ����ο���
-����������Ƥ��ޤ�������Ū�ˡ��ƥ�ǥ��ñ��Υǡ����١����ơ��֥���б�
-�Ť����Ƥ��ޤ���
+モデルとは，サイトを構成するデータの，ただ一つかつ最終的なデータソースを指
+します．モデルには，保存したいデータに不可欠なデータフィールドと，その振舞
+いが収められています．一般的に，各モデルは単一のデータベーステーブルに対応
+づけられています．
 
-���ܤȤ��ơ��ޤ��ʲ��Τ��Ȥ��ΤäƤ����ޤ��礦:
+基本として，まず以下のことを知っておきましょう:
 
-    * �ƥ�ǥ�� Python �Υ��饹�ǡ� ``django.db.models.Model`` �Υ��֥���
-      ���ˤʤ�ޤ���
-    * ��ǥ�γ�°���ͤϡ��ǡ����١�����Τ���ե�����ɤ�ɽ�����ޤ���
-    * ��ǥ�Υ᥿�ǡ��� (�ե�����ɤ�ɽ������ʤ�����) �� ``Meta`` �ȸƤ�
-      ����������饹�����֤��ޤ���
-    * Django �� admin �����ȤǻȤ���᥿�ǡ����� ``Admin`` �ȸƤФ������
-      ���饹�����֤��ޤ���
-    * �����ξ�����Ȥˡ� Django �ϥǡ����١��� API ��ư�������ޤ���
-      API �ˤĤ��Ƥ� `�ǡ����١��� API ��ե����`_ �ǲ��⤷�ޤ���
+    * 各モデルは Python のクラスで， ``django.db.models.Model`` のサブクラ
+      スになります．
+    * モデルの各属性値は，データベース上のあるフィールドを表現します．
+    * モデルのメタデータ (フィールドで表現されない情報) は ``Meta`` と呼ば
+      れる内部クラスに配置します．
+    * Django の admin サイトで使われるメタデータは ``Admin`` と呼ばれる内部
+      クラスに配置します．
+    * これらの情報をもとに， Django はデータベース API を自動生成します．
+      API については `データベース API リファレンス`_ で解説します．
 
-���Υɥ�����Ȥ����򤹤��ǡ� `��ǥ���θ�����ݥ��ȥ�`_ 
-�����ͤˤʤ�Ǥ��礦�� (Django �Υ���������ʪ��Ǥϡ����������
-``tests/modeltests`` �ǥ��쥯�ȥ�˼�����Ƥ��ޤ���)
+このドキュメントを理解する上で， `モデル例の公式リポジトリ`_ 
+が参考になるでしょう． (Django のソース配布物中では，これらの例は
+``tests/modeltests`` ディレクトリに収められています．)
 
-.. _`��ǥ���θ�����ݥ��ȥ�`: 
+.. _`モデル例の公式リポジトリ`: 
     ../models/
-.. _`�ǡ����١��� API ��ե����`: ../db-api/
+.. _`データベース API リファレンス`: ../db-api/
 
 .. _Quick example:
 
-��ñ����
+簡単な例
 ========
 
-�ʲ��Υ�ǥ���Ǥϡ� ``first_name`` ����� ``last_name`` �Ȥ����ե�����ɤ�
-���ä� ``Person`` ��������Ƥ��ޤ�::
+以下のモデル例では， ``first_name`` および ``last_name`` というフィールドを
+持った ``Person`` を定義しています::
 
     from django.db import models
 
@@ -43,11 +43,11 @@
         first_name = models.CharField(maxlength=30)
         last_name = models.CharField(maxlength=30)
 
-``first_name`` �� ``last_name`` �ϥ�ǥ�� *�ե������ (fields)* �Ǥ�����
-�ե�����ɤϥ��饹°���Ȥ���������졤��°�����ǡ����١����Υ������б���
-�ޤ���
+``first_name`` と ``last_name`` はモデルの *フィールド (fields)* です．各
+フィールドはクラス属性として定義され，各属性がデータベースのカラムに対応し
+ます．
 
-��� ``Person`` ��ǥ�ϡ��ʲ��Τ褦�ʥǡ����١����ơ��֥���������ޤ�::
+上の ``Person`` モデルは，以下のようなデータベーステーブルを生成します::
 
     CREATE TABLE myapp_person (
         "id" serial NOT NULL PRIMARY KEY,
@@ -55,31 +55,31 @@
         "last_name" varchar(30) NOT NULL
     );
 
-�ʲ��˵���Ū���������򼨤��ޤ�:
+以下に技術的な注意点を示します:
 
-    * �ơ��֥��̾���� ``myapp_person`` �ϥ�ǥ�Υ᥿�ǡ������鼫ưŪ��Ƴ
-      �Ф�����ΤǤ����������Х饤�ɤ�Ǥ��ޤ�����Ҥ� `�ơ��֥�̾`_ �򻲾�
-      ���Ƥ���������
-    * ``id`` �ϼ�ưŪ���ɲä���ޤ��������ε�ư��ޤ������Х饤�ɤǤ��ޤ���
-      `��ưŪ�ʼ祭���ե������`_ �򻲾Ȥ��Ƥ���������
-    * ������� ``CREATE TABLE`` SQL ʸ�� PostgreSQL �ν񼰤ǽ񤫤�Ƥ��ޤ�
-      ���� Django �� `����ե�����`_ �˻��ꤵ�줿�ǡ����١����Хå�����ɸ�
-      ���� SQL ��Ȥ��ޤ���
+    * テーブルの名前， ``myapp_person`` はモデルのメタデータから自動的に導
+      出したものですが，オーバライドもできます．後述の `テーブル名`_ を参照
+      してください．
+    * ``id`` は自動的に追加されますが，この挙動もまたオーバライドできます．
+      `自動的な主キーフィールド`_ を参照してください．
+    * この例の ``CREATE TABLE`` SQL 文は PostgreSQL の書式で書かれています
+      が， Django は `設定ファイル`_ に指定されたデータベースバックエンド向
+      けの SQL を使います．
 
-.. _`����ե�����`: ../settings/
+.. _`設定ファイル`: ../settings/
 .. _settings file: ../settings/
 
 
 .. _Fields:
 
-�ե������
+フィールド
 ==========
 
-��ǥ�ǺǤ���פǤ��ꡤ���ĥ�ǥ�����ǺǾ���ɬ�פ���ʬ�ϡ���ǥ��⤬���
-���Ƥ���ǡ����١����ե�����ɤΥꥹ�ȤǤ����ե�����ɤϥ��饹��°���Ȥ���
-�������Ƥ��ޤ���
+モデルで最も重要であり，かつモデル定義で最小限必要な部分は，モデル内が定義
+しているデータベースフィールドのリストです．フィールドはクラスの属性として
+定義されています．
 
-��򼨤��ޤ�::
+例を示します::
 
     class Musician(models.Model):
         first_name = models.CharField(maxlength=50)
@@ -94,404 +94,404 @@
 
 .. _Field name restrictions:
 
-�ե������̾������
+フィールド名の制約
 ------------------
 
-Django ����ǥ�Υե������̾�˲ݤ��Ƥ����������Ĥ�������ޤ���:
+Django がモデルのフィールド名に課している制約は二つしかありません:
 
-    1. �ե������̾�� Python ��ͽ���Ǥ��äƤϤʤ�ޤ��󡥤���ʤ����
-       Python �Υ��󥿥������顼���������������Ǥ����㤨��::
-
-           class Example(models.Model):
-               pass = models.IntegerField() # 'pass' ��ͽ���Ǥ�!
-
-    2. �ե������̾�ˤ���İʾ��Ϣ³���륢�����������������ƤϤʤ�ޤ���
-       �ʤ��ʤ顤Django �Υ�����ȹ繽ʸ�ǻȤ��Ƥ��뤫��Ǥ����㤨��::
+    1. フィールド名は Python の予約語であってはなりません．さもなければ
+       Python のシンタクスエラーを引き起こすからです．例えば::
 
            class Example(models.Model):
-               foo__bar = models.IntegerField()  # 'foo__bar' �� '__' �����äƤ��ޤ�!
+               pass = models.IntegerField() # 'pass' は予約語です!
 
-�ե�����ɤ�̾����ɬ������ǡ����١����Υ����̾�Ȱ��פ��Ƥ��ʤ��Ƥ�褤��
-�ǡ�����������ϲ����ǽ�Ǥ����ܤ����ϸ�Ҥ� `db_column`_ �򻲾Ȥ��Ƥ���
-������
+    2. フィールド名には二つ以上の連続するアンダースコアを入れてはなりません．
+       なぜなら，Django のクエリ照合構文で使われているからです．例えば::
 
-``join`` �� ``where``, ``select`` �Τ褦�� SQL ��ͽ���ϡ���ǥ�Υե�����
-��̾�˻ȤäƤ� *���ޤ��ޤ���* ���Ȥ����Τ⡤Django �Ϥ����ʤ� SQL ������ʸ
-�Ǥ����ƤΥǡ����١����ơ��֥�̾�䥫���̾�򥨥������פ��뤫��Ǥ�����������
-�פˤϥǡ����١������󥸥��ͭ�Υ������ȥ��󥿥�����Ȥ��ޤ���
+           class Example(models.Model):
+               foo__bar = models.IntegerField()  # 'foo__bar' に '__' が入っています!
+
+フィールドの名前は必ずしもデータベースのカラム名と一致していなくてもよいの
+で，これらの制約は回避可能です．詳しくは後述の `db_column`_ を参照してくだ
+さい．
+
+``join`` や ``where``, ``select`` のような SQL の予約語は，モデルのフィール
+ド名に使っても *かまいません* ．というのも，Django はいかなる SQL クエリ文
+でも全てのデータベーステーブル名やカラム名をエスケープするからです．エスケー
+プにはデータベースエンジン固有のクオートシンタクスを使います．
 
 
 .. _Field types:
 
-�ե�����ɤΥ�����
+フィールドのタイプ
 ------------------
 
-��ǥ�γƥե�����ɤ�Ŭ�ڤ� ``Field`` ���饹�Υ��󥹥��󥹤ˤ��ͤФʤ�ޤ�
-�� Django �ϥե�����ɥ��饹����ʲ��Τ����Ĥ���Ƚ��˻Ȥ��ޤ�:
+モデルの各フィールドは適切な ``Field`` クラスのインスタンスにせねばなりませ
+ん． Django はフィールドクラス型を以下のいくつかの判定に使います:
 
-    * �ǡ����١����Υ���෿ (``INTEGER``, ``VARCHAR`` �ʤ�)��
-    * Django �� admin �����ȤǻȤ����������åȤ����� 
-      (``<input type="text">``, ``<select>`` �ʤ�)��
-    * Django �� admin ��ޥ˥ԥ�졼���ǻȤ��Ƥ���Ǿ��¤θ���
-      (validation)��
+    * データベースのカラム型 (``INTEGER``, ``VARCHAR`` など)．
+    * Django の admin サイトで使うウィジェットの選択 
+      (``<input type="text">``, ``<select>`` など)．
+    * Django の admin やマニピュレータで使われている最小限の検証
+      (validation)．
 
-�Ȥ���ե�����ɷ��ϰʲ����̤�Ǥ���
+使えるフィールド型は以下の通りです．
 
 ``AutoField``
 ~~~~~~~~~~~~~
 
-``IntegerField`` �ΰ��ǡ����Ѳ�ǽ�� ID ���椫�鼫ưŪ�˥��󥯥���Ȥ���
-�����ޤ����̾���Υե�����ɤ�ľ��ɬ�פˤʤ뤳�ȤϤʤ��Ǥ��礦���祭����
-�ե�����ɤϡ��ä˻��ꤷ�ʤ��¤꼫ưŪ���ɲä���ޤ��� 
-`��ưŪ�ʼ祭���ե������`_ �򻲾Ȥ��Ƥ���������
+``IntegerField`` の一種で，利用可能な ID の中から自動的にインクリメントして
+いきます．通常，このフィールドが直接必要になることはないでしょう．主キーの
+フィールドは，特に指定しない限り自動的に追加されます． 
+`自動的な主キーフィールド`_ を参照してください．
 
 ``BooleanField``
 ~~~~~~~~~~~~~~~~
 
-���� (true/false) �ͤ�ɽ���ե�����ɤǤ���
+真偽 (true/false) 値を表すフィールドです．
 
-admin �ǤϤ��Υե�����ɤϥ����å��ܥå����Ȥ���ɽ������ޤ���
+admin ではこのフィールドはチェックボックスとして表現されます．
 
 ``CharField``
 ~~~~~~~~~~~~~
 
-ʸ����ե�����ɤǡ�û��ʸ���󤫤���Ĺ����Τ�Ŭ���Ƥ��ޤ���
+文字列フィールドで，短い文字列からやや長いものに適しています．
 
-���̤Υƥ����Ȥ����줿�����ˤ� ``TextField`` ��ȤäƲ�������
+大量のテキストを入れたい場合には ``TextField`` を使って下さい．
 
-admin �Ǥ� ``<input type="text">`` (��Ԥ����ϥե������) ��ɽ������ޤ���
+admin では ``<input type="text">`` (一行の入力フィールド) で表現されます．
 
-``CharField`` �ˤ� ``maxlength`` �Ȥ���ɬ�ܤΰ���������ޤ������ΰ����ϥե���
-��ɤ� (ʸ������ɽ����) ����Ĺ�Ǥ��� ``maxlength`` �ؤ�����ϥǡ����١�����
-Django ��θ��ڤ�ξ���Υ�٥�ǹԤ��ޤ���
+``CharField`` には ``maxlength`` という必須の引数があります．この引数はフィー
+ルドの (文字数で表した) 最大長です． ``maxlength`` への制約はデータベースと
+Django 内の検証の両方のレベルで行われます．
 
 ``CommaSeparatedIntegerField``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-����ޤǶ��ڤä���������ʤ�ե�����ɤǤ��� ``CharField`` ��Ʊ������
-``maxlength`` ������ɬ�פǤ���
+カンマで区切った整数からなるフィールドです． ``CharField`` と同じく，
+``maxlength`` 引数が必要です．
 
 ``DateField``
 ~~~~~~~~~~~~~
 
-���եե�����ɤǤ������ץ����ΰ����������Ĥ�����ޤ�:
+日付フィールドです．オプションの引数がいくつかあります:
 
     =================  ====================================================
-    ����               ����
+    引数               説明
     =================  ====================================================
-    ``auto_now``       ���֥������Ȥ���¸�����٤ˡ����λ��λ����ưŪ����
-                       �ꤷ�ޤ��� "last-modified"  �����ॹ����פμ¸�����
-                       ���Ǥ��������ͤϥ����Х饤�ɤǤ���ǥե�����ͤǤϤ�
-                       ���� *���* ���ߤ����դˤʤ�Τ����դ��Ƥ��������� 
+    ``auto_now``       オブジェクトを保存する度に，その時の時刻を自動的に設
+                       定します． "last-modified"  タイムスタンプの実現に便
+                       利です．この値はオーバライドできるデフォルト値ではな
+                       く， *常に* 現在の日付になるので注意してください． 
 
-    ``auto_now_add``   ���֥������Ȥ������������λ����ưŪ�����ꤷ�ޤ���
-                       �����ॹ����פ������������Ǥ��������ͤϥ����Х饤��
-                       �Ǥ���ǥե�����ͤǤϤʤ��� *���* ���ߤ����դˤʤ�
-                       �Τ����դ��Ƥ���������
+    ``auto_now_add``   オブジェクトを生成した時の時刻を自動的に設定します．
+                       タイムスタンプの生成に便利です．この値はオーバライド
+                       できるデフォルト値ではなく， *常に* 現在の日付になる
+                       ので注意してください．
     =================  ====================================================
 
-admin �Ǥϡ� JavaScript �Υ��������� �ֺ����פؤΥ��硼�ȥ��åȤΤĤ���
-``<input type="text">`` �Ȥ���ɽ������ޤ���
+admin では， JavaScript のカレンダーと 「今日」へのショートカットのついた
+``<input type="text">`` として表現されます．
 
 ``DateTimeField``
 ~~~~~~~~~~~~~~~~~
 
-���դȻ���Υե�����ɤǤ��� ``DateField`` ��Ʊ�����ץ�������ޤ���
+日付と時刻のフィールドです． ``DateField`` と同じオプションを取ります．
 
-admin �Ǥ� JavaScript �Υ��硼�ȥ��åȤΤĤ��� ``<input type="text">``
-�ե�����ɤ�ɽ������ޤ���
+admin では JavaScript のショートカットのついた ``<input type="text">``
+フィールドで表現されます．
 
 ``EmailField``
 ~~~~~~~~~~~~~~
 
-�ͤ�ͭ���� e-mail ���ɥ쥹�Ǥ��뤫�����å����� ``CharField`` �Ǥ������Υե���
-��ɤˤ� ``maxlength`` �����Ǥ��ޤ��� ``maxlength`` �ϼ�ưŪ�� 75 �˥���
-�Ȥ���뤫��Ǥ���
+値が有効な e-mail アドレスであるかチェックする ``CharField`` です．このフィー
+ルドには ``maxlength`` を指定できません． ``maxlength`` は自動的に 75 にセッ
+トされるからです．
 
 ``FileField``
 ~~~~~~~~~~~~~
 
-�ե����륢�åץ����ɤΤ���Υե�����ɤǤ���
+ファイルアップロードのためのフィールドです．
 
-ɬ�ܤΰ����� ``upload_to`` ������ޤ�������ϥե�����Υ��åץ�������Ȥʤ롤
-��������Υե����륷���ƥ��Υѥ��Ǥ����ѥ��ˤ� 
-`strftime �ˤ��ե����ޥå�`_ ������Ƥ�褯��(�ǥ��쥯�ȥ꤬���åץ�����
-���줿�ե�����Ǥ��դ�ʤ��褦��) �ե�����Υ��åץ�����������Ȥä���¸��
-��񤭴������ޤ���
+必須の引数， ``upload_to`` があります．これはファイルのアップロード先となる，
+ローカルのファイルシステム上のパスです．パスには 
+`strftime によるフォーマット`_ を入れてもよく，(ディレクトリがアップロード
+されたファイルであふれないように) ファイルのアップロード日時を使って保存先
+を書き換えられます．
 
-admin �Ǥϡ� ``<input type="file">`` (�ե����륢�åץ����ɥ��������å�)
-��ɽ������ޤ���
+admin では， ``<input type="file">`` (ファイルアップロードウィジェット)
+で表現されます．
 
-��ǥ���� ``FileField`` �� ``ImageField`` (��������) ��Ȥ��ˤϡ��ʲ��Τ褦
-�ʥ��ƥåפ�ɬ�פǤ�:
+モデル中で ``FileField`` や ``ImageField`` (下記参照) を使うには，以下のよう
+なステップが必要です:
 
-    1. Django �˥��åץ����ɤ��줿�ե��������¸�����������Υե�ѥ�
-       ������ե�������� ``MEDIA_ROOT`` �˻��ꤷ�ޤ���(�ѥե����ޥ�
-       �����ͳ���顤���åץ����ɤ��줿�ե�����ϥǡ����١�������¸����
-       �ޤ���) ��¸���ؤθ��� URL �� ``MEDIA_URL`` �˻��ꤷ�ޤ���
-       �ǥ��쥯�ȥ�� Web �����ФΥ桼����������Ȥˤ�äƽ񤭹��߲�ǽ
-       �Ǥ��뤫��ǧ���Ƥ���������
+    1. Django にアップロードされたファイルを保存させたい場所のフルパス
+       を設定ファイル中の ``MEDIA_ROOT`` に指定します．(パフォーマンス
+       上の理由から，アップロードされたファイルはデータベースに保存され
+       ません．) 保存場所への公開 URL を ``MEDIA_URL`` に指定します．
+       ディレクトリは Web サーバのユーザアカウントによって書き込み可能
+       であるか確認してください．
 
-    2. ``FileField`` �� ``ImageField`` ���ǥ��������ޤ������ΤȤ���
-       ``upload_to`` ���ץ�������ꤷ�ơ� ``MEDIA_ROOT`` ���Υ��֥ǥ�
-       �쥯�ȥ�Τɤ��˥��åץ����ɤ��줿�ե�������֤��٤����� Django 
-       �˶����ޤ���
+    2. ``FileField`` や ``ImageField`` をモデルに定義します．このとき，
+       ``upload_to`` オプションを指定して， ``MEDIA_ROOT`` 下のサブディ
+       レクトリのどこにアップロードされたファイルを置くべきかを Django 
+       に教えます．
 
-    3. �ǡ����١�������¸�����Τϥե�����ؤΥѥ� (``MEDIA_ROOT`` ��
-       �������) �Ǥ���Django ���󶡤��Ƥ��� ``get_<fieldname>_url`` ��
-       ����Ȥ����Ȥˤʤ�Ǥ��礦���㤨�С� ``mug_shot`` �Ȥ���̾����
-       ``ImageField`` ������С������ؤ����� URL �� 
-       ``{{ object.get_mug_shot_url }}`` �Ǽ����Ǥ��ޤ���
+    3. データベースに保存されるのはファイルへのパス (``MEDIA_ROOT`` か
+       らの相対) です．Django の提供している ``get_<fieldname>_url`` 関
+       数を使うことになるでしょう．例えば， ``mug_shot`` という名前の
+       ``ImageField`` があれば，画像への絶対 URL は 
+       ``{{ object.get_mug_shot_url }}`` で取得できます．
 
-�㤨�С� ``MEDIA_ROOT`` �� ``'/home/media'`` �ˤ��ơ� ``upload_to`` ��
-``'photos/%Y/%m/%d'`` �����ꤷ���Ȥ��ޤ��� ``upload_to`` �� ``'%Y/%m/%d'``
-����ʬ�� strftime ��Ʊ���ե����ޥå�ʸ����ȤäƤ��ޤ������ʤ���� ``'%Y'``
-�� 4 ���ǯ�桤 ``'%m'`` �� 2 ��η ``'%d'`` �� 2 �������ɽ���ޤ���
-���äơ��ե������ 2007 ǯ�� 1 �� 15 ���˥��åץ����ɤ���ȡ�
-``/home/media/photos/2007/01/15`` ����¸����뤳�Ȥˤʤ�ޤ���
+例えば， ``MEDIA_ROOT`` を ``'/home/media'`` にして， ``upload_to`` を
+``'photos/%Y/%m/%d'`` に設定したとします． ``upload_to`` の ``'%Y/%m/%d'``
+の部分は strftime と同じフォーマット文字を使っています．すなわち， ``'%Y'``
+が 4 桁の年号， ``'%m'`` が 2 桁の月， ``'%d'`` が 2 桁の日を表します．
+従って，ファイルを 2007 年の 1 月 15 日にアップロードすると，
+``/home/media/photos/2007/01/15`` に保存されることになります．
 
-�ե�����Υ��åץ����ɤ��������Ȥ��ˤϡ���˥��åץ�������ξ��䥢�å�
-�����ɤ����ե���������դ��ơ��������ƥ��ۡ�����򤱤�褦�ˤ��Ƥ�����
-���� *���åץ����ɤ�������ƤΥե����������å�����* ��ͽ�۳��Υե����뤬
-���åץ����ɤ���ʤ��褦�ˤ��ޤ��礦���㤨�С��Х�ǡ�������Ԥ鷺�� Web
-�����ФΥɥ�����ȥ롼�Ȳ��ؤΥե�����Υ��åץ����ɤ�����Ū�˼��������
-�ȡ�������ï���� CGI �� PHP ������ץȤ򥢥åץ����ɤ��ơ����ʤ��Υ����Ⱦ�
-�� URL ��ˬ�䤷���ͤ˥�����ץȤ�¹Ԥ������Ƥ��ޤ��ޤ�������ʤ��Ȥ����
-�ƤϤʤ�ޤ���
+ファイルのアップロードを処理するときには，常にアップロード先の場所やアップ
+ロードされるファイルに注意して，セキュリティホールを避けるようにしてくださ
+い． *アップロードされる全てのファイルをチェックして* ，予想外のファイルが
+アップロードされないようにしましょう．例えば，バリデーションを行わずに Web
+サーバのドキュメントルート下へのファイルのアップロードを盲目的に受け入れる
+と，そこに誰かが CGI や PHP スクリプトをアップロードして，あなたのサイト上
+の URL を訪問した人にスクリプトを実行させられてしまいます．そんなことを許し
+てはなりません．
 
-.. _`strftime �ˤ��ե����ޥå�`: 
+.. _`strftime によるフォーマット`: 
     http://www.python.jp/doc/release/lib/module-time.html#l2h-1941
 
 ``FilePathField``
 ~~~~~~~~~~~~~~~~~
 
-�ե����륷���ƥ��Τ���ǥ��쥯�ȥ겼�Υե�����̾���������٤�褦�ˤʤä�
-����ե�����ɤǤ��� 3 �Ĥ����̤ʰ��������ꡤ���Τ����ǽ�ΰ�Ĥ�ɬ�ܤǤ�:
+ファイルシステム上のあるディレクトリ下のファイル名だけを選べるようになって
+いるフィールドです． 3 つの特別な引数があり，そのうち最初の一つは必須です:
 
     ===============  =======================================================
-    ����             ����
+    引数             説明
     ===============  =======================================================
-    ``path``         ɬ�ܤǤ��� ``FilePathField`` ��������������뤿���
-                     �ǥ��쥯�ȥ�ؤ����Хѥ��Ǥ�����: ``"/home/images"``
+    ``path``         必須です． ``FilePathField`` が選択肢を作成するための
+                     ディレクトリへの絶対パスです．例: ``"/home/images"``
 
-    ``match``        ���ץ����Ǥ�������ɽ����ɽ��ʸ����ǡ�
-                     ``FilePathField`` ���ե�����̾�Υե��륿�˻Ȥ��ޤ�����
-                     ��ɽ���ϥե�ѥ��ǤϤʤ��ե�����̾��Ŭ�Ѥ����Τ�����
-                     ���Ƥ��������� ��: ``"foo.*\.txt^"`` �� ``foo23.txt``
-                     �ˤϥޥå����ޤ����� ``bar.txt`` �� ``foo23.gif`` �ˤ�
-                     �ޥå����ޤ���
+    ``match``        オプションです．正規表現を表す文字列で，
+                     ``FilePathField`` がファイル名のフィルタに使います．正
+                     規表現はフルパスではなくファイル名に適用されるので注意
+                     してください． 例: ``"foo.*\.txt^"`` は ``foo23.txt``
+                     にはマッチしますが， ``bar.txt`` や ``foo23.gif`` には
+                     マッチしません．
 
-    ``recursive``    ���ץ����Ǥ��� ``True`` �ޤ��� ``False`` �Ǥ����ǥե�
-                     ��Ȥ� ``False`` �ǡ�``path`` �Υ��֥ǥ��쥯�ȥ��ޤ�
-                     �뤫�ɤ�������ꤷ�ޤ���
+    ``recursive``    オプションです． ``True`` または ``False`` です．デフォ
+                     ルトは ``False`` で，``path`` のサブディレクトリを含め
+                     るかどうかを指定します．
     ===============  =======================================================
 
-������󡤤����ΰ������Ȥ߹�碌�ƻȤäƤ⤫�ޤ��ޤ���
+もちろん，これらの引数を組み合わせて使ってもかまいません．
 
-�褯���봪�㤤�ϡ� ``match`` ���ե�����̾�ǤϤʤ��ե�ѥ���Ŭ�Ѥ����Ȼפ�
-�Ƥ��ޤ����ȤǤ����ʲ�����::
+よくある勘違いは， ``match`` がファイル名ではなくフルパスに適用されると思っ
+てしまうことです．以下の例::
 
     FilePathField(path="/home/images", match="foo.*", recursive=True)
 
-�� ``/home/images/foo.gif`` �ˤϥޥå����ޤ������ե�����̾���� (``foo.gif``
-�� ``bar.gif``) �˥ޥå����뤿�ᡤ ``/home/images/foo/bar.gif`` �ˤϥޥå�
-���ޤ���
+は ``/home/images/foo.gif`` にはマッチしますが，ファイル名本体 (``foo.gif``
+や ``bar.gif``) にマッチするため， ``/home/images/foo/bar.gif`` にはマッチ
+しません．
 
 ``FloatField``
 ~~~~~~~~~~~~~~
 
-��ư���������Ǥ�����Ĥ� **ɬ�ܤ�** ����������ޤ�:
+浮動小数点数です．二つの **必須の** 引数があります:
 
     ======================  ==============================================
-    ����                    ����
+    引数                    説明
     ======================  ==============================================
-    ``max_digits``          ������ɽ���˻Ȥ���������Ǥ���
+    ``max_digits``          数字の表現に使える最大桁数です．
 
-    ``decimal_places``      �������κ������Ǥ���
+    ``decimal_places``      小数部の最大桁数です．
     ======================  ==============================================
 
-�㤨�С��������ʲ� 2 ��ޤǤ����٤���������� 999 �ޤ�ɽ���Ǥ����ͤ���¸��
-��ˤ�::
+例えば，小数点以下 2 桁までの精度を持ち，最大 999 まで表現できる値を保存す
+るには::
 
     models.FloatField(..., max_digits=5, decimal_places=2)
 
-�Τ褦�ˤ��ޤ���10 ���ޤǤ��ͤ�ɽ���Ǥ����������ʲ� 10 ��ޤǤ����٤�����
-����¸����ˤ�::
+のようにします．10 億までの値を表現でき，小数点以下 10 桁までの精度をもつ値
+を保存するには::
 
     models.FloatField(..., max_digits=19, decimal_places=10)
 
-�Τ褦�ˤ��ޤ���
+のようにします．
 
-admin �Ǥϡ� ``<input type="text">`` (��Ԥ����ϥե������) ��ɽ������ޤ���
+admin では， ``<input type="text">`` (一行の入力フィールド) で表現されます．
 
 ``ImageField``
 ~~~~~~~~~~~~~~
 
-``FileField`` �˻��Ƥ��ޤ��������åץ����ɤ��줿���֥������Ȥ�ͭ���ʥ��᡼
-�����ɤ������ڤ��ޤ�����ĤΥ��ץ��������� ``height_field`` �����
-``width_field`` ��Ȥꡤ�������ͤ����ꤵ��Ƥ�����ˤϡ���ǥ�Υ���
-���󥹤���¸����Ȥ��˲����ι⤵������Ʊ������¸���ޤ���
+``FileField`` に似ていますが，アップロードされたオブジェクトが有効なイメー
+ジかどうか検証します．二つのオプション引数， ``height_field`` および
+``width_field`` をとり，これらの値が設定されている場合には，モデルのインス
+タンスを保存するときに画像の高さと幅も同時に保存します．
 
-`Python Imaging Library`_ ��ɬ�פǤ���
+`Python Imaging Library`_ が必要です．
 
 .. _Python Imaging Library: http://www.pythonware.com/products/pil/
 
 ``IntegerField``
 ~~~~~~~~~~~~~~~~
 
-�����Ǥ���
+整数です．
  
-admin �Ǥϡ� ``<input type="text">`` (��Ԥ����ϥե������) ��ɽ������ޤ���
+admin では， ``<input type="text">`` (一行の入力フィールド) で表現されます．
 
 ``IPAddressField``
 ~~~~~~~~~~~~~~~~~~
 
-IP ���ɥ쥹�� ʸ���������ɽ������� (i.e. "24.124.1.30") �Ǥ���
+IP アドレスを 文字列形式で表したもの (i.e. "24.124.1.30") です．
 
-admin �Ǥϡ� ``<input type="text">`` (��Ԥ����ϥե������) ��ɽ������ޤ���
+admin では， ``<input type="text">`` (一行の入力フィールド) で表現されます．
 
 ``NullBooleanField``
 ~~~~~~~~~~~~~~~~~~~~
 
-``BooleanField`` ��, Ʊ���Ǥ����� ``NULL`` �������˻Ȥ��ޤ���
-``null=True`` �� ``BooleanField`` ������˻ȤäƲ�������
+``BooleanField`` と, 同じですが， ``NULL`` を選択肢に使えます．
+``null=True`` の ``BooleanField`` の代わりに使って下さい．
 
-admin �Ǥϡ��������� ("Unknown") �֤Ϥ��� ("Yes")���֤������� ("No") ������
-����� ``<select>`` �ܥå�����ɽ������ޤ���
+admin では，「不明」 ("Unknown") 「はい」 ("Yes")，「いいえ」 ("No") の選択
+肢をもつ ``<select>`` ボックスで表現されます．
 
 ``PhoneNumberField``
 ~~~~~~~~~~~~~~~~~~~~
 
-``CharField`` ��Ʊ���Ǥ������ͤ�����ꥫ�����������ֹ�Ȥ���ͭ���ʷ���
-(``XXX-XXX-XXXX``) ���ɤ���������å����ޤ���
+``CharField`` と同じですが，値がアメリカ形式の電話番号として有効な形式
+(``XXX-XXX-XXXX``) かどうかをチェックします．
 
 ``PositiveIntegerField``
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-``IntegerField`` ��Ʊ���Ǥ��������ο��Ǥʤ���Фʤ�ޤ���
+``IntegerField`` と同じですが，正の数でなければなりません．
 
 ``PositiveSmallIntegerField``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``PositiveIntegerField`` ��Ʊ���Ǥ����������ϰϰʲ� (�ǡ����١�����¸�Ǥ�)
-���ͤ����Ȥ��ޤ���
+``PositiveIntegerField`` と同じですが，ある範囲以下 (データベース依存です)
+の値しか使えません．
 
 ``SlugField``
 ~~~~~~~~~~~~~
 
-�֥��饰 (slug)�פϿ�ʹ�ȳ����Ѹ�ǡ����Ƥ򼨤�û����٥�Ǥ������饰��ʸ����
-����������������������ϥ��ե󥹥饰��������ʤ�ޤ������饰�Ϥ褯 URL �˻�
-���ޤ���
+「スラグ (slug)」は新聞業界の用語で，内容を示す短いラベルです．スラグは文字，
+数字，アンダースコア，ハイフンスラグだけからなります．スラグはよく URL に使
+われます．
 
-CharField ��Ʊ�͡� ``maxlength`` �����Ǥ��ޤ������ꤷ�ʤ��ä���硤
-Django �ϥǥե�����ͤ� 50 ��Ȥ��ޤ��� ``db_index=True`` �ˤʤ�ޤ���
+CharField と同様， ``maxlength`` を指定できます．指定しなかった場合，
+Django はデフォルト値の 50 を使います． ``db_index=True`` になります．
 
-�ɲäΥ��ץ����Ȥ��ơ� ``prepopulate_from`` ��Ȥ�ޤ������Υ��ץ����ϡ�
-admin �ե������ JavaScript ��𤷤ƥ��饰��ư��������ݤˡ����ˤ���ե���
-��ɤ�̾������ʤ�ꥹ�ȤǤ�::
+追加のオプションとして， ``prepopulate_from`` をとります．このオプションは，
+admin フォームで JavaScript を介してスラグを自動生成する際に，元にするフィー
+ルドの名前からなるリストです::
 
     models.SlugField(prepopulate_from=("pre_name", "name"))
 
-DateTimeField �� ``prepopulate_from`` ��������ޤ���
+DateTimeField は ``prepopulate_from`` に入れられません．
 
-admin �Ǥϡ� ``SlugField`` �� ``<input type="text">`` (��Ԥ����ϥե������)
-��ɽ������ޤ���
+admin では， ``SlugField`` は ``<input type="text">`` (一行の入力フィールド)
+で表現されます．
 
 ``SmallIntegerField``
 ~~~~~~~~~~~~~~~~~~~~~
 
-``IntegerField`` ��Ʊ�ͤǤ����������ϰϰʲ� (�ǡ����١�����¸�Ǥ�) ���ͤ���
-�Ȥ��ޤ���
+``IntegerField`` と同様ですが，ある範囲以下 (データベース依存です) の値しか
+使えません．
 
 ``TextField``
 ~~~~~~~~~~~~~
 
-Ĺ���ƥ����ȤΤ���Υե�����ɤǤ���
+長いテキストのためのフィールドです．
 
-admin �Ǥϡ� ``<textarea>`` (ʣ���Ԥ����ϥե������) ��ɽ������ޤ���
+admin では， ``<textarea>`` (複数行の入力フィールド) で表現されます．
 
 ``TimeField``
 ~~~~~~~~~~~~~
 
-����Ǥ���``DateField`` �� ``DateTimeField`` ��Ʊ��������ưŪ���ͤ����뤿
-��Υ��ץ�����Ȥ��ޤ���
+時刻です．``DateField`` や ``DateTimeField`` と同じく，自動的に値を埋めるた
+めのオプションを使えます．
 
-admin �Ǥϡ�JavaScript �Υ��硼�ȥ��åȤ��Ĥ��� ``<input type="text">`` ��
-ɽ������ޤ���
+admin では，JavaScript のショートカットがついた ``<input type="text">`` で
+表現されます．
 
 ``URLField``
 ~~~~~~~~~~~~
 
-URL ��ɽ���ե�����ɤǤ��� ``verify_exists`` ���ץ����� ``True`` (�ǥե�
-����ͤǤ�) �ˤ���ȡ����ꤵ�줿 URL ���ºߤ��� (URL �ϼºݤ˥����ɤǤ�����
-�� 404 �������֤��ʤ�) ���ɤ������ڤ��ޤ���
+URL を表すフィールドです． ``verify_exists`` オプションを ``True`` (デフォ
+ルト値です) にすると，指定された URL が実在する (URL は実際にロードでき，か
+つ 404 応答を返さない) かどうか検証します．
 
-admin �Ǥϡ� ``<input type="text">`` (��Ԥ����ϥե������) ��ɽ������ޤ���
+admin では， ``<input type="text">`` (一行の入力フィールド) で表現されます．
 
 ``USStateField``
 ~~~~~~~~~~~~~~~~
 
-2 ʸ���Υ���ꥫ�罰��̾ά��Ǥ���
+2 文字のアメリカ合衆国州名略号です．
 
-admin �Ǥϡ� ``<input type="text">`` (��Ԥ����ϥե������) ��ɽ������ޤ���
+admin では， ``<input type="text">`` (一行の入力フィールド) で表現されます．
 
 ``XMLField``
 ~~~~~~~~~~~~
 
-``TextField`` ��Ʊ�ͤǤ��������ꤵ�줿�������ޤ˽��äơ��ͤ�ͭ���� XML �Ǥ�
-�뤫���ڤ��ޤ��� ``schema_path`` ��ɬ�ܤΰ����ˤȤ�ޤ��� ``schema_path``
-�ϸ��ڤ˻Ȥ� RelaxNG_ �������ޤ�ؤ��ե����륷���ƥ��Υѥ�̾�Ǥ���
+``TextField`` と同様ですが，指定されたスキーマに従って，値が有効な XML であ
+るか検証します． ``schema_path`` を必須の引数にとります． ``schema_path``
+は検証に使う RelaxNG_ スキーマを指すファイルシステム上のパス名です．
 
 .. _RelaxNG: http://www.relaxng.org/
 
 
 .. _Field options:
 
-�ե�����ɤΥ��ץ����
+フィールドのオプション
 ----------------------
 
-���ƤΥե�����ɷ��ǡ��ʲ��ΰ��������Ǥ��ޤ��������ΰ����Ϥ��٤ƥ��ץ���
-��Ǥ���
+全てのフィールド型で，以下の引数を指定できます．これらの引数はすべてオプショ
+ンです．
 
 ``null``
 ~~~~~~~~
 
-``True`` �ˤ���ȡ� Django �϶����ͤ� ``NULL`` �Ȥ��ƥǡ����١���������ޤ���
-�ǥե�����ͤ� ``False`` �Ǥ���
+``True`` にすると， Django は空の値を ``NULL`` としてデータベースに入れます．
+デフォルト値は ``False`` です．
 
-����ʸ�����ͤ� ``NULL`` �ǤϤʤ���ʸ����Ȥ�����¸����뤳�Ȥ����դ��Ʋ���
-���� ``null=True`` ���Ȥ���Τϡ���������֡��뷿�����դΤ褦��ʸ����ǤϤ�
-���ե�����ɷ��ξ������Ǥ���
+空の文字列値は ``NULL`` ではなく空文字列として保存されることに注意して下さ
+い． ``null=True`` が使えるのは，整数型やブール型，日付のような文字列ではな
+いフィールド型の場合だけです．
 
-���̤���ͳ�Τʤ��¤ꡤ``CharField`` �� ``TextField`` �Τ褦�ʡ�ʸ����١���
-�Υե�����ɤˤ� ``null`` ����ꤷ�ʤ��褦�ˤ��Ƥ���������ʸ����١����Υե���
-��ɤ� ``nill=True`` �Ǥ���Ȥ������Ȥϡ��֥ǡ������ʤ��פ��Ȥ�ɽ���Τ�
-``NULL`` �ȶ�ʸ����Ȥ�����Ĥ��ͤ�¸�ߤ��뤳�Ȥ򼨤��ޤ���¿���ξ�硤�֥ǡ�
-�����ʤ��פ��Ȥ�ɽ���Τ���ĤΤ�������ΤϾ�Ĺ�Ǥ�������ޤ��� Django
-�δ����Ǥϡ��ǡ����Τʤ�ʸ����ե�����ɤ��ͤ� ``NULL`` �ǤϤʤ���ʸ�����
-����
+特別な理由のない限り，``CharField`` や ``TextField`` のような，文字列ベース
+のフィールドには ``null`` を指定しないようにしてください．文字列ベースのフィー
+ルドが ``nill=True`` であるということは，「データがない」ことを表すのに
+``NULL`` と空文字列という二つの値が存在することを示します．多くの場合，「デー
+タがない」ことを表すのに二つのを取り得るのは冗長でしかありません． Django
+の慣習では，データのない文字列フィールドの値は ``NULL`` ではなく空文字列で
+す．
     
 ``blank``
 ~~~~~~~~~
 
-``True`` �ˤ���ȡ��ե�����ɤ��ͤ���� (blank) �ˤǤ��ޤ���
+``True`` にすると，フィールドの値を空白 (blank) にできます．
 
-``null`` �Ȥϰ㤦���Ȥ����դ��Ƥ��������� ``null`` �����˥ǡ����١������
-ɽ���˴ؤ�복ǰ�Ǥ���Τ��Ф��� ``blank`` �Ȥ��ͤθ��� (validation) �˴ؤ�
-�복ǰ�Ǥ�������ե�����ɤ� ``blank=True`` ����ꤹ��ȡ� Django �� admin
-�����Ⱦ�ǡ������ͤΥ���ȥ�����褦�ˤʤ�ޤ��� ``blank=False`` �ˤ���
-�ȡ����Υե�����ɤˤ�ɬ���ͤ�����ͤФʤ�ޤ���
+``null`` とは違うことに注意してください． ``null`` が純粋にデータベース上の
+表現に関わる概念であるのに対し， ``blank`` とは値の検証 (validation) に関わ
+る概念です．あるフィールドに ``blank=True`` を指定すると， Django の admin
+サイト上で，空の値のエントリを作れるようになります． ``blank=False`` にする
+と，そのフィールドには必ず値を入れねばなりません．
 
 ``choices``
 ~~~~~~~~~~~
 
-2 ���ǤΥ��ץ뤫��ʤ� iterable (�ꥹ�Ȥޤ��ϥ��ץ�) �򡤥ե�����ɤ��ͤ���
-���ˤ��ޤ���
+2 要素のタプルからなる iterable (リストまたはタプル) を，フィールドの値の選
+択肢にします．
 
-�����ͤ���ꤹ��ȡ� Django �� admin �ˤ�ɸ��Ū�ʥƥ����ȥե�����ɤ�����
-������ܥå�����ɽ�����졤���ꤵ�줿���������򤨤�٤�褦�ˤʤ�ޤ���
+この値を指定すると， Django の admin には標準的なテキストフィールドの代わり
+に選択ボックスが表示され，指定された選択肢だけをえらべるようになります．
 
-�����ꥹ�Ȥϰʲ��Τ褦�ˤʤ�ޤ�::
+選択肢リストは以下のようになります::
 
     YEAR_IN_SCHOOL_CHOICES = (
         ('FR', 'Freshman'),
@@ -501,10 +501,10 @@ admin �Ǥϡ� ``<input type="text">`` (��Ԥ����ϥե������) ��ɽ������ޤ���
         ('GR', 'Graduate'),
     )
 
-�ƥ��ץ�κǽ�����Ǥϡ��ǡ����١����˼ºݤ���¸������ͤǤ�������ܤ��ͤ�
-�ƥ��ץ������Ф���ʹֲ��ɤ�̾���Ǥ���
+各タプルの最初の要素は，データベースに実際に保存される値です．二つ目の値は
+各オプションに対する人間可読な名前です．
 
-�����ꥹ�Ȥϡ���ǥ륯�饹�ΰ����Ȥ�������Ǥ��ޤ�::
+選択肢リストは，モデルクラスの一部として定義できます::
 
     class Foo(models.Model):
         GENDER_CHOICES = (
@@ -513,7 +513,7 @@ admin �Ǥϡ� ``<input type="text">`` (��Ԥ����ϥե������) ��ɽ������ޤ���
         )
         gender = models.CharField(maxlength=1, choices=GENDER_CHOICES)
 
-�ޤ�����ǥ륯�饹�γ��Ǥ�����Ǥ��ޤ�::
+また，モデルクラスの外でも定義できます::
 
     GENDER_CHOICES = (
         ('M', 'Male'),
@@ -522,205 +522,205 @@ admin �Ǥϡ� ``<input type="text">`` (��Ԥ����ϥե������) ��ɽ������ޤ���
     class Foo(models.Model):
         gender = models.CharField(maxlength=1, choices=GENDER_CHOICES)
 
-``choices`` ���åȤ���ĥ�ǥ�ե�����ɳơ��ˤĤ��ơ� Django ���ü�ʥ᥽��
-�ɤ��ɲä����ե�����ɤθ����ͤ�ʹֲ��ɤʷ����Ǽ����Ǥ���褦�ˤ��ޤ����ǡ�
-���١��� API �ɥ�����Ȥ� `get_FOO_display <../db_api/#get-foo-display>`_
-�򻲾Ȥ��Ƥ���������
+``choices`` セットを持つモデルフィールド各々について， Django は特殊なメソッ
+ドを追加し，フィールドの現在値を人間可読な形式で取得できるようにします．デー
+タベース API ドキュメントの `get_FOO_display <../db_api/#get-foo-display>`_
+を参照してください．
 
 .. _get_FOO_display: ../db_api/#get-foo-display
 
-�Ǹ�ˡ� choices �ϥꥹ�Ȥ䥿�ץ�Ǥʤ��Ƥ�褯��Ǥ�դ� iterable ���֥�����
-�ȤǤ��ޤ�ʤ����Ȥ����դ��Ƥ����������Ĥޤꡤ choices ��ưŪ�����Ǥ���Τ�
-�����ȤϤ����� ``choices`` ��ưŪ��������褦�ʥϥå��򤹤뤯�餤�ʤ顤Ŭ��
-�ʥǡ����١����ơ��֥�� ``ForeignKey`` �ǻ��Ȥ��������褤�Ǥ��礦��
-�Ȥ����Τ⡤ ``choices`` �Ϥ��ޤ��ѹ��Τʤ���Ū�������Τ���Υ��ץ�����
-����Ǥ���
+最後に， choices はリストやタプルでなくてもよく，任意の iterable オブジェク
+トでかまわないことに注意してください．つまり， choices は動的生成できるので
+す．とはいえ， ``choices`` を動的生成するようなハックをするくらいなら，適当
+なデータベーステーブルを ``ForeignKey`` で参照した方がよいでしょう．
+というのも， ``choices`` はあまり変更のない静的な選択肢のためのオプションだ
+からです．
 
 ``core``
 ~~~~~~~~
 
-.. XXX����XXX
+.. XXX意訳XXX
 
-���֥������Ȥ�¾�Υ��֥������Ȥ����졼������ĥ���Ƥ��ơ�����饤����
-�����оݤǤ���Ȥ��ˡ��ե�����ɤ򥳥��ǡ����Ȥ��ƥޡ������ޤ���
+オブジェクトが他のオブジェクトからリレーションを張られていて，インライン編
+集の対象であるときに，フィールドをコアデータとしてマークします．
 
 .. For objects that are edited inline to a related object.
 
-Django �� admin ��ǥ���饤���Խ����Ƥ��륪�֥������Ȥ� "core" �ե������
-���ͤ����ƾõ��ȡ����Υ��֥������ȤϺ������ޤ���
+Django の admin 上でインライン編集しているオブジェクトの "core" フィールド
+の値を全て消去すると，そのオブジェクトは削除されます．
 
-����饤���Խ���ǽ�ʥ�졼�����ˤϡ� ``core=True`` �Ǥ���ե�����ɤ�����
-���Ȥ���ɬ�פǤ����ʤ���Х��顼�ˤʤ�ޤ���
+インライン編集可能なリレーションには， ``core=True`` であるフィールドが少な
+くとも一つ必要です．なければエラーになります．
 
-"core" ����ꤷ���ե�����ɤϡ�Django admin �����Ⱦ�Ǥ�ɬ�ܤΥե�����ɤ�
-���ư�����Τ����դ��Ƥ����������¼�Ū�ˤϡ�����饤���Խ����оݤˤʤ��
-���ʥ��֥������Ȥ����ƤΥե�����ɤ�  ``core=True`` ����ꤷ�Ƥ����ͤФʤ�
-�ޤ���
+"core" を指定したフィールドは，Django admin サイト上では必須のフィールドと
+して扱われるので注意してください．実質的には，インライン編集の対象になるよ
+うなオブジェクトの全てのフィールドに  ``core=True`` を指定しておかねばなり
+ません．
 
 ``db_column``
 ~~~~~~~~~~~~~
 
-�ե�����ɤ˻Ȥ��ǡ����١��������̾�Ǥ��������ͤ���ꤷ�ʤ���С� Django
-�ϥե������̾��Ȥ��ޤ���
+フィールドに使うデータベースカラム名です．この値を指定しなければ， Django
+はフィールド名を使います．
 
-�ǡ����١��������̾�� SQL ��ͽ���Ǥ��ä��ꡤ Python ���ѿ�̾�Ȥ��ƻȤ���
-��ʸ����ޤ�Ǥ��� (�褯����Τϥϥ��ե�Ǥ�) ���Ǥ����ꤢ��ޤ���
-Django ��ɬ�פ˱����ƥ����̾��ơ��֥�̾�򥯥����Ȥ��ޤ���
+データベースカラム名が SQL の予約語であったり， Python で変数名として使えな
+い文字を含んでいる (よくあるのはハイフンです) 場合でも問題ありません．
+Django は必要に応じてカラム名やテーブル名をクオートします．
 
 ``db_index``
 ~~~~~~~~~~~~
 
-``True`` �ˤ���� ``django-admin.py sqlindexes`` ��¹Ԥ������ˡ��ե������
-���Ф��� ``CREATE INDEX`` ʸ����Ϥ��ޤ���
+``True`` にすると ``django-admin.py sqlindexes`` を実行した時に，フィールド
+に対して ``CREATE INDEX`` 文を出力します．
 
 ``default``
 ~~~~~~~~~~~
 
-�ե�����ɤΥǥե�����ͤǤ���
+フィールドのデフォルト値です．
 
 ``editable``
 ~~~~~~~~~~~~
 
-``False`` �ˤ���ȡ� admin ��䡤���֥������Ȥ� ``AddManipulator`` �����
-``ChangeManipulator`` ���饹��Ȥä��ե���������ǥե�����ɤ��ͤ��Խ��Ǥ�
-�ʤ��ʤ�ޤ����ǥե�����ͤ� ``True`` �Ǥ���
+``False`` にすると， admin 上や，オブジェクトの ``AddManipulator`` および
+``ChangeManipulator`` クラスを使ったフォーム処理でフィールドの値を編集でき
+なくなります．デフォルト値は ``True`` です．
 
 ``help_text``
 ~~~~~~~~~~~~~
 
-���֥������Ȥ� admin �ե�����β���ɽ������롤�ɲäΡ֥إ�סץƥ����ȤǤ���
-�ȤϤ��������֥������Ȥ� admin �Υե��������äƤ��ʤ��Ƥ�ɥ�����ȤȤ�
-��ͭ�ѤǤ��礦��
+オブジェクトの admin フォームの下に表示される，追加の「ヘルプ」テキストです．
+とはいえ，オブジェクトが admin のフォームを持っていなくてもドキュメントとし
+て有用でしょう．
 
 ``primary_key``
 ~~~~~~~~~~~~~~~
 
-``True`` �˻��ꤹ��ȡ��ե�����ɤ��ǥ�μ祭���ˤ��ޤ���
+``True`` に指定すると，フィールドをモデルの主キーにします．
 
-��ǥ�ΤɤΥե�����ɤˤ� ``primary_key=True`` ����ꤷ�ʤ���С�Django ��
-��ưŪ�˰ʲ��Υե�����ɤ��ɲä��ޤ�::
+モデルのどのフィールドにも ``primary_key=True`` を指定しなければ，Django は
+自動的に以下のフィールドを追加します::
 
     id = models.AutoField('ID', primary_key=True)
 
-���äơ��ǥե���Ȥμ祭���ο��񤤤��ѹ��������ΤǤʤ������ꡤ
-``primary_key=True`` ��ե�����ɤ˻��ꤷ�Ƥ���ɬ�פϤ���ޤ���
+従って，デフォルトの主キーの振舞いを変更したいのでないかぎり，
+``primary_key=True`` をフィールドに指定しておく必要はありません．
 
-``primary_key=True`` �Ǥ���Ȥ������Ȥϡ� ``blank=False``��``null=False``��
-���� ``unique=True`` �Ǥ��뤳�Ȥ�ؤ��ޤ�����ĤΥ��֥������Ȥˤϰ�Ĥ�����
-���������Ǥ��ޤ���
+``primary_key=True`` であるということは， ``blank=False``，``null=False``，
+かつ ``unique=True`` であることを指します．一つのオブジェクトには一つしか主
+キーを指定できません．
 
 ``radio_admin``
 ~~~~~~~~~~~~~~~
 
-�ǥե���ȤǤϡ�``ForeignKey`` �Υե�����ɤ� ``choices`` �����ꤵ�줿�ե���
-��ɤ��Ф��ơ� Django �� admin ������ܥå������󥿥ե����� (<select>) ���
-���ޤ��� ``radio_admin`` �� ``True`` �ˤ���ȡ� Django �ϥ饸���ܥ���Υ���
-���ե�������Ȥ��ޤ���
+デフォルトでは，``ForeignKey`` のフィールドや ``choices`` の設定されたフィー
+ルドに対して， Django の admin は選択ボックスインタフェース (<select>) を使
+います． ``radio_admin`` を ``True`` にすると， Django はラジオボタンのイン
+タフェースを使います．
 
-�ե�����ɤ� ``ForeignKey`` �Ǥ��뤫�� ``choices`` �����ꤵ��Ƥ���
-�ΤǤʤ���С����Υ��ץ�������ꤷ�ƤϤʤ�ޤ���
+フィールドが ``ForeignKey`` であるか， ``choices`` が設定されている
+のでなければ，このオプションを指定してはなりません．
 
 ``unique``
 ~~~~~~~~~~
 
-``True`` �Ǥ���С��ե�����ɤϥơ��֥����Τǰ�դ��ͤ���ͤФʤ�ޤ���
+``True`` であれば，フィールドはテーブル全体で一意の値を取らねばなりません．
 
-��������ϡ��ǡ����١�����٥�� Django �� admin �Υ�٥��Ŭ�Ѥ���ޤ���
+この制約は，データベースレベルと Django の admin のレベルで適用されます．
 
 ``unique_for_date``
 ~~~~~~~~~~~~~~~~~~~
 
-``DateField`` �� ``DateTimeField`` ���Υե�����ɤ�̾������ꤷ�Ƥ����ȡ���
-�Υե�����ɤ����դ��Ф��ư�դ��ͤˤʤ�褦�����󤷤ޤ���
+``DateField`` や ``DateTimeField`` 型のフィールドの名前を指定しておくと，そ
+のフィールドの日付に対して一意な値になるように制約します．
 
-�㤨�С� ``title`` �Ȥ���̾���Υե�����ɤ����ꡤ
-``unique_for_date="pub_date"`` �����ꤵ��Ƥ����Ȥ���ȡ� Django ��Ʊ��
-``title`` �� ``pub_date`` ���ͤ���Ĥ褦�ʥ���ȥ���������ޤ���
+例えば， ``title`` という名前のフィールドがあり，
+``unique_for_date="pub_date"`` が指定されていたとすると， Django は同じ
+``title`` や ``pub_date`` の値を持つようなエントリを受け入れません．
 
-��������� Django �� admin �ե�����Υ�٥��Ŭ�Ѥ��졤�ǡ����١�����٥��
-��Ŭ�Ѥ���ޤ���
+この制約は Django の admin フォームのレベルで適用され，データベースレベルで
+は適用されません．
 
 ``unique_for_month``
 ~~~~~~~~~~~~~~~~~~~~
 
-``unique_for_date`` ��Ʊ�ͤǤ������ե�����ɤ��ͤ���Ȥ˰�դǤ���褦��
-���󤷤ޤ���
+``unique_for_date`` と同様ですが，フィールドの値が月ごとに一意であるように
+制約します．
 
 ``unique_for_year``
 ~~~~~~~~~~~~~~~~~~~
 
-``unique_for_date`` �� ``unique_for_month`` ��Ʊ�ͤǤ���
+``unique_for_date`` や ``unique_for_month`` と同様です．
 
 ``validator_list``
 ~~~~~~~~~~~~~~~~~~
 
-�ե�����ɤ�Ŭ�Ѥ����ɲäΥХ�ǡ��� (���ڵ���) �Υꥹ�ȤǤ����ƥХ�ǡ���
-�ϸƤӽФ���ǽ���֥������Ȥǡ������� ``field_data, all_data`` ���ꡤ���顼
-���������Ȥ��ˤ� ``django.core.validators.ValidationError`` �����Ф���褦
-�ˤʤäƤ��ʤ���Фʤ�ޤ��� (`�Х�ǡ����Υɥ������`_) �򻲾Ȥ��Ƥ�����
-����
+フィールドに適用する追加のバリデータ (検証機構) のリストです．各バリデータ
+は呼び出し可能オブジェクトで，引数に ``field_data, all_data`` を取り，エラー
+が生じたときには ``django.core.validators.ValidationError`` を送出するよう
+になっていなければなりません (`バリデータのドキュメント`_) を参照してくださ
+い．
 
-Django �ˤϤۤ�ξ��������Х�ǡ������Ĥ��Ƥ��ޤ����Х�ǡ�����
-``django.core.validators`` �˼�����Ƥ��ޤ���
+Django にはほんの少しだけバリデータがついてきます．バリデータは
+``django.core.validators`` に収められています．
 
-.. _`�Х�ǡ����Υɥ������`: ../forms/#validators
+.. _`バリデータのドキュメント`: ../forms/#validators
 
 .. _Verbose field names:
 
-�ܺ٤ʥե������̾
+詳細なフィールド名
 ------------------
 
-�ƥե�����ɤη��ϡ�  ``ForeignKey``, ``ManyToManyField`` �����
-``OneToOneField`` ����������ץ����θ������ (positional argument) �����
-�����Ȥ��ƻ���Ǥ��ޤ������ΰ����ˤϿʹֲ��ɤʥ����̾����ꤷ�ޤ���������
-���ꤷ�ʤ���С� Django �ϥ����̾�Υ�������������򥹥ڡ������Ѵ����ơ���
-ưŪ�˿ʹֲ��ɤʥ����̾���������ޤ���
+各フィールドの型は，  ``ForeignKey``, ``ManyToManyField`` および
+``OneToOneField`` を除き，オプションの固定引数 (positional argument) を第一
+引数として指定できます．この引数には人間可読なカラム名を指定します．引数を
+指定しなければ， Django はカラム名のアンダースコアをスペースに変換して，自
+動的に人間可読なカラム名を生成します．
 
-������Ǥϡ��ʹֲ��ɤʥ����̾�� ``"Person's first name"`` �ˤʤ�ޤ�::
+下の例では，人間可読なカラム名は ``"Person's first name"`` になります::
 
     first_name = models.CharField("Person's first name", maxlength=30)
 
-������Ǥ� ``"first name"`` �Ǥ�::
+下の例では ``"first name"`` です::
 
     first_name = models.CharField(maxlength=30)
 
-``ForeignKey``, ``ManyToManyField`` ����� ``OneToOneField`` �Ǥϡ�������
-��ɬ�ܤǡ���ǥ�Υ��饹�ˤ��ޤ������äơ��ʹֲ��ɤʥ����̾����ꤹ��ˤϡ�
-``verbose_name`` ������ɰ�����Ȥ��ޤ�::
+``ForeignKey``, ``ManyToManyField`` および ``OneToOneField`` では，第一引数
+は必須で，モデルのクラスにします．従って，人間可読なカラム名を指定するには，
+``verbose_name`` キーワード引数を使います::
 
     poll = models.ForeignKey(Poll, verbose_name="the related poll")
     sites = models.ManyToManyField(Site, verbose_name="list of sites")
     place = models.OneToOneField(Place, verbose_name="related place")
 
-����Ū�ˡ� ``verbose_name`` ����Ƭ��ʸ������ʸ���ˤ��ʤ����ȤˤʤäƤ��ޤ���
-Django ��ɬ�פʤȤ�����Ƭ��ʸ����ưŪ����ʸ���ˤ��ޤ���
+慣習的に， ``verbose_name`` の先頭の文字は大文字にしないことになっています．
+Django は必要なときに先頭の文字を自動的に大文字にします．
 
 
 .. _Relationships:
 
-��졼�����
+リレーション
 ------------
 
-�ط��ǡ����١����ΰ��Ϥϥơ��֥����ߤ˴�Ϣ�Ť��뤳�Ȥˤ���ΤϤ����ޤǤ�
-����ޤ���Django �ǤϤ褯�Ȥ���ǡ����١�����졼����� (relationship)��
-¿�а� (many-to-one)��¿��¿ (many-to-many)�����а� (one-to-one) ���������
-��ˡ���󶡤��Ƥ��ޤ���
+関係データベースの威力はテーブルを相互に関連づけることにあるのはいうまでも
+ありません．Django ではよく使われるデータベースリレーション (relationship)，
+多対一 (many-to-one)，多対多 (many-to-many)，一対一 (one-to-one) を定義する
+方法を提供しています．
 
 .. _Many-to-one relationships:
 
-¿�а�Υ�졼�����
+多対一のリレーション
 ~~~~~~~~~~~~~~~~~~~~
 
-¿�а�Υ�졼�������������ˤ� ``ForeignKey`` ��Ȥ��ޤ������Υե�����
-�ɤ�¾�Υե�����ɷ���Ʊ���褦�ˡ���ǥ�Υ��饹°���˴ޤ�ƻȤ��ޤ���
+多対一のリレーションを定義するには ``ForeignKey`` を使います．このフィール
+ドは他のフィールド型と同じように，モデルのクラス属性に含めて使えます．
 
-``ForeignKey`` �ˤϡ������������Ĥ��ꡤ��졼������ĥ���оݤΥ��饹��
-���ꤷ�ޤ���
+``ForeignKey`` には，固定引数が一つあり，リレーションを張る対象のクラスを
+指定します．
 
-�㤨�С� ``Car`` ��ǥ�� ``Manufacturer`` �Ȥ����ե�����ɤ�����������Ȥ�
-�ޤ��礦�����ʤ�������� ``Manufacturer`` �ˤ�ʣ���� ``Car`` ���б����뤬��
-�� ``Car`` �ˤϰ�Ĥ��� ``Manufacturer`` ���б�����褦�ˤ������Ȥ��ޤ��礦��
-���ξ�硤�ʲ��Τ褦��������ޤ�::
+例えば， ``Car`` モデルに ``Manufacturer`` というフィールドを持たせたいとし
+ましょう．すなわち，ある ``Manufacturer`` には複数の ``Car`` が対応するが，
+各 ``Car`` には一つだけ ``Manufacturer`` が対応するようにしたいとしましょう．
+この場合，以下のように定義します::
 
     class Manufacturer(models.Model):
         # ...
@@ -729,11 +729,11 @@ Django ��ɬ�פʤȤ�����Ƭ��ʸ����ưŪ����ʸ���ˤ��ޤ���
         manufacturer = models.ForeignKey(Manufacturer)
         # ...
 
-�Ƶ�Ū�ʥ�졼������ĥ�롤�Ĥޤ꼫ʬ���Ȥؤ�¿�а�Υ�졼������ĥ���
-��ˤϡ� ``models.ForeignKey('self')`` ��Ȥ��ޤ���
+再帰的なリレーションを張る，つまり自分自身への多対一のリレーションを張る場
+合には， ``models.ForeignKey('self')`` を使います．
 
-̤����Υ�ǥ�ؤΥ�졼���������������硤��ǥ륪�֥������ȤǤϤʤ���
-�ǥ��̾����Ȥ��ޤ�::
+未定義のモデルへのリレーションを作成した場合，モデルオブジェクトではなくモ
+デルの名前も使えます::
 
     class Car(models.Model):
         manufacturer = models.ForeignKey('Manufacturer')
@@ -742,139 +742,139 @@ Django ��ɬ�פʤȤ�����Ƭ��ʸ����ưŪ����ʸ���ˤ��ޤ���
     class Manufacturer(models.Model):
         # ...
 
-�ȤϤ�����ʸ�����Ȥäƥ�ǥ�򻲾ȤǤ���Τϡ�Ʊ�� models.py �ե��������
-�����ǥ�����ʤΤ����դ��Ƥ����������̤Υ��ץꥱ���������Υ�ǥ�䡤��
-��¾�ξ�꤫�� import ������ǥ�λ��Ȥˤ�ʸ�����Ȥ��ޤ���
+とはいえ，文字列を使ってモデルを参照できるのは，同じ models.py ファイル中に
+あるモデルだけなので注意してください．別のアプリケーション中のモデルや，そ
+の他の場所から import したモデルの参照には文字列を使えません．
 
-����΢�Ǥϡ� Django �ϥե������̾�� "_id" ��Ĥ���̾���ǥǡ����١����Υ���
-��̾���������ޤ��������Ǥϡ� ``Car`` ��ǥ�Υǡ����١����ơ��֥�ˤ�
-``manufacturer_id`` ����ब����ޤ� (���Υ����̾�� ``db_column`` ������Ū
-�˻��ꤷ���ѹ��Ǥ��ޤ����ܤ����� ``db_column`` �򻲾Ȥ��Ƥ�������) ���ȤϤ�
-�������������SQL ʸ��ȯ�Ԥ���ΤǤʤ������ꡤ�ǡ����١����Υ����̾�򥳡�
-�ɤ�ľ�ܰ���ɬ�פϤ���ޤ���
+舞台裏では， Django はフィールド名に "_id" をつけた名前でデータベースのカラ
+ム名を生成します．上の例では， ``Car`` モデルのデータベーステーブルには
+``manufacturer_id`` カラムが入ります (このカラム名は ``db_column`` を明示的
+に指定して変更できます．詳しくは ``db_column`` を参照してください) ．とはい
+え，カスタムのSQL 文を発行するのでないかぎり，データベースのカラム名をコー
+ドで直接扱う必要はありません．
 
-ɬ�ܤǤϤ���ޤ��󤬡� ``ForeignKey`` ��̾�� (�����Ǥ� ``manufacturer``)
-�ϡ���ǥ�̾��ʸ���ˤ�����Τˤ���褦����ޤ���������󹥤���̾�����դ�
-�Ƥ⤫�ޤ��ޤ����㤨��::
+必須ではありませんが， ``ForeignKey`` の名前 (上の例では ``manufacturer``)
+は，モデル名を小文字にしたものにするよう勧めます．もちろん好きな名前を付け
+てもかまいません．例えば::
 
     class Car(models.Model):
         company_that_makes_it = models.ForeignKey(Manufacturer)
         # ...
 
-�����ʻ������ `¿�а�Υ�졼������ǥ����`_ �򻲾Ȥ��Ƥ���������
+完全な使用例は `多対一のリレーションモデルの例`_ を参照してください．
 
-.. _`¿�а�Υ�졼������ǥ����`: ../models/many_to_one/
+.. _`多対一のリレーションモデルの例`: ../models/many_to_one/
 
-``ForeignKey`` �ե�����ɤϥ�졼������ư���������뤿��ΰ����򤤤��Ĥ�
-�Ȥ�ޤ������������ƥ��ץ����Ǥ�:
+``ForeignKey`` フィールドはリレーションの動作を定義するための引数をいくつか
+とれます．これらは全てオプションです:
 
 
     ======================= =================================================
-    ����                    ����
+    引数                    説明
     ======================= =================================================
-    ``edit_inline``         ``False`` �Ǥʤ���С���졼�������Υ��֥���
-                            ���Ȥ��졼����󸵤Υ��֥������ȤΥڡ�����
-                            �֥���饤��ǡ��Խ��Ǥ��ޤ�������ˤ�ꡤ��졼
-                            �������Υ��֥������Ȥ��ȼ��� admin ���󥿥ե���
-                            ��������ʤ��ʤ�ޤ��� 
-                            ``models.TABULAR`` �ޤ��� ``models.STACKED`` ���
-                            �ꤷ�Ƥ������������줾�졤����饤���Խ���ǽ��
-                            ���֥������Ȥ�ơ��֥�ޤ��ϥ����å������ե���
-                            ��ɤȤ���ɽ�����ޤ���
+    ``edit_inline``         ``False`` でなければ，リレーション先のオブジェ
+                            クトをリレーション元のオブジェクトのページで
+                            「インラインで」編集できます．これにより，リレー
+                            ション先のオブジェクトは独自の admin インタフェー
+                            スを持たなくなります． 
+                            ``models.TABULAR`` または ``models.STACKED`` を指
+                            定してください．それぞれ，インライン編集可能な
+                            オブジェクトをテーブルまたはスタックしたフィー
+                            ルドとして表示します．
 
-    ``limit_choices_to``    admin �����Ѳ�ǽ�����������¤��뤿��Ρ����
-                            ����ͤ��б��Ť�������Ǥ�
-                            (`�ǡ����١��� API �Υ�ե����`_ ����)��
-                            ``models.LazyDate`` ���Ȥ߹�碌�ơ����֥�����
-                            �Ȥ����դ����¤Ǥ��ޤ����㤨��::
+    ``limit_choices_to``    admin で利用可能な選択肢を制限するための，ラベ
+                            ルと値を対応づけた辞書です
+                            (`データベース API のリファレンス`_ 参照)．
+                            ``models.LazyDate`` と組み合わせて，オブジェク
+                            トを日付で制限できます．例えば::
 
                               limit_choices_to = {
                                  'pub_date__lte': models.LazyDate()}
 
-                            �Τ褦�ˤ���ȡ� ``pub_date`` �����ߤ��������
-                            ���Υ��֥������Ȥ������٤ʤ��ʤ�ޤ���
+                            のようにすると， ``pub_date`` が現在の日時より
+                            前のオブジェクトしか選べなくなります．
 
-                            ���ʣ���ʥ������¸����뤿��ˡ����������
-                            ``Q`` ���֥������� (``get_sql()`` �᥽�åɤ���
-                            �������֥�������) �����Ǥ��ޤ��� 
+                            より複雑なクエリを実現するために，辞書の代りに
+                            ``Q`` オブジェクト (``get_sql()`` メソッドを備
+                            えたオブジェクト) も指定できます． 
 
-                            ``edit_inline`` �ȸߴ���������ޤ���
+                            ``edit_inline`` と互換性がありません．
 
-    ``max_num_in_admin``    ����饤���Խ����֥������Ȥ��Խ�����Ȥ��ˡ� 
-                            ��졼������ĥ��줿���֥������Ȥ� admin ��
-                            ���粿�Ĥޤ�ɽ�����뤫����ꤷ�ޤ����㤨�С�
-                            �ԥ��˾褻����ȥåԥ󥰤� 10 �ĤޤǤ�����
-                            ��������С� ``max_num_in_admin=10`` �Ȥ���
-                            ���Ȥǡ��桼���� 10 �İʾ�Υȥåԥ󥰤�
-                            ���Ϥ����ʤ��Ǥ��ޤ���
+    ``max_num_in_admin``    インライン編集オブジェクトを編集するときに， 
+                            リレーションの張られたオブジェクトを admin に
+                            最大何個まで表示するかを指定します．例えば，
+                            ピザに乗せられるトッピングを 10 個までに制限
+                            したければ， ``max_num_in_admin=10`` とする
+                            ことで，ユーザに 10 個以上のトッピングを
+                            入力させなくできます．
 
-                            �������¤Ǥϡ���졼������ĥ��줿���֥�����
-                            �Ȥ�ºݤ� 10 �İʾ������Ǥ��ʤ�����櫓�Ǥ�
-                            �ʤ��Τ����դ��Ƥ������������ΰ��������椷��
-                            ����Τ� admin ���󥿥ե����������ǡ� Python
-                            API ��٥��ǡ����١�����٥�Ǥ����¤�ݤ���
-                            ����
+                            この制限では，リレーションの張られたオブジェク
+                            トを実際に 10 個以上生成できなくするわけでは
+                            ないので注意してください．この引数が制御して
+                            いるのは admin インタフェースだけで， Python
+                            API レベルやデータベースレベルでは制限を課しま
+                            せん．
 
-    ``min_num_in_admin``    ��졼������ĥ��줿���֥������Ȥ� admin 
-                            �˾��ʤ��Ȥⲿ��ɽ�����뤫����ꤷ�ޤ���
-                            �̾���֥������Ȥ��������ơ��� (creation stage)
-                            �Ǥϡ� ``num_in_admin`` �ĤΥ���饤�󥪥֥���
-                            ���Ȥ�ɽ�����졤�Խ����ơ��� (edit stage) �Ǥ�
-                            ��¸�Υ��֥������Ȥ˲ä���
-                            ``num_extra_on_change`` �Ĥζ��򥪥֥������Ȥ�
-                            ɽ������褦�ˤʤäƤ��ޤ���
-                            ����������졼������ĥ��줿���֥������Ȥο�
-                            �� ``min_num_in_admin`` �İʲ��ξ��ˤ�ɽ��
-                            ���ޤ���
+    ``min_num_in_admin``    リレーションの張られたオブジェクトを admin 
+                            に少なくとも何個表示するかを指定します．
+                            通常，オブジェクトの生成ステージ (creation stage)
+                            では， ``num_in_admin`` 個のインラインオブジェ
+                            クトが表示され，編集ステージ (edit stage) では
+                            既存のオブジェクトに加えて
+                            ``num_extra_on_change`` 個の空白オブジェクトを
+                            表示するようになっています．
+                            ただし，リレーションの張られたオブジェクトの数
+                            が ``min_num_in_admin`` 個以下の場合には表示
+                            しません．
 
-    ``num_extra_on_change`` ���֥������Ȥ��ѹ����ơ����ˤ����ơ��ɲäΥ֥�
-                            �󥯤Υե�����ɤ򲿸�ɽ�����뤫����ꤷ�ޤ���
+    ``num_extra_on_change`` オブジェクトの変更ステージにおいて，追加のブラ
+                            ンクのフィールドを何個表示するかを指定します．
 
-    ``num_in_admin``        ���֥������Ȥ��ɲå��ơ����ǡ�����饤�󥪥֥���
-                            ���Ȥ�ǥե���Ȥǲ���ɽ�����뤫����ꤷ�ޤ���
+    ``num_in_admin``        オブジェクトの追加ステージで，インラインオブジェ
+                            クトをデフォルトで何個表示するかを指定します．
 
-    ``raw_id_admin``        �ɥ��åץ������˥塼������ˡ����������Ϥ�
-                            ��ե�����ɤ�����ɽ�����ޤ���
+    ``raw_id_admin``        ドロップダウンメニューの代わりに，整数を入力す
+                            るフィールドだけを表示します．
                             
-                            ��Ϣ�Ť����оݤˤʤ륪�֥������Ȥο���¿������
-                            ����ܥå���������Ū�Ǥʤ����������Ǥ���
+                            関連づけの対象になるオブジェクトの数が多すぎて
+                            選択ボックスが実用的でない場合に便利です．
 
-                            ``edit_inline`` �Ȥ��Ȥ߹�碌�ƻȤ��ޤ���
+                            ``edit_inline`` とは組み合わせて使えません．
 
-    ``related_name``        ��졼�������Υ��֥������Ȥ���ջ��Ȥ���Ȥ�
-                            �˻Ȥ���̾���Ǥ����ܤ����� 
-                            `���֥������ȤΥ�졼�����˴ؤ������`_
-                            �򻲾Ȥ��Ƥ���������
+    ``related_name``        リレーション先のオブジェクトから逆参照するとき
+                            に使われる名前です．詳しくは 
+                            `オブジェクトのリレーションに関する解説`_
+                            を参照してください．
 
-    ``to_field``            ��졼�������Υ��֥������ȤΡ���졼������
-                            ĥ���оݤΥե������̾�Ǥ����ǥե���ȤǤϡ�
-                            ��졼�������Υ��֥������Ȥμ祭����Ȥ��ޤ���
+    ``to_field``            リレーション先のオブジェクトの，リレーションを
+                            張る対象のフィールド名です．デフォルトでは，
+                            リレーション先のオブジェクトの主キーを使います．
     ======================= =================================================
 
 
-.. _`�ǡ����١��� API �Υ�ե����`: ../db-api/
+.. _`データベース API のリファレンス`: ../db-api/
 .. _`Database API reference`: ../db_api/
-.. _`���֥������ȤΥ�졼�����˴ؤ������`:
+.. _`オブジェクトのリレーションに関する解説`:
     ../db-api/#related-objects
 .. _related objects documentation: 
     ../db_api/#related-objects
 
 .. _Many-to-many relationships:
 
-¿��¿�Υ�졼�����
+多対多のリレーション
 ~~~~~~~~~~~~~~~~~~~~
 
-¿��¿�� (many-to-many) ��졼�������������ˤ� ``ManyToManyField``
-��Ȥ��ޤ������Υե�����ɤ�¾�Υե�����ɷ���Ʊ���褦�ˡ���ǥ�Υ��饹°
-���˴ޤ�ƻȤ��ޤ���
+多対多の (many-to-many) リレーションを定義するには ``ManyToManyField``
+を使います．このフィールドは他のフィールド型と同じように，モデルのクラス属
+性に含めて使えます．
 
-``ManyToManyField`` �ˤϸ����������Ĥ��ꡤ��졼������ĥ���оݤΥ��饹��
-���ꤷ�ޤ���
+``ManyToManyField`` には固定引数が一つあり，リレーションを張る対象のクラスを
+指定します．
 
-�㤨�С� ``Pizza`` �ˤ�ʣ���� ``Topping`` ���֥������Ȥ���������ޤ���
-���ʤ�������� ``Topping`` ��ʣ���Υԥ��ξ���֤��ơ��դˤ��줾��Υԥ��ˤ�
-ʣ���Υȥåԥ󥰤��֤���Ȥ����櫓�Ǥ������Υ�졼������ɽ���ˤϼ��Τ褦��
-���ޤ�::
+例えば， ``Pizza`` には複数の ``Topping`` オブジェクトを持たせられます．
+すなわち，ある ``Topping`` は複数のピザの上に置けて，逆にそれぞれのピザには
+複数のトッピングを置けるというわけです．このリレーションを表すには次のように
+します::
 
     class Topping(models.Model):
         # ...
@@ -884,127 +884,127 @@ Django ��ɬ�פʤȤ�����Ƭ��ʸ����ưŪ����ʸ���ˤ��ޤ���
         toppings = models.ManyToManyField(Topping)
 
 
-``ForeignKey`` ��Ʊ��������ǥ�̾�ǤϤʤ�ʸ���� ``'self'`` ��Ȥ��м�ʬ����
-�ؤΥ�졼����������Ǥ��ޤ����ޤ�����ǥ�̾�����ä�ʸ�����Ȥ��С�̤��
-���Υ�ǥ�⻲�ȤǤ��ޤ�����������ʸ�����Ȥäƥ�ǥ�򻲾ȤǤ���Τϡ�Ʊ
-�� models.py �ե�������ˤ����ǥ�����Ǥ����̤Υ��ץꥱ���������Υ�ǥ�
-�䡤����¾�ξ�꤫�� import ������ǥ��ʸ����ǻ��ȤǤ��ޤ���
+``ForeignKey`` と同じく，モデル名ではなく文字列 ``'self'`` を使えば自分自身
+へのリレーションを定義できます．また，モデル名の入った文字列を使えば，未定
+義のモデルも参照できます．ただし，文字列を使ってモデルを参照できるのは，同
+じ models.py ファイル中にあるモデルだけです．別のアプリケーション中のモデル
+や，その他の場所から import したモデルは文字列で参照できません．
 
-ɬ�ܤǤϤ���ޤ��󤬡� ``ManyToManyField`` ��̾�� (�����Ǥ� ``toppings``)
-�ϡ���졼�������Υ�ǥ�̾��ʣ�����ˤ���褦����ޤ���
+必須ではありませんが， ``ManyToManyField`` の名前 (上の例では ``toppings``)
+は，リレーション先のモデル名の複数形にするよう勧めます．
 
-�ظ�Ǥϡ� Django ����֤� join �ơ��֥���������ơ�¿��¿�Υ�졼�����
-��ɽ�����ޤ���
+背後では， Django は中間の join テーブルを生成して，多対多のリレーション
+を表現します．
 
-�ɤ���Υ�ǥ�� ``ManyToManyField`` ��������Ƥ⤫�ޤ��ޤ��󤬡�
-�ɤ��餫�����Υ�ǥ�ˤ���ɬ�פ���ޤ��� -- ξ���ˤϻ���Ǥ��ޤ���
+どちらのモデルで ``ManyToManyField`` を定義してもかまいませんが，
+どちらか片方のモデルにしか必要ありません -- 両方には指定できません．
 
-����Ū�ˡ� Django �� admin ��ȤäƤ����硤 ``ManyToManyField`` ���󥹥�
-�󥹤�����Ƥ����Τϡ� admin ���󥿥ե��������Խ������¦�Υ��֥������Ȥˤ�
-�Ƥ����ޤ��������Ǥϡ� ``topping`` �� (``Topping`` �� ``ManyToManyField``
-�� ``pizzas`` ��⤿����ΤǤϤʤ�) ``Pizza`` ������Ƥ����ޤ����Ȥ����Τ⡤
-�֥ȥåԥ󥰤�褻��ԥ��פȹͤ������֥ԥ��ξ�˾褻��ȥåԥ󥰡פ��
-������������������Ǥ����������ƾ����Ǥϡ� ``Pizza`` �� admin �ե������
-�桼���˥ȥåԥ󥰤����Ф��뤳�Ȥˤʤ�ޤ���
+一般的に， Django の admin を使っている場合， ``ManyToManyField`` インスタ
+ンスを入れておくのは， admin インタフェースで編集される側のオブジェクトにし
+ておきます．上の例では， ``topping`` は (``Topping`` に ``ManyToManyField``
+の ``pizzas`` をもたせるのではなく) ``Pizza`` に入れておきます．というのも，
+「トッピングを乗せるピザ」と考えるよりも「ピザの上に乗せるトッピング」を考
+える方が自然だからです．こうして上の例では， ``Pizza`` の admin フォームで
+ユーザにトッピングを選ばせることになります．
 
-��������� `Many-to-many relationship model example`_ �򻲾Ȥ��Ƥ���������
+完全な例は `Many-to-many relationship model example`_ を参照してください．
 
 .. _Many-to-many relationship model example: ../models/many_to_many/
 
-``ManyToManyField`` �ե�����ɤϥ�졼������ư���������뤿��ΰ�����
-�����Ĥ��Ȥ�ޤ������������ƥ��ץ����Ǥ�:
+``ManyToManyField`` フィールドはリレーションの動作を定義するための引数を
+いくつかとれます．これらは全てオプションです:
 
 
     =======================  ========================================================
-    ����                     ����
+    引数                     説明
     =======================  ========================================================
-    ``related_name``         ���Ҥ� ``ForeignKey`` �������򻲾Ȥ��Ƥ���������
+    ``related_name``         前述の ``ForeignKey`` の説明を参照してください．
 
-    ``filter_interface``     �桼���ӥ�ƥ������Ť� ``<select multiple>``
-                             ������ˡ������������������ Javascript ��
-                             �֥ե��륿�ץ��󥿥ե�������Ȥ��ޤ����ͤ�
-                             ``models.HORIZONTAL`` �ޤ��� ``models.VERTICAL``
-                             �Τ����줫 (���󥿥ե������򲣤ʤ�Ӥˤ��뤫��
-                             �ʤ�Ӥ��뤫) �Ǥ���
+    ``filter_interface``     ユーザビリティが紙一重の ``<select multiple>``
+                             の代わりに，気の利いた控えめな Javascript の
+                             「フィルタ」インタフェースを使います．値は
+                             ``models.HORIZONTAL`` または ``models.VERTICAL``
+                             のいずれか (インタフェースを横ならびにするか縦
+                             ならびするか) です．
 
-    ``limit_choices_to``     ``ForeignKey`` ��Ʊ̾���ץ����������򻲾Ȥ�
-                             �Ƥ���������
+    ``limit_choices_to``     ``ForeignKey`` の同名オプションの説明を参照し
+                             てください．
 
-    ``symmetrical``          ��ʬ���Ȥؤ� ``ManyToManyField`` ����������
-                             ���ˤΤ߻Ȥ��ޤ����ʲ��Τ褦�ʥ�ǥ��ͤ��ޤ�::
+    ``symmetrical``          自分自身への ``ManyToManyField`` を定義すると
+                             きにのみ使います．以下のようなモデルを考えます::
 
                                class Person(models.Model):
                                    friends = models.ManyToManyField("self")
 
-                             Django �����Υ�ǥ���������ݡ���ʬ���Ȥ���
-                             ���� ``ManyToManyField`` ���������Ƥ��뤳��
-                             ��ǧ�����ơ� ``Person`` ���饹��
-                             ``person_set`` °�����ɲä��ʤ��褦�ˤ��ޤ���
-                             ������ꡤ ``ManyToManyField`` ���о�Ū
-                             (symmetrical) �Ǥ���Ȥߤʤ��ޤ������ʤ������
-                             �����ʤ���ͧã�ʤ顤���ʤ��ϻ��ͧã�Ǥ��롤��
-                             �����褦�ˤǤ���
+                             Django がこのモデルを処理する際，自分自身に対
+                             する ``ManyToManyField`` が定義されていること
+                             を認識して， ``Person`` クラスに
+                             ``person_set`` 属性を追加しないようにします．
+                             その代り， ``ManyToManyField`` を対称的
+                             (symmetrical) であるとみなします．すなわち，私
+                             があなたの友達なら，あなたは私の友達である，と
+                             いうようにです．
 
-                             ``self`` ���Ф��� ``ManyToMany`` �δط����о�
-			     ����˾�ޤʤ����ϡ� ``symmetrical`` ��
-			     ``False`` �ˤ��Ƥ�������������ˤ�ꡤ Django
-			     �˵ջ����ѤΥǥ�����ץ����ɲä�����
-			     ``ManyToMany`` �����оΤˤǤ��ޤ���
+                             ``self`` に対する ``ManyToMany`` の関係に対称
+			     性を望まない場合は， ``symmetrical`` を
+			     ``False`` にしてください．これにより， Django
+			     に逆参照用のデスクリプタを追加させ，
+			     ``ManyToMany`` を非対称にできます．
 
-    ``db_table``             ¿��¿�Υ�졼�����������¸���뤿��˺�����
-                             ���ơ��֥��̾���Ǥ���̾������ꤷ�ʤ���С�
-                             Django �ϥǥե���Ȥ�̾����Ȥ��ޤ����ǥե���
-                             �Ȥ�̾���ϡ���礹����ĤΥơ��֥��̾���˴��
-                             ���Ʒ����ޤ���
+    ``db_table``             多対多のリレーション情報を保存するために作成さ
+                             れるテーブルの名前です．名前を指定しなければ，
+                             Django はデフォルトの名前を使います．デフォル
+                             トの名前は，結合する二つのテーブルの名前に基づ
+                             いて決められます．
     =======================  ========================================================
 
 
 .. _One-to-one relationships:
 
-���а�Υ�졼�����
+一対一のリレーション
 ~~~~~~~~~~~~~~~~~~~~
 
-���а�Υ�졼�����Υ��ޥ�ƥ������Ϥޤ�ʤ��ѹ������Τǡ��Ȥ�ʤ��褦
-�˴���ޤ�������Ǥ�Ȥ������Τʤ顤�ɤ߿ʤ�ǲ�������
+一対一のリレーションのセマンティクスはまもなく変更されるので，使わないよう
+に勧めます．それでも使いたいのなら，読み進んで下さい．
 
-���а�Υ�졼�������������ˤϡ� ``OneToOneField`` ��Ȥ��ޤ���
-���Υե�����ɤ�¾�Υե�����ɷ���Ʊ���褦�ˡ���ǥ�Υ��饹°
-���˴ޤ�ƻȤ��ޤ���
+一対一のリレーションを定義するには， ``OneToOneField`` を使います．
+このフィールドは他のフィールド型と同じように，モデルのクラス属
+性に含めて使えます．
 
-���Υ�졼����󤬤�äȤ�ͭ�ѤʤΤϡ����륪�֥������Ȥ��̤Υ��֥�������
-�򲿤餫�η��ǡֳ�ĥ�פ��Ƥ�����μ祭���Ȥ��ƻȤ����Ǥ���
+このリレーションがもっとも有用なのは，あるオブジェクトが別のオブジェクト
+を何らかの形で「拡張」している場合の主キーとして使う場合です．
 
-``OneToOneField`` �ˤϸ����������Ĥ��ꡤ��졼������ĥ���оݤΥ��饹��
-���ꤷ�ޤ���
+``OneToOneField`` には固定引数が一つあり，リレーションを張る対象のクラスを
+指定します．
 
-�㤨�С��־�� (place)�פΥǡ����١�������Ȥ��ˤϡ����ɥ쥹�������ֹ桤
-�Ȥ��ä�ɸ��Ū�ʤ�Τ�������ޤ������ξ�ǡ��쥹�ȥ��ǡ����١��������
-����Ȥ��ˡ� ``Restaurant`` ��ǥ�����Ʊ���ե�����ɤ�Ĥ���褦��
-�����֤���� (repeat yourself) �򤹤�����ˡ����ǡ����١�������פˤ���
-�쥹�ȥ��Υǡ����١���������������Ȥ��ޤ��礦�����ΤȤ��� ``Restaurant`` 
-�ˤ� ``Place`` �ؤ� ``OneToOneField`` ��⤿�����ޤ� (�쥹�ȥ���
-�����Ф��� "is-a" �δط�������Ǥ�)
+例えば，「場所 (place)」のデータベースを作るときには，アドレス，電話番号，
+といった標準的なものを作成します．その上で，レストランデータベースを作成
+するときに， ``Restaurant`` モデルの中に同じフィールドをつくるような
+繰り返し作業 (repeat yourself) をする代わりに，場所データベースを基盤にして
+レストランのデータベースを作成したいとしましょう．このとき， ``Restaurant`` 
+には ``Place`` への ``OneToOneField`` をもたせられます (レストランは
+場所に対して "is-a" の関係だからです)
 
-``ForeignKey`` ��Ʊ��������ǥ�̾�ǤϤʤ�ʸ���� ``'self'`` ��Ȥ��м�ʬ����
-�ؤΥ�졼����������Ǥ��ޤ����ޤ�����ǥ�̾�����ä�ʸ�����Ȥ��С�̤��
-���Υ�ǥ�⻲�ȤǤ��ޤ���
+``ForeignKey`` と同じく，モデル名ではなく文字列 ``'self'`` を使えば自分自身
+へのリレーションを定義できます．また，モデル名の入った文字列を使えば，未定
+義のモデルも参照できます．
 
-�ºݤˤϡ� ``OneToOneField`` �� ``id`` �ե�����ɤ��֤������ޤ�
-(���а�Υ�졼�����Ǥϡ��祭����ͭ���뤫��Ǥ�)���ޤ��� admin ����
-�ե�������ǥ��֥������Ȥ��Խ�����ݤˤϡ��ɤ߽Ф����ѤΥե�����ɤȤ���
-ɽ������ޤ���
+実際には， ``OneToOneField`` は ``id`` フィールドを置き換えます
+(一対一のリレーションでは，主キーを共有するからです)．また， admin インタ
+フェース上でオブジェクトを編集する際には，読み出し専用のフィールドとして
+表示されます．
 
-��������� `One-to-one relationship model example`_ �򻲾Ȥ��Ƥ���������
+完全な例は `One-to-one relationship model example`_ を参照してください．
 
 .. _One-to-one relationship model example: ../models/one_to_one/
 
 .. _Meta options:
 
-Meta ���ץ����
+Meta オプション
 ===============
 
-��ǥ�˥᥿�ǡ�������ꤹ��ˤϡ��ʲ��Τ褦�˥�ǥ��������
-``class Meta`` ��Ȥ��ޤ�::
+モデルにメタデータを指定するには，以下のようにモデルの内部で
+``class Meta`` を使います::
 
     class Foo(models.Model):
         bar = models.CharField(maxlength=30)
@@ -1012,53 +1012,53 @@ Meta ���ץ����
         class Meta:
             # ...
 
-��ǥ�Υ᥿�ǡ����ˤϡ����֥������Ȥ��¤ӵ�§�ʤɡ��֥ե�����ɤǤʤ����
-���ơפ�����ޤ���
+モデルのメタデータには，オブジェクトの並び規則など，「フィールドでないもの
+全て」を入れます．
 
-���ѤǤ������Ƥ� ``Meta`` ���ץ����Υꥹ�Ȥ�ʲ��˼����ޤ����ɤΥ��ץ���
-��� ``Meta`` �ε��Ҥ�ɬ�ܤǤϤ���ޤ��󡥥�ǥ�� ``class Meta`` ���ɲä�
-�뤫�ɤ����⥪�ץ����Ǥ���
+利用できる全ての ``Meta`` オプションのリストを以下に示します．どのオプショ
+ンも ``Meta`` の記述に必須ではありません．モデルに ``class Meta`` を追加す
+るかどうかもオプションです．
 
 ``db_table``
 ------------
 
-��ǥ�λȤ��ǡ����١����ơ��֥��̾���Ǥ�::
+モデルの使うデータベーステーブルの名前です::
 
     db_table = "music_album"
 
-���Υ��ץ�������ꤷ�ʤ���С�Django �� 
-``app_label + '_' + model_class_name`` ��Ȥ��ޤ����ܤ����ϸ�ҤΡ֥ơ��֥�
-̾�פ򻲾Ȥ��Ƥ���������
+このオプションを指定しなければ，Django は 
+``app_label + '_' + model_class_name`` を使います．詳しくは後述の「テーブル
+名」を参照してください．
 
 
-�ǡ����١����ơ��֥�̾�� SQL ��ͽ���Ǥ��ä��ꡤ Python �ѿ�̾�Ȥ��ƻȤ���
-��ʸ����ޤ�Ǥ����� (�褯����Τϥϥ��ե�Ǥ�) �Ǥ�����Ϥ���ޤ���
-Django ���ظ�ǥ����̾�ȥơ��֥�̾�򥯥����Ȥ��ޤ���
+データベーステーブル名が SQL の予約語であったり， Python 変数名として使えな
+い文字を含んでいる場合 (よくあるのはハイフンです) でも問題はありません．
+Django は背後でカラム名とテーブル名をクオートします．
 
 ``get_latest_by``
 -----------------
 
-��ǥ���� ``DateField`` �ޤ��� ``DateTimeField`` ��̾���Ǥ������Υ��ץ���
-��ϡ���ǥ�� ``Manager`` �� ``latest()`` �᥽�åɤ��Ȥ��ǥե���ȤΥե���
-��ɤ���ꤷ�ޤ���
+モデル中の ``DateField`` または ``DateTimeField`` の名前です．このオプショ
+ンは，モデルの ``Manager`` の ``latest()`` メソッドが使うデフォルトのフィー
+ルドを指定します．
 
-�㤨��::
+例えば::
 
     get_latest_by = "order_date"
 
-��������� `latest() �Υɥ������`_ �򻲾Ȥ��Ƥ���������
+完全な例は `latest() のドキュメント`_ を参照してください．
 
-.. _`latest() �Υɥ������`: ../models/get_latest/
+.. _`latest() のドキュメント`: ../models/get_latest/
 
 
 ``order_with_respect_to``
 -------------------------
 
-���֥������Ȥ����Υե�����ɤǡ��¤��ؤ���ǽ (orderable)�פˤ��ޤ�������
-���ץ�����Ȥ��Τϡ���졼������ĥ��줿���֥������Ȥ򡤿ƥ��֥�������
-�˽��ä��¤��ؤ�������礬�ۤȤ�ɤǤ����㤨�С� ``Answer`` �� ``Question``
-�˥�졼������ĥ�äƤ��ꡤ��Ĥ� ``Question`` ��ʣ���� ``Answer`` ������
-�ơ� ``Answer`` �ν��֤����פǤ�����ϰʲ��Τ褦�ˤ��ޤ�::
+オブジェクトを指定のフィールドで「並べ替え可能 (orderable)」にします．この
+オプションを使うのは，リレーションの張られたオブジェクトを，親オブジェクト
+に従って並べ替えたい場合がほとんどです．例えば， ``Answer`` が ``Question``
+にリレーションを張っており，一つの ``Question`` に複数の ``Answer`` があっ
+て， ``Answer`` の順番が重要である場合は以下のようにします::
 
     class Answer(models.Model):
         question = models.ForeignKey(Question)
@@ -1071,32 +1071,32 @@ Django ���ظ�ǥ����̾�ȥơ��֥�̾�򥯥����Ȥ��ޤ���
 ------------
 
 
-���֥������ȤΥꥹ�Ȥ��������Ȥ��˻Ȥ��롤���֥������ȤΥǥե���Ȥ���
-�ӽ絬§�Ǥ�::
+オブジェクトのリストを取得するときに使われる，オブジェクトのデフォルトの並
+び順規則です::
 
     ordering = ['-order_date']
 
-�ͤ�ʸ����Υ��ץ��ꥹ�ȤǤ�����ʸ����ϥե�����ɤ�̾���ǡ��߽���¤٤�
-���ˤϥ��ץ����� "-" ����Ƭ���դ��ޤ�����Ƭ�� "-" �Τʤ��ե�����ɤϾ�
-����¤٤��ޤ������֤������ˤ���ˤ� "?" ��ȤäƲ�������
+値は文字列のタプルやリストです．各文字列はフィールドの名前で，降順に並べる
+場合にはオプションの "-" を先頭に付けます．先頭に "-" のないフィールドは昇
+順に並べられます．順番をランダムにするには "?" を使って下さい．
 
-�㤨�С� ``pub_date`` �ե�����ɤǾ�����¤٤���ˤϰʲ��Τ褦�ˤ��ޤ�::
+例えば， ``pub_date`` フィールドで昇順に並べる場合には以下のようにします::
 
     ordering = ['pub_date']
 
-�㤨�С� ``pub_date`` �ե�����ɤǹ߽���¤٤���ˤϰʲ��Τ褦�ˤ��ޤ�::
+例えば， ``pub_date`` フィールドで降順に並べる場合には以下のようにします::
 
     ordering = ['-pub_date']
 
-�㤨�С� ``pub_date`` �ե�����ɤǹ߽���¤١������ ``author`` �Ǿ���˾�
-��ˤϰʲ��Τ褦�ˤ��ޤ�::
+例えば， ``pub_date`` フィールドで降順に並べ，さらに ``author`` で昇順に場
+合には以下のようにします::
 
     ordering = ['-pub_date', 'author']
 
-����¾����� `Specifying ordering`_ �򻲾Ȥ��Ƥ���������
+その他の例は `Specifying ordering`_ を参照してください．
 
-``ordering`` �ˤ����ĥե�����ɤ����äƤ⡤ admin �����ȤϺǽ�Υե������
-�����Ȥ�ʤ��Τ����դ��Ƥ���������
+``ordering`` にいくつフィールドがあっても， admin サイトは最初のフィールド
+しか使わないので注意してください．
 
 .. _Specifying ordering:
    ../models/ordering/
@@ -1105,138 +1105,138 @@ Django ���ظ�ǥ����̾�ȥơ��֥�̾�򥯥����Ȥ��ޤ���
 ---------------
 
 
-���֥������Ȥ��������˥ѡ��ߥå����ơ��֥���ɲä���ѡ��ߥå����Υꥹ
-�ȤǤ��� ``admin`` ���åȤ��ĥ��֥������Ȥˤϡ��ɲá�������ѹ��Υѡ��ߥ�
-����󤬼�ưŪ����������ޤ����ʲ�����Ǥϡ�``can_deliver_pizzas`` �Ȥ�����
-�äΥѡ��ߥå�����������Ƥ��ޤ�::
+オブジェクトの生成時にパーミッションテーブルに追加するパーミッションのリス
+トです． ``admin`` セットをもつオブジェクトには，追加，削除，変更のパーミッ
+ションが自動的に生成されます．以下の例では，``can_deliver_pizzas`` という追
+加のパーミッションを定義しています::
 
     permissions = (("can_deliver_pizzas", "Can deliver pizzas"),)
 
-``(permission_code, human_readable_permission_name)`` �η�����Ȥ� 2 ���Ǥ�
-���ץ뤫��ʤ�ꥹ�ȤǤ���
+``(permission_code, human_readable_permission_name)`` の形式をとる 2 要素の
+タプルからなるリストです．
 
 ``unique_together``
 -------------------
 
-�Ȥ߹�碌�Ȥ��ư�դˤ��ʤ���Фʤ�ʤ��ե�����ɥ��åȤΥꥹ�ȤǤ�::
+組み合わせとして一意にしなければならないフィールドセットのリストです::
 
     unique_together = (("driver", "restaurant"),)
 
-��������� Django �� admin ��ǻȤ���ȤȤ�ˡ��ǡ����١�����٥�Ǥ⶯��
-����ޤ� (���ʤ����Ŭ�ڤ� ``UNIQUE`` ʸ�� ``CREATE TABLE`` ʸ������ޤ�)��
+この制約は Django の admin 上で使われるとともに，データベースレベルでも強制
+されます (すなわち，適切な ``UNIQUE`` 文が ``CREATE TABLE`` 文に入ります)．
 
 ``verbose_name``
 ----------------
 
-�ʹֲ��ɤʥ��֥�������̾��ñ�����Ǥ�::
+人間可読なオブジェクト名の単数形です::
 
     verbose_name = "pizza"
 
-���ΰ�������ꤷ�ʤ���硤Django �ϥ��饹̾����Τ���ʸ�����Ȥ��ޤ����㤨
-�� ``CamelCase`` �� ``camel case`` �ˤʤ�ޤ���
+この引数を指定しない場合，Django はクラス名を解体した文字列を使います．例え
+ば ``CamelCase`` は ``camel case`` になります．
 
 ``verbose_name_plural``
 -----------------------
 
 
-���֥������Ȥ�ʣ����̾�Ǥ�::
+オブジェクトの複数形名です::
 
     verbose_name_plural = "stories"
 
-���ΰ�������ꤷ�ʤ���硤Django �� ``verbose_name + "s"`` ��Ȥ��ޤ���
+この引数を指定しない場合，Django は ``verbose_name + "s"`` を使います．
 
 
 .. _Table names:
 
-�ơ��֥�̾
+テーブル名
 ==========
 
-Django �ϥ�ǥ륯�饹̾�ȥ�ǥ륯�饹�����äƤ��륢�ץꥱ��������̾������
-�ǡ����١����ơ��֥�̾��ưŪ��Ƴ�Ф��ơ��桼�������֤�̵�̻Ȥ����ʤ��Ƥ�
-��褦�ˤ��Ƥ��ޤ�����ǥ�Υǡ����١����ơ��֥�̾�ϡ���ǥ�Ρ֥��ץꥱ��
-������٥�ס����ʤ�� ``manage.py startapp`` �˻��ꤹ��̾���ȡ���ǥ��
-���饹̾�򥢥�����������Ƿ�礷����Τˤʤ�ޤ���
+Django はモデルクラス名とモデルクラスの入っているアプリケーションの名前から
+データベーステーブル名を自動的に導出して，ユーザが時間を無駄使いしなくてす
+むようにしています．モデルのデータベーステーブル名は，モデルの「アプリケー
+ションラベル」，すなわち ``manage.py startapp`` に指定する名前と，モデルの
+クラス名をアンダースコアで結合したものになります．
 
-�㤨�С�  (``manage.py startapp bookstore`` �Ǻ�������) ``bookstore`` �Ȥ�
-�����ץꥱ������󤬤��ä��Ȥ��ޤ��礦�� ``class Book`` �Ȥ�������������
-��ϥǡ����١�����Ǥ� ``bookstore_book`` �Ȥ����ơ��֥�ˤʤ�ޤ���
+例えば，  (``manage.py startapp bookstore`` で作成した) ``bookstore`` とい
+うアプリケーションがあったとしましょう． ``class Book`` として定義したモデ
+ルはデータベース中では ``bookstore_book`` というテーブルになります．
 
-�ǡ����١����ơ��֥�̾�򥪡��Х饤�ɤ���ˤϡ� ``class Meta`` ���
-``db_table`` �ѥ�᥿����ꤷ�Ƥ���������
+データベーステーブル名をオーバライドするには， ``class Meta`` 中で
+``db_table`` パラメタを指定してください．
 
 .. _Automatic primary key fields:
 
-��ưŪ�ʼ祭���ե������
+自動的な主キーフィールド
 ========================
 
-�ǥե���ȤǤϡ� Django �ϳƥ�ǥ�˰ʲ��Υե������::
+デフォルトでは， Django は各モデルに以下のフィールド::
 
     id = models.AutoField(primary_key=True)
 
-���ɲä��ޤ�������ϼ�ưŪ���ͤ򥤥󥯥���Ȥ����ɲä��Ƥ椯�ե�����ɤǡ�
-�祭���˻Ȥ��ޤ���
+を追加します．これは自動的に値をインクリメントして追加してゆくフィールドで，
+主キーに使われます．
 
-��������μ祭������ꤷ������С������줫�Υե�����ɤ�
-``primary_key=True`` ����ꤷ�Ƥ���������  ``primary_key`` �����ꤵ��Ƥ���
-�Τ� Django �����Ĥ���ȡ� ``id`` ������ưŪ���ɲä��ޤ���
+カスタムの主キーを指定したければ，いずれかのフィールドに
+``primary_key=True`` を指定してください．  ``primary_key`` が設定されている
+のを Django が見つけると， ``id`` カラムを自動的に追加しません．
 
-�ƥ�ǥ�ˤ�ɬ����� ``primary_key=True`` �Υե�����ɤ�ɬ�פǤ���
+各モデルには必ず一つ ``primary_key=True`` のフィールドが必要です．
 
 
 .. _Admin options:
 
-Admin ���ץ����
+Admin オプション
 ================
 
-����Υ�ǥ�� admin �����Ⱦ�ǲĻ�ˤ���ˤϡ��ʲ��Τ褦�˥�ǥ��������
-``"class Admin"`` ��Ȥ��ޤ�::
+自作のモデルを admin サイト上で可視にするには，以下のようにモデルの内部で
+``"class Admin"`` を使います::
 
     class Person(models.Model):
         first_name = models.CharField(maxlength=30)
         last_name = models.CharField(maxlength=30)
 
         class Admin:
-            # ���ץ����򤳤��˵��Ҥ��ޤ�
+            # オプションをここに記述します
             pass
 
 
-``Admin`` ���饹�� admin �����Ⱦ�ǤΥ�ǥ��ɽ����ˡ�� Django �˶����ޤ���
+``Admin`` クラスは admin サイト上でのモデルの表示方法を Django に教えます．
 
-���Ѳ�ǽ�� ``Admin`` ���ץ����Υꥹ�Ȥ򼨤��ޤ��������Υ��饹�ѿ�������
-���ץ����Ǥ������ץ������������ꤻ���� admin ���󥿥ե�������Ȥ�������
-�С��ʲ��Τ褦�� ``pass`` ��Ȥ��ޤ�::
+利用可能な ``Admin`` オプションのリストを示します．これらのクラス変数は全て
+オプションです．オプションを全く指定せずに admin インタフェースを使いたけれ
+ば，以下のように ``pass`` を使います::
 
     class Admin:
         pass
 
-``class Admin`` ���ǥ���ɲä��뤫�ɤ����������Υ��ץ����Ǥ���
+``class Admin`` をモデルに追加するかどうかも全くのオプションです．
 
 ``date_hierarchy``
 ------------------
 
-``date_hierarchy`` ���ǥ�� ``DateField`` �� ``DateTimeField`` �˻��ꤹ��
-�ȡ��ѹ��ꥹ�ȤΥڡ����ˡ�����ե�����ɤ����դ�Ȥä����ե١����ǹʤ����
-�Ǥ���ʥӥ���������Ȥ߹��ޤ�ޤ���
+``date_hierarchy`` をモデルの ``DateField`` や ``DateTimeField`` に指定する
+と，変更リストのページに，指定フィールドの日付を使って日付ベースで絞り込み
+できるナビゲーションが組み込まれます．
 
-��::
+例::
 
     date_hierarchy = 'pub_date'
 
 ``fields``
 ----------
 
-admin �Ρ��ɲ� (add)�פ���ӡ��ѹ� (change)�ץڡ����Υ쥤�����Ȥ����椹���
-�ϡ� ``fields`` ��Ȥ��ޤ���
+admin の「追加 (add)」および「変更 (change)」ページのレイアウトを制御するに
+は， ``fields`` を使います．
 
-``fields`` �� 2 ���ǤΥ��ץ�Υꥹ�ȤǤ����ƥ��ץ�� admin �ե�����ڡ�����
-�� ``<fieldset>`` ��ɽ���ޤ� (``<fieldset>`` �ϥե�����Ρ֥��������פˤ�
-��ޤ�)��
+``fields`` は 2 要素のタプルのリストです．各タプルは admin フォームページ上
+の ``<fieldset>`` を表します (``<fieldset>`` はフォームの「セクション」にな
+ります)．
 
-�ե�����ɥ��åȤ� ``(name, field_options)`` �η�����Ȥ�ޤ��� ``name``
-�ϥե�����ɥ��åȤ�̾����ɽ��ʸ����ǡ�``field_options`` �ϥե�����ɥ���
-�Ȥ�ɽ�����ե�����ɤξ�������줿����Ǥ���
+フィールドセットは ``(name, field_options)`` の形式をとります． ``name``
+はフィールドセットの名前を表す文字列で，``field_options`` はフィールドセッ
+トに表示すフィールドの情報を入れた辞書です．
 
-``django.contrib.flatpages.FlatPage`` ��ǥ뤫��ȴ���Ф�����򼨤��ޤ�::
+``django.contrib.flatpages.FlatPage`` モデルから抜き出した例を示します::
 
     class Admin:
         fields = (
@@ -1249,31 +1249,31 @@ admin �Ρ��ɲ� (add)�פ���ӡ��ѹ� (change)�ץڡ����Υ쥤�����Ȥ����椹���
             }),
         )
 
-���Υե�����ɥ��åȤˤ�äơ� admin �Υڡ����ϰʲ��Τ褦�ˤʤ�ޤ�:
+このフィールドセットによって， admin のページは以下のようになります:
 
     .. image:: http://media.djangoproject.com/img/doc/flatfiles_admin.png
 
 
-``fields`` ����ꤷ�ʤ���硤 Django �� ``AutoField`` �Ǥʤ�����
-``editable=True`` �Ǥ���ե�����ɤγơ��򡤥�ǥ������������֤�
-���̤Υե�����ɥ��åȤȤ���ɽ�����ޤ���
+``fields`` を指定しない場合， Django は ``AutoField`` でなくかつ
+``editable=True`` であるフィールドの各々を，モデルに定義した順番に
+個別のフィールドセットとして表示します．
 
-``field_options`` ����ˤϰʲ��Τ褦�ʥ���������ޤ�:
+``field_options`` 辞書には以下のようなキーがあります:
 
 ``fields``
 ~~~~~~~~~~
 
-�ե�����ɥ��å����ɽ������ե������̾����ʤ륿�ץ�Ǥ���ɬ�ܤΥ����Ǥ���
+フィールドセット内に表示するフィールド名からなるタプルです．必須のキーです．
 
-��::
+例::
 
     {
     'fields': ('first_name', 'last_name', 'address', 'city', 'state'),
     }
 
-Ʊ���Ԥ�ʣ���Υե�����ɤ�ɽ����������硤�����Υե�����ɤ򥿥ץ�ǥ��
-�פ�������ޤ���������Ǥϡ� ``first_name`` �� ``last_name`` ��Ʊ���Ԥ�
-ɽ������ޤ�::
+同じ行に複数のフィールドを表示したい場合，それらのフィールドをタプルでラッ
+プして入れます．下の例では， ``first_name`` と ``last_name`` が同じ行に
+表示されます::
 
     {
     'fields': (('first_name', 'last_name'), 'address', 'city', 'state'),
@@ -1282,79 +1282,79 @@ admin �Ρ��ɲ� (add)�פ���ӡ��ѹ� (change)�ץڡ����Υ쥤�����Ȥ����椹���
 ``classes``
 ~~~~~~~~~~~
 
-�ե�����ɥ��åȤ�Ŭ�Ѥ�����ɲä� CSS ���饹̾�Ǥ���ñ���ʸ�������ꤷ��
-����
+フィールドセットに適用される追加の CSS クラス名です．単純な文字列を指定しま
+す．
 
-��::
+例::
 
     {
     'classes': 'wide',
     }
 
-�ޤ����ʲ�����Τ褦�ˡ����ڡ����Ƕ��ڤ��ʣ���Υ��饹��Ŭ�ѤǤ��ޤ�::
+また，以下の例のように，スペースで区切ると複数のクラスを適用できます::
 
     {
     'classes': 'wide extrapretty',
     }
 
-�ǥե���ȤΥ������륷���Ȥ��������Ƥ��������ʥ��饹�Ȥ��� ``collapse``
-�� ``wide`` ������ޤ��� ``collapse`` ��������Υե�����ɤϡ� admin �ڡ���
-�ǤϺǽ��ޤ���ޤ� (collapse) �Ƥ��ꡤ������ "����å�����Ÿ�� (click to
-expand)" ��󥯤��֤�����äƤ��ޤ��� ``wide`` ��������Υե�����ɥ��åȤ�
-�Ͽ�ʿ�������ɲäΥ��ڡ������ä��ޤ���
+デフォルトのスタイルシートで定義されている便利なクラスとして ``collapse``
+や ``wide`` があります． ``collapse`` スタイルのフィールドは， admin ページ
+では最初折り畳まれ (collapse) ており，小さな "クリックして展開 (click to
+expand)" リンクに置き換わっています． ``wide`` スタイルのフィールドセットに
+は水平方向に追加のスペースが加わります．
 
 ``description``
 ~~~~~~~~~~~~~~~
 
-�ƥե�����ɥ��åȤ���Ƭ��ɽ�������ɲä�ʸ����ǡ����ץ����Ǥ�������ʸ��
-��Ϥ��Τޤ�ɽ�������Τǡ� HTML ��Ȥ��ޤ����� HTML �����̰��������ʸ��
-(����ѡ�����ɤʤ�) �ϼ�ʬ�ǥ��������פ��Ƥ����ͤФʤ�ޤ���
+各フィールドセットの先頭に表示する追加の文字列で，オプションです．この文字
+列はそのまま表示されるので， HTML を使えますし， HTML で特別扱いされる文字
+(アンパーサンドなど) は自分でエスケープしておかねばなりません．
 
 ``js``
 ------
 
-JavaScript �ե������ URL ��ɽ��ʸ����Υꥹ�ȤǤ��� JavaScript �� admin ��
-���꡼��� ``<script src=""`` �����ǥ�󥯤���ޤ������Υ��ץ����ϡ�����
-�� admin �ڡ����� JavaScript �������ꡤ����Υե�����ɤ˥ǥե�����ͤ�
-���뤿��� "quick link" ���󶡤����ꤹ�뤿��˻Ȥ��ޤ���
+JavaScript ファイルの URL を表す文字列のリストです． JavaScript は admin ス
+クリーンに ``<script src=""`` タグでリンクされます．このオプションは，特定
+の admin ページを JavaScript で操作したり，特定のフィールドにデフォルト値を
+埋めるための "quick link" を提供したりするために使えます．
 
-``http://`` �� ``/`` �ǻϤޤ�ʤ����� URL ��Ȥ��ȡ� Django �� admin �ϥ��
-���� ``settings.ADMIN_MEDIA_PREFIX`` ��ץ�ե��������ޤ���
+``http://`` や ``/`` で始まらない相対 URL を使うと， Django の admin はリン
+クに ``settings.ADMIN_MEDIA_PREFIX`` をプレフィクスします．
 
 
 ``list_display``
 ----------------
 
-admin ���ѹ��ꥹ�ȥڡ�����ɽ������ե�����ɤ����椹��ˤ� ``list_display``
-��Ȥ��ޤ���
+admin の変更リストページに表示するフィールドを制御するには ``list_display``
+を使います．
 
-��::
+例::
 
     list_display = ('first_name', 'last_name')
 
-``list_display`` ����ꤷ�ʤ���С� admin �����Ȥϳƥ��֥������Ȥ�
-``__str__()`` ɽ����ɽ�����륫�����Ĥ���ɽ�����ޤ���
+``list_display`` を指定しなければ， admin サイトは各オブジェクトの
+``__str__()`` 表現を表示するカラムを一つだけ表示します．
 
-``list_display`` �ˤϤ����Ĥ��ü�ʥ�����������ޤ�:
+``list_display`` にはいくつか特殊なケースがあります:
 
-    * �ե�����ɤ� ``ForeignKey`` �ξ�硤��Ϣ�Ť����Ƥ��륪�֥������Ȥ�
-      ``__str__()`` ��ɽ�����ޤ���
+    * フィールドが ``ForeignKey`` の場合，関連づけられているオブジェクトの
+      ``__str__()`` を表示します．
 
-    * ``ManyToManyField`` �ե�����ɤ�ɽ���ϡ��ơ��֥�γƹԤ��Ф��Ƹ��̤�
-      SQL ʸ��¹Ԥ��뤳�ȤˤʤäƤ��ޤ��Τǥ��ݡ��Ȥ��Ƥ��ޤ��󡥤ɤ�����
-      ��ɽ�����������ʤ顤��������᥽�åɤ��ǥ�˼������ơ��᥽�åɤ�̾
-      ���� ``list_display`` ���ɲä��Ƥ������� (``list_display`` �ؤΥ�����
-      ��᥽�åɤ��ɲäˤĤ��Ƥϡ���Ǿܤ����������Ƥ��ޤ�)��
+    * ``ManyToManyField`` フィールドの表示は，テーブルの各行に対して個別に
+      SQL 文を実行することになってしまうのでサポートしていません．どうして
+      も表示させたいなら，カスタムメソッドをモデルに実装して，メソッドの名
+      前を ``list_display`` に追加してください (``list_display`` へのカスタ
+      ムメソッドの追加については，後で詳しく説明しています)．
 
-    * �ե�����ɤ� ``BooleanField`` �� ``NullBooleanField`` �ξ�硤
-      ``True`` �� ``False`` ������ "����" �� "����" �򼨤����������ɽ��
-      ���ޤ���
+    * フィールドが ``BooleanField`` や ``NullBooleanField`` の場合，
+      ``True`` や ``False`` の代りに "オン" や "オフ" を示すアイコンを表示
+      します．
 
-    * �ե������̾����ǥ�Υ᥽�åɤˤʤäƤ�����硤�᥽�åɤ�Ƥӽ�
-      ������̤�ɽ�����ޤ������Υ᥽�åɤˤϡ��ե�����ɤΥإå��˻Ȥ���
-      ��� ``short_description`` �Ȥ����ؿ�°�����ʤ���Фʤ�ޤ���
+    * フィールド名がモデルのメソッドになっていた場合，メソッドを呼び出
+      した結果を表示します．このメソッドには，フィールドのヘッダに使うた
+      めの ``short_description`` という関数属性がなければなりません．
 
-      ��򼨤��ޤ�::
+      例を示します::
 
           class Person(models.Model):
               name = models.CharField(maxlength=50)
@@ -1367,11 +1367,11 @@ admin ���ѹ��ꥹ�ȥڡ�����ɽ������ե�����ɤ����椹��ˤ� ``list_display``
                   return self.birthday.strftime('%Y')[:3] + "0's"
               decade_born_in.short_description = 'Birth decade'
 
-    * �Ϥ��줿ʸ���󤬥�ǥ�Υ᥽�å�̾�ξ�硤 Django �ϥǥե���Ȥǥ᥽��
-      �ɤν��Ϥ򥨥������פ��ޤ����᥽�åɤν��Ϥ򥨥������פ������ʤ����
-      �ˤϡ��᥽�åɤ� ``allow_tags`` °�����ͤ� ``True`` �ˤ��Ƥ���������
+    * 渡された文字列がモデルのメソッド名の場合， Django はデフォルトでメソッ
+      ドの出力をエスケープします．メソッドの出力をエスケープしたくない場合
+      には，メソッドの ``allow_tags`` 属性の値を ``True`` にしてください．
 
-      �ʲ��˥�ǥ���򼨤��ޤ�::
+      以下にモデル例を示します::
 
           class Person(models.Model):
               first_name = models.CharField(maxlength=50)
@@ -1386,11 +1386,11 @@ admin ���ѹ��ꥹ�ȥڡ�����ɽ������ե�����ɤ����椹��ˤ� ``list_display``
                       (self.color_code, self.first_name, self.last_name)
               colored_name.allow_tags = True
 
-    * �Ϥ��줿ʸ���󤬥�ǥ�Τ���᥽�åɤ�ؤ��Ƥ��ꡤ�᥽�åɤ� True ��
-      False ���֤���硤�᥽�åɤ� ``boolean`` °���� ``True`` �����ꤷ�Ƥ�
-      ���ȡ�Django �� "on" �� "off" �Υ��������ɽ�����ޤ���
+    * 渡された文字列がモデルのあるメソッドを指しており，メソッドが True か
+      False を返す場合，メソッドの ``boolean`` 属性を ``True`` に設定してお
+      くと，Django は "on" や "off" のアイコンを表示します．
 
-      �ʲ��˺ǽ�Ū�ʥ�ǥ����򼨤��ޤ�::
+      以下に最終的なモデルの例を示します::
 
           class Person(models.Model):
               first_name = models.CharField(maxlength=50)
@@ -1404,25 +1404,25 @@ admin ���ѹ��ꥹ�ȥڡ�����ɽ������ե�����ɤ����椹��ˤ� ``list_display``
               born_in_fifties.boolean = True
 
 
-    * ``__str__()`` �᥽�åɤ�¾�Υ�ǥ�᥽�åɤ�Ʊ���褦��
-      ``list_display`` ���������Τǡ��ʲ��Τ褦�˽񤤤Ƥ��������ꤢ���
-      ����::
+    * ``__str__()`` メソッドは他のモデルメソッドと同じように
+      ``list_display`` に入れられるので，以下のように書いても全く問題ありま
+      せん::
 
           list_display = ('__str__', 'some_other_field')
 
-    * ``list_display`` �����ǤΤ�������ǥ�Υե�����ɤǤʤ���Τˤϡ��ѹ�
-      �ꥹ�ȥڡ������¤ӽ���Ѥ���Ȥ��Υ����ˤϻȤ��ޤ��󡥤���� Django
-      �����֥������Ȥ������ǡ����١�����٥�ǹԤäƤ��ꡤ��������᥽��
-      �ɤ��ɤ���äƥ��֥������Ȥ����󤹤뤫�� SQL ��٥���Τ�Ѥ��ʤ�����
-      �Ǥ���
+    * ``list_display`` の要素のうち，モデルのフィールドでないものには，変更
+      リストページで並び順を変えるときのカラムには使えません．これは Django
+      がオブジェクトの整列をデータベースレベルで行っており，カスタムメソッ
+      ドがどうやってオブジェクトを整列するかを SQL レベルで知る術がないため
+      です．
 
-    * �̾ ``list_display`` �����ǤΤ�������ǥ�Υե�����ɤǤʤ���Τ�
-      �ϡ��ѹ��ꥹ�ȥڡ������¤ӽ���Ѥ���Ȥ��Υ����ˤϻȤ��ޤ���
-      (Django �ϥ����Ȥ򤹤٤ƥǡ����١�����٥�ǹԤ�����Ǥ�)
+    * 通常， ``list_display`` の要素のうち，モデルのフィールドでないものに
+      は，変更リストページで並び順を変えるときのカラムには使えません．
+      (Django はソートをすべてデータベースレベルで行うからです)
       
-      ``list_display`` �����Ǥ��ºݤ˥ǡ����١�����Τ���ե�����ɤ�ؤ���
-      �����硤 ``admin_order_field`` �Ȥ���°����Ȥäơ� Django �ˤ��Τ�
-      �Ȥ򶵤����ޤ����㤨��::
+      ``list_display`` の要素が実際にデータベース上のあるフィールドを指して
+      いる場合， ``admin_order_field`` という属性を使って， Django にそのこ
+      とを教えられます．例えば::
       
         class Person(models.Model):
             first_name = models.CharField(maxlength=50)
@@ -1436,204 +1436,204 @@ admin ���ѹ��ꥹ�ȥڡ�����ɽ������ե�����ɤ����椹��ˤ� ``list_display``
             colored_first_name.allow_tags = True
             colored_first_name.admin_order_field = 'first_name'
     
-      ������Ǥϡ� Django �� Admin ��� ``colored_first_name`` ���¤��Ѥ���
-      �ݤ� ``first_name`` �ե�����ɤ�Ȥ��ޤ���
+      この例では， Django は Admin 上で ``colored_first_name`` を並べ変える
+      際に ``first_name`` フィールドを使います．
 
 
 ``list_display_links``
 ----------------------
 
-``list_display_links`` �����ꤹ��ȡ� ``list_display`` �ΤɤΥե�����ɤ�
-���֥������ȤΡ��ѹ��ץڡ����˥�󥯤��뤫������Ǥ��ޤ���
+``list_display_links`` を設定すると， ``list_display`` のどのフィールドを
+オブジェクトの「変更」ページにリンクするかを制御できます．
 
-�ǥե���ȤǤϡ��ѹ��ꥹ�ȥڡ����ϥ��֥������Ȥ��ѹ��ڡ��������쥫��ࡤ
-���ʤ�� ``list_display`` ����Ƭ�˻��ꤷ���ե�����ɤ˥�󥯤�ĥ��ޤ���
-``list_display_links`` ��Ȥ��ȡ������Υ������ѹ��Ǥ��ޤ���
-``list_display_links`` �ˤϡ��ե������̾�Υꥹ�Ȥޤ��ϥ��ץ��
-(``list_display`` ��Ʊ��������) ���ꤷ�ޤ���
+デフォルトでは，変更リストページはオブジェクトの変更ページ中の第一カラム，
+すなわち ``list_display`` の先頭に指定したフィールドにリンクを張ります．
+``list_display_links`` を使うと，リンク先のカラムを変更できます．
+``list_display_links`` には，フィールド名のリストまたはタプルを
+(``list_display`` と同じ形式で) 指定します．
 
-``list_display_links`` �˻��ꤹ��ե������̾�ϡ���ĤǤ�ʣ���Ǥ⹽���ޤ���
-�ե������̾�� ``list_display`` ����󤵤�Ƥ���¤ꡤ Django �Ϥɤ�ʤ�¿
-���� (���뤤�Ϥɤ�ʤˤ鷺����) �ե�����ɤ���󥯤���Ƥ��Ƥ�����ˤ��ޤ�
-��ɬ�פʤΤϡ� ``list_display_links`` ��Ȥ��ˤ� ``list_display`` �����
-���Ƥ����ͤФʤ�ʤ����Ȥ������Ȥ����Ǥ���
+``list_display_links`` に指定するフィールド名は，一つでも複数でも構いません．
+フィールド名が ``list_display`` に列挙されている限り， Django はどんなに多
+くの (あるいはどんなにわずかな) フィールドがリンクされていても問題にしませ
+ん．必要なのは， ``list_display_links`` を使うには ``list_display`` を定義
+しておかねばならない，ということだけです．
 
-�ʲ�����Ǥϡ� ``first_name`` ����� ``last_name`` �ե�����ɤ��ѹ��ѹ��ꥹ
-�ȥڡ����˥�󥯤���ޤ�::
+以下の例では， ``first_name`` および ``last_name`` フィールドが変更変更リス
+トページにリンクされます::
 
     class Admin:
         list_display = ('first_name', 'last_name', 'birthday')
         list_display_links = ('first_name', 'last_name')
 
-�Ǹ�ˡ� ``list_display_links`` ��Ȥ��ˤ� ``list_display`` ����ꤻ�ͤФ�
-��ʤ��Τ����դ��ޤ��礦��
+最後に， ``list_display_links`` を使うには ``list_display`` も指定せねばな
+らないので注意しましょう．
 
 
 ``list_filter``
 ---------------
 
-admin ���ѹ��ꥹ�ȥڡ����α�¦�Υ����ɥС��ˤ���ե��륿��ͭ���ˤ���ˤϡ�
-``list_filter`` �����ꤷ�ޤ��������ͤϥե������̾�Υꥹ�Ȥˤ��ޤ����ƥե���
-���̾�� ``BooleanField``, ``DateField``, ``DateTimeField``, ``ForeignKey``
-�Τ����줫�Ǥʤ���Фʤ�ޤ���
+admin の変更リストページの右側のサイドバーにあるフィルタを有効にするには，
+``list_filter`` を設定します．この値はフィールド名のリストにします．各フィー
+ルド名は ``BooleanField``, ``DateField``, ``DateTimeField``, ``ForeignKey``
+のいずれかでなければなりません．
 
-�ʲ������ ``django.contrib.auth.models.User`` ��ǥ뤫��Ȥä���Τǡ�
-``list_display`` �� ``list_filter`` �λ��Ȥߤ򼨤��Ƥ��ޤ�:: 
+以下の例は ``django.contrib.auth.models.User`` モデルからとったもので，
+``list_display`` と ``list_filter`` の仕組みを示しています:: 
 
     class Admin:
         list_display = ('username', 'email', 'first_name', 'last_name', 
                         'is_staff')
         list_filter = ('is_staff', 'is_superuser')
 
-��Υ����ɤˤ�äơ� admin ���ѹ��ꥹ�Ȥϰʲ��Τ褦�ˤʤ�ޤ�:
+上のコードによって， admin の変更リストは以下のようになります:
 
     .. image:: http://media.djangoproject.com/img/doc/users_changelist.png
 
-(������Ǥϡ���Ҥ��� ``search_fields`` ��������Ƥ��ޤ���)
+(この例では，後述する ``search_fields`` も定義しています．)
 
 
 ``list_per_page``
 -----------------
 
-admin �ѹ��ꥹ�Ȥ�ڡ���ʬ�� (paginate) ��ɽ������Ȥ��ˡ��ƥڡ����˲��Ĥ�
-�����ƥ��ɽ�����뤫����ޤ����ǥե�����ͤ� ``100`` �Ǥ���
+admin 変更リストをページ分割 (paginate) で表示するときに，各ページに何個の
+アイテムを表示するかを決めます．デフォルト値は ``100`` です．
 
 ``list_select_related``
 -----------------------
 
-``list_select_related`` �����ꤹ��ȡ� admin ���ѹ��ꥹ�ȥڡ�����ɽ�����륪
-�֥������ȥꥹ�Ȥ��������ݤ� ``select_related()`` ��Ȥ��褦 Django �˻�
-���Ǥ��ޤ�������ˤ�ꡤ�ǡ����١����������ȯ�Կ����ޤ����ޤ���
+``list_select_related`` を設定すると， admin の変更リストページに表示するオ
+ブジェクトリストを取得する際に ``select_related()`` を使うよう Django に指
+示できます．これにより，データベースクエリの発行数を抑えられます．
 
-�ͤ� ``True`` �ޤ��� ``False`` �ˤ��ޤ����ǥե���Ȥ� ``False`` �Ǥ���
+値は ``True`` または ``False`` にします．デフォルトは ``False`` です．
 
-``list_display`` �Τ����줫�Υե�����ɤ� ``ForeignKey`` �ξ�硤 Django ��
-��������˴ؤ�餺 ``select_related`` ��Ȥ��ޤ���
+``list_display`` のいずれかのフィールドが ``ForeignKey`` の場合， Django は
+この設定に関わらず ``select_related`` を使います．
 
-``select_related()`` �ξܺ٤� `select_related() �Υɥ������`_ �򻲾�
-���Ƥ���������
+``select_related()`` の詳細は `select_related() のドキュメント`_ を参照
+してください．
 
-.. _`select_related() �Υɥ������`:
+.. _`select_related() のドキュメント`:
     ../db-api/#select-related
 
 ``ordering``
 ------------
 
-``ordering`` �����ꤹ��ȡ� admin �ι����ꥹ�Ȥˤ��������������Ǥ��ޤ���
-�ͤϥ��ץ뤫��ʤ�ꥹ�Ȥǡ���ǥ�� ``ordering`` �ѥ�᥿��Ʊ�������ǻ���
-���ޤ���
+``ordering`` を設定すると， admin の更新リストにおける整列順を指定できます．
+値はタプルからなるリストで，モデルの ``ordering`` パラメタと同じ形式で指定
+します．
 
 ``save_as``
 -----------
 
-``save_as`` ����ꤹ��ȡ����֥��������Խ��ڡ����ǡ���̾����¸ (save as)��
-��ǽ��Ȥ���褦�ˤʤ�ޤ���
+``save_as`` を指定すると，オブジェクト編集ページで「別名で保存 (save as)」
+機能を使えるようになります．
 
-�̾���֥��������Խ��ڡ����ˤϻ��Ĥ���¸���ץ���󡤤��ʤ������¸
-(Save)�ס�����¸�����Խ���³���� (Save and continue editing)�ס�����¸����
-�⤦����ɲ� (Save and add another)�פ�����ޤ��� ``save_as`` �� ``True``
-�ˤ���ȡ�����¸���Ƥ⤦����ɲáפϡ���̾����¸ (Save as)�פ��֤�������
-����
+通常，オブジェクト編集ページには三つの保存オプション，すなわち「保存
+(Save)」，「保存して編集を続ける (Save and continue editing)」，「保存して
+もう一つ追加 (Save and add another)」があります． ``save_as`` を ``True``
+にすると．「保存してもう一つ追加」は「別名で保存 (Save as)」に置き換わりま
+す．
 
-����̾����¸�פϡ����ߤΥ��֥������Ȥ򤽤Τޤ���¸����ΤǤϤʤ���(������
-ID ����ä�) �̤Υ��֥������ȤȤ�����¸���뤳�ȤǤ���
+「別名で保存」は，現在のオブジェクトをそのまま保存するのではなく，(新たな
+ID を持った) 別のオブジェクトとして保存することです．
 
 ``save_on_top``
 ---------------
 
-``save_on_top`` ����ꤹ��ȡ� admin ���ѹ��ե�����κǾ�������¸�ܥ������
-�äǤ��ޤ���
+``save_on_top`` を指定すると， admin の変更フォームの最上部に保存ボタンを追
+加できます．
 
-�̾��¸�ܥ���ϥե�����κǲ���������ɽ������ޤ��� ``save_on_top`` ���
-�ꤹ��ȡ��ܥ���Ϻǲ��������Ǥʤ��Ǿ����ˤ�ɽ������ޤ���
+通常，保存ボタンはフォームの最下部だけに表示されます． ``save_on_top`` を指
+定すると，ボタンは最下部だけでなく最上部にも表示されます．
 
-�ǥե���ȤǤϡ� ``save_on_top`` �� ``False`` �Ǥ���
+デフォルトでは， ``save_on_top`` は ``False`` です．
 
 ``search_fields``
 -----------------
 
-``search_fields`` ����ꤹ��ȡ� admin ���ѹ��ꥹ�ȥڡ����Ǹ����ܥå������
-����褦�ˤʤ�ޤ��������ͤϥ桼���������������ƥ����ȥܥå��������Ϥ���
-�Ȥ��˸������оݤˤʤ�ե������̾�Υꥹ�ȤǤ���
+``search_fields`` を指定すると， admin の変更リストページで検索ボックスを使
+えるようになります．この値はユーザが検索クエリをテキストボックスに入力した
+ときに検索の対象になるフィールド名のリストです．
 
-�ե��� ��ɤ� ``CharField`` �� ``TextField`` �Τ褦�ʲ��餫�Υƥ����ȥե���
-��ɤǤʤ���Фʤ�ޤ��� DB �ȹ� API �Ρ֥�졼��������ס�ɽ����Ȥ��С�
-``ForeignKey`` ��𤷤��ե�����ɤλ����Ԥ��ޤ�::
+フィー ルドは ``CharField`` や ``TextField`` のような何らかのテキストフィー
+ルドでなければなりません． DB 照合 API の「リレーション追跡」表記を使えば，
+``ForeignKey`` を介したフィールドの指定も行えます::
 
     search_fields = ['foreign_key__related_fieldname']
 
-admin �θ����ܥå����Ǹ�����¹Ԥ���ȡ� Django �ϸ����������ñ���ʬ��
-�ơ���ñ���ޤ�褦�����ƤΥ��֥������Ȥ��֤��ޤ����������羮ʸ������̤�
-���� ``search_fields`` �˻��ꤷ���ե�����ɤΤ������ʤ��Ȥ��Ĥ�ñ�줬����
-�Ƥ���ХҥåȤ��ޤ����㤨�С� ``search_fields`` ��
-``['first_name', 'last_name']`` �����ꤵ��Ƥ����硤�桼���� 
-``john lennon`` �򸡺�����ȡ� Django �ϰʲ��Τ褦�� ``WHERE`` �����ä�
-SQL �������ʸ�����¹Ԥ��ޤ�::
+admin の検索ボックスで検索を実行すると， Django は検索クエリを単語に分解し
+て，各単語を含むような全てのオブジェクトを返します．検索は大小文字を区別せ
+ず， ``search_fields`` に指定したフィールドのうち少なくとも一つに単語が入っ
+ていればヒットします．例えば， ``search_fields`` が
+``['first_name', 'last_name']`` に設定されている場合，ユーザが 
+``john lennon`` を検索すると， Django は以下のような ``WHERE`` 節を持った
+SQL に等価な検索を実行します::
 
     WHERE (first_name ILIKE '%john%' OR last_name ILIKE '%john%')
     AND (first_name ILIKE '%lennon%' OR last_name ILIKE '%lennon%')
 
-����®�ʡ����뤤�Ϥ������θ�����������Ԥ��ˤϡ��ե������̾�����˰ʲ�
-�Τ褦�ʱ黻�Ҥ��֤��ޤ�:
+より高速な，あるいはより制約の厳しい検索を行うには，フィールド名の前に以下
+のような演算子を置きます:
 
 ``^``
-    �ե�����ɤ���Ƭ�˥ޥå����ޤ����㤨�С� ``search_fields`` ��
-    ``['^first_name', '^last_name']`` �ˤ��ơ��桼���� ``john lennon`` ��
-    ��������硤Django �ϰʲ��Τ褦�� ``WHERE`` ��� SQL �������ʸ�����¹�
-    ���ޤ�::
+    フィールドの先頭にマッチします．例えば， ``search_fields`` を
+    ``['^first_name', '^last_name']`` にして，ユーザが ``john lennon`` を検
+    索した場合，Django は以下のような ``WHERE`` 節の SQL に等価な検索を実行
+    します::
 
         WHERE (first_name ILIKE 'john%' OR last_name ILIKE 'john%')
         AND (first_name ILIKE 'lennon%' OR last_name ILIKE 'lennon%')
 
-    ���Υ������Ȥ��ȡ��ǡ����١����ϥ�������Ƭ��ʬ����������å������
-    �褯���������Υǡ������Τ�Ĵ�٤ʤ��Ƥ�褯�ʤ뤿�ᡤ�̾��
-    ``'%john%'`` ����������ΨŪ�ˤʤ�ޤ����ä��ơ������˥���ǥ�����
-    ���ꤵ��Ƥ���С��ǡ����١����ˤ�äƤ�  ``LIKE`` ������Ǥ��äƤ⥤��
-    �ǥ�����Ȥä��������¹ԤǤ���Ȥ�������������ޤ���
+    このクエリを使うと，データベースはカラムの先頭部分だけをチェックすれば
+    よく，カラム中のデータ全体を調べなくてもよくなるため，通常の
+    ``'%john%'`` クエリよりも効率的になります．加えて，カラムにインデクスが
+    設定されていれば，データベースによっては  ``LIKE`` クエリであってもイン
+    デクスを使ったクエリを実行できるという利点があります．
 
 ``=``
-    �羮ʸ������̤��ʤ���̩���פǤ����㤨�С� ``search_fields`` ��
-    ``['=first_name', '=last_name']`` �ˤ��ơ��桼���� ``john lennon`` ��
-    ��������硤 Django �ϰʲ��Τ褦�� ``WHERE`` ��� SQL �������ʸ�����¹�
-    ���ޤ�::
+    大小文字を区別しない厳密一致です．例えば， ``search_fields`` を
+    ``['=first_name', '=last_name']`` にして，ユーザが ``john lennon`` を検
+    索した場合， Django は以下のような ``WHERE`` 節の SQL に等価な検索を実行
+    します::
 
         WHERE (first_name ILIKE 'john' OR last_name ILIKE 'john')
         AND (first_name ILIKE 'lennon' OR last_name ILIKE 'lennon')
     
-    ���������Ϥϥ��ڡ������ڤ�ʤΤǡ�������˽����ȡ� ``first_name`` ��
-    ``'john winston'`` (���ڡ�����ޤ���) �Ǥ���褦�ʥ쥳���ɤϸ����Ǥ�
-    �ʤ��Τ����դ��Ƥ���������
+    クエリ入力はスペース区切りなので，この例に従うと， ``first_name`` が
+    ``'john winston'`` (スペースを含むもの) であるようなレコードは検索でき
+    ないので注意してください．
 
 ``@``
-    ��ʸ�����ޥå���¹Ԥ��ޤ����ǥե���Ȥ� search �᥽�åɤ˻��Ƥ��ޤ�����
-    ����ǥ�����Ȥ��ޤ������ߤΤȤ��� MySQL �Ǥ����Ȥ��ޤ���
+    全文検索マッチを実行します．デフォルトの search メソッドに似ていますが，
+    インデクスを使います．現在のところ MySQL でしか使えません．
 
 
 .. _Managers:
 
-�ޥͥ���
+マネジャ
 ========
 
-�ޥͥ��� (``Manager``) �Ȥϡ��ǡ����١������������� Django ��ǥ���󶡤�
-�Ƥ��륤�󥿥ե������Ǥ��� Django ���ץꥱ���������Υ�ǥ�����ƾ��ʤ���
-���ĥޥͥ���������Ƥ��ޤ���
+マネジャ (``Manager``) とは，データベースクエリ操作を Django モデルに提供し
+ているインタフェースです． Django アプリケーション内のモデルは全て少なくと
+も一つマネジャを備えています．
 
-�ޥͥ��㥯�饹 ``Manager`` ��ư��ϥǡ����١��� API �ɥ�����Ȥ�
-`���֥������Ȥμ���`_ ������������Ƥ��ޤ�����������Ǥϥޥͥ���ε�ư��
-�����ޥ������뤿��Υ�ǥ륪�ץ����ˤĤ��ƶ���Ū�˿���ޤ���
+マネジャクラス ``Manager`` の動作はデータベース API ドキュメントの
+`オブジェクトの取得`_ の節で説明していますが，この節ではマネジャの挙動をカ
+スタマイズするためのモデルオプションについて具体的に触れます．
 
-.. _`���֥������Ȥμ���`: ../db-api/#retrieving-objects
+.. _`オブジェクトの取得`: ../db-api/#retrieving-objects
 
 .. _Manager names:
 
-�ޥͥ���̾
+マネジャ名
 ----------
 
-�ǥե���ȤǤϡ� Django �����Ƥ� Django ��ǥ륯�饹�� ``object`` �Ȥ���̾
-����  ``Manager`` ���֥������Ȥ��ɲä��ޤ����������� ``objects`` ��ե�����
-��̾�Ȥ��ƻȤ��������䡤�ޥͥ���� ``objects`` �ʳ���̾����Ĥ���������
-�ϡ���ǥ뤴�Ȥ�̾�����Ѥ��Ƥ��ɬ�פ�����ޤ������饹��ǥޥͥ����̾����
-�ѹ�����ˤϡ� ``models.Manager()`` ���Υ��饹°����������ޤ����㤨��::
+デフォルトでは， Django は全ての Django モデルクラスに ``object`` という名
+前で  ``Manager`` オブジェクトを追加します．ただし， ``objects`` をフィール
+ド名として使いたい場合や，マネジャに ``objects`` 以外の名前をつけたい場合に
+は，モデルごとに名前を変えてやる必要があります．クラス中でマネジャの名前を
+変更するには， ``models.Manager()`` 型のクラス属性を定義します．例えば::
 
     from django.db import models
 
@@ -1641,39 +1641,39 @@ SQL �������ʸ�����¹Ԥ��ޤ�::
         #...
         people = models.Manager()
 
-�Τ褦�ˤ���ȡ� ``Person.objects`` �� ``AttributeError`` �㳰�ˤʤꡤ
-``Person.people.all()`` �� ``Person`` ���֥������ȤΥꥹ�Ȥ��󶡤���褦��
-�ʤ�ޤ���
+のようにすると， ``Person.objects`` は ``AttributeError`` 例外になり，
+``Person.people.all()`` が ``Person`` オブジェクトのリストを提供するように
+なります．
 
 .. _Custom Managers:
 
-��������ޥͥ���
+カスタムマネジャ
 ----------------
 
-���쥯�饹�� ``Manager`` ���饹���ĥ���ơ���ǥ���ǥ�������Υޥͥ����
-�󥹥��󥹲�����С���ǥ�ǥ�������Υޥͥ����Ȥ��ޤ���
+基底クラスの ``Manager`` クラスを拡張して，モデル中でカスタムのマネジャをイ
+ンスタンス化すれば，モデルでカスタムのマネジャを使えます．
 
-�ޥͥ���򥫥����ޥ���������ͳ���礭��ʬ������Ĥ���ޤ�����Ĥϥޥͥ����
-�ɲäΥ᥽�åɤ������������硤�⤦��Ĥϥޥͥ�����֤���� ``QuerySet`` 
-���ѹ����������Ǥ���
+マネジャをカスタマイズする理由は大きく分けて二つあります．一つはマネジャに
+追加のメソッドを持たせたい場合，もう一つはマネジャの返す初期 ``QuerySet`` 
+を変更したい場合です．
 
 .. _Adding extra Manager methods:
 
-�ɲäΥޥͥ���᥽�å����
+追加のマネジャメソッド定義
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-��ǥ�ˡ֥ơ��֥��٥�פε�ǽ�������������硤�ޥͥ���ؤΥ᥽�åɤ���
-����ˡ�Ǥ��� (�ֹԥ�٥�פε�ǽ��������������㤨�Х�ǥ륪�֥������Ȥθġ�
-�Υ��󥹥��󥹤˱ƶ�����ؿ���������������ˤϡ���������Υޥͥ���᥽��
-�ɤǤϤʤ� `��ǥ�Υ᥽�å�`_ ��ȤäƲ�������)
+モデルに「テーブルレベル」の機能を持たせたい場合，マネジャへのメソッドは良
+い方法です． (「行レベル」の機能を持たせたい，例えばモデルオブジェクトの個々
+のインスタンスに影響する関数を実装したい場合には，カスタムのマネジャメソッ
+ドではなく `モデルのメソッド`_ を使って下さい．)
 
-��������Υޥͥ���᥽�åɤϲ����֤��Ƥ⤫�ޤ��ޤ��� ``QuerySet`` ���֤�
-�ʤ��Ƥ�褤�ΤǤ���
+カスタムのマネジャメソッドは何を返してもかまいません． ``QuerySet`` を返さ
+なくてもよいのです．
 
-�㤨�С��ʲ��Υ�������ޥͥ���Ǥϡ� ``with_counts()`` �Ȥ����᥽�åɤ���
-���Ƥ��ޤ������Υ᥽�åɤ����Ƥ� ``OpinionPoll`` ���֥������Ȥ���ʤ�ꥹ��
-���֤��ޤ��������κݤ˽��󥯥���η�̤Ǥ��� ``num_responses`` �Ȥ����ɲä�
-°�����ɲä��ޤ�::
+例えば，以下のカスタムマネジャでは， ``with_counts()`` というメソッドを提供
+しています．このメソッドは全ての ``OpinionPoll`` オブジェクトからなるリスト
+を返しますが，その際に集約クエリの結果である ``num_responses`` という追加の
+属性を追加します::
 
     class PollManager(models.Manager):
         def with_counts(self):
@@ -1702,67 +1702,67 @@ SQL �������ʸ�����¹Ԥ��ޤ�::
         person_name = models.CharField(maxlength=50)
         response = models.TextField()
 
-������Ǥϡ�``OpinionPoll.objects.with_counts()`` ��Ȥ��ȡ�
-``num_responses`` °���������� ``OpinionPoll`` ���֥������ȤΥꥹ�Ȥ��֤���
-����
+この例では，``OpinionPoll.objects.with_counts()`` を使うと，
+``num_responses`` 属性を備えた ``OpinionPoll`` オブジェクトのリストを返しま
+す．
 
-������Ǥ⤦������դ����ߤ����Τϡ��ޥͥ���᥽�åɤ���ʬ��°���Ƥ�����
-�륯�饹����Ф������ ``self.model`` �˥��������Ǥ���Ȥ������Ǥ���
+この例でもう一つ注意して欲しいのは，マネジャメソッドが自分の属しているモデ
+ルクラスを取り出すために ``self.model`` にアクセスできるという点です．
 
 
 .. _Modifying initial Manager QuerySets:
 
-��� QuerySet ���ѹ�
+初期 QuerySet の変更
 ~~~~~~~~~~~~~~~~~~~~
 
-�ޥͥ���Υ١����� ``QuerySet`` �ϡ������ƥ������ƤΥ��֥������Ȥ��֤���
-�����㤨�С��ʲ��Υ�ǥ�::
+マネジャのベースの ``QuerySet`` は，システム上の全てのオブジェクトを返しま
+す．例えば，以下のモデル::
 
     class Book(models.Model):
         title = models.CharField(maxlength=100)
         author = models.CharField(maxlength=50)
 
-�Ǥϡ� ``Book.objects.all()`` �Ȥ���ȡ��ǡ����١���������Ƥ� books ���֤�
-�ޤ���
+では， ``Book.objects.all()`` とすると，データベース上の全ての books を返し
+ます．
 
-``Manager.get_query_set()`` �᥽�åɤ򥪡��Х饤�ɤ���С� ``Manager`` �Υ١�
-���� ``QuerySet`` �򥪡��Х饤�ɤǤ��ޤ��� ``get_query_set()`` ��ɬ�פʥץ�
-�ѥƥ��������� ``QuerySet`` ���֤��ͤФʤ�ޤ���
+``Manager.get_query_set()`` メソッドをオーバライドすれば， ``Manager`` のベー
+スの ``QuerySet`` をオーバライドできます． ``get_query_set()`` は必要なプロ
+パティを備えた ``QuerySet`` を返さねばなりません．
 
-�㤨�С��ʲ��Υ�ǥ�ˤ� *��Ĥ�* �ޥͥ��㤬����ޤ������������ƤΥ��֥���
-���Ȥ��֤����⤦������ Roald Dahl �ν񤤤��ܤ������֤��ޤ�::
+例えば，以下のモデルには *二つの* マネジャがあります．片方は全てのオブジェ
+クトを返し，もう一方は Roald Dahl の書いた本だけを返します::
 
-    # �ޤ� Manager �Υ��֥��饹��������ޤ���
+    # まず Manager のサブクラスを定義します．
     class DahlBookManager(models.Manager):
         def get_query_set(self):
             return super(DahlBookManager, self).get_query_set().filter(author='Roald Dahl')
 
-    # ���� Book ��ǥ������Ū�˥եå����ޤ���
+    # 次に Book モデルに明示的にフックします．
     class Book(models.Model):
         title = models.CharField(maxlength=100)
         author = models.CharField(maxlength=50)
 
-        objects = models.Manager() # �ǥե���ȥޥͥ��㡥
-        dahl_objects = DahlBookManager() # Dahl ����Υޥͥ��㡥
+        objects = models.Manager() # デフォルトマネジャ．
+        dahl_objects = DahlBookManager() # Dahl 縛りのマネジャ．
 
-���Υ�ǥ���Ǥϡ� ``Book.objects.all()`` �ϥǡ����١������ Book ��������
-���ޤ����� ``Book.dahl_objects.all()`` �� Roald Dahl �ν񤤤��ܤ������֤���
-����
+このモデル例では， ``Book.objects.all()`` はデータベース上の Book を全て返
+しますが， ``Book.dahl_objects.all()`` は Roald Dahl の書いた本だけを返しま
+す．
 
-``get_query_set()`` �� ``QuerySet`` ���֥������Ȥ��֤��Τǡ��������
-``filter()`` �� ``exclude()`` ��Ϥ������Ƥ� ``QuerySet`` �᥽�åɤ�Ȥ���
-�������äơ��ʲ��Τ褦��ʸ��¹ԤǤ��ޤ�::
+``get_query_set()`` は ``QuerySet`` オブジェクトを返すので，もちろん
+``filter()`` や ``exclude()`` をはじめ全ての ``QuerySet`` メソッドを使えま
+す．従って，以下のような文を実行できます::
 
     Book.dahl_objects.all()
     Book.dahl_objects.filter(title='Matilda')
     Book.dahl_objects.count()
 
-������Ϥ⤦��Ķ�̣�����ƥ��˥å���¸�ߤ򼨤��Ƥ��ޤ��������Ʊ����ǥ��
-ʣ���Υޥͥ����Ȥ���Ȥ������ȤǤ�����ǥ�ˤϡ������ʤ����ޥͥ���Υ���
-�����󥹤򥢥��å��Ǥ��ޤ������μ�ˡ��Ȥ��ȡ��褯���Ѥ���ե��륿���ǥ�
-�˴�ñ�˼����Ǥ��ޤ���
+この例はもう一つ興味深いテクニックの存在を示しています．それは同じモデルで
+複数のマネジャを使えるということです．モデルには，好きなだけマネジャのイン
+スタンスをアタッチできます．この手法を使うと，よく利用するフィルタをモデル
+に簡単に実装できます．
 
-�㤨��::
+例えば::
 
     class MaleManager(models.Manager):
         def get_query_set(self):
@@ -1780,34 +1780,34 @@ SQL �������ʸ�����¹Ԥ��ޤ�::
         men = MaleManager()
         women = FemaleManager()
 
-������Ǥϡ� ``Person.men.all()``, ``Person.women.all()``,
-``Person.people.all()`` �Ȥ��ä��������ȯ�ԤǤ���褦�ˤʤäƤ��ꡤ������
-��η�̤������ޤ���
+この例では， ``Person.men.all()``, ``Person.women.all()``,
+``Person.people.all()`` といったクエリを発行できるようになっており，期待通
+りの結果を得られます．
 
-��������Υޥͥ��㥪�֥������Ȥ�Ȥ���硤 Django ����ǥ���˺ǽ�˸��Ĥ�
-���ޥͥ��� (��ǥ������������֤Ǻǽ�Υޥͥ���) �����̰��������Ȥ�����
-�Ȥ����դ��Ƥ��������� Django �ϥ��饹��Ǻǽ�˸��Ĥ����ޥͥ����֥ǥե�
-��ȤΡץޥͥ���ˤ��ޤ��� Django �� admin �����Ȥʤɡ�����ν����Ǥϡ�����
-�������ȤΥꥹ�Ȥ��������ݤ˥ǥե���ȤΥޥͥ����Ȥ��ޤ������äơ��ǽ�
-�Υޥͥ�������Ū�ե��륿�γݤ��äƤ��ʤ��ޥͥ���ˤ��Ƥ����Ȥ褤�Ǥ��礦��
-������Ǥϡ� ``people`` �Ȥ����ޥͥ��㤬�ǽ���������Ƥ��뤿�ᡤ�ǥե���
-�ȥޥͥ���Ȥ��ƻȤ��ޤ���
+カスタムのマネジャオブジェクトを使う場合， Django がモデル内に最初に見つけ
+たマネジャ (モデルに定義した順番で最初のマネジャ) は特別扱いされるというこ
+とに注意してください． Django はクラス内で最初に見つけたマネジャを「デフォ
+ルトの」マネジャにします． Django の admin サイトなど，特定の処理では，オブ
+ジェクトのリストを取得する際にデフォルトのマネジャを使います．従って，最初
+のマネジャは比較的フィルタの掛かっていないマネジャにしておくとよいでしょう．
+前の例では， ``people`` というマネジャが最初に定義されているため，デフォル
+トマネジャとして使われます．
 
 
 .. _Model methods:
 
-��ǥ�Υ᥽�å�
+モデルのメソッド
 ================
 
-��������ιԥ�٥� ("row-level") �ε�ǽ�򥪥֥������Ȥ˼�������ˤϡ�������
-��Υ᥽�åɤ�������ޤ��� ``Manager`` �᥽�åɤ���Ū���֥ơ��֥��
-(table-wide)�� �����Ǥ���Τ��Ф�����ǥ�᥽�åɤϸġ��Υ�ǥ륤�󥹥���
-�����Ф��ƺ��Ѥ��ޤ���
+カスタムの行レベル ("row-level") の機能をオブジェクトに実装するには，カスタ
+ムのメソッドを定義します． ``Manager`` メソッドの目的が「テーブル級
+(table-wide)」 の操作であるのに対し，モデルメソッドは個々のモデルインスタン
+スに対して作用します．
 
-���Υ�ǥ�᥽�åɤϡ��ӥ��ͥ������å����ǥ�Ȥ���������ս�ˤޤȤ�Ƥ�
-���Τ�ͭ�Ѥʥƥ��˥å��ˤʤ�ޤ���
+このモデルメソッドは，ビジネスロジックをモデルというただ一箇所にまとめてお
+くのに有用なテクニックになります．
 
-�㤨�С��ʲ��Υ�ǥ���ˤϤ����Ĥ���������᥽�åɤ�����ޤ�::
+例えば，以下のモデル例にはいくつかカスタムメソッドがあります::
 
     class Person(models.Model):
         first_name = models.CharField(maxlength=50)
@@ -1835,27 +1835,27 @@ SQL �������ʸ�����¹Ԥ��ޤ�::
             return '%s %s' % (self.first_name, self.last_name)
         full_name = property(_get_full_name)
 
-������κǸ�Υ᥽�åɤ� *�ץ��ѥƥ� (property)* �Ǥ����ܤ�����
-`�ץ��ѥƥ�������`_ �򻲾Ȥ��Ƥ���������
+この例の最後のメソッドは *プロパティ (property)* です．詳しくは
+`プロパティの説明`_ を参照してください．
 
-.. _`�ץ��ѥƥ�������`: 
+.. _`プロパティの説明`: 
     http://www.python.org/download/releases/2.2/descrintro/#property
 
 
-�����Ĥ��Υ᥽�åɤˤ����̤ʰ�̣������ޤ�:
+いくつかのメソッドには特別な意味があります:
 
 ``__str__``
 -----------
 
-``__str__()`` �ϡ����֥������Ȥ��Ф��� ``str()`` ��ƤӽФ����ݤ��֤����Ƥ�
-������뤿��� Python ���ü�᥽�åɤǤ��� Django �Ϥ�����������
-``str(obj)`` ��ȤäƤ��ޤ����ۤȤ�ɤϡ� Django �� admin �����Ȥǥ��֥���
-���Ȥ������󥰤���ɽ�������Ȥ����ͤȤ��ơ��ޤ����֥������Ȥ�ɽ�������
-���˥ƥ�ץ졼�Ȥ�����������ͤȤ��ƻȤ��Ƥ��ޤ������äơ����֥������Ȥ�
-``__str__`` �ϡ��ʹֲ��ɤʤ狼��䤹��ʸ������֤��ͤФʤ�ޤ���ɬ�ܤǤ�
-����ޤ��󤬡������侩���ޤ���
+``__str__()`` は，オブジェクトに対して ``str()`` を呼び出した際に返す内容を
+定義するための Python の特殊メソッドです． Django はそこかしこで
+``str(obj)`` を使っています．ほとんどは， Django の admin サイトでオブジェ
+クトをレンダリングして表示したときの値として，またオブジェクトを表示すると
+きにテンプレートに挿入される値として使われています．従って，オブジェクトの
+``__str__`` は，人間可読なわかりやすい文字列を返さねばなりません．必須では
+ありませんが，強く推奨します．
 
-�㤨��::
+例えば::
 
     class Person(models.Model):
         first_name = models.CharField(maxlength=50)
@@ -1868,54 +1868,54 @@ SQL �������ʸ�����¹Ԥ��ޤ�::
 ``get_absolute_url``
 ------------------------------------
 
-���֥������Ȥ� URL �η׻���ˡ�� Django �˶�����ˤ� ``get_absolute_url`` ��
-���åɤ�������Ƥ����������㤨��::
+オブジェクトの URL の計算方法を Django に教えるには ``get_absolute_url`` メ
+ソッドを定義してください．例えば::
 
     def get_absolute_url(self):
         return "/people/%i/" % self.id
 
-Django �Ϥ��Υ᥽�åɤ� admin ���󥿥ե������ǻȤ��ޤ������֥������Ȥ�
-``get_absolute_url()`` ��������Ƥ�����硤���֥������Ȥξܺ٥ڡ����ˤϡ֥�
-���Ⱦ��ɽ�� (View on site)�פȤ�����󥯤�ɽ������ޤ������Υ�󥯤ϡ�����
-�������Ȥ� ``get_absolute_url()`` �˴�Ť��ơ����֥������Ȥ�������Ƥ���ӥ塼
-��ľ�����٤�褦�ˤʤäƤ��ޤ���
+Django はこのメソッドを admin インタフェースで使います．オブジェクトが
+``get_absolute_url()`` を定義していた場合，オブジェクトの詳細ページには「サ
+イト上で表示 (View on site)」というリンクが表示されます．このリンクは，オブ
+ジェクトの ``get_absolute_url()`` に基づいて，オブジェクトを公開しているビュー
+に直接飛べるようになっています．
 
-�ޤ�������¾�ˤ⡤�㤨���ۿ��ե졼�����ʤɤǡ� ``get_absolute_url()``
-��Ȥ����Ȥǥ桼��������������Ƥ��ޤ���
+また，その他にも，例えば配信フレームワークなどで， ``get_absolute_url()``
+を使うことでユーザの利便性を高めています．
 
-�ƥ�ץ졼�Ȥǥ��֥������Ȥ� URL ��ɽ�������硤�ϡ��ɥ����ɤ���ΤǤ�
-�ʤ� ``get_absolute_url()`` ��Ȥ��褦�ˤ���Ȥ褤�Ǥ��礦���㤨�С��ʲ���
-�ƥ�ץ졼��::
+テンプレートでオブジェクトの URL を表示する場合，ハードコードするのでは
+なく ``get_absolute_url()`` を使うようにするとよいでしょう．例えば，以下の
+テンプレート::
 
     <a href="/people/{{ object.id }}/">{{ object.name }}</a>
 
-���ɤ���ǤϤʤ����ʲ��Τ褦�ˤ���Ȥ褤�Ǥ��礦::
+は良い例ではなく，以下のようにするとよいでしょう::
 
     <a href="{{ object.get_absolute_url }}">{{ object.name }}</a>
 
-(�Τ��ˡ� ``get_absolute_url()`` �� URL �ȥ�ǥ�򥫥åץ�󥰤��Ƥ��ޤ��� 
-DRY §�ˤ�ȿ���Ƥ�
-�ޤ����������ʤ��顤������������Τ���� DRY §��տ�Ū�˶ʤ��Ƥ����������
-�ˤ����ޤ��󡥺�Ԥ����ϸ��ߡ���� DRY §�˽��ä�������� URL �����Ԥ���
-�褦�ʥ��꡼�����ˡ���Ϻ���Ǥ���)
+(確かに， ``get_absolute_url()`` は URL とモデルをカップリングしてしまい， 
+DRY 則には反してい
+ます．しかしながら，これは利便性のために DRY 則を意図的に曲げている希少な例
+にすぎません．作者たちは現在，より DRY 則に従ったやり方で URL 定義を行える
+ようなクリーンな方法を模索中です．)
 
 .. _The ``permalink`` decorator:
 
-``permalink`` �ǥ��졼��
+``permalink`` デコレータ
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-��˽Ҥ٤� ``get_absolute_url()`` ������ϡ��������� DRY §�ο��ȤǤ��롤��
-�ʤ�� URLconf �ȥ�ǥ��ξ���� URL ���������Ƥ���Ȥ������Ǥ���
+上に述べた ``get_absolute_url()`` の問題は，いささか DRY 則の侵犯である，す
+なわち URLconf とモデルの両方で URL が定義されているという点です．
 
-``permalink`` �ǥ��졼����Ȥ��ȡ� URLconf �����ǥ��æ���åץ�󥰤Ǥ���
-�������Υǥ��졼���ˤϡ��ӥ塼�ؿ��������Υꥹ�ȡ������� (���ץ����Ȥ���)
-̾���Ĥ��ѥ�᥿�����ä��������ꤷ�ޤ��������ξ��󤫤顤 Django ��
-���ꤷ���ѥ�᥿�� URLconf ���֤������ƴ����� URL �ѥ���׻����ޤ����㤨�С�
-�ʲ��Τ褦�� URLconf ���������Ƥ����Ȥ��ޤ��礦::
+``permalink`` デコレータを使うと， URLconf からモデルを脱カップリングできま
+す．このデコレータには，ビュー関数，引数のリスト，そして (オプションとして)
+名前つきパラメタの入った辞書を指定します．これらの情報から， Django は
+指定したパラメタで URLconf を置き換えて完全な URL パスを計算します．例えば，
+以下のような URLconf が定義されていたとしましょう::
 
     (r'^/people/(\d+)/$', 'people.views.details'),
 
-�ޤ�����ǥ�� ``get_absolute_url`` �᥽�åɤϰʲ��Τ褦������Ǥ��ޤ�::
+また，モデルの ``get_absolute_url`` メソッドは以下のように定義できます::
 
     from django.db.models import permalink
 
@@ -1924,12 +1924,12 @@ DRY §�ˤ�ȿ���Ƥ�
     get_absolute_url = permalink(get_absolute_url)
 
 
-�ޤ����ʲ��Τ褦�� URLconf �Υ���ȥ꤬���ä��Ȥ��ޤ�::
+また，以下のような URLconf のエントリがあったとします::
 
     (r'/archive/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$',
         archive_view)
 
-``permalink`` �ϰʲ��Τ褦�˻Ȥ��ޤ�::
+``permalink`` は以下のように使えます::
 
     def get_absolute_url(self):
         return ('archive_view', (), {
@@ -1938,25 +1938,25 @@ DRY §�ˤ�ȿ���Ƥ�
             'day': self.created.day})
     get_absolute_url = permalink(get_absolute_url)
 
-������Ǥϡ��� 2 �����˶������� (���Υ��ץ�) ����ꤷ�Ƥ��ޤ���������ϰ���
-�ꥹ�Ȥ��Ϥ�����������ɰ����������Ϥ���������Ǥ���
+この例では，第 2 引数に空の配列 (空のタプル) を指定していますが，これは引数
+リストを渡さず，キーワード引数だけを渡したいからです．
 
-``permalink`` ��Ȥ��С� URL �˴ؤ������򷫤��֤����Ȥʤ�����ǥ������
-URL ��ɽ���˻Ȥä��ӥ塼���ӤĤ����ޤ���������Ʊ�͡�
-``get_absolute_url`` �ϥƥ�ץ졼����Ǥ�Ȥ��ޤ���
+``permalink`` を使えば， URL に関する情報を繰り返すことなく，モデルの絶対
+URL と表示に使ったビューを結びつけられます．以前と同様，
+``get_absolute_url`` はテンプレート中でも使えます．
 
 .. _Executing custom SQL:
 
-�������� SQL �μ¹�
+カスタム SQL の実行
 -------------------
 
-����Υ�ǥ�᥽�åɤ�⥸�塼���٥�Υ᥽�åɤǤϡ���ͳ�˥�������� SQL
-ʸ��񤱤ޤ��� ``django.db.connection`` �Ȥ������֥������Ȥ����ߤΥǡ����١�
-����³��ɽ�����Ƥ��ޤ�����������SQL ��Ȥ��ˤϡ��ޤ�
-``connection.cursor()`` ��ƤӽФ��ƥ������륪�֥������Ȥ��������������
-``cursor.execute(sql, [params])`` ��ƤӽФ��� SQL ��¹Ԥ����塤
-``cursor.fetchone()`` �� ``cursor.fetchall()`` ���ɤ�Ƿ�̹Ԥ��֤��ޤ�����
-����::
+自作のモデルメソッドやモジュールレベルのメソッドでは，自由にカスタムの SQL
+文を書けます． ``django.db.connection`` というオブジェクトが現在のデータベー
+ス接続を表現しています．カスタムSQL を使うには，まず
+``connection.cursor()`` を呼び出してカーソルオブジェクトを取得し，次いで
+``cursor.execute(sql, [params])`` を呼び出して SQL を実行した後，
+``cursor.fetchone()`` や ``cursor.fetchall()`` を読んで結果行を返します．例
+えば::
 
     def my_custom_sql(self):
         from django.db import connection
@@ -1965,32 +1965,32 @@ URL ��ɽ���˻Ȥä��ӥ塼���ӤĤ����ޤ���������Ʊ�͡�
         row = cursor.fetchone()
         return row
 
-``connection`` �� ``cursor`` ��ɸ��� `Python DB-API`_ ��ȤäƤ��ޤ���
-Python DB-API �˾ܤ����ʤ��Τʤ顤��� SQL ʸ�� ``cursor.execute()`` �ǥѥ�
-�᥿��ľ�� SQL �������ΤǤϤʤ����ץ졼���ۥ�� ``"%s"`` ��ȤäƤ��뤳��
-�����դ��Ʋ����������Υƥ��˥å���Ȥ��ȡ�����ˤ���ǡ����١����饤�֥��
-��ɬ�פ˱����Ƽ�ưŪ�˥ѥ�᥿�򥯥����Ȥ����ꥨ�������׽��������ꤷ�ޤ���
+``connection`` や ``cursor`` は標準の `Python DB-API`_ を使っています．
+Python DB-API に詳しくないのなら，上の SQL 文の ``cursor.execute()`` でパラ
+メタを直接 SQL に入れるのではなく，プレースホルダ ``"%s"`` を使っていること
+に注意して下さい．このテクニックを使うと，根底にあるデータベースライブラリ
+は必要に応じて自動的にパラメタをクオートしたりエスケープ処理したりします．
 
-����: ``WHERE`` ���ʬ�����ꤷ���������ʤ顤ɸ��ξȹ� API �� ``where``
-�� ``tables`` �� ``params`` �Ȥ��ä���������ꤷ�Ƽ¸��Ǥ��ޤ���
-`extra() �Υɥ������`_ �򻲾Ȥ��Ƥ���������
+注意: ``WHERE`` 節を自分で設定したいだけなら，標準の照合 API に ``where``
+や ``tables`` ， ``params`` といった引数を指定して実現できます．
+`extra() のドキュメント`_ を参照してください．
 
 .. _Python DB-API: http://www.python.org/peps/pep-0249.html
-.. _`extra() �Υɥ������`: 
+.. _`extra() のドキュメント`: 
     ../db-api/#extra-select-none-where-none-params-none-tables-none
 .. _Other lookup options: ../db_api/#other-lookup-options
 
 .. _Overriding default model methods:
 
-�ǥե���ȥ�ǥ�᥽�åɤΥ����Х饤��
+デフォルトモデルメソッドのオーバライド
 --------------------------------------
 
-`�ǡ����١��� API �Υɥ������`_ �Ǥ����������褦�ˡ� Django �ϳƥ�ǥ��
-��ưŪ�ˤ����Ĥ��᥽�åɤ��ɲä��ޤ��� ``save()`` �� ``delete()`` ��������
-�Ǥ��������Υ᥽�åɤ򥪡��Х饤�ɤ���С����ε�ư���ѹ��Ǥ��ޤ���
+`データベース API のドキュメント`_ でも説明したように， Django は各モデルに
+自動的にいくつかメソッドを追加します． ``save()`` や ``delete()`` がその例
+です．これらのメソッドをオーバライドすれば，その挙動を変更できます．
 
-�Ȥ߹��ߥ᥽�åɤ򥪡��Х饤�ɤ����ŵŪ�ʥ桼���������ϡ����֥������Ȥ���
-¸����ݤ˲����̤ν�����Ԥ��Ȥ�����ΤǤ����㤨��::
+組み込みメソッドをオーバライドする古典的なユースケースは，オブジェクトを保
+存する際に何か別の処理を行うというものです．例えば::
 
     class Blog(models.Model):
         name = models.CharField(maxlength=100)
@@ -1998,10 +1998,10 @@ Python DB-API �˾ܤ����ʤ��Τʤ顤��� SQL ʸ�� ``cursor.execute()`` �ǥѥ�
 
         def save(self):
             do_something()
-            super(Blog, self).save() # �ּºݤΡ� save() ��ƤӽФ��ޤ���
+            super(Blog, self).save() # 「実際の」 save() を呼び出します．
             do_something_else()
 
-�ޤ����ʲ��Τ褦�ˤ������¸���޻ߤǤ��ޤ�::
+また，以下のようにすれば保存を抑止できます::
 
     class Blog(models.Model):
         name = models.CharField(maxlength=100)
@@ -2009,22 +2009,22 @@ Python DB-API �˾ܤ����ʤ��Τʤ顤��� SQL ʸ�� ``cursor.execute()`` �ǥѥ�
 
         def save(self):
             if self.name == "Yoko Ono's blog":
-                return # Yoko �ϼ�ʬ�Υ֥�������äƤ��ޤ���
+                return # Yoko は自分のブログを持っていません！
             else:
-                super(Blog, self).save() # �ּºݤΡ�save() ��ƤӽФ��ޤ���
+                super(Blog, self).save() # 「実際の」save() を呼び出します．
 
-.. _`�ǡ����١��� API �Υɥ������`: ../db-api/
+.. _`データベース API のドキュメント`: ../db-api/
 .. _database API docs: ../db_api/
 
 
 .. _Models across files:
 
-�ե�����֤ˤޤ������ǥ�
+ファイル間にまたがるモデル
 ==========================
 
-����⥸�塼�뤫���̤Υ⥸�塼��ؤΥ�졼��������������ʤ�ĥ��ޤ���
-��졼������ĥ��ˤϡ���ǥ��������Ƭ�ǥ�졼������оΤΥ�ǥ��
-import ���Ƥ�����ɬ�פʤȤ����Ǥ��Υ�ǥ륯�饹�򻲾Ȥ��ޤ����㤨��::
+あるモジュールから別のモジュールへのリレーションは全く問題なく張れます．
+リレーションを張るには，モデル定義の先頭でリレーション対称のモデルを
+import しておき，必要なところでそのモデルクラスを参照します．例えば::
 
     from mysite.geography.models import ZipCode
 
@@ -2035,18 +2035,18 @@ import ���Ƥ�����ɬ�פʤȤ����Ǥ��Υ�ǥ륯�饹�򻲾Ȥ��ޤ����㤨��::
 
 .. _Using models:
 
-��ǥ��Ȥ�
+モデルを使う
 ============
 
-��ǥ����������顤�Ǹ�Υ��ƥåפȤ��ơ����Υ�ǥ�� *�Ȥ�* �� Django ��
-�����ޤ���
+モデルを定義したら，最後のステップとして，そのモデルを *使う* と Django に
+教えます．
 
-����ե�������Խ����ơ� ``models.py`` �����ä��⥸�塼���̾����
-``INSTALLED_APPS`` ������ɲä��Ƥ���������
+設定ファイルを編集して， ``models.py`` の入ったモジュールの名前を
+``INSTALLED_APPS`` 設定に追加してください．
 
-�㤨�С����ץꥱ�������Υ�ǥ뤬 ``mysite.myapp.models`` �⥸�塼��
-(``manage.py startapp``������ץȤǺ������������ץꥱ�������Υѥå�������
-¤) �˼�����Ƥ����硤 ``INSTALLED_APPS`` �ϰʲ��Τ褦�ˤʤ�ޤ�::
+例えば，アプリケーションのモデルが ``mysite.myapp.models`` モジュール
+(``manage.py startapp``スクリプトで作成した，アプリケーションのパッケージ構
+造) に収められている場合， ``INSTALLED_APPS`` は以下のようになります::
 
     INSTALLED_APPS = (
         #...
@@ -2056,54 +2056,54 @@ import ���Ƥ�����ɬ�פʤȤ����Ǥ��Υ�ǥ륯�饹�򻲾Ȥ��ޤ����㤨��::
 
 .. _Providing initial SQL data:
 
-SQL ������ǡ�������
+SQL 初期化データの提供
 ======================
 
-Django �Ǥϡ� CREATE TABLE ʸ��¹Ԥ���ľ���Ǥ�դ� SQL ��ǡ����١�������
-����եå����󶡤��Ƥ��ޤ����㤨�С����Υեå���Ȥ��С���ưŪ�˥ǥե����
-�Υ쥳���ɤ�ơ��֥���ɲä����� SQL �ؿ������������Ǥ��ޤ���
+Django では， CREATE TABLE 文を実行した直後に任意の SQL をデータベースに渡
+せるフックを提供しています．例えば，このフックを使えば，自動的にデフォルト
+のレコードをテーブルに追加したり SQL 関数を作成したりできます．
 
-�եå��Τ��餯���ñ��Ǥ�: Django �� ``<appname>`` �򥢥ץꥱ�������ǥ�
-�쥯�ȥ��̾���� ``<modelname>`` ���ǥ�̾��ʸ���ˤ���ʸ����Ȥ��ơ�
-``<appname>/sql/<modelname>.sql`` ��õ���褦�ˤʤäƤ�������Ǥ���
+フックのからくりは単純です: Django は ``<appname>`` をアプリケーションディ
+レクトリの名前， ``<modelname>`` をモデル名を小文字にした文字列として，
+``<appname>/sql/<modelname>.sql`` を探すようになっているだけです．
 
-���Υɥ�����Ȥ���Ƭ�ˤ��� ``Person`` ����ǡ���ǥ뤬 ``myapp`` �β�����
-����Ƥ����Ȥ���ȡ� ``myapp/sql/person.sql`` �Ȥ����ե������Ǥ�դ� SQL ʸ�����Ǥ��ޤ����㤨�аʲ��Τ褦��̿���������ޤ�::
+このドキュメントの冒頭にある ``Person`` の例で，モデルが ``myapp`` の下に置
+かれていたとすると， ``myapp/sql/person.sql`` というファイルに任意の SQL 文を指定できます．例えば以下のような命令を入れられます::
 
     INSERT INTO myapp_person (first_name, last_name) VALUES ('John', 'Lennon');
     INSERT INTO myapp_person (first_name, last_name) VALUES ('Paul', 'McCartney');
 
-�� SQL �ե�����ˤ�ͭ���� SQL ʸ������Ƥ����ͤФʤ�ޤ��� SQL �ե������
-��ǥ�Υơ��֥���������� SQL ���¹Ԥ��줿ľ��˥ǡ����١�����ľ�ܥѥ�����
-�Ϥ���ޤ���
+各 SQL ファイルには有効な SQL 文を入れておかねばなりません． SQL ファイルは
+モデルのテーブルを生成する SQL が実行された直後にデータベースに直接パイプ入
+力されます．
 
-SQL �ե������ ``manage.py`` �� ``sqlinitialdata``, ``sqlreset``,
-``sqlall`` ����� ``reset`` ���ޥ�ɤμ¹Ի��˻��Ȥ���ޤ����ܤ�����
-`manage.py �Υɥ������`_ �򻲾Ȥ��Ƥ���������
+SQL ファイルは ``manage.py`` の ``sqlinitialdata``, ``sqlreset``,
+``sqlall`` および ``reset`` コマンドの実行時に参照されます．詳しくは
+`manage.py のドキュメント`_ を参照してください．
 
-ʣ���� SQL �ǡ����ե����뤬�����硤�ġ��Υե������¹Ԥ�����֤��ݾڤ���
-�Ƥ��ʤ��Τ����դ��Ʋ����������ꤷ�Ƥ��Ƥ褤�Τϡ���������� SQL �ǡ����ե�
-�����¹Ԥ������ˡ�ɬ���ǡ����١����ơ��֥�Ϻ�������Ƥ���Ȥ������Ȥ���
-�Ǥ���
+複数の SQL データファイルがある場合，個々のファイルを実行する順番は保証され
+ていないので注意して下さい．仮定していてよいのは，カスタムの SQL データファ
+イルを実行する前に，必ずデータベーステーブルは作成されているということだけ
+です．
 
-.. _`manage.py �Υɥ������`: ../django_admin/#sqlinitialdata-appname-appname
+.. _`manage.py のドキュメント`: ../django_admin/#sqlinitialdata-appname-appname
 .. _`manage.py documentation`: ../django_admin/#sqlinitialdata-appname-appname
 
 .. _Database-backend-specific SQL data:
 
-�ǡ����١����Хå��������ͭ�� SQL �ǡ���
+データベースバックエンド特有の SQL データ
 -----------------------------------------
 
-�Хå��������ͭ�� SQL �ǡ������Ф���եå��⤢��ޤ����㤨�С� PostgreSQL
-�� MySQL �������̡��ν���ǡ������Ѱդ���Τʤ顤�ƥ��ץꥱ������󤴤Ȥ�
-Django �� ``<appname>/sql/<modelname>.<backend>.sql`` �Ȥ����ե������õ��
-�ޤ��� ``<appname>`` �ϥ��ץꥱ�������ǥ��쥯�ȥ��̾���� ``<modelname>``
-�ϥ�ǥ�̾��ʸ���ˤ���ʸ���� ``<backend>`` ������ե������
-``DATABASE_ENGINE`` �˻��ꤹ��Хå�����ɤ�̾�� (``postgresql``, ``mysql``
-�ʤ�) �Ǥ���
+バックエンド特有の SQL データに対するフックもあります．例えば， PostgreSQL
+と MySQL 向けに別々の初期データを用意するのなら，各アプリケーションごとに
+Django は ``<appname>/sql/<modelname>.<backend>.sql`` というファイルを探し
+ます． ``<appname>`` はアプリケーションディレクトリの名前， ``<modelname>``
+はモデル名を小文字にした文字列， ``<backend>`` は設定ファイルの
+``DATABASE_ENGINE`` に指定するバックエンドの名前 (``postgresql``, ``mysql``
+など) です．
 
-�Хå�����ɸ�ͭ�� SQL �ǡ����ϡ��Хå���������ͭ�� SQL �ǡ�����������
-�¹Ԥ���ޤ����㤨�С����ץꥱ���������� ``sql/person.sql`` �����
-``sql/person.postgresql.sql`` �����äƤ��ơ� PostgreSQL ��Хå�����ɤˤ�
-�ƥ��󥹥ȡ����Ԥä���硤 Django �Ϥޤ� ``sql/person.postgresql.sql`` ��
-���Ƥ�¹Ԥ��Ƥ��� ``sql/person.sql`` ��¹Ԥ��ޤ���
+バックエンド固有の SQL データは，バックエンド非固有の SQL データよりも前に
+実行されます．例えば，アプリケーション中に ``sql/person.sql`` および
+``sql/person.postgresql.sql`` が入っていて， PostgreSQL をバックエンドにし
+てインストールを行った場合， Django はまず ``sql/person.postgresql.sql`` の
+内容を実行してから ``sql/person.sql`` を実行します．

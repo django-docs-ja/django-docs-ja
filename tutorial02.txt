@@ -1,171 +1,171 @@
 =====================================
-�Ϥ���Ƥ� Django ���ץ���������� 2
+はじめての Django アプリ作成，その 2
 =====================================
 
 :revision-up-to: 4805 (release 0.96)
 
-���Υ��塼�ȥꥢ��� `���塼�ȥꥢ�뤽�� 1`_ ��³���Ǥ��������Ǥϡ���³��
-Web ��ɼ���ץꥱ�������γ�ȯ����ˤ��ơ�Django ����ư�����������������
-(admin ������) ������˲��⤷�ޤ���
+このチュートリアルは `チュートリアルその 1`_ の続きです．ここでは，引続き
+Web 投票アプリケーションの開発を例にして，Django が自動生成する管理サイト
+(admin サイト) を焦点に解説します．
 
-.. _`���塼�ȥꥢ�뤽�� 1`: ../tutorial01/
+.. _`チュートリアルその 1`: ../tutorial01/
 .. _Tutorial 1: ../tutorial1/
 
-.. admonition:: �߷�ů��
+.. admonition:: 設計哲学
 
-    ����ƥ�Ĥ��ɲä��ѹ��������Ԥ�����Υ����åդ�ܵҸ����� admin ����
-    �ȹ��ۤϡ���¤���η礱������ʤ�ΤǤ��������ǡ� Django �Ǥϥ�ǥ���
-    �����뤿��� admin ���󥿥ե����������˼�ư�����Ƥ��ޤ���
+    コンテンツの追加や変更，削除を行うためのスタッフや顧客向けの admin サイ
+    ト構築は，創造性の欠けた退屈なものです．そこで， Django ではモデルを管
+    理するための admin インタフェースを完全に自動化しています．
 
-    Django �ϥ˥塼���롼��Ķ��ǳ�ȯ����ޤ������˥塼���롼��Ķ��Ǥϡ�
-    �֥���ƥ�Ĥκ����� (content publisher)�ѡפȡָ����� (public) �ץ���
-    �Ȥ򤭤������Τ˶��̤��Ƥ��ޤ��������ȴ����ԤϿ���������䥤�٥�ȡ�
-    ���ݡ��ĤΥ������ʤɤ����Ϥ˻Ȥ�������ƥ�Ĥϸ����ѥ����Ⱦ��ɽ������
-    �ޤ��� Django �ϡ������ȴ����Ը����ΰ층�����줿����ƥ���Խ����󥿥ե���
-    �����󶡤Ȥ���������褷�Ƥ���ΤǤ���
+    Django はニュースルーム環境で開発されました．ニュースルーム環境では，
+    「コンテンツの作成者 (content publisher)用」と「公開用 (public) 」サイ
+    トをきわめて明確に区別しています．サイト管理者は新たな話題やイベント，
+    スポーツのスコアなどの入力に使い，コンテンツは公開用サイト上で表示され
+    ます． Django は，サイト管理者向けの一元化されたコンテンツ編集インタフェー
+    スの提供という問題を解決しているのです．
 
-    admin �ϰ��̤Υ����Ȥ�ˬ��Ԥ˻ȤäƤ�餦����Τ�ΤǤϤʤ���
-    �����ȴ����ԤΤ���Τ�ΤʤΤǤ���
+    admin は一般のサイトを訪問者に使ってもらうためのものではなく，
+    サイト管理者のためのものなのです．
 
 .. _Activate the admin site:
 
-admin �����Ȥ�ͭ����
+admin サイトの有効化
 ====================
 
-�ǥե���ȤǤϡ� Django �� admin �����Ȥ�ͭ���ǤϤʤ�����ʬ�����򤷤�ͭ����
-���ͤФʤ�ޤ��� admin �����Ȥ�ͭ���ˤ���ˤϡ��ʲ��� 3 �Ĥκ�Ȥ�ɬ�פ�
-��:
+デフォルトでは， Django の admin サイトは有効ではなく，自分で選択して有効に
+せねばなりません． admin サイトを有効にするには，以下の 3 つの作業が必要で
+す:
 
-    * ``INSTALLED_APPS`` ����� ``"django.contrib.admin"`` ���ɲä��ޤ���
-    * ``python manage.py syncdb`` ��¹Ԥ��ޤ��������ʥ��ץꥱ��������
-      ``INSTALLED_APPS`` ���ɲä����Τǡ��ǡ����١����򹹿����ͤФʤ�ޤ���
-    * ``mysite/urls.py`` �ե�������Խ����� "Uncomment this for admin:" ��
-      �񤫤줿�Ԥμ��ιԤΥ����ȥ����Ȥ������ޤ������Υե������
-      URLconf �Ȥ����ޤ��� URLconf �ˤĤ��Ƥϥ��塼�ȥꥢ��μ������ǲ��⤷
-      �ޤ������Ϥ������������꤬ URL �򥢥ץꥱ���������б��Ť��Ƥ��뤳��
-      ������Ф��Ƥ����ޤ��礦��
+    * ``INSTALLED_APPS`` 設定に ``"django.contrib.admin"`` を追加します．
+    * ``python manage.py syncdb`` を実行します．新たなアプリケーションを
+      ``INSTALLED_APPS`` に追加したので，データベースを更新せねばなりません．
+    * ``mysite/urls.py`` ファイルを編集し， "Uncomment this for admin:" と
+      書かれた行の次の行のコメントアウトを解除します．このファイルは
+      URLconf といいます． URLconf についてはチュートリアルの次の部で解説し
+      ます．今はただ，この設定が URL をアプリケーションに対応づけていること
+      だけを覚えておきましょう．
 
-��ȯ�����Фε�ư
+開発サーバの起動
 ================
 
-��ȯ�ѥ����Ф�ư���ơ� admin �����Ȥ�õ�����Ƥߤޤ��礦��
+開発用サーバを起動して， admin サイトを探検してみましょう．
 
-���塼�ȥꥢ�뤽�� 1 �ǡ���ȯ�����Ф�ʲ��Τ褦�˵�ư�����Τ�פ��Ф��Ƥ���
-����::
+チュートリアルその 1 で，開発サーバを以下のように起動したのを思い出してくだ
+さい::
 
     python manage.py runserver
 
-���ϥ֥饦����ư���ơ���������ɥᥤ��� "/admin/" ���Ĥޤ�
-http://127.0.0.1:8000/admin/ �˥����������ޤ����ʲ��Τ褦�� admin �Υ�����
-����̤�ɽ�������Ϥ��Ǥ�:
+次はブラウザを起動して，ローカルドメインの "/admin/" ，つまり
+http://127.0.0.1:8000/admin/ にアクセスします．以下のような admin のログイ
+ン画面が表示されるはずです:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin01.png
    :alt: Django admin login screen
 
 .. _Enter the admin site:
 
-admin �����Ȥ�����
+admin サイトに入る
 ==================
 
-�����������󤷤Ƥߤޤ��礦��(���塼�ȥꥢ�뤽�� 1 �ǡ������ѥ桼���Υ�����
-��Ȥ���������Ϥ��Ǥ����Ф��Ƥ��ޤ���?) �������󤷤��顤 Django �� admin
-����ǥ����ڡ�����ɽ�������Ϥ��Ǥ�:
+さあログインしてみましょう．(チュートリアルその 1 で，スーパユーザのアカウ
+ントを作成したはずです．覚えていますか?) ログインしたら， Django の admin
+インデクスページが表示されるはずです:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin02t.png
    :alt: Django admin index page
    :target: http://media.djangoproject.com/img/doc/tutorial/admin02.png
 
-�ǥե���ȤǤϡ��֥��롼�� (Groups)�פȡ֥桼�� (Users)�פȤ��� 2 �ĤΥ���
-�פ��Խ���ǽ�ʥ���ƥ�Ĥ�ɽ�������Ϥ��Ǥ��������ϥǥե���Ȥ� Django
-����°���Ƥ��륳���ε�ǽ�Ǥ���
+デフォルトでは，「グループ (Groups)」と「ユーザ (Users)」という 2 つのタイ
+プの編集可能なコンテンツが表示されるはずです．これらはデフォルトで Django
+に付属しているコアの機能です．
 
-(`��������Ǥ��ʤ����Ϥ�����򻲾Ȥ��Ƥ�������`_)
+(`ログインできない場合はこちらを参照してください`_)
 
-.. _`��������Ǥ��ʤ����Ϥ�����򻲾Ȥ��Ƥ�������`: ../faq/#the-admin-site
+.. _`ログインできない場合はこちらを参照してください`: ../faq/#the-admin-site
 .. _"I can't log in" questions: ../faq/#the-admin-site
 
 .. _Make the poll app modifiable in the admin:
 
-Poll ��ǥ�� admin ���Խ��Ǥ���褦�ˤ���
+Poll モデルを admin で編集できるようにする
 ==========================================
 
-�Ȥ����ǡ� polls ���ץꥱ�������Ϥɤ��ˤ����Ǥ��礦�� admin �Υ���ǥ�
-���ڡ����򸫤Ƥ�ɽ������Ƥ��ޤ���͡�
+ところで， polls アプリケーションはどこにあるんでしょう？ admin のインデク
+スページを見ても表示されていませんね．
 
-�¤ϡ��ޤ���Ĥ��٤����Ȥ��ĤäƤ��ޤ����� ``Poll`` ��ǥ����ǡ�
-``Poll`` ���֥������Ȥ� admin ���󥿥ե��������������褦���ꤹ��ɬ�פ���
-��ΤǤ��� ``mysite/polls/models.py`` �ե�������Խ����ơ���ǥ�����
-``Admin`` �Ȥ���̾���Υ��饹����ޤ��� ���饹������ˤ� ``pass`` �Ƚ񤤤�
-���ˤ��Ƥ����ޤ�::
+実は，まだ一つやるべきことが残っていました． ``Poll`` モデルの中で，
+``Poll`` オブジェクトに admin インタフェースを持たせるよう指定する必要があ
+るのです． ``mysite/polls/models.py`` ファイルを編集して，モデルの中に
+``Admin`` という名前のクラスを作ります． クラスの定義には ``pass`` と書いて
+空にしておきます::
 
     class Poll(models.Model):
         # ...
         class Admin:
             pass
 
-``class Admin`` ����ˤϡ����Υ�ǥ뤬 Django admin �ǤɤΤ褦��ɽ�������
-�������椹�뤿�������򤤤�ޤ����ȤϤ�������������ƾ�ά��ǽ�ʤΤǡ�����
-���饹��Ĥ��äƤ��������ǡ֥ǥե���Ȥ�����ǥ��֥������Ȥ� admin ����
-�ե�����������פǤ��ޤ���
+``class Admin`` の中には，このモデルが Django admin でどのように表示される
+かを制御するための設定をいれます．とはいえ，設定は全て省略可能なので，空の
+クラスをつくっておくだけで「デフォルトの設定でオブジェクトの admin インタ
+フェースを作成」できます．
 
-Django admin �ڡ����������ɤ��ơ��ɤ���Ѳ��������������Ƥߤޤ��礦��
-��ȯ�����Фϥץ��������Ȥ�ưŪ�˥�����ɤ��Ƥ����Τǡ������ɤ˲ä�����
-���Ϥ������˥֥饦���ǳ�ǧ�Ǥ��ޤ���
+Django admin ページをリロードして，どんな変化が起きたか見てみましょう．
+開発サーバはプロジェクトを自動的にリロードしてくれるので，コードに加えた変
+更はただちにブラウザで確認できます．
 
 .. _Explore the free admin functionality:
 
-admin �ε�ǽ��õ�椷�Ƥߤ�
+admin の機能を探究してみる
 ==========================
 
-``Poll`` ���������饹 ``Admin`` ������������Ȥǡ� Django �� ``Poll`` ��
-admin �ڡ�����ɽ������褦�ˤʤ�ޤ�:
+``Poll`` に内部クラス ``Admin`` を持たせたことで， Django は ``Poll`` を
+admin ページに表示するようになります:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin03t.png
    :alt: Django admin index page, now with polls displayed
    :target: http://media.djangoproject.com/img/doc/tutorial/admin03.png
 
-��Polls�� �򥯥�å����ƤߤƤ��������� �ѹ��ꥹ�� (change list) �Υڡ���
-������ޤ������Υڡ����ϥǡ����١���������Ƥ� ``Poll`` ���֥������Ȥ�ɽ��
-�������֥������Ȥ����򤷤��ѹ��Ǥ���褦�ˤʤäƤ��ޤ������Υ��塼�ȥꥢ��
-�Ǻ������� ��What's up�פȤ��� ``Poll`` ���֥������Ȥ�����ޤ��͡�
+「Polls」 をクリックしてみてください． 変更リスト (change list) のページ
+に入ります．このページはデータベース上の全ての ``Poll`` オブジェクトを表示
+し，オブジェクトを選択して変更できるようになっています．前のチュートリアル
+で作成した 「What's up」という ``Poll`` オブジェクトがありますね．
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin04t.png
    :alt: Polls change list page
    :target: http://media.djangoproject.com/img/doc/tutorial/admin04.png
 
-��What's up?�פ򥯥�å������Խ����Ƥߤޤ��礦:
+「What's up?」をクリックして編集してみましょう:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin05t.png
    :alt: Editing form for poll object
    :target: http://media.djangoproject.com/img/doc/tutorial/admin05.png
 
-�ʲ����������դ��Ƥ�������:
+以下の点に注意してください:
 
-* �ե������ Poll ��ǥ���Ȥ˼�ưŪ����������Ƥ��ޤ���
-* ��ǥ�Υե�����ɤη��ˤ�ä� (``models.DateTimeField``, 
-  ``models.CharField`` �ʤɤ�) Ŭ�ڤ� HTML ���ϥ��������åȤ��б����Ƥ��ޤ���
-  �ƥ����פΥե�����ɤϡ� Django admin �ǥǡ�����ɤΤ褦��ɽ�����뤫���Τ�
-  �Ƥ��ޤ���
-* ``DateTimeField`` �ˤ� JavaScript �Υ��硼�ȥ��åȤ��Ĥ��Ƥ��ޤ�������
-  (Date) �Υ����ˤϡֺ��� (Today)�פؤΥ��硼�ȥ��åȤȡ����������Υݥ�
-  �ץ��åץܥ��󤬤���ޤ������� (Time) �Υ����ˤϡָ��� (Now)�פؤΥ��硼
-  �ȥ��åȤȡ��褯���Ϥ������֤Υꥹ�Ȥ�ɽ������ݥåץ��åץܥ��󤬤���
-  �ޤ���
+* フォームは Poll モデルをもとに自動的に生成されています．
+* モデルのフィールドの型によって (``models.DateTimeField``, 
+  ``models.CharField`` などの) 適切な HTML 入力ウィジェットが対応しています．
+  各タイプのフィールドは， Django admin でデータをどのように表示するかを知っ
+  ています．
+* ``DateTimeField`` には JavaScript のショートカットがついています．日付
+  (Date) のカラムには「今日 (Today)」へのショートカットと，カレンダーのポッ
+  プアップボタンがあります．時刻 (Time) のカラムには「現在 (Now)」へのショー
+  トカットと，よく入力される時間のリストを表示するポップアップボタンがあり
+  ます．
 
-�ڡ�������������ʬ�ˤ����ܥ��󤬤����Ĥ�ɽ������Ƥ��ޤ�:
+ページの末尾の部分には操作ボタンがいくつか表示されています:
 
-* ��¸ (Save) -- �ѹ�����¸���ơ����Υ�ǥ���ѹ��ꥹ�ȤΥڡ��������ޤ���
-* ��¸�����Խ���³���� (Save and continue editing) -- �ѹ�����¸���ơ�����
-  ���֥������Ȥ��Խ��ڡ����������ɤ��ޤ���
-* ��¸���Ƥ⤦����ɲ� (Save and add another) -- �ѹ�����¸���ơ����Υ�ǥ�
-  �Υ��֥������Ȥ򿷵��ɲä��뤿��ζ����Խ��ڡ���������ɤ��ޤ���
-* ��� (Delete) -- �����ǧ�ڡ�����ɽ�����ޤ���
+* 保存 (Save) -- 変更を保存して，このモデルの変更リストのページに戻ります．
+* 保存して編集を続ける (Save and continue editing) -- 変更を保存して，この
+  オブジェクトの編集ページをリロードします．
+* 保存してもう一つ追加 (Save and add another) -- 変更を保存して，このモデル
+  のオブジェクトを新規追加するための空の編集ページをロードします．
+* 削除 (Delete) -- 削除確認ページを表示します．
 
-�ֺ����פ�ָ��ߡץ��硼�ȥ��åȤ򥯥�å����ơ���Date published�פ��ѹ���
-�Ƥߤޤ��礦���ѹ������顤����¸�����Խ���³����פ򲡤��ޤ������ˡ������
-��������� (History)�פ򥯥�å����Ƥߤޤ��礦���桼���� Django admin ���
-���Υ��֥������Ȥ��Ф��ƹԤä����Ƥ��ѹ�������ѹ�������ѹ���Ԥä��桼
-����̾���Ĥ��ǥꥹ�Ȥˤ����ڡ�����ɽ�����ޤ�:
+「今日」や「現在」ショートカットをクリックして，「Date published」を変更し
+てみましょう．変更したら，「保存して編集を続ける」を押します．次に，右上に
+ある「履歴 (History)」をクリックしてみましょう．ユーザが Django admin 上で
+このオブジェクトに対して行った全ての変更履歴を，変更時刻と変更を行ったユー
+ザの名前つきでリストにしたページを表示します:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin06t.png
    :alt: History page for poll object
@@ -173,14 +173,14 @@ admin �ڡ�����ɽ������褦�ˤʤ�ޤ�:
 
 .. _Customize the admin form:
 
-admin �ե�����Υ������ޥ���
+admin フォームのカスタマイズ
 ============================
 
-���Ф餯���Ƥߤơ���������ε�ǽ�򥳡��ɤ������񤫤��˼¸��������Ȥ˶�
-ò���ޤ��礦��
+しばらく操作してみて，これだけの機能をコードを全然書かずに実現したことに驚
+嘆しましょう．
 
-�����������ޥ������Ƥߤޤ��礦�� �������饹 ``Admin`` �� ``fields`` �Ȥ���
-���饹°�����ɲä���ȡ��ե�����ɤ��¤ӽ������Ū���ѹ��Ǥ��ޤ�::
+少しカスタマイズしてみましょう． 内部クラス ``Admin`` の ``fields`` という
+クラス属性を追加すると，フィールドの並び順を明示的に変更できます::
 
         # ...
         class Admin:
@@ -188,18 +188,18 @@ admin �ե�����Υ������ޥ���
                 (None, {'fields': ('pub_date', 'question')}),
             )
 
-����ǡ���Publication date�ץե�����ɤ�ɽ�����֤��� 2 ���ܤ�����Ƭ�ˤʤ��
-��:
+これで，「Publication date」フィールドの表示位置が， 2 番目から先頭になりま
+す:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin07.png
    :alt: Fields have been reordered
 
-��Ĥ����ե�����ɤ��ʤ��Τǡ����ޤ�ѤäȤ����Ѳ��ǤϤ���ޤ���͡�������
-����������Υե�����ɤ�����褦�� admin �ե�����Ǥϡ�ľ��Ū�ʥե�����
-�ɤ��¤ӽ�Ȥ�����Τϥ桼���ӥ�ƥ��ν��פ����ǤǤ���
+二つしかフィールドがないので，あまりぱっとした変化ではありませんね．しかし
+何ダースものフィールドを操作するような admin フォームでは，直感的なフィール
+ドの並び順というものはユーザビリティの重要な要素です．
 
-Ʊ��������������ե�����ɤ������硤�ե������ʣ���Υե�����ɥ��åȤ�ʬ
-�䤷�������Ȥ⤢��Ǥ��礦::
+同じく何ダースもフィールドがある場合，フォームを複数のフィールドセットに分
+割したいこともあるでしょう::
 
         class Admin:
             fields = (
@@ -207,17 +207,17 @@ admin �ե�����Υ������ޥ���
                 ('Date information', {'fields': ('pub_date',)}),
             )
 
-``fields`` �γƥ��ץ����Ƭ�����Ǥϥե�����ɥ��åȤΥ����ȥ�ˤʤ�ޤ���
-�ե�����ϰʲ��Τ褦�ˤʤ�ޤ�:
+``fields`` の各タプルの先頭の要素はフィールドセットのタイトルになります．
+フォームは以下のようになります:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin08t.png
    :alt: Form has fieldsets now
    :target: http://media.djangoproject.com/img/doc/tutorial/admin08.png
 
-�ƥե�����ɥ��åȤˤ�Ǥ�դ� HTML ���饹�����Ǥ��ޤ��� Django �Ǥ�
-``"collapse"`` �Ȥ������饹���󶡤��Ƥ��ޤ��������Υ��饹����ꤹ��ȡ��ե���
-��ɥ��åȤϺǽ��ޤ���ޤ줿���֤�ɽ������ޤ�����������ʤϻȤ�ʤ��ե���
-��ɤ��������󤢤�褦�ʥե������ȤäƤ�����������Ǥ�::
+各フィールドセットには任意の HTML クラスを指定できます． Django では
+``"collapse"`` というクラスを提供していますが，このクラスを指定すると，フィー
+ルドセットは最初折り畳まれた状態で表示されます．これは普段は使わないフィー
+ルドがたくさんあるようなフォームを使っている場合に便利です::
 
         class Admin:
             fields = (
@@ -231,113 +231,113 @@ admin �ե�����Υ������ޥ���
 
 .. _Adding related objects:
 
-��졼������ĥ�ä����֥������Ȥ��ɲ�
+リレーションを張ったオブジェクトの追加
 ======================================
 
-OK�� Poll �� admin �ڡ����ϤǤ��ޤ����������� ``Poll`` ��ʣ���� ``Choice``
-����ĤΤˡ� admin �ڡ����ˤ�ɽ������Ƥ��ޤ���͡�
+OK， Poll の admin ページはできました．しかし ``Poll`` は複数の ``Choice``
+を持つのに， admin ページには表示されていませんね．
 
-���ΤȤ����ϡ�
+今のところは．
 
-��������β��ˡ����Ĥ���ޤ�������ܤϡ� ``Choice`` ��ǥ�� ``Poll`` ��
-Ʊ���褦�� ``Admin`` ���饹����ꤹ��Ȥ�����ˡ�Ǥ������ξ�硤�����ɤϰʲ�
-�Τ褦�ˤʤ�Ǥ��礦::
+この問題の解決法は二つあります．一つ目は， ``Choice`` モデルに ``Poll`` と
+同じように ``Admin`` クラスを指定するという方法です．その場合，コードは以下
+のようになるでしょう::
 
     class Choice(models.Model):
         # ...
         class Admin:
             pass
 
-����� Django admin �����Ȥǡ�Choice�� �����٤�褦�ˤʤ�ޤ�����Choice ��
-�ɲáץե�����ϰʲ��Τ褦�ˤʤ�ޤ�:
+これで Django admin サイトで「Choice」 を選べるようになります．「Choice の
+追加」フォームは以下のようになります:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin10.png
    :alt: Choice admin page
 
-���Υե�����Ǥϡ�Poll�ץե�����ɤ�����ܥå����ˤʤꡤ�ǡ����١��������
-�Ƥ� Poll ���֥������Ȥ����٤�褦�ˤʤ�ޤ��� Django �� ``ForeignKey`` ��
-ɽ��������ˤ� ``<select>`` �ܥå�����Ȥ�ͤФʤ�ʤ��Ȥ������Ȥ��ΤäƤ�
-��ΤǤ������λ����Ǥϡ� Poll �ϥǡ����١�����˰�Ĥ����ʤ��Ϥ��Ǥ��͡�
+このフォームでは「Poll」フィールドは選択ボックスになり，データベース上の全
+ての Poll オブジェクトを選べるようになります． Django は ``ForeignKey`` を
+表示する時には ``<select>`` ボックスを使わねばならないということを知ってい
+るのです．今の時点では， Poll はデータベース上に一つしかないはずですね．
 
-Poll �ե�����ɤ��٤ˡ֤⤦����ɲ� (Add Another)�ץ�󥯤�����Τ����դ���
-���������� ForeignKey �δط��ˤ��륪�֥������Ȥʤ顤���⤷�ʤ��Ƥ⤳�Υ��
-����ɽ������ޤ����֤⤦����ɲáפ򥯥�å�����ȡ���Poll ���ɲ� (Add
-Poll)�פȤ����ݥåץ��åץ�����ɥ���ɽ�����ޤ������Υ�����ɥ��� Poll ����
-�ä��ơ���¸�פ򲡤��ȡ� Django �� Poll ��ǡ����١�������¸���ơ���Ȥ�
-��Choice ���ɲáץե����������Ѥߤι��ܤȤ���ưŪ���ɲä��ޤ���
+Poll フィールドの隣に「もう一つ追加 (Add Another)」リンクがあるのに注意して
+ください． ForeignKey の関係にあるオブジェクトなら，何もしなくてもこのリン
+クが表示されます．「もう一つ追加」をクリックすると，「Poll を追加 (Add
+Poll)」というポップアップウィンドウを表示します．このウィンドウで Poll を追
+加して「保存」を押すと， Django は Poll をデータベースに保存して，もとの
+「Choice の追加」フォームに選択済みの項目として動的に追加します．
 
-��������������ˡ�� Choice ���֥������Ȥ򥷥��ƥ���ɲä���ˤϸ�ΨŪ�ǤϤ�
-��ޤ��󡥤ष���� Poll ���֥������Ȥ��ɲä������ Choice ��Ҥ�·���ɲý�
-�褿���������Ǥ���͡��������Ƥߤޤ��礦��
+しかし，この方法は Choice オブジェクトをシステムに追加するには効率的ではあ
+りません．むしろ， Poll オブジェクトを追加する時に Choice をひと揃い追加出
+来た方が便利ですよね．そうしてみましょう．
 
-Choice ��ǥ뤫�� ``Admin`` �������ơ� ``ForeignKey(Poll)`` �ե�����ɤ�
-�ʲ��Τ褦���Խ����Ƥ�������::
+Choice モデルから ``Admin`` を削除して， ``ForeignKey(Poll)`` フィールドを
+以下のように編集してください::
 
     poll = models.ForeignKey(Poll, edit_inline=models.STACKED, 
                              num_in_admin=3)
 
-���ιԤ� Django ���Ф��ơ���Choice ���֥������Ȥ� Poll �� admin �ڡ�������
-�Խ����롥�ǥե���ȤǤϡ� 3 �Ĥ� Choice ��ɽ������Τ˽�ʬ�ʥե�����ɤ���
-�դ��뤳�ȡפȻؼ����ޤ���
+この行は Django に対して，「Choice オブジェクトは Poll の admin ページから
+編集する．デフォルトでは， 3 つの Choice を表示するのに十分なフィールドを用
+意すること」と指示します．
 
-���ˡ� ``Choice`` ��¾�Υե�����ɤ��ѹ����ơ� ``core=True`` ����ꤷ�ޤ�::
+次に， ``Choice`` の他のフィールドを変更して， ``core=True`` を指定します::
 
     choice = models.CharField(maxlength=200, core=True)
     votes = models.IntegerField(core=True)
 
-Django �μ�����ؼ��Ϥ����ʤ�ޤ�: ��Choice �� Poll �� admin �ڡ������Խ���
-����ˤϡ� 'choice' �ե�����ɤ� 'votes' �ե�����ɤλ��꤬ɬ�ס�������
-�ե�����ɤΤ��������ʤ��Ȥ��Ĥ����ꤵ��Ƥ���С������� Choice ���֥���
-���Ȥ���������ɤ���Υե�����ɤ��ͤ��������餽�� Choice ���֥������Ȥ�
-������뤳�ȡ�
+Django の受ける指示はこうなります: 「Choice を Poll の admin ページで編集す
+る時には， 'choice' フィールドと 'votes' フィールドの指定が必要．これらの
+フィールドのうちすくなくとも一つが指定されていれば，新たな Choice オブジェ
+クトを作成し，どちらのフィールドの値も削除したらその Choice オブジェクトを
+削除すること」
 
-��Poll ���ɲáץڡ���������ɤ��ơ��ɤ��ɽ���ˤʤä������Ƥߤޤ��礦:
+「Poll を追加」ページをロードして，どんな表示になったか見てみましょう:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin11t.png
    :alt: Add poll page now has choices on it
    :target: http://media.djangoproject.com/img/doc/tutorial/admin11.png
 
-�Ѥ�ä�����ߤƤߤޤ��礦: ��졼��������Ǥ��� Choice ��ɽ�����뤿���
-3 �ĤΥ����åȤ�����ޤ� (``num_in_admin`` �˻��ꤷ�����Ǥ���)������������
-�Ǥ˺����������֥������Ȥ���ѹ����� (Change)�ץڡ����򳫤������ˤϡ�
-Choice �ο�������;ʬ�Υ����åȤ�ɽ�����ޤ��� (�Ĥޤꡤ�ɲäǤ����졼
-��������Υ��֥������Ȥξ�¤ϥϡ��ɥ����ɤ���Ƥ��ޤ���) ���ʤߤˡ�
-Poll ���ѹ�����Ȥ��ˡ���� Choice �ե�����ɤ� 3 ��;ʬ���ɲä���������
-�� ``num_extra_on_change=3`` �Τ褦�ˤ��ޤ���
+変わった点をみてみましょう: リレーション相手である Choice を表示するために
+3 つのスロットがあります (``num_in_admin`` に指定した数ですね)．ただし，す
+でに作成したオブジェクトを「変更する (Change)」ページを開いた場合には，
+Choice の数よりも一つ余分のスロットを表示します． (つまり，追加できるリレー
+ション相手のオブジェクトの上限はハードコードされていません．) ちなみに，
+Poll を変更するときに，常に Choice フィールドを 3 つ余分に追加したい場合に
+は ``num_extra_on_change=3`` のようにします．
 
-�Ȥ����ǡ�����Ϥ���ä�����ˤʤꤽ���Ǥ��� Choice ���֥������Ȥ����Ϥ���
-����Υե�����ɤ�����ɽ�����褦�Ȥ���ȡ������ʹ����Υ����꡼��ɬ�פǤ���
-�Ȥ����櫓�ǡ� Django �ˤϥ���饤��ǥ�졼��������Υ��֥������Ȥ�ɽ��
-������ˡ��⤦����󶡤��Ƥ��ޤ�::
+ところで，これはちょっと問題になりそうです． Choice オブジェクトを入力する
+ためのフィールドを全部表示しようとすると，相当な広さのスクリーンが必要です．
+というわけで， Django にはインラインでリレーション相手のオブジェクトを表示
+する方法をもう一つ提供しています::
 
     poll = models.ForeignKey(Poll, edit_inline=models.TABULAR, 
                              num_in_admin=3)
 
-``edit_inline`` �� ``models.STACKED`` ���� ``models.TABULAR`` ���ѹ�����ȡ�
-��졼��������Υ��֥������ȤϤ�ꥳ��ѥ��Ȥʥơ��֥������ɽ������ޤ�:
+``edit_inline`` を ``models.STACKED`` から ``models.TABULAR`` に変更すると，
+リレーション相手のオブジェクトはよりコンパクトなテーブル形式で表示されます:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin12.png
    :alt: Add poll page now has more compact choices
 
 .. _Customize the admin change list:
 
-admin ���ѹ��ꥹ�ȥڡ����򥫥����ޥ�������
+admin の変更リストページをカスタマイズする
 ===========================================
 
-����������� Poll �� admin �ڡ����Ϥ����֤褯�ʤäƤ��ޤ��������٤ϡ��ѹ���
-���ȡץڡ����򤹤���������ޤ��礦�����Υڡ����ϥ����ƥ������Ƥ� Poll ��
-ɽ�����ޤ���
+さあ，これで Poll の admin ページはだいぶよくなってきました．今度は「変更リ
+スト」ページをすこしいじりましょう．このページはシステム上の全ての Poll を
+表示します．
 
-������� change list �ڡ����ϰʲ��Τ褦�ˤʤäƤ��ޤ�:
+作業前の change list ページは以下のようになっています:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin04t.png
    :alt: Polls change list page
    :target: http://media.djangoproject.com/img/doc/tutorial/admin04.png
 
-�ǥե���ȤǤϡ� Django �ϥ��֥������Ȥ� ``str()`` ��ɽ�����ޤ������ƥե���
-��ɤ��ͤ�ɽ������Ƥ���������Ǥ��礦��ɽ��������ˤ� ``list_display`` ��
-�ץ�����Ȥ��ޤ��� ���Υ��ץ����ˤϡ������ɽ���������ե�����ɤ�̾����
-���ץ�ˤ��ƻ��ꤷ�ޤ�::
+デフォルトでは， Django はオブジェクトの ``str()`` を表示しますが，各フィー
+ルドの値も表示されていると便利でしょう．表示させるには ``list_display`` オ
+プションを使います． このオプションには，カラム表示したいフィールドの名前を
+タプルにして指定します::
 
     class Poll(models.Model):
         # ...
@@ -345,157 +345,157 @@ admin ���ѹ��ꥹ�ȥڡ����򥫥����ޥ�������
             # ...
             list_display = ('question', 'pub_date')
 
-���ޤ��Ȥ��ơ����塼�ȥꥢ�� 1 �����������������᥽�å�
-``was_published_today`` ���ɲä��Ƥߤޤ��礦::
+おまけとして，チュートリアル 1 で定義したカスタムメソッド
+``was_published_today`` も追加してみましょう::
 
     list_display = ('question', 'pub_date', 'was_published_today')
 
-����ǡ� Poll ���ѹ��ꥹ�ȤΥڡ����ϰʲ��Τ褦�ˤʤ�ޤ�:
+これで， Poll の変更リストのページは以下のようになります:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin13t.png
    :alt: Polls change list page, updated
    :target: http://media.djangoproject.com/img/doc/tutorial/admin13.png
 
-�����Υإå��򥯥�å�����ȡ��������ͤ˱����ƥ���ȥ���¤ٴ����Ǥ���
-���������� ``was_published_today`` �إå����㳰�ǡ�����ϥ᥽�åɤ�����ͤ�
-�Ȥä��¤ٴ����򥵥ݡ��Ȥ��Ƥ��ʤ�����Ǥ��� ``was_published_today`` �Υ���
-��إå��Υǥե�����ͤ��᥽�åɤ�̾���ˤʤäƤ��� (��������������϶����
-�֤�����äƤ���) ���Ȥˤ����դ��Ʋ��������᥽�åɤ� ``short_description``
-°������ꤹ��Х����̾���ѹ��Ǥ��ޤ�::
+カラムのヘッダをクリックすると，カラムの値に応じてエントリを並べ換えできま
+す．ただし ``was_published_today`` ヘッダは例外で，これはメソッドの戻り値を
+使った並べ換えをサポートしていないからです． ``was_published_today`` のカラ
+ムヘッダのデフォルト値がメソッドの名前になっている (アンダースコアは空白に
+置き換わっている) ことにも注意して下さい．メソッドに ``short_description``
+属性を指定すればカラム名を変更できます::
 
     def was_published_today(self):
         return self.pub_date.date() == datetime.date.today()
     was_published_today.short_description = 'Published today?'
 
 
-�⤦������ Poll ���ѹ��ꥹ�Ȥ���ɤ��ơ��ե��륿���ä��ޤ��礦�� 
-�ʲ��ιԤ� ``class Admin`` ���������ޤ�::
+もう一点， Poll の変更リストを改良して，フィルタをを加えましょう． 
+以下の行を ``class Admin`` の中に入れます::
 
     list_filter = ['pub_date']
 
-����ǡ��֥ե��륿 (Filter)�ץ����ɥС����Ǥ����ѹ��ꥹ�Ȥ� ``pub_date``
-�ե�����ɤ��ͤ˽��äƥե��륿�Ǥ���褦�ˤʤ�ޤ�:
+これで，「フィルタ (Filter)」サイドバーができ，変更リストを ``pub_date``
+フィールドの値に従ってフィルタできるようになります:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial/admin14t.png
    :alt: Polls change list page, updated
    :target: http://media.djangoproject.com/img/doc/tutorial/admin14.png
 
-ɽ�������ե��륿�Υ����פϡ��ե��륿�˻Ȥ��ե�����ɤΥ����פˤ�ä��Ѥ�
-��ޤ��� ``pub_date`` �� ``DateTimeField`` �ʤΤǡ� Django �ϥǥե���Ȥ�
-�ե��륿�Υ��ץ���󤬡֤��٤Ƥ��� (Any date)�ס��ֺ��� (Today)�ס��ֲ�� 7
-���� (Past 7 days)�ס��ֺ��� (This month)�פ����ơֺ�ǯ (This year)�פǤ���
-�ȹͤ��ޤ���
+表示されるフィルタのタイプは，フィルタに使うフィールドのタイプによって変わ
+ります． ``pub_date`` は ``DateTimeField`` なので， Django はデフォルトの
+フィルタのオプションが「すべての日 (Any date)」，「今日 (Today)」，「過去 7
+日間 (Past 7 days)」，「今月 (This month)」そして「今年 (This year)」である
+と考えます．
 
-�ٹ���δ���Ǥ��͡�������ǽ���ɲä��Ƥߤޤ��礦::
+細工は隆々ですね．検索機能を追加してみましょう::
 
     search_fields = ['question']
 
-������ѹ��ꥹ�Ȥξ����˸����ܥå�����ɽ������ޤ����桼���������������
-����ȡ� Django �� ``question`` �ե�����ɤ򸡺����ޤ����ե�����ɤϤ�����
-�Ǥ�Ȥ��ޤ���������΢�Ǥ� ``LIKE`` �������ȤäƤ���Τǡ��ǡ����١�����
-��٤򤫤��ʤ�����ˤϾＱŪ�ʸ��������ꤷ�ޤ��礦��
+これで変更リストの上部に検索ボックスが表示されます．ユーザが検索語を入力
+すると， Django は ``question`` フィールドを検索します．フィールドはいくつ
+でも使えますが，舞台裏では ``LIKE`` クエリを使っているので，データベースに
+負荷をかけないためには常識的な検索語を指定しましょう．
 
-�Ǹ�ˡ� Poll ���֥������Ȥˤ����եǡ���������Τǡ����դ�Ȥäƹʤ�����
-�������ʤϤ��Ǥ����ʲ��ΰ�Ԥ��ɲä��ޤ��礦::
+最後に， Poll オブジェクトには日付データがあるので，日付を使って絞り込める
+と便利なはずです．以下の一行を追加しましょう::
 
     date_hierarchy = 'pub_date'
 
-����ǡ����դ�Ȥä�����Ū�ʥʥӥ���������ѹ��ꥹ�ȥڡ����ξ������ɲä�
-��ޤ����ȥåץ�٥�Ǥϡ�����ȥ�Τ���ǯ��ɽ�����ޤ������β��Ϸ�ˤʤä�
-���ơ��Ǹ�������Ȥ˥���ȥ��ɽ�����ޤ���
+これで，日付を使った階層的なナビゲーションが変更リストページの上部に追加さ
+れます．トップレベルでは，エントリのある年を表示します．その下は月になって
+いて，最後は日ごとにエントリを表示します．
 
-���ơ��ѹ��ꥹ�Ȥˤϲ��⤷�ʤ��Ƥ�ڡ���ʬ�䵡ǽ�����롤�Ȥ������Ȥ򤳤���
-���Τ餻���Ƥ����������褤�Ǥ��礦���ǥե���ȤǤϥڡ��������� 50 �Ĥ�����
-��ɽ�����ޤ����ڡ���ʬ�䡤�����ܥå������ե��륿�����դˤ�볬�ز��������
-�إå���Ȥä��¤ٴ����Ȥ��ä��ѹ��ꥹ�Ȥε�ǽ�ϡ����٤Ƥ���Ĵ���ƻפ��Τ�
-�ޤ�ư���ΤǤ���
+さて，変更リストには何もしなくてもページ分割機能がある，ということをここで
+お知らせしておいた方がよいでしょう．デフォルトではページあたり 50 個の要素
+を表示します．ページ分割，検索ボックス，フィルタ，日付による階層化，カラム
+ヘッダを使った並べ換えといった変更リストの機能は，すべてが協調して思いのま
+まに動作するのです．
 
 .. _Customize the admin look and feel:
 
-admin �Υ�å� & �ե�����򥫥����ޥ�������
+admin のルック & フィールをカスタマイズする
 ===========================================
 
-��Django ���� (Django adminstration)�פȤ� "example.com" �Ȥ��ä��ƥ����Ȥ�
-admin �ڡ����ξ�����ɽ������Ƥ��ޤ���������Ϥ���������ΤǤ��͡���������
-�����ñ�ʤ�ץ졼���ۥ���ƥ����Ȥˤ����ޤ���
+「Django 管理 (Django adminstration)」とか "example.com" といったテキストが
+admin ページの上部に表示されていますが，これはいささか滑稽ですね．ただし，
+これは単なるプレースホルダテキストにすぎません．
 
-�ѹ�����Τϴ�ñ�ǡ� Django �Υƥ�ץ졼�ȥ����ƥ��Ȥ��ޤ��� Django ��
-admin �����Ȥϡ����켫�� Django �Ǻ���Ƥ���Τǡ����󥿥ե������� Django
-�Υƥ�ץ졼�ȥ����ƥ��ȤäƤ���ΤǤ� (�ʤ�ƥ᥿�ʡ�)
+変更するのは簡単で， Django のテンプレートシステムを使います． Django の
+admin サイトは，それ自身 Django で作られているので，インタフェースは Django
+のテンプレートシステムを使っているのです (なんてメタな！)
 
-����ե����� (``mysite/settings.py`` �Ǥ������) �򳫤��ơ�
-``TEMPLATE_DIRS`` �Ȥ��������õ���Ʋ������� ``TEMPLATE_DIRS`` �ϥե����륷
-���ƥ��Υǥ��쥯�ȥ�̾����ʤ륿�ץ�ǡ� Django �ƥ�ץ졼�Ȥ�����ɤ���
-�Ȥ���õ��������ꤷ�ޤ����Ĥޤ긡���ѥ��Ǥ���
+設定ファイル (``mysite/settings.py`` でしたよね) を開いて，
+``TEMPLATE_DIRS`` という設定を探して下さい． ``TEMPLATE_DIRS`` はファイルシ
+ステム上のディレクトリ名からなるタプルで， Django テンプレートをロードする
+ときに探す場所を指定します．つまり検索パスです．
 
-�ǥե���ȤǤϡ� ``TEMPLATE_DIRS`` �ˤϲ�����ꤵ��Ƥ��ޤ��󡥰���ɲä��ơ�
-Django �˼���ƥ�ץ졼�Ȥ��֤����򶵤��ޤ��礦::
+デフォルトでは， ``TEMPLATE_DIRS`` には何も指定されていません．一行追加して，
+Django に自作テンプレートの置き場所を教えましょう::
 
     TEMPLATE_DIRS = (
-        "/home/my_username/mytemplates", # ��ʬ�δĶ��˹�碌���ѹ����Ƥ���������
+        "/home/my_username/mytemplates", # 自分の環境に合わせて変更してください．
     )
 
-�ǥե���Ȥ� Django admin �������ѥƥ�ץ졼���־�
-(``django/contrib/admin/templates``) ���顤 ``admin/base_site.html`` �Ȥ���
-�ƥ�ץ졼�Ȥ򥳥ԡ����ơ� ``TEMPLATE_DIRS`` ��� ``admin`` �Ȥ����ǥ��쥯
-�ȥ겼���֤��ޤ����㤨�С� ``TEMPLATE_DIRS`` �� 
-``"/home/my_username/mytemplates"`` �� ���ꤷ�Ƥ���С� 
-``django/contrib/admin/templates/admin/base_site.html`` ��
-``/home/my_username/mytemplates/admin/base_site.html`` �˥��ԡ����ޤ��� 
-``admin`` �Ȥ������֥ǥ��쥯�ȥ����Τ�˺��ʤ��褦�ˤ��Ʋ�������
+デフォルトの Django admin サイト用テンプレート置場
+(``django/contrib/admin/templates``) から， ``admin/base_site.html`` という
+テンプレートをコピーして， ``TEMPLATE_DIRS`` 上の ``admin`` というディレク
+トリ下に置きます．例えば， ``TEMPLATE_DIRS`` に 
+``"/home/my_username/mytemplates"`` と 設定していれば， 
+``django/contrib/admin/templates/admin/base_site.html`` を
+``/home/my_username/mytemplates/admin/base_site.html`` にコピーします． 
+``admin`` というサブディレクトリを作るのを忘れないようにして下さい．
 
-�ե�������Խ����ơ� Django �Ƚ񤫤줿��ʬ��ʬ�Υ�����̾���Ѥ��� URL ���
-���路����Τ��ѹ����Ƥ���������
+ファイルを編集して， Django と書かれた部分を自分のサイト名に変え， URL もふ
+さわしいものに変更してください．
 
-Django �Υǥե���Ȥ� admin �ƥ�ץ졼�ȤϤɤ�⥪���Х饤�ɲ�ǽ�Ǥ����ƥ�
-�ץ졼�Ȥ򥪡��Х饤�ɤ���ˤϡ� ``base_site.html`` ��Ʊ�����Ĥޤ�ǥե���
-�ȤΥǥ��쥯�ȥ꤫�饫������ǥ��쥯�ȥ�˥��ԡ������Խ�����Ȥ�������Ȥ�
-�Ƥ���������
+Django のデフォルトの admin テンプレートはどれもオーバライド可能です．テン
+プレートをオーバライドするには， ``base_site.html`` と同じ，つまりデフォル
+トのディレクトリからカスタムディレクトリにコピーして編集するという手順をとっ
+てください．
 
-�������ɼԤϤ�������˻פ��Ǥ��礦:��``TEMPLATE_DIRS`` �ϥǥե���Ȥǲ����
-�ꤷ�Ƥ��ʤ��Τˡ� Django �Ϥɤ����ƥǥե���ȤΥƥ�ץ졼�Ȥ��ܤ����Ƥ��
-��Τ��������������ϡ��֥ǥե���ȤǤϡ� Django �ϥƥ�ץ졼�Ȥ����Ĥ����
-����硤��ưŪ�˳ƥ��ץꥱ�������ѥå������� ``templates/`` ���֥ǥ��쥯
-�ȥ겼��õ���褦�ե�����Хå���褦�ˤʤäƤ���פǤ����ܤ�����
-`�ƥ�ץ졼�ȥ����������פβ���`_ �򻲾Ȥ��Ƥ���������
+賢明な読者はこう疑問に思うでしょう:「``TEMPLATE_DIRS`` はデフォルトで何も指
+定していないのに， Django はどうしてデフォルトのテンプレートを捜し当てられ
+るのだろう？」答えは，「デフォルトでは， Django はテンプレートが見つからな
+い場合，自動的に各アプリケーションパッケージの ``templates/`` サブディレク
+トリ下を探すようフォールバックるようになっている」です．詳しくは
+`テンプレートローダタイプの解説`_ を参照してください．
 
-.. _`�ƥ�ץ졼�ȥ����������פβ���`: ../templates_python/#loader-types
+.. _`テンプレートローダタイプの解説`: ../templates_python/#loader-types
 .. _loader types documentation: ../templates_python.html/#loader-types
 
 .. _Customize the admin index page:
 
-admin ����ǥ����ڡ����Υ������ޥ���
+admin インデクスページのカスタマイズ
 ====================================
 
-�⤷������ȡ�Ʊ���褦�ˤ��� Django admin �����ȤΥ���ǥ����ڡ����Υ�å�
-& �ե�����򥫥����ޥ����������ʤ뤫�⤷��ޤ���͡�
+もしかすると，同じようにして Django admin サイトのインデクスページのルック
+& フィールをカスタマイズしたくなるかもしれませんね．
 
-�ǥե���ȤǤϡ�����ǥ����ڡ����� ``INSTALLED_APPS`` ����˽��ä����ƤΥ�
-�ץꥱ��������ɽ�����ޤ���������ɽ���ν��֤ϥ�����Ǥ������⤷�������
-�쥤�����Ȥ������㤦��Τ��Ѥ������Ȼפ������Τ�ޤ��󡥤ʤ�ˤ��衤�����
-�����ڡ����Ȥ�����Τ� admin �ǺǤ���פʥڡ����Ǥ��ꡤ��ñ�˻Ȥ��ʤ���Ф�
-��ʤ��Ϥ��Ǥ���
+デフォルトでは，インデクスページは ``INSTALLED_APPS`` 設定に従って全てのア
+プリケーションを表示します．しかし表示の順番はランダムですし，もしかすると
+レイアウトを全然違うものに変えたいと思うかも知れません．なんにせよ，インデ
+クスページというものは admin で最も重要なページであり，簡単に使えなければな
+らないはずです．
 
-�������ޥ������٤��ƥ�ץ졼�Ȥ� ``admin/index.html`` �Ǥ� (�����
-``admin/base_site.html`` �ξ���Ʊ���褦�ˡ��ǥե���ȤΥǥ��쥯�ȥ꤫�饫
-������ƥ�ץ졼���־�Υǥ��쥯�ȥ�˥��ԡ����Ƥ�������)���ե�������Խ���
-��ȡ� ``{% get_admin_app_list as app_list %}`` �Ȥ����ƥ�ץ졼�ȥ�������
-�Ĥ���Ϥ��Ǥ������������󥹥ȡ��뤵�줿���ץꥱ��������ɽ�����Ƥ���ߥ�
-����ʬ�Ǥ������Υ��������ˡ�����Υ��֥������Ȥ� admin �ڡ����Υ�󥯤���
-��ϡ��ɥ����ɤ��ơ���ʬ�����ɤȻפ����ˤǤ��ޤ���
+カスタマイズすべきテンプレートは ``admin/index.html`` です (前節の
+``admin/base_site.html`` の場合と同じように，デフォルトのディレクトリからカ
+スタムテンプレート置場のディレクトリにコピーしてください)．ファイルを編集す
+ると， ``{% get_admin_app_list as app_list %}`` というテンプレートタグが見
+つかるはずです．ここがインストールされたアプリケーションを表示しているミソ
+の部分です．このタグの代りに，特定のオブジェクトの admin ページのリンクだけ
+をハードコードして，自分が最良と思う形にできます．
 
-���μ�κ�ȤˤĤ��ơ� Django �Ϥ⤦��ĥ��硼�ȥ��åȤ��󶡤��Ƥ��ޤ���
-``python manage.py adminindex polls`` ��¹Ԥ���ȡ� admin ����ǥ����ڡ���
-�˼�����ǻȤ���褦�ʤҤȤޤȤޤ�Υƥ�ץ졼�ȥ����ɤ���Ϥ��ޤ������
-��­�ݤ���ˤ���������Ǥ��礦��
+この手の作業について， Django はもう一つショートカットを提供しています．
+``python manage.py adminindex polls`` を実行すると， admin インデクスページ
+に取り込んで使えるようなひとまとまりのテンプレートコードを出力します．作業
+の足掛かりにすると便利でしょう．
 
-Django  admin �����ȤΥ�å� & �ե�����򥫥����ޥ�������ܤ�����ˡ�ˤĤ���
-�ϡ� `Django admin CSS ������`_ �򻲾Ȥ��Ƥ���������
+Django  admin サイトのルック & フィールをカスタマイズする詳しい方法について
+は， `Django admin CSS ガイド`_ を参照してください．
 
-admin �����Ȥ�Ȥ����ʤ���褦�ˤʤä��顤 `���塼�ȥꥢ�뤽�� 3`_ �˿ʤ�ǡ�
-poll ���ץꥱ�������θ����ѥӥ塼�����ˤȤ꤫����ޤ��礦��
+admin サイトを使いこなせるようになったら， `チュートリアルその 3`_ に進んで，
+poll アプリケーションの公開用ビュー作成にとりかかりましょう．
 
-.. _`Django admin CSS ������`: ../admin_css/
-.. _`���塼�ȥꥢ�뤽�� 3`: ../tutorial03/
+.. _`Django admin CSS ガイド`: ../admin_css/
+.. _`チュートリアルその 3`: ../tutorial03/
 .. _ Django admin CSS guide: ../admin_css/
 .. _part 3 of this tutorial: ../tutorial3/

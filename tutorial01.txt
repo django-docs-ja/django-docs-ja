@@ -1,34 +1,34 @@
 =====================================
-�Ϥ���Ƥ� Django ���ץ���������� 1 
+はじめての Django アプリ作成，その 1 
 =====================================
 
 .. contents::
 
 :revision-up-to: 4884 (0.96+ SVN)
 
-���������򤨤ʤ���ؤ�Ǥ椭�ޤ��礦��
+さあ，例を交えながら学んでゆきましょう．
 
-���Υ��塼�ȥꥢ��Ǥϡ���ñ����ɼ (poll) ���ץꥱ�������κ����˼���Ȥ�
-�Ǥ�餤�ޤ���
+このチュートリアルでは，簡単な投票 (poll) アプリケーションの作成に取り組ん
+でもらいます．
 
-Poll ���ץꥱ�������ϡ�
+Poll アプリケーションは，
 
-    * �桼������ɼ�������̤�ɽ��������Ǥ�������ѥ�����
-    * ��ɼ���ܤ��ɲá��ѹ��������Ԥ�����δ��� (admin) ������
+    * ユーザが投票したり結果を表示したりできる公開用サイト
+    * 投票項目の追加，変更，削除を行うための管理 (admin) サイト
 
-����Ĥ���ʬ��ʬ����Ƥ����ΤȤ��ޤ��� `Django �ϴ��˥��󥹥ȡ���Ѥ�`_
-�Ǥ���͡� �ǤϻϤ�ޤ��礦�� Django �����󥹥ȡ��뤵��Ƥ��뤫�ɤ����ϡ�
-Python ���å������ư���� ``import django`` ��¹Ԥ��Ƥߤ�Ф狼��ޤ���
-���顼�ʤ� import �Ǥ���ʤ顤 Django �ϥ��󥹥ȡ��뤵��Ƥ��ޤ���
+の二つの部分に分かれているものとします． `Django は既にインストール済み`_
+ですよね？ では始めましょう． Django がインストールされているかどうかは，
+Python 対話シェルを起動して ``import django`` を実行してみればわかります．
+エラーなく import できるなら， Django はインストールされています．
 
-.. _`Django �ϴ��˥��󥹥ȡ���Ѥ�`: ../install/
+.. _`Django は既にインストール済み`: ../install/
 .. _`Django installed`: ../install/
 
-.. admonition:: ���ä��Ȥ���:
+.. admonition:: 困ったときは:
 
-    ���Υ��塼�ȥꥢ���ʤ�Ƥ椯��Ǻ��ä����Ȥ����ä��顤 
-    `django-users`_ ��  ``irc.freenode.net`` �� `#django`_ ����ͥ�Ǽ��䤷
-    �ƤߤƤ���������
+    このチュートリアルを進めてゆく上で困ったことがあったら， 
+    `django-users`_ や  ``irc.freenode.net`` の `#django`_ チャネルで質問し
+    てみてください．
 
 .. _django-users: http://groups.google.com/group/django-users 
 .. _#django: irc://irc.freenode.net/django
@@ -36,44 +36,44 @@ Python ���å������ư���� ``import django`` ��¹Ԥ��Ƥߤ�Ф狼��ޤ���
 
 .. _Creating a project:
 
-�ץ��������Ȥκ���
+プロジェクトの作成
 ==================
 
-���� Django ��Ȥ��Τʤ顤�ǽ�Υ��åȥ��åפ�Ԥ�ɬ�פ�����ޤ����̾�ϡ�
-Django �� *�ץ��������� (project)* �������륳���ɤ�ư�������ޤ����ץ�����
-���ȤȤϡ��ǡ����١���������� Django ��ͭ�Υ��ץ���󡤥��ץꥱ��������
-ͭ������ʤɤȤ��ä����ġ��� Django ���󥹥��󥹤�����򤢤Ĥ᤿��ΤǤ���
+初めて Django を使うのなら，最初のセットアップを行う必要があります．通常は，
+Django の *プロジェクト (project)* を構成するコードを自動生成します．プロジェ
+クトとは，データベースの設定や Django 固有のオプション，アプリケーション固
+有の設定などといった，個々の Django インスタンスの設定をあつめたものです．
 
-���ޥ�ɥ饤�󤫤顤�����ɤ��֤��������� ``cd`` ���ơ�
-``django-admin.py startproject mysite`` ��¹Ԥ��Ƥ������������ߤΥǥ��쥯
-�ȥ�� ``mysite`` �ǥ��쥯�ȥ꤬��������ޤ���
+コマンドラインから，コードを置きたい場所に ``cd`` して，
+``django-admin.py startproject mysite`` を実行してください．現在のディレク
+トリに ``mysite`` ディレクトリが作成されます．
 
 .. note::
     
-    �ץ��������Ȥ�̾�����դ���Ȥ����Ȥ߹��ߤ� Python �⥸�塼��� Django
-    �Υ���ݡ��ͥ�Ȥ�̾����Ȥ�ʤ��褦�ˤ��Ƥ����������Ȥ�櫓�� 
-    ``django`` (Django ���Τ���äƤ��ޤ��ޤ�) �� ``site`` (�Ȥ߹��ߤ�
-    Python �ѥå�����̾�����ޤ�) ��Ȥ�ʤ��褦�ˤ��ޤ��礦��
+    プロジェクトの名前を付けるとき，組み込みの Python モジュールや Django
+    のコンポーネントの名前を使わないようにしてください．とりわけ， 
+    ``django`` (Django 自体と被ってしまいます) や ``site`` (組み込みの
+    Python パッケージ名と被ります) を使わないようにしましょう．
 
-(``python setup.py`` �桼�ƥ���ƥ��� Django �򥤥󥹥ȡ��뤷���Τʤ顤
-``django-admin.py`` �������ƥ�ѥ��Τɤ����ˤ���Ϥ��Ǥ����ѥ���ˤʤ���С�
-``site-packages/django/bin`` �ˤ���ޤ��� ``site-packages`` �� Python ����
-���ȡ���ǥ��쥯�ȥ����ˤ���ޤ����ѥ���Τɤ������㤨��
-``/usr/local/bin`` �˥���ܥ�å���󥯤�ĥ�äƤ����ޤ��礦��)
+(``python setup.py`` ユーティリティで Django をインストールしたのなら，
+``django-admin.py`` がシステムパスのどこかにあるはずです．パス上になければ，
+``site-packages/django/bin`` にあります． ``site-packages`` は Python イン
+ストールディレクトリの中にあります．パス上のどこか，例えば
+``/usr/local/bin`` にシンボリックリンクを張っておきましょう．)
 
-.. admonition:: �����ɤϤɤ����֤��Ρ�
+.. admonition:: コードはどこに置くの？
 
-    PHP �ηи�������ʤ顤����ޤǤ� Web �����ФΥɥ�����ȥ롼�Ȳ�
-    (``/var/www`` �Ȥ��ä����) �˥����ɤ����֤��Ƥ������ȤǤ��礦�� Django
-    �ǤϤ�������ɬ�פϤ���ޤ��󡥤ष�� Python �����ɤ�ɥ�����ȥ롼��
-    �����֤��Τϸ����ǤϤ���ޤ��󡥥����ɤ�ɥ�����ȥ롼�Ȳ����֤��ȡ�
-    ï���������ɤ� Web ��𤷤��ɤ��褦�ˤʤäƤ��ޤ�����Ǥ�������ϰ���
-    ������������ޤ���
+    PHP の経験があるなら，これまでは Web サーバのドキュメントルート下
+    (``/var/www`` といった場所) にコードを配置してきたことでしょう． Django
+    ではそうする必要はありません．むしろ Python コードをドキュメントルート
+    下に置くのは賢明ではありません．コードをドキュメントルート下に置くと，
+    誰かがコードを Web を介して読めるようになってしまうからです．これは安全
+    上よろしくありません．
 
-    �����ɤϥɥ�����ȥ롼�Ȥ� **��** ���㤨�� ``/home/mycode`` �Τ褦��
-    �����֤��ޤ��礦��
+    コードはドキュメントルートの **外** ，例えば ``/home/mycode`` のような
+    場所に置きましょう．
 
-``startproject`` �����������������ߤƤߤޤ��礦:
+``startproject`` が何を作成したかをみてみましょう:
 
 .. class:: python-code
 
@@ -85,28 +85,28 @@ Django �� *�ץ��������� (project)* �������륳���ɤ�ư�������ޤ����ץ�����
         settings.py
         urls.py
 
-�ե�����Ϥ��줾��ʲ��Τ褦��������äƤ��ޤ�:
+ファイルはそれぞれ以下のような役割を持っています:
 
-    * ``__init__.py``: ���Υǥ��쥯�ȥ꤬ Python �ѥå������Ǥ��뤳�Ȥ�
-      Python ���Τ餻�뤿��ζ��Υե�����Ǥ���(Python �ν鿴�Ԥϡ� Python
-      �θ����ɥ�����Ȥ� (`�ѥå������ξܤ�������`_ ���ɤ�ǲ�������)
-    * ``manage.py``: Django �ץ��������Ȥ��Ф����͡�������Ԥ�����Υ���
-      ��ɥ饤��桼�ƥ���ƥ��Ǥ���
-    * ``settings.py``: Django �ץ��������Ȥ�����ե�����Ǥ���
-    * ``urls.py``: Django �ץ��������Ȥ� URL ����������ʤ�� Django ������
-      �Ȥˤ�������ܼ��פ��������ޤ���
+    * ``__init__.py``: このディレクトリが Python パッケージであることを
+      Python に知らせるための空のファイルです．(Python の初心者は， Python
+      の公式ドキュメントの (`パッケージの詳しい説明`_ を読んで下さい．)
+    * ``manage.py``: Django プロジェクトに対する様々な操作を行うためのコマ
+      ンドラインユーティリティです．
+    * ``settings.py``: Django プロジェクトの設定ファイルです．
+    * ``urls.py``: Django プロジェクトの URL 宣言，いうなれば Django 化サイ
+      トにおける「目次」に相当します．
 
-.. _`�ѥå������ξܤ�������`: http://www.python.jp/doc/release/tut/node8.html#packages
+.. _`パッケージの詳しい説明`: http://www.python.jp/doc/release/tut/node8.html#packages
 .. _more on packages: http://docs.python.org/tut/node8.html#packages
 
 .. _The development server:
 
-��ȯ�ѥ�����
+開発用サーバ
 ------------
 
-�ץ��������Ȥ����ޤ�ư��뤫�Τ���ޤ��礦�� ``mysite`` �ǥ��쥯�ȥ�˰�
-�ꡤ ``python manage.py runserver`` ��¹Ԥ��Ƥ����������ʲ��Τ褦�ʥ�å���
-����ɽ�������Ϥ��Ǥ�::
+プロジェクトがうまく動作するか確かめましょう． ``mysite`` ディレクトリに移
+り， ``python manage.py runserver`` を実行してください．以下のようなメッセー
+ジが表示されるはずです::
 
     Validating models...
     0 errors found.
@@ -116,166 +116,166 @@ Django �� *�ץ��������� (project)* �������륳���ɤ�ư�������ޤ����ץ�����
     Quit the server with CONTROL-C (Unix) or CTRL-BREAK (Windows).
 
 
-����ǡ� Django ��ȯ�����Ф�ư���ޤ����� Django ��ȯ�����Ф� Python ����
-�ǽ񤫤줿���̤� Web �����ФǤ������Υ����Фϡ���ȯ���®�˹Ԥ������Ѥ�Ŭ��
-�����֤ˤʤ�ޤ� Apache �Τ褦�ʱ��ѥ����Ф�����򤤤���ʤ��Ƥ��ɤ��褦��
-���뤿��Τ�ΤǤ���
+これで， Django 開発サーバを起動しました． Django 開発サーバは Python だけ
+で書かれた軽量な Web サーバです．このサーバは，開発を迅速に行い，運用に適し
+た状態になるまで Apache のような運用サーバの設定をいじらなくても良いように
+するためのものです．
 
-���������դ��Ƥ������ۤ����褤�Ǥ��礦: ���Υ����Фϳ�ȯ������Ѥ�����ͤ�
-�ƺ���Ƥ��뤿�ᡤ���Ф˱��ѴĶ��ǤϻȤ�ʤ��褦�ˤ��Ƥ������� (ɮ�Ԥ���
-������� Web �ե졼�����Ǥ��äơ� Web �����ФǤϤ���ޤ���)��
+ここで注意しておいたほうがよいでしょう: このサーバは開発中の利用だけを考え
+て作られているため，絶対に運用環境では使わないようにしてください (筆者たち
+の専門は Web フレームワークであって， Web サーバではありません)．
 
-����������ǥ����Ф���ư�����Τǡ��֥饦���� http://127.0.0.1:8000/ �˥���
-�������ƤߤƤ��������� "Welcome to Django" ��ɽ�����줿���������ʥѥ��ƥ�Ĵ
-�Υ饤�ȥ֥롼�Υڡ������Ф�Ϥ��Ǥ�����ä��͡�
+さあ，これでサーバが起動したので，ブラウザで http://127.0.0.1:8000/ にアク
+セスしてみてください． "Welcome to Django" と表示された，愉快げなパステル調
+のライトブルーのページが出るはずです．やったね！
 
-.. admonition:: �ݡ����ֹ���ѹ�
+.. admonition:: ポート番号の変更
 
-    �ǥե���ȤǤϡ� ``runserver`` ���ޥ�ɤ�¹Ԥ���ȡ���ȯ�ѥ����Фϥݡ�
-    ���ֹ� 8000 �ǵ�ư���ޤ��������ФΥݡ����ֹ���ѹ���������С����ޥ��
-    �饤������ǻ��ꤷ�ޤ����㤨�Хݡ����ֹ�� 8080 �ˤ�������аʲ��Τ褦
-    �ˤ��Ƥ�������::
+    デフォルトでは， ``runserver`` コマンドを実行すると，開発用サーバはポー
+    ト番号 8000 で起動します．サーバのポート番号を変更したければ，コマンド
+    ライン引数で指定します．例えばポート番号を 8080 にしたければ以下のよう
+    にしてください::
 
         python manage.py runserver 8080
 
-    ��ȯ�����Фξܺ٤������� `django-admin �Υɥ������`_ �ˤ���ޤ���
+    開発サーバの詳細な説明は `django-admin のドキュメント`_ にあります．
 
-.. _`django-admin �Υɥ������`: ../django-admin/
+.. _`django-admin のドキュメント`: ../django-admin/
 
 .. _Database setup:
 
-Database ������
+Database の設定
 ---------------
 
-����Ǥ� ��``settings.py`` ���Խ����ޤ��礦�� ``settings.py`` �� Django ��
-�����ɽ�������̾�� Python �⥸�塼��Ǥ��������񤭴����ơ����Ȥ��Υǡ�
-���١����ؤ���³�ѥ�᥿�˹�碌�ޤ��礦:
+それでは ，``settings.py`` を編集しましょう． ``settings.py`` は Django の
+設定を表現する通常の Python モジュールです．設定を書き換えて，お使いのデー
+タベースへの接続パラメタに合わせましょう:
 
-    * ``DATABASE_ENGINE`` -- 'postgresql', 'mysql' �ޤ��� 'sqlite3'
-      �Τ����줫�Ǥ���¾�ˤ� `�����Ĥ� <../settings/>`_ ����ޤ���
-    * ``DATABASE_NAME`` -- �ǡ����١�����̾���Ǥ��� SQLite ��ȤäƤ�����
-      �ˤϥǡ����١����ե�����Υե�ѥ� (���Хѥ�) �ˤ��ޤ���
-    * ``DATABASE_USER`` -- �ǡ����١����Υ桼��̾�Ǥ� (SQLite �ǤϻȤ��ޤ�
-      ��)��
-    * ``DATABASE_PASSWORD`` -- �ǡ����١����Υѥ���ɤǤ���(SQLite �Ǥϻ�
-      ���ޤ���)��
-    * ``DATABASE_HOST`` -- �ǡ����١����Τ���ۥ��ȤǤ����ǡ����١���������
-      ��ʪ��Ū��Ʊ���ޥ����ˤ���Τʤ��ʸ����ˤ��Ƥ����ޤ���(SQLite ��
-      �ϻȤ��ޤ���)��
+    * ``DATABASE_ENGINE`` -- 'postgresql', 'mysql' または 'sqlite3'
+      のいずれかです．他にも `いくつか <../settings/>`_ あります．
+    * ``DATABASE_NAME`` -- データベースの名前です． SQLite を使っている場合
+      にはデータベースファイルのフルパス (絶対パス) にします．
+    * ``DATABASE_USER`` -- データベースのユーザ名です (SQLite では使いませ
+      ん)．
+    * ``DATABASE_PASSWORD`` -- データベースのパスワードです．(SQLite では使
+      いません)．
+    * ``DATABASE_HOST`` -- データベースのあるホストです．データベースサーバ
+      が物理的に同じマシン上にあるのなら空文字列にしておきます．(SQLite で
+      は使いません)．
 
 .. admonition:: Note
 
-    PostgreSQL �� MySQL ��ȤäƤ����硤���λ����ǥǡ����١������������
-    �����Ƥ����������ǡ����١������������ˤϡ��ǡ����١��������åץ����
-    �Ȥ� "``CREATE DATABASE database_name;``" ��¹Ԥ��ޤ���
+    PostgreSQL や MySQL を使っている場合，この時点でデータベースを作成して
+    おいてください．データベースを作成するには，データベースの対話プロンプ
+    トで "``CREATE DATABASE database_name;``" を実行します．
 
-``settings.py`` ���Խ�����ݡ��ե�����������᤯�ˤ��� ``INSTALLED_APPS``
-��������դ��Ƥ��������������ѿ��ˤϡ����ߤ� Django ���󥹥��󥹤�ͭ���ˤʤ�
-�Ƥ������Ƥ� Django ���ץꥱ��������̾��������ޤ������ץꥱ��������ʣ
-���Υץ��������Ȥ����ѤǤ������ۤ�Ǥ��ޤ���
+``settings.py`` を編集する際，ファイルの末尾近くにある ``INSTALLED_APPS``
+設定に注意してください．この変数には，現在の Django インスタンスで有効になっ
+ている全ての Django アプリケーションの名前が入ります．アプリケーションは複
+数のプロジェクトで利用でき，配布もできます．
 
-�ǥե���ȤǤ� ``INSTALLED_APPS`` �ˤϰʲ��Υ��ץꥱ����������äƤ��ޤ���
-�����Υ��ץꥱ�������Ϥ������ Django ����°�Τ�ΤǤ�:
+デフォルトでは ``INSTALLED_APPS`` には以下のアプリケーションが入っています．
+これらのアプリケーションはいずれも Django に付属のものです:
 
-    * ``django.contrib.auth`` -- ǧ�ڥ����ƥ�Ǥ���
-    * ``django.contrib.contenttypes`` -- ����ƥ�ĥ����׽����ե졼����
-      �Ǥ���
-    * ``django.contrib.sessions`` -- ���å����ե졼�����Ǥ���
-    * ``django.contrib.sites`` -- ��Ĥ� Django ��ʣ���Υ����Ȥ�������뤿
-      ��Υե졼�����Ǥ���
+    * ``django.contrib.auth`` -- 認証システムです．
+    * ``django.contrib.contenttypes`` -- コンテンツタイプ処理フレームワーク
+      です．
+    * ``django.contrib.sessions`` -- セッションフレームワークです．
+    * ``django.contrib.sites`` -- 一つの Django で複数のサイトを管理するた
+      めのフレームワークです．
 
-�����ϡ��褯��������������ʤΤǥǥե���Ȥ���°���Ƥ��ޤ���
+これらは，よくある状況で便利なのでデフォルトで付属しています．
 
-�����Υ��ץꥱ��������ɬ�����ʤ��Ȥ��ĤΥǡ����١����ơ��֥��Ȥ���
-���������ǡ����ץꥱ��������Ȥ����˥ơ��֥��������Ƥ���ɬ�פ�����ޤ���
-�ơ��֥���������ˤϰʲ��Υ��ޥ�ɤ�Ȥ��ޤ�::
+これらのアプリケーションは必ず少なくとも一つのデータベーステーブルを使いま
+す．そこで，アプリケーションを使う前にテーブルを作成しておく必要があります．
+テーブルを作成するには以下のコマンドを使います::
 
     python manage.py syncdb
 
-``syncdb`` ���ޥ�ɤ� ``INSTALLED_APPS`` �����õ���� ``settings.py`` ��
-�ǡ����١�������˽��äƥǡ����١������ɬ�פʥơ��֥��������ޤ������ޥ�
-�ɤ����������ǡ����١����򼨤���å�������ɽ�����졤ǧ�ڥ����ƥ�ǻȤ�����
-�ѥ桼����������Ȥ�������������ɤ����Ҥͤ�ץ���ץȤ��Фޤ������������
-��������Ƥ����ޤ��礦��
+``syncdb`` コマンドは ``INSTALLED_APPS`` 設定を探し， ``settings.py`` の
+データベース設定に従ってデータベース上に必要なテーブルを作成します．コマン
+ドが生成したデータベースを示すメッセージが表示され，認証システムで使うスー
+パユーザアカウントを作成したいかどうか尋ねるプロンプトが出ます．アカウント
+を作成しておきましょう．
 
-Django ���ɤ�ʥơ��֥�������������̣������ʤ顤�ǡ����١����Υ��ޥ�ɥ�
-���󥯥饤����Ȥ�Ȥäơ� ``\dt`` (PostgreSQL), ``SHOW TABLES;`` (MySQL), 
-���뤤�� ``.schema`` (SQLite) �����Ϥ��Ƥߤޤ��礦��
+Django がどんなテーブルを作成したか興味があるなら，データベースのコマンドラ
+インクライアントを使って， ``\dt`` (PostgreSQL), ``SHOW TABLES;`` (MySQL), 
+あるいは ``.schema`` (SQLite) と入力してみましょう．
 
-.. admonition:: �ߥ˥ޥꥹ�ȤΤ����
+.. admonition:: ミニマリストのために
 
-    ��ǽҤ٤��褦�ˡ��ǥե���ȤΥ��ץꥱ�������Ϥ褯���륱�������б���
-    �뤿������äƤ���ˤ�������ï�⤬ɬ�פȤ��Ƥ���櫓�ǤϤ���ޤ��󡥥�
-    �ե���ȥ��ץꥱ�������ΰ����ʤ������ʤ꤬ɬ�פʤ���С� ``syncdb``
-    ��¹Ԥ������˳�������Ԥ򥳥��ȥ����Ȥ��뤫������Ƥ��ޤ��ޤ���
-    ``syncdb`` ���ޥ�ɤ� ``INSTALLED_APPS`` �ˤ��륢�ץꥱ�������Υơ���
-    ����������Ƥ���ˤ����ޤ���
+    上で述べたように，デフォルトのアプリケーションはよくあるケースに対応す
+    るために入っているにすぎず，誰もが必要としているわけではありません．デ
+    フォルトアプリケーションの一部なり全部なりが必要なければ， ``syncdb``
+    を実行する前に該当する行をコメントアウトするか削除してかまいません．
+    ``syncdb`` コマンドは ``INSTALLED_APPS`` にあるアプリケーションのテーブ
+    ルを生成しているにすぎません．
 
 .. _Creating models:
 
-��ǥ�κ���
+モデルの作成
 ============
 
-����������Ǽ�ʬ�ѤδĶ������ʤ���ץ��������Ȥ�Ω���夬�ꡤ��ȤˤȤ꤫��
-��������Ǥ��ޤ�����
+さあ，これで自分用の環境，すなわちプロジェクトが立ち上がり，作業にとりかか
+る準備ができました．
 
-Django �ǽ񤤤����ץꥱ�������� Python �ѥå���������ʤꡤ ���뵬��˽���
-�� `Python �ѥ�`_ �Τɤ������֤��ͤФʤ�ޤ���Django �ˤϥ��ץꥱ�������
-�δ���Ū�ʥǥ��쥯�ȥ깽¤��������뤿��Υ桼�ƥ���ƥ����Ĥ��Ƥ���Τǡ�
-�ǥ��쥯�ȥ�κ����ϵ��ˤ��������ɤε��Ҥ˽���Ǥ��ޤ���
+Django で書いたアプリケーションは Python パッケージからなり， ある規約に従っ
+て `Python パス`_ のどこかに置かねばなりません．Django にはアプリケーション
+の基本的なディレクトリ構造を作成するためのユーティリティがついてくるので，
+ディレクトリの作成は気にせずコードの記述に集中できます．
 
-.. admonition:: �ץ��������Ȥȥ��ץꥱ�������
+.. admonition:: プロジェクトとアプリケーション
 
-    �ץ��������Ȥȥ��ץꥱ�������ΰ㤤�Ȥϲ��Ǥ��礦�������ץꥱ�������
-    �Ȥϡ��ºݤ˲��餫�ν�����Ԥ� Web ���ץꥱ��������ؤ��ޤ����㤨�Х�
-    ���������ƥ������쥳���ɤΥǡ����١�����ñ�����ɼ���ץ�Ȥ��ä����
-    �Ǥ����ץ��������ȤȤϡ����륦���֥����ȸ���������ȥ��ץꥱ��������
-    ���᤿��ΤǤ�����ĤΥץ��������Ȥˤ�ʣ���Υ��ץꥱ��������������
-    �ޤ����ޤ�����ĤΥ��ץꥱ��������ʣ���Υץ��������ȤǻȤ��ޤ���
+    プロジェクトとアプリケーションの違いとは何でしょうか？アプリケーション
+    とは，実際に何らかの処理を行う Web アプリケーションを指します．例えばブ
+    ログシステムや公開レコードのデータベース，単純な投票アプリといった具合
+    です．プロジェクトとは，あるウェブサイト向けに設定とアプリケーションを
+    集めたものです．一つのプロジェクトには複数のアプリケーションを入れられ
+    ます．また，一つのアプリケーションは複数のプロジェクトで使えます．
 
-���Υ��塼�ȥꥢ��Ǥϡ���ñ�Τ��ᡤ��ɼ���ץꥱ�������� ``mysite`` �ǥ�
-�쥯�ȥ����˺��ޤ������η�̡����ץꥱ�������ϥץ��������Ȥȥ��åץ�
-�󥰤��ޤ������ʤ���� poll ���ץꥱ���������� Python �����ɤ�
-``mysite.polls`` �Τ褦�˻��Ȥ���뤳�Ȥˤʤ�ޤ������塼�ȥꥢ��θ�Ⱦ
-�Ǥϡ����ץꥱ�������������Ѥ�æ���åץ�󥰤�����ˡ�ˤĤ��Ƶ�������ͽ��
-�Ǥ���
+このチュートリアルでは，簡単のため，投票アプリケーションを ``mysite`` ディ
+レクトリの中に作ります．その結果，アプリケーションはプロジェクトとカップリ
+ングします．すなわち， poll アプリケーション内の Python コードは
+``mysite.polls`` のように参照されることになります．チュートリアルの後半
+では，アプリケーションを配布用に脱カップリングする方法について議論する予定
+です．
 
-���ץꥱ���������������ˤϡ� ``mysite`` �ǥ��쥯�ȥ�β������äơ���
-���Τ褦�ʥ��ޥ��::
+アプリケーションを作成するには， ``mysite`` ディレクトリの下に入って，以
+下のようなコマンド::
 
     python manage.py startapp polls
 
-�����Ϥ��ޤ������Υ��ޥ�ɤ� ``polls`` �Ȥ����ǥ��쥯�ȥ����������������
-�쥤�����Ȥϰʲ��Τ褦�ˤʤ�ޤ�::
+を入力します．このコマンドは ``polls`` というディレクトリを作成し，その中の
+レイアウトは以下のようになります::
 
     polls/
         __init__.py
         models.py
         views.py
 
-���Υǥ��쥯�ȥ깽¤�������� poll ���ץꥱ���������������Ǥ���
+このディレクトリ構造こそが， poll アプリケーションの全体像です．
 
-Django �ǥǡ����١��� Web ���ץꥱ��������񤯤���κǽ�Υ��ƥåפϡ���
-�ǥ������Ǥ����ܼ�Ū�ˤϡ��ǡ����١����Υ쥤�����Ȥȡ��ɲäΥ᥿�ǡ�����
-����Ǥ���
+Django でデータベース Web アプリケーションを書くための最初のステップは，モ
+デルの定義です．本質的には，データベースのレイアウトと，追加のメタデータの
+定義です．
 
 .. class:: admonition-philosophy
-.. admonition:: �߷�ů��
+.. admonition:: 設計哲学
 
-   ��ǥ�ϡ�������Υǡ������Ф���ͣ�� (single) �η���Ū�� (definitive) ����
-   ���Ǥ�����ǥ�ˤϼ�ʬ����Ǽ�������ǡ����ˤȤä�ɬ���Բķ�ʥե�����ɤȡ�
-   ���Υǡ����ε�ư�����ޤ��� Django �� `DRY §`_ �˽��äƤ��ޤ���Django
-   �Υ�ǥ����Ū�ϡ�������Ĥξ��ǥǡ�����ǥ����������������鼫ưŪ��
-   �ǡ�������Ф���褦�ˤ��뤳�Ȥˤ���ޤ���
+   モデルは，手持ちのデータに対する唯一 (single) の決定的な (definitive) ソー
+   スです．モデルには自分が格納したいデータにとって必要不可欠なフィールドと，
+   そのデータの挙動を収めます． Django は `DRY 則`_ に従っています．Django
+   のモデルの目的は，ただ一つの場所でデータモデルを定義し，そこから自動的に
+   データを取り出せるようにすることにあります．
 
-���줫�鳫ȯ�����ñ�� poll ���ץꥱ�������Ǥϡ���ɼ���� (poll) �������
-(choice) ����ĤΥ�ǥ��������ޤ��� poll �ˤϼ������ (question) �ȸ�����
-(publication date) �ξ��󤬤���ޤ��� choice �ˤ������Υƥ����Ȥ���ɼ��
-(vote) �Ȥ�����ĤΥե�����ɤ�����ޤ����� choice �ϰ�Ĥ� poll �˴�Ϣ�Ť�
-���뤳�Ȥˤʤ�ޤ���
+これから開発する簡単な poll アプリケーションでは，投票項目 (poll) と選択肢
+(choice) の二つのモデルを作成します． poll には質問事項 (question) と公開日
+(publication date) の情報があります． choice には選択肢のテキストと投票数
+(vote) という二つのフィールドがあります．各 choice は一つの poll に関連づけ
+られることになります．
 
-Django �Ǥϡ�����������ǰ���ñ�� Python ���饹��ɽ���Ǥ��ޤ���
-``polls/models.py`` �ե������ʲ��Τ褦���Խ����Ƥ�������::
+Django では，こうした概念を簡単な Python クラスで表現できます．
+``polls/models.py`` ファイルを以下のように編集してください::
 
     from django.db import models
 
@@ -288,66 +288,66 @@ Django �Ǥϡ�����������ǰ���ñ�� Python ���饹��ɽ���Ǥ��ޤ���
         choice = models.CharField(maxlength=200)
         votes = models.IntegerField()
 
-�����ɤ�ñ������Ǥ��͡��ƥ�ǥ�ϰ�ĤΥ��饹��ɽ�����졤�������
-``django.db.models.Model`` �Υ��֥��饹�ˤʤäƤ��ޤ����ƥ�ǥ�ˤ�ʣ���Υ�
-�饹�ѿ������ꡤ�ġ��Υ��饹�ѿ��ϥ�ǥ�Υǡ����١����ե�����ɤ�ɽ������
-���ޤ���
+コードは単純明解ですね．各モデルは一つのクラスで表現され，いずれも
+``django.db.models.Model`` のサブクラスになっています．各モデルには複数のク
+ラス変数があり，個々のクラス変数はモデルのデータベースフィールドを表現して
+います．
 
-�ƥե�����ɤ� ``models.*Field`` ���饹�Υ��󥹥��󥹤Ȥ���ɽ������Ƥ��ޤ���
-�㤨�С� ``models.CharField`` ��ʸ���Υե�����ɤǡ�
-``models.DateTimeField`` �������ե�����ɤǤ��������������饹�ϡ��ƥե�����
-�ɤˤɤΤ褦�ʥǡ������򵭲������뤫�� Django �˶����ޤ���
+各フィールドは ``models.*Field`` クラスのインスタンスとして表現されています．
+例えば， ``models.CharField`` は文字のフィールドで，
+``models.DateTimeField`` は日時フィールドです．こうしたクラスは，各フィール
+ドにどのようなデータ型を記憶させるかを Django に教えます．
 
-``models.*Field`` ���󥹥��󥹤�̾�� (``question`` �� ``pub_date``) �ϥե���
-��ɤ�̾���ǡ��׻����ˤȤäư����䤹��̾�����դ��ޤ�������̾���� Python ����
-�ɤ���ǻȤ��ޤ������ǡ����١����Ǥϥ����̾�˻Ȥ��ޤ���
+``models.*Field`` インスタンスの名前 (``question`` や ``pub_date``) はフィー
+ルドの名前で，計算機にとって扱いやすい名前を付けます．この名前は Python コー
+ドの中で使いますし，データベースではカラム名に使います．
 
-``Field`` ������������ˤϡ����ץ����Ȥ��ƿʹֲ��ɤʥե������̾�����
-�Ǥ��ޤ������Υե������̾�� Django ����Ĥ���� (introspection) ��ǽ�ǻȤ�
-¾���ɥ�����ȤȤ��Ƥ�����̤����ޤ����ʹֲ��ɤʥե������̾����ꤷ��
-����硤 Django �ϵ������ɤ�̾����Ȥ��ޤ��������Ǥϡ� ``Poll.pub_date``
-�ˤ����ʹֲ��ɤʥե������̾����ꤷ�ޤ�������ǥ��¾�Υե�����ɤǤϡ��ե���
-��ɤε������ɤ�̾���Ͽʹֲ��ɤ�̾���Ȥ��Ƥ⽽ʬ�ʤΤ�������Ƥ��ޤ���
+``Field`` の第一固定引数には，オプションとして人間可読なフィールド名も指定
+できます．このフィールド名は Django の二つの内省 (introspection) 機能で使う
+他，ドキュメントとしての役割も果たします．人間可読なフィールド名を指定しな
+い場合， Django は機械可読な名前を使います．上の例では， ``Poll.pub_date``
+にだけ人間可読なフィールド名を指定しました．モデルの他のフィールドでは，フィー
+ルドの機械可読な名前は人間可読な名前としても十分なので定義していません．
 
-``Field`` ���饹����ˤ�ɬ�ܤΰ�������Ĥ�Τ�����ޤ����㤨��
-``CharField`` �ˤ� ``maxlength`` ����ꤹ��ɬ�פ�����ޤ������ΰ����ϥǡ���
-�١����������ޤǻȤ���¾����ǽҤ٤�Х�ǡ������Ǥ�Ȥ��ޤ���
+``Field`` クラスの中には必須の引数を持つものがあります．例えば
+``CharField`` には ``maxlength`` を指定する必要があります．この引数はデータ
+ベーススキーマで使われる他，後で述べるバリデーションでも使われます．
 
-�Ǹ�ˡ� ``models.ForeignKey`` ��Ȥäƥ�졼������������Ƥ��뤳�Ȥ���
-�դ��Ʋ����������Υ�졼�����ϡ��� Choice ����Ĥ� Poll �˴�Ϣ�Ť�����
-���뤳�Ȥ� Django �˶����ޤ��� Django ��¿�а졤¿��¿�����а�Ȥ��ä�����
-���Ȥ��Ƥ����졼��������Ƥ򥵥ݡ��Ȥ��Ƥ��ޤ���
+最後に， ``models.ForeignKey`` を使ってリレーションが定義されていることに注
+意して下さい．このリレーションは，各 Choice が一つの Poll に関連づけられて
+いることを Django に教えます． Django は多対一，多対多，一対一といった，広
+く使われているリレーション全てをサポートしています．
 
-.. _`Python �ѥ�`: http://www.python.jp/doc/release/tut/node8.html#SECTION008110000000000000000
+.. _`Python パス`: http://www.python.jp/doc/release/tut/node8.html#SECTION008110000000000000000
 .. _`Python path`: http://docs.python.org/tut/node8.html#SECTION008110000000000000000
-.. _`DRY §`: http://c2.com/cgi/wiki?DontRepeatYourself
+.. _`DRY 則`: http://c2.com/cgi/wiki?DontRepeatYourself
 .. _DRY Principle: http://c2.com/cgi/wiki?DontRepeatYourself
 
 .. _Activating models:
 
-��ǥ��ͭ���ˤ���
+モデルを有効にする
 ==================
 
-���ҤΤ褦�ʤۤ�Τ鷺���ʥ����ɤ��ǥ�˽񤯤����ǡ� Django �Ϥ��������
-������ˤ��ޤ������Υ����ɤ�Ȥäơ� Django ��:
+前述のようなほんのわずかなコードをモデルに書くだけで， Django はたくさんの
+情報を手にします．このコードを使って， Django は:
 
-    * ���ץꥱ�������Υǡ����١����������ޤ���� (``CREATE TABLE`` ʸ���
-      ��) �Ǥ��ޤ���
-    * Poll �� Choice ���֥������Ȥ� Python ���饢���������뤿��Υǡ����١�
-      �� API ������Ǥ��ޤ���
+    * アプリケーションのデータベーススキーマを作成 (``CREATE TABLE`` 文を実
+      行) できます．
+    * Poll や Choice オブジェクトに Python からアクセスするためのデータベー
+      ス API を作成できます．
 
-���������������� ``polls`` ���ץꥱ�������򥤥󥹥ȡ��뤷�����Ȥ�ץ�����
-���Ȥ˶����Ƥ��ɬ�פ�����ޤ���
+ただし，その前に ``polls`` アプリケーションをインストールしたことをプロジェ
+クトに教えてやる必要があります．
 
 .. class:: admonition-philosophy
-.. admonition:: �߷�ů��
+.. admonition:: 設計哲学
 
-    Django ���ץꥱ�������ϡ֥ץ饰��ǽ (pluggable)�פǤ������ץꥱ������
-    �������� Django ���󥹥ȡ���˷���դ��Ƥ��ʤ��Τǡ����ץꥱ�������
-    ��ʣ���Υץ��������ȤǻȤä��ꡤñ�Τ����ۤ�����Ǥ��ޤ���
+    Django アプリケーションは「プラグ可能 (pluggable)」です．アプリケーショ
+    ンは特定の Django インストールに結び付いていないので，アプリケーション
+    を複数のプロジェクトで使ったり，単体で配布したりできます．
 
-���� ``settings.py`` �ե�������Խ����ơ�``INSTALLED_APPS`` ������ѹ�����
-``'mysite.polls'`` ������ޤ����ʲ��Τ褦�ˤʤ�Ϥ��Ǥ�::
+再度 ``settings.py`` ファイルを編集して，``INSTALLED_APPS`` 設定を変更し，
+``'mysite.polls'`` を入れます．以下のようになるはずです::
 
     INSTALLED_APPS = (
         'django.contrib.auth',
@@ -357,13 +357,13 @@ Django �Ǥϡ�����������ǰ���ñ�� Python ���饹��ɽ���Ǥ��ޤ���
         'mysite.polls'
     )
 
-����� Django �� ``mysite`` �� ``polls`` ���ץꥱ����������äƤ��뤳
-�Ȥ��Τ�ޤ������⤦��ĥ��ޥ�ɤ�¹Ԥ��Ƥߤޤ��礦::
+これで Django は ``mysite`` に ``polls`` アプリケーションが入っているこ
+とを知りました．もう一つコマンドを実行してみましょう::
 
     python manage.py sql polls
 
-�ʲ��Τ褦�� (polls ���ץꥱ��������Ѥ� CRATE TABLE SQL ʸ) ��ɽ��������
-���Ǥ�::
+以下のような (polls アプリケーション用の CRATE TABLE SQL 文) が表示されるは
+ずです::
 
     BEGIN;
     CREATE TABLE "polls_poll" (
@@ -379,152 +379,152 @@ Django �Ǥϡ�����������ǰ���ñ�� Python ���饹��ɽ���Ǥ��ޤ���
     );
     COMMIT;
 
-�ʲ����������դ��Ƥ�������:
+以下の点に注意してください:
 
-    * �ºݤ˽��Ϥ���� SQL ʸ�ϡ��ȤäƤ���ǡ����١����ˤ�ä��Ѥ��ޤ���
+    * 実際に出力される SQL 文は，使っているデータベースによって変わります．
 
-    * �ơ��֥�̾�ϥ��ץꥱ��������̾�� (``polls``) �ȥ�ǥ�ξ�ʸ��ɽ��
-      (``poll`` ����� ``choice``) ��ȤäƼ�ưŪ����������ޤ� (���ε�ư��
-      �����Х饤�ɤǤ��ޤ���)
+    * テーブル名はアプリケーションの名前 (``polls``) とモデルの小文字表記
+      (``poll`` および ``choice``) を使って自動的に生成されます (この挙動は
+      オーバライドできます．)
 
-    * �祭�� (primary key, ID) �ϼ�ưŪ����������ޤ� (���ε�ư�⥪���Х饤
-      �ɲ�ǽ�Ǥ�)
+    * 主キー (primary key, ID) は自動的に生成されます (この挙動もオーバライ
+      ド可能です)
 
-    * �ص��塤 Django �ϳ��������Υե������̾�� ``"_id"`` ���ɲä��ޤ�����
-      �����󤳤ε�ư�⥪���Х饤�ɲ�ǽ�Ǥ���
+    * 便宜上， Django は外部キーのフィールド名に ``"_id"`` を追加します．も
+      ちろんこの挙動もオーバライド可能です．
 
-    * ���������Υ�졼������ ``REFERENCES`` ʸ������Ū�˺�������ޤ���
+    * 外部キーのリレーションは ``REFERENCES`` 文で明示的に作成されます．
 
-    * SQL ʸ�ϻȤäƤ���ǡ����١����˱����ƺ٤���Ĵ������ޤ������äơ�
-      ``auto_increment`` (MySQL)�� `serial`` (PostgreSQL)�� 
-      ``integer primary key`` (SQLite) �Ȥ��ä��ǡ����١�����ͭ�Υե������
-      �����פϼ�ưŪ�˻��ꤵ��ޤ����������Ȥλ��������ʤ����Ť���ŤΤ�
-      ����ΰ������Ȥ������Ȥ��ä����Ȥ⼫ư��Ĵ�����ޤ������Υ��塼�ȥ�
-      ����κ�Ԥ� PostgreSQL ��ȤäƤ��ꡤ����Ǥν��Ϥ� PostgreSQL ��ʸ
-      ˡ�˽स�Ƥ��ޤ���
+    * SQL 文は使っているデータベースに応じて細かく調整されます．従って，
+      ``auto_increment`` (MySQL)， `serial`` (PostgreSQL)， 
+      ``integer primary key`` (SQLite) といったデータベース固有のフィールド
+      タイプは自動的に指定されます．クオートの仕方，すなわち一重と二重のど
+      ちらの引用符を使うか，といったことも自動で調整します．このチュートリ
+      アルの作者は PostgreSQL を使っており，例題での出力は PostgreSQL の文
+      法に準じています．
 
-    * `sql` ���ޥ�ɤ�¹Ԥ��Ƥ⡤�ºݤ˥ǡ����١����� SQL ��¹Ԥ���櫓��
-      �Ϥ���ޤ��� `sql` ���ޥ�ɤϡ��桼���� Django �ε�ư���Τꤿ���ȹ�
-      �����Ȥ��Τ��ᡤñ�� SQL ʸ�򥹥��꡼���ɽ�����Ƥ�������Ǥ���ɬ�פ�
-      �顤���� SQL ʸ�򥳥ԡ����ƥǡ����١������饤����ȤΥץ���ץȤ˥ڡ�
-      ���ȤǤ��ޤ�������Ǥ����Ҥ٤�褦�ˡ� Django �Ǥ� SQL ��ǡ����١���
-      �� commit �������ñ����ˡ���󶡤��Ƥ��ޤ���
+    * `sql` コマンドを実行しても，実際にデータベースで SQL を実行するわけで
+      はありません． `sql` コマンドは，ユーザが Django の挙動を知りたいと考
+      えたときのため，単に SQL 文をスクリーンに表示しているだけです．必要な
+      ら，この SQL 文をコピーしてデータベースクライアントのプロンプトにペー
+      ストできますが，後ですぐ述べるように， Django では SQL をデータベース
+      に commit させる簡単な方法を提供しています．
 
-��̣������ʤ顤�ʲ��Υ��ޥ�ɤ�¹Ԥ��ƤߤƤ�������:
+興味があるなら，以下のコマンドも実行してみてください:
 
-    * ``python manage.py validate polls`` -- ��ǥ�ι����˥��顼���ʤ���Ĵ
-      �٤ޤ���
+    * ``python manage.py validate polls`` -- モデルの構成にエラーがないか調
+      べます．
 
-    * ``python manage.py sqlcustom polls`` -- �ƥ��ץꥱ���������������
-      ���Ƥ��������������ޥ��� (�ơ��֥�������ѹ�������) �Ѥ� SQL ʸ�����
-      ���ޤ���
+    * ``python manage.py sqlcustom polls`` -- 各アプリケーション向けに定義
+      しておいた，カスタマイズ (テーブル形式の変更や制約) 用の SQL 文を出力
+      します．
 
-    * ``python manage.py sqlclear polls`` -- ���ץꥱ��������ѤΥơ��֥��
-      �������ǡ����١������¸�ߤ����ΤˤĤ���ɬ�פ˱����� ``DROP TABLE``
-      ʸ����Ϥ��ޤ���
+    * ``python manage.py sqlclear polls`` -- アプリケーション用のテーブルの
+      うち，データベース上に存在するものについて必要に応じて ``DROP TABLE``
+      文を出力します．
 
-    * ``python manage.py sqlindexes polls`` -- ���ץꥱ��������Ѥ� 
-      ``CREATE INDEX`` ʸ����Ϥ��ޤ���
+    * ``python manage.py sqlindexes polls`` -- アプリケーション用の 
+      ``CREATE INDEX`` 文を出力します．
 
     * ``python manage.py sqlall polls`` -- 'sql', 'sqlinitialdata',
-      'sqlindexes' ���ޥ�ɤ��碌����ΤǤ���
+      'sqlindexes' コマンドを合わせたものです．
 
 
-�����Υ��ޥ�ɤν��Ϥ򸫤�С����̲��Ǽºݤ˹Ԥ��Ƥ��뤳�Ȥ����򤹤��
-���ˤʤ�Ǥ��礦��
+これらのコマンドの出力を見れば，水面下で実際に行われていることを理解する助
+けになるでしょう．
 
-``syncdb`` ����ټ¹Ԥ��ơ���ǥ�ơ��֥��ǡ����١�����˺������ޤ��礦::
+``syncdb`` を再度実行して，モデルテーブルをデータベース上に作成しましょう::
 
     python manage.py syncdb
 
-``syncdb`` ���ޥ�ɤ� ``INSTALLED_APPS`` ����Ͽ����Ƥ��륢�ץꥱ��������
-�������ǡ����١�����ˤޤ�¸�ߤ��ʤ���Τ��Ф��� ``sqlall`` ���������� SQL
-���������ޤ������ˤ��äơ��Ǹ�� ``syncdb`` ��¹Ԥ������ʸ�˿����˥ץ�
-�������Ȥ��ɲä��줿���ץꥱ�������Υơ��֥�Ƚ���ǡ���������ǥ�������
-�����ޤ���  ``syncdb`` �Ϥ�������¸�ߤ��ʤ��ơ��֥��������������Τǡ�����
-�֤��¹Ԥ��Ƥ⤫�ޤ��ޤ���
+``syncdb`` コマンドは ``INSTALLED_APPS`` に登録されているアプリケーションの
+うち，データベース上にまだ存在しないものに対して ``sqlall`` で生成した SQL
+を生成します．こにれよって，最後に ``syncdb`` を実行した時以後に新たにプロ
+ジェクトに追加されたアプリケーションのテーブルと初期データ，インデクスを生
+成します．  ``syncdb`` はその都度存在しないテーブルだけを生成するので，繰り
+返し実行してもかまいません．
 
-``manage.py`` �桼�ƥ���ƥ��ǤǤ��뤳�ȤˤĤ��Ƥ�
-`django-admin.py �Υɥ������`_ ���ɤ�ǲ�������
+``manage.py`` ユーティリティでできることについては
+`django-admin.py のドキュメント`_ を読んで下さい．
 
-.. _`django-admin.py �Υɥ������`: ../django-admin/
+.. _`django-admin.py のドキュメント`: ../django-admin/
 .. _django-admin.py documentation: ../django_admin/
 
-API ��ͷ��Ǥߤ�
+API で遊んでみる
 ================
 
-���ơ�Python ���å������ư���ơ� Django ���󶡤��� API ��ͷ��Ǥߤޤ���
-���� Python �������ư����ˤϡ��ʲ��Υ��ޥ�ɤ�¹Ԥ��ޤ�::
+さて，Python 対話シェルを起動して， Django が提供する API で遊んでみましょ
+う． Python シェルを起動するには，以下のコマンドを実行します::
 
     python manage.py shell
 
-ñ�� "python" ��¹Ԥ��ʤ��Τϡ� ``manage.py`` �ǥץ��������ȤδĶ������ꤷ
-�Ƥ��뤫��Ǥ��������Ǥ����ִĶ�������פȤ�:
+単に "python" を実行しないのは， ``manage.py`` でプロジェクトの環境を設定し
+ているからです．ここでいう「環境の設定」とは:
 
-    * ``mysite`` �� ``sys.path`` ������ޤ�����������������뤿��ˡ�
-      Django �������륳���ɤ���ˤ� Python �Υɥå�ɽ�� (�㤨��
-      ``'mysite.polls.models'``) �ǥץ��������Ȥ򻲾Ȥ����Τ�����ޤ���
-      ����ɽ���ǥץ��������Ȥ򤦤ޤ����ȤǤ���褦�ˤ���ˤϡ� ``mysite``
-      �ѥå�������  ``sys.path`` ��ˤʤ���Фʤ�ޤ���
+    * ``mysite`` を ``sys.path`` に入れます．柔軟性を持たせるために，
+      Django を構成するコードの中には Python のドット表記 (例えば
+      ``'mysite.polls.models'``) でプロジェクトを参照するものがあります．
+      この表記でプロジェクトをうまく参照できるようにするには， ``mysite``
+      パッケージは  ``sys.path`` 上になければなりません．
 
-      ��������ɽ��ˡ����ϡ����Ǥ˸������Ȥ�����Ϥ��Ǥ�: �㤨��
-      ``INSTALLED_APPS`` ����ϡ��ɥå�ɽ���Υѥå�����̾����ʤ�ꥹ�ȤǤ���
+      こうした表記法の例は，すでに見たことがあるはずです: 例えば
+      ``INSTALLED_APPS`` 設定は，ドット表記のパッケージ名からなるリストです．
 
-    * �Ķ��ѿ� ``DJANGO_SETTINGS_MODULE`` �����ꤷ�ơ� ``settings.py`` �ե�
-      ����κ߽�� Django �˶����ޤ���
+    * 環境変数 ``DJANGO_SETTINGS_MODULE`` を設定して， ``settings.py`` ファ
+      イルの在処を Django に教えます．
 
-.. admonition:: manage.py ��Ȥ鷺�˺Ѥޤ�����ˡ
+.. admonition:: manage.py を使わずに済ませる方法
 
-    ``manage.py`` ��Ȥ������ʤ��Ƥ⡤����Ϥ���ޤ��� ``mysite`` ��
-    Python �ѥ���ˤ���褦�� (``import mysite`` ���̤�褦��) ���ơ��Ķ���
-    �� ``DJANGO_SETTINGS_MODULE`` ��  ``mysite.settings`` �����ꤷ�Ƥ�����
-    ����
+    ``manage.py`` を使いたくなくても，問題はありません． ``mysite`` が
+    Python パス上にあるように (``import mysite`` が通るように) して，環境変
+    数 ``DJANGO_SETTINGS_MODULE`` を  ``mysite.settings`` に設定してくださ
+    い．
 
-    �ܤ����� `django-admin.py �Υɥ������`_ �򻲾Ȥ��Ƥ���������
+    詳しくは `django-admin.py のドキュメント`_ を参照してください．
 
-����������ä��顤�ǡ����١��� API ��������õ�����Ƥߤޤ��礦::
+シェルに入ったら，データベース API の世界を探検してみましょう::
 
-    # �����ۤɽ񤤤Ƥ�������ǥ륯�饹�� import ���ޤ���
+    # さきほど書いておいたモデルクラスを import します．
     >>> from mysite.polls.models import Poll, Choice
 
-    # �ޤ� Poll �ϰ�Ĥ�Ǥ��Ƥ��ޤ���
+    # まだ Poll は一つもできていません．
     >>> Poll.objects.all()
     []
 
-    # ������ Poll ��������ޤ��礦��
+    # 新たな Poll を作成しましょう．
     >>> from datetime import datetime
     >>> p = Poll(question="What's up?", pub_date=datetime.now())
 
-    # ���褿���֥������Ȥ�ǡ����١�������¸���ޤ��� save() ������Ū�˸Ƥ�
-    # �ͤФʤ�ޤ���
+    # 出来たオブジェクトをデータベースに保存します． save() は明示的に呼ば
+    # ねばなりません．
     >>> p.save()
 
-    # ����ǥ��֥������Ȥ� ID ��������Ƥ��ޤ��������Ȥ��Υǡ����١�����
-    # ��äƤϡ������ͤ� "1" �ǤϤʤ� "1L" �ΤȤ��⤢��ޤ������ۤ��뤳�Ȥ�
-    # ����ޤ���ñ�˥ǡ����١����Хå�����ɤ� Python Ĺ���������ͤ��֤�
-    # �褦�ˤʤäƤ�������Τ��ȤǤ���
+    # これでオブジェクトに ID が割り当てられました．お使いのデータベースに
+    # よっては，この値は "1" ではなく "1L" のときもあります．心配することは
+    # ありません．単にデータベースバックエンドが Python 長整数型で値を返す
+    # ようになっているだけのことです．
     >>> p.id
     1
 
-    # �ǡ����١����γƥ����� Python ��°���Ȥ��ƥ����������ޤ���
+    # データベースの各カラムに Python の属性としてアクセスします．
     >>> p.question
     "What's up?"
     >>> p.pub_date
     datetime.datetime(2005, 7, 15, 12, 00, 53)
 
-    # °�����ѹ����� save() ��ƤӽФ��ȥ������ͤ��ѹ����ޤ���
+    # 属性を変更して save() を呼び出すとカラムの値を変更します．
     >>> p.pub_date = datetime(2005, 4, 1, 0, 0)
     >>> p.save()
 
-    # objects.all() �ϥǡ����١���������Ƥ� Poll ���֤��ޤ���
+    # objects.all() はデータベース上の全ての Poll を返します．
     >>> Poll.objects.all()
     [<Poll: Poll object>]
 
 
-���äȡ�����ä��ԤäƲ������� ``<Poll: Poll object>`` �ʤ���������ڤ�ɽ��
-�ǤϤ���ޤ���͡������� (``polls/models.py`` �ե�������������Ƥ���)
-polls �ط��Υ�ǥ�򾯤��������ơ� ``Poll`` �� ``Choice`` �� ``__str__()``
-�᥽�åɤ��ɲä��ޤ��礦::
+おっと，ちょっと待って下さい． ``<Poll: Poll object>`` なんて全然親切な表現
+ではありませんね．そこで (``polls/models.py`` ファイルに定義されている)
+polls 関係のモデルを少し修正して， ``Poll`` と ``Choice`` に ``__str__()``
+メソッドを追加しましょう::
 
     class Poll(models.Model):
         # ...
@@ -536,12 +536,12 @@ polls �ط��Υ�ǥ�򾯤��������ơ� ``Poll`` �� ``Choice`` �� ``__str__()``
         def __str__(self):
             return self.choice
 
-``__str__()`` ���ǥ���ɲä��Ƥ����Τϡ����åץ���ץȤǰ����Ȥ�������Ū
-�ˤ褤�����Ǥʤ������֥������Ȥ�ɽ�� (representation) �� Django ��ư admin
-�Τ�����Ȥ����ǻȤ��Ƥ���Ȥ������Ǥ���פǤ���
+``__str__()`` をモデルに追加しておくのは，対話プロンプトで扱うときに精神的
+によいだけでなく，オブジェクトの表現 (representation) は Django 自動 admin
+のいたるところで使われているという点でも重要です．
 
-``__str__()`` ���̾�� Python �᥽�åɤȤ������Ȥ����դ��Ƥ����������ǥ���
-�˥�������Υ᥽�åɤ��ɲä��Ƥߤޤ��礦::
+``__str__()`` は通常の Python メソッドということに注意してください．デモ用
+にカスタムのメソッドを追加してみましょう::
 
     import datetime
     # ...
@@ -550,26 +550,26 @@ polls �ط��Υ�ǥ�򾯤��������ơ� ``Poll`` �� ``Choice`` �� ``__str__()``
         def was_published_today(self):
             return self.pub_date.date() == datetime.date.today()
 
-``import datetime`` �� Python ��ɸ��⥸�塼�� ``datetime`` �򻲾Ȥ��Ƥ���
-���Ȥ����դ��Ƥ���������
+``import datetime`` で Python の標準モジュール ``datetime`` を参照している
+ことに注意してください．
 
-``python manage.py shell`` ��¹Ԥ��ơ�Python ���å���������ޤ��礦::
+``python manage.py shell`` を実行して，Python 対話シェルに戻りましょう::
 
     >>> from mysite.polls.models import Poll, Choice
 
-    # __str__() ���������Ư���Ƥ��뤳�Ȥ��ǧ���ޤ���
+    # __str__() がきちんと働いていることを確認します．
     >>> Poll.objects.all()
     [<Poll: What's up?>]
 
-    # Django ���͡��ʥǡ����١����ȹ� API ���󶡤��Ƥ��ޤ��� API �ϥ����
-    # �ɰ����Ƕ����ޤ����Ǥ��ޤ���
+    # Django は様々なデータベース照合 API を提供しています． API はキーワー
+    # ド引数で隅々まで操作できます．
     >>> Poll.objects.filter(id=1)
     [<Poll: What's up?>]
     >>> Poll.objects.filter(question__startswith='What')
     [<Poll: What's up?>]
 
-    # 2005 ǯ�� Poll ����Ф��ޤ��礦�����ʤ������Υ��塼�ȥꥢ���¹�
-    # ���Ƥ���Τ� 2005 ǯ�Ǥʤ��Τʤ顤Ŭ�����ͤ��ɤߤ����Ƥ���������
+    # 2005 年の Poll を取り出しましょう．あなたがこのチュートリアルを実行
+    # しているのが 2005 年でないのなら，適当に値を読みかえてください．
     >>> Poll.objects.get(pub_date__year=2005)
     <Poll: What's up?>
 
@@ -580,21 +580,21 @@ polls �ط��Υ�ǥ�򾯤��������ơ� ``Poll`` �� ``Choice`` �� ``__str__()``
     >>> Poll.objects.filter(question__startswith='What')
     [<Poll: What's up?>]
 
-    # �祭���ξȹ�Ϥ褯���뤳�ȤʤΤǡ� Django �ϼ祭���θ�̩���פ�ȹ�
-    # ���륷�硼�ȥ��åȤ��󶡤��Ƥ��ޤ���
-    # �ʲ��μ¹�ʸ�� Poll.objects.get(id=1) ��Ʊ���Ǥ���
+    # 主キーの照合はよくあることなので， Django は主キーの厳密一致を照合
+    # するショートカットを提供しています．
+    # 以下の実行文は Poll.objects.get(id=1) と同じです．
     >>> Poll.objects.get(pk=1)
     <Poll: What's up?>
 
-    # ��������᥽�åɤ�ư��뤫�Τ���Ƥߤޤ��礦��
+    # カスタムメソッドが動作するか確かめてみましょう．
     >>> p = Poll.objects.get(pk=1)
     >>> p.was_published_today()
     False
 
-    # Poll ����Ĥ� Choice ����ꤷ�ޤ��礦�� create ��ƤӽФ��ȡ�������
-    # Choice ���֥������Ȥ��������� INSERT ʸ��¹Ԥ��� Poll ���饢��������
-    # ǽ�� Choice ���֥������Ȥν�����ɲä��ơ������˺������줿 Choice ��
-    # �֥������Ȥ��֤��ޤ���
+    # Poll に二つの Choice を指定しましょう． create を呼び出すと，新たな
+    # Choice オブジェクトを生成し， INSERT 文を実行し， Poll からアクセス可
+    # 能な Choice オブジェクトの集合に追加して，新たに作成された Choice オ
+    # ブジェクトを返します．
 
     >>> p = Poll.objects.get(pk=1)
     >>> p.choice_set.create(choice='Not much', votes=0)
@@ -603,36 +603,36 @@ polls �ط��Υ�ǥ�򾯤��������ơ� ``Poll`` �� ``Choice`` �� ``__str__()``
     <Choice: The sky>
     >>> c = p.choice_set.create(choice='Just hacking again', votes=0)
 
-    # Choice ���֥������Ȥϼ�ʬ�˴�Ϣ�Ť����줿 Poll ���֥������Ȥ�
-    # �����������뤿��� API �������Ƥ��ޤ���
+    # Choice オブジェクトは自分に関連づけされた Poll オブジェクトに
+    # アクセスするための API を備えています．
     >>> c.poll
     <Poll: What's up?>
 
-    # �դ�Ԥ��ޤ�: Poll ���֥������Ȥ��� Choice ���֥������Ȥ˥��������Ǥ�
-    # �ޤ���
+    # 逆も行えます: Poll オブジェクトから Choice オブジェクトにアクセスでき
+    # ます．
     >>> p.choice_set.all()
     [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]
     >>> p.choice_set.count()
     3
 
-    # API ��ɬ�פ˱����Ƽ�ưŪ�˥�졼���������פ��ޤ�����졼������é
-    # ��ˤ���ť��������������Ȥ��ޤ�������ɽ��ˡ�ˤ����¤��ʤ������ʳ�
-    # �Ǥ�Ϣ���Ǥ��ޤ����ʲ�����Ǥϡ� pub_date �� 2005 �����Ƥ� Poll �˴�
-    # Ϣ�Ť����Ƥ��� Choice ���֤��ޤ���
+    # API は必要に応じて自動的にリレーションを追跡します．リレーションを辿
+    # るには二重アンダースコアを使います．この表記法には制限がなく，何段階
+    # でも連鎖できます．以下の例では， pub_date が 2005 の全ての Poll に関
+    # 連づけられている Choice を返します．
     >>> Choice.objects.filter(poll__pub_date__year=2005)
     [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]
 
-    # choice ���ĺ�����ޤ��礦�� delete() ��Ȥ��ޤ���
+    # choice を一つ削除しましょう． delete() を使います．
     >>> c = p.choice_set.filter(choice__startswith='Just hacking')
     >>> c.delete()
 
-�ǡ����١��� API �ξܺ٤ϡ� `�ǡ����١��� API ��ե����`_ �򻲾Ȥ��Ƥ���
-������
+データベース API の詳細は， `データベース API リファレンス`_ を参照してくだ
+さい．
 
-API ��Ȥ����ʤ���褦�ˤʤä��顤 `���塼�ȥꥢ���� 2 ��`_ �˿ʤ�ǡ�
-Django �μ�ư admin ��ư�����Ƥߤޤ��礦��
+API を使いこなせるようになったら， `チュートリアル第 2 部`_ に進んで，
+Django の自動 admin を動かしてみましょう．
 
-.. _`�ǡ����١��� API ��ե����`: ../db-api/
-.. _`���塼�ȥꥢ���� 2 ��`: ../tutorial02/
+.. _`データベース API リファレンス`: ../db-api/
+.. _`チュートリアル第 2 部`: ../tutorial02/
 .. _Database API reference: ../db_api/
 .. _part 2 of this tutorial: ../tutorial02/

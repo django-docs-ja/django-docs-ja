@@ -1,191 +1,191 @@
 ======
-��ݲ�
+国際化
 ======
 
 :revision-up-to: 4805 (release 0.96)
 
-Django �ϥ����ɤȥƥ�ץ졼�Ȥ������ǹ�ݲ���ե륵�ݡ��Ȥ��Ƥ��ޤ������Υ�
-������ȤǤϹ�ݲ��λ��ȤߤˤĤ����������ޤ���
+Django はコードとテンプレートの双方で国際化をフルサポートしています．このド
+キュメントでは国際化の仕組みについて説明します．
 
 .. _Overview:
 
-����
+概要
 ====
 
-��ݲ��Υ�����ϡ���Ĥ� Web ���ץꥱ�������ʣ���θ���ǥ���ƥ�Ĥ䵡ǽ
-���󶡤Ǥ���褦�ˤ��뤳�Ȥˤ���ޤ���
+国際化のゴールは，一つの Web アプリケーションが複数の言語でコンテンツや機能
+を提供できるようにすることにあります．
 
-Django ��ȯ�Ԥϡ��Ǿ��¤Υեå��� Python �����ɤȥƥ�ץ졼�Ȥ������ळ��
-�ǹ�ݲ��Ȥ���������ˤ��ɤ��失�ޤ��������Υեå���
-**����ʸ���� (translation string)** �ȸƤФ�Ƥ��ޤ�������ʸ����� Django
-�ˡ֤��Υƥ����ȤˤĤ��ƥ���ɥ桼���θ���˹�ä��ƥ����Ȥ�����ʤ顤�ƥ�
-���Ȥ��������ƽ��Ϥ���פȻؼ����ޤ�����
+Django 開発者は，最小限のフックを Python コードとテンプレートに埋め込むこと
+で国際化というゴールにたどり着けます．これらのフックは
+**翻訳文字列 (translation string)** と呼ばれています．翻訳文字列は Django
+に「このテキストについてエンドユーザの言語に合ったテキストがあるなら，テキ
+ストを翻訳して出力せよ」と指示します．　
 
-Django �Ϥ����Υեå������դ��ơ��桼���θ�������˹�碌�� Web ���ץꥱ��
-�����򥪥󥶥ե饤���������ޤ���
+Django はこれらのフックに注意して，ユーザの言語設定に合わせて Web アプリケー
+ションをオンザフライで翻訳します．
 
-Django ���ԤäƤ���Τϡ��ܼ�Ū�ˤϰʲ�����Ĥκ�ȤǤ�:
+Django が行っているのは，本質的には以下の二つの作業です:
 
-    * ��ȯ�Ԥ�ƥ�ץ졼�Ȥκ�Ԥˡ����ץꥱ�������Τɤ���ʬ�������Ǥ��뤫
-      ���ꤵ���ޤ���
-    * ���ꤷ���եå���Ȥäơ�����Υ桼���θ�������˽��ä� Web ���ץꥱ��
-      �������������ޤ���
+    * 開発者やテンプレートの作者に，アプリケーションのどの部分を翻訳できるか
+      指定させます．
+    * 指定したフックを使って，特定のユーザの言語設定に従って Web アプリケー
+      ションを翻訳します．
 
 .. _`How to internationalize your app: in three steps`:
 
-���ץꥱ���������ݲ����뤿��� 3 ���ƥå�
+アプリケーションを国際化するための 3 ステップ
 ---------------------------------------------
 
-    1. �����о�ʸ����� Python �����ɤȥƥ�ץ졼�Ȥ������ߤޤ���
-    2. ���ݡ��Ȥ�����������Ф�����������������������ޤ���
-    3. Django ����ե������ locale �ߥɥ륦������ͭ���ˤ��ޤ���
+    1. 翻訳対象文字列を Python コードとテンプレートに埋め込みます．
+    2. サポートしたい言語に対して翻訳カタログを作成します．
+    3. Django 設定ファイルで locale ミドルウェアを有効にします．
 
 .. class:: behind-the-scenes
-.. admonition:: ����΢
+.. admonition:: 舞台裏
 
-    Django ������������ Python ����°��ɸ��� ``gettext`` �⥸�塼���Ȥ�
-    �Ƥ��ޤ���
+    Django の翻訳機構は Python に付属の標準の ``gettext`` モジュールを使っ
+    ています．
 
 .. _If you don't need internationalization:
 
-��ݲ���ɬ�פʤ����
+国際化が必要ない場合
 ====================
 
-Django �ι�ݲ��եå��ϥǥե���Ȥ�ͭ���ˤʤäƤ���Τǡ��ե졼�����ΰ�
-���� i18n ����ߤΤ鷺���ʥ����Хإåɤ������Ƥ��ޤ�����ݲ��ε�ǽ��Ȥ���
-���ʤ���С�����ե������ ``USE_I18N = False`` �����ꤷ�Ƥ���������
-``USE_I18N`` �� ``False`` �����ꤹ��ȡ� Django �Ϲ�ݲ�����������ɤ��ʤ�
-�褦��Ŭ����Ԥ��ޤ��� `USE_I18N �Υɥ������`_ �򻲾Ȥ��Ƥ���������
+Django の国際化フックはデフォルトで有効になっているので，フレームワークの一
+部で i18n がらみのわずかなオーバヘッドが生じています．国際化の機能を使いた
+くなければ，設定ファイルで ``USE_I18N = False`` を設定してください．
+``USE_I18N`` を ``False`` に設定すると， Django は国際化機構をロードしない
+よう最適化を行います． `USE_I18N のドキュメント`_ を参照してください．
 
-���ξ�硤 ``TEMPLATE_CONTEXT_PROCESSORS`` �����
-``'django.core.context_processors.i18n'`` �򳰤����Ȥˤʤ�Ǥ��礦��
+この場合， ``TEMPLATE_CONTEXT_PROCESSORS`` からも
+``'django.core.context_processors.i18n'`` を外すことになるでしょう．
 
 
-.. _`USE_I18N �Υɥ������`: ../settings/#use-i18n
+.. _`USE_I18N のドキュメント`: ../settings/#use-i18n
 .. _documentation for USE_I18N: ../settings/#use-i18n
 
 .. _How to specify translation strings:
 
-����ʸ����λ�����ˡ
+翻訳文字列の指定方法
 ====================
 
-����ʸ���� (translation string) �ϡ��֤��Υƥ����Ȥ������оݤˤ���פȤ���
-�����Ԥ��ޤ�������ʸ����� Python �����ɤˤ�ƥ�ץ졼�Ȥˤ⸽��ޤ�����
-����ǽ��ʸ�����ޡ������Ƥ����ΤϺ�Ԥ����Ǥ��ꡤ���������ƥ�ϥޡ�����
-�줿ʸ���󤷤������оݤˤ��ޤ���
+翻訳文字列 (translation string) は，「このテキストを翻訳対象にする」という
+指定を行います．翻訳文字列は Python コードにもテンプレートにも現れます．翻
+訳可能な文字列をマークしておくのは作者の役割であり，翻訳システムはマークさ
+れた文字列しか翻訳対象にしません．
 
 .. _In Python code:
 
-Python ��������Ǥλ���
+Python コード内での指定
 -----------------------
 
 .. _Standard translation:
 
-ɸ��Ū������
+標準的な翻訳
 ~~~~~~~~~~~~
 
-�����о�ʸ�����ؿ� ``_()`` �ǻ��ꤷ�ޤ���(�ؿ�̾�ϡ֥�������������פǤ���
-ǰ�Τ���) ���δؿ��� Python �⥸�塼��Τɤ��Ǥ����ѤǤ��ޤ���
+翻訳対象文字列を関数 ``_()`` で指定します．(関数名は「アンダースコア」です．
+念のため) この関数は Python モジュールのどこでも利用できます．
 
-import ����ɬ�פϤ���ޤ���
+import する必要はありません．
 
-������Ǥϡ� ``"Welcome to my site."`` �Ȥ����ƥ����Ȥ�����ʸ����Ȥ��ƥޡ�
-�����ޤ�::
+下の例では， ``"Welcome to my site."`` というテキストを翻訳文字列としてマー
+クします::
 
     def my_view(request):
         output = _("Welcome to my site.")
         return HttpResponse(output)
 
-``django.utils.translation.gettext()`` �� ``_()`` ��Ʊ���Ǥ������äơ�����
-��Ͼ���������Ʊ���ˤʤ�ޤ�::
+``django.utils.translation.gettext()`` は ``_()`` と同じです．従って，下の
+例は上の例と全く同じになります::
 
     from django.utils.translation import gettext
     def my_view(request):
         output = gettext("Welcome to my site.")
         return HttpResponse(output)
 
-�����Ϸ׻��Ѥߤ��ͤ��Ф��ƹԤ��ޤ������äơ���������� 2 ���Ʊ���ˤʤ�
-�ޤ�::
+翻訳は計算済みの値に対して行われます．従って，下の例も上の 2 例と同じになり
+ます::
 
     def my_view(request):
         words = ['Welcome', 'to', 'my', 'site.']
         output = _(' '.join(words))
         return HttpResponse(output)
 
-�������ѿ����Ф��Ƥ�Ȥ��ޤ������äơ��������ޤ���������Ʊ���ˤʤ�ޤ�::
+翻訳は変数に対しても使えます．従って，下の例もまた，上の例と同じになります::
 
     def my_view(request):
         sentence = 'Welcome to my site.'
         output = _(sentence)
         return HttpResponse(output)
 
-(��� 2 �Ĥ���Τ褦���ѿ���׻��Ѥߤ��ͤ�Ȥ���硤 Django ������ʸ����
-�Х桼�ƥ���ƥ� ``make-messages.py`` �Ϥ�����ʸ����򸡽ФǤ��ʤ����Ȥ�
-���դ��Ƥ����ޤ��礦���ܤ����ϸ�� ``make-messages`` ���������ޤ���)
+(上の 2 つの例のように変数や計算済みの値を使う場合， Django の翻訳文字列検
+出ユーティリティ ``make-messages.py`` はこれらの文字列を検出できないことに
+注意しておきましょう．詳しくは後に ``make-messages`` で説明します．)
 
-``_()`` �� ``gettext()`` ���Ϥ�ʸ����ˤϡ� Pyton ��ɸ���̾���դ��䴰��ʸ
-�ˤ��ץ졼���ۥ����Ȥ��ޤ����㤨��::
+``_()`` や ``gettext()`` に渡す文字列には， Pyton の標準の名前付き補完構文
+によるプレースホルダを使えます．例えば::
 
     def my_view(request, n):
         output = _('%(name)s is my name.') % {'name': n}
         return HttpResponse(output)
 
-���Υƥ��˥å���Ȥ��ȡ����줴�Ȥ������ǥץ졼���ۥ�����¤��Ѥ��Ǥ���褦
-�ˤʤꡤ�㤨�С��Ѹ������ʸ�� ``"Adrian is my name."`` �Ǥ���Τ��Ф��ơ�
-���ڥ����Ǥ� ``"Me llamo Adrian."`` �Ǥ���褦�ˡ��ץ졼���ۥ���ΰ��֤�
-����ʸ������ǰ�ư�Ǥ��ޤ���
+このテクニックを使うと，言語ごとの翻訳でプレースホルダを並べ変えできるよう
+になり，例えば，英語の翻訳文が ``"Adrian is my name."`` であるのに対して，
+スペイン語では ``"Me llamo Adrian."`` であるように，プレースホルダの位置を
+翻訳文の前後で移動できます．
 
-������ͳ���顤���������Ȥä��䴰 (``%s`` �� ``%d``) �ǤϤʤ���̾���դ���
-�䴰 (``%(name)s``) ��Ȥ��٤��Ǥ�����������ˤ���䴰��Ȥä���硤�ץ졼
-���ۥ���ν��֤ˤ�äƤ��ޤ������Ǥ��ʤ���礬����ޤ���
+この理由から，固定引数を使った補完 (``%s`` や ``%d``) ではなく，名前付きの
+補完 (``%(name)s``) を使うべきです．固定引数による補完を使った場合，プレー
+スホルダの順番によってうまく翻訳できない場合があります．
 
 .. _Marking strings as no-op:
 
-�����ˤ��������ʤ�ʸ�����ޡ�������
+すぐには翻訳しない文字列をマークする
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-�����ˤ��������ʤ�ʸ����Υޡ����ˤ� 
-``django.utils.translation.gettext_noop()`` ��ȤäƲ��������ޡ�������ʸ��
-��ϸ���ѿ��Ȥ��ƻȤ���Ȥ�����������ޤ���
+すぐには翻訳しない文字列のマークには 
+``django.utils.translation.gettext_noop()`` を使って下さい．マークした文字
+列は後で変数として使われるときに翻訳されます．
 
-���δؿ��ϡ�������������������Ȥ���ʸ������֤��Ƥ����������˻Ȥ��ޤ���
-�Ȥ����Τ⡤����ϡ��㤨�Хǡ����١������ʸ����Τ褦�ˡ������ƥ��桼��
-�֤Ƕ��̤��ͤǤ�������ǡ��桼���˥�å������Ȥ����󼨤���Ǹ���ʳ�������
-���ͤФʤ�ʤ���礬���뤫��Ǥ���
+この関数は，ソース言語の中に定数として文字列を置いておきたい場合に使います．
+というのも，定数は，例えばデータベース中の文字列のように，システムやユーザ
+間で共通な値である一方で，ユーザにメッセージとして提示する最後の段階で翻訳
+せねばならない場合があるからです．
 
 .. _Lazy translation:
 
-�������ٱ䤵����
+翻訳を遅延させる
 ~~~~~~~~~~~~~~~~
 
-ʸ������������ٱ� (lazy) ������ˤϡ�
-``django.utils.translation.gettext_lazy()`` ��Ȥ��ޤ����������ٱ䤵����ȡ�
-``gettext_lazy()`` ��ƤӽФ��ޤ�����ʸ������ͤ˥����������ޤ���
+文字列の翻訳を遅延 (lazy) させるには，
+``django.utils.translation.gettext_lazy()`` を使います．翻訳を遅延させると，
+``gettext_lazy()`` を呼び出すまで翻訳文字列の値にアクセスしません．
 
-�㤨�С���ǥ�� ``help_text`` ������������˰ʲ��Τ褦�ˤ��ޤ�::
+例えば，モデルの ``help_text`` を翻訳する場合に以下のようにします::
 
     from django.utils.translation import gettext_lazy
 
     class MyThing(models.Model):
         name = models.CharField(help_text=gettext_lazy('This is the help text'))
 
-������Ǥϡ�  ``gettext_lazy()`` �ϼºݤ�����ʸ����ǤϤʤ���ʸ����ؤ��ٱ�
-���� (lazy reference) ����¸���ޤ����������Τ�ʸ����򥳥�ƥ����ȤǻȤä�
-�����㤨�� admin �����Ȥǥƥ�ץ졼�Ȥ������󥰤����Ȥ��˽��Ƽ¹Ԥ���
-�ޤ���
+この例では，  ``gettext_lazy()`` は実際の翻訳文字列ではなく，文字列への遅延
+参照 (lazy reference) を保存します．翻訳自体は文字列をコンテキストで使った
+時，例えば admin サイトでテンプレートをレンダリングしたときに初めて実行され
+ます．
 
-``gettext_lazy`` �Ȥ���̾������Ĺ�Ƿ��ʤ顤�ʲ��Τ褦�ˤ��� ``_`` (�������
-������) �˥����ꥢ���Ǥ��ޤ�::
+``gettext_lazy`` という名前が冗長で嫌なら，以下のようにして ``_`` (アンダー
+スコア) にエイリアスできます::
 
     from django.utils.translation import gettext_lazy as _
 
     class MyThing(models.Model):
         name = models.CharField(help_text=_('This is the help text'))
 
-`Django ��ǥ�`_ ����Ǥϡ�����ٱ�������Ȥ��褦�ˤ��Ƥ����������ե������
-̾��ơ��֥�̾��������Ĥ��Ƥ����Τ��ɤ������ǥ��Ǥ����ȤϤ����������
-``Meta`` ���饹������Ū�� ``verbose_name`` �� ``verbose_name_plural`` ����
-��������ꤹ��Ȥ�����Ȥˤʤ�ޤ�::
+`Django モデル`_ の中では，常に遅延翻訳を使うようにしてください．フィールド
+名やテーブル名に翻訳をつけておくのも良いアイデアです．とはいえ，これは
+``Meta`` クラスで明示的に ``verbose_name`` や ``verbose_name_plural`` オプ
+ションを指定するという作業になります::
 
     from django.utils.translation import gettext_lazy as _
 
@@ -195,16 +195,16 @@ import ����ɬ�פϤ���ޤ���
             verbose_name = _('my thing')
             verbose_name_plural = _('mythings')
 
-.. _`Django ��ǥ�`: ../model-api/
+.. _`Django モデル`: ../model-api/
 .. _Django models: ../model_api/
 
 .. _Pluralization:
 
-ʣ������
+複数形化
 ~~~~~~~~~~~~~
 
-ʣ�����Υ�å���������ꤹ��ˤ� ``django.utils.translation.ngettext()`` ��
-�Ȥ��ޤ����㤨��::
+複数形のメッセージを指定するには ``django.utils.translation.ngettext()`` を
+使います．例えば::
 
     from django.utils.translation import ngettext
     def hello_world(request, count):
@@ -213,55 +213,55 @@ import ����ɬ�פϤ���ޤ���
         }
         return HttpResponse(page)
 
-``ngettext`` �ϡ�ñ����������ʸ����ʣ����������ʸ���󡤤����ƥ��֥�������
-�ο� (��������� ``count`` �Ȥ����ѿ����Ϥ���ޤ�) �Ȥ��� 3 �Ĥΰ�����Ȥ�
-�ޤ���
+``ngettext`` は，単数形の翻訳文字列，複数形の翻訳文字列，そしてオブジェクト
+の数 (翻訳言語に ``count`` という変数で渡されます) という 3 つの引数をとり
+ます．
 
 .. _In template code:
 
-�ƥ�ץ졼����Ǥ�����
+テンプレート内での翻訳
 ----------------------
 
-`Django �ƥ�ץ졼��`_ ����Ǥ������ϡ���ĤΥƥ�ץ졼�ȥ�����Ȥä�
-Python �����ɤȤϾ�����ä���ˡ�ǹԤ��ޤ����ƥ�ץ졼�Ȥ������ѤΥ�����Ȥ�
-��褦�ˤ���ˤϡ��ƥ�ץ졼�Ȥξ������ ``{% load i18n %}`` ������Ƥ�����
-����
+`Django テンプレート`_ の中での翻訳は，二つのテンプレートタグを使って
+Python コードとは少し違った方法で行います．テンプレートで翻訳用のタグを使え
+るようにするには，テンプレートの上の方に ``{% load i18n %}`` を入れておきま
+す．
 
-�ƥ�ץ졼�ȥ��� ``{% trans %}`` �������ʸ�����ɽ���줿����ƥ�Ĥ�������
-�ޤ�::
+テンプレートタグ ``{% trans %}`` は定数の文字列で表されたコンテンツを翻訳し
+ます::
 
     <title>{% trans "This is the title." %}</title>
 
-�ͤ������ѤȤ��Ƥ����ޡ���������������ˤ����������ˤ� ``noop`` ���ץ���
-���Ȥ��ޤ�::
+値を翻訳用としてだけマークし，後で翻訳にかけたい場合には ``noop`` オプショ
+ンを使います::
 
     <title>{% trans "value" noop %}</title>
 
-``{% trans %}`` ����Ǥϥƥ�ץ졼���ѿ���Ȥ��ޤ��󡥻Ȥ���Τϰ�ť�����
-�Ȥ���ť������ȤǰϤޤ줿���ʸ��������Ǥ�����������ѿ� (�ץ졼���ۥ��)
-��Ȥ��������ˤϡ��ʲ�����Τ褦�� ``{% blocktrans %}`` ��Ȥ��ޤ�::
+``{% trans %}`` の中ではテンプレート変数を使えません．使えるのは一重クオー
+トか二重クオートで囲まれた定数文字列だけです．翻訳中で変数 (プレースホルダ)
+を使いたい場合には，以下の例のように ``{% blocktrans %}`` を使います::
 
     {% blocktrans %}This will have {{ value }} inside.{% endblocktrans %}
 
-�ƥ�ץ졼�ȼ���������������硤���ʤ���ƥ�ץ졼�ȥե��륿�ν��Ϥ�������
-�������ˤϡ��������������ѿ��˥Х���ɤ��ơ������֥��å���ǻȤ���褦
-�ˤ��ͤФʤ�ޤ���::
+テンプレート式を翻訳したい場合，すなわちテンプレートフィルタの出力を翻訳し
+たい場合には，式をローカルな変数にバインドして，翻訳ブロック中で使えるよう
+にせねばなりません::
 
     {% blocktrans with value|filter as myvar %}
     This will have {{ myvar }} inside.
     {% endblocktrans %}
 
 
-``blocktrans`` ���������ʣ���Ĥμ���«�����������ˤϡ� ``and`` ��Ȥä�
-ʬ�䤷�ޤ�::
+``blocktrans`` タグの中で複数個の式を束縛したい場合には， ``and`` を使って
+分割します::
 
     {% blocktrans with book|title as book_t and author|title as author_t %}
     This is {{ book_t }} by {{ author_t }}
     {% endblocktrans %}
 
 
-ʣ����������ˤϡ� ``{% blocktrans %}`` �� ``{% endblocktrans %}`` �δ֤�
-``{% plural %}`` ������ñ������ʣ������ξ���η����򵭽Ҥ��ޤ�::
+複数形化するには， ``{% blocktrans %}`` と ``{% endblocktrans %}`` の間に
+``{% plural %}`` タグで単数形と複数形の両方の形式を記述します::
 
     {% blocktrans count list|count as counter %}
     There is only one {{ name }} object.
@@ -269,214 +269,214 @@ Python �����ɤȤϾ�����ä���ˡ�ǹԤ��ޤ����ƥ�ץ졼�Ȥ������ѤΥ�����Ȥ�
     There are {{ counter }} {{ name }} objects.
     {% endblocktrans %}
 
-����Ū�ˤϡ��֥��å�����ӥ���饤�������������Ŭ�ڤ� ``gettext`` /
-``ngettext`` �ƤӽФ���Ԥ��ޤ���
+内部的には，ブロックおよびインラインの翻訳は全て適切な ``gettext`` /
+``ngettext`` 呼び出しを行います．
 
-``RequestContext`` ����Ĥ�����������ͭ���ѿ��˥��������Ǥ��ޤ�:
+``RequestContext`` は二つの翻訳処理固有の変数にアクセスできます:
 
-    * ``LANGUAGES`` �ϳƸ���θ��쥳���ɤȸ���̾����ʤ륿�ץ�ǤǤ�������
-      �Υꥹ�ȤǤ���
-    * ``LANGUAGE_CODE`` �ϸ��ߤΥ桼���������ǡ�ʸ����Ǥ�����: ``en-us``
-      (��Ҥ� "��������θ��Хᥫ�˥���" �򻲾Ȥ��Ƥ�������)��
-    * ``LANGUAGE_BIDI`` �ϸ��ߤθ����ɽ������ (direction) �Ǥ��� ``True``
-      �ʤ�С��إ֥饤��䥢��ӥ���Τ褦�˱����麸�˵��Ҥ������򼨤���
-      ``False`` �ʤ�Ѹ졤�ե�󥹸졤�ɥ��ĸ�Τ褦�˺����鱦�˵��Ҥ����
-      ���ؤ��ޤ���
+    * ``LANGUAGES`` は各言語の言語コードと言語名からなるタプルでできた言語
+      のリストです．
+    * ``LANGUAGE_CODE`` は現在のユーザ設定言語で，文字列です．例: ``en-us``
+      (後述の "言語設定の検出メカニズム" を参照してください)．
+    * ``LANGUAGE_BIDI`` は現在の言語の表記方向 (direction) です． ``True``
+      ならば，ヘブライ語やアラビア語のように右から左に記述する言語を示し，
+      ``False`` なら英語，フランス語，ドイツ語のように左から右に記述する言
+      語を指します．
 
-``RequestContext`` ��ĥ��Ȥ�ʤ���С��ʲ��� 3 �ĤΥ�����Ȥä��ͤ�����Ǥ�
-�ޤ�::
+``RequestContext`` 拡張を使わなければ，以下の 3 つのタグを使って値を取得でき
+ます::
 
     {% get_current_language as LANGUAGE_CODE %}
     {% get_available_languages as LANGUAGES %}
     {% get_current_language_bidi as LANGUAGE_BIDI %}
 
-�����Υ�����Ȥ��ˤ� ``{% load i18n %}`` ��ɬ�פǤ���
+これらのタグを使うには ``{% load i18n %}`` が必要です．
 
-�����եå������ʸ�����Ȥ��ƥ�ץ졼�ȥ֥��å����ƤǤ����ѤǤ��ޤ���
-``_()`` ��ʸ��Ȥä�����ʸ�������ꤷ�Ƥ����������㤨��::
+翻訳フックは定数文字列を使うテンプレートブロック全てでも利用できます．
+``_()`` 構文を使って翻訳文字列を指定してください．例えば::
 
     {% some_special_tag _("Page not found") value|yesno:_("yes,no") %}
 
-���ΤФ����������ȥե��륿��ξ���������Ѥߤ�ʸ����򰷤����Ȥˤʤ�Τǡ���
-����̵ͭ�ˤĤ��Ƶ����ۤ�ɬ�פ��ʤ��ʤ�ޤ���
+このばあい，タグとフィルタの両方は翻訳済みの文字列を扱うことになるので，翻
+訳の有無について気を配る必要がなくなります．
 
-.. _`Django �ƥ�ץ졼��`: ../templates_python/
+.. _`Django テンプレート`: ../templates_python/
 .. _Django templates: ../templates_python/
 
 .. _How to create language files:
 
-����ե�����κ���
+言語ファイルの作成
 ==================
 
-ʸ����������ѤΥ�����Ĥ����顤���٤�����ʸ���Τ�� (�ޤ��ϼ�������)
-ɬ�פ�����ޤ��������Ǥ�����ʸ�����ˡ�ˤĤ��Ƽ����ޤ���
+文字列に翻訳用のタグをつけたら，今度は翻訳文自体を書く (または手に入れる)
+必要があります．ここでは翻訳文を書く方法について示します．
 
-.. admonition:: �������������
+.. admonition:: ロケールの制約
 
-    Django �ϡ� Django ���Τ��Ф����������������Τʤ�����ؤ��ϰ貽�򥵥ݡ�
-    �Ȥ��Ƥ��ޤ��󡥤����������μ���Υ����������󶡤��Ƥ⡤ Django ����
-    �ˤ��θ���Υ��ݡ��Ȥ��ʤ���С�����������̵�뤵��ޤ�������Υ��ץꥱ��
-    ����������θ���Υ�������򥵥ݡ��Ȥ��������Τʤ顤�ޤ��� Django ��
-    ������ʬ���Ф���Ǿ��¤����������������������ɬ�פ�����Ǥ��礦���ޤ���
-    ���ξ�硤�������줿��å����� (����Υ��ץꥱ���������Υ�������) ��
-    �Ѹ�Υ�å����� (Django ���Τ��Դ����ʥ�������) �����꺮���ä�ɽ���ˤʤ�
-    �Ƥ��ޤ��Ǥ��礦��
+    Django は， Django 本体に対する翻訳カタログのない言語への地域化をサポー
+    トしていません．ある言語向けの自作のカタログを提供しても， Django 本体
+    にその言語のサポートがなければ，カタログは無視されます．自作のアプリケー
+    ションに特定の言語のロケールをサポートさせたいのなら，まずは Django の
+    コア部分に対する最小限の翻訳カタログを作成する必要があるでしょう．また，
+    その場合，翻訳されたメッセージ (自作のアプリケーション内のカタログ) と
+    英語のメッセージ (Django 自体の不完全なカタログ) が入り混じった表示になっ
+    てしまうでしょう．
 
 .. _Message files:
 
-��å������ե�����
+メッセージファイル
 ------------------
 
-�ǽ�Υ��ƥåפϡ��������ɲä�������Ѥ� **��å������ե�����** �κ����Ǥ���
-��å������ե������ʿʸ�ƥ����ȥե�����ǡ����줴�Ȥ˺������졤����ʸ����
-���Ƥȡ����줴�Ȥ��б�����ɽ����������Ƥ��ޤ�����å������ե�����γ�ĥ
-�Ҥ� ``.po`` �Ǥ���
+最初のステップは，新たに追加する言語用の **メッセージファイル** の作成です．
+メッセージファイルは平文テキストファイルで，言語ごとに作成され，翻訳文字列
+全てと，言語ごとの対応する表現が収められています．メッセージファイルの拡張
+子は ``.po`` です．
 
-Django �ˤ� ``bin/make-messages.py`` �Ȥ����ġ��뤬��°���Ƥ��ޤ������Υġ�
-��ϥ�å������ե�����κ�����ݻ���ư�����ޤ���
+Django には ``bin/make-messages.py`` というツールが付属しています．このツー
+ルはメッセージファイルの作成や維持を自動化します．
 
-��å������ե�����κ����乹����Ԥ��ˤϡ��ʲ��Τ褦�˥��ޥ�ɤ�¹Ԥ��ޤ�::
+メッセージファイルの作成や更新を行うには，以下のようにコマンドを実行します::
 
     bin/make-messages.py -l de
 
-�����ǡ� ``de`` �Ϻ�����������å������ե�����θ��쥳���ɤǤ������쥳����
-�ϥ�������ɽ���η����ˤ��ޤ����㤨�С��֥饸���ξ��ˤ� ``pt_BR`` �ǡ�����
-���ȥꥢ�ɥ��Ĥ� ``de_AT`` �Ǥ���
+ここで， ``de`` は作成したいメッセージファイルの言語コードです．言語コード
+はロケール表示の形式にします．例えば，ブラジル語の場合には ``pt_BR`` で，オー
+ストリアドイツは ``de_AT`` です．
 
-������ץȤϰʲ��� 3 ����ξ��Τ����줫�Ǽ¹Ԥ��ޤ�:
+スクリプトは以下の 3 種類の場所のいずれかで実行します:
 
-    * ``django`` �Υ롼�ȥǥ��쥯�ȥ� (Subversion ��������å������Ȥ�����
-      ���Υ롼�ȤǤϤʤ��� ``$PYTHONPATH`` �˥�󥯤���Ƥ��뤫��
-      ``$PYTHONPATH`` ��Τɤ����ˤ���ǥ��쥯�ȥ�Ǥ�)��
-    * Django �ץ��������ȤΥ롼�ȥǥ��쥯�ȥꡥ
-    * Django ���ץꥱ�������Υ롼�ȥǥ��쥯�ȥꡥ
+    * ``django`` のルートディレクトリ (Subversion からチェックアウトしたと
+      きのルートではなく， ``$PYTHONPATH`` にリンクされているか，
+      ``$PYTHONPATH`` 上のどこかにあるディレクトリです)．
+    * Django プロジェクトのルートディレクトリ．
+    * Django アプリケーションのルートディレクトリ．
 
-������ץȤ� Django �������ĥ꡼���Τ��������ơ������Ѥ˥ޡ������줿���Ƥ�
-ʸ�������Ф��ޤ���������ץȤ� ``conf/locale`` ���˥�å������ե�����
-����� (�⤷���Ϲ���) ���ޤ��� ``de`` ����Ǥϡ��ե������
-``conf/locale/de/LC_MESSAGES/django.po`` �ˤʤ�ޤ���
+スクリプトは Django ソースツリー全体を走査して，翻訳用にマークされた全ての
+文字列を取り出します．スクリプトは ``conf/locale`` 下にメッセージファイル
+を作成 (もしくは更新) します． ``de`` の例では，ファイルは
+``conf/locale/de/LC_MESSAGES/django.po`` になります．
 
-�ץ��������ȥ������ĥ꡼�䥢�ץꥱ������󥽡����ĥ꡼�Ǽ¹Ԥ���ȡ�Ʊ����
-���˽������Ԥ��ޤ�������������ǥ��쥯�ȥ�ξ���
-``locale/LANG/LC_MESSAGES`` �ˤʤ�ޤ� (``conf`` �ץ�ե��������ʤ����Ȥ���
-�դ��Ƥ�������)��
+プロジェクトソースツリーやアプリケーションソースツリーで実行すると，同じよ
+うに処理が行われますが，ロケールディレクトリの場所は
+``locale/LANG/LC_MESSAGES`` になります (``conf`` プレフィクスがないことに注
+意してください)．
 
-.. admonition:: gettext ���ʤ��ä���?
+.. admonition:: gettext がなかったら?
 
-    ``gettext`` �桼�ƥ���ƥ��򥤥󥹥ȡ��뤷�Ƥ��ʤ���硤
-    ``make-messages.py`` �϶��Υե������������ޤ������ξ�硤 ``gettext``
-    �桼�ƥ���ƥ��򥤥󥹥ȡ��뤹�뤫���Ѹ��Ѥζ��Υ�å������ե�����
-    (``conf/locale/en/LC_MESSAGES/django.po``) �򥳥ԡ����ƻȤäƲ�������
+    ``gettext`` ユーティリティをインストールしていない場合，
+    ``make-messages.py`` は空のファイルを作成します．この場合， ``gettext``
+    ユーティリティをインストールするか，英語用の空のメッセージファイル
+    (``conf/locale/en/LC_MESSAGES/django.po``) をコピーして使って下さい．
 
-``.po`` �ե��������ľ�ʷ����ǽ񤫤�Ƥ��ޤ��� ``.po`` �ե�����ˤ��������
-�ƥʤΥ��󥿥��Ⱦ���Τ褦�ʤ鷺���ʥ᥿�ǡ��������äƤ��ޤ�������ʳ�����
-��ʬ�� **��å�����** �Υꥹ�ȤǤ�����å�����������ʸ���������θ����Ѥ�
-�ºݤ������ƥ����ȤǤ���
+``.po`` ファイルは素直な形式で書かれています． ``.po`` ファイルには翻訳メン
+テナのコンタクト情報のようなわずかなメタデータが入っています．それ以外の大
+部分は **メッセージ** のリストです．メッセージは翻訳文字列と特定の言語用の
+実際の翻訳テキストです．
 
-�㤨�С� Django ���ץꥱ�������� ``"Welcome to my site."`` �Ȥ����ƥ�����
-������ʸ���󤬰ʲ��Τ褦�����äƤ����Ȥ��ޤ�::
+例えば， Django アプリケーションに ``"Welcome to my site."`` というテキスト
+の翻訳文字列が以下のように入っていたとします::
 
     _("Welcome to my site.")
 
-``make-messages.py`` ��¹Ԥ���ȡ��ʲ��Τ褦�ʥ��������Ҥ�ޤ� ``.po`` �ե�
-������������Ϥ��Ǥ�::
+``make-messages.py`` を実行すると，以下のようなコード断片を含む ``.po`` ファ
+イルを作成するはずです::
 
     #: path/to/python/module.py:23
     msgid "Welcome to my site."
     msgstr ""
 
-������Ƥ��ñ���������ޤ��礦:
+上の内容を簡単に説明しましょう:
 
-    * ``msgid`` ������ʸ����ǡ������������ɤ˽񤫤�Ƥ�����ΤǤ����ѹ���
-      �ƤϤʤ�ޤ���
-    * ``msgstr`` �ˤϳƸ��������������ޤ����ǽ�϶��ˤʤäƤ��ꡤ�ѹ�����
-      �Τϥ桼������Ǥ�Ǥ�������ʸ����μ���˥������Ȥ�˺��ʤ��褦������
-      ���Ƥ���������
-    * �ص��塤�ƥ�å������ˤϳ�����������ʸ����Τ��ä��ե�����̾�ȹ��ֹ�
-      �����äƤ��ޤ���
+    * ``msgid`` は翻訳文字列で，ソースコードに書かれていたものです．変更し
+      てはなりません．
+    * ``msgstr`` には各言語の翻訳を入れます．最初は空になっており，変更する
+      のはユーザの責任です．翻訳文字列の周りにクオートを忘れないように注意
+      してください．
+    * 便宜上，各メッセージには該当する翻訳文字列のあったファイル名と行番号
+      が入っています．
 
-Ĺ����å����������̤ʥ������Ȥ��ư����ޤ��� ``msgstr`` (�ޤ��� ``msgid``)
-��ľ���ʸ���󤬶�ʸ����ξ�硤����ƥ�ļ��ΤϤ��μ���ʣ���Ԥˤ錄�äƽ�
-����Ƥ����ΤȤߤʤ��ޤ���������ʸ�����ľ�ܷ�礵���Τǡ�ʸ�������
-�֤Ǥ������˥��ڡ�����˺��ʤ��褦�ˤ��ޤ��礦������ʤ��ȡ�����ʤ���ʸ��
-�󤬤��äĤ��Ƥ��ޤ��ޤ���!
+長いメッセージは特別なケースとして扱います． ``msgstr`` (または ``msgid``)
+の直後の文字列が空文字列の場合，コンテンツ自体はその次の複数行にわたって書
+かれているものとみなします．これらの文字列は直接結合されるので，文字列の中
+間では末尾にスペースを忘れないようにしましょう．さもないと，空白なしで文字
+列がくっついてしまいますよ!
 
-.. admonition:: ʸ�������ɥ��åȤ�����
+.. admonition:: 文字コードセットに注意
 
-    ``.po`` �ե������ƥ����ȥ��ǥ����Ǻ�������Ȥ��ˤϡ�ʸ�������ɥ��å�
-    �ι� (``"CHARSET"`` ��õ���Ʋ�����) ��ޤ��Խ����ơ����줫���Խ��˻Ȥ�
-    ʸ�����åȤˤ��Ƥ�������������Ū�ˡ��ۤȤ�ɤθ���Ǥ� utf-8 ��Ȥ����
-    ���Ǥ����� ``gettext`` �Ϥɤ��ʸ�����åȤ��������Ƥ⤦�ޤ���������Ϥ�
-    �Ǥ���
+    ``.po`` ファイルをテキストエディタで作成するときには，文字コードセット
+    の行 (``"CHARSET"`` を探して下さい) をまず編集して，これから編集に使う
+    文字セットにしてください．一般的に，ほとんどの言語では utf-8 を使えるは
+    ずですが， ``gettext`` はどんな文字セットを投入してもうまく処理するはず
+    です．
 
-���ƤΥ����������ɤȥƥ�ץ졼�Ȥ򿷤�������ʸ����Ǥ��ᤷ�� **���Ƥ�** ��
-���Ѥ˥�å������ե�����򹹿�����ˤϡ��ʲ��Τ褦�ˤ��ޤ�::
+全てのソースコードとテンプレートを新たな翻訳文字列でためし， **全ての** 言
+語用にメッセージファイルを更新するには，以下のようにします::
 
     make-messages.py -a
 
 .. _Compiling message files:
 
-��å������ե�����Υ���ѥ���
+メッセージファイルのコンパイル
 ------------------------------
 
-��å������ե������������ơ��ѹ����������� ``gettext`` ��Ȥäƥ�å�����
-�ե���������ΨŪ�ʷ����˥���ѥ��뤷�ޤ�����Ȥ�
-``bin/compile-messages.py`` �桼�ƥ���ƥ��ǹԤ��ޤ��礦��
+メッセージファイルを作成して，変更し終えたら ``gettext`` を使ってメッセージ
+ファイルをより効率的な形式にコンパイルします．作業は
+``bin/compile-messages.py`` ユーティリティで行いましょう．
 
-���Υġ�������Ƥ� ``.po`` �ե�����򥳥�ѥ��뤷�� ``.mo`` �ե���������
-���ޤ��� ``.mo`` �ե�����ϥХ��ʥ�ե�����ǡ� ``gettext`` �ǻȤ�����˺�
-Ŭ������Ƥ��ޤ��� ``make-messages.py`` ��¹Ԥ����Τ�Ʊ���ǥ��쥯�ȥ�ǡ�
-�ʲ��Τ褦�� ``compile-messages.py`` ��¹Ԥ��Ƥ�������::
+このツールは全ての ``.po`` ファイルをコンパイルして ``.mo`` ファイルを作成
+します． ``.mo`` ファイルはバイナリファイルで， ``gettext`` で使うために最
+適化されています． ``make-messages.py`` を実行したのと同じディレクトリで，
+以下のように ``compile-messages.py`` を実行してください::
 
    bin/compile-messages.py
 
-����ǽ����Ǥ����⤦������Ȥ���褦�ˤʤäƤ���Ϥ��Ǥ���
+これで終わりです．もう翻訳を使えるようになっているはずです．
 
-.. admonition:: �����Ԥؤ�����
+.. admonition:: 翻訳者への注意
 
-    Django �����ݡ��ȤǤ��ʤ��褦��������������Ƥ��ޤä��顤���󶵤��Ʋ���
-    ��! ���� `��������ФȰݻ�`_ �ˤ���ޤ���
+    Django がサポートできないような翻訳を作成してしまったら，是非教えて下さ
+    い! 手順は `翻訳の提出と維持`_ にあります．
 
-.. _`��������ФȰݻ�`: 
+.. _`翻訳の提出と維持`: 
     ../contributing/#submitting-and-maintaining-translations
 .. _Submitting and maintaining translations: 
     ../
 
 .. _How Django discovers language preference:
 
-��������θ��Хᥫ�˥���
+言語設定の検出メカニズム
 ========================
 
-�����ν�����λ���������뤤�� Django ��°��������Ȥ����������ʤ顤���Ȥ�
-���ץꥱ��������������ͭ���ˤ�������Ǥ���
+翻訳の準備を完了した，あるいは Django 付属の翻訳を使いたいだけなら，あとは
+アプリケーションで翻訳を有効にするだけです．
 
-�ظ�Ǥϡ� Django �ϥ桼���λ��Ѹ��������ǥ�������Ƥ��ޤ������Υ��
-��Ͻ���ǡ����󥹥ȡ������Ρ����뤤������Υ桼�����ޤ��Ϥ���ξ�����Ф���
-���Ѹ�������Ǥ��ޤ���
+背後では， Django はユーザの使用言語を決めるモデルを備えています．このモデ
+ルは柔軟で，インストール全体，あるいは特定のユーザ，またはその両方に対して
+使用言語を決定できます．
 
-���󥹥ȡ������ΤǤλ��Ѹ�������ꤹ��ˤϡ� `����ե�����`_ ��
-``LANGUAGE_CODE`` �����ꤷ�ޤ��� Django ���������ǥե���Ȥ��������졤��
-�ʤ��¾��Ŭ�ڤ��������ʤ����˻�ߤ��������ꤷ�ޤ���
+インストール全体での使用言語を設定するには， `設定ファイル`_ の
+``LANGUAGE_CODE`` を設定します． Django この設定をデフォルトの翻訳言語，す
+なわち他の適切な翻訳がない場合に試みる言語に設定します．
 
-Django ��ͥ��ƥ��֤θ����ư�������������ǡ����ļ�ʬ�θ�����Ф������ե�
-����򤹤Ǥ˽������Ƥ���Τʤ顤 ``LANGUAGE_CODE`` �����ꤹ������ǺѤߤޤ���
+Django をネイティブの言語で動かしたいだけで，かつ自分の言語に対する言語ファ
+イルをすでに準備しているのなら， ``LANGUAGE_CODE`` を設定するだけで済みます．
 
-�ġ��Υ桼������ʬ�λȤ��������������Ǥ���褦�ˤ���ˤ�
-``LocaleMiddleware`` ��ȤäƤ��������� ``LocaleMiddleware`` �ϡ��ꥯ������
-�������ޤ줿�ǡ����˴�Ť��������������ǽ�ˤ����桼�����Ȥ˥���ƥ��
-�򥫥����ޥ������ޤ���
+個々のユーザが自分の使いたい言語を選択できるようにするには
+``LocaleMiddleware`` を使ってください． ``LocaleMiddleware`` は，リクエスト
+に埋め込まれたデータに基づいた言語の選択を可能にし，ユーザごとにコンテンツ
+をカスタマイズします．
 
-``LocaleMiddleware`` ��Ȥ��ˤϡ� ``MIDDLEWARE_CLASSES`` �����
-``'django.middleware.locale.LocaleMiddleware'`` ���ɲä��ޤ����ߥɥ륦����
-�ν��֤Ͻ��פǡ��ʲ��Υ����ɥ饤��˽��äƲ�����:
+``LocaleMiddleware`` を使うには， ``MIDDLEWARE_CLASSES`` 設定に
+``'django.middleware.locale.LocaleMiddleware'`` を追加します．ミドルウェア
+の順番は重要で，以下のガイドラインに従って下さい:
 
-    * �ޤ������󥹥ȡ���ѤߤΥߥɥ륦��������Ƭ�ˤ���褦�ˤ��Ƥ���������
-    * ``LocaleMiddleware`` �ϥ��å�����Ȥ��Τǡ� ``SessionMiddleware``
-      �θ�������֤��Ƥ���������
-    * ``CacheMiddleware`` ��ȤäƤ���ʤ顤���θ���� ``LocaleMiddleware``
-      �����֤��Ƥ���������
+    * まず，インストール済みのミドルウェアの先頭にくるようにしてください．
+    * ``LocaleMiddleware`` はセッションを使うので， ``SessionMiddleware``
+      の後ろに配置してください．
+    * ``CacheMiddleware`` を使っているなら，その後ろに ``LocaleMiddleware``
+      を配置してください．
 
-�㤨�С� ``MIDDLEWARE_CLASSES`` �ϰʲ��Τ褦�ˤʤ�ޤ�::
+例えば， ``MIDDLEWARE_CLASSES`` は以下のようになります::
 
     MIDDLEWARE_CLASSES = (
        'django.contrib.sessions.middleware.SessionMiddleware',
@@ -484,52 +484,52 @@ Django ��ͥ��ƥ��֤θ����ư�������������ǡ����ļ�ʬ�θ�����Ф������ե�
        'django.middleware.common.CommonMiddleware',
     )
 
-(�ߥɥ륦�����ξܺ٤� `�ߥɥ륦�����Υɥ������`_ �򻲾Ȥ��Ƥ���������)
+(ミドルウェアの詳細は `ミドルウェアのドキュメント`_ を参照してください．)
 
-``LocaleMiddleware`` �ϥ桼���θ��������ʲ��Τ褦�ʥ��르�ꥺ��Ƿ��ꤷ��
-���Ȼ�ߤޤ�:
+``LocaleMiddleware`` はユーザの言語設定を以下のようなアルゴリズムで決定しよ
+うと試みます:
 
-    * �ޤ������ߤΥ桼���� `���å����`_ �� ``django_language`` �������ʤ�
-      ��õ���ޤ���
-    * �ʤ���С� ``django_language`` �Ȥ���̾���� HTTP cookie ��õ���ޤ���
-    * �ʤ���С� ``Accept-Language`` HTTP �إå���õ���ޤ������Υإå��ϥ�
-      �饦�������������졤�����Ф��Ф��ƽ�̤Ĥ��Ǹ���������Τ餻�Ƥ��ޤ���
-      Djang �Ϥ����������Ĵ�١����Ѳ�ǽ�������Τ�������õ���ޤ���
-    * �ʤ���С��������Х�����ꤵ�줿 ``LANGUAGE_CODE`` �������Ȥ��ޤ���
+    * まず，現在のユーザの `セッション`_ に ``django_language`` キーがない
+      か探します．
+    * なければ， ``django_language`` という名前の HTTP cookie を探します．
+    * なければ， ``Accept-Language`` HTTP ヘッダを探します．このヘッダはブ
+      ラウザから送信され，サーバに対して順位つきで言語設定を知らせてきます．
+      Djang はこの設定を順に調べ，利用可能な翻訳のある言語を探します．
+    * なければ，グローバルに設定された ``LANGUAGE_CODE`` の設定を使います．
 
-����:
+注意:
 
-    * �嵭�ΤɤΥ��ƥåפǤ⡤���������ɸ��θ���̾ɽ��ˡ�˽��ä�ʸ�����
-      �񤫤�Ƥ����Τ����ꤷ�Ƥ��ޤ����㤨�С��֥饸���� ``pt-br`` �Ǥ���
-    * ���ܸ��� (base language) �����ꤵ��Ƥ��ơ������� (sublanguage) ����
-      �ꤵ��Ƥ��ʤ���硤 Django �ϴ��ܸ���������ͥ�褷�ޤ����㤨�С��桼
-      ���� ``de-at`` (�������ȥꥢ�ɥ��ĸ�) ����ꤷ�Ƥ���Τ��Ф��ơ�
-      Django ¦�ˤ� ``de`` �Τ����ʤ���硤 Django �� ``de`` ��Ȥ��ޤ���
-    * `LANGUAGES ����`_ �˥ꥹ�ȥ��åפ������줷������Ǥ��ޤ���(���Ƥθ�
-      ����Ф����������󶡤Ǥ��ʤ��ʤɤ���ͳ��) ������������θ���Υ���
-      ���åȤ����¤��������ˤϡ� ``LANGUAGES`` �����ꤷ�ޤ����㤨��::
+    * 上記のどのステップでも，言語設定は標準の言語名表記法に従った文字列で
+      書かれているものと想定しています．例えば，ブラジル語は ``pt-br`` です．
+    * 基本言語 (base language) が指定されていて，副言語 (sublanguage) が指
+      定されていない場合， Django は基本言語の設定を優先します．例えば，ユー
+      ザが ``de-at`` (オーストリアドイツ語) を指定しているのに対して，
+      Django 側には ``de`` のしかない場合， Django は ``de`` を使います．
+    * `LANGUAGES 設定`_ にリストアップした言語しか選択できません．(全ての言
+      語に対する翻訳を提供できないなどの理由で) 言語選択を指定の言語のサブ
+      セットに制限したい場合には， ``LANGUAGES`` を設定します．例えば::
 
           LANGUAGES = (
             ('de', _('German')),
             ('en', _('English')),
           )
 
-      ������Ǥϡ���ư����������˥塼�����Ѳ�ǽ�ʸ����ɥ��ĸ�:de ��
-      �Ѹ�:en (����� de-ch �� en-us �Τ褦��������) �����¤��Ƥ��ޤ���
+      この例では，自動生成されるメニューで利用可能な言語をドイツ語:de と
+      英語:en (および de-ch や en-us のような副言語) に制限しています．
 
-      .. _`LANGUAGES ����`: ../settings/#languages
+      .. _`LANGUAGES 設定`: ../settings/#languages
       .. _LANGUAGES setting: 
           ../settings/#languages
 
-    * ��ι�����������褦�ˡ���������� ``LANGUAGES`` �����Ԥä���硤��
-      �θ���������о�ʸ����˴ޤ�Ƥ⹽���ޤ��󡥤�������
-      ``django.utils.translation`` �� ``gettext()`` �ǤϤʤ����֥��ߡ��Ρ�
-      ``gettext()`` �ǥޡ������Ƥ����������۴� import ���ɤ����ᡤ *�褷��*
-      ����ե�������� ``django.utils.translation`` �� import ���ʤ��Ǥ���
-      ������
+    * 上の項で説明したように，カスタムの ``LANGUAGES`` 設定を行った場合，そ
+      の言語を翻訳対象文字列に含めても構いません．ただし，
+      ``django.utils.translation`` の ``gettext()`` ではなく，「ダミーの」
+      ``gettext()`` でマークしてください．循環 import を防ぐため， *決して*
+      設定ファイル中で ``django.utils.translation`` を import しないでくだ
+      さい．
 
-      �������� ``LANGUAGES`` �Υޡ������åפϡ֥��ߡ��Ρ� ``gettext()`` ��
-      ���ǲ�褷�ޤ����ʲ�������ե�����Ǥε�����򼨤��ޤ�::
+      カスタム ``LANGUAGES`` のマークアップは「ダミーの」 ``gettext()`` 関
+      数で解決します．以下に設定ファイルでの記述例を示します::
 
           gettext = lambda s: s
 
@@ -538,35 +538,35 @@ Django ��ͥ��ƥ��֤θ����ư�������������ǡ����ļ�ʬ�θ�����Ф������ե�
               ('en', gettext('English')),
           )
 
-      ���Τ褦�����ꤷ�Ƥ����Ƥ⡤ ``make-messages.py`` ������ʸ����򸡽�
-      ���������оݤȤ��ƥޡ������ޤ������������¹Ի��������Ϥ����ʤ��ޤ�
-      �󡥤������äơ��¹Ի��ˤ� ``LANGUAGES`` ��Ȥ������ɤ� *������*
-      ``gettext()`` �ǥ�åפ��Ƥ����ͤФʤ�ޤ���
+      このように設定しておいても， ``make-messages.py`` は翻訳文字列を検出
+      して翻訳対象としてマークします．ただし，実行時の翻訳はおこなわれませ
+      ん．したがって，実行時には ``LANGUAGES`` を使うコードを *本当の*
+      ``gettext()`` でラップしておかねばなりません．
 
-    * ``LocaleMiddleware`` ������Ǥ���Τϡ� Django ������Ū����ʬ��������
-      �󶡤��Ƥ����������Ǥ��� Django �Υ������ĥ꡼���������åȤ����ä�
-      ���ʤ�������������󶡤�������С��ޤ����θ���ऱ�δ�����ʬ��������
-      �󶡤���ɬ�פ�����ޤ����㤨�С�Django �ϥƥ��˥����å����� ID
-      (technical message ID) ��Ȥä����դ����Υե����ޥåȤ��᤹��Τǡ�
-      �����ƥ��������ư�����ˤϾ��ʤ��Ȥ⤳��������ʬ��������ɬ�פˤ�
-      ��ޤ���
+    * ``LocaleMiddleware`` で選択できるのは， Django が基本的な部分の翻訳を
+      提供している言語だけです． Django のソースツリーの翻訳セットに入って
+      いない言語の翻訳を提供したければ，まずその言語むけの基本部分の翻訳を
+      提供する必要があります．例えば，Django はテクニカルメッセージ ID
+      (technical message ID) を使って日付や時刻のフォーマットを解釈するので，
+      システムを正しく動作させるには少なくともこうした部分の翻訳が必要にな
+      ります．
 
-      ��Ȥ�Ϥ��ˤϡ��ޤ��Ѹ��Ѥ� ``.po`` �ե�����򥳥ԡ�����Ȥ褤�Ǥ���
-      �������ʤ��Ȥ�ƥ��˥����å������������������ޤ����Х�ǡ����Υ��
-      ���������äƤ����Ȥ褤�Ǥ��礦��
+      作業を始めるには，まず英語用の ``.po`` ファイルをコピーするとよいでしょ
+      う．少なくともテクニカルメッセージだけは翻訳します．バリデータのメッ
+      セージもやっておくとよいでしょう．
 
-      �ƥ��˥����å����� ID �ϴ�ñ�˶��̤Ǥ��ޤ�����å����� ID ��������
-      ʸ���ǤǤ��Ƥ��뤫��Ǥ������Υ�å����� ID ��¾�Υ�å�������Ʊ����
-      �����������Ƥ褤��ΤǤϤʤ��������������������������ꤻ�ͤФʤ��
-      �����㤨�С� ``DATETIME_FORMAT`` (���뤤�� ``DATE_FORMAT`` ��
-      ``TIME_FORMAT``) �ξ�硤��ʬ�θ���ˤ������������ե����ޥå�ʸ�����
-      ���ꤻ�ͤФʤ�ޤ��󡥥ե����ޥåȤ� ``now`` �ƥ�ץ졼�ȥ����ǻȤ��
-      �Ƥ���ե����ޥå�ʸ�����Ʊ��ʸˡ�˽����ޤ���
+      テクニカルメッセージ ID は簡単に区別できます．メッセージ ID は全て大
+      文字でできているからです．このメッセージ ID は他のメッセージと同じよ
+      うに翻訳してよいものではなく，ローカルの正しい形式を指定せねばなりま
+      せん．例えば， ``DATETIME_FORMAT`` (あるいは ``DATE_FORMAT`` や
+      ``TIME_FORMAT``) の場合，自分の言語における正しいフォーマット文字列を
+      指定せねばなりません．フォーマットは ``now`` テンプレートタグで使われ
+      ているフォーマット文字列と同じ文法に従います．
 
-``LocaleMiddleware`` ���桼������򸡽Ф���ȡ���������� 
-`�ꥯ�����ȥ��֥�������`_ �� ``request.LANGUAGE_CODE`` �ǥ��������Ǥ���褦
-�ˤʤ�ޤ��������ͤϥӥ塼�����ɤǼ�ͳ���ɤߤ����Ƥ��ޤ��ޤ��󡥰ʲ��˰���
-��󤲤ޤ�::
+``LocaleMiddleware`` がユーザ設定を検出すると，その設定は 
+`リクエストオブジェクト`_ の ``request.LANGUAGE_CODE`` でアクセスできるよう
+になります．この値はビューコードで自由に読みだしてかまいません．以下に一例
+を挙げます::
 
     def hello_world(request, count):
         if request.LANGUAGE_CODE == 'de-at':
@@ -574,51 +574,51 @@ Django ��ͥ��ƥ��֤θ����ư�������������ǡ����ļ�ʬ�θ�����Ф������ե�
         else:
             return HttpResponse("You prefer to read another language.")
 
-��Ū�� (�ߥɥ륦������Ȥ�ʤ�) �����Ǥϡ����������
-``settings.LANGUAGE_CODE`` ���ͤˤʤꡤưŪ�� (�ߥɥ륦������Ȥä�) ������
-�ϡ���������� ``request.LANGUAGE_CODE`` ���ͤˤʤ�Τ����դ��Ƥ���������
+静的な (ミドルウェアを使わない) 翻訳では，言語設定は
+``settings.LANGUAGE_CODE`` の値になり，動的な (ミドルウェアを使った) 翻訳で
+は，言語設定は ``request.LANGUAGE_CODE`` の値になるので注意してください．
 
-.. _`����ե�����`: ../settings/
+.. _`設定ファイル`: ../settings/
 .. _settings file: ../settings/
-.. _`�ߥɥ륦�����Υɥ������`: ../middleware/
+.. _`ミドルウェアのドキュメント`: ../middleware/
 .. _middleware documentation: ../middleware/
-.. _`���å����`: ../sessions/
-.. _`�ꥯ�����ȥ��֥�������`: ../request_response/#httprequest-objects
+.. _`セッション`: ../sessions/
+.. _`リクエストオブジェクト`: ../request_response/#httprequest-objects
 .. _session: ../sessions/
 .. _request object: ../request_response/#httprequest-objects
 
 .. The set_language redirect view:
 
-``set_language`` ������쥯�ȥӥ塼
+``set_language`` リダイレクトビュー
 ===================================
 
-�������Τ���ˡ� Django �ˤ� ``django.views.i18n.set_language`` �Ȥ����ӥ塼
-����°���Ƥ��ޤ������Υӥ塼�ϥ桼���θ��������Ԥä��塤�����Υڡ����˥�
-�����쥯�Ȥ����ᤷ�ޤ���
+利便性のために， Django には ``django.views.i18n.set_language`` というビュー
+が付属しています．このビューはユーザの言語設定を行った後，以前のページにリ
+ダイレクトして戻します．
 
-���Υӥ塼��ͭ���ˤ���ˤϡ��ʲ��ιԤ� URLconf ������ޤ�::
+このビューを有効にするには，以下の行を URLconf に入れます::
 
     (r'^i18n/', include('django.conf.urls.i18n')),
 
-(��: ������Ǥϥӥ塼�� ``/i18n/setlang/`` �ǻȤ���褦�ˤ��Ƥ��ޤ�)
+(注: この例ではビューを ``/i18n/setlang/`` で使えるようにしています)
 
-���Υӥ塼�� ``GET`` �᥽�åɤǸƤӽФ����褦�ˤʤäƤ��ޤ����ޤ���������
-ʸ������� ``language`` �ѥ�᥿�����ꤵ��Ƥ����Τ����ꤷ�Ƥ��ޤ�������
-�����Υ��ݡ��Ȥ�ͭ���Ǥ���С��ӥ塼�ϥ桼���Υ��å�������˸��������
-��¸���ޤ������å����ͭ���Ǥʤ���硤��������� ``django_language`` ����
-��������¸����ޤ���
+このビューは ``GET`` メソッドで呼び出されるようになっています．また，クエリ
+文字列中に ``language`` パラメタが設定されているものと想定しています．セッ
+ションのサポートが有効であれば，ビューはユーザのセッション情報に言語設定を
+保存します．セッションが有効でない場合，言語設定は ``django_language`` クッ
+キーに保存されます．
 
-���������Ԥä��塤 Django �ϰʲ��Υ��르�ꥺ��˽��äƥ桼���������쥯
-�Ȥ��ޤ�:
+言語設定を行った後， Django は以下のアルゴリズムに従ってユーザをリダイレク
+トします:
 
-    * Django �ϥ�����ʸ������� ``next`` �ѥ�᥿���ʤ���õ���ޤ���
-    * ``next`` �ѥ�᥿���ʤ������ξ�硤 Django �� ``Referer`` �إå���
-      URL �����ꤵ��Ƥ��ʤ���Ĵ�٤ޤ���
-    * ``Referer`` �إå������ξ�硤���ʤ���桼���Υ֥饦������ե���إ�
-      �����������Ƥ����硤�桼���� ``/`` (�����ȤΥ롼��) �˥�����쥯��
-      ����ޤ���
+    * Django はクエリ文字列中に ``next`` パラメタがないか探します．
+    * ``next`` パラメタがないか空の場合， Django は ``Referer`` ヘッダに
+      URL が指定されていないか調べます．
+    * ``Referer`` ヘッダが空の場合，すなわちユーザのブラウザがリファラヘッ
+      ダを抑制している場合，ユーザは ``/`` (サイトのルート) にリダイレクト
+      されます．
 
-HTML �ƥ�ץ졼�ȥ����ɤ���򼨤��ޤ�::
+HTML テンプレートコードの例を示します::
     <form action="/i18n/setlang/" method="get">
     <input name="next" type="hidden" value="/next/page/" />
     <select name="language">
@@ -631,101 +631,101 @@ HTML �ƥ�ץ졼�ȥ����ɤ���򼨤��ޤ�::
 
 .. _Using translations in your own projects:
 
-����Υץ��������Ȥ�������Ȥ�
+自作のプロジェクトで翻訳を使う
 ==============================
 
-Django �ϰʲ��Υ��르�ꥺ��˽��ä�������õ���ޤ�:
+Django は以下のアルゴリズムに従って翻訳を探します:
 
-    * �ޤ������߸ƤӽФ���Ƥ���ӥ塼�����äƤ��륢�ץꥱ�������ǥ��쥯
-      �ȥ겼�� ``locale`` �ǥ��쥯�ȥ��õ���ޤ����������򤵤�Ƥ�������
-      �б���������������С����������򥤥󥹥ȡ��뤷�ޤ���
-    * ���ˡ��ץ��������ȥǥ��쥯�ȥ겼�� ``locale`` �ǥ��쥯�ȥ��õ���ޤ���
-      ����������С����������򥤥󥹥ȡ��뤷�ޤ���
-    * �Ǹ�ˡ� ``django/conf/locale`` �ˤ�����ܤ�����������å����ޤ���
+    * まず，現在呼び出されているビューの入っているアプリケーションディレク
+      トリ下に ``locale`` ディレクトリを探します．現在選択されている言語に
+      対応する翻訳があれば，その翻訳をインストールします．
+    * 次に，プロジェクトディレクトリ下に ``locale`` ディレクトリを探します．
+      翻訳があれば，その翻訳をインストールします．
+    * 最後に， ``django/conf/locale`` にある基本の翻訳をチェックします．
 
-�������뤳�Ȥǡ��ȼ������������ä����ץꥱ��������񤤤��ꡤ���ܤ�������
-���Ƥ�ץ��������ȥѥ����֤��������ǥ����Х饤�ɤ�����Ǥ��ޤ����ޤ���ʣ��
-�ξ����ʥ��ץꥱ���������礭��Υץ��������Ȥ��ۤ���Ȥ��ˡ����Ƥ�����
-���ĤΥץ���������ñ�̤Υ�å������ե�����ˤޤȤ�Ƥ����ޤ����ɤ�������
-ˡ��Ȥ뤫�ϥ桼������Ǥ���
+こうすることで，独自の翻訳の入ったアプリケーションを書いたり，基本の翻訳の
+内容をプロジェクトパスに置いた翻訳でオーバライドしたりできます．また，複数
+の小さなアプリケーションで大きめのプロジェクトを構築するときに，全ての翻訳
+を一つのプロジェクト単位のメッセージファイルにまとめておけます．どういう方
+法をとるかはユーザ次第です．
 
 .. note::
 
-    `settings �Υɥ������`_ �˼������褦�ˡ� ``DJANGO_SETTINGS_MODULE``
-    ��Ȥ鷺�˼�ư�������Ԥä���硤�ץ��������ȥǥ��쥯�ȥ����
-    ``locale`` �ǥ��쥯�ȥ�ϥ����å�����ޤ��󡥤���� Django ���ץ�������
-    �ȥǥ��쥯�ȥ�ξ���Ĵ�٤�Ѥ�⤿�ʤ�����Ǥ� (Django ���̾����ե�
-    ����Τ��������� ``locale`` �ǥ��쥯�ȥ�ξ���Ĵ�٤ޤ�������ư
-    �������Ԥ�������ե����뤬¸�ߤ��ʤ��ʤäƤ��ޤ�����Ǥ�)��
+    `settings のドキュメント`_ に示したように， ``DJANGO_SETTINGS_MODULE``
+    を使わずに手動で設定を行った場合，プロジェクトディレクトリ内の
+    ``locale`` ディレクトリはチェックされません．これは Django がプロジェク
+    トディレクトリの場所を調べる術をもたないからです (Django は通常，設定ファ
+    イルのある場所を基準に ``locale`` ディレクトリの場所を調べますが，手動
+    で設定を行うと設定ファイルが存在しなくなってしまうからです)．
 
-.. _`settings �Υɥ������`: 
+.. _`settings のドキュメント`: 
     ../settings/#using-settings-without-the-django-settings-module-environment-variable
 .. _settings documentation: ../settings/#using-settings-without-the-django-settings-module-environment-variable
 
 
-��å������ե������ݥ��ȥ��Ʊ���褦�ʹ����ˤʤäƤ��ޤ�:
+メッセージファイルリポジトリも同じような構成になっています:
 
     * ``$APPPATH/locale/<language>/LC_MESSAGES/django.(po|mo)``
     * ``$PROJECTPATH/locale/<language>/LC_MESSAGES/django.(po|mo)``
-    * ����ե������ ``LOCALE_PATHS`` �˻��ꤵ��Ƥ������ƤΥѥ��������
-      �������� ``<language>/LC_MESSAGES/django.(po|mo)`` ��õ���ޤ���
+    * 設定ファイルの ``LOCALE_PATHS`` に指定されている全てのパスを指定順に
+      検索して ``<language>/LC_MESSAGES/django.(po|mo)`` を探します．
     * ``$PYTHONPATH/django/conf/locale/<language>/LC_MESSAGES/django.(po|mo)``
 
-��å������ե�����κ����ˤϡ� Django ��å������ե������Ʊ��
-``make-messages.py`` �ġ����ȤäƲ��������ġ���μ¹Ԥ���������ꡤ���ʤ�
-�� ``conf/locale`` (�������ĥ꡼�ξ��) �������뤤�� ``locale`` (���ץꥱ��
-������å�������ץ��������ȥ�å������ξ��) �ǥ��쥯�ȥ�Τ���ǥ��쥯
-�ȥ�ǹԤ�ͤФʤ�ޤ��󡥤ޤ��� ``gettext`` �λȤ��Х��ʥ������
-``django.mo`` �ե��������������ˤ� ``compile-messages.py`` ��Ȥ��ޤ���
+メッセージファイルの作成には， Django メッセージファイルと同じ
+``make-messages.py`` ツールを使って下さい．ツールの実行は正しい場所，すなわ
+ち ``conf/locale`` (ソースツリーの場合) か，あるいは ``locale`` (アプリケー
+ションメッセージやプロジェクトメッセージの場合) ディレクトリのあるディレク
+トリで行わねばなりません．また， ``gettext`` の使うバイナリ形式の
+``django.mo`` ファイルを生成するには ``compile-messages.py`` を使います．
 
-���ץꥱ��������å������ե������ȯ������ᥫ�˥���Ϥ��ʣ���ǡ�
-``LocaleMiddleware`` ��ɬ�פˤʤ�ޤ������äơ����Υߥɥ륦������Ȥ�ʤ���
-�硤 Django ��å������ե�����ȥץ��������ȥ�å������ե����������������
-��ޤ���
+アプリケーションメッセージファイルを発見するメカニズムはやや複雑で，
+``LocaleMiddleware`` が必要になります．従って，このミドルウェアを使わない場
+合， Django メッセージファイルとプロジェクトメッセージファイルだけが処理さ
+れます．
 
-�Ǹ�ˡ������ե������ɤΤ褦�˹������뤫���ä���ȹͤ��Ƥ����褦�˴����
-������ʬ�κ�ä����ץꥱ��������¾�Υ桼�����ۤä��ꡤ¾�Υץ��������Ȥ�
-���Ѥ����ꤹ��ʤ顤���ץꥱ��������ͭ��������ɬ�פˤʤ�Ǥ��礦����������
-���ץꥱ��������ͭ�Υ�å�������ץ��������Ȥ��Ȥ�������
-``make-messages`` �ˤޤĤ�뺤�ä������������������Ȥ�����ޤ�:
-``make-messages`` �ϸ��ߤΥѥ��ʲ������ƤΥǥ��쥯�ȥ�򸡺����Ƥ��ޤ��Τǡ�
-���Ǥ˥��ץꥱ��������å������ե���������äƤ����å����� ID �����ץ�
-�������ȤΥ�å������ե���������äƤ��ޤ����Ȥ�����ΤǤ���
+最後に，翻訳ファイルをどのように構成するかしっかりと考えておくように勧めま
+す．自分の作ったアプリケーションを他のユーザに配ったり，他のプロジェクトで
+利用したりするなら，アプリケーション固有の翻訳が必要になるでしょう．しかし，
+アプリケーション固有のメッセージやプロジェクトごとの翻訳は
+``make-messages`` にまつわる困った問題を引き起こすことがあります:
+``make-messages`` は現在のパス以下の全てのディレクトリを検索してしまうので，
+すでにアプリケーションメッセージファイルに入っているメッセージ ID が，プロ
+ジェクトのメッセージファイルに入ってしまうことがあるのです．
 
-��������κǤ��ñ�ʲ��ˡ�ϡ��ץ��������Ȥ�ľ��Ū�˹��ۤ��ʤ� (�ʤ�������
-���������������Ƥ���) ���ץꥱ��������ץ��������ȥĥ꡼�γ������֤��Ƥ�
-���Ȥ�����ΤǤ�����������С��ץ��������ȥ�٥�� ``make-messages`` ��¹�
-���Ƥ⡤��ʬ�Υץ��������Ȥ����˴ط�������ʬ��ʸ������������������̸Ĥ���
-�ۤ��줿���ץꥱ��������ʸ������оݤˤ��ʤ��ʤ�ޤ���
+この問題の最も簡単な解決法は，プロジェクトを直接的に構築しない (なおかつ独
+自の翻訳を備えている) アプリケーションをプロジェクトツリーの外に配置してお
+くというものです．こうすれば，プロジェクトレベルで ``make-messages`` を実行
+しても，自分のプロジェクトに明に関係する部分の文字列だけを翻訳し，別個に配
+布されたアプリケーションの文字列を対象にしなくなります．
 
-������ JavaScript
+翻訳と JavaScript
 =================
 
-JavaScript ���������ɲä��褦�Ȥ���ȡ������Ĥ��������ľ�̤��ޤ�:
+JavaScript に翻訳を追加しようとすると，いくつかの問題に直面します:
 
-    * JavaScript �����ɤˤ� ``gettext`` �����ؤΥ����������ʤ�����ޤ���
+    * JavaScript コードには ``gettext`` 実装へのアクセス手段がありません．
 
-    * JavaScript �����ɤˤ� .po �� .mo �ե�����ؤΥ����������ʤ�����ޤ���
-      �Ȥ����Τ⡤�����Υե�����ϥ����Ф��֤���Ƥ��뤫��Ǥ���
+    * JavaScript コードには .po や .mo ファイルへのアクセス手段がありません．
+      というのも，これらのファイルはサーバに置かれているからです．
 
-    * JavaScript ���������������ϤǤ���������������Ƥ����ͤФʤ�ޤ���
+    * JavaScript の翻訳カタログはできるだけ小さくしておかねばなりません．
 
-Django �Ǥϡ�������������Ф���������Ȥ߹��ߤ��󶡤��Ƥ��ޤ������β��
-���������� JavaScript ���Ϥ��ơ� ``gettext`` �ʤɤ� JavaScript ��������Ǹ�
-�ӽФ���褦�ˤ��ޤ���
+Django では，これらの問題に対する解決策を組み込みで提供しています．この解決
+策は翻訳を JavaScript に渡して， ``gettext`` などを JavaScript コード内で呼
+び出せるようにします．
 
 .. _`The javascript_catalog view`:
 
-``javascript_catalog`` �ӥ塼
+``javascript_catalog`` ビュー
 -------------------------------
 
-���Ҥ�������Ф�������ϡ� ``javascript_catalog`` �ӥ塼�ˤ���ޤ�������
-�ӥ塼�� ``gettext`` ���󥿥ե�������ޤͤ��ؿ������ä� JavaScript �����ɤȡ�
-����ʸ����Υ��쥤���������ޤ�������ʸ����Υ��쥤�� {{{info_dict}}} �� URL
-�λ���˽��äƥ��ץꥱ��������ץ��������ȡ�Django ������ʬ������Ф���
-�ޤ���
+前述の問題に対する解決策は， ``javascript_catalog`` ビューにあります．この
+ビューは ``gettext`` インタフェースをまねた関数の入った JavaScript コードと，
+翻訳文字列のアレイを送信します．翻訳文字列のアレイは {{{info_dict}}} や URL
+の指定に従ってアプリケーションやプロジェクト，Django コア部分から取り出され
+ます．
 
-�㤨�аʲ��Τ褦�˥եå��򤫤����Ȥ��ޤ��礦::
+例えば以下のようにフックをかけたとしましょう::
 
     js_info_dict = {
         'packages': ('your.app.package',),
@@ -735,93 +735,93 @@ Django �Ǥϡ�������������Ф���������Ȥ߹��ߤ��󶡤��Ƥ��ޤ������β��
         (r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict),
     )
 
-``packages`` �Υ��ץ�����äƤ����ʸ����� Python �Υɥåȶ��ڤ�Υѥå���
-��ɽ�� (``INSTALLED_APPS`` �ǻȤ��Ƥ���񼰤�Ʊ��) �ǡ� ``locale`` �ǥ���
-���ȥ�����äƤ���ѥå������ˤ��ޤ���ʣ���Υѥå���������ꤷ����硤����
-�Υ�����������ĤΥ������������礵��ޤ������λ��ͤϡ�ʣ���Υ��ץꥱ������
-���ʸ����򰷤��褦�� JavaScript �������Ǥ���
+``packages`` のタプルに入っている各文字列は Python のドット区切りのパッケー
+ジ表記 (``INSTALLED_APPS`` で使われている書式と同じ) で， ``locale`` ディレ
+クトリの入っているパッケージにします．複数のパッケージを指定した場合，全て
+のカタログが一つのカタログに統合されます．この仕様は，複数のアプリケーショ
+ンの文字列を扱うような JavaScript で便利です．
 
-URL �ѥ�����˥ѥå�����̾������Ƥ����С��ӥ塼��ưŪ�ˤǤ��ޤ�::
+URL パターンにパッケージ名を入れておけば，ビューを動的にできます::
 
     urlpatterns = patterns('',
         (r'^jsi18n/(?P<packages>\S+?)/$, 'django.views.i18n.javascript_catalog'),
     )
 
-�������Ƥ����ơ��ѥå�����̾�� '+' �Ƕ��ڤä��ѥå�����̾�ꥹ�ȤȤ��ƻ����
-���ޤ�������ϡ�ʣ���Υ��ץꥱ������󤫤�Υ����ɤ�ȤäƤ��ơ��ѹ�������
-�˵����Ƥ����硤����ʥ��������ե���������ץ뤷�ʤ��Ƥ���Τ������Ǥ���
-�������ƥ������ͳ���顤�ѥå�����̾�ꥹ�Ȥ˻���Ǥ���Τϡ�
-``django.conf`` �� ``INSTALLED_APPS`` ��������äƤ��륢�ץꥱ����������
-�Ǥ���
+こうしておいて，パッケージ名を '+' で区切ったパッケージ名リストとして指定で
+きます．これは，複数のアプリケーションからのコードを使っていて，変更が頻繁
+に起きている場合，巨大なカタログファイルを毎回プルしなくてすむので便利です．
+セキュリティ上の理由から，パッケージ名リストに指定できるのは，
+``django.conf`` か ``INSTALLED_APPS`` 設定に入っているアプリケーションだけ
+です．
 
 .. _Using the JavaScript translation catalog:
 
-JavaScript ��������������Ȥ�
+JavaScript 翻訳カタログを使う
 -----------------------------
 
-����������Ȥ��ˤϡ�ñ�˰ʲ��Τ褦�ˤ���ưŪ���������줿������ץȤ�ץ뤷
-�ޤ�::
+カタログを使うには，単に以下のようにして動的に生成されたスクリプトをプルし
+ます::
 
     <script type="text/javascript" src="/path/to/jsi18n/"></script>
 
-����Ϥޤ��� admin �������Ф�����������Ф��Ƥ���Τ�Ʊ����ˡ�Ǥ���������
-��������ɤ����顤JavaScript ����ɸ��Ū�� ``gettext`` ���󥿥ե�������Ȥ�
-�ƥ��������Ǥ���褦�ˤʤ�ޤ�::
+これはまさに admin がサーバから翻訳を取り出しているのと同じ方法です．カタロ
+グをロードしたら，JavaScript から標準的な ``gettext`` インタフェースを使っ
+てアクセスできるようになります::
 
     document.write(gettext('this is to be translated'));
 
-ʸ�����䴰��Ԥ��� ``ngettext`` ���󥿥ե������⤢��ޤ�::
+文字列補完を行える ``ngettext`` インタフェースもあります::
 
     d = {
         count: 10
     };
     s = interpolate(ngettext('this is %(count)s object', 'this are %(count)s objects', d.count), d);
 
-``interpolate`` �ؿ��ϡ���������ˤ���䴰��̾���դ��䴰��ξ���򥵥ݡ��Ȥ�
-�Ƥ��ޤ������äơ���Υ����ɤϰʲ��Τ褦�ˤ�񤱤ޤ�::
+``interpolate`` 関数は，固定引数による補完と名前付き補完の両方をサポートし
+ています．従って，上のコードは以下のようにも書けます::
 
     s = interpolate(ngettext('this is %s object', 'this are %s objects', 11), [11]);
 
-�䴰�ι�ʸ�� Python ����ڤꤿ��ΤǤ����ȤϤ���������ʸ�����䴰���ɼ�˻�
-��ʤ������褤�Ǥ��礦: �䴰��ǽ�� JavaScript ��ư���Ƥ��ꡤ��Ǥϲ��٤���
-��ɽ���ִ���ԤäƤ��ޤ������ν����� Python ��ʸ�����䴰�ۤɹ�®�ǤϤʤ���
-�ǡ�������ɬ�פʾ�� (�㤨�� ``ngettext`` ��Ȥä�Ŭ�ڤ�ʣ����ɽ����¸���
-�������) �����ˤ��Ƥ���������
+補完の構文は Python から借りたものです．とはいえ，この文字列補完を派手に使
+わない方がよいでしょう: 補完機能は JavaScript で動いており，中では何度も正
+規表現置換を行っています．この処理は Python の文字列補完ほど高速ではないの
+で，本当に必要な場合 (例えば ``ngettext`` を使って適切な複数形表現を実現し
+たい場合) だけにしてください．
 
 .. _Creating JavaScript translation catalogs:
 
-JavaScript �����������������������
+JavaScript の翻訳カタログを作成する
 -----------------------------------
 
-JavaScript ���������������κ����ȹ�����ˡ��¾�� Django ���������������ξ��
-��Ʊ���ǡ� {{{make-messages.py}}} �ġ����Ȥ��ޤ�����������
-``-d djangojs`` �ѥ�᥿����ꤷ�Ƥ����������㤨��:: 
+JavaScript の翻訳カタログの作成と更新方法，他の Django の翻訳カタログの場合
+と同じで， {{{make-messages.py}}} ツールを使います．ただし，
+``-d djangojs`` パラメタを指定してください．例えば:: 
 
     make-messages.py -d djangojs -l de
 
-�����Ǥϡ��ɥ��ĸ������ JavaScript ��������������������ޤ��Ϲ������Ƥ�
-�ޤ����������������򹹿������顤�̾�� Django ��������������Ʊ���褦�ˡ�
-``compile-messages.py`` ��¹Ԥ��Ƥ���������
+上の例では，ドイツ語向けの JavaScript の翻訳カタログを作成または更新してい
+ます．翻訳カタログを更新したら，通常の Django 翻訳カタログと同じように，
+``compile-messages.py`` を実行してください．
 
 .. _Specialities of Django translation:
 
-Django ��������ħ
+Django 翻訳の特徴
 =================
 
-``gettext`` �ˤĤ��ƾܤ�����С� Django ��������ǽ�ˤϰʲ��Τ褦����ħ����
-�뤳�Ȥ˵��Ť��Ǥ��礦:
+``gettext`` について詳しければ， Django の翻訳機能には以下のような特徴があ
+ることに気づくでしょう:
 
-    * ʸ����ɥᥤ��� ``django`` �ޤ��� ``djangojs`` �Ǥ�������ʸ����ɥ�
-      ����ϡ����̤Υ�å������ե�����饤�֥�� (�̾��
-      ``/usr/share/locale/`` �ˤ���ޤ�) �˥ǡ�������¸���Ƥ���¾�Υץ�����
-      ��� Django �Υǡ�������̤��뤿��Ǥ��� ``django`` �ɥᥤ��ϡ�
-      Python �ȥƥ�ץ졼������ʸ����˻Ȥ�졤�������Х�����������������
-      �ɤ߹��ޤ�ޤ��� ``djangojs`` �� JavaScript �����ǻȤ�����ˡ���ǽ��
-      �����꾮��������ʬ���Ƥ���ޤ���
-    * Django �Ǥ� ``gettext`` �� ``gettext_noop`` �����ȤäƤ��ޤ��󡥤���
-      �ϡ� Django ����� ``DEFAULT_CHARSET`` ������Ū�˻ȤäƤ��뤿��Ǥ���
-      �桼���Ͼ�� utf-8 ����Ϥ��ͤФʤ�ʤ��Τǡ� ``ugettext`` �Ϥ��ޤ���
-      ��Ω���ʤ��ΤǤ���
-    * Django �� ``xgettext`` ��ñ�ΤǤϻȤ��ޤ��� Django �Ǥϡ�
-      ``xgettext`` �� ``msgfmt`` �� Python ��åѱۤ��˻Ȥ��ޤ���������ص�
-      �����ͳ�ˤ��ޤ���
+    * 文字列ドメインは ``django`` または ``djangojs`` です．この文字列ドメ
+      インは，共通のメッセージファイルライブラリ (通常は
+      ``/usr/share/locale/`` にあります) にデータを保存している他のプログラ
+      ムと Django のデータを区別するためです． ``django`` ドメインは，
+      Python とテンプレート翻訳文字列に使われ，グローバルな翻訳カタログ上に
+      読み込まれます． ``djangojs`` は JavaScript だけで使うために，可能な
+      かぎり小さくして分けてあります．
+    * Django では ``gettext`` と ``gettext_noop`` しか使っていません．これ
+      は， Django が常に ``DEFAULT_CHARSET`` を内部的に使っているためです．
+      ユーザは常に utf-8 を出力せねばならないので， ``ugettext`` はあまり役
+      に立たないのです．
+    * Django は ``xgettext`` を単体では使いません． Django では，
+      ``xgettext`` や ``msgfmt`` を Python ラッパ越しに使います．これは便宜
+      上の理由によります．

@@ -1,37 +1,37 @@
 ==================================================
-�����ɥѡ��ƥ��ˤ�� Django �ǥ����ȥ�ӥ塼�����
+サードパーティによる Django ディストリビューション
 ==================================================
 
 :revision-up-to: 4805 (release 0.96)
 
-�Ƕᡤ�����Ĥ��Υ����ɥѡ��ƥ��Υǥ����ȥ�ӥ塼�����ץ��Х��������ѥå���
-�����������ƥ�� Django ��ޤ��褦�ˤʤ�ޤ������ѥå��������������ƥ��
-�Ȥ��ȡ�Django ��ư���ɬ�פʰ�¸�ط��Τ��륳��ݡ��ͥ�� (�ǡ����١�������
-�ץ��ʤ�) ��ưŪ�˥��󥹥ȡ���Ǥ��뤿�ᡤ���󥹥ȡ���䥢�åץ��졼�ɤκ�Ȥ������˴�ñ������ޤ���
+最近，いくつかのサードパーティのディストリビューションプロバイダが，パッケー
+ジ管理システムに Django を含めるようになりました．パッケージ管理システムを
+使うと，Django の動作に必要な依存関係のあるコンポーネント (データベースアダ
+プタなど) を自動的にインストールできるため，インストールやアップグレードの作業が大幅に簡単化されます．
 
-�̾�����ɥѡ��ƥ��Υǥ����ȥ�ӥ塼�����ѥå������ϺǶ�ΰ����ǥ�꡼
-���� Django ���Ȥ˺�������ޤ������Τ��ᡤ��ȯ�Ǥ� Django ��Ȥ�������С�
-`��ȯ�С������Υ��󥹥ȡ��� <../install/#installing-the-development-version>`_
-�������˽��äơ�Subversion ��ݥ��ȥ꤫���������ɬ�פ�����Ǥ��礦��
+通常，サードパーティのディストリビューションパッケージは最近の安定版リリー
+スの Django をもとに作成されます．このため，開発版の Django を使いたければ，
+`開発バージョンのインストール <../install/#installing-the-development-version>`_
+の説明に従って，Subversion リポジトリから取得する必要があるでしょう．
 
 .. _installing the development version: ../install/#installing-the-development-version
 
 .. _Linux distributions:
 
-Linux �ǥ����ȥ�ӥ塼�����
+Linux ディストリビューション
 ============================
 
 Debian
 ------
 
-`Debian GNU/Linux`_ �Ǥϡ� 
-`�ѥå������Ǥ� Django <http://packages.debian.org/testing/python/python-django>`_
-�����ѤǤ��ޤ������󥹥ȡ���� "testing" ����� "unstable" �Τɤ���Υ�ݥ�
-�ȥ꤫��Ǥ�Ԥ��ޤ��� ``apt-get install python-django`` �����Ϥ��ޤ���
+`Debian GNU/Linux`_ では， 
+`パッケージ版の Django <http://packages.debian.org/testing/python/python-django>`_
+を利用できます．インストールは "testing" および "unstable" のどちらのリポジ
+トリからでも行えます． ``apt-get install python-django`` と入力します．
 
-Debian �����Υѥå������򥤥󥹥ȡ��뤹���硤 ``apt`` �ϥǡ����١�������
-�ץ��Υ��󥹥ȡ���򴫤�Ƥ���Ǥ��礦�� Django ���Ȥ߹�碌�ƻȤ������ǡ�
-���١��������Υ����ץ�������ǥ��󥹥ȡ��뤷�Ƥ���������
+Debian 向けのパッケージをインストールする場合， ``apt`` はデータベースアダ
+プタのインストールを勧めてくるでしょう． Django と組み合わせて使いたいデー
+タベース向けのアダプタを選んでインストールしてください．
 
 .. _Debian GNU/Linux: http://www.debian.org/
 .. _packaged version of Django: http://packages.debian.org/testing/python/python-django
@@ -39,10 +39,10 @@ Debian �����Υѥå������򥤥󥹥ȡ��뤹���硤 ``apt`` �ϥǡ����١�������
 Ubuntu
 ------
 
-Debian �� ``python-django`` �ѥå������� `Ubuntu Linux`_ �Ǥ����ѤǤ���
-Ubuntu 7.04 ("Feisty Fawn") �� "universe" ��ݥ��ȥ�����äƤ��ޤ���
-`���Ԥ� Ubuntu �ѥå����� <http://packages.ubuntu.com/feisty/python/python-django>`_
-��  Django 0.95.1 �١����ǡ� Debian ��Ʊ����ˡ�ǥ��󥹥ȡ���Ǥ��ޤ���
+Debian の ``python-django`` パッケージは `Ubuntu Linux`_ でも利用でき，
+Ubuntu 7.04 ("Feisty Fawn") の "universe" リポジトリに入っています．
+`現行の Ubuntu パッケージ <http://packages.ubuntu.com/feisty/python/python-django>`_
+は  Django 0.95.1 ベースで， Debian と同じ方法でインストールできます．
 
 .. _Ubuntu Linux: http://www.ubuntu.com/
 .. _current Ubuntu package: http://packages.ubuntu.com/feisty/python/python-django
@@ -50,11 +50,11 @@ Ubuntu 7.04 ("Feisty Fawn") �� "universe" ��ݥ��ȥ�����äƤ��ޤ���
 Fedora
 ------
 
-`Fedora Linux`_ ������ Django �ӥ�ɤ� "Fedora Extras" ��ݥ��ȥ�����äƤ�
-�ޤ��� 
-`���Ԥ� Fedora �ѥå����� <http://fedoraproject.org/extras/6/i386/repodata/repoview/Django-0-0.95.1-1.fc6.html>`_
-��0.95.1 �˴�Ť��Ƥ��ꡤ���󥹥ȡ��뤹��ˤ� ``yum install Django`` �ȥ���
-�פ��ޤ���
+`Fedora Linux`_ 向けの Django ビルドは "Fedora Extras" リポジトリに入ってい
+ます． 
+`現行の Fedora パッケージ <http://fedoraproject.org/extras/6/i386/repodata/repoview/Django-0-0.95.1-1.fc6.html>`_
+は0.95.1 に基づいており，インストールするには ``yum install Django`` とタイ
+プします．
 
 .. _Fedora Linux: http://fedora.redhat.com/
 .. _current Fedora package: http://fedoraproject.org/extras/6/i386/repodata/repoview/Django-0-0.95.1-1.fc6.html
@@ -62,28 +62,28 @@ Fedora
 Gentoo
 ------
 
-`Gentoo Linux`_ ������ Django �ӥ�ɤ� 0.95.1 �˴�Ť��Ƥ��ޤ���
-`���Ԥ� Gentoo �ӥ�� <http://packages.gentoo.org/packages/?category=dev-python;name=django>`_ 
-�򥤥󥹥ȡ��뤹��ˤϡ� ``emerge Django`` �ȥ����פ��ޤ���
+`Gentoo Linux`_ 向けの Django ビルドは 0.95.1 に基づいています．
+`現行の Gentoo ビルド <http://packages.gentoo.org/packages/?category=dev-python;name=django>`_ 
+をインストールするには， ``emerge Django`` とタイプします．
 
 .. _Gentoo Linux: http://www.gentoo.org/
 .. _current Gentoo build: http://packages.gentoo.org/packages/?category=dev-python;name=django
 
 .. _For distributors:
 
-�ǥ����ȥ�ӥ塼���������ԤΤ���ξ���
+ディストリビューション作成者のための情報
 ========================================
 
-�ǥ����ȥ�ӥ塼�����ѥå�����������������ȹͤ��Ƥ���ʤ顤���Ǥ�����
-�����ޤ����ޤ���
-`django-developers �᡼��󥰥ꥹ�� <http://groups.google.com/group/django-developers/>`_
-�����äƼ��ʾҲ𤷤Ƥ���������
+ディストリビューションパッケージを作成したいと考えているなら，喜んでお手伝
+いします．まずは
+`django-developers メーリングリスト <http://groups.google.com/group/django-developers/>`_
+に入って自己紹介してください．
 
-�ޤ����ǥ����ȥ�ӥ塼���������Ԥϡ� 
-`django-announce �᡼��󥰥ꥹ�� <http://groups.google.com/group/django-announce/>`_
-�ˤ����äƤ����褦����ޤ������Υ᡼��󥰥ꥹ�Ȥ� (�ȤƤ�) ή�̤ξ��ʤ��᡼
-��󥰥ꥹ�Ȥǡ� Django �ο�������꡼����Х��ե������˴ؤ��륢�ʥ��󥹤�
-ή��ޤ���
+また，ディストリビューション作成者は， 
+`django-announce メーリングリスト <http://groups.google.com/group/django-announce/>`_
+にも入っておくよう勧めます．このメーリングリストは (とても) 流量の少ないメー
+リングリストで， Django の新しいリリースやバグフィクスに関するアナウンスが
+流れます．
 
 .. _django-developers mailing list: http://groups.google.com/group/django-developers/
 .. _django-announce mailing list: http://groups.google.com/group/django-announce/

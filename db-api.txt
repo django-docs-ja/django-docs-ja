@@ -1,18 +1,18 @@
 =============================
-�ǡ����١��� API ��ե����
+データベース API リファレンス
 =============================
 
 :revision-up-to: 4805 (release 0.96)
 
-`�ǡ�����ǥ�`_ ����������顤���ϥǡ����١�������ǡ�������Ф�ɬ�פ���
-��ޤ������Υɥ�����ȤǤϡ���ǥ뤫�����ѤǤ���ǡ����١�����ݲ� API �ȡ�
-���֥������Ȥ�����������������������ˡ�ˤĤ����������ޤ���
+`データモデル`_ を作成したら，次はデータベースからデータを取り出す必要があ
+ります．このドキュメントでは，モデルから利用できるデータベース抽象化 API と，
+オブジェクトを生成，取得，更新する方法について説明します．
 
-.. _`�ǡ�����ǥ�`: ../model_api/
+.. _`データモデル`: ../model_api/
 .. _`data models`: ../model_api/
 
-���Υ�ե���󥹤Ǥϡ��ʲ��Τ褦�� Poll ���ץꥱ�������򻲹ͤ��ä�ʤ��
-��::
+このリファレンスでは，以下のような Poll アプリケーションを参考に話を進めま
+す::
 
     class Blog(models.Model):
         name = models.CharField(maxlength=100)
@@ -41,522 +41,522 @@
 
 .. _Creating objects:
 
-���֥������Ȥ�����
+オブジェクトの生成
 ==================
 
-Django �Ǥϡ��ǡ����١����ơ��֥��Υǡ����� Python ���֥������Ȥ�ɽ������
-����ˡ���ǥ륯�饹���ǡ����١����ơ��֥��ɽ���������饹�Υ��󥹥��󥹤�
-�ơ��֥��Υ쥳���ɤ�ɽ������Ȥ���ľ��Ū�ʥ����ƥ��ȤäƤ��ޤ���
+Django では，データベーステーブル上のデータを Python オブジェクトで表現する
+ために，モデルクラスがデータベーステーブルを表現し，クラスのインスタンスが
+テーブル上のレコードを表現するという直感的なシステムを使っています．
 
-���֥������Ȥ���������ˤϡ�������ɰ�����Ȥäƥ�ǥ륯�饹�Υ��󥹥���
-������������ ``save()`` �᥽�åɤ�ƤӽФ��ƥǡ����١�������¸���ޤ���
+オブジェクトを生成するには，キーワード引数を使ってモデルクラスのインスタン
+スを生成し， ``save()`` メソッドを呼び出してデータベースに保存します．
 
-��ǥ륯�饹�� Python �ѥ���Τɤ�����Ǥ� import �Ǥ��������̤��ư���
-�� (�虜�虜���Τ褦�������򤹤�Τϡ������ΥС������� Django �Ǥϥ�ǥ�
-�� import ��ˡ�����ʤ����Ѥ����ä�����Ǥ�)��
+モデルクラスは Python パス上のどこからでも import でき，期待通りに動作しま
+す (わざわざこのような説明をするのは，以前のバージョンの Django ではモデル
+の import 方法がかなり風変わりだったからです)．
 
-��ǥ뤬 ``mysite/blog/models.py`` �Ȥ����ե�������������Ƥ���Ȥ���ȡ�
-���֥������Ȥκ����ϰʲ�����Τ褦�ˤʤ�ޤ�::
+モデルが ``mysite/blog/models.py`` というファイルで定義されているとすると，
+オブジェクトの作成は以下の例のようになります::
 
     from mysite.blog.models import Blog
     b = Blog(name='Beatles Blog', tagline='All the latest Beatles news.')
     b.save()
 
-�������ˤ�äơ��ظ�Ǥ� ``INSERT`` SQL ʸ���¹Ԥ���ޤ��� Django �ϥ桼
-��������Ū�� ``save()`` ��ƤӽФ��ޤǥǡ����١��������ޤ���
+この操作によって，背後では ``INSERT`` SQL 文が実行されます． Django はユー
+ザが明示的に ``save()`` を呼び出すまでデータベースを操作しません．
 
-��󥹥ƥåפǥ��֥������Ȥ�����������¸����ˤ� `create`__ �᥽�åɤ��
-���ޤ���
+ワンステップでオブジェクトを生成して保存するには `create`__ メソッドを使
+います。
 
 __ `create(**kwargs)`_
 
 .. _Auto-incrementing primary keys:
 
-�祭���μ�ư���󥯥����
+主キーの自動インクリメント
 --------------------------
 
-��ǥ�� ``AutoField`` �����ʤ����ư���󥯥���Ȥ����祭�����������
-�ϡ����֥������Ȥ��Ф��ƺǽ�� ``save()`` ��ƤӽФ����Ȥ��˼�ư���󥯥��
-����ͤ��׻����졤��¸����ޤ���
+モデルに ``AutoField`` ，すなわち自動インクリメントされる主キーがある場合に
+は，オブジェクトに対して最初に ``save()`` を呼び出したときに自動インクリメ
+ント値が計算され，保存されます．
 
-�㤨��::
+例えば::
 
     b2 = Blog(name='Cheddar Talk', tagline='Thoughts on cheese.')
-    b2.id     # b �ˤ� ID ���ʤ��Τ� None ���֤��ޤ���
+    b2.id     # b には ID がないので None を返します．
     b2.save()
-    b2.id     # ��������¸���줿���֥������Ȥ� ID ���֤��ޤ���
+    b2.id     # 新たに保存されたオブジェクトの ID を返します．
 
-ID ���ͤ� Django �ǤϤʤ��ǡ����١����ˤ�äƷ׻������Τǡ� ``save()`` ��
-�ƤӽФ��ޤǤ� ID ���ͤ�ʬ����ޤ���
+ID の値は Django ではなくデータベースによって計算されるので， ``save()`` を
+呼び出すまでは ID の値は分かりません．
 
-(�������Τ��ᡤ����Ū�� ``primary_key=True`` ����ꤷ���ե�����ɤ��������
-�������ꡤ�ǥե���ȤǤϳƥ�ǥ�� ``id`` �Ȥ���̾���� ``AutoField``
-���ɲä���ޤ����ܤ����� `AutoField �Υɥ������`_ �򻲾Ȥ��Ƥ���������)
+(利便性のため，明示的に ``primary_key=True`` を指定したフィールドを作成しな
+いかぎり，デフォルトでは各モデルに ``id`` という名前の ``AutoField``
+が追加されます．詳しくは `AutoField のドキュメント`_ を参照してください．)
 
-.. _`AutoField �Υɥ������`: ../model_api/#autofield
+.. _`AutoField のドキュメント`: ../model_api/#autofield
 .. _AutoField documentation: ../model_api/#autofield
 
 .. _Explicitly specifying auto-primary-key values:
 
-��ư�祭�����ͤ�����Ū�˻��ꤹ��
+自動主キーの値を明示的に指定する
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-��ǥ뤬 ``AutoField`` ����äƤ��ơ������ʥ��֥������Ȥ� ID ����¸��������
-Ū�˻��ꤷ������硤 ID ��ưŪ�˷��ꤵ��������¸��������Ū�˻��ꤷ�Ƥ���
-������
+モデルが ``AutoField`` を持っていて，新たなオブジェクトの ID を保存時に明示
+的に指定したい場合， ID を自動的に決定させずに保存前に明示的に指定してくだ
+さい．
 
-�㤨��::
+例えば::
 
     b3 = Blog(id=3, name='Cheddar Talk', tagline='Thoughts on cheese.')
     b3.id     # Returns 3.
     b3.save()
     b3.id     # Returns 3.
 
-��ư�祭�����ͤ��ư�ǳ�����Ƥ��硤�褷�ƴ���¸�ߤ���祭�����ͤ�����
-�Ƥʤ��褦�ˤ��Ƥ�������! ����Ū�ʼ祭���ͤ���ä������ʥ��֥������Ȥ����
-�������μ祭�������Ǥ˥ǡ����١������¸�ߤ����硤 Django ����¸����
-���ʥ��֥������Ȥκ����ǤϤʤ�����¸�Υ��֥������Ȥ��ѹ��Ȥߤʤ��ޤ���
+自動主キーの値を手動で割り当てる場合，決して既に存在する主キーの値を割り当
+てないようにしてください! 明示的な主キー値を持った新たなオブジェクトを作成
+し，その主キーがすでにデータベース上に存在する場合， Django は保存操作を新
+たなオブジェクトの作成ではなく，既存のオブジェクトの変更とみなします．
 
-��� ``'Cheddar Talk'`` �֥�������ˤȤ�ȡ��ʲ�����ϥǡ����١�����δ�¸
-�Υ쥳���ɤ򥪡��Х饤�ɤ��Ƥ��ޤ��ޤ�::
+上の ``'Cheddar Talk'`` ブログを例にとると，以下の例はデータベース上の既存
+のレコードをオーバライドしてしまいます::
 
     b4 = Blog(id=3, name='Not Cheddar', tagline='Anything but cheese.')
     b4.save()  # Overrides the previous blog with ID=3!
 
-������ͳ�ˤĤ��Ƥϸ�Ҥ� `UPDATE �� INSERT �ζ���`_ �򻲾Ȥ��Ƥ���������
+この理由については後述の `UPDATE と INSERT の区別`_ を参照してください．
 
-�祭���ξ��ͤ��ʤ��ȤϤä���Ƚ�äƤ�����ʤ顤��ư�祭�����ͤ�����Ū�ʻ�
-������̤Υ��֥������Ȥ���¸����ݤˤ����������Ǥ���
+主キーの衝突がないとはっきり判っている場合なら，自動主キーの値の明示的な指
+定は大量のオブジェクトを保存する際にきわめて便利です．
 
 .. _Saving changes to objects:
 
-���֥������Ȥؤ��ѹ�����¸����
+オブジェクトへの変更を保存する
 ==============================
 
-���Ǥ˥ǡ����١�����ˤ��륪�֥������Ȥؤ��ѹ�����¸����ˤ� ``save()`` ��
-�Ȥ��ޤ���
+すでにデータベース上にあるオブジェクトへの変更を保存するには ``save()`` を
+使います．
 
-``Blog`` ���󥹥��� ``b5`` �����Ǥ˥ǡ����١�����ˤ���Ȥ���ȡ��ʲ�����
-�� ``b5`` ��̾�����ѹ����ơ��ǡ����١�����Υ쥳���ɤ򹹿����ޤ�::
+``Blog`` インスタンス ``b5`` がすでにデータベース上にあるとすると，以下の例
+は ``b5`` の名前を変更して，データベース上のレコードを更新します::
 
     b5.name = 'New name'
     b5.save()
 
-������Ǥϡ��ظ�� ``UPDATE`` SQL ʸ���¹Ԥ���Ƥ��ޤ��� Django ������Ū��
-``save()`` ��ƤӽФ��ޤǥǡ����١��������ޤ���
+この例では，背後で ``UPDATE`` SQL 文が実行されています． Django は明示的に
+``save()`` を呼び出すまでデータベースを操作しません．
 
-``save()`` �᥽�åɤˤ�����ͤ�����ޤ���
+``save()`` メソッドには戻り値がありません．
 
 .. _How Django knows to UPDATE vs. INSERT:
 
-UPDATE �� INSERT �ζ���
+UPDATE と INSERT の区別
 -----------------------
 
-Django �ǡ����١������֥������Ȥ����֥������Ȥκ������ѹ���Ʊ�� ``save()``
-�᥽�åɤ�ȤäƤ��뤳�Ȥˤ����Ť����⤷��ޤ���͡� Django �� ``INSERT``
-�� ``UPDATE`` SQL ʸ�Τɤ����Ȥ��٤�����Ƚ�Ǥ���ݲ����Ƥ��ޤ�������Ū
-�˸����ȡ� ``save()`` ��ƤӽФ����Ȥ��ˡ�Django �ϰʲ��Υ��르�ꥺ��˽���
-�ޤ�:
+Django データベースオブジェクトがオブジェクトの作成と変更に同じ ``save()``
+メソッドを使っていることにお気づきかもしれませんね． Django は ``INSERT``
+と ``UPDATE`` SQL 文のどちらを使うべきかの判断を抽象化しています．具体的
+に言うと， ``save()`` を呼び出したときに，Django は以下のアルゴリズムに従い
+ます:
 
-    * ���֥������Ȥμ祭��°����ɾ���ͤ� ``False`` �Ǥʤ���� (``None`` ��
-      ��ʸ����ξ��ʤɤǤʤ����) �� Django �� ``SELECT`` �������Ȥäơ�
-      ��������祭������ĥ쥳���ɤ�¸�ߤ��뤫�ɤ���Ĵ�٤ޤ���
-    * ��������祭������ĥ쥳���ɤ��ǡ����١������¸�ߤ�����ˤ�
-      ``UPDATE`` �������Ȥ��ޤ���
-    * ���֥������Ȥμ祭��°�������� *����Ƥ��ʤ�* ���䡤�祭�������ꤵ
-      ��Ƥ��뤬��������쥳���ɤ�¸�ߤ��ʤ���硤 ``INSERT`` ��Ȥ��ޤ���
+    * オブジェクトの主キー属性の評価値が ``False`` でない場合 (``None`` や
+      空文字列の場合などでない場合) ， Django は ``SELECT`` クエリを使って，
+      該当する主キーを持つレコードが存在するかどうか調べます．
+    * 該当する主キーを持つレコードがデータベース上に存在する場合には
+      ``UPDATE`` クエリを使います．
+    * オブジェクトの主キー属性が設定 *されていない* 場合や，主キーが設定さ
+      れているが該当するレコードは存在しない場合， ``INSERT`` を使います．
 
-�����ʥ��֥������Ȥ���¸����ݡ��ޤ��Ȥ��Ƥ��ʤ��ͤ�祭���˻���Ǥ�����
-�ڤ��ʤ������ꡤ�祭�����ͤ�����Ū�˻��ꤷ�ʤ��褦���դ��Ƥ����������ܤ���
-�Ͼ嵭�� `��ư�祭�����ͤ�����Ū�˻��ꤹ��`_ �򻲾Ȥ��Ƥ���������
+新たなオブジェクトを保存する際，まだ使われていない値を主キーに指定できる保
+証がないかぎり，主キーの値を明示的に指定しないよう注意してください．詳しく
+は上記の `自動主キーの値を明示的に指定する`_ を参照してください．
 
 .. _Retrieving objects:
 
-���֥������Ȥμ���
+オブジェクトの取得
 ==================
 
-���֥������Ȥ�ǡ����١��������������ˤϡ���ǥ륯�饹�Υޥͥ���
-(``Manager``) ��𤷤ƥ����ꥻ�å� (``QuerySet``) ���ۤ��ޤ���
+オブジェクトをデータベースから取得するには，モデルクラスのマネジャ
+(``Manager``) を介してクエリセット (``QuerySet``) を構築します．
 
-�����ꥻ�åȤϥǡ����١�����ˤ��륪�֥������Ȥν��ޤ��ɽ�����Ƥ��ޤ���
-�����ꥻ�åȤˤϡ���������ѥ�᥿�˽��äƹʤ���ि��ξ��Ǥ���
-*�ե��륿 (filter)* �������Ĥ���ʣ���Ĥ���ޤ��� SQL �Ѹ�Ǥ����С�
-�����ꥻ�åȤ� ``SELECT`` ʸ�Ǥ��ꡤ�ե��륿�� ``WHERE`` �� ``LIMIT``
-�Τ褦�ʸ�����ˤ�����ޤ���
+クエリセットはデータベース上にあるオブジェクトの集まりを表現しています．
+クエリセットには，集合を指定パラメタに従って絞り込むための条件である
+*フィルタ (filter)* がゼロ個から複数個あります． SQL 用語でいえば，
+クエリセットは ``SELECT`` 文であり，フィルタは ``WHERE`` や ``LIMIT``
+のような限定節にあたります．
 
-�����ꥻ�åȤϥ�ǥ�Υޥͥ��㤫��������ޤ�����ǥ�ˤϺ����Ĥ�
-�ޥͥ��㤬���ꡤ�ǥե���ȤǤ� ``objects`` �Ȥ���̾�����Ĥ��Ƥ��ޤ���
-�ޥͥ���ˤϥ�ǥ륯�饹����ľ�ܥ����������Ƥ�������::
+クエリセットはモデルのマネジャから取得します．モデルには最低一つの
+マネジャがあり，デフォルトでは ``objects`` という名前がついています．
+マネジャにはモデルクラスから直接アクセスしてください::
 
     Blog.objects  # <django.db.models.manager.Manager object at ...>
     b = Blog(name='Foo', tagline='Bar')
     b.objects     # AttributeError: "Manager isn't accessible via Blog instances."
 
-(�֥ơ��֥��٥�פ����ȡ֥쥳���ɥ�٥�פ�����ʬΥ�����뤿�ᡤ�ޥͥ���
-�ϥ�ǥ�Υ��󥹥��󥹤ǤϤʤ���ǥ륯�饹�������饢�������Ǥ���褦�ˤʤ�
-�Ƥ��ޤ���)
+(「テーブルレベル」の操作と「レコードレベル」の操作を分離させるため，マネジャ
+はモデルのインスタンスではなくモデルクラスだけからアクセスできるようになっ
+ています．)
 
-��ǥ���ǤΥ����ꥻ�åȤμ�ʥ������ϥޥͥ���Ǥ����ޥͥ���ϡ��ǡ����١�
-�����֥������Ⱦ�����ƤΥ��֥������Ȥ�ɽ���֥롼�ȤΡץ����ꥻ�åȤǤ��뤫
-�Τ褦�˿��񤤤ޤ����㤨�С���������ꥻ�åȤǤ��� ``Blog.objects`` �ˤϡ�
-�ǡ����١���������Ƥ� ``Blog`` ���֥������Ȥ����äƤ��ޤ���
+モデル内でのクエリセットの主なソースはマネジャです．マネジャは，データベー
+スオブジェクト上の全てのオブジェクトを表す「ルートの」クエリセットであるか
+のように振舞います．例えば，初期クエリセットである ``Blog.objects`` には，
+データベース上の全ての ``Blog`` オブジェクトが入っています．
 
 
 .. _Retrieving all objects:
 
-���ƤΥ��֥������Ȥμ���
+全てのオブジェクトの取得
 ------------------------
 
-�ơ��֥뤫�饪�֥������Ȥ��������Ǥ�ñ�����ˡ�Ǥϡ����ƤΥ��֥������Ȥ�
-�������ޤ����ޥͥ���� ``all()`` �᥽�åɤ�ȤäƲ�������
+テーブルからオブジェクトを取得する最も単純な方法では，全てのオブジェクトを
+取得します．マネジャの ``all()`` メソッドを使って下さい．
 
-�㤨��::
+例えば::
 
     all_entries = Entry.objects.all()
 
-``all()`` �᥽�åɤϥǡ����١���������ƤΥ��֥������Ȥ�ɽ�����륯���ꥻ��
-�Ȥ��֤��ޤ���
+``all()`` メソッドはデータベース上の全てのオブジェクトを表現するクエリセッ
+トを返します．
 
-(``Entry.objects`` �������ꥻ�åȤ��֤��Ȥ����Τʤ顤�ʤ�ñ��
-``Entry.objects`` �Ƚ񤫤ʤ��ΤǤ��礦��������ϡ��롼�ȤΥ����ꥻ�åȤǤ�
-�� ``Entry.objects`` �����̰�������Ƥ��ơ���ɾ���Ǥ��ʤ��褦�ˤʤäƤ��뤫
-��Ǥ��� ``all()`` �᥽�åɤϡ���ɾ�� *�Ǥ���* �����ꥻ�åȤ��֤��ޤ���
+(``Entry.objects`` がクエリセットを返すというのなら，なぜ単に
+``Entry.objects`` と書かないのでしょうか？それは，ルートのクエリセットであ
+る ``Entry.objects`` が特別扱いされていて，値評価できないようになっているか
+らです． ``all()`` メソッドは，値評価 *できる* クエリセットを返します．
 
 
 .. _Filtering objects:
 
-���֥������ȤΥե��륿���
+オブジェクトのフィルタ操作
 --------------------------
 
-�ޥͥ���ˤ�ä��󶡤���륯���ꥻ�åȤ�Ȥ��С��ǡ����١����ơ��֥�����
-�ƤΥ��֥������Ȥ�ɽ���ޤ����ȤϤ������̾�������֥������Ȥν��礫�饵�֥���
-�Ȥ�������Ф��������ȤǤ��礦��
+マネジャによって提供されるクエリセットを使えば，データベーステーブル上の全
+てのオブジェクトを表せます．とはいえ，通常は全オブジェクトの集合からサブセッ
+トだけを取り出したいことでしょう．
 
-���֥��åȤ��������ˤϡ��ե��륿�����ɲä��ơ���������ꥻ�åȤ��ե�
-���󤹤�ɬ�פ�����ޤ��������ꥻ�åȤ������ˤϡ������Ĥ���ˡ������ޤ�:
+サブセットを作成するには，フィルタ条件を追加して，初期クエリセットをリファ
+インする必要があります．クエリセットの洗練には，主に二つの方法があります:
 
 ``filter(**kwargs)``
-    ���ꤷ���ȹ�ѥ�᥿�˰��פ��륪�֥������Ȥν����ɽ�����롤�����ʥ���
-    �ꥻ�åȤ��֤��ޤ���
+    指定した照合パラメタに一致するオブジェクトの集合を表現する，新たなクエ
+    リセットを返します．
 
 ``exclude(**kwargs)``
-    ���ꤷ���ȹ�ѥ�᥿�˰��� *���ʤ�* ���֥������Ȥν����ɽ�����롤����
-    �ʥ����ꥻ�åȤ��֤��ޤ���
+    指定した照合パラメタに一致 *しない* オブジェクトの集合を表現する，新た
+    なクエリセットを返します．
 
-�ȹ�ѥ�᥿ (��δؿ�����ˤ����� ``**kwargs``) �ϡ���Ҥ� 
-`�ե�����ɤξȹ�`_ �ǲ��⤹��ե����ޥåȤˤ��ͤФʤ�ޤ���
+照合パラメタ (上の関数定義における ``**kwargs``) は，後述の 
+`フィールドの照合`_ で解説するフォーマットにせねばなりません．
 
-�㤨�С� 2006 ǯ�Υ֥�������ȥ��ɽ�������ꥻ�åȤ��������ˤϡ��ʲ��Τ�
-���� ``filter()`` ��Ȥ��ޤ�::
+例えば， 2006 年のブログエントリを表すクエリセットを取得するには，以下のよ
+うに ``filter()`` を使います::
 
     Entry.objects.filter(pub_date__year=2006)
 
-(``Entry.objects.all().filter(...)`` �Τ褦�ˡ� ``all()`` ��Ȥ�ʤ��Ƥ��
-�����Ȥ����դ��Ʋ������� ``all()`` ��ȤäƤ�����ʤ�ư��ޤ�����
-``all()`` ��ɬ�פȤʤ�Τϥ롼�ȥ����ꥻ�åȤ������ƤΥ��֥������Ȥ����
-�������������Ǥ���)
+(``Entry.objects.all().filter(...)`` のように， ``all()`` を使わなくてもよ
+いことに注意して下さい． ``all()`` を使っても問題なく動作しますが，
+``all()`` が必要となるのはルートクエリセットから全てのオブジェクトを取り出
+したい場合だけです．)
 
 
 .. _Chaining filters:
 
-�ե��륿��Ϣ��
+フィルタの連鎖
 ~~~~~~~~~~~~~~
 
-�����ꥻ�åȤ��ե����󤷤���̤ϡ����켫�Υ����ꥻ�åȤˤʤ�ޤ������äơ�
-��ե���������Ϣ���������ޤ����㤨��::
+クエリセットをリファインした結果は，それ自体クエリセットになります．従って，
+リファイン操作は連鎖させられます．例えば::
 
     Entry.objects.filter(
         headline__startswith='What').exclude(
             pub_date__gte=datetime.now()).filter(
                 pub_date__gte=datetime(2005, 1, 1))
 
-�����ϡ��ǡ����١��������ƤΥ���ȥ��ɽ����������ꥻ�åȤ��Ф���
-``filter()`` �򤫤������ ``exclude()`` ��¹Ԥ�������ˤ⤦���
-``filter()`` �򤫤��Ƥ��ޤ����ǽ�Ū��������Τϡ� "What" �ǻϤޤ�
-�إåɥ饤��Τ����� January 1, 2005 ���麣���ޤǤδ֤˸������줿����ȥ��
-�ʤ�ޤ���
+上の例は，データベースの全てのエントリを表す初期クエリセットに対し，
+``filter()`` をかけた後に ``exclude()`` を実行し，さらにもう一つ
+``filter()`` をかけています．最終的に得られるのは， "What" で始まる
+ヘッドラインのうち， January 1, 2005 から今日までの間に公開されたエントリに
+なります．
 
 .. _Filtered QuerySets are unique:
 
-�ե��륿���������ꥻ�åȤϰ�դˤʤ�
+フィルタしたクエリセットは一意になる
 ------------------------------------
 
-�����ꥻ�åȤΥ�ե������Ԥ��ȡ��������ٿ����ʥ����ꥻ�åȤ����ޤ�������
-�ʥ����ꥻ�åȤϰ����Υ����ꥻ�åȤˤʤ�������Ƥ��ޤ��󡥥�ե��������
-�Τ��Ӥˡ��̸Ĥ���Ω���������ꥻ�åȤ��������졤���̤���¸�����ꡤ�����Ѥ�
-����Ǥ��ޤ���
+クエリセットのリファインを行うと，その都度新たなクエリセットを得ます．新た
+なクエリセットは以前のクエリセットになんら縛られていません．リファイン操作
+のたびに，別個の独立したクエリセットが作成され，個別に保存したり，再利用し
+たりできます．
 
-�㤨��::
+例えば::
 
     q1 = Entry.objects.filter(headline__startswith="What")
     q2 = q1.exclude(pub_date__gte=datetime.now())
     q3 = q1.filter(pub_date__gte=datetime.now())
 
-����� 3 �ĤΥ����ꥻ�åȤ��̸ĤΤ�ΤǤ����ǽ�ϥإåɥ饤�� "What" �ǻ�
-�ޤ����ƤΥ���ȥ�����ä��١����Υ����ꥻ�åȤǤ�������ܤΥ����ꥻ�åȤϡ�
-�ǽ�Υ����ꥻ�åȤΥ��֥��åȤǤ��ꡤ ``pub_date`` ���ͤ����߻��������
-������Τ��ӽ����ޤ��������ܤΥ����ꥻ�åȤ�ǽ�Υ����ꥻ�åȤΥ��֥��å�
-�ǡ� ``pub_date`` ���ͤ����߻�������礭����Τ��������򤹤�褦�ˤʤä�
-���ޤ�������������ե��������ϡ���������ꥻ�å� (``q1``) �˱ƶ���ڤܤ�
-�ޤ���
+これら 3 つのクエリセットは別個のものです．最初はヘッドラインが "What" で始
+まる全てのエントリの入ったベースのクエリセットです．二つ目のクエリセットは，
+最初のクエリセットのサブセットであり， ``pub_date`` の値が現在時刻よりも大
+きいものを排除します．三つ目のクエリセットも最初のクエリセットのサブセット
+で， ``pub_date`` の値が現在時刻よりも大きいものだけを選択するようになって
+います．こうしたリファイン操作は，初期クエリセット (``q1``) に影響を及ぼし
+ません．
 
 .. _QuerySets are lazy:
 
-�����ꥻ�åȤ��ٱ�ɾ�������
+クエリセットは遅延評価される
 ----------------------------
 
-�����ꥻ�åȤ�ɾ�����ٱ䷿ (lazy) �Ǥ������ʤ���������ꥻ�åȤκ������Τ�
-�ǡ����١�����������������ޤ��󡥥����ꥻ�åȤ� *ɾ�������* �ޤǥǡ���
-�١����ؤΥ������¹Ԥ��ʤ��Τǡ��䡹�ե��륿��Ťͤ��ޤ���
+クエリセットの評価は遅延型 (lazy) です．すなわち，クエリセットの作成自体は
+データベース操作を引き起こしません．クエリセットは *評価される* までデータ
+ベースへのクエリを実行しないので，延々フィルタを重ねられます．
 
 .. _When QuerySets are evaluated:
 
-�����ꥻ�åȤϤ���ɾ�������Τ�
+クエリセットはいつ評価されるのか
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-�ʲ�����ˡ��Ȥ��ȡ������ꥻ�åȤ�ɾ���Ǥ��ޤ�:
+以下の方法を使うと，クエリセットを評価できます:
 
-    * **���ƥ졼�����** �����ꥻ�åȤϥ��ƥ졼������ǽ���֥������ȤǤ�
-      �ꡤ���֥������Ȥ��Ф��ƺǽ�˥��ƥ졼���������Ԥä��Ȥ��˥ǡ���
-      �١����������¹Ԥ��ޤ����㤨�С��ʲ�����ϥǡ����١���������ƤΥ�
-      ��ȥ�Υإåɥ饤�����Ϥ��ޤ�::
+    * **イテレーション．** クエリセットはイテレーション可能オブジェクトであ
+      り，オブジェクトに対して最初にイテレーション操作を行ったときにデータ
+      ベースクエリを実行します．例えば，以下の例はデータベース中の全てのエ
+      ントリのヘッドラインを出力します::
 
           for e in Entry.objects.all():
               print e.headline
 
-    * **���饤����** `�����ꥻ�åȤ������ݤ�`_ ������������Ƥ���褦�ˡ�
-      Python �����󥹥饤��ɽ����Ȥ��ȥ����ꥻ�åȤ򥹥饤���Ǥ��ޤ����̾
-      �����ꥻ�åȤ��Ф��륹�饤���� (̤ɾ����) �̤Υ����ꥻ�åȤ��֤��ޤ�
-      �������饤��ɽ���ˡ֥��ƥå� (step)�ץѥ�᥿��Ȥä����ˤϡ��ǡ���
-      �١����������¹Ԥ��ޤ���
+    * **スライス．** `クエリセットに制約を課す`_ の節で説明しているように，
+      Python の配列スライス表記を使うとクエリセットをスライスできます．通常，
+      クエリセットに対するスライスは (未評価の) 別のクエリセットを返します
+      が，スライス表記に「ステップ (step)」パラメタを使った場合には，データ
+      ベースクエリを実行します．
 
-    * **repr().** �����ꥻ�åȤ��Ф��� ``repr()`` ��ƤӽФ��ȡ������ꥻ��
-      �Ȥ���ɾ������ޤ�������� Python ���å��󥿥ץ꥿�Ǥ��������Τ����
-      ���ͤǡ� API ������Ū�˻Ȥ��Ȥ��˷�̤�¨�¤˸�����褦�ˤ��Ƥ��ޤ���
+    * **repr().** クエリセットに対して ``repr()`` を呼び出すと，クエリセッ
+      トは値評価されます．これは Python 対話インタプリタでの利便性のための
+      仕様で， API を対話的に使うときに結果を即座に見られるようにしています．
 
-    * **len().** �����ꥻ�åȤ��Ф��� ``len()`` ��ƤӽФ��ȡ������ꥻ��
-      �Ȥ���ɾ������ޤ���ͽ�ۤ˰�鷺�� ``len()`` �ϥ������̥ꥹ�Ȥ�Ĺ��
-      ���֤��ޤ���
+    * **len().** クエリセットに対して ``len()`` を呼び出すと，クエリセッ
+      トは値評価されます．予想に違わず， ``len()`` はクエリ結果リストの長さ
+      を返します．
 
-      ����: �����ꥻ�å���Υ쥳���ɤο����Τꤿ�������ʤ顤 ``len()`` ��
-      *�Ȥ�ʤ��Ǥ�������* ���쥳���ɿ��η׻��ϥǡ����١������ SQL ʸ��
-      ``SELECT COUNT(*)`` �ȤäƹԤ������ڤ��˸�ΨŪ�Ǥ��ꡤ�ޤ��ˤ�����ͳ
-      ���� Django �Ǥ� ``count()`` �᥽�åɤ��󶡤��Ƥ��ޤ�����Ҥ�
-      ``count()`` �򻲾Ȥ��Ƥ���������
+      注意: クエリセット中のレコードの数を知りたいだけなら， ``len()`` は
+      *使わないでください* ．レコード数の計算はデータベース上で SQL 文の
+      ``SELECT COUNT(*)`` 使って行う方が遥かに効率的であり，まさにその理由
+      から Django では ``count()`` メソッドを提供しています．後述の
+      ``count()`` を参照してください．
 
-    * **list().** �����ꥻ�åȤ��Ф��� ``list()`` ��ƤӽФ��ȡ���ɾ����
-      ���Ǥ��ޤ����㤨��::
+    * **list().** クエリセットに対して ``list()`` を呼び出すと，値評価を強
+      制できます．例えば::
 
           entry_list = list(Entry.objects.all())
 
-      �ȤϤ�����������ˡ��Ȥ��ȡ�Django �����Ƥ����ǤΥꥹ�Ȥ�����˥���
-      �ɤ��뤿�ᡤ����ʥ��ꥪ���Хإåɤ������������ǽ��������Τǽ�ʬ
-      ���դ��Ƥ���������������Ф��������ꥻ�åȤ��Ф��륤�ƥ졼��������
-      �Ǥϡ�ɬ�פ�ʬ�����ǡ���������ɤ��ƥ��֥������Ȥ򥤥󥹥��󥹲�����
-      �Ȥ�������������ޤ���
+      とはいえ，この方法を使うと，Django が全ての要素のリストをメモリ上にロー
+      ドするため，巨大なメモリオーバヘッドを引き起こす可能性があるので十分
+      注意してください．これに対し，クエリセットに対するイテレーション操作
+      では，必要な分だけデータをロードしてオブジェクトをインスタンス化する
+      という利点があります．
 
 
 .. _Limiting QuerySets:
 
-�����ꥻ�åȤ������ݤ�
+クエリセットに制約を課す
 ------------------------
 
-�����ꥻ�åȤ��֤���̤�����θĿ������¤��������ˤϡ����󥹥饤��ɽ����
-�Ȥ��ޤ�������� SQL �� ``LIMIT`` ��� ``OFFSET`` ��������ˤʤ�ޤ���
+クエリセットの返す結果を特定の個数に制限したい場合には，配列スライス表記を
+使います．これは SQL の ``LIMIT`` 節や ``OFFSET`` 節と等価になります．
 
-�ʲ�����ϡ��ǽ�� 5 ���֥������Ȥ������֤��ޤ� (``LIMIT 5`` ���������ޤ�)::
+以下の例は，最初の 5 オブジェクトだけを返します (``LIMIT 5`` に相当します)::
 
     Entry.objects.all()[:5]
 
-�ʲ�����ϡ� 5 ���ܤ��� 10 ���ܤޤǤΥ��֥������Ȥ��֤��ޤ�
-(``OFFSET 5 LIMIT 5`` ���������ޤ�)::
+以下の例は， 5 番目から 10 番目までのオブジェクトを返します
+(``OFFSET 5 LIMIT 5`` に相当します)::
 
     Entry.objects.all()[5:10]
 
-���̤ˡ������ꥻ�åȤΥ��饤���ϥ����ꥻ�åȤ��֤����������ɾ���ϹԤ��ޤ�
-���㳰�ϥ��饤��ɽ���ˡ֥��ƥå� (step)�ץѥ�᥿��Ȥä��Ȥ��Ǥ����ʲ���
-��Ǥϡ��������ºݤ˼¹Ԥ����ǽ�� 10 ���֥��������椫�� 1 �Ĥ����˥��֥���
-���Ȥ���Ф����ꥹ�Ȥ��֤��ޤ�::
+一般に，クエリセットのスライスはクエリセットを返し，クエリの評価は行いませ
+ん．例外はスライス表記に「ステップ (step)」パラメタを使ったときです．以下の
+例では，クエリを実際に実行し，最初の 10 オブジェクト中から 1 つおきにオブジェ
+クトを取り出したリストを返します::
 
     Entry.objects.all()[:10:2]
 
-�ꥹ�ȤǤϤʤ� *ñ���* ���֥������Ȥ������������� 
-(``SELECT foo FROM bar LIMIT 1`` �Τ褦�ʾ��) �ˤϡ����饤���ǤϤʤ�ñ���
-����ǥ��������Ԥ��ޤ����ʲ�����ϥǡ����١����Υ���ȥ��إåɥ饤���
-�Ĥ��ƥ���ե��٥åȽ�����󤷤��塤�ǽ�� ``Entry`` ����������֤��ޤ�::
+リストではなく *単一の* オブジェクトを取得したい場合 
+(``SELECT foo FROM bar LIMIT 1`` のような場合) には，スライスではなく単純な
+インデクス指定を行います．以下の例はデータベースのエントリをヘッドラインに
+ついてアルファベット順に整列した後，最初の ``Entry`` を取得して返します::
 
     Entry.objects.order_by('headline')[0]
 
-����Ϥ��������ʲ���Ʊ���ˤʤ�ޤ�::
+これはだいたい以下と同じになります::
 
     Entry.objects.order_by('headline')[0:1].get()
 
-��������������˥ޥå����륪�֥������Ȥ��ʤ���硤���Ԥ� ``IndexError``,
-��Ԥ� ``DoesNotExist`` �����Ф��ޤ���
+ただし，指定条件にマッチするオブジェクトがない場合，前者は ``IndexError``,
+後者は ``DoesNotExist`` を送出します．
 
 .. _QuerySet methods that return new QuerySets:
 
-�����ʥ����ꥻ�åȤ��֤������ꥻ�åȥ᥽�å�
+新たなクエリセットを返すクエリセットメソッド
 --------------------------------------------
 
-Django �Ǥϡ������ꥻ�åȤ��֤���̤η����䡤 SQL ������μ¹���ˡ���ѹ���
-�뤿��Υ�ե�����᥽�åɤ��������󶡤��Ƥ��ޤ���
+Django では，クエリセットの返す結果の形式や， SQL クエリの実行方法を変更す
+るためのリファインメソッドを幅広く提供しています．
 
 ``filter(**kwargs)``
 ~~~~~~~~~~~~~~~~~~~~
 
-����ξȹ�ѥ�᥿�˰��פ��륪�֥������Ȥ����ä������ʥ����ꥻ�åȤ��֤���
-����
+指定の照合パラメタに一致するオブジェクトの入った新たなクエリセットを返しま
+す．
 
-�ȹ�ѥ�᥿ (``**kwargs``) �ϸ�Ҥ� `�ե�����ɤξȹ�`_ ����������ե����ޥ�
-�Ȥˤ��ޤ���ʣ���Υѥ�᥿����ꤹ��ȡ��ظ�� SQL ʸ�Ǥ� ``AND`` �Ƿ�礵
-��ޤ���
+照合パラメタ (``**kwargs``) は後述の `フィールドの照合`_ で説明するフォーマッ
+トにします．複数のパラメタを指定すると，背後の SQL 文では ``AND`` で結合さ
+れます．
 
 ``exclude(**kwargs)``
 ~~~~~~~~~~~~~~~~~~~~~
 
-����ξȹ�ѥ�᥿�˰��� *���ʤ�* ���֥������Ȥ����ä������ʥ����ꥻ�åȤ�
-�֤��ޤ���
+指定の照合パラメタに一致 *しない* オブジェクトの入った新たなクエリセットを
+返します．
 
-�ȹ�ѥ�᥿ (``**kwargs``) �ϸ�Ҥ� `�ե�����ɤξȹ�`_ ����������ե����ޥ�
-�Ȥˤ��ޤ���ʣ���Υѥ�᥿����ꤹ��ȡ��ظ�� SQL ʸ�Ǥ� ``AND`` �Ƿ�礵
-�졤�����������Τ� ``NOT()`` �ǰϤߤޤ���
+照合パラメタ (``**kwargs``) は後述の `フィールドの照合`_ で説明するフォーマッ
+トにします．複数のパラメタを指定すると，背後の SQL 文では ``AND`` で結合さ
+れ，制約条件節全体を ``NOT()`` で囲みます．
 
-�ʲ�����Ǥϡ� ``pub_date`` �����ߤ��̤��������ˤʤäƤ��ơ� *����* 
-``headline`` �� "Hello" �ǻϤޤ����ƤΥ���ȥ��������ޤ�::
+以下の例では， ``pub_date`` が現在より未来の日時になっていて， *かつ* 
+``headline`` が "Hello" で始まる全てのエントリを除外します::
 
     Entry.objects.exclude(pub_date__gt=datetime.date(2005, 1, 3), headline='Hello')
 
-SQL �Ѹ�Ǥ����ȡ��ʲ��Τ褦�ʥ������ɾ���ˤʤ�ޤ�::
+SQL 用語でいうと，以下のようなクエリの評価になります::
 
     SELECT ...
     WHERE NOT (pub_date > '2005-1-3' AND headline = 'Hello')
 
-�ޤ����ʲ�����Ǥϡ� ``pub_date`` �����ߤ��̤��������ˤʤäƤ��뤫��
-*�ޤ���* ``headline`` �� "Hello" �ǻϤޤ����ƤΥ���ȥ��������ޤ�::
+また，以下の例では， ``pub_date`` が現在より未来の日時になっているか，
+*または* ``headline`` が "Hello" で始まる全てのエントリを除外します::
 
     Entry.objects.exclude(pub_date__gt=datetime.date(2005, 1, 3)).exclude(headline='Hello')
 
-SQL �Ѹ�Ǥ����ȡ��ʲ��Τ褦�ʥ������ɾ���ˤʤ�ޤ�::
+SQL 用語でいうと，以下のようなクエリの評価になります::
 
     SELECT ...
     WHERE NOT pub_date > '2005-1-3'
     AND NOT headline = 'Hello'
 
-����ܤ������������������ˤʤäƤ��뤳�Ȥ����դ��Ʋ�������
+二つ目の例の方が厳しい制約になっていることに注意して下さい．
 
 ``order_by(*fields)``
 ~~~~~~~~~~~~~~~~~~~~~
 
-�ǥե���ȤǤϡ� ``QuerySet`` ���֤���̤ϥ�ǥ�� ``Meta`` �� ``ordering``
-���ץ����˻��ꤷ��������Υ��ץ�˽��ä����󤵤�ޤ��� ``order_by`` ��
-�Ȥ��ȡ����ε�ư�� ``QuerySet`` ñ�̤ǥ����Х饤�ɤǤ��ޤ���
+デフォルトでは， ``QuerySet`` の返す結果はモデルの ``Meta`` の ``ordering``
+オプションに指定した整列条件のタプルに従って整列されます． ``order_by`` を
+使うと，この挙動を ``QuerySet`` 単位でオーバライドできます．
 
-�㤨��::
+例えば::
 
     Entry.objects.filter(pub_date__year=2005).order_by('-pub_date', 'headline')
 
-���Υ�����η�̤ϡ��ޤ� ``pub_date`` �ǹ߽���¤١������� ``headline`` ��
-������¤٤���Τˤʤ�ޤ��� ``"-pub_date"`` ����Ƭ�ˤ���ޥ��ʥ����椬 
-*�߽�* ɽ���Ƥ��ޤ���������ꤷ�ʤ��Ⱦ���ˤʤ�ޤ��������������
-��������С��ʲ��Τ褦�� "?" ��Ȥ��ޤ�::
+このクエリの結果は，まず ``pub_date`` で降順に並べ，次いで ``headline`` で
+昇順に並べたものになります． ``"-pub_date"`` の先頭にあるマイナス記号が 
+*降順* 表しています．何も指定しないと昇順になります．整列をランダムに
+したければ，以下のように "?" を使います::
 
     Entry.objects.order_by('?')
 
-�̤Υơ��֥�Υե�������ͤ����󤵤����硤�ơ��֥�̾��ɥå�ɽ���ǻ��ꤷ
-�ޤ�::
+別のテーブルのフィールド値で整列させる場合，テーブル名をドット表記で指定し
+ます::
 
     Entry.objects.order_by('blogs_blog.name', 'headline')
 
-�羮ʸ���ζ��̤��θ�������󤹤뤫�ɤ�������ꤹ����ˡ�Ϥ���ޤ����羮ʸ
-���ζ��̤ˤĤ��Ƥϡ� Django �ϸ��߻ȤäƤ���ǡ����١����Хå�����ɤ�����
-��ˡ�˽����ޤ���
+大小文字の区別を考慮して整列するかどうかを指定する方法はありません．大小文
+字の区別については， Django は現在使っているデータベースバックエンドの整列
+方法に従います．
 
 ``distinct()``
 ~~~~~~~~~~~~~~
 
-SQL ������� ``SELECT DISTINCT`` ��Ȥ������� ``QuerySet`` ���֤��ޤ���
-``distinct()`` ��Ȥ��ȡ��������̤����ʣ����Ԥ�ʤ����ޤ���
+SQL クエリに ``SELECT DISTINCT`` を使う新たな ``QuerySet`` を返します．
+``distinct()`` を使うと，クエリ結果から重複する行をなくします．
 
-�ǥե���ȤǤϡ� ``QuerySet`` �Ͻ�ʣ����Ԥ����ޤ����̾�ϡ�
-``Blog.objects.all()`` �Τ褦��ñ��ʥ�����Ͻ�ʣ����Ԥ�ޤ�褦�ʷ�̤ˤ�
-��ʤ����ᡤ����Ϥ��ޤ�����ˤϤʤ�ޤ���
+デフォルトでは， ``QuerySet`` は重複する行を除去しません．通常は，
+``Blog.objects.all()`` のような単純なクエリは重複する行を含むような結果にな
+らないため，これはあまり問題にはなりません．
 
-�������������꤬ʣ���Υơ��֥�ˤ錄���硤 ``QuerySet`` ��ɾ����̤˽�ʣ
-�����̤������礬����ޤ������ξ��ˤ� ``distinct()`` ��ȤäƲ�������
+しかし，クエリが複数のテーブルにわたる場合， ``QuerySet`` の評価結果に重複
+する結果が入る場合があります．その場合には ``distinct()`` を使って下さい．
 
 ``values(*fields)``
 ~~~~~~~~~~~~~~~~~~~
 
-``ValueQuerySet`` ���֤��ޤ��� ``ValueQuerySet`` �� ``QuerySet`` �Υ��֥���
-���ǡ�ɾ����̤Ȥ��ƥ�ǥ륤�󥹥��󥹥��֥������Ȥ����˼���Υꥹ�Ȥ���
-�� ``QuerySet`` �Ǥ���
+``ValueQuerySet`` を返します． ``ValueQuerySet`` は ``QuerySet`` のサブクラ
+スで，評価結果としてモデルインスタンスオブジェクトの代りに辞書のリストを返
+す ``QuerySet`` です．
 
-�ꥹ����γƼ���ϸġ��Υ��֥������Ȥ�ɽ�����Ƥ��ꡤ��������ǥ륪�֥�����
-�Ȥγ�°��̾�ˡ��б����Ƥ��ޤ���
+リスト中の各辞書は個々のオブジェクトを表現しており，キーがモデルオブジェク
+トの各属性名に，対応しています．
 
-�ʲ�����Ǥϡ� ``values()`` �μ�����̾�Υ�ǥ륪�֥������Ȥ���Ӥ��Ƥ���
-��::
+以下の例では， ``values()`` の辞書と通常のモデルオブジェクトを比較していま
+す::
 
-    # �ꥹ�Ȥˤ� Blog ���֥������Ȥ�����ޤ���
+    # リストには Blog オブジェクトが入ります．
     >>> Blog.objects.filter(name__startswith='Beatles')
     [Beatles Blog]
 
-    # �ꥹ�Ȥˤϼ�������ޤ���
+    # リストには辞書が入ります．
     >>> Blog.objects.filter(name__startswith='Beatles').values()
     [{'id': 1, 'name': 'Beatles Blog', 'tagline': 'All the latest Beatles news.'}]
 
-``values()`` ���ץ����β���Ĺ�ΰ��� ``*fields`` ����ޤ������Υ��ץ�����
-``SELECT`` �����¤˻Ȥ��ե������̾����󤷤���ΤǤ��� ``fields`` ����ꤷ
-����硤����ˤϻ��ꤷ��̾���Υե�����ɤΥ������ͤ���������ޤ���
-``*fields`` ����ꤷ�ʤ���С�����ˤϥơ��֥�����ƤΥե�����ɤΥ�������
-������ޤ���
+``values()`` オプションの可変長の引数 ``*fields`` を取れます．このオプションは
+``SELECT`` の制限に使うフィールド名を列挙したものです． ``fields`` を指定し
+た場合，辞書には指定した名前のフィールドのキーと値だけが入ります．
+``*fields`` を指定しなければ，辞書にはテーブルの全てのフィールドのキーと値
+が入ります．
 
-��򼨤��ޤ�::
+例を示します::
 
     >>> Blog.objects.values()
     [{'id': 1, 'name': 'Beatles Blog', 'tagline': 'All the latest Beatles news.'}],
     >>> Blog.objects.values('id', 'name')
     [{'id': 1, 'name': 'Beatles Blog'}]
 
-``ValuesQuerySet`` �������ʤΤϡ��鷺���ʿ��Υե�����ɤ��ͤ���ɬ�פǤʤ���
-��ǥ륤�󥹥��󥹥��֥������Ȥε�ǽ��ɬ�פǤʤ���ʬ���äƤ�����Ǥ���
-ɬ�פʥե�����ɤ��������򤹤�ȡ�����˸�ΨŪ�ˤʤ�ޤ���
+``ValuesQuerySet`` が便利なのは，わずかな数のフィールドの値しか必要でなく，
+モデルインスタンスオブジェクトの機能が必要でないと分かっている場合です．
+必要なフィールドだけを選択すると，さらに効率的になります．
 
-�Ǹ�ˡ� ``ValuesQuerySet`` �� ``QuerySet`` �Υ��֥��饹�ʤΤǡ�
-``QuerySet`` �����ƤΥ᥽�åɤ���äƤ����������դ��Ƥ���������
-``ValuesQuerySet`` ���Ф��� ``filter()`` �� ``order_by()`` �Ȥ��ä������
-���ޤ����������ʲ�����ĤθƤӽФ��������ˤʤ�ޤ�::
+最後に， ``ValuesQuerySet`` は ``QuerySet`` のサブクラスなので，
+``QuerySet`` の全てのメソッドを持っている点に注意してください．
+``ValuesQuerySet`` に対して ``filter()`` や ``order_by()`` といった操作を行
+えます．そう，以下の二つの呼び出しは等価になります::
 
     Blog.objects.values().order_by('id')
     Blog.objects.order_by('id').values()
 
-Django �κ�Ԥ����ϡ����Ƥ� SQL �ط��Υ᥽�åɤ�������֤������θ�� (ɬ��
-�ʤ�) ���ϴط��Υ᥽�å� (``values()`` �ʤ�) �����֤��������򹥤�Ǥ��ޤ���
-�ȤϤ���������ϼºݾ�����ǤϤʤ��Τǡ��Ŀ�Ū�ʿ����ȿ�Ǥ����Ƥ��ޤ��ޤ�
-��
+Django の作者たちは，全ての SQL 関係のメソッドを先に配置し，その後に (必要
+なら) 出力関係のメソッド (``values()`` など) を配置するやり方を好んでいます．
+とはいえ，これは実際上問題ではないので，個人的な信条を反映させてかまいませ
+ん．
 
 ``dates(field, kind, order='ASC')``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``DateQuerySet`` ���֤��ޤ��� ``DateQuerySet`` �� ``QuerySet`` �Υ��֥��饹
-�ǡ�ɾ����̤Ȥ��ƥ����ꥻ�å���Υ���ƥ�Ĥ������դ�
-``datetime.datetime`` ���֥������ȤȤ����֤� ``QuerySet`` �Ǥ���
+``DateQuerySet`` を返します． ``DateQuerySet`` は ``QuerySet`` のサブクラス
+で，評価結果としてクエリセット内のコンテンツの全日付を
+``datetime.datetime`` オブジェクトとして返す ``QuerySet`` です．
 
-``field`` �ϥ�ǥ�� ``DateField`` �ޤ��� ``DateTimeField`` ��̾���Ǥ���
+``field`` はモデルの ``DateField`` または ``DateTimeField`` の名前です．
 
-``kind`` �� ``"year"``, ``"month"`` �ޤ��� ``"day"`` �Ǥ���
-��̥ꥹ����γ� ``datetime.datetime`` ���֥������Ȥ� ``type`` �λ���˽���
-���ڤ�ͤ���ޤ���
+``kind`` は ``"year"``, ``"month"`` または ``"day"`` です．
+結果リスト中の各 ``datetime.datetime`` オブジェクトは ``type`` の指定に従っ
+て切り詰められます．
 
-    * ``"year"`` �ե�����ɤ�ǯ��ʬ���ͤν�ʣ���ʤ��ꥹ�Ȥ��֤��ޤ���
-    * ``"month"`` �ե�����ɤ�ǯ������ʬ���ͤν�ʣ���ʤ��ꥹ�Ȥ��֤��ޤ���
-    * ``"day"`` �ե�����ɤ�ǯ�������ʬ���ͤν�ʣ���ʤ��ꥹ�Ȥ��֤��ޤ���
+    * ``"year"`` フィールドの年部分の値の重複しないリストを返します．
+    * ``"month"`` フィールドの年／月部分の値の重複しないリストを返します．
+    * ``"day"`` フィールドの年／月／日部分の値の重複しないリストを返します．
 
-``order`` �ˤϷ�̤��¤ӽ����ꤷ�ޤ����ǥե�����ͤ� ``'ASC'`` �ǡ�
-``"ASC"`` �ޤ��� ``"DESC"`` �ˤǤ��ޤ���
+``order`` には結果の並び順を指定します．デフォルト値は ``'ASC'`` で，
+``"ASC"`` または ``"DESC"`` にできます．
 
-��򼨤��ޤ�::
+例を示します::
 
     >>> Entry.objects.dates('pub_date', 'year')
     [datetime.datetime(2005, 1, 1)]
@@ -573,14 +573,14 @@ Django �κ�Ԥ����ϡ����Ƥ� SQL �ط��Υ᥽�åɤ�������֤������θ�� (ɬ��
 ``none()``
 ~~~~~~~~~~
 
-**��ȯ�Ǥ� Django �ǿ������ɲä��줿��ǽ�Ǥ�**
+**開発版の Django で新たに追加された機能です**
 
-``EmptyQuerySet`` ���֤��ޤ��� ``EmptyQuerySet`` �Ȥϡ�ɾ����̤���˶���
-�ꥹ�Ȥˤʤ륯���ꥻ�åȤǤ����ؿ�������ͤʤɤǶ��ξȹ��̤��֤���������
-�ƤӽФ�¦�� (���Υꥹ�ȤʤɤǤϤʤ�) �����ꥻ�åȥ��֥������Ȥ�����ͤ��
-�Ԥ��Ƥ�����������Ǥ���
+``EmptyQuerySet`` を返します． ``EmptyQuerySet`` とは，評価結果が常に空の
+リストになるクエリセットです．関数の戻り値などで空の照合結果を返したいが，
+呼び出し側が (空のリストなどではなく) クエリセットオブジェクトの戻り値を期
+待している場合に便利です．
 
-��::
+例::
     
     >>> Entry.objects.none()
     []
@@ -589,32 +589,32 @@ Django �κ�Ԥ����ϡ����Ƥ� SQL �ط��Υ᥽�åɤ�������֤������θ�� (ɬ��
 ``select_related()``
 ~~~~~~~~~~~~~~~~~~~~
 
-��ưŪ�˳��������Υ�졼����������ספ����������¹Ԥ����Ȥ��˥�졼����
-����Υ��֥������Ȥ�ä������򤹤�褦�� ``QuerySet`` ���֤��ޤ���
-����ϥѥե����ޥ󥹤���夵���뤿��ε����ǡ�������� (�Ȥ�������) ����
-�ˤʤ�ޤ������ʸ�γ��������ؤΥ�졼�����ǥǡ����١��������꤬ɬ�פʤ�
-�ʤ�ޤ���
+自動的に外部キーのリレーションを「追跡」し，クエリを実行したときにリレーショ
+ン先のオブジェクトも加えて選択するような ``QuerySet`` を返します．
+これはパフォーマンスを向上させるための機構で，クエリは (ときに非常に) 巨大
+になりますが，以後の外部キーへのリレーションでデータベースクエリが必要なく
+なります．
 
-�ʲ�����Ǥϡ��̾�ξȹ�� ``select_related()`` ��Ȥä��ȹ�Ȥΰ㤤�����
-���Ƥ��ޤ����̾�ξȹ�ϰʲ��Τ褦�ˤʤ�ޤ�::
+以下の例では，通常の照合と ``select_related()`` を使った照合との違いを比較
+しています．通常の照合は以下のようになります::
 
-    # �ǡ����١��������ޤ���
+    # データベースを操作します．
     e = Entry.objects.get(id=5)
 
-    # ��졼�������� Blog ���֥������Ȥ�������뤿��˺��٥ǡ����١�����
-    # ���ޤ���
+    # リレーション先の Blog オブジェクトを取得するために再度データベースを
+    # 操作します．
     b = e.blog
 
-``select_related()`` ��Ȥä��ȹ�ϰʲ��Τ褦�ˤʤ�ޤ�::
+``select_related()`` を使った照合は以下のようになります::
 
-    # �ǡ����١��������ޤ���
+    # データベースを操作します．
     e = Entry.objects.select_related().get(id=5)
 
-    # e.blog �Ͼ�Υ�����Ǽ����ѤߤʤΤǡ��ǡ����١��������ޤ���
+    # e.blog は上のクエリで取得済みなので，データベースを操作しません．
     b = e.blog
 
-``select_related`` �ϲ�ǽ�ʸ¤곰�����������פ��뤳�Ȥ����դ��Ƥ�����������
-���Τ褦�ʥ�ǥ�::
+``select_related`` は可能な限り外部キーを追跡することに注意してください．以
+下のようなモデル::
 
     class City(models.Model):
         # ...
@@ -627,9 +627,9 @@ Django �κ�Ԥ����ϡ����Ƥ� SQL �ط��Υ᥽�åɤ�������֤������θ�� (ɬ��
         # ...
         author = models.ForeignKey(Person)
 
-�ξ�硤 ``Book.objects.select_related().get(id=4)`` 
-��¹Ԥ���ȡ���졼������ĥ��줿 ``Person`` *�˲ä���*  ``City`` �⥭���
-���夷�ޤ�::
+の場合， ``Book.objects.select_related().get(id=4)`` 
+を実行すると，リレーションの張られた ``Person`` *に加えて*  ``City`` もキャッ
+シュします::
 
     b = Book.objects.select_related().get(id=4)
     p = b.author         # Doesn't hit the database.
@@ -639,63 +639,63 @@ Django �κ�Ԥ����ϡ����Ƥ� SQL �ط��Υ᥽�åɤ�������֤������θ�� (ɬ��
     p = b.author         # Hits the database.
     c = p.hometown       # Hits the database.
 
-``select_related()`` �� ``null=True`` �Ǥ���褦�ʳ����������������פ���
-���Τ����դ��Ƥ���������
+``select_related()`` は ``null=True`` であるような外部キーカラムは追跡しな
+いので注意してください．
 
-�̾ ``select_related()`` ��Ȥ��ȡ��ǡ����١����θƤӽФ�����򸺤餻��
-�Τǡ������˥ѥե����ޥ󥹤����Ǥ��ޤ�������������졼����󤬿����ͥ���
-���Ƥ���褦�ʾ����Ǥϡ� ``select_related()`` �����פ����졼����󤬡�¿
-������פ���ˡ�����ʥ�������������Ƥ��ޤ������Ū�˥ѥե����ޥ󥹤��㲼
-�򾷤���礬����ޤ���
+通常， ``select_related()`` を使うと，データベースの呼び出し回数を減らせる
+ので，大幅にパフォーマンスを向上できます．しかし，リレーションが深くネスト
+しているような状況では， ``select_related()`` が追跡するリレーションが「多
+すぎる」ために，巨大なクエリを生成してしまい，結果的にパフォーマンスの低下
+を招く場合があります．
 
-���������������б����뤿�ᡤ ``select_related()`` �� ``depth`` ��������ꤹ
-��ȡ��ʲ�����Τ褦�˥�졼�����򲿡֥�٥�פޤ����פ��뤫������Ǥ���
-��::
+こうした状況に対応するため， ``select_related()`` に ``depth`` 引数を指定す
+ると，以下の例のようにリレーションを何「レベル」まで追跡するかを制御できま
+す::
 
     b = Book.objects.select_related(depth=1).get(id=4)
-    p = b.author         # ���׺ѤߤΥ�졼����󡥥ǡ����١��������ޤ���
-    c = p.hometown       # ̤���פΥ�졼����󡥥ǡ����١�����ƤӽФ��ޤ���
+    p = b.author         # 追跡済みのリレーション．データベースを操作しません．
+    c = p.hometown       # 未追跡のリレーション．データベースを呼び出します．
 
-``depth`` �����ϳ�ȯ�Ǥ� Django �ǿ������ɲä��줿��ǽ�Ǥ���
+``depth`` 引数は開発版の Django で新たに追加された機能です．
     
 ``extra(select=None, where=None, params=None, tables=None)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-���Ȥ��ơ� Django �Υ�����ɽ��ˡ�����Ǥ�ʣ���� ``WHERE`` ����ưפ�ɽ���Ǥ�
-�ʤ���礬����ޤ������������ðۤʾ��Τ���ˡ� Django �Ǥ� ``extra()``
-�Ȥ��������ꥻ�åȽ����Ҥ��󶡤��Ƥ��ޤ������Υ᥽�åɤϡ������ꥻ�åȤ�
-�������� SQL ʸ�������� SQL ����������뤿��Υեå��Ǥ���
+時として， Django のクエリ表記法だけでは複雑な ``WHERE`` 節を容易に表現でき
+ない場合があります．こうした特異な場合のために， Django では ``extra()``
+というクエリセット修飾子を提供しています．このメソッドは，クエリセットが
+生成する SQL 文中に特定の SQL 節を挿入するためのフックです．
 
-����塤�����γ�ĥ�ȹ絡ǽ�� (ľ�� SQL �����ɤ�񤤤Ƥ��뤿��) �ǡ����١�
-�����󥸥�֤β�����������ޤ��󡥤ޤ��� DRY §�ο��ȤǤ⤢��ޤ�����ǽ�ʸ�
-��Ȥ�ʤ��褦�ˤ��Ʋ�������
+定義上，これらの拡張照合機能は (直接 SQL コードを書いているため) データベー
+スエンジン間の可搬性がありません．また， DRY 則の侵犯でもあります．可能な限
+り使わないようにして下さい．
 
-``params``, ``select``, ``where``,  ``tables`` �Τ����줫����ꤷ�ޤ���
-������ΰ�����ɬ�ܤǤϤ���ޤ��󤬡����ʤ��Ȥ��Ĥϻ��ꤻ�ͤФʤ�ޤ���
+``params``, ``select``, ``where``,  ``tables`` のいずれかを指定します．
+いずれの引数も必須ではありませんが，少なくとも一つは指定せねばなりません．
 
 ``select``
-    ``select`` ������ɤ�Ȥ��ȡ� ``SELECT`` ����ɲäΥե�����ɤ������
-    ���ޤ������ΰ����ϡ�°��̾�Ȥ���°���ͤ�׻����뤿��� SQL ����б��Ť�
-    ������ˤ��ޤ���
+    ``select`` キーワードを使うと， ``SELECT`` 節に追加のフィールドを選択で
+    きます．この引数は，属性名とその属性値を計算するための SQL 節を対応づけ
+    た辞書にします．
 
-    �㤨��::
+    例えば::
 
         Entry.objects.extra(select={'is_recent': "pub_date > '2006-01-01'"})
 
-    �Τ褦�ˤ���ȡ� ``Entry`` ���֥������Ȥϡ�����ȥ�� ``pub_date`` ��
-    Jan. 1, 2006 ����礭�����ɤ����򼨤��֡����ͤ�°�� ``is_recent`` ��
-    ���Ĥ褦�ˤʤ�ޤ���
+    のようにすると， ``Entry`` オブジェクトは，エントリの ``pub_date`` が
+    Jan. 1, 2006 より大きいかどうかを示すブール値の属性 ``is_recent`` を
+    持つようになります．
 
-    Django �ϻ��ꤵ�줿 SQL ��ľ�� ``SELECT`` ʸ����������Τǡ�������
-    SQL ʸ�ϰʲ��Τ褦�ˤʤ�ޤ�::
+    Django は指定された SQL を直接 ``SELECT`` 文に挿入するので，上の例の
+    SQL 文は以下のようになります::
 
         SELECT blog_entry.*, (pub_date > '2006-01-01')
         FROM blog_entry;
 
 
-    ������Ϥ�äȹ��٤Ǥ���������Ǥϡ� ``Blog`` ���֥������Ȥ˴�Ϣ�Ť���
-    ��Ƥ��� ``Entry`` ���֥������ȤθĿ���ɽ�������� ``Blog`` ���֥�����
-    �Ȥ� ``entry_count`` °���˻������뤿��˥��֥������¹Ԥ��Ƥ��ޤ�::
+    次の例はもっと高度です．この例では， ``Blog`` オブジェクトに関連づけら
+    れている ``Entry`` オブジェクトの個数を表す整数を， ``Blog`` オブジェク
+    トの ``entry_count`` 属性に持たせるためにサブクエリを実行しています::
 
         Blog.objects.extra(
             select={
@@ -704,89 +704,89 @@ Django �κ�Ԥ����ϡ����Ƥ� SQL �ط��Υ᥽�åɤ�������֤������θ�� (ɬ��
             },
         )
 
-    (��ξ��Ǥϡ�������� ``FROM`` ��� ``blog_blog`` ������Ȥ������¤�
-    ���Ѥ��Ƥ��ޤ���)
+    (上の場合では，クエリの ``FROM`` 節に ``blog_blog`` が入るという事実を
+    利用しています．)
 
-    �����ξ�硤 SQL �ϰʲ��Τ褦�ˤʤ�ޤ�::
+    上の例の場合， SQL は以下のようになります::
 
         SELECT blog_blog.*, (SELECT COUNT(*) FROM blog_entry WHERE blog_entry.blog_id = blog_blog.id)
         FROM blog_blog;
 
-    �ۤȤ�ɤΥǡ����١������󥸥�Ǥϡ����֥��쥯�����μ���˴ݳ�̤�ɬ
-    �פǤ�����Django �� ``select`` ��Ǥ�ɬ�פʤ��Ȥ������Ȥ����դ��Ƥ�����
-    �����ޤ��� MySQL �ΰ����ΥС������Τ褦�ˡ��ǡ����١����Хå�����ɤ�
-    ��äƤϥ��֥�����򥵥ݡ��Ȥ��ʤ��Τ����դ��Ƥ���������
+    ほとんどのデータベースエンジンでは，サブセレクションの周りに丸括弧が必
+    要ですが，Django の ``select`` 節では必要ないということに注意してくださ
+    い．また， MySQL の一部のバージョンのように，データベースバックエンドに
+    よってはサブクエリをサポートしないので注意してください．
 
 ``where`` / ``tables``
-    ����Ū���ɲä� ``WHERE`` ����Ϥ�ɬ�פ������� -- �����餯������Ū�ʷ�
-    ���ԤäƤ����� -- �ˤϡ� ``where`` ������ɤ�ȤäƲ�������
-    ``tables`` ��Ȥ��С� SQL �� ``FROM`` ��˼�ư�ǥơ��֥�̾���ɲäǤ���
-    ����
+    明示的に追加の ``WHERE`` 節を渡す必要がある場合 -- おそらく非明示的な結
+    合を行っている場合 -- には， ``where`` キーワードを使って下さい．
+    ``tables`` を使えば， SQL の ``FROM`` 節に手動でテーブル名を追加できま
+    す．
 
-    ``where`` �� ``tables`` �ϡ��Ȥ��ʸ����Υꥹ�Ȥ�����ˤȤ�ޤ���
-    ``where`` �ѥ�᥿�����Ƥ����ơ�¿�θ������� "AND" �Ƿ�礵��ޤ���
+    ``where`` や ``tables`` は，ともに文字列のリストを引数にとります．
+    ``where`` パラメタの内容は全て，多の検索条件と "AND" で結合されます．
 
-    �㤨��::
+    例えば::
 
         Entry.objects.extra(where=['id IN (3, 4, 5, 20)'])
 
-    �ϡ�(�绨�Ĥˤ��ä�) �ʲ��Τ褦�� SQL ʸ���Ѵ�����ޤ�:
+    は，(大雑把にいって) 以下のような SQL 文に変換されます:
 
         SELECT * FROM blog_entry WHERE id IN (3, 4, 5, 20);
 
 ``params``
 
-    ����������� ``select`` �� ``where`` �ѥ�᥿�Ǥϡ�ɸ��� Python ��ʸ��
-    ��ץ졼���ۥ�� ``'%s'`` ��Ȥäơ��ǡ����١������󥸥󤬼�ưŪ�˥ѥ�
-    �᥿�򥯥����Ȥ���褦�ؼ��Ǥ��ޤ��� ``params`` �����ˤϡ��ץ졼���ۥ�
-    �����֤���������ѥ�᥿�Υꥹ�Ȥ���ꤷ�ޤ���
+    上で説明した ``select`` や ``where`` パラメタでは，標準の Python の文字
+    列プレースホルダ ``'%s'`` を使って，データベースエンジンが自動的にパラ
+    メタをクオートするよう指示できます． ``params`` 引数には，プレースホル
+    ダで置き換えられるパラメタのリストを指定します．
 
-    �㤨��::
+    例えば::
 
         Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
 
-    ``select`` �� ``where`` �����ľ���ͤ������ޤ������ ``params`` ���
-    ���褦�ˤ��Ƥ����������Ȥ����Τ⡤ ``params`` ��Ȥ��С��Хå�����ɸ�
-    ͭ����ˡ�ǥѥ�᥿���ͤ��������������Ȥ��뤫��Ǥ��� (�㤨�а�����ʸ��
-    �ʤɤ����������������פ��ޤ�)
+    ``select`` や ``where`` の中に直接値を埋め込まず，常に ``params`` を使
+    うようにしてください．というのも， ``params`` を使えば，バックエンド固
+    有の方法でパラメタの値を正しくクオートするからです． (例えば引用符文字
+    などを正しくエスケープします)
 
-    ������::
+    悪い例::
 
         Entry.objects.extra(where=["headline='Lennon'"])
 
-    �ɤ���::
+    良い例::
 
         Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
 
 
 .. _QuerySet methods that do not return QuerySets:
 
-QuerySet ���֤��ʤ������ꥻ�åȥ᥽�å�
+QuerySet を返さないクエリセットメソッド
 ---------------------------------------
 
-�ʲ��Υ����ꥻ�åȥ᥽�åɤϡ������ꥻ�åȤ�ɾ�����ơ������ꥻ�å� *�Ǥʤ�*
-�ͤ��֤��ޤ���
+以下のクエリセットメソッドは，クエリセットを評価して，クエリセット *でない*
+値を返します．
 
-�����Υ᥽�åɤϥ���å����Ȥ鷺 (��Ҥ� `����å���ȥ����ꥻ�å�`_ ��
-���Ȥ��Ƥ�������)���᥽�åɸƤӽФ����Ȥ˥ǡ����١����˥�����򤫤��ޤ���
+これらのメソッドはキャッシュを使わず (後述の `キャッシュとクエリセット`_ を
+参照してください)，メソッド呼び出しごとにデータベースにクエリをかけます．
 
 ``get(**kwargs)``
 ~~~~~~~~~~~~~~~~~
 
-�ȹ�ѥ�᥿�˰��פ��륪�֥������Ȥ��֤��ޤ����ȹ�ѥ�᥿�ϸ�Ҥ� 
-`�ե�����ɤξȹ�`_ ����������ե����ޥåȤˤ��ޤ���
+照合パラメタに一致するオブジェクトを返します．照合パラメタは後述の 
+`フィールドの照合`_ で説明するフォーマットにします．
 
-ʣ���Υ��֥������Ȥ����Ĥ��ä����ˤ� ``AssertionError`` �����Ф��ޤ���
+複数のオブジェクトが見つかった場合には ``AssertionError`` を送出します．
 
-����ѥ�᥿���Ф��륪�֥������Ȥ����Ĥ���ʤ��ä����ˤ� ``DoesNotExist``
-�㳰�����Ф��ޤ��� ``DoesNotExist`` �㳰�ϥ�ǥ륯�饹��°���ΰ�ĤǤ���
-�㤨��::
+指定パラメタに対するオブジェクトが見つからなかった場合には ``DoesNotExist``
+例外を送出します． ``DoesNotExist`` 例外はモデルクラスの属性の一つです．
+例えば::
 
     Entry.objects.get(id='foo') # raises Entry.DoesNotExist
 
-``DoesNotExist`` �㳰�� ``django.core.exceptions.ObjectDoesNotExist`` ���
-�����Ƥ���Τǡ�ʣ���� ``DoesNotExist`` �㳰�� ``except:`` �Υ������åȤˤ�
-���ޤ����㤨��::
+``DoesNotExist`` 例外は ``django.core.exceptions.ObjectDoesNotExist`` を継
+承しているので，複数の ``DoesNotExist`` 例外を ``except:`` のターゲットにで
+きます．例えば::
 
     from django.core.exceptions import ObjectDoesNotExist
     try:
@@ -799,31 +799,31 @@ QuerySet ���֤��ʤ������ꥻ�åȥ᥽�å�
 ``create(**kwargs)``
 ~~~~~~~~~~~~~~~~~~~~
 
-��󥹥ƥåפǥ��֥������Ȥ�����������¸���뤿����ص��᥽�åɤǤ���
-���ʤ�����ʲ���ʸ::
+ワンステップでオブジェクトを生成して保存するための便宜メソッドです。
+すなわち、以下の文::
 
     p = Person.objects.create(first_name="Bruce", last_name="Springsteen")
 
-�ȡ��ʲ���ʸ::
+と、以下の文::
 
     p = Person(first_name="Bruce", last_name="Springsteen")
     p.save()
 
-�������Ǥ���
+は等価です。
 
 ``get_or_create(**kwargs)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-kwargs �˻��ꤷ�����֥������Ȥ�ȹ礷���ʤ�����������뤿����ص��᥽�åɤ�
-����
+kwargs に指定したオブジェクトを照合し、なければ生成するための便宜メソッドで
+す。
 
 
-``(object, created)`` �η����Υ��ץ���֤��ޤ��� ``object`` �ϼ����ޤ��Ϻ�
-�����줿���֥������ȤǤ��ꡤ ``created`` �ϥ֡����ͤǡ����֥������Ȥ�������
-�������줿���ɤ����򼨤��ޤ���
+``(object, created)`` の形式のタプルを返します． ``object`` は取得または作
+成されたオブジェクトであり， ``created`` はブール値で，オブジェクトが新たに
+生成されたかどうかを示します．
 
-���Υ᥽�åɤϡ�����ޤ�Υ����ɤ�񤯾�ǤΥ��硼�ȥ��åȤȤ�����������
-���ꡤ�ǡ���������ॹ����ץȤ�񤯤Ȥ��������Ǥ����㤨��::
+このメソッドは，お決まりのコードを書く上でのショートカットとして定義されて
+おり，データを取り込むスクリプトを書くときに便利です．例えば::
 
     try:
         obj = Person.objects.get(first_name='John', last_name='Lennon')
@@ -831,20 +831,20 @@ kwargs �˻��ꤷ�����֥������Ȥ�ȹ礷���ʤ�����������뤿����ص��᥽�åɤ�
         obj = Person(first_name='John', last_name='Lennon', birthday=date(1940, 10, 9))
         obj.save()
 
-���Τ褦�ʥ����ɥѥ�����Ǥϡ���ǥ���Υե�����ɤ�������ȼ���館�ʤ���
-��ޤ��� ``get_or_create()`` ��Ȥ��ȡ���Υ�������ϰʲ��Τ褦�˽�ľ����
-��::
+このようなコードパターンでは，モデル中のフィールドが増えると手に負えなくな
+ります． ``get_or_create()`` を使うと，上のコード例は以下のように書き直せま
+す::
 
     obj, created = Person.objects.get_or_create(first_name='John', last_name='Lennon',
                       defaults={'birthday': date(1940, 10, 9)})
 
 
-``get_or_create()`` ���Ϥ��줿������ɰ����ϡ� (���ץ����ΰ����Ǥ���
-``defaults`` �������) ���� ``get()`` �θƤӽФ����ΰ����Ȥ����Ϥ���ޤ���
-���֥������Ȥ����Ĥ��ä���硤 ``get_or_create()`` �ϸ��Ĥ��ä����֥�������
-�� ``False`` ���֤��ޤ������֥������Ȥ� *���Ĥ���ʤ��ä�* ��硤����������
-���줿���֥������Ȥ� ``True`` ���֤��ޤ��������ʥ��֥������Ȥϰʲ��Υ��르
-�ꥺ��Ǻ�������ޤ�::
+``get_or_create()`` に渡されたキーワード引数は， (オプションの引数である
+``defaults`` を除いて) 全て ``get()`` の呼び出し時の引数として渡されます．
+オブジェクトが見つかった場合， ``get_or_create()`` は見つかったオブジェクト
+と ``False`` を返します．オブジェクトが *見つからなかった* 場合，新たに生成
+されたオブジェクトと ``True`` を返します．新たなオブジェクトは以下のアルゴ
+リズムで作成されます::
 
     defaults = kwargs.pop('defaults', {})
     params = dict([(k, v) for k, v in kwargs.items() if '__' not in k])
@@ -852,61 +852,61 @@ kwargs �˻��ꤷ�����֥������Ȥ�ȹ礷���ʤ�����������뤿����ص��᥽�åɤ�
     obj = self.model(**params)
     obj.save()
 
-��Υ����ɤ����ܸ��ɽ���ʤ顤�ޤ� ``'defaults'`` �Ǥʤ�������ɰ����Τ�
-������ť��������������ޤޤʤ���� (��ť�������������Ϥ����ޤ��ȹ�Υ���
-��ɤʤΤǽ������ޤ�) ��Ȥäƥѥ�᥿ ``params`` ���������ɬ�פ˱�����
-�ǥե������ ``defaults`` �����Ƥ򹹿����ơ����η�̤��ǥ륯�饹��Ƥӽ�
-���Ȥ��Υ�����ɰ����˻Ȥ��ޤ���
+上のコードを日本語で表すなら，まず ``'defaults'`` でないキーワード引数のう
+ち，二重アンダースコアを含まないもの (二重アンダースコアはあいまい照合のキー
+ワードなので除外します) を使ってパラメタ ``params`` を作成し，必要に応じて
+デフォルト値 ``defaults`` で内容を更新して，その結果をモデルクラスを呼び出
+すときのキーワード引数に使います．
 
-``defaults`` �Ȥ���̾���Υե������̾����äƤ��ơ� ``get_or_create()`` ��
-��Ǹ�̩�ȹ�˻Ȥ�������С��ʲ��Τ褦�� ``'defaults__exact'`` ��Ȥ��ޤ�::
+``defaults`` という名前のフィールド名を持っていて， ``get_or_create()`` の
+中で厳密照合に使いたければ，以下のように ``'defaults__exact'`` を使います::
 
     Foo.objects.get_or_create(defaults__exact='bar', defaults={'defaults': 'baz'})
 
-�Ǹ�ˡ� Django �ӥ塼����� ``get_or_create()`` ��Ȥ����ˤĤ��ƤҤȤ���
-���դ��Ƥ����ޤ��礦��������������褦�ˡ���Ȥ��� ``get_or_create()`` ��ͭ
-�ѤʤΤϡ��ǡ�������Ϥ������������¸�Υǡ�����¸�ߤ��ʤ����˿����ʥ쥳��
-�ɤ���������褦�ʥ�����ץȤ�񤯾��Ǥ����ӥ塼�� ``get_or_create()`` ��
-�Ȥ������Τʤ顤�ä���ͳ�Τʤ��¤� ``POST`` �ꥯ��������ǻȤ��褦�ˤ��ޤ���
-�����������Ȥ��ơ� ``GET`` �ꥯ�����Ȥν�����Ǥϥǡ����˱ƶ���ڤܤ��٤���
-�Ϥ���ޤ��󡥥ǡ����������Ѥ�⤿�餹�褦�ʥڡ����Υꥯ�����ȤˤϾ��
-``POST`` ��Ȥ��褦�ˤ��ޤ��礦���ܤ����ϡ� HTTP ���ͤˤ�����
-`�����ʥ᥽�å�`_ �򻲾Ȥ��Ƥ���������
+最後に， Django ビューの中で ``get_or_create()`` を使う場合についてひとこと
+注意しておきましょう．上で説明したように，主として ``get_or_create()`` が有
+用なのは，データを解析し，該当する既存のデータが存在しない場合に新たなレコー
+ドを生成するようなスクリプトを書く場合です．ビューで ``get_or_create()`` を
+使いたいのなら，特に理由のない限り ``POST`` リクエスト中で使うようにしましょ
+う．一般論として， ``GET`` リクエストの処理中ではデータに影響を及ぼすべきで
+はありません．データに副作用をもたらすようなページのリクエストには常に
+``POST`` を使うようにしましょう．詳しくは， HTTP 仕様における
+`安全なメソッド`_ を参照してください．
 
-.. _`�����ʥ᥽�å�`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
+.. _`安全なメソッド`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
 .. _Safe methods: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
 
 
 ``count()``
 ~~~~~~~~~~~
 
-�����ꥻ�åȤ˰��פ���ǡ����١�����Υ��֥������ȤθĿ���ɽ���������֤���
-���� ``count()`` ���㳰�����Ф��ޤ���
+クエリセットに一致するデータベース上のオブジェクトの個数を表す整数を返しま
+す． ``count()`` は例外を送出しません．
 
-�㤨��::
+例えば::
 
-    # �ǡ����١�����Υ���ȥ���������֤��ޤ���
+    # データベース中のエントリの総数を返します．
     Entry.objects.count()
 
-    # �إåɥ饤�� 'Lennon' ��ޤ२��ȥ���������֤��ޤ���
+    # ヘッドラインが 'Lennon' を含むエントリの総数を返します．
     Entry.objects.filter(headline__contains='Lennon').count()
 
-``count()`` ���ظ�� ``SELECT COUNT(*)`` ��¹Ԥ���Τǡ�ñ�˥��֥������Ȥ�
-�Ŀ�������������ˤϡ����ƤΥ쥳���ɤ� Python ���֥������ȤȤ��ƥ����ɤ�
-�Ƥ��� ``len()`` ��ƤӽФ��ΤǤϤʤ������ ``count()`` ��Ȥ��褦�ˤ��Ƥ�
-��������
+``count()`` は背後で ``SELECT COUNT(*)`` を実行するので，単にオブジェクトの
+個数を数えたい場合には，全てのレコードを Python オブジェクトとしてロードし
+てから ``len()`` を呼び出すのではなく，常に ``count()`` を使うようにしてく
+ださい．
 
-(PostgreSQL �� MySQL �Ȥ��ä�) �ɤΥǡ����١�����ȤäƤ��뤫�ˤ�äơ����
-�ͤ� Python ���̾���������ǤϤʤ���Ĺ�����ˤʤ뤳�Ȥ⤢��ޤ�������ϼ���
-�������Ǥ��ꡤ����Ū������ˤʤ뤳�ȤϤ���ޤ���
+(PostgreSQL や MySQL といった) どのデータベースを使っているかによって，戻り
+値が Python の通常の整数型ではなく，長整数になることもあります．これは実装
+上の問題であり，現実的に問題になることはありません．
 
 ``in_bulk(id_list)``
 ~~~~~~~~~~~~~~~~~~~~
 
-�祭�����ͤΥꥹ�Ȥ�����ˤȤꡤ�Ƽ祭���ͤȥ��֥������Ȥ��б��Ť��������
-�֤��ޤ���
+主キーの値のリストを引数にとり，各主キー値とオブジェクトを対応づけた辞書を
+返します．
 
-�㤨��::
+例えば::
 
     >>> Blog.objects.in_bulk([1])
     {1: Beatles Blog}
@@ -915,72 +915,72 @@ kwargs �˻��ꤷ�����֥������Ȥ�ȹ礷���ʤ�����������뤿����ص��᥽�åɤ�
     >>> Blog.objects.in_bulk([])
     {}
 
-``in_bulk()`` �˶��Υꥹ�Ȥ��Ϥ��ȶ��μ�����֤��ޤ���
+``in_bulk()`` に空のリストを渡すと空の辞書を返します．
 
 ``latest(field_name=None)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-���եե�����ɤǤ��� ``field_name`` ���ͤ˱����ơ��ơ��֥���κǿ��Υ��֥���
-���Ȥ��֤��ޤ���
+日付フィールドである ``field_name`` の値に応じて，テーブル中の最新のオブジェ
+クトを返します．
 
-�ʲ�����Ǥϡ� ``pub_date`` �ե�����ɤ˱����ơ��ơ��֥���κǿ���
-``Entry`` ���֤��ޤ�::
+以下の例では， ``pub_date`` フィールドに応じて，テーブル中の最新の
+``Entry`` を返します::
 
     Entry.objects.latest('pub_date')
 
-��ǥ�� ``Meta`` ��  ``get_latest_by`` ����ꤷ�Ƥ����硤 ``latest()``
-�� ``field_name`` �����Ͼ�ά�Ǥ��ޤ��� Django �� ``get_latest_by`` �˻��ꤷ
-���ե�����ɤ�ǥե�����ͤˤ��ޤ���
+モデルの ``Meta`` で  ``get_latest_by`` を指定している場合， ``latest()``
+の ``field_name`` 引数は省略できます． Django は ``get_latest_by`` に指定し
+たフィールドをデフォルト値にします．
 
-``get()`` ��Ʊ�͡� ``latest()`` �ϻ���ѥ�᥿�˰��פ��륪�֥������Ȥ��ʤ�
-���� ``DoesNotExist`` �����Ф��ޤ���
+``get()`` と同様， ``latest()`` は指定パラメタに一致するオブジェクトがない
+場合に ``DoesNotExist`` を送出します．
 
-``latest()`` �Ͻ����������Ȳ������Τ��������¸�ߤ��Ƥ��ޤ���
+``latest()`` は純粋に利便性と可読性のためだけに存在しています．
 
 .. _Field lookups:
 
-�ե�����ɤξȹ�
+フィールドの照合
 ----------------
 
-�ե�����ɤξȹ�ϡ� SQL �� ``WHERE`` �����Ȥ���ޤ����ե�����ɾȹ�ϡ�
-``filter()``, ``exclude()`` ����� ``get()`` �Ȥ��ä������ꥻ�åȤΥ᥽�å�
-�Υ�����ɰ����Ȥ��ƻ��ꤷ�ޤ���
+フィールドの照合は， SQL の ``WHERE`` 節の中身を決めます．フィールド照合は，
+``filter()``, ``exclude()`` および ``get()`` といったクエリセットのメソッド
+のキーワード引数として指定します．
 
-����Ū�ˡ��ȹ�Υ�����ɰ���̾��  ``field__lookuptype=value`` �Τ褦�ʷ�
-����Ȥ�ޤ� (�����������������ŤǤ�)���㤨��::
+基本的に，照合のキーワード引数名は  ``field__lookuptype=value`` のような形
+式をとります (アンダースコアは二重です)．例えば::
 
     Entry.objects.filter(pub_date__lte='2006-01-01')
 
-�ϡ�(�绨�Ĥˤ��ä�) �ʲ��Τ褦�� SQL ʸ���Ѵ�����ޤ�::
+は，(大雑把にいって) 以下のような SQL 文に変換されます::
 
     SELECT * FROM blog_entry WHERE pub_date <= '2006-01-01';
 
-.. admonition:: �ե�����ɸ����Τ��餯��
+.. admonition:: フィールド検索のからくり
 
-   Python �ˤϡ�Ǥ�դ�̾�����ͤ��ä��������������ؿ���������뵡ǽ��
-   ���ꡤ����̾�Ȥ����ͤϼ¹Ի���ɾ������ޤ������路������ϸ����� Python
-   ���塼�ȥꥢ��� `������ɰ���`_ �򻲾Ȥ��Ƥ���������
+   Python には，任意の名前と値をもった引数を受け取れる関数を定義する機能が
+   あり，引数名とその値は実行時に評価されます．くわしい情報は公式の Python
+   チュートリアルの `キーワード引数`_ を参照してください．
 
-   .. _`������ɰ���`: 
+   .. _`キーワード引数`: 
        http://www.python.jp/doc/release/tut/node6.html#SECTION006720000000000000000
 
 
-̵���ʥ�����ɰ������Ϥ�����硤 ``TypeError`` �����Ф��ޤ���
+無効なキーワード引数を渡した場合， ``TypeError`` を送出します．
 
-�ǡ����١��� API �Ǥϡ��ʲ��ξȹ祿���פ򥵥ݡ��Ȥ��Ƥ��ޤ�:
+データベース API では，以下の照合タイプをサポートしています:
 
 exact
 ~~~~~
 
-��̩�ʰ��פǤ�������оݤ��ͤ� ``None`` �ˤ���ȡ�SQL �ˤ����� ``NULL`` ��
-����ӤȤ��ư����ޤ� (�ܤ����� isnull_ �򻲾Ȥ��Ƥ�������)��
+厳密な一致です，比較対象の値を ``None`` にすると，SQL における ``NULL`` と
+の比較として扱われます (詳しくは isnull_ を参照してください)．
 
-��::
+例::
 
     Entry.objects.get(id__exact=14)
     Entry.objects.get(id__exact=None)
 
-������ SQL ʸ::
+等価な SQL 文::
 
     SELECT ... WHERE id = 14;
     SELECT ... WHERE id = NULL;
@@ -988,806 +988,806 @@ exact
 iexact
 ~~~~~~
 
-�羮ʸ���ζ��̤򤷤ʤ����פǤ���
+大小文字の区別をしない一致です．
 
-��::
+例::
 
     Blog.objects.get(name__iexact='beatles blog')
 
-������ SQL ʸ::
+等価な SQL 文::
 
     SELECT ... WHERE name ILIKE 'beatles blog';
 
-������ϡ� ``'Beatles Blog'``, ``'beatles blog'``, ``'BeAtLes BLoG'``
-�ʤɤ˥ޥå����ޤ���
+この例は， ``'Beatles Blog'``, ``'beatles blog'``, ``'BeAtLes BLoG'``
+などにマッチします．
 
 contains
 ~~~~~~~~
 
-�羮ʸ������̤�����ޥƥ��ȤǤ���
+大小文字を区別する包含テストです．
 
-��::
+例::
 
     Entry.objects.get(headline__contains='Lennon')
 
-������ SQL ʸ::
+等価な SQL 文::
 
     SELECT ... WHERE headline LIKE '%Lennon%';
 
-������Ǥϡ� ``'Today Lennon honored'`` �Ȥ����إåɥ饤��ˤϰ��פ��ޤ�����
-``'today lennon honored'`` �ˤϰ��פ��ޤ���
+この例では， ``'Today Lennon honored'`` というヘッドラインには一致しますが，
+``'today lennon honored'`` には一致しません．
 
-SQLite ���羮ʸ������̤��� ``LIKE`` �򥵥ݡ��Ȥ��ʤ��Τǡ� ``contains`` ��
-``icontains`` ��Ʊ���ˤʤ�ޤ���
+SQLite は大小文字を区別する ``LIKE`` をサポートしないので， ``contains`` は
+``icontains`` と同じになります．
 
 icontains
 ~~~~~~~~~
 
-�羮ʸ������̤��ʤ���ޥƥ��ȤǤ���
+大小文字を区別しない包含テストです．
 
-��::
+例::
 
     Entry.objects.get(headline__icontains='Lennon')
 
-������ SQL ʸ::
+等価な SQL 文::
 
     SELECT ... WHERE headline ILIKE '%Lennon%';
 
 gt
 ~~
 
-����礭���ͤ˰��פ��ޤ���
+より大きい値に一致します．
 
-��::
+例::
 
     Entry.objects.filter(id__gt=4)
 
-������ SQL ʸ::
+等価な SQL 文::
 
     SELECT ... WHERE id > 4;
 
 gte
 ~~~
 
-��������������礭���ͤ˰��פ��ޤ���
+等しいか，より大きい値に一致します．
 
 lt
 ~~
 
-��꾯�ʤ��ͤ˰��פ��ޤ���
+より少ない値に一致します．
 
 lte
 ~~~
 
-������������꾯�ʤ��ͤ˰��פ��ޤ���
+等しいか，より少ない値に一致します．
 
 in
 ~~
 
-����Υꥹ�Ȥ����äƤ����Τ˰��פ��ޤ���
+指定のリストに入っているものに一致します．
 
-��::
+例::
 
     Entry.objects.filter(id__in=[1, 3, 4])
 
-������ SQL ʸ::
+等価な SQL 文::
 
     SELECT ... WHERE id IN (1, 3, 4);
 
 startswith
 ~~~~~~~~~~
 
-�羮ʸ������̤��� starts-with �Ǥ���
+大小文字を区別する starts-with です．
 
-��::
+例::
 
     Entry.objects.filter(headline__startswith='Will')
 
-������ SQL ʸ::
+等価な SQL 文::
 
     SELECT ... WHERE headline LIKE 'Will%';
 
-SQLite ���羮ʸ������̤��� ``LIKE`` �򥵥ݡ��Ȥ��ʤ��Τǡ� ``startswith``
-�� ``istartswith`` ��Ʊ���ˤʤ�ޤ���
+SQLite は大小文字を区別する ``LIKE`` をサポートしないので， ``startswith``
+は ``istartswith`` と同じになります．
 
 istartswith
 ~~~~~~~~~~~
 
-�羮ʸ������̤��ʤ� starts-with �Ǥ���
+大小文字を区別しない starts-with です．
 
-��::
+例::
 
     Entry.objects.filter(headline__istartswith='will')
 
-������ SQL ʸ::
+等価な SQL 文::
 
     SELECT ... WHERE headline ILIKE 'Will%';
 
 endswith
 ~~~~~~~~
 
-�羮ʸ������̤��� ends-with �Ǥ���
+大小文字を区別する ends-with です．
 
-��::
+例::
 
     Entry.objects.filter(headline__endswith='cats')
 
-������ SQL ʸ::
+等価な SQL 文::
 
     SELECT ... WHERE headline LIKE '%cats';
 
-SQLite ���羮ʸ������̤��� ``LIKE`` �򥵥ݡ��Ȥ��ʤ��Τǡ� ``endswith``
-�� ``iendswith`` ��Ʊ���ˤʤ�ޤ���
+SQLite は大小文字を区別する ``LIKE`` をサポートしないので， ``endswith``
+は ``iendswith`` と同じになります．
 
 iendswith
 ~~~~~~~~~
 
-�羮ʸ������̤��ʤ� ends-with �Ǥ���
+大小文字を区別しない ends-with です．
 
-��::
+例::
 
     Entry.objects.filter(headline__iendswith='will')
 
-������ SQL ʸ::
+等価な SQL 文::
 
     SELECT ... WHERE headline ILIKE '%will'
 
 range
 ~~~~~
 
-�ϰϥƥ��� (����ƥ���) �Ǥ���
+範囲テスト (閉包テスト) です．
 
-��::
+例::
 
     start_date = datetime.date(2005, 1, 1)
     end_date = datetime.date(2005, 3, 31)
     Entry.objects.filter(pub_date__range=(start_date, end_date))
 
-������ SQL ʸ::
+等価な SQL 文::
 
     SELECT ... WHERE pub_date BETWEEN '2005-01-01' and '2005-03-31';
 
-``range`` �����ա����͡�ʸ���ʤɡ�SQL �� ``BETWEEN`` ��Ȥ�����ʤ�ɤ���
-��Ȥ��ޤ���
+``range`` は日付，数値，文字など，SQL で ``BETWEEN`` を使える場所ならどこで
+も使えます．
 
 year
 ~~~~
 
-date/datetime �ե�����ɤˤ����롤 year �θ�̩���פǤ���
+date/datetime フィールドにおける， year の厳密一致です．
 
-��::
+例::
 
     Entry.objects.filter(pub_date__year=2005)
 
-������ SQL ʸ::
+等価な SQL 文::
 
     SELECT ... WHERE EXTRACT('year' FROM pub_date) = '2005';
 
-(��̩�� SQL ���󥿥����ϥǡ����١������󥸥�ˤ�äư㤤�ޤ���)
+(厳密な SQL シンタクスはデータベースエンジンによって違います．)
 
 month
 ~~~~~
 
-date/datetime �ե�����ɤˤ����롤 month �θ�̩���פǤ��� 1 (1��)
-���� 12 (12 ��) �ޤǤ�����������ˤȤ�ޤ���
+date/datetime フィールドにおける， month の厳密一致です． 1 (1月)
+から 12 (12 月) までの整数を引数にとります．
 
-��::
+例::
 
     Entry.objects.filter(pub_date__month=12)
 
-������ SQL ʸ::
+等価な SQL 文::
 
     SELECT ... WHERE EXTRACT('month' FROM pub_date) = '12';
 
-(��̩�� SQL ���󥿥����ϥǡ����١������󥸥�ˤ�äư㤤�ޤ���)
+(厳密な SQL シンタクスはデータベースエンジンによって違います．)
 
 day
 ~~~
 
-date/datetime �ե�����ɤˤ����롤 day �θ�̩���פǤ���
+date/datetime フィールドにおける， day の厳密一致です．
 
-��::
+例::
 
     Entry.objects.filter(pub_date__day=3)
 
-������ SQL ʸ::
+等価な SQL 文::
 
     SELECT ... WHERE EXTRACT('day' FROM pub_date) = '3';
 
-(��̩�� SQL ���󥿥����ϥǡ����١������󥸥�ˤ�äư㤤�ޤ���)
-���Υ�����ʸ�ϡ���1 �� 3 ���פ��7 �� 3 ���פΤ褦�ˡ���� 3 �����˥ޥå���
-�ޤ���
+(厳密な SQL シンタクスはデータベースエンジンによって違います．)
+このクエリ文は，「1 月 3 日」や「7 月 3 日」のように，毎月 3 日，にマッチし
+ます．
 
 isnull
 ~~~~~~
 
-``True`` �ޤ��� ``False`` ������ˤȤꡤ���줾�줬 ``IS NULL`` �����
-``IS NOT NULL`` ���б����Ƥ��ޤ���
+``True`` または ``False`` を引数にとり，それぞれが ``IS NULL`` および
+``IS NOT NULL`` に対応しています．
 
-��::
+例::
 
     Entry.objects.filter(pub_date__isnull=True)
 
-������ SQL ʸ::
+等価な SQL 文::
 
     SELECT ... WHERE pub_date IS NULL;
 
 .. admonition:: ``__isnull=True`` vs ``__exact=None``
 
-    ``__isnull=True`` �� ``__exact=None`` �ˤϽ��פʰ㤤������ޤ���
-    SQL ������Ǥ� ``NULL`` ���������ͤ�¸�ߤ��ʤ��Τǡ� ``__exact=None``
-    �� *���* ���η�̥��åȤ��֤����Ȥˤʤ�ޤ��������� ``__isnull`` �ϡ�
-    ����ե�����ɤ� ``NULL`` �ͤ����äƤ��뤫�ɤ�������ӱ黻��Ԥ鷺�˷�
-    �ꤷ�ޤ���
+    ``__isnull=True`` と ``__exact=None`` には重要な違いがあります．
+    SQL の定義では ``NULL`` に等しい値は存在しないので， ``__exact=None``
+    は *常に* 空の結果セットを返すことになります．一方， ``__isnull`` は，
+    指定フィールドに ``NULL`` 値が入っているかどうかを比較演算を行わずに決
+    定します．
 
 search
 ~~~~~~
 
-��ʸ����ǥ�������Ѥ�����ʸ�����ǡ��֡����ͤ��֤��ޤ������Υ᥽�åɤ�
-``contains`` �˻��Ƥ��ޤ�������ʸ����ǥ�����Ȥ�����Ϥ뤫�˹�®�Ǥ���
+全文インデクスを活用した全文検索で、ブール値を返します。このメソッドは
+``contains`` に似ていますが、全文インデクスを使うためはるかに高速です。
 
-���ε�ǽ�� MySQL �Ǥ������Ѳ�ǽ�Ǥ����ޤ�����ʸ����ǥ������ɲä���ˤϥǡ�
-���١�����ľ������ɬ�פ�����ޤ���
+この機能は MySQL でだけ利用可能です。また、全文インデクスを追加するにはデー
+タベースを直接操作する必要があります。
 
 
 .. _Default lookups are exact:
 
-�ǥե���Ȥξȹ������ exact
+デフォルトの照合形式は exact
 ----------------------------
 
-�ȹ���� (lookup type) ����ꤷ�ʤ���硤�Ĥޤꥭ����ɰ�������ť������
-�����������äƤ��ʤ����ϡ��ȹ������ ``exact`` �Ǥ���Ȥߤʤ���ޤ���
+照合形式 (lookup type) を指定しない場合，つまりキーワード引数に二重アンダー
+スコアが入っていない場合は，照合形式は ``exact`` であるとみなされます．
 
-�㤨�С��ʲ�����Ĥ�ʸ�������Ǥ�::
+例えば，以下の二つの文は等価です::
 
-    Blog.objects.get(id__exact=14) # ����Ū�ʷ���
-    Blog.objects.get(id=14) # ���ۤ� __exact ��ɽ��
+    Blog.objects.get(id__exact=14) # 明示的な形式
+    Blog.objects.get(id=14) # 暗黙で __exact を表す
 
-����� ``exact`` �ȹ礬�褯��������Ǥ��뤳�Ȥˤ���ص�Ū�ʤ�ΤǤ���
+これは ``exact`` 照合がよくある形式であることによる便宜的なものです．
 
 .. _The pk lookup shortcut:
 
-pk �ȹ祷�硼�ȥ��å�
+pk 照合ショートカット
 ---------------------
 
-�������Τ���ˡ� Django �ˤ� ``pk`` �Ȥ����ȹ����������ޤ��� ``pk`` ��
-``primary_key`` ��ɽ���ޤ���
+利便性のために， Django には ``pk`` という照合形式があります． ``pk`` は
+``primary_key`` を表します．
 
-``Blog`` ��ǥ����Ǥϡ��祭���� ``id`` �ե�����ɤʤΤǡ��ʲ�����Ĥ�ʸ��
-�����ˤʤ�ޤ�::
+``Blog`` モデルの例では，主キーは ``id`` フィールドなので，以下の二つの文は
+等価になります::
 
-    Blog.objects.get(id__exact=14) # ����Ū�ʷ���
-    Blog.objects.get(id=14) # ���ۤ� __exact ��ɽ��
-    Blog.objects.get(pk=14) # pk �ϰ��ۤ� id__exact ��ɽ��
+    Blog.objects.get(id__exact=14) # 明示的な形式
+    Blog.objects.get(id=14) # 暗黙で __exact を表す
+    Blog.objects.get(pk=14) # pk は暗黙で id__exact を表す
 
-``pk`` �� ``__exact`` �Υ�����ˤ����Ȥ��ʤ��櫓�ǤϤ���ޤ��󡥤ɤΥ�����
-�ѥ�����ɤ� ``pk`` ���Ȥ߹�碌�Ƥ��ޤ��ޤ��� ``pk`` ��Ȥä�������ϡ�
-��ǥ�μ祭�����Ф��륯����ˤʤ�ޤ���
+``pk`` は ``__exact`` のクエリにしか使えないわけではありません．どのクエリ
+用キーワードも ``pk`` と組み合わせてかまいません． ``pk`` を使ったクエリは，
+モデルの主キーに対するクエリになります．
 
-    # id �� 1, 4 ����� 7 �Υ֥�������ȥ���������
+    # id が 1, 4 および 7 のブログエントリを取得する
     Blog.objects.filter(pk__in=[1,4,7])
-    # id > 14 �����ƤΥ֥�������ȥ���������
+    # id > 14 の全てのブログエントリを取得する
     Blog.objects.filter(pk__gt=14)
 
-``pk`` �ˤ�븡���� join �ۤ��Ǥ�Ԥ��ޤ��� �㤨�С��ʲ�����Ĥ�ʸ��������
-��::
+``pk`` による検索は join 越しでも行えます． 例えば，以下の二つの文は等価で
+す::
 
-    Entry.objects.filter(blog__id__exact=3) # ����Ū�ʷ���
-    Entry.objects.filter(blog__id=3) # ���ۤ� __exact ��ɽ��
-    Entry.objects.filter(blog__pk=3) # __pk �ϰ��ۤ� __id__exact ��ɽ��
+    Entry.objects.filter(blog__id__exact=3) # 明示的な形式
+    Entry.objects.filter(blog__id=3) # 暗黙で __exact を表す
+    Entry.objects.filter(blog__pk=3) # __pk は暗黙で __id__exact を表す
 
 .. _Lookups that span relationships:
 
-��졼������ޤ������ȹ�
+リレーションをまたいだ照合
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django �Ǥϡ��ظ�Ǽ�ưŪ�� SQL ``JOIN`` ����������ȹ�κݤ˥�졼������
-�����ספ��롤���ϤǤ���ʤ���ľ��Ū�ʼ��ʤ��󶡤��Ƥ��ޤ�����졼������
-�ޤ����ˤϡ���ť��������������Ȥäƥ�졼������ĥ��줿�ե�����ɤΥե���
-���̾����ꤷ�ޤ�����졼�����֤Υ��ѥ�ϡ���Ū�Υե�����ɤ���ã�����
-�Ǥ�����Ǥ�Ϣ���������ޤ���
+Django では，背後で自動的に SQL ``JOIN`` を処理し，照合の際にリレーションを
+「追跡」する，強力でありながら直感的な手段を提供しています．リレーションを
+またぐには，二重アンダースコアを使ってリレーションの張られたフィールドのフィー
+ルド名を指定します．リレーション間のスパンは，目的のフィールドに到達するま
+でいくらでも連鎖させられます．
 
-�ʲ�����Ǥϡ� ``name`` �� ``'Beatles Blog'`` �Ǥ���褦�� ``Blog`` ��
-``Entry`` ����ȥꥪ�֥����������Ƥ�������ޤ�::
+以下の例では， ``name`` が ``'Beatles Blog'`` であるような ``Blog`` の
+``Entry`` エントリオブジェクト全てを取得します::
 
     Entry.objects.filter(blog__name__exact='Beatles Blog')
 
-���ѥ�Ϲ����ʤ�������ĥ��ޤ���
+スパンは好きなだけ深く張れます．
 
-��졼�����Υ��ѥ�ϵ������ˤ�ĥ��ޤ����ֵ������Ρץ�졼�����򻲾Ȥ�
-��ˤϡ���ǥ�̾��ʸ���ˤ���̾����Ȥ��ޤ���
+リレーションのスパンは逆方向にも張れます．「逆方向の」リレーションを参照す
+るには，モデル名を小文字にした名前を使います．
 
-�ʲ�����Ǥϡ� ``headline`` �� ``'Lennon'`` ��ޤ�褦�� ``Entry`` �򾯤ʤ�
-�Ȥ��Ļ��Ĥ褦�����Ƥ� ``Blog`` ���֥������Ȥ�������ޤ�::
+以下の例では， ``headline`` に ``'Lennon'`` を含むような ``Entry`` を少なく
+とも一つ持つような全ての ``Blog`` オブジェクトを取得します::
 
     Blog.objects.filter(entry__headline__contains='Lennon')
 
 .. _Escaping parenthesis and underscores in LIKE statements:
 
-LIKE ʸ�ˤ�����ѡ�����Ȥȥ�������������Υ���������
+LIKE 文におけるパーセントとアンダースコアのエスケープ
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``LIKE`` ��Ȥ� SQL ʸ�ˤʤ�褦�ʥե�����ɾȹ�᥽�å� (``iexact``,
+``LIKE`` を使う SQL 文になるようなフィールド照合メソッド (``iexact``,
 ``contains``, ``icontains``, ``startswith``, ``istartswith``, ``endswith``,
-``iendswith``) �Ǥϡ� ``LIKE`` ʸ�ǻȤ�����Ĥ��ü��ʸ�������ʤ���ѡ���
-��ȵ���ȥ��������������ưŪ�˥��������פ��ޤ��� (``LIKE`` ʸ�Ǥϡ��ѡ�
-����ȵ����Ǥ�դ�ʣ��ʸ�����Ф���磻��ɥ����ɤ�ɽ�������������������Ǥ
-�դΰ�ʸ�����Ф���磻��ɥ����ɤ�ɽ���ޤ���)
+``iendswith``) では， ``LIKE`` 文で使われる二つの特殊な文字，すなわちパーセ
+ント記号とアンダースコアを自動的にエスケープします． (``LIKE`` 文では，パー
+セント記号は任意の複数文字に対するワイルドカードを表し，アンダースコアは任
+意の一文字に対するワイルドカードを表します．)
 
-���ε�ǽ�ˤ�äơ��ȹ�����ľ��Ū�˹Ԥ����ǡ����١�������ݲ�����ޤ���
-�㤨�С��ѡ�����ȵ����ޤ�褦�ʥ���ȥ����Ƥ������������С��ʲ��Τ褦
-�˥ѡ�����ȵ���򤽤Τޤ޻Ȥ��ޤ�::
+この機能によって，照合操作を直感的に行え，データベースの抽象化を守れます．
+例えば，パーセント記号を含むようなエントリ全てを取得したければ，以下のよう
+にパーセント記号をそのまま使います::
 
     Entry.objects.filter(headline__contains='%')
 
-Django �ϥ������Ȥν����˵����ۤäƤ���ޤ��� SQL �ϰʲ��Τ褦�ʴ����ˤʤ�
-�ޤ�::
+Django はクオートの処理に気を配ってくれます． SQL は以下のような感じになり
+ます::
 
     SELECT ... WHERE headline LIKE '%\%%';
 
-��������������ˤĤ��Ƥ�Ʊ���褦�ʥ��������פ�Ԥ��ޤ����ѡ�����ȵ���ȥ�
-������������Ϥ������Ʃ��Ū�˽�������ޤ���
+アンダースコアについても同じようなエスケープを行います．パーセント記号とア
+ンダースコアはいずれも透過的に処理されます．
 
 .. _Caching and QuerySets:
 
-����å���ȥ����ꥻ�å�
+キャッシュとクエリセット
 ------------------------
 
-�ǡ����١����ؤΥ���������Ǿ��¤ˤȤɤ�뤿�ᡤ�����ꥻ�åȳơ��ˤϥ����
-���夬����ޤ�����ΨŪ�ʥ����ɤ�񤯾�ǡ�����å���Τ��餯������򤷤Ƥ�
-���ΤϽ��פʤ��ȤǤ���
+データベースへのアクセスを最小限にとどめるため，クエリセット各々にはキャッ
+シュがあります．効率的なコードを書く上で，キャッシュのからくりを理解してお
+くのは重要なことです．
 
-�����ꥻ�åȤ��������������줿�����Ǥϡ�����å���϶��Ǥ��������ꥻ�åȤ�
-�ǽ��ɾ�������Ȥ� (���ʤ�����ǡ����١����ؤΥ����꤬�ǽ���������Ȥ�)��
-Django �ϥ������̤򥯥��ꥻ�åȥ��֥���������Υ���å������¸��������Ū
-�˥ꥯ�����Ȥ�����̤��� (�㤨�С������ꥻ�åȤ��Ф��ƥ��ƥ졼���������
-������ˤϡ���̥��åȤκǽ������) ���֤��ޤ�������ʸ�ϡ������ꥻ�å�
-������Ѥ���ȥ���å���Ѥߤη�̤��֤��ޤ���
+クエリセットが新たに生成された時点では，キャッシュは空です．クエリセットを
+最初に評価したとき (すなわち，データベースへのクエリが最初に生じたとき)，
+Django はクエリ結果をクエリセットオブジェクト内のキャッシュに保存し，明示的
+にリクエストした結果だけ (例えば，クエリセットに対してイテレーション操作を
+する場合には，結果セットの最初の要素) を返します．それ以後は，クエリセット
+を際利用するとキャッシュ済みの結果を返します．
 
-���Υ���å���ε�ư��褯�Ф��Ƥ����Ʋ��������Ȥ����Τ⡤�����ꥻ�åȤ���
-��������ʤ��ȡ������̤Ȥ����Ǽ����ޤ��Ϥ�ˤʤ뤫��Ǥ����㤨�С���
-������Ǥ���ĤΥ����ꥻ�åȤ���������ͤ�ɾ�����ơ������˥����ꥻ�åȤ��
-�ƤƤ��ޤäƤ��ޤ�::
+このキャッシュの挙動をよく覚えておいて下さい．というのも，クエリセットを正
+しく扱わないと，おもわぬところで手を噛まれるはめになるからです．例えば，以
+下の例では二つのクエリセットを作成し，値を評価して，すぐにクエリセットを捨
+ててしまっています::
 
     print [e.headline for e in Entry.objects.all()]
     print [e.pub_date for e in Entry.objects.all()]
 
-����Ϥ��ʤ������Ʊ���ǡ����١��������꤬���ټ¹Ԥ��졤�ǡ����١��������
-���ܲä����뤳�Ȥ򼨤��ޤ����ޤ��� ``Entry`` ����ĤΥꥯ�����Ȥ���������
-�ˤ��ɲä��줿�������줿�ꤹ���ǽ�������뤿�ᡤ��ĤΥꥹ�Ȥˤ�ɬ������
-Ʊ���ǡ����١����쥳���ɤ����äƤ���Ȥϸ¤�ޤ���
+これはすなわち全く同じデータベースクエリが二度実行され，データベースの負荷
+を倍加させることを示します．また， ``Entry`` は二つのリクエストを処理する間
+にも追加されたり削除されたりする可能性があるため，二つのリストには必ずしも
+同じデータベースレコードが入っているとは限りません．
 
-��������������򤱤�ˤϡ������ꥻ�åȤ���¸���ƺ����Ѥ��Ƥ�������::
+こうした問題を避けるには，クエリセットを保存して再利用してください::
 
     queryset = Poll.objects.all()
-    print [p.headline for p in queryset] # �����ꥻ�åȤ�ɾ�����ޤ���
-    print [p.pub_date for p in queryset] # ����å�����ͤ�����Ѥ��ޤ���
+    print [p.headline for p in queryset] # クエリセットを評価します．
+    print [p.pub_date for p in queryset] # キャッシュの値を再利用します．
 
 .. _Comparing objects:
 
-���֥������Ȥ����
+オブジェクトの比較
 ==================
 
-��ĤΥ�ǥ륪�֥������Ȥ���Ӥ���ˤϡ�ɸ��� Python ��ӱ黻�ҡ����ʤ��
-���������: ``==`` ��Ȥ��ޤ����ظ�Ǥ���ĤΥ�ǥ륪�֥������ȴ֤μ祭����
-����Ӥ���ޤ���
+二つのモデルオブジェクトを比較するには，標準の Python 比較演算子，すなわち
+二重等号符: ``==`` を使います．背後では二つのモデルオブジェクト間の主キー値
+が比較されます．
 
-��� ``Entry`` ����Ǥϡ��ʲ�����Ĥ�ʸ�������ˤʤ�ޤ�::
+上の ``Entry`` の例では，以下の二つの文は等価になります::
 
     some_entry == other_entry
     some_entry.id == other_entry.id
 
-��ǥ�μ祭���� ``id`` �Ȥ���̾���Ǥʤ��Ƥ�����Ϥ���ޤ��󡥤ɤΤ褦��̾
-���Ǥ��졤��ӤϾ�˼祭����ȤäƹԤ��ޤ����㤨�С���ǥ�μ祭���Υե���
-���̾�� ``name`` �Ǥ���С��ʲ�����Ĥ�ʸ�������ˤʤ�ޤ�::
+モデルの主キーが ``id`` という名前でなくても問題はありません．どのような名
+前であれ，比較は常に主キーを使って行われます．例えば，モデルの主キーのフィー
+ルド名が ``name`` であれば，以下の二つの文は等価になります::
 
     some_obj == other_obj
     some_obj.name == other_obj.name
 
 .. _Complex lookups with Q objects:
 
-Q ���֥������Ȥ�Ȥä�ʣ���ʾȹ�
+Q オブジェクトを使った複雑な照合
 ================================
 
-``filter()`` �ʤɤ�ʣ���Υ�����ɰ�������ꤷ�ƥ������Ԥ��ȡ��ơ��Υ���
-��ɰ�����ɽ���ȹ���ϰ㤤�� "AND" �Ƿ�Ф�ޤ������ʣ���ʥ����� (�㤨
-�� ``OR`` ��Ȥä�������) ��¹Ԥ���ɬ�פ�������ˤ� ``Q`` ���֥������Ȥ�
-�Ȥ��ޤ���
+``filter()`` などで複数のキーワード引数を指定してクエリを行うと，各々のキー
+ワード引数の表す照合条件は違いに "AND" で結ばれます．より複雑なクエリ (例え
+ば ``OR`` を使ったクエリ) を実行する必要がある場合には ``Q`` オブジェクトを
+使えます．
 
-``Q`` ���֥������� (``django.db.models.query.Q``) �ϡ�ʣ���Υ�����ɰ���
-�򥫥ץ��벽���뤿��˻Ȥ��ޤ���������ɰ��������Ҥ� 
-`�ե�����ɤξȹ�`_ ������������Τ�Ʊ���Ǥ���
+``Q`` オブジェクト (``django.db.models.query.Q``) は，複数のキーワード引数
+をカプセル化するために使われます．キーワード引数は前述の 
+`フィールドの照合`_ で説明したものと同じです．
 
-�㤨�С��ʲ��� ``Q`` ���֥������Ȥ�ñ��� ``LIKE`` ������򥫥ץ��벽���Ƥ�
-�ޤ�::
+例えば，以下の ``Q`` オブジェクトは単一の ``LIKE`` クエリをカプセル化してい
+ます::
 
     Q(question__startswith='What')
 
-``Q`` ���֥������Ȥ� ``&`` �� ``|`` �Ȥ��ä��黻�Ҥ��Ȥ߹�碌���ޤ�����
-���ҤǷ�Ф줿��Ĥ� ``Q`` ���֥������ȤϿ����� ``Q`` ���֥������Ȥˤʤ��
-����
+``Q`` オブジェクトは ``&`` や ``|`` といった演算子で組み合わせられます．演
+算子で結ばれた二つの ``Q`` オブジェクトは新たな ``Q`` オブジェクトになりま
+す．
 
-�㤨�С��ʲ���ʸ����Ĥ� ``question__startswith`` ������� "OR" ������Τ�
-ɽ��ñ��� ``Q`` ���֥������Ȥˤʤ�ޤ�::
+例えば，以下の文は二つの ``question__startswith`` クエリを "OR" したものを
+表す単一の ``Q`` オブジェクトになります::
 
     Q(question__startswith='Who') | Q(question__startswith='What')
 
 
-���� ``Q`` ���֥������Ȥϰʲ��� ``WHERE`` ���Ʊ���ˤʤ�ޤ�::
+この ``Q`` オブジェクトは以下の ``WHERE`` 節と同じになります::
 
     WHERE question LIKE 'Who%' OR question LIKE 'What%'
 
-``Q`` ���֥������Ȥ� ``&`` �� ``|`` ���Ȥ߹�碌��С������ʤ���ʣ���ʥ���
-��ʸ������Ǥ��ޤ����ݳ�̤�Ȥä����롼�ԥ󥰤��ǽ�Ǥ���
+``Q`` オブジェクトを ``&`` と ``|`` で組み合わせれば，好きなだけ複雑なクエ
+リ文を作成できます．丸括弧を使ったグルーピングも可能です．
 
-������ɰ�����Ȥ�ȹ�ؿ� (``filter()``, ``exclude()``, ``get()`` �ʤ�)
-�ˤϡ�ʣ���� ``Q`` ���������Ȥ��� (̾���ʤ��ΰ����Ȥ���) �Ϥ��ޤ���ʣ����
-``Q`` ���֥������Ȥ�ȹ�ؿ����Ϥ�����硤�����ϸߤ��� "AND" �Ƿ�Ф�ޤ���
-�㤨��::
+キーワード引数をとる照合関数 (``filter()``, ``exclude()``, ``get()`` など)
+には，複数の ``Q`` を固定引数として (名前なしの引数として) 渡せます．複数の
+``Q`` オブジェクトを照合関数に渡した場合，それらは互いに "AND" で結ばれます．
+例えば::
 
     Poll.objects.get(
         Q(question__startswith='Who'),
         Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6))
     )
 
-�ϡ����������ʲ��Τ褦�� SQL �ˤʤ�ޤ�::
+は，だいたい以下のような SQL になります::
 
     SELECT * from polls WHERE question LIKE 'Who%'
         AND (pub_date = '2005-05-02' OR pub_date = '2005-05-06')
 
-�ȹ�ؿ��� ``Q`` ���֥������Ȥȥ�����ɰ����򺮤��ƻȤ��ޤ����ȹ�ؿ�����
-�������Ƥΰ����� (������ɰ����� ``Q`` ���֥������Ȥ�) �ߤ��� "AND" �Ƿ�
-�Ф�ޤ����������� ``Q`` ����ꤹ����ϤɤΥ�����ɰ����������˻��ꤻ
-�ͤФʤ�ޤ��󤿤Ȥ���::
+照合関数は ``Q`` オブジェクトとキーワード引数を混ぜて使えます．照合関数に渡
+した全ての引数は (キーワード引数も ``Q`` オブジェクトも) 互いに "AND" で結
+ばれます．ただし， ``Q`` を指定する場合はどのキーワード引数よりも前に指定せ
+ねばなりませんたとえば::
 
 
     Poll.objects.get(
         Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6)),
         question__startswith='Who')
 
-��ͭ���ʥ�����ǡ��������Ʊ���ˤʤ�ޤ������ʲ���ʸ::
+は有効なクエリで，前の例と同じになりますが，以下の文::
 
     # INVALID QUERY
     Poll.objects.get(
         question__startswith='Who',
         Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6)))
 
-��̵���Ǥ���
+は無効です．
 
-`OR lookups examples page`_ ����⻲�Ȥ��Ƥ���������
+`OR lookups examples page`_ の例も参照してください．
 
 .. _OR lookups examples page: ../models/or_lookups/
 
 .. _Related objects:
 
-��졼�����
+リレーション
 ============
 
-��ǥ���ǥ�졼����� (``ForeignKey``, ``OneToOneField``,
-``ManyToManyField``) ���������ȡ����Υ�ǥ�Υ��󥹥��󥹤ϥ�졼�������
-�Υ��֥������Ȥ˥����������뤿��������� API ����Ĥ褦�ˤʤ�ޤ���
+モデル内でリレーション (``ForeignKey``, ``OneToOneField``,
+``ManyToManyField``) を定義すると，そのモデルのインスタンスはリレーション先
+のオブジェクトにアクセスするための便利な API を持つようになります．
 
-���Υɥ�����Ȥ���Ƭ�Υ�ǥ����ˤȤ�ȡ� ``Entry`` ���֥������� ``e`` 
-�ϡ� ``e`` �˴�Ϣ�Ť����Ƥ��� ``Blog`` ���֥������Ȥ� ``blog`` �Ȥ���°��
-��Ȥä� ``e.blog`` �Τ褦�˥��������Ǥ��ޤ���
+このドキュメントの冒頭のモデルを例にとると， ``Entry`` オブジェクト ``e`` 
+は， ``e`` に関連づけられている ``Blog`` オブジェクトに ``blog`` という属性
+を使って ``e.blog`` のようにアクセスできます．
 
-(����΢�Ǥϡ����ε�ǽ�� Python �� `�ǥ�����ץ�`_ ��ȤäƼ�������Ƥ��ޤ���
-������ɤ����Ȥ����櫓�ǤϤ���ޤ��󤬡���̣�Τ���ͤΤ���ˤ����ǻ�Ŧ����
-�����ޤ���)
+(舞台裏では，この機能は Python の `デスクリプタ`_ を使って実装されています．
+だからどうだというわけではありませんが，興味のある人のためにここで指摘して
+おきます．)
 
-Django �Ϥޤ�����졼�����Ρ����¦�פؤΥ������� API�����ʤ����졼����
-���ĥ��줿¦�����졼������ĥ�ä�¦�Υ�ǥ�ؤΥ�󥯤�������ޤ�����
-���С� ``Blog`` ���֥������� ``b`` �ϡ���졼������ĥ�ä����Ƥ� ``Entry``
-���֥������ȤΥꥹ�Ȥ� ``entry_set`` °����Ȥä� ``b.entry_set.all()`` ��
-�褦�˥��������Ǥ��ޤ���
+Django はまた，リレーションの「相手側」へのアクセス API，すなわちリレーショ
+ンを張られた側からリレーションを張った側のモデルへのリンクも作成します．例
+えば， ``Blog`` オブジェクト ``b`` は，リレーションを張った全ての ``Entry``
+オブジェクトのリストに ``entry_set`` 属性を使って ``b.entry_set.all()`` の
+ようにアクセスできます．
 
-������Ǥ���ϡ�������Ƭ�˼����� ``Blog`` ``Blog``, ``Author``, ``Entry``
-�Υ�ǥ��ȤäƤ��ޤ���
+この節での例は，全て冒頭に示した ``Blog`` ``Blog``, ``Author``, ``Entry``
+のモデルを使っています．
 
-.. _`�ǥ�����ץ�`: http://users.rcn.com/python/download/Descriptor.htm
+.. _`デスクリプタ`: http://users.rcn.com/python/download/Descriptor.htm
 .. _descriptors: http://users.rcn.com/python/download/Descriptor.htm
 
 .. _One-to-many relationships:
 
-����¿�Υ�졼�����
+一対多のリレーション
 --------------------
 
 .. _Forward:
 
-������
+順方向
 ~~~~~~
 
-��ǥ�� ``ForeignKey`` �ե�����ɤ������硤���Υ�ǥ�Υ��󥹥��󥹤ϡ�
-ñ��°����Ȥäƥ�졼������� (����) �Υ��֥������Ȥ򻲾ȤǤ��ޤ���
+モデルに ``ForeignKey`` フィールドがある場合，そのモデルのインスタンスは，
+単に属性を使ってリレーション先 (外部) のオブジェクトを参照できます．
 
-��::
+例::
 
     e = Entry.objects.get(id=2)
-    e.blog # ��졼�������� Blog ���֥������Ȥ��֤��ޤ���
+    e.blog # リレーション先の Blog オブジェクトを返します．
 
-��������°�����ͤϼ��� (get) ������ (set) ��Ǥ��ޤ��������ʤ��顤��������
-�ؤ��ѹ��� ``save()`` ��ƤӽФ��ޤǥǡ����١�����ȿ�Ǥ���ޤ���
+外部キー属性の値は取得 (get) も設定 (set) もできます．当然ながら，外部キー
+への変更は ``save()`` を呼び出すまでデータベースに反映されません．
 
-��::
+例::
 
     e = Entry.objects.get(id=2)
     e.blog = some_blog
     e.save()
 
-``ForeignKey`` �ե�����ɤ� ``null=True`` �����ꤵ��Ƥ������ (``NULL`` ��
-������Ƥ�����)���ʲ�����Τ褦�� ``None`` �������Ǥ��ޤ�::
+``ForeignKey`` フィールドに ``null=True`` が設定されていた場合 (``NULL`` 値
+を許している場合)，以下の例のように ``None`` を代入できます::
 
     e = Entry.objects.get(id=2)
     e.blog = None
     e.save() # "UPDATE blog_entry SET blog_id = NULL ...;"
 
-����¿�Υ�졼�����ˤ�����������Υ��������ϡ���졼�������Υ��֥�����
-�Ȥ˺ǽ�˥������������ݤ˥���å��夵��ޤ�������ʹߤΥ��������Ǥϡ�Ʊ��
-���֥������ȥ��󥹥��󥹤γ��������ؤΥ��������ϥ���å��夵�줿�ͤ��֤���
-�����㤨��::
+一対多のリレーションにおける順方向のアクセスは，リレーション先のオブジェク
+トに最初にアクセスした際にキャッシュされます．それ以降のアクセスでは，同じ
+オブジェクトインスタンスの外部キーへのアクセスはキャッシュされた値を返しま
+す．例えば::
 
     e = Entry.objects.get(id=2)
-    print e.blog  # �ǡ����١����򸡺����ơ���Ϣ�Ť���줿 Blog ���֤��ޤ���
-    print e.blog  # �ǡ����١����ϸ�������������å����Ȥ��ޤ���
+    print e.blog  # データベースを検索して，関連づけられた Blog を返します．
+    print e.blog  # データベースは検索せず，キャッシュを使います．
 
-�����ꥻ�åȤΥ᥽�å� ``select_related()`` ��Ȥ��ȡ�����¿�Υ�졼�����
-�Υ�졼������襪�֥����������Ƥ򤢤餫����Ƶ�Ū�˥���å���˼����ߤ�
-�����㤨��::
+クエリセットのメソッド ``select_related()`` を使うと，一対多のリレーション
+のリレーション先オブジェクト全てをあらかじめ再帰的にキャッシュに取り込みま
+す．例えば::
 
     e = Entry.objects.select_related().get(id=2)
     print e.blog  # Doesn't hit the database; uses cached version.
     print e.blog  # Doesn't hit the database; uses cached version.
 
-``select_related()`` �Υɥ�����Ȥϡ����ҤΡ� �����ʥ����ꥻ�åȤ��֤���
-���ꥻ�åȥ᥽�åɡפ���ˤ���ޤ���
+``select_related()`` のドキュメントは，前述の「 新たなクエリセットを返すク
+エリセットメソッド」の節にあります．
 
 .. _Backward:
 
-������
+逆方向
 ~~~~~~
 
-�����ǥ뤬 ``ForeignKey`` ���̤Υ�ǥ�˥�졼������ĥ�äƤ����硤��
-�졼������ĥ��줿¦�Υ�ǥ�Υ��󥹥��󥹤ϡ���졼������ĥ�ä�¦�Υ�
-�ǥ�����ƤΥ��󥹥��󥹤��֤��ޥͥ���˥��������Ǥ���褦�ˤʤ�ޤ�����졼
-������ĥ�äƤ���¦�Υ�ǥ�̾�����ƾ�ʸ���ˤ�����Τ� ``FOO`` �Ȥ���ȡ���
-�ͥ����̾���Υǥե�����ͤ� ``FOO_set`` �ˤʤ�ޤ������Υޥͥ���ϥ����ꥻ��
-�Ȥ��֤��ޤ��������ꥻ�åȤˤ����ҤΡ֥��֥������Ȥμ����פ�������������ե�
-�륿������Ԥ��ޤ���
+あるモデルが ``ForeignKey`` で別のモデルにリレーションを張っている場合，リ
+レーションを張られた側のモデルのインスタンスは，リレーションを張った側のモ
+デルの全てのインスタンスを返すマネジャにアクセスできるようになります．リレー
+ションを張っている側のモデル名を全て小文字にしたものを ``FOO`` とすると，マ
+ネジャの名前のデフォルト値は ``FOO_set`` になります．このマネジャはクエリセッ
+トを返します．クエリセットには前述の「オブジェクトの取得」の節で説明したフィ
+ルタや操作を行えます．
 
-��::
+例::
 
     b = Blog.objects.get(id=1)
-    b.entry_set.all() # Blog �˴�Ϣ�Ť���줿���Ƥ� Entry ���֤��ޤ���
+    b.entry_set.all() # Blog に関連づけられた全ての Entry を返します．
 
-    # b.entry_set �ϥ����ꥻ�åȤ��֤��ޥͥ���Ǥ���
+    # b.entry_set はクエリセットを返すマネジャです．
     b.entry_set.filter(headline__contains='Lennon')
     b.entry_set.count()
 
-``ForeignKey`` ���������Ȥ��� ``related_name`` �ѥ�᥿�����ꤷ�Ƥ����ȡ�
-``FOO_set`` ��̾���򥪡��Х饤�ɤǤ��ޤ����㤨�С� ``Entry`` ��ǥ�������
-``blog = ForeignKey(Blog, related_name='entries')`` �Τ褦�˲����ȡ����
-��������ϰʲ��Τ褦�ˤʤ�ޤ�::
+``ForeignKey`` を定義するときに ``related_name`` パラメタを設定しておくと，
+``FOO_set`` の名前をオーバライドできます．例えば， ``Entry`` モデルの定義を
+``blog = ForeignKey(Blog, related_name='entries')`` のように改めると，上の
+コード例は以下のようになります::
 
     b = Blog.objects.get(id=1)
-    b.entries.all() # Blog �˴�Ϣ�Ť���줿���Ƥ� Entry ���֤��ޤ���
+    b.entries.all() # Blog に関連づけられた全ての Entry を返します．
 
-    # b.entries �ϥ����ꥻ�åȤ��֤��ޥͥ���Ǥ���
+    # b.entries はクエリセットを返すマネジャです．
     b.entries.filter(headline__contains='Lennon')
     b.entries.count()
 
-``ForeignKey`` �Υޥͥ���ؤεդΥ��������ϤǤ��ޤ��� ``ForeignKey`` �ϥ�
-�󥹥��󥹤Ȥ��ƥ����������ͤФʤ�ޤ����㤨��::
+``ForeignKey`` のマネジャへの逆のアクセスはできません． ``ForeignKey`` はイ
+ンスタンスとしてアクセスせねばなりません．例えば::
 
 
-    # AttributeError: "Manager must be accessed via instance" �����Ф��ޤ���
+    # AttributeError: "Manager must be accessed via instance" を送出します．
     Blog.entry_set 
 
-���ҤΡ֥��֥������Ȥμ����פ��������������ꥻ�åȤΥ᥽�åɤ˲ä��ơ�
-``ForeignKey`` ��𤷤��ޥͥ���ϰʲ����ɲäΥ᥽�åɤ������Ƥ��ޤ�:
+前述の「オブジェクトの取得」で説明したクエリセットのメソッドに加えて，
+``ForeignKey`` を介したマネジャは以下の追加のメソッドを備えています:
 
-    * ``add(obj1, obj2, ...)``: ����Υ�ǥ륪�֥������Ȥ��졼������襪
-      �֥������ȤΥ��åȤ˲ä��ޤ���
+    * ``add(obj1, obj2, ...)``: 指定のモデルオブジェクトをリレーション先オ
+      ブジェクトのセットに加えます．
 
-      ��::
+      例::
 
           b = Blog.objects.get(id=1)
           e = Entry.objects.get(id=234)
           b.entry_set.add(e) # Associates Entry e with Blog b.
 
-    * ``create(**kwargs)``: �����ʥ��֥������Ȥ����������¸���ơ���졼����
-      ���襪�֥������ȤΥ��åȤ˲ä��ޤ��������������֥������Ȥ��֤��ޤ���
+    * ``create(**kwargs)``: 新たなオブジェクトを作成し，保存して，リレーショ
+      ン先オブジェクトのセットに加えます．作成したオブジェクトを返します．
 
-      ��::
+      例::
 
           b = Blog.objects.get(id=1)
           e = b.entry_set.create(headline='Hello', body_text='Hi', 
               pub_date=datetime.date(2005, 1, 1))
-          # ��ưŪ�� save() �����Τǡ� e.save() ��Ƥ�ɬ�פϤ���ޤ���
+          # 自動的に save() されるので， e.save() を呼ぶ必要はありません．
 
-      ����ϰʲ�������Ʊ���Ǥ� (���������Ԥ������ʷ�Ǥ�)::
+      これは以下の操作と同じです (ただし前者の方が簡潔です)::
 
           b = Blog.objects.get(id=1)
           e = Entry(blog=b, headline='Hello', body_text='Hi', 
               pub_date=datetime.date(2005, 1, 1))
           e.save()
 
-      ��ǥ뤫�饪�֥������Ȥ��������Ȥ��ˡ���졼������������뤿���
-      ������ɰ�����ɬ�פȤ��ʤ����Ȥ����դ��Ʋ������������Ǥϡ�
-      ``create()`` �� ``blog`` �ѥ�᥿���Ϥ��Ƥ��ޤ��� Django ��
-      ``Entry`` ���֥������Ȥ� ``blog`` �ե�����ɤ��ͤ� ``b`` �Ǥ��뤳�Ȥ�
-      ��ʬ��Ƚ�̤��ޤ���
+      モデルからオブジェクトを作成するときに，リレーションを定義するための
+      キーワード引数を必要としないことに注意して下さい．上の例では，
+      ``create()`` に ``blog`` パラメタを渡していません． Django は
+      ``Entry`` オブジェクトの ``blog`` フィールドの値が ``b`` であることを
+      自分で判別します．
 
-    * ``remove(obj1, obj2, ...)``: ��졼������襪�֥������ȤΥ��åȤ��顤
-      ����Υ��֥������Ȥ����ޤ���
+    * ``remove(obj1, obj2, ...)``: リレーション先オブジェクトのセットから，
+      指定のオブジェクトを除去します．
 
-      ��::
+      例::
 
           b = Blog.objects.get(id=1)
           e = Entry.objects.get(id=234)
-          b.entry_set.remove(e) # Blog b ���� Entry e �����ޤ���
+          b.entry_set.remove(e) # Blog b から Entry e を除去します．
 
-      �ǡ����١����ΰ����������ʤ��褦�ˤ��뤿�ᡤ���Υ᥽�åɤ�
-      ``null=True`` �Ǥ��� ``ForeignKey`` ���֥������ȤǤ����Ȥ��ޤ��󡥥�
-      �졼�������Υե�����ɤ� ``None`` (``NULL``) �ˤǤ��ʤ���硤���륪
-      �֥������Ȥ������褦�Ȥ����Ȥ��ˡ�ɬ�����餫���̤Υ��֥������Ȥ���
-      �ä��ͤФʤ�ʤ��ʤ뤫��Ǥ��������Ǥϡ� ``b.entry_set()`` ����
-      ``e`` ���������� ``e.blog = None`` ��Ʊ���ˤʤꡤ ��������
-      ``blog`` �� ``null=True`` �Ǥʤ������̵�������ˤʤ�ޤ���
+      データベースの一貫性を壊さないようにするため，このメソッドは
+      ``null=True`` である ``ForeignKey`` オブジェクトでしか使えません．リ
+      レーション先のフィールドを ``None`` (``NULL``) にできない場合，あるオ
+      ブジェクトを削除しようとしたときに，必ず何らかの別のオブジェクトに追
+      加せねばならなくなるからです．上の例では， ``b.entry_set()`` から
+      ``e`` を除去する操作は ``e.blog = None`` と同じになり， 外部キー
+      ``blog`` が ``null=True`` でないために無効な操作になります．
 
-    * ``clear()``: ��졼������襪�֥������ȤΥ��åȤ������ƤΥ��֥�������
-      �����ޤ���
+    * ``clear()``: リレーション先オブジェクトのセットから全てのオブジェクト
+      を除去します．
 
-      ��::
+      例::
 
           b = Blog.objects.get(id=1)
           b.entry_set.clear()
 
-      ��졼�������Υ��֥����������Ƥ�������櫓�ǤϤ���ޤ���ñ�˥�
-      �졼����������������Ǥ���
+      リレーション先のオブジェクト全てを削除するわけではありません．単にリ
+      レーションを解除するだけです．
 
-      ``remove()`` �� ``clear()`` ��Ʊ�͡� ``null=True`` �Ǥ���褦�ʳ�������
-      �Ǥ����Ȥ��ޤ���
+      ``remove()`` や ``clear()`` と同様， ``null=True`` であるような外部キー
+      でしか使えません．
 
-��졼������襻�åȤΥ��Ф������������ˤϡ����ƥ졼������ǽ���֥���
-���Ȥ��������ޤ����㤨��::
+リレーション先セットのメンバを一括で代入するには，イテレーション可能オブジェ
+クトを代入します．例えば::
 
     b = Blog.objects.get(id=1)
     b.entry_set = [e1, e2]
 
-``clear()`` �᥽�åɤ����ѤǤ����硤���ƥ졼������ǽ���֥������� (���
-��Ǥϥꥹ��) ���饪�֥������Ȥ� ``entry_set`` ���ɲä������ˡ�������Υ���
-�Ȥ˴���¸�ߤ��륪�֥������Ȥ����ƽ���ޤ��� ``clear()`` �᥽�åɤ����� 
-*�Ǥ��ʤ�* ��硤����¸�ߤ��륪�֥������Ȥ���������ñ�˥��ƥ졼������ǽ
-���֥������Ⱦ�����ƤΥ��֥������Ȥ��ɲä��ޤ���
+``clear()`` メソッドを利用できる場合，イテレーション可能オブジェクト (上の
+例ではリスト) からオブジェクトを ``entry_set`` に追加する前に，代入先のセッ
+トに既に存在するオブジェクトを全て除去します． ``clear()`` メソッドを利用 
+*できない* 場合，既に存在するオブジェクトを削除せず，単にイテレーション可能
+オブジェクト上の全てのオブジェクトを追加します．
 
-����������������ֵ������Ρ����ϡ��������ǡ����١�����¨���ѹ����ޤ���
-����̤��ɲá���������������Ȥ��ä�����Ԥ��٤�¨�¤˼�ưŪ�˥ǡ����١�
-������¸����ޤ���
+この節で説明した「逆方向の」操作は，いずれもデータベースを即時変更します．
+操作結果は追加，新規作成，削除といった操作を行う度に即座に自動的にデータベー
+スに保存されます．
 
 .. _Many-to-many relationships:
 
-¿��¿�Υ�졼�����
+多対多のリレーション
 --------------------
 
-¿��¿�Υ�졼�����ξ�硤��졼�����δط��ˤ����ǥ�ΰ����ϡ��ߤ���
-�⤦�����˥����������뤿��μ�ư API ��������ޤ������� API �ϰ���¿�Υ�졼
-�����ˤ�����ֵ������Ρ׻��ȤΤ褦��ư��ޤ������Ҥ� `������`_ �򻲾Ȥ�
-�Ƥ���������
+多対多のリレーションの場合，リレーションの関係にあるモデルの一方は，互いに
+もう一方にアクセスするための自動 API を獲得します．この API は一対多のリレー
+ションにおける「逆方向の」参照のように動作します．前述の `逆方向`_ を参照し
+てください．
 
-����¿�Υ�졼�����Ȥ�ͣ��ΰ㤤�ϡ�°����̾���Ť���§�Ǥ���
-``ManyToManyField`` ���������¦�Υ�ǥ�ϥե������̾�򤽤Τޤ޻Ȥ��ޤ�����
-��ȿ��¦�Ρץ�ǥ�Ǥϡ����Υ�ǥ�Υ�ǥ�̾��ʸ���ˤ��ơ� ``'_set'``
-���ɲä������ (����¿�Υ�졼�����ˤ�����������λ��Ȥ�Ʊ��) �ˤʤ�ޤ���
+一対多のリレーションとの唯一の違いは，属性の名前づけ規則です．
+``ManyToManyField`` を定義した側のモデルはフィールド名をそのまま使いますが，
+「反対側の」モデルでは，相手のモデルのモデル名を小文字にして， ``'_set'``
+を追加したもの (一対多のリレーションにおける逆方向の参照と同じ) になります．
 
-���Ȥä����������������򤷤䤹���Ǥ��礦::
+例を使って説明した方が理解しやすいでしょう::
 
     e = Entry.objects.get(id=3)
-    e.authors.all() # Entry �����Ƥ� Author ���֥������Ȥ��֤��ޤ���
+    e.authors.all() # Entry の全ての Author オブジェクトを返します．
     e.authors.count()
     e.authors.filter(name__contains='John')
 
     a = Author.objects.get(id=5)
-    a.entry_set.all() # Author �����Ƥ� Entry ���֥������Ȥ��֤��ޤ���
+    a.entry_set.all() # Author の全ての Entry オブジェクトを返します．
 
-``ForeignKey`` ��Ʊ�͡� ``ManyToManyField`` �ˤ� ``related_name`` �ѥ�᥿
-�����Ǥ��ޤ��� �����ǡ� ``Entry`` �� ``ManyToManyField`` ��
-``related_name='entries'`` ����ꤷ�Ƥ�����硤 ``Author`` ���󥹥��󥹤�
-``entry_set`` �ǤϤʤ� ``entries`` �Ȥ���°������Ĥ褦�ˤʤ�ޤ���
+``ForeignKey`` と同様， ``ManyToManyField`` には ``related_name`` パラメタ
+を指定できます． 上の例で， ``Entry`` の ``ManyToManyField`` に
+``related_name='entries'`` を指定していた場合， ``Author`` インスタンスは
+``entry_set`` ではなく ``entries`` という属性を持つようになります．
 
 
 .. _One-to-one relationships:
 
-���а�Υ�졼�����
+一対一のリレーション
 --------------------
 
-���а�Υ�졼�����Υ��ޥ�ƥ������Ϥޤ�ʤ��ѹ������Τǡ��Ȥ�ʤ��褦
-�˴���ޤ���
+一対一のリレーションのセマンティクスはまもなく変更されるので，使わないよう
+に勧めます．
 
 .. _How are the backward relationships possible?:
 
-��졼�����θ������ȤϤɤ���äƼ¸�����Ƥ���Τ�
+リレーションの後方参照はどうやって実現されているのか
 ----------------------------------------------------
 
-¾�Υ��֥������ȥ�졼����ʥ�ޥåѤǤϡ������������졼�������������
-�Фʤ�ޤ��� Django �γ�ȯ�Ԥ����Ϥ���� DRY § (Don't Repeat Yourself)
-�ο��Ȥ��ȹͤ������ᡤ Django �Ǥ����������ǥ�졼�������������Ф褤��
-���ˤ��Ƥ��ޤ���
+他のオブジェクトリレーショナルマッパでは，双方向からリレーションを定義せね
+ばなりません． Django の開発者たちはこれを DRY 則 (Don't Repeat Yourself)
+の侵犯だと考えたため， Django では片方だけでリレーションを定義すればよいよ
+うにしています．
 
-���������ʤ������ǥ륯�饹������ʬ���Ф��ƥ�졼������ĥ�äƤ����ǥ�
-���饹�Τ��Ȥ򡤤��Υ��饹�������ɤ�������˸��ΤǤ���ΤǤ��礦����
+しかし，なぜあるモデルクラスが，自分に対してリレーションを張っているモデル
+クラスのことを，そのクラスがロードされる前に検知できるのでしょうか？
 
-������ ``INSTALLED_APPS`` ����ˤ���ޤ����ǽ�˥�ǥ������ɤ������ˡ�
-Django �� ``INSTALLED_APPS`` �����ƤΥ�ǥ���������ơ�ɬ�פ˱����Ƹ�������
-�������˺������ޤ��� ``INSTALLED_APPS`` ���ܼ�Ū�ʵ�ǽ�ΰ�Ĥϡ� Django
-�˥�ǥ�ɥᥤ������������Τ餻�뤳�ȤʤΤǤ���
+答えは ``INSTALLED_APPS`` 設定にあります．最初にモデルをロードした時に，
+Django は ``INSTALLED_APPS`` の全てのモデルを走査して，必要に応じて後方参照
+をメモリ中に作成します． ``INSTALLED_APPS`` の本質的な機能の一つは， Django
+にモデルドメインの全体像を知らせることなのです．
 
 .. _Queries over related objects:
 
-��졼������襪�֥������Ȥ�Ȥä�������
+リレーション先オブジェクトを使ったクエリ
 ----------------------------------------
 
-��졼�������Υ��֥������Ȥ�ȹ���˴ޤ९����ϡ��̾���ͤΥե������
-�����ä��������Ʊ���褦�ʵ�§�˽����ޤ���������˥ޥå����Ȥ����ͤ����
-�����硢���֥������ȤΥ��󥹥��󥹼��Τ������֥������Ȥμ祭���ͤΤ�����
-����Ȥ��ޤ���
+リレーション先のオブジェクトを照合条件に含むクエリは、通常の値のフィールド
+の入ったくえりと同じような規則に従います。クエリにマッチ条件として値を指定
+する場合、オブジェクトのインスタンス自体か、オブジェクトの主キー値のいずれ
+かを使えます。
 
-�㤨�С� ``id=5`` �Ǥ���褦��Blog ���֥������� ``b`` ���Ф��Ƥϡ��ʲ��λ�
-�ĤΥ�����Ϥ��٤������ˤʤ�ޤ�::
+例えば、 ``id=5`` であるようなBlog オブジェクト ``b`` に対しては、以下の三
+つのクエリはすべて等価になります::
 
-    Entry.objects.filter(blog=b) # ���֥������ȥ��󥹥��󥹤�Ȥä�������
-    Entry.objects.filter(blog=b.id) # ���󥹥��󥹤� id ��Ȥä�������
-    Entry.objects.filter(blog=5) # id ��ľ�ܻȤä�������
+    Entry.objects.filter(blog=b) # オブジェクトインスタンスを使ったクエリ
+    Entry.objects.filter(blog=b.id) # インスタンスの id を使ったクエリ
+    Entry.objects.filter(blog=5) # id を直接使ったクエリ
 
 .. _Deleting objects:
 
-���֥������Ȥκ��
+オブジェクトの削除
 ==================
 
-����ѤΥ᥽�åɤˤϡ��ص�Ū�� ``delete()`` �Ȥ���̾�����դ��Ƥޤ������Υ�
-���åɤϥ��֥������Ȥ򤿤����˺����������ͤ��֤��ޤ����㤨��::
+削除用のメソッドには，便宜的に ``delete()`` という名前が付いてます．このメ
+ソッドはオブジェクトをただちに削除し，戻り値を返しません．例えば::
 
     e.delete()
 
-ʣ���Υ��֥������Ȥΰ��ƺ�����ǽ�Ǥ��� ``QuerySet`` �ˤ� ``delete()``
-�᥽�åɤ����ꡤ ``QuerySet`` �����ƤΥ��Ф������ޤ���
+複数のオブジェクトの一斉削除も可能です． ``QuerySet`` には ``delete()``
+メソッドがあり， ``QuerySet`` の全てのメンバを削除します．
 
-�㤨�С� ``pub_date`` �� 2005 ǯ�� ``Entry`` ���֥������Ȥ����ƺ������ˤ�
-�ʲ��Τ褦�ˤ��ޤ�::
+例えば， ``pub_date`` が 2005 年の ``Entry`` オブジェクトを全て削除するには
+以下のようにします::
 
     Entry.objects.filter(pub_date__year=2005).delete()
 
-Django �ϡ����֥������Ȥ�������ݤˡ�SQL�Ǥ��� ``ON DELETE CASCADE`` ����
-�򥨥ߥ�졼�Ȥ��ޤ������ʤ��������оݤΥ��֥������Ȥ�ؤ��褦�ʳ�������
-��������ƤΥ��֥������Ȥ�Ʊ���˺�������ΤǤ���::
+Django は，オブジェクトを削除する際に，SQLでいう ``ON DELETE CASCADE`` 制約
+をエミュレートします．すなわち，削除対象のオブジェクトを指すような外部キー
+を持つ全てのオブジェクトも同時に削除されるのです．::
 
     b = Blog.objects.get(pk=1)
-    # ����̿��ϡ� Blog �� Blog ��ؤ� Entry ���Ƥ������Ƥ��ޤ��ޤ���
+    # 次の命令は， Blog と Blog を指す Entry 全てを削除してしまいます．
     b.delete()
 
 
-``delete()`` �� ``QuerySet`` �Υ᥽�åɤˤ������� ``Manager`` ���Τˤϸ���
-����Ƥ��ʤ��Τ����դ��Ƥ�������������ϸ��ä� ``Entry.objects.delete()`` 
-��¹Ԥ��� *���Ƥ�* ����ȥ�������Ƥ��ޤ�ʤ��褦�ˤ��뤿��ΰ���������
-�������������ƤΥ��֥������Ȥ��� *������* �Τʤ顤�ʲ��Τ褦������Ū����
-�ƤΥ��֥������Ȥ�ɽ�������ꥻ�åȤ�ꥯ�����Ȥ��Ƥ�������::
+``delete()`` は ``QuerySet`` のメソッドにすぎず， ``Manager`` 自体には公開
+されていないので注意してください．これは誤って ``Entry.objects.delete()`` 
+を実行して *全ての* エントリを削除してしまわないようにするための安全機構で
+す．本当に全てのオブジェクトを削除 *したい* のなら，以下のように明示的に全
+てのオブジェクトを表すクエリセットをリクエストしてください::
 
     Entry.objects.all().delete()
 
 
 .. _Extra instance methods:
 
-�ɲäΥ��󥹥��󥹥᥽�å�
+追加のインスタンスメソッド
 ==========================
 
-``save()``, ``delete()`` �˲ä��ơ���ǥ륪�֥������Ȥϰʲ��Τ����줫�����뤤
-�����ƤΥ᥽�åɤ���Ĥ��Ȥ�����ޤ�:
+``save()``, ``delete()`` に加えて，モデルオブジェクトは以下のいずれか，あるい
+は全てのメソッドを持つことがあります:
 
 get_FOO_display()
 -----------------
 
-``choices`` ���åȤ�������ƤΥե�����ɤˤĤ��ơ����֥������Ȥ�
-``get_FOO_display()`` �᥽�åɤ�����ޤ��� ``FOO`` �ϥե������̾�Ǥ�������
-�᥽�åɤϡ��ֿʹֲ��ɤʡץե������̾���֤��ޤ����㤨�С��ʲ��Υ�ǥ�::
+``choices`` セットを持つ全てのフィールドについて，オブジェクトは
+``get_FOO_display()`` メソッドを持ちます． ``FOO`` はフィールド名です．この
+メソッドは，「人間可読な」フィールド名を返します．例えば，以下のモデル::
 
     GENDER_CHOICES = (
         ('M', 'Male'),
@@ -1797,8 +1797,8 @@ get_FOO_display()
         name = models.CharField(maxlength=20)
         gender = models.CharField(maxlength=1, choices=GENDER_CHOICES)
 
-�Ǥϡ��� ``Person`` ���󥹥��󥹤� ``get_gender_display()`` �᥽�å�
-������ޤ�::
+では，各 ``Person`` インスタンスは ``get_gender_display()`` メソッド
+を持ちます::
 
     >>> p = Person(name='John', gender='M')
     >>> p.save()
@@ -1810,127 +1810,127 @@ get_FOO_display()
 get_next_by_FOO(\**kwargs) and get_previous_by_FOO(\**kwargs)
 -------------------------------------------------------------
 
-``null=True`` �Ǥ���褦�� ``DateField`` ����� ``DateTimeField`` �ե�����
-�ɤˤĤ��ơ����֥������Ȥ� ``get_next_by_FOO()`` ����� 
-``get_previous_by_FOO()`` �᥽�åɤ�����ޤ��� ``FOO`` �ϥե������̾�Ǥ���
-���Υ᥽�åɤϳ��������եե�����ɤ˱��������Υ��֥������Ȥ伡�Υ��֥�����
-�Ȥ��֤��ޤ���Ŭ�ڤʥ��֥������Ȥ��ʤ���� ``DoesNotExist`` �����Ф��ޤ���
+``null=True`` であるような ``DateField`` および ``DateTimeField`` フィール
+ドについて，オブジェクトは ``get_next_by_FOO()`` および 
+``get_previous_by_FOO()`` メソッドを持ちます． ``FOO`` はフィールド名です．
+このメソッドは該当の日付フィールドに応じて前のオブジェクトや次のオブジェク
+トを返します．適切なオブジェクトがなければ ``DoesNotExist`` を送出します．
 
-�����Υ᥽�åɤϤ�����⥪�ץ����Υ�����ɰ�����Ȥ�ޤ���������
-���ҤΡ֥ե�����ɸ����פǲ��⤷�������ˤ��ޤ���
+これらのメソッドはいずれもオプションのキーワード引数をとります．引数は
+前述の「フィールド検索」で解説した形式にします．
 
-Ʊ�������ͤ���ĥ��֥������Ȥ������硤���Υ᥽�åɤ� ID ��Ȥä������å�
-�˥ե�����Хå����ޤ�������ˤ�ꡤ�쥳���ɤ������åפ������ʣ�����ꤷ��
-�����Ȥ��ݾڤ���Ƥ��ޤ��������ʥ����ɤ���� `�ȹ� API �Υ���ץ��ǥ�`_
-�򻲾Ȥ��Ƥ���������
+同じ日付値を持つオブジェクトがある場合，このメソッドは ID を使ったチェック
+にフォールバックします．これにより，レコードがスキップしたり重複したりしな
+いことが保証されています．完全なコードの例は `照合 API のサンプルモデル`_
+を参照してください．
 
-.. _`�ȹ� API �Υ���ץ��ǥ�`: ../models/lookup/
+.. _`照合 API のサンプルモデル`: ../models/lookup/
 .. _lookup API sample model: ../models/lookup/
 
 get_FOO_filename()
 ------------------
 
-�� ``FileField`` �ˤĤ������֥������Ȥ� ``get_FOO_filename()`` �᥽�åɤ��
-���ޤ��� ``FOO`` �ϥե������̾�Ǥ������Υ᥽�åɤϡ� ``MEDIA_ROOT`` ������
-�˴�Ť��ƥե�����Υե����륷���ƥ��Ǥδ����ʥѥ����֤��ޤ���
+各 ``FileField`` につき，オブジェクトは ``get_FOO_filename()`` メソッドを持
+ちます． ``FOO`` はフィールド名です．このメソッドは， ``MEDIA_ROOT`` の設定
+に基づいてファイルのファイルシステム上での完全なパスを返します．
 
-``ImageField`` �ϵ���Ū�� ``FileField`` �Υ��֥��饹�Ǥ��뤿�ᡤ
-``ImageField`` �Υե�����ɤ�������ƤΥ�ǥ�Ϥ��Υ᥽�åɤ�Ȥ��ޤ���
+``ImageField`` は技術的に ``FileField`` のサブクラスであるため，
+``ImageField`` のフィールドを持つ全てのモデルはこのメソッドを使えます．
 
 get_FOO_url()
 -------------
 
-�� ``FileField`` �ˤĤ������֥������Ȥ� ``get_FOO_url()`` �᥽�åɤ������
-���� ``FOO`` �ϥե������̾�Ǥ������Υ᥽�åɤϡ� ``MEDIA_URL`` ������˴��
-���ƥե�����δ����� URL ���֤��ޤ����ե�����ɤ��ͤ����ξ�硤��ʸ�������
-���ޤ���
+各 ``FileField`` につき，オブジェクトは ``get_FOO_url()`` メソッドを持ちま
+す． ``FOO`` はフィールド名です．このメソッドは， ``MEDIA_URL`` の設定に基づ
+いてファイルの完全な URL を返します．フィールドの値が空の場合，空文字列を返
+します．
 
 get_FOO_size()
 --------------
 
-�� ``FileField`` �ˤĤ������֥������Ȥ� ``get_FOO_filename()`` �᥽�åɤ��
-���ޤ��� ``FOO`` �ϥե������̾�Ǥ������Υե�����ɤϥե�����Υ�������Х�
-�Ȥ�ñ�̤Ȥ����֤��ޤ� (�ظ�Ǥ� ``os.path.getsize`` ��ȤäƤ��ޤ�)��
+各 ``FileField`` につき，オブジェクトは ``get_FOO_filename()`` メソッドを持
+ちます． ``FOO`` はフィールド名です．このフィールドはファイルのサイズをバイ
+トを単位として返します (背後では ``os.path.getsize`` を使っています)．
 
 save_FOO_file(filename, raw_contents)
 -------------------------------------
 
-�� ``FileField`` �ˤĤ������֥������Ȥ� ``get_FOO_filename()`` �᥽�åɤ��
-���ޤ��� ``FOO`` �ϥե������̾�Ǥ������Υ᥽�åɤϻ���Υե���������Υե�
-����̾�ǥե����륷���ƥ����¸���ޤ������ꤵ�줿�ե�����̾�Υե����뤬����
-��¸�ߤ����硤 Django ��Ʊ̾�Υե����뤬���Ĥ���ʤ��ʤ�ޤǥե�����̾��
-���� (���ġ���ĥ�Ҥ�����) �˥���������������ɲä��Ƥ椭�ޤ���
+各 ``FileField`` につき，オブジェクトは ``get_FOO_filename()`` メソッドを持
+ちます． ``FOO`` はフィールド名です．このメソッドは指定のファイルを指定のファ
+イル名でファイルシステムに保存します．指定されたファイル名のファイルがすで
+に存在する場合， Django は同名のファイルが見つからなくなるまでファイル名の
+末尾 (かつ，拡張子よりも前) にアンダースコアを追加してゆきます．
 
 get_FOO_height() and get_FOO_width()
 ------------------------------------
 
-�� ``ImageField`` �ˤĤ������֥������Ȥ� ``get_FOO_width()`` �����
-``get_FOO_width()`` �᥽�åɤ�����ޤ��� ``FOO`` �ϥե������̾�Ǥ������Υ�
-���åɤϲ����ι⤵ (����) ��ԥ������ñ�̤Ȥ����������֤��ޤ���
+各 ``ImageField`` につき，オブジェクトは ``get_FOO_width()`` および
+``get_FOO_width()`` メソッドを持ちます． ``FOO`` はフィールド名です．このメ
+ソッドは画像の高さ (や幅) をピクセルを単位とする整数で返します．
 
 .. _Shortcuts:
 
-���硼�ȥ��å��Ѥδؿ�
+ショートカット用の関数
 ======================
 
-�ӥ塼��ȯ���Ƥ���ȡ��ǡ����١��� API �����뤿��Υ��ǥ����ब������
-�⤢�뤳�Ȥ˵��Ť��Ϥ��Ǥ��� Django �Ϥ����������ǥ�����򥷥硼�ȥ��åȴ�
-���Ȥ�����������ӥ塼��ν����򤹤ä���Ƚ񤱤�褦�ˤ��Ƥ��ޤ���
+ビューを開発していると，データベース API を操作するためのイディオムがいくつ
+もあることに気づくはずです． Django はこうしたイディオムをショートカット関
+数として定義し，ビュー内の処理をすっきりと書けるようにしています．
 
 get_object_or_404()
 -------------------
 
-�褯�Ȥ��륤�ǥ�����ΰ�Ĥϡ� ``get()`` ��ƤӽФ������֥������Ȥ�¸�ߤ�
-�ʤ��Ȥ��ˤ� ``Http404`` �����Ф���Ȥ�����ΤǤ��� ``get_object_or_404()``
-�Ϥ��ν�����ؿ��ˤ�����ΤǤ��� ``get_object_or_404()`` �� Django ��ǥ��
-�������˼�ꡤ�����Ǥ�դΥ�����ɰ�������ޤ���������ɰ����ϥ��
-��Υޥͥ���� ``get()`` �ؿ����Ϥ���ޤ������֥������Ȥ�¸�ߤ��ʤ����
-``Http404`` �����Ф��ޤ�::
+よく使われるイディオムの一つは， ``get()`` を呼び出し，オブジェクトが存在し
+ないときには ``Http404`` を送出するというものです． ``get_object_or_404()``
+はこの処理を関数にしたものです． ``get_object_or_404()`` は Django モデルを
+第一引数に取り，さらに任意のキーワード引数を取れます．キーワード引数はモデ
+ルのマネジャの ``get()`` 関数に渡されます．オブジェクトが存在しなければ
+``Http404`` を送出します::
     
-    # �祭���� 3 �Υ���ȥ���������
+    # 主キーが 3 のエントリを取得する
     e = get_object_or_404(Entry, pk=3)
 
-���Υ��硼�ȥ��åȴؿ����ǥ���Ϥ���硤�ظ�� ``get()`` �������������
-�ϥǥե���ȤΥޥͥ���Ǥ����ǥե���Ȱʳ��Υޥͥ����Ȥ��������䡤���
-��˥�졼������ĥ�äƤ��륪�֥������ȤΥꥹ�Ȥ����������ˤϡ��ʲ�����
-�Τ褦�� ``get_object_or_404()`` �˥ޥͥ��㥪�֥������Ȥ�ľ�ܻ��ꤷ�Ƥ�����
-��::
+このショートカット関数をモデルに渡す場合，背後で ``get()`` クエリを受けるの
+はデフォルトのマネジャです．デフォルト以外のマネジャを使いたい場合や，モデ
+ルにリレーションを張っているオブジェクトのリストを得たい場合には，以下の例
+のように ``get_object_or_404()`` にマネジャオブジェクトを直接指定してくださ
+い::
 
-    # Blog ��ǥ�Υ��󥹥��� `e` �˴�Ϣ�Ť����Ƥ��롤̾���� 'Fred' ��
-    # 'Fred' �� Author ���󥹥��󥹤��������
+    # Blog モデルのインスタンス `e` に関連づけられている，名前が 'Fred' の
+    # 'Fred' の Author インスタンスを取得する
     a = get_object_or_404(e.authors, name='Fred')
 
-    # ��������ޥͥ��� 'recent_entries' ��Ȥäơ��祭���� 3 �Υ���ȥ��
-    # ��������
+    # カスタムマネジャ 'recent_entries' を使って，主キーが 3 のエントリを
+    # 検索する
     e = get_object_or_404(Entry.recent_entries, pk=3)
 
 get_list_or_404()
 -----------------
 
-``get_list_or_404`` ��ư��� ``get_object_or_404()`` �ȤۤȤ��Ʊ���Ǥ�����
-``get()`` ������� ``filter()`` ��Ȥ����ꥹ�Ȥ����ξ��� ``Http404`` ��
-���Ф��ޤ���
+``get_list_or_404`` の動作は ``get_object_or_404()`` とほとんど同じですが，
+``get()`` の代わりに ``filter()`` を使い，リストが空の場合に ``Http404`` を
+送出します．
 
 
 .. _Falling back to raw SQL:
 
-�� SQL �ؤΥե�����Хå�
+生 SQL へのフォールバック
 =========================
 
-Django �Υǡ����١����ޥåѤǰ����ˤ�ʣ�������� SQL ʸ��񤫤ͤФʤ�ʤ���
-���ʾ��ˤϡ����� SQL ʸ�¹ԥ⡼�ɤ�Ȥ��ޤ���
+Django のデータベースマッパで扱うには複雑すぎる SQL 文を書かねばならないよ
+うな場合には，生の SQL 文実行モードを使えます．
 
-�� raw-SQL ʸ�¹ԥ⡼�ɤλȤ����Ȥ��Ƥ�����ʤΤϡ����Τ褦�ʥ�����ʸ��¹�
-�����ǥ�Υ�������᥽�åɤ䥫������ޥͥ���Υ᥽�åɤ��������Ȥ�����
-�ΤǤ��� Django �ϥ�ǥ�쥤��ǥǡ����١���������򵭽Ҥ���褦��
-*�׵ᤷ�ƤϤ��ޤ���* �������Υ��ץ�������Ȥ뤳�Ȥǡ��ǡ������������Τ����
-�����å����ս�ˤޤȤ����Τǡ��������ȿ����δ������饹�ޡ��Ȥˤʤ��
-�����ܤ��������� `�������� SQL ʸ�μ¹�`_ �򻲾Ȥ��Ƥ���������
+生 raw-SQL 文実行モードの使い方としてお勧めなのは，そのようなクエリ文を実行
+するモデルのカスタムメソッドやカスタムマネジャのメソッドを実装するというも
+のです． Django はモデルレイヤでデータベースクエリを記述するように
+*要求してはいません* が，このアプローチをとることで，データアクセスのための
+ロジックを一箇所にまとめられるので，コード組織化の観点からスマートになりま
+す．詳しい説明は `カスタム SQL 文の実行`_ を参照してください．
 
-�Ǹ�ˡ� Django �Υǡ����١����쥤���ñ�˥ǡ����١����ؤΰ�ĤΥ��󥿥ե���
-���˲᤮�ʤ��Ȥ������Ȥ����դ��Ƥ����ޤ��礦���ǡ����١����ˤ�¾�Υġ����
-�ץ��������졤�ǡ����١����ե졼������𤷤ƥ��������Ǥ��ޤ����ǡ���
-�١����ˤĤ��� Django ��ͭ�β���������櫓�ǤϤʤ��ΤǤ���
+最後に， Django のデータベースレイヤは単にデータベースへの一つのインタフェー
+スに過ぎないということに注意しておきましょう．データベースには他のツールや
+プログラム言語，データベースフレームワークを介してアクセスできます．データ
+ベースについて Django 固有の何かがあるわけではないのです．
 
-.. _`�������� SQL ʸ�μ¹�`: ../model_api/#executing-custom-sql
+.. _`カスタム SQL 文の実行`: ../model_api/#executing-custom-sql
 .. _Executing custom SQL: ../model_api/#executing-custom-sql

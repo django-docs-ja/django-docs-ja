@@ -1,5 +1,5 @@
 ===========================
-Django �ˤĤ��Ƥ褯�������
+Django についてよくある質問
 ===========================
 
 :revision-up-to: 4805 (release 0.96)
@@ -8,36 +8,36 @@ Django �ˤĤ��Ƥ褯�������
 
 .. _General questions:
 
-����Ū�ʼ���
+一般的な質問
 ============
 
 .. _Why does this project exist?:
 
-�ʤ�����ʥץ��������Ȥ�����ΤǤ�����
+なぜこんなプロジェクトがあるのですか？
 --------------------------------------
 
-Django �϶ˤ�Ƽ���Ū�������Τ�Ȥ���Ĺ���Ƥ��ޤ�����Web ��ʹ��ȯ�Ԥ��Ƥ���
-WorldOnline �Ǥϡ�����Ū�� Web ���ץꥱ�������򡤥��㡼�ʥꥺ��Ȥ�����Ω
-���������ڤ�˴֤˹礦�褦�˹��ۤ��ͤФʤ�ޤ�����ž�η㤷���˥塼���롼
-��ˤ����ơ� WorldOnline ��ʣ���� Web ���ץꥱ�������򥳥󥻥ץȤ���Ω��
-�夲�����ˤ�äƤ����ޤǤλ��֤�ͣ��β���Ȥ��Ƥ���ΤǤ���
+Django は極めて実践的な要請のもとで成長してきました．Web 新聞を発行している
+WorldOnline では，効果的な Web アプリケーションを，ジャーナリズムとして成立
+する締め切りに間に合うように構築せねばなりません．変転の激しいニュースルー
+ムにおいて， WorldOnline は複雑な Web アプリケーションをコンセプトから立ち
+上げ公開にもっていくまでの時間を唯一の課題としているのです．
 
-Ʊ���ˡ� WorldOnline �� Web ��ȯ�Ԥ����ϡ����� Web ��ȯ�β�ƻ�˴ؤ��Ƥϰ��
-���ƴ�������ԤǤ���
+同時に， WorldOnline の Web 開発者たちは，こと Web 開発の王道に関しては一貫
+して完璧主義者です．
 
-����������ͳ���� Django �� Web ���ץꥱ�������򤿤����᤯��������ǤϤ�
-����Web ��ȯ�� *��ƻ* �˽��äƺ����Ǥ���褦���߷פ���Ƥ���ΤǤ���
-2003 ǯ��WorldOnline �γ�ȯ�� (Adrian Holovaty �� Simon Willison) �� PHP ��
-���ڤ��Ĥ��� Python �ˤ�� Web ��ȯ�˼���ȤߤϤ���ޤ���������Ū�ǹ⤤��
-�������������� Lawrence.com �Τ褦�ʥ����ȳ�ȯ����ǡ����� Web ���ץꥱ��
-���������®�˳�ȯ�Ǥ���褦�ˡ������ȤΥ����ɤ������Ѥ� Web ��ȯ�ե졼
-�������ڤ�Ф��� 2 ǯ�᤯�δ֤��äȲ��ɤ�ä��ʤ���Ȥ�����Ǥ��ޤ�����
+こうした理由から Django は Web アプリケーションをただ素早く作れるだけではな
+く，Web 開発の *王道* に従って作成できるように設計されているのです．
+2003 年，WorldOnline の開発者 (Adrian Holovaty と Simon Willison) は PHP に
+見切りをつけ， Python による Web 開発に取り組みはじめました．集約的で高い双
+方向性を備えた Lawrence.com のようなサイト開発の中で，彼らは Web アプリケー
+ションをより迅速に開発できるように，サイトのコードから汎用の Web 開発フレー
+ムワークを切り出し， 2 年近くの間ずっと改良を加えながら使い込んできました．
 
-2005 ǯ�βơ� World Online �Ϥ���ޤǤγ�ȯ�����̤� Django �Ȥ��ƥ����ץ󥽡�
-�����������򲼤��ޤ����� Django �� `Apache`_, `Python`_, ������
-`PostgreSQL`_ ��Ϥ���Ȥ����͡��ʥ����ץ󥽡����ץ��������Ȥʤ��Ǥϼ¸���
-�ޤ���Ǥ����������ƺ�����ã�ϥ����ץ󥽡������ߥ�˥ƥ���¿���ʤ�Ȥ⤪��
-���Ǥ��뤳�Ȥ˥說�說���Ƥ���ΤǤ���
+2005 年の夏， World Online はこれまでの開発の成果を Django としてオープンソー
+ス化する決定を下しました． Django は `Apache`_, `Python`_, そして
+`PostgreSQL`_ をはじめとする様々なオープンソースプロジェクトなしでは実現し
+ませんでした．そして今，私達はオープンソースコミュニティに多少なりともお返
+しできることにワクワクしているのです．
 
 .. _Apache: http://httpd.apache.org/
 .. _Python: http://www.python.org/
@@ -45,99 +45,99 @@ WorldOnline �Ǥϡ�����Ū�� Web ���ץꥱ�������򡤥��㡼�ʥꥺ��Ȥ�����Ω
 
 .. _What does "Django" mean, and how do you pronounce it?:
 
-"Django" �ȤϤɤ�������̣�ǡ��ɤΤ褦��ȯ������ΤǤ�����
+"Django" とはどういう意味で，どのように発音するのですか？
 ---------------------------------------------------------
 
-Django �� 1930 ǯ�夫�� 1950 ǯ�����ˤ����Ƴ����������ץ������㥺�Υ�����
-���ȡ� `����󥴡��饤��ϥ��`_ (`Django Reinhardt`_) �ˤ��ʤ��̾�դ����
-�ޤ����������Ǥϡ�����󥴤���˾�Ǥ�ͥ�줿�����ꥹ�Ȥΰ�ͤ˿������Ƥ�
-�ޤ���
+Django は 1930 年代から 1950 年代初期にかけて活躍したジプシージャズのギタリ
+スト， `ジャンゴ・ラインハルト`_ (`Django Reinhardt`_) にちなんで名付けられ
+ました．今日では，ジャンゴは歴史上最も優れたギタリストの一人に数えられてい
+ます．
 
-��ζʤ�ʹ���ƤߤƤ������������äȵ������뤳�ȤǤ��礦��
+彼の曲を聞いてみてください．きっと気に入ることでしょう．
 
-Django �� **JANG**-oh ('a' �Ͽ��Ф�) ��ȯ�����ޤ������� FANG-oh ��
-Ʊ���Ǥ��� "D" ��ȯ�����ޤ���
+Django は **JANG**-oh ('a' は伸ばす) と発音します．韻は FANG-oh と
+同じです． "D" は発音しません。
 
-.. _`����󥴡��饤��ϥ��`: http://ja.wikipedia.org/wiki/%E3%82%B8%E3%83%A3%E3%83%B3%E3%82%B4%E3%83%BB%E3%83%A9%E3%82%A4%E3%83%B3%E3%83%8F%E3%83%AB%E3%83%88
+.. _`ジャンゴ・ラインハルト`: http://ja.wikipedia.org/wiki/%E3%82%B8%E3%83%A3%E3%83%B3%E3%82%B4%E3%83%BB%E3%83%A9%E3%82%A4%E3%83%B3%E3%83%8F%E3%83%AB%E3%83%88
 .. _Django Reinhardt: http://en.wikipedia.org/wiki/Django_Reinhardt
 
 
 .. _Is Django stable?:
 
-Django �ϰ��ꤷ�Ƥ��ޤ�����
+Django は安定していますか？
 ---------------------------
 
-�Ϥ��� World Online �ϻ�ã�� 3 ǯ�ʾ�ˤ錄�ä� Django ��ȤäƤ��ޤ�����
-Django �ǹ��ۤ��������Ȥϡ�����ޤǤ� 100 ���ҥåȡ�����Ķ����ȥ�ե��å�
-���ѥ����˸����줿���Ȥ����ꡤ���٤⥹��å���ɥåȸ��̤����äƤ��ޤ���
-�����Ǥ��͡������ư���Ǥ���
+はい． World Online は私達は 3 年以上にわたって Django を使ってきました．
+Django で構築したサイトは，これまでに 100 万ヒット／時を超えるトラフィック
+スパイクに見舞われたことがあり，何度もスラッシュドット効果を喰らっています．
+そうですね．きわめて安定です．
 
 .. _Does Django scale?:
 
-Django �ϥ������뤷�ޤ�����
+Django はスケールしますか？
 ---------------------------
 
-�Ϥ����ϡ��ɥ������Ȥ�����Τϡ���ȯ���֤���٤ư¤���ΤǤ���������椨
-Django �ϥ桼����������ǽ�ʥϡ��ɥ�������Ǥ���������Ѥ���٤��߷פ���Ƥ�
-�ޤ���
+はい．ハードウェアというものは，開発時間に比べて安いものですし，それゆえ
+Django はユーザが投入可能なハードウェアをできるだけ活用するべく設計されてい
+ます．
 
-Django �ϡ֥쥤��֤ǲ��ⶦͭ���ʤ� (shared-nothing)�ץ������ƥ�����ʤΤǡ�
-�ǡ����١��������С�����å��奵���С� Web/���ץꥱ������󥵡��ФΤɤΥ��
-��˥ϡ��ɥ��������ɲä��Ƥ⤫�ޤ��ޤ���
+Django は「レイヤ間で何も共有しない (shared-nothing)」アーキテクチャなので，
+データベースサーバ，キャッシュサーバ， Web/アプリケーションサーバのどのレベ
+ルにハードウェアを追加してもかまいません．
 
-Django �ϥ��ץꥱ�������쥤�䤫��Υǡ����١����쥤���ʬΥ��������
-�ץ�ʤ��鶯�Ϥ� `����å���ե졼����`_ �������Ƥ��ޤ���
+Django はアプリケーションレイヤからのデータベースレイヤを分離し，シン
+プルながら強力な `キャッシュフレームワーク`_ を備えています．
 
-.. _`����å���ե졼����`: ../cache/
+.. _`キャッシュフレームワーク`: ../cache/
 .. _`cache framework`: ../cache/
 
 .. _Who's behind this?:
 
-Django ������΢�ˤ�ï������ΤǤ�����
+Django の舞台裏には誰がいるのですか？
 -------------------------------------
 
-Django ���ƹ񥫥󥶥���������� (Lawrence, Kansas, USA) �ΤȤ��뿷ʹ��
-Web ����Ǥ��� `World Online`_ �ǳ�ȯ����ޤ�����
+Django は米国カンザス州ローレンス (Lawrence, Kansas, USA) のとある新聞の
+Web 部門である `World Online`_ で開発されました．
 
 `Adrian Holovaty`_
-    Adrian �ϥ��㡼�ʥꥺ��ΥХå����饦��ɤ���ä� Web ��ȯ�ԤǤ������
-    2 ǯȾ�δ� World Online �Υ꡼�ɥץ�����ޤ�Фᡤ���δ֤� Django ��
-    ȯ���� World Online �����Ȥ�������ޤ������������ washingtonpost.com
-    ��Ư���Ƥ��ꡤ�ǡ����١�����Хå�����ɤˤ�����å��ʾ��󥵥��Ȥι���
-    �˷Ȥ�뤫����顤 Django �γ�ȯ���³���ƴ��Ĥ��Ƥ��ޤ��� Adrian ��
-    (Django Reinhardt ���������) ���������դ䡤 `chicagocrime.org`_ �Τ褦
-    �ʥ����ɥץ��������ȤΥϥå����椬�����Ǥ����������߽��Ǥ���
+    Adrian はジャーナリズムのバックグラウンドを持った Web 開発者です．彼は
+    2 年半の間 World Online のリードプログラマを勤め，その間に Django を開
+    発して World Online サイトを実装しました．現在彼は washingtonpost.com
+    で働いており，データベースをバックエンドにしたリッチな情報サイトの構築
+    に携わるかたわら， Django の開発も継続して監督しています． Adrian は
+    (Django Reinhardt スタイルの) ギター演奏や， `chicagocrime.org`_ のよう
+    なサイドプロジェクトのハッキング中が好きです．シカゴ在住です．
 
-    IRC �Ǥϡ� ``adrian_h`` ��̾��äƤ��ޤ���
+    IRC では， ``adrian_h`` と名乗っています．
 
 `Jacob Kaplan-Moss`_
-    Jacob �ϥ���ե���˥������褿�ˤǡ������ǥ��󥰤�������Ʊ���������֤�
-    �䤯�Ȥ������յ���Ϻ�Ǥ������ World Online �γ�ȯ��ش����Ƥ��ꡤ
-    Ʊ�����͡���ͥ�줿�����ɥץ��������Ȥ��Ѷ�Ū�˥ϥå����Ƥ��ޤ������
-    Python-ObjC �Х���ǥ��󥰤˹׸��������Ȥ����ꡤ Python �� Tivo ���ץ�
-    �������������ˡ�򸫤Ĥ����ǽ���ˤǤ⤢��ޤ����Ƕ���� PSP ��ư��
-    Python �ˤɤäפ�ϤޤäƤ��ޤ������󥶥���������󥹺߽��Ǥ���
+    Jacob はカリフォルニアから来た男で，コーディングと料理に同じだけ時間を
+    割くという生意気野郎です．彼は World Online の開発を指揮しており，
+    同時に様々な優れたサイドプロジェクトを積極的にハックしています．彼は
+    Python-ObjC バインディングに貢献したことがあり， Python で Tivo アプリ
+    ケーションを書く方法を見つけた最初の男でもあります．最近彼は PSP で動く
+    Python にどっぷりはまっています．カンザス州ローレンス在住です．
 
-    IRC �Ǥ� ``jacobkm`` ��̾��äƤ��ޤ���
+    IRC では ``jacobkm`` と名乗っています．
 
 `Simon Willison`_
-    Simon �ϥ��󥰥��ɤ����褿º�ɤ��٤� Web ��ȯ�ԤǤ������ World
-    Online �� 1 ǯ�֤Υ��󥿡��󥷥åפ�ᤴ�������δ֤� Adrian �ȤȤ��
-    Djang �򥹥���å����鳫ȯ���ޤ�������Ϥޤ�˸����Ǯ�Ȥαѹ�ͤǡ�
-    Web ��ȯ�β�ƻ�ˤĤ��ƳθǤ��뿮ǰ����äƤ��ꡤ¿�����ɼԤ��� Web ��
-    ȯ�˴ؤ��� blog, http://simon.incutio.com ��ǯ��δֱ��Ĥ��Ƥ��ޤ�����
-    Simon �ϸ��� Yahoo UK ��Ư���Ƥ��ꡤ��Hacker Liason�פξι�����Ƥ��ޤ���
-    ���󥰥��ɺ߽��Ǥ���
+    Simon はイングランドから来た尊敬すべき Web 開発者です．彼は World
+    Online で 1 年間のインターンシップを過ごし，その間に Adrian とともに
+    Djang をスクラッチから開発しました．彼はまれに見る情熱家の英国人で，
+    Web 開発の王道について確固たる信念を持っており，多くの読者をもつ Web 開
+    発に関する blog, http://simon.incutio.com を何年もの間運営してきました．
+    Simon は現在 Yahoo UK で働いており，「Hacker Liason」の称号を得ています．
+    イングランド在住です．
 
-    IRC �Ǥ� ``SimonW`` ��̾��äƤ��ޤ���
+    IRC では ``SimonW`` と名乗っています．
 
 `Wilson Miner`_
-    Wilson �Υǥ�����Ѥϡ���ã����å��������˻�Ω�Ƥ����Ƥ��ޤ��ޤ�������
-    �� `Apple`_ �Υ��󥿥饯�ƥ��֥ǥ����ʤ�Ф�Ƥ��ޤ����Ǥ� Apple �ǲ���
-    ��äƤ��뤫ʹ���ƤϤ����ޤ��󡥤���ʤ��Ȥ򤷤��顤��˥�������㤤
-    �ޤ��补����ե�󥷥����߽��Ǥ���
+    Wilson のデザイン術は，私達をロックスターに仕立てあげてしまいます．日中
+    は `Apple`_ のインタラクティブデザイナを勤めています．でも Apple で何を
+    やっているか聞いてはいけません．そんなことをしたら，彼にシメられちゃい
+    ますよ．サンフランシスコ在住です．
 
-    IRC �Ǥ� ``wilsonian`` ��̾��äƤ��ޤ���
+    IRC では ``wilsonian`` と名乗っています．
 
 .. _`Apple`: http://www.apple.com/
 .. _`World Online`: http://code.djangoproject.com/wiki/WorldOnline
@@ -151,200 +151,200 @@ Web ����Ǥ��� `World Online`_ �ǳ�ȯ����ޤ�����
 
 .. _Which sites use Django?:
 
-�ɤ�ʥ����Ȥ� Django ��ȤäƤ���ΤǤ�����
+どんなサイトが Django を使っているのですか？
 --------------------------------------------
 
-Django wiki �ˤ� `Django �Ǻ��줿�����Ȱ���`_ �Ȥ����ý��ڡ��������ꡤ
-�������Ƥ������Ƥ��ޤ�����ʬ�� Django �����Ȥ�ɤ�����ͳ���ɲä��Ƥ���������
+Django wiki には `Django で作られたサイト一覧`_ という特集ページがあり，
+日々内容が増えています．自分の Django サイトもどうぞ自由に追加してください．
 
-.. _`Django �Ǻ��줿�����Ȱ���`: http://code.djangoproject.com/wiki/DjangoPoweredSites
+.. _`Django で作られたサイト一覧`: http://code.djangoproject.com/wiki/DjangoPoweredSites
 .. _list of Django-powered sites: http://code.djangoproject.com/wiki/DjangoPoweredSites
 
 
 .. _Django appears to be a MVC framework, but you call the Controller the "view", and the View the "template". How come you don't use the standard names?:
 
-Django �� MVC �ե졼�����Τ褦�Ǥ���������ȥ����� (Controller) ��֥ӥ塼 (view)�פȸƤӡ��ӥ塼 (View) ��֥ƥ�ץ졼�� (template)�פȸƤ�Ǥ��ޤ����ɤ�����ɸ��Ū�ʸƤ����򤷤ʤ��ΤǤ�����
+Django は MVC フレームワークのようですが，コントローラ (Controller) を「ビュー (view)」と呼び，ビュー (View) を「テンプレート (template)」と呼んでいます．どうして標準的な呼び方をしないのですか？
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-�����Ǥ��͡��Ƥ�̾�ˤϵ�����;�Ϥ�����Ǥ��礦��
+そうですね，呼び名には議論の余地があるでしょう．
 
-�桹�� MVC �β��Ǥϡ��֥ӥ塼�פȤϥ桼�����󼨤����ǡ����Τ��Ȥ򤤤���
-�����Ĥޤꡤ�ǡ����� *�ɤΤ褦�˸����뤫* �Ȥ������ȤǤϤʤ����ष�� *�ɤ�
-�ǡ������󼨤��뤫* �Ǥ����ӥ塼�� *�ɤΥǡ����򸫤��뤫* �Ǥ��ꡤ
-*�ɤ������뤫* �ǤϤ���ޤ��󡥤�����Ĥ����餫�˰㤤�ޤ���
+我々の MVC の解釈では，「ビュー」とはユーザに提示されるデータのことをいいま
+す．つまり，データが *どのように見えるか* ということではなく，むしろ *どの
+データを提示するか* です．ビューは *どのデータを見せるか* であり，
+*どう見せるか* ではありません．この二つは明らかに違います．
 
-�Ȥ����櫓�ǡ��桹�Υ������Ǥϡ��֥ӥ塼�פ������ URL ���Ф��� Python ����
-��Хå��ؿ��ˤʤ�ޤ����ʤ��ʤ顤������Хå��ؿ��ϤɤΥǡ������󼨤��뤫
-����Ƥ��뤫��Ǥ���
+というわけで，我々のケースでは，「ビュー」は特定の URL に対する Python コー
+ルバック関数になります．なぜなら，コールバック関数はどのデータを提示するか
+を決めているからです．
 
-����ˡ��ƥ�ץ졼�Ȥˤ�äƥ���ƥ�Ĥȥץ쥼��ơ�������ʬΥ���Ϥä���
-���Ƥ��ޤ���Django �Ǥϡ��ӥ塼�ϤɤΥǡ������󼨤��뤫����Ƥ��ޤ�����
-�ӥ塼���̾ *�ɤΤ褦��* �ǡ������󼨤��뤫��ƥ�ץ졼�Ȥ˰Ѥͤޤ���
+さらに，テンプレートによってコンテンツとプレゼンテーションの分離がはっきり
+しています．Django では，ビューはどのデータを提示するかを決めていますが，
+ビューは通常， *どのように* データを提示するかをテンプレートに委ねます．
 
-�Ǥϡ��֥���ȥ�����פϤɤ�������ΤǤ��礦���� Django �ξ�硤�����餯��
-�졼���������ʤ�� URL ����ˤ������äƥꥯ�����Ȥ�Ŭ�ڤʥӥ塼��������
-�뵡�����Τ�����ȥ�����ˤ�����Ȥ�����Ǥ��礦��
+では，「コントローラ」はどこに入るのでしょうか． Django の場合，おそらくフ
+レームワーク，すなわち URL 設定にしたがってリクエストを適切なビューに送信す
+る機構自体がコントローラにあたるといえるでしょう．
 
-ά�줬�����ߤʤ顤 Django �� "MTV" �ե졼�����ȸƤ�Ǥ�褤�Ǥ��礦����
-�ޤꡤ��ǥ� (Model)���ƥ�ץ졼�� (Template)�������ƥӥ塼 (View) �Ǥ���
-���ä���������ꤷ�ä��꤭�ޤ���
+略語がお好みなら， Django を "MTV" フレームワークと呼んでもよいでしょう．つ
+まり，モデル (Model)，テンプレート (Template)，そしてビュー (View) です．
+こっちの方がよりしっくりきます．
 
-�Ǹ�ˡ���ɽ��פʤΤ�������褹�뤳�ȤǤ��������ơ��Ƥ����ϲ��Ǥ��졤
-Django �Ϥ����ˤȤäƺǤ����ˤ��ʤä���ˡ��������褷�Ƥ���ΤǤ���
+最後に，結局重要なのは問題を解決することです．そして，呼び方は何であれ，
+Django はわれわれにとって最も理にかなった方法で問題を解決しているのです．
 
 .. _<Framework X> does <feature Y> -- why doesn't Django?:
 
-<�ե졼���� X> �ˤ� <��ǽ Y> ������ޤ� -- �ɤ����� Django �ˤʤ��ΤǤ�����
+<フレームワーク X> には <機能 Y> があります -- どうして Django にないのですか？
 -------------------------------------------------------------------------------
 
-������ˤ�¾�ˤ������餷�� Web �ե졼����������Τ��ɤ��ΤäƤ��ޤ�����
-ɬ�פǤ���Ф������饢���ǥ���ڤ��Τˤ�֤����ǤϤ���ޤ��󡥤ȤϤ�����
-Django �Ϥޤ��˻�ã���������� Web �ե졼�������������ä����餳����ȯ��
-�줿�ΤǤ��äơ���<Framework X> ���Ǥ��뤫��פȤ�����ͳ�� Django �˵�ǽ��
-�ɲä��뽽ʬ����ͳ�ˤϤʤ�ʤ��Ȥ������Ȥ����դ��Ʋ�������
+世の中には他にも素晴らしい Web フレームワークがあるのは良く知っていますし，
+必要であればそこからアイデアを借りるのにやぶさかではありません．とはいえ，
+Django はまさに私達が旧態然の Web フレームワークに不満だったからこそ開発さ
+れたのであって，「<Framework X> ができるから」という理由は Django に機能を
+追加する十分な理由にはならないということに注意して下さい．
 
 .. _Why did you write all of Django from scratch, instead of using other Python libraries?:
 
-�ʤ���¸�� Python �饤�֥���Ȥ鷺������å��� Django ���ä��ΤǤ�����
+なぜ既存の Python ライブラリを使わずスクラッチで Django を作ったのですか？
 --------------------------------------------------------------------------
 
-Django ��񤭻Ϥ᤿�� 2 ǯ���� Adrian �� Simon �Ͼ������֤��ä��������Ѥ�
-�����͡��� Python �����֥ե졼�������Ƥߤޤ�����
+Django を書き始めた約 2 年前， Adrian と Simon は少し時間を取って当時利用で
+きた様々な Python ウェブフレームワークを試してみました．
 
-���η�̡���ʬ�ʽ�����Τ�Τϰ�Ĥ�ʤ��Ȥ���������ã�����ΤǤ���
+その結果，十分な出来具合のものは一つもないという結論に達したのです．
 
-��ã�Ϲ��ߤˤ��뤵���ΤǤ���(�����ڤ����) ��������ԤȸƤ�Ǥ⤤���Ǥ���
-����
+私達は好みにうるさいのです．(締め切りを守る) 完璧主義者と呼んでもいいでしょ
+う．
 
-����ޤǤ��äȡ���ã�ϼ�ʬ���������Ǥ˼����Ѥߤε�ǽ��¸����륪���ץ󥽡�
-���饤�֥��˽в�äƤ��ޤ��������������饤�֥��ˡ�¾�ο�ã��Ʊ�������
-Ʊ����ˡ�ǲ�褷�褦�Ȥ��Ƥ���Τ򸫤Ƥϸ����Ť�����פ��Ǥ���������ʬ��
-���Υ����ɤγ�¦���Ȥ߹���ˤϤ⤦�٤����ޤ�������ã�Ϥ��Ǥˤ����Ĥ�α���
-�Ķ����ȼ��Υե졼������񤭾夲���ƥ��Ȥ����������Ƥ��Ƥ��ꡤ�Ǥ�������
-�ɤϲ�Ŭ�ʤޤǤ��׵���������Ƥ����ΤǤ���
+これまでずっと，私達は自分たちがすでに実装済みの機能を実現するオープンソー
+スライブラリに出会ってきました．そうしたライブラリに，他の人達が同じ問題を
+同じ方法で解決しようとしているのを見ては元気づけられる思いでしたが，自分た
+ちのコードの外側に組み込むにはもう遅すぎました．私達はすでにいくつもの運用
+環境で独自のフレームワークを書き上げ，テストし，実装してきており，できたコー
+ドは快適なまでに要求を満たしていたのです．
 
-�������ۤȤ�ɤξ�硤��¸�Υե졼������ġ�������餫�ˤ����κ���Ū��
-��̿Ū�ʷ�٤����ꡤ��ã����м��ˤ����ޤ�������ɡ���ã��ů�ؤ� 100% �礦
-��ΤϤʤ��ä��ΤǤ���
+一方，ほとんどの場合，既存のフレームワークやツールは明らかにある主の根本的，
+致命的な欠陥があり，私達を神経質にさせました．結局，私達の哲学に 100% 合う
+ものはなかったのです．
 
-�����֤��Ƥ����ޤ�������ã�Ϲ��ߤˤ��뤵���ΤǤ���
+繰り返していいますが，私達は好みにうるさいのです．
 
-��ã���߷�ů�ؤ� `�߷�ů�ؤΥڡ���`_ �˾ܤ����񤤤Ƥ���ޤ���
+私達の設計哲学は `設計哲学のページ`_ に詳しく書いてあります．
 
-.. _`�߷�ů�ؤΥڡ���`: ../design_philosophies/
+.. _`設計哲学のページ`: ../design_philosophies/
 .. _design philosophies page: ../design_philosophies/
 
 .. _Do you have any of those nifty "screencast" things?:
 
-���ä������֥����꡼�󥭥㥹�ȡפ�����������ޤ�����
+かっこいい「スクリーンキャスト」か何かがありますか？
 ----------------------------------------------------
 
-���߿ʹ�����Ȥ������Ȥ������Ǹ��Ǥ��ޤ���������������ã�Ϥޤ� Django ���
-�ɤ��Ƥ��뿿����ʤΤǡ������ǤϤʤ��� Django 1.0 �ˤʤä��Ȥ��κǽ�Ū�ʾ���
-��ȿ�Ǥ��������ȻפäƤ��ޤ������������Ѥ���С� Django API �Ϥޤ��Ѳ�����
-���⤷��ʤ��Τǡ�����ޤǤϥ����꡼�󥭥㥹�Ȥˤޤ����ۤɥ��ͥ륮����Ȥ�
-�����ʤ��Ȥ������ȤǤ���
+現在進行中だということだけは断言できます．がしかし，私達はまだ Django を改
+良している真最中なので，現状ではなく， Django 1.0 になったときの最終的な状態
+を反映させたいと思っています．言い方を変えれば， Django API はまだ変化する
+かもしれないので，それまではスクリーンキャストにまださほどエネルギーを使い
+たくないということです．
 
-�ȤϤ����ʤ��顤 `������� Django �����꡼�󥭥㥹��`_ �Ϥ���Τǥ����å���
-�ƤߤƤ���������
+とはいいながら， `非公式の Django スクリーンキャスト`_ はあるのでチェックし
+てみてください．
 
-.. _`������� Django �����꡼�󥭥㥹��`: http://www.throwingbeans.org/django_screencasts.html
+.. _`非公式の Django スクリーンキャスト`: http://www.throwingbeans.org/django_screencasts.html
 .. _unofficial Django screencast: http://www.throwingbeans.org/django_screencasts.html
 
 
 .. _Is Django a content-management-system (CMS)?:
 
-Django �ϥ���ƥ�Ĵ��������ƥ� (CMS) �ʤΤǤ��礦��?
+Django はコンテンツ管理システム (CMS) なのでしょうか?
 -----------------------------------------------------
 
-�������� Django �� CMS �ǤϤ���ޤ��󤷡�������֥����󥭡������ƥ�פΤ�
-���ʤ�ΤǤ⤢��ޤ��� Django �� Web �ե졼�����Ǥ��ꡢ Web �����Ȥ�
-���ۤ���ݤ˻Ȥ���ץ�����ߥ󥰥ġ���ˤ����ޤ���
+いいえ。 Django は CMS ではありませんし、いわゆる「ターンキーシステム」のよ
+うなものでもありません。 Django は Web フレームワークであり、 Web サイトを
+構築する際に使えるプログラミングツールにすぎません。
 
-�㤨�С� Django �� Drupal_ �Τ褦�ʥ����ƥ����Ӥ���Τ�̵��̣�Ǥ����Ȥ���
-�Τ⡢ Django �Ϥޤ��� Drupal �Τ褦�ʥ����ƥ�� *���* ����Τ�Τ������
-����
+例えば、 Django を Drupal_ のようなシステムと比較するのは無意味です。という
+のも、 Django はまさに Drupal のようなシステムを *作る* ためのものだからで
+す。
 
-������� Django �μ�ư admin �����ȤϤ��Ф餷������ȯ���֤�����ˤʤ�ޤ���
-�������� admin �����Ȥ� Django �Ȥ����ե졼�����Τ����⥸�塼��˲᤮��
-���󡣤�äȸ����ʤ顢 Django ���� CMS Ū�ʡץ��ץꥱ�����������������
-�Ȥ�櫓������������äƤϤ��ޤ��������Τ��Ȥ��� CMS Ū�Ǥʤ��ץ��ץꥱ������
-��γ�ȯ�˸����Ƥ��ʤ����ʤ�Ƥ��ȤˤĤʤ��ä���Ϥ��ʤ��ΤǤ���
+もちろん、 Django の自動 admin サイトはすばらしく、開発時間の節約になります。
+しかし、 admin サイトは Django というフレームワークのいちモジュールに過ぎま
+せん。もっと言うなら、 Django が「 CMS 的な」アプリケーションを作成する上で
+とりわけ便利な点を持ってはいますが、そのことが「 CMS 的でない」アプリケーショ
+ンの開発に向いていない、なんてことにつながったりはしないのです。
 
 .. _Drupal: http://drupal.org/
 
 .. _When will you release Django 1.0?:
 
-���Ĥˤʤä��� Django 1.0 ���꡼������ΤǤ�����
+いつになったら Django 1.0 をリリースするのですか？
 --------------------------------------------------
 
-û������: Django �� API ���������꤬�ʤ��ʤꡤ "1.0" ��ɬ�פȹͤ��Ƥ�������
-�ε�ǽ���ɲä��������ΥС������Ȥθߴ�����ݻ��Ǥ���褦�ˤʤä��������Ǥ���
+短い答え: Django の API 構成に問題がなくなり， "1.0" に必要と考えている全て
+の機能を追加し，以前のバージョンとの互換性を維持できるようになった時点，です．
 
-Django �� `magic-removal �֥���`_ �Υޡ����ˤ�ꡤDjango 1.0 �ؤ�ƻ�Τ��
-��ʬ�ʤߤޤ�����
+Django の `magic-removal ブランチ`_ のマージにより，Django 1.0 への道のりは
+大分進みました．
 
-1.0 �ˤʤäƤ��ʤ�����Ȥ��äƤ��ä��ꤷ�ʤ��ǲ������͡�
+1.0 になっていないからといってがっかりしないで下さいね．
 
-.. _magic-removal �֥���: http://code.djangoproject.com/wiki/RemovingTheMagic
+.. _magic-removal ブランチ: http://code.djangoproject.com/wiki/RemovingTheMagic
 .. _quite a few production sites: http://code.djangoproject.com/wiki/DjangoPoweredSites
 
 .. How can I download the Django documentation to read it offline?:
 
-�ɤ����� Django �Υɥ�����Ȥ����������ɤ��ƥ��ե饤����ɤ�ޤ�����
+どうやれば Django のドキュメントをダウンロードしてオフラインで読めますか？
 --------------------------------------------------------------------------
 
-Django �Υɥ�����Ȥ� Django tarball ��꡼���� ``docs`` �ǥ��쥯�ȥ��
-����ޤ��������Υɥ�����Ȥ� ReST (ReStructuredText) �����ǽ񤫤�Ƥ��ꡤ
-�ƥƥ����ȥե����뤬 Django ���������ȤΥڡ������б����Ƥ��ޤ���
+Django のドキュメントは Django tarball リリースの ``docs`` ディレクトリに
+あります．これらのドキュメントは ReST (ReStructuredText) 形式で書かれており，
+各テキストファイルが Django 公式サイトのページに対応しています．
 
-�ɥ�����Ȥ� `�С��������������ƥ಼�ˤ���`_ �Τǡ������ɤ��ѹ��������
-������Τ�Ʊ���褦�ˤ��ƥɥ�����Ȥ��ѹ�����������Ǥ��ޤ���
+ドキュメントは `バージョン管理システム下にある`_ ので，コードの変更状況を閲
+覧するのと同じようにしてドキュメントの変更状況を閲覧できます．
 
-����Ū�ˤϡ� Django �����ȤΥɥ�����ȤϺǿ��γ�ȯ�Ǥ� ReST �ɥ������
-������������ޤ������äơ� Django �����Ȥˤ���ɥ�����Ȥ��������ǿ���
-Django ��꡼���Υɥ�����Ȥ���¿���ξ�����󶡤��Ƥ��뤳�Ȥ�����ޤ���
+技術的には， Django サイトのドキュメントは最新の開発版の ReST ドキュメント
+から生成されます，従って， Django サイトにあるドキュメントの方が，最新の
+Django リリースのドキュメントよりも多くの情報を提供していることがあります．
 
-.. _`�С��������������ƥ಼�ˤ���`: http://code.djangoproject.com/browser/django/trunk/docs
+.. _`バージョン管理システム下にある`: http://code.djangoproject.com/browser/django/trunk/docs
 .. _stored in revision control: http://code.djangoproject.com/browser/django/trunk/docs
 
 
 .. _Where can I find Django developers for hire?:
 
-Django ��ȯ�ԤϤɤ��Ǹۤ��ޤ�����
+Django 開発者はどこで雇えますか？
 ---------------------------------
 
-`�ῦ��γ�ȯ�ԥꥹ��`_ �ˤϡ����Ǥ��ʤ����ϤˤʤäƤ���� Django ��ȯ��
-�Υꥹ�Ȥ�����ޤ���
+`求職中の開発者リスト`_ には，喜んであなたの力になってくれる Django 開発者
+のリストがあります．
 
-�ޤ�����ͤ� http://www.gypsyjobs.com/ �˽Ф��ƤߤƤ�褤���⤷��ޤ���
+また，求人を http://www.gypsyjobs.com/ に出してみてもよいかもしれません．
 
-.. _`�ῦ��γ�ȯ�ԥꥹ��`: http://code.djangoproject.com/wiki/DevelopersForHire
+.. _`求職中の開発者リスト`: http://code.djangoproject.com/wiki/DevelopersForHire
 .. _developers for hire page: http://code.djangoproject.com/wiki/DevelopersForHire
 
 
 .. _Installation questions:
 
-���󥹥ȡ���˴ؤ������
+インストールに関する質問
 ========================
 
 .. _How do I get started?:
 
-�ɤ�����Ϥ᤿�餤���Ǥ�����
+どこから始めたらいいですか？
 ----------------------------
 
-    #. `�����ɤ�����������`_ ���Ƥ���������
-    #. Django �򥤥󥹥ȡ��뤷�Ƥ������� (`���󥹥ȡ��륬����`_ ���ɤ�ǲ�
-       ����)��
-    #. `���塼�ȥꥢ��`_ ���äƤߤƤ���������
-    #. ¾�� `�ɥ������`_ �ˤ��ܤ��̤��Ʋ������������ȥ�֥�˽в�ä��顤
-       `����`_ ���Ƥߤޤ��礦��
+    #. `コードをダウンロード`_ してください．
+    #. Django をインストールしてください (`インストールガイド`_ を読んで下
+       さい)．
+    #. `チュートリアル`_ をやってみてください．
+    #. 他の `ドキュメント`_ にも目を通して下さい．何かトラブルに出会ったら，
+       `質問`_ してみましょう．
 
-.. _`�����ɤ�����������`: http://www.djangoproject.com/download/
-.. _`���󥹥ȡ��륬����`: ../install/
-.. _`���塼�ȥꥢ��`:  ../tutorial01/
-.. _`�ɥ������`: ../index/
-.. _`����`: http://www.djangoproject.com/community/
+.. _`コードをダウンロード`: http://www.djangoproject.com/download/
+.. _`インストールガイド`: ../install/
+.. _`チュートリアル`:  ../tutorial01/
+.. _`ドキュメント`: ../index/
+.. _`質問`: http://www.djangoproject.com/community/
 
 .. _`Download the code`: http://www.djangoproject.com/download/
 .. _`installation guide`: ../install/
@@ -354,28 +354,28 @@ Django ��ȯ�ԤϤɤ��Ǹۤ��ޤ�����
 
 .. _How do I fix the "install a later version of setuptools" error?:
 
-"install a later version of setuptools" �β����ˡ�ϡ�
+"install a later version of setuptools" の解決方法は？
 ------------------------------------------------------
 
-Django ����ʪ�����äƤ��� ``ez_setup.py`` ��¹Ԥ��Ƥ���������
+Django 配布物に入っている ``ez_setup.py`` を実行してください．
 
 .. _What are Django's prerequisites?:
 
-Django ��ư�����ˤϲ���ɬ�ס�
+Django を動かすには何が必要？
 -----------------------------
 
-Django ��ư�����ˤ� Python_ 2.3 �ʹߤ�ɬ�פǤ���Django �ν���Ū�����ѤǤϡ�
-����ʳ��� Python �饤�֥������פǤ���
+Django を動かすには Python_ 2.3 以降が必要です．Django の初歩的な利用では、
+それ以外の Python ライブラリは不要です．
 
-��ȯ�Ķ���Ȥ���硤�Ĥޤ� Django �����������ξ��ϡ� Web �����Ф��̤�
-���󥹥ȡ��뤷�Ƥ���ɬ�פϤ���ޤ��� Django �ˤϷ��̤ʳ�ȯ�ѥ����Ф��Ĥ�
-�Ƥ��ޤ���
-���ѴĶ��ˤ� `Apache 2`_ �� mod_python_ �򴫤�ޤ����� Django �� WSGI_ ����
-�˽��äƤ���Τǡ��͡��ʥ����Хե�åȥե������ư��ޤ���
+開発環境を使う場合，つまり Django を試したいだけの場合は， Web サーバを別に
+インストールしておく必要はありません． Django には軽量な開発用サーバがつい
+てきます．
+運用環境には `Apache 2`_ と mod_python_ を勧めますが， Django は WSGI_ 仕様
+に従っているので，様々なサーバフラットフォームで動作します．
 
-Django ��ǡ����١����ȹ�碌�ƻȤ��ʤ�ǡ����١������󥸥��ɬ�פǤ���
-�桹�� PostgreSQL_ �ե���ʤΤ� PostgreSQL �򤪴��ᤷ�ޤ����� MySQL_ ��
-`SQLite 3`_ �⥵�ݡ��Ȥ��Ƥ��ޤ���
+Django をデータベースと合わせて使うならデータベースエンジンも必要です．
+我々は PostgreSQL_ ファンなので PostgreSQL をお勧めしますが， MySQL_ や
+`SQLite 3`_ もサポートしています．
 
 .. _Python: http://www.python.org/
 .. _Apache 2: http://httpd.apache.org/
@@ -388,329 +388,329 @@ Django ��ǡ����١����ȹ�碌�ƻȤ��ʤ�ǡ����١������󥸥��ɬ�פǤ���
 
 .. _Do I lose anything by using Python 2.3 versus newer Python versions, such as Python 2.5?:
 
-Python 2.3 ��Ȥ��Τϡ� 2.5 �Τ褦�ʿ������С�������Ȥ����������Ǥ�����
+Python 2.3 を使うのは， 2.5 のような新しいバージョンを使うよりも不利ですか？
 ----------------------------------------------------------------------------
 
-�������� Django ���Τ� 2.3 �ʹ����ƤΥС������� Python ��ư���ݾڤ���Ƥ�
-�ޤ���
+いいえ． Django 自体は 2.3 以降全てのバージョンの Python で動作保証されてい
+ます．
 
-������� 2.3 ���⿷���� Python ��ȤäƤ���С���ʬ�Υ����ɤ˿�����
-Python �ε�ǽ�������ޤ�����Python ���Τβ��ɤˤ�äƤ⤿�餵�줿��®��
-���Ŭ���β��ä�������ޤ����������� Django �ե졼�������Τϡ� 2.3 ��
-�� 2.4 �� 2.5 �Ǥ�Ʊ���褦��ư��ޤ���
+もちろん， 2.3 よりも新しい Python を使っていれば，自分のコードに新しい
+Python の機能を取り込めますし，Python 自体の改良によってもたらされた高速化
+や最適化の恩恵を受けられます．ただし， Django フレームワーク自体は， 2.3 で
+も 2.4 や 2.5 でも同じように動作します．
 
 .. _Do I have to use mod_python?:
 
-mod_python ��Ȥ�ͤФʤ�ʤ��ΤǤ��礦����
+mod_python を使わねばならないのでしょうか？
 -------------------------------------------
 
-�ºݤ˱��Ѥ����Ǥ� mod_python ��Ȥ��褦����Ƥ��ޤ����� Django �� WSGI_
-�ȸƤФ�빽����ȤäƤ��뤿�ᡤɬ������ mod_python ��Ȥ�ͤФʤ�ʤ��櫓
-�ǤϤ���ޤ��� Django �� WSGI ��ͭ�������������Ф��̿��Ǥ��ޤ���
-mod_python ��Ȥ�ʤ������ǺǤ�褯�Ȥ��뱿�������� FastCGI �ˤ���Τ�
-�����ܤ�������� `FastCGI �� Django ��Ȥ�`_ �򻲾Ȥ��Ƥ���������
+実際に運用する上では mod_python を使うよう勧めていますが， Django は WSGI_
+と呼ばれる構成を使っているため，必ずしも mod_python を使わねばならないわけ
+ではありません． Django は WSGI を有効化したサーバと通信できます．
+mod_python を使わない構成で最もよく使われる運用方式は FastCGI によるもので
+す．詳しい情報は `FastCGI で Django を使う`_ を参照してください．
 
-�ޤ�������¾�α�����ˡ�ˤĤ��Ƥ� `�����й����˴ؤ��� wiki�ڡ���`_ �򻲾Ȥ�
-�Ƥ���������
+また，その他の運用方法については `サーバ構成に関する wikiページ`_ を参照し
+てください．
 
-Django ���Ƥߤ��ꡤ��������Υ���ԥ塼����ǳ�ȯ��������ʤ顤 Django
-���դ��Ƥ��볫ȯ�� Web �����Ф�ȤäƤ���������
+Django を試してみたり，ローカルのコンピュータ上で開発するだけなら， Django
+に付いてくる開発用 Web サーバを使ってください．
 
 
-.. _`FastCGI �� Django ��Ȥ�`: ../fastcgi/
-.. _`�����й����˴ؤ��� wiki�ڡ���`: http://code.djangoproject.com/wiki/ServerArrangements
+.. _`FastCGI で Django を使う`: ../fastcgi/
+.. _`サーバ構成に関する wikiページ`: http://code.djangoproject.com/wiki/ServerArrangements
 .. _WSGI: http://www.python.org/peps/pep-0333.html
-.. _`����������˴ؤ��� wiki �ڡ���`: http://code.djangoproject.com/wiki/ServerArrangements
+.. _`サーバ設定に関する wiki ページ`: http://code.djangoproject.com/wiki/ServerArrangements
 .. _server arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
 
 .. _How do I install mod_python on Windows?:
 
-Windows �ؤ� mod_python �Υ��󥹥ȡ�����ˡ�ϡ�
+Windows への mod_python のインストール方法は？
 ----------------------------------------------
 
-    * Python 2.4 ��ȤäƤ���ʤ�
-      `Python 2.4 ���� mod_python �� win32 �ӥ��`_ �����ꤷ�Ƥ���������
-    * Python 2.4 �ξ�硤 `Windows �Ǥ� Django HOWTO`_ �⻲�Ȥ��Ƥ���������
-    * Python 2.3 �ʤ顤 http://www.modpython.org/ ���� mod_python ���ä�
-      ��ơ� `Running mod_python on Apache on Windows2000`_ ���ɤ�ǲ�������
-    * �ޤ��� (Windows �˸¤餺) `guide to getting mod_python
-      working`_ ���ɤ�ǲ�������
+    * Python 2.4 を使っているなら
+      `Python 2.4 向け mod_python の win32 ビルド`_ を入手してください．
+    * Python 2.4 の場合， `Windows での Django HOWTO`_ も参照してください．
+    * Python 2.3 なら， http://www.modpython.org/ から mod_python を取って
+      来て， `Running mod_python on Apache on Windows2000`_ を読んで下さい．
+    * また， (Windows に限らず) `guide to getting mod_python
+      working`_ を読んで下さい．
 
-.. _`Python 2.4 ���� mod_python �� win32 �ӥ��`: http://www.lehuen.com/nicolas/index.php/2005/02/21/39-win32-build-of-mod_python-314-for-python-24
-.. _`Windows �Ǥ� Django HOWTO`: http://thinkhole.org/wp/2006/04/03/django-on-windows-howto/
+.. _`Python 2.4 向け mod_python の win32 ビルド`: http://www.lehuen.com/nicolas/index.php/2005/02/21/39-win32-build-of-mod_python-314-for-python-24
+.. _`Windows での Django HOWTO`: http://thinkhole.org/wp/2006/04/03/django-on-windows-howto/
 .. _`guide to mod_python & Python 2.3`: http://www.lehuen.com/nicolas/index.php/2005/02/21/39-win32-build-of-mod_python-314-for-python-24
 .. _`Running mod_python on Apache on Windows2000`: http://groups-beta.google.com/group/comp.lang.python/msg/139af8c83a5a9d4f
 .. _`guide to getting mod_python working`: http://www.dscpl.com.au/articles/modpython-001.html
 
 .. _Will Django run under shared hosting (like TextDrive or Dreamhost)?:
 
-Django �϶�ͭ�ۥ��ƥ��󥰥����ӥ� (TextDrive �� Dreamhost) ��ư���ޤ�����
+Django は共有ホスティングサービス (TextDrive や Dreamhost) で動きますか？
 -------------------------------------------------------------------------
 
-`Django ��Ȥ��� Web �ۥ���`_ �Υڡ����򤴤�󲼤�����
+`Django を使える Web ホスト`_ のページをごらん下さい．
 
-.. _`Django ��Ȥ��� Web �ۥ���`: http://code.djangoproject.com/wiki/DjangoFriendlyWebHosts
+.. _`Django を使える Web ホスト`: http://code.djangoproject.com/wiki/DjangoFriendlyWebHosts
 .. _`Django-friendly Web hosts`: http://code.djangoproject.com/wiki/DjangoFriendlyWebHosts
 
 .. _Should I use the official version or development version?:
 
-������꡼���ȳ�ȯ�ǤΤɤ����Ȥ��٤��ʤΤǤ��礦����
+公式リリースと開発版のどちらを使うべきなのでしょうか？
 ------------------------------------------------------
 
-Django �γ�ȯ��ã������ Django ���ɤ�ŤͤƤ��ꡤ���줿�����ɤ�����å�����
-���ʤ��褦��꤯�פ�äƤ��ޤ�����ã�ϼ�ʬ�Υ����Ф� (Subversion ��ݥ��ȥ�
-���) ��ȯ��Υ����ɤ�ľ�ܻȤäƤ��ꡤ����˱��ѤǤ��Ƥ��ޤ������Τ��Ȥ��
-����ȡ��������Ȥ��ơ��ָ����Ρץ�꡼�����Ϥ��¿���ε�ǽ�Ⱦ��ʤ��Х���
-���ĺǿ��γ�ȯ�Ǥ�Ȥ��褦�˴���ޤ���
+Django の開発者達は毎日 Django 改良を重ねており，壊れたコードをチェックイン
+しないよう上手く計らっています．私達は自分のサーバに (Subversion レポジトリ
+上の) 開発中のコードを直接使っており，安定に運用できています．このことを考
+えると，一般論として．「公式の」リリースよりはより多くの機能と少ないバグを
+持つ最新の開発版を使うように勧めます．
 
 .. _Using Django:
 
-Django ��Ȥ���Ǥμ���
+Django を使う上での質問
 =======================
 
 .. _Why do I get an error about importing DJANGO_SETTINGS_MODULE?:
 
-DJANGO_SETTINGS_MODULE �� import ����ߤΥ��顼���Ǥ�ΤϤʤ���
+DJANGO_SETTINGS_MODULE の import がらみのエラーがでるのはなぜ？
 ---------------------------------------------------------------
 
-�ʲ��������ǧ���Ƥ�������:
+以下の点を確認してください:
 
-    * �Ķ��ѿ� DJANGO_SETTINGS_MODULE ����������� Python �⥸�塼��̾�ˤʤ�
-      �Ƥ��ޤ��� (���Ȥ��� "mysite.settings.main")��
+    * 環境変数 DJANGO_SETTINGS_MODULE が完全指定の Python モジュール名になっ
+      ていますか (たとえば "mysite.settings.main")．
 
-    * ����⥸�塼��� ``sys.path`` �ξ�ˤ���ޤ��� (``import
-      mysite.settings.main`` �Ϥ��ޤ������ޤ���)��
+    * 設定モジュールは ``sys.path`` の上にありますか (``import
+      mysite.settings.main`` はうまくいきますか)．
 
-    * (�����ޤǤ�ʤ�) �⥸�塼��˹�ʸ���顼�Ϥ���ޤ��󤫡�
+    * (言うまでもなく) モジュールに構文エラーはありませんか．
 
-    * mod_python ��ȤäƤ��ơ�Django �ꥯ�����ȥϥ�ɥ�� *�ȤäƤ��ʤ�*
-      �Τʤ顤 ``SetEnv`` �˴ؤ�� mod_python �ΥХ�����򤹤�ɬ�פ������
-      ���� Django ���鲿�餫�Υ⥸�塼��� import �������ˡ��ʲ��Υ����ɤ�
-      �¹Ԥ��Ƥ�������::
+    * mod_python を使っていて，Django リクエストハンドラは *使っていない*
+      のなら， ``SetEnv`` に関わる mod_python のバグを回避する必要がありま
+      す． Django から何らかのモジュールを import する前に，以下のコードを
+      実行してください::
 
             os.environ.update(req.subprocess_env)
 
-      (``req`` �� mod_python �Υꥯ�����ȥ��֥������ȤǤ�)��
+      (``req`` は mod_python のリクエストオブジェクトです)．
 
 .. _I can't stand your template language. Do I have to use it?:
 
-�ƥ�ץ졼�ȸ���򹥤��ˤʤ�ޤ��󡥤ɤ����Ƥ�Ȥ�ʤ��Ȥ���Ǥ�����
+テンプレート言語を好きになれません．どうしても使わないとだめですか？
 --------------------------------------------------------------------
 
-��ã�Ϥ��Υƥ�ץ졼�ȥ��󥸥�� chunky bacon ����η����ȻפäƤ�����
-�������ƥ�ץ졼�ȸ��������Ȥ�����ΤϽ����˶ᤤ��Τ�����Ȥ������Ȥ�ǧ
-�����Ƥ��ޤ��� Django �Ǥϡ��ƥ�ץ졼�ȸ�����Ф������¤Ϥʤ�餢��ޤ���
-�Ǥ����顤 ZPT �� Cheetah �ʤɤ�Ȥ������Τʤ顤����ϼ�ͳ�Ǥ���
+私達はこのテンプレートエンジンを chunky bacon 以来の傑作だと思っているんで
+すが，テンプレート言語の選択というものは宗教に近いものがあるということは認
+識しています． Django では，テンプレート言語に対する制限はなんらありません．
+ですから， ZPT や Cheetah などを使いたいのなら，それは自由です．
 
 .. _Do I have to use your model/database layer?:
 
-��°�Υ�ǥ롿�ǡ����١����쥤���Ȥ�ͤФʤ�ʤ��ΤǤ�����
+付属のモデル／データベースレイヤを使わねばならないのですか？
 ------------------------------------------------------------
 
-���������ƥ�ץ졼�ȥ����ƥ��Ʊ�͡���ǥ롿�ǡ����١����쥤��ϥե졼��
-����¾����ʬ��æ���åץ�󥰤��Ƥ��ޤ���
+いいえ，テンプレートシステムと同様，モデル／データベースレイヤはフレームワー
+クの他の部分と脱カップリングしています．
 
-ͣ����㳰: �̤Υǡ����١����饤�֥���Ȥä����ˤϡ� Django �μ�ư����
-admin �����Ȥ����ѤǤ��ʤ��ʤ�ޤ��� admin ������ Django �Υǡ����١����쥤
-��ȥ��åץ�󥰤��Ƥ��ޤ���
+唯一の例外: 別のデータベースライブラリを使った場合には， Django の自動生成
+admin サイトを利用できなくなります． admin だけは Django のデータベースレイ
+ヤとカップリングしています．
 
 
 .. _How do I use image and file fields?:
 
-������ե�����Υե�����ɤλȤ����ϡ�
+画像やファイルのフィールドの使い方は？
 --------------------------------------
 
-��ǥ�� ``FileField`` �� ``ImageField`` ��Ȥ��ˤϡ������Ĥ��Υ��ƥåפ�Ƨ
-��ɬ�פ�����ޤ�:
+モデルで ``FileField`` や ``ImageField`` を使うには，いくつかのステップを踏
+む必要があります:
 
-    #. ����ե�������� ``MEDIA_ROOT`` ����ꤷ�ޤ��������ͤϡ�Django ������
-       �ץ����ɤ��줿�ե�������֤����ˤ��ޤ� (�ѥե����ޥ󥹾����ͳ���顤
-       �ե������ǡ����١������֤����ȤϤ���ޤ���)�� ``MEDIA_URL`` �򤽤�
-       �ǥ��쥯�ȥ�θ��� URL �ˤ��ޤ����ǥ��쥯�ȥ�� Web �����ФΥ桼����
-       ������Ȥ��Ф��ƽ񤭹��߲�ǽ�ˤ��Ƥ����ͤФʤ�ޤ���
+    #. 設定ファイル内で ``MEDIA_ROOT`` を指定します．この値は，Django がアッ
+       プロードされたファイルを置く場所にします (パフォーマンス上の理由から，
+       ファイルをデータベースに置くことはありません)． ``MEDIA_URL`` をその
+       ディレクトリの公開 URL にします．ディレクトリは Web サーバのユーザア
+       カウントに対して書き込み可能にしておかねばなりません．
 
-    #. ��ǥ�� ``FileField`` �� ``ImageField`` ���ɲä��� ``upload_to`` ��
-       �ץ�����������ơ� ``MEDIA_ROOT`` �ΤɤΥ��֥ǥ��쥯�ȥ�˥ե�����
-       �򥢥åץ����ɤ�����Τ��� Django �˶����ޤ���
+    #. モデルに ``FileField`` や ``ImageField`` を追加し， ``upload_to`` オ
+       プションを定義して， ``MEDIA_ROOT`` のどのサブディレクトリにファイル
+       をアップロードさせるのかを Django に教えます．
 
-    #. �ǡ����١����ˤ���¸�����Τϡ��ե������ (``MEDIA_ROOT`` �������
-       �Ф�ɽ����) �ѥ������Ǥ��� Django ���󶡤��Ƥ����ص��ؿ�
-       ``get_<filename>_url`` ��Ȥ����Ȥˤʤ�Ǥ��礦���㤨�С�
-       ``mug_shot`` �Ȥ���̾���� ``ImageField`` ������Ȥ���ȡ��ƥ�ץ졼
-       �Ȥǲ����� URL ����ꤹ��ˤ� ``{{ object.get_mug_shot_url }}`` �Τ�
-       ���ˤ��ޤ���
+    #. データベースにい保存されるのは，ファイルの (``MEDIA_ROOT`` からの相
+       対で表した) パスだけです． Django の提供している便宜関数
+       ``get_<filename>_url`` を使うことになるでしょう．例えば，
+       ``mug_shot`` という名前の ``ImageField`` があるとすると，テンプレー
+       トで画像の URL を指定するには ``{{ object.get_mug_shot_url }}`` のよ
+       うにします．
 
 .. _Databases and models:
 
-�ǡ����١����ȥ�ǥ�˴ؤ������
+データベースとモデルに関する質問
 ================================
 
 .. _How can I see the raw SQL queries Django is running?:
 
-Django ���¹Ԥ��Ƥ������� SQL ������򸫤��ޤ�����
+Django が実行している生の SQL クエリを見られますか？
 ----------------------------------------------------
 
-�ޤ��� ``DEBUG`` ����� ``True`` �ˤ���  Django ��ư�����Ƥ��뤫��ǧ���Ƥ�
-�����������ˡ��ʲ��Υ����ɤ�¹Ԥ��ޤ�::
+まず， ``DEBUG`` 設定を ``True`` にして  Django を動かしているか確認してく
+ださい．次に，以下のコードを実行します::
 
     >>> from django.db import connection
     >>> connection.queries
     [{'sql': 'SELECT polls_polls.id,polls_polls.question,polls_polls.pub_date FROM polls_polls',
     'time': '0.002'}]
 
-``connection.queries`` ��Ȥ���Τ� ``DEBUG`` �� ``True`` �λ������Ǥ�����
-���ͤϡ�������μ¹Խ�˼�����¤٤���ΤǤ����Ƽ���ˤϰʲ����ͤ����äƤ�
-�ޤ�::
+``connection.queries`` を使えるのは ``DEBUG`` が ``True`` の時だけです．こ
+の値は，クエリの実行順に辞書を並べたものです．各辞書には以下の値が入ってい
+ます::
 
-    ``sql`` -- ���� SQL ʸ
-    ``time`` -- SQL ʸ�μ¹Ԥˤ����ä����֤��ä�ɽ�������
+    ``sql`` -- 生の SQL 文
+    ``time`` -- SQL 文の実行にかかった時間を秒で表したもの
 
-``connection.queries`` �ˤϡ� INSERT, UPDATE, SELECT �Ȥ��ä����Ƥ� SQL ʸ
-������ޤ���������ϥ��ץꥱ������󤬥ǡ����١����������٤˵�Ͽ����
-�Ƥ椭�ޤ���
+``connection.queries`` には， INSERT, UPDATE, SELECT といった全ての SQL 文
+が入ります．クエリはアプリケーションがデータベースを操作する度に記録され
+てゆきます．
 
 .. _Can I use Django with a pre-existing database?:
 
-��¸�Υǡ����١����� Django ��Ȥ��ޤ�����
+既存のデータベースで Django を使えますか？
 ------------------------------------------
 
-�Ȥ��ޤ��� `�Ť��ǡ����١������Ȥ߹���`_ �򻲾Ȥ��Ƥ���������
+使えます． `古いデータベースの組み込み`_ を参照してください．
 
-.. _`�Ť��ǡ����١������Ȥ߹���`: ../legacy_databases/
+.. _`古いデータベースの組み込み`: ../legacy_databases/
 .. _`Integrating with a legacy database`: ../legacy_databases/
 
 
 .. _If I make changes to a model, how do I update the database?:
 
-��ǥ���ѹ��������Υǡ����١����ι�����ˡ�ϡ�
+モデルを変更した場合のデータベースの更新方法は？
 ------------------------------------------------
 
-�ǡ������ä��Ƥ⤫�ޤ�ʤ��Τʤ顤 ``manage.py`` �桼�ƥ���ƥ���Ȥäơ���
-��Υ��ץꥱ��������ꥻ�åȤ��� SQL ��ȯ�ԤǤ��ޤ�::
+データが消えてもかまわないのなら， ``manage.py`` ユーティリティを使って，特
+定のアプリケーションをリセットする SQL を発行できます::
 
     manage.py reset appname
 
-�������ǡ� ``appname`` �˴ط������ơ��֥뤬������졤���ٺ�������ޤ���
+この操作で， ``appname`` に関係したテーブルが削除され，再度作成されます．
 
-�ǡ��������������ʤ��Τʤ顤���Ȥ� ``ALTER TABLE`` ʸ��¹Ԥ��ͤФʤ��
-���󡥻�ã�Ϥ��Ĥ⤳����ˡ�Ǥ�äƤ��ޤ����Ȥ����Τ⡤�ǡ����ΰ����ϤȤƤ�
-���Ťˤ��ͤФʤ�ʤ��Τǡ���ã�ϼ�ư�����򤱤����ΤǤ����ȤϤ������ǡ����١�
-���ι�������ʬŪ�˼�ư�����뵡ǽ���ɲä��٤����ߺ����Ǥ���
+データを削除したくないのなら，手作業で ``ALTER TABLE`` 文を実行せねばなりま
+せん．私達はいつもこの方法でやっています．というのも，データの扱いはとても
+慎重にせねばならないので，私達は自動化を避けたいのです．とはいえ，データベー
+スの更新を部分的に自動化する機能を追加すべく現在作業中です．
 
 .. _Do Django models support multiple-column primary keys?:
 
-Django �Υ�ǥ��ʣ�������ˤ錄��祭���򥵥ݡ��Ȥ��Ƥ��ޤ�����
+Django のモデルは複数カラムにわたる主キーをサポートしていますか？
 -----------------------------------------------------------------
 
-�����������ݡ��Ȥ��Ƥ���Τ�ñ�����μ祭�������Ǥ���
+いいえ．サポートしているのは単カラムの主キーだけです．
 
-������������Ū�ˤ�����ˤϤʤ�ޤ��󡥤Ȥ����Τϡ�(``unique_together`` ���
-�륪�ץ�������ꤷ���ꡤľ�ܥǡ����١�����������ä��ꤷ��) ¾�������
-�ݤ�����ǥ��٥�ǰ���������Ǥ��뤫��Ǥ���ñ�����μ祭���� admin ��
-�󥿥ե������򤦤ޤ���Ư�����뤿�ᡤ�㤨���Խ������оݤΥ��֥������Ȥ��
-�ꤹ��ʷ�ʼ��ʤȤ���ɬ�פʤΤǤ���
+しかし，実践的には問題にはなりません．というのは，(``unique_together`` モデ
+ルオプションを指定したり，直接データベースに制約を作ったりして) 他の制約を
+課し，モデルレベルで一意性を強制できるからです．単カラムの主キーは admin イ
+ンタフェースをうまく稼働させるため，例えば編集や削除対象のオブジェクトを指
+定する簡潔な手段として必要なのです．
 
 
 .. _How do I add database-specific options to my CREATE TABLE statements, such as specifying MyISAM as the table type?:
 
-�ơ��֥������ MyISAM �˻��ꤹ��ʤɡ��ǡ����١�����ͭ�Υ��ץ����� CREATE TABLE ʸ���ɲä������ΤǤ������ɤ�����Ф褤�Ǥ�����
+テーブル形式を MyISAM に指定するなど，データベース固有のオプションを CREATE TABLE 文に追加したいのですが，どうすればよいですか？
 --------------------------------------------------------------------------------------------------------------------------------
 
-��ã�ϡ��ơ��֥�η����Τ褦�ʥǡ����١�����ͭ�Υ��ץ������б����뤿���
-Django �Υ����ɤ��ü�ʥ��������ɲä������ʤ��ȹͤ��Ƥ��ޤ��������������ץ���
-���Ȥ�������С� `SQL �ν���ǡ����ե�����`_ ��������ơ��������
-``ALTER TABLE`` ʸ��ȤäƼ�ʬ����Ū��¸����Ƥ�������������ǡ����ե�����
-�ϥǡ����١�������� ``CREATE TABLE`` ʸ�θ�˼¹Ԥ���ޤ���
+私達は，テーブルの形式のようなデータベース固有のオプションに対応するために
+Django のコードに特殊なケースを追加したくないと考えています．こうしたオプショ
+ンを使いたければ， `SQL の初期データファイル`_ を作成して，その中で
+``ALTER TABLE`` 文を使って自分の目的を実現してください．初期データファイル
+はデータベースの中で ``CREATE TABLE`` 文の後に実行されます．
 
-�㤨�С� MySQL ��ȤäƤ��ơ� MyISAM �ơ��֥륿���פ�Ȥ��������ˤϡ����
-�ǡ����ե������������ơ��ʲ��Τ褦�ʹԤ��������ޤ�::
+例えば， MySQL を使っていて， MyISAM テーブルタイプを使いたい場合には，初期
+データファイルを作成して，以下のような行を挿入します::
 
     ALTER TABLE myapp_mytable ENGINE=MyISAM;
 
-`SQL �ν���ǡ����ե�����`_ �Ǥ��������Ƥ��ޤ����� SQL �ե�����ˤ�Ǥ�դ�
-SQL �����ɤ��������Τǡ�SQL �ǹԤʤ����ѹ��ʤ鲿�Ǥ�¸��Ǥ��ޤ���
+`SQL の初期データファイル`_ でも説明していますが， SQL ファイルには任意の
+SQL コードを入れられるので，SQL で行なえる変更なら何でも実現できます．
 
-.. _`SQL �ν���ǡ����ե�����`: ../model_api/#providing-initial-sql-data
+.. _`SQL の初期データファイル`: ../model_api/#providing-initial-sql-data
 .. _SQL initial data file: ../model_api/#providing-initial-sql-data
 
-Django ������꡼���򵯤����Ƥ���ΤǤ������ʤ��Ǥ�����
+Django がメモリリークを起こしているのですが，なぜですか？
 ---------------------------------------------------------
 
-Django �˴��ΤΥ���꡼���Ϥ���ޤ��� Django �ץ������������ɤ�ɤ�
-���񤷤ơ����ä����˳������뵤�ۤ��ʤ���硤 ``DEBUG`` �� ``True`` �ˤʤä�
-���ʤ���Ĵ�٤ƤߤƤ��������� ``DEBUG`` �� ``True`` �ˤ���ȡ� Django �ϼ¹�
-���� SQL ʸ�����ƤΥ��ԡ�����¸����褦�ˤʤ뤫��Ǥ���
+Django に既知のメモリリークはありません． Django プロセスがメモリをどんどん
+消費して，いっこうに開放する気配がない場合， ``DEBUG`` が ``True`` になって
+いないか調べてみてください． ``DEBUG`` を ``True`` にすると， Django は実行
+した SQL 文の全てのコピーを保存するようになるからです．
 
-(������� ``django.db.connection.queries`` ����¸����ޤ���
-`Django ���¹Ԥ��Ƥ������� SQL ������򸫤��ޤ�����`_ �򻲾Ȥ��Ƥ���������)
+(クエリは ``django.db.connection.queries`` で保存されます．
+`Django が実行している生の SQL クエリを見られますか？`_ を参照してください．)
 
-������褹��ˤϡ� ``DEBUG`` �� ``False`` �ˤ��Ƥ���������
+問題を解決するには， ``DEBUG`` を ``False`` にしてください．
 
-������ꥹ�Ȥ��ư�Ǿõ��ˤϡ��ʲ��Τ褦�� ``reset_queries()`` ��Ƥӽ�
-���Ƥ�������::
+クエリリストを手動で消去するには，以下のように ``reset_queries()`` を呼び出
+してください::
 
     from django import db
     db.reset_queries()
 
 
-admin �����Ȥ˴ؤ������
+admin サイトに関する質問
 ========================
 
 .. _`I can't log in. When I enter a valid username and password, it just brings up the login page again, with no error messages.`:
 
-��������Ǥ��ޤ����������桼��̾�ȥѥ���ɤ����Ϥ����Τˡ����顼��å�������Ф����٥�������ڡ�����ɽ�������ΤǤ���
+ログインできません．正しいユーザ名とパスワードを入力したのに，エラーメッセージも出ず再度ログインページが表示されるのです．
 --------------------------------------------------------------------------------------------------------------------------
 
 
-Django ��ȯ�Ԥ��륯�å����Υɥᥤ��ȡ��֥饦���˳�Ǽ���줿�ɥᥤ�󤬰��פ�
-�Ƥ��ʤ����ᡤ�������󥯥å��������������ꤵ��ʤ�����Ǥ����ʲ�����Ĥ���
-�����ƤߤƲ�����:
+Django の発行するクッキーのドメインと，ブラウザに格納されたドメインが一致し
+ていないため，ログインクッキーが正しく設定されないからです．以下の二つの対
+策を試してみて下さい:
 
-    * admin ����ե������ ``SESSION_COOKIE_DOMAIN`` �Ȥ��Ȥ��Υɥᥤ�󤬰�
-      �פ���褦�����ꤷ�Ƥ����������㤨�С��֥饦����
-      "http://www.mysite.com/admin/" �˥�����������褦�ˤʤäƤ���Τʤ顤
-      "myproject.settings" �ˤ� ``SESSION_COOKIE_DOMAIN = 'www.mysite.com'``
-      �����ꤻ�ͤФʤ�ޤ���
+    * admin 設定ファイルの ``SESSION_COOKIE_DOMAIN`` とお使いのドメインが一
+      致するように設定してください．例えば，ブラウザで
+      "http://www.mysite.com/admin/" にアクセスするようになっているのなら，
+      "myproject.settings" には ``SESSION_COOKIE_DOMAIN = 'www.mysite.com'``
+      と設定せねばなりません．
 
-    * �֥饦���ˤ�äƤ� (Firefox?) �ɥåȤ����äƤ��ʤ��ɥᥤ�󤫤�Υ���
-      ���������������Ȥ��ʤ��褦�Ǥ���admin �� "localhost" �ʤɤΤ褦�ʥɥ�
-      �Ȥ�ޤޤʤ��ɥᥤ��Ǽ¹Ԥ��Ƥ���Τʤ顤"localhost.localdomain" ��
-      "127.0.0.1" �Τ褦�˻��ꤷ�ƥ����������Ƥ����������ޤ���
-      ``SESSION_COOKIE_DOMAIN`` �⤽��˹�碌���ѹ����Ƥ���������
+    * ブラウザによっては (Firefox?) ドットの入っていないドメインからのクッ
+      キーを受け取ろうとしないようです．admin を "localhost" などのようなドッ
+      トを含まないドメインで実行しているのなら，"localhost.localdomain" や
+      "127.0.0.1" のように指定してアクセスしてください．また，
+      ``SESSION_COOKIE_DOMAIN`` もそれに合わせて変更してください．
 
 .. _`I can't log in. When I enter a valid username and password, it brings up the login page again, with a "Please enter a correct username and password" error.`:
 
-��������Ǥ��ޤ����������桼��̾�ȥѥ���ɤ����Ϥ����Ȥ��������������桼��̾�ȥѥ���ɤ����Ϥ��Ƥ��������פȤ������顼��å�������ɽ�����줿��������ڡ�����ɽ������ޤ���
+ログインできません．正しいユーザ名とパスワードを入力したところ，「正しいユーザ名とパスワードを入力してください」というエラーメッセージの表示されたログインページが表示されます．
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-�桼���͡���ȥѥ���ɤ��������������Τʤ顤�桼����������Ȥ�
-``is_active`` �ǡ����� ``is_staff`` �� ``True`` �ˤʤäƤ��뤫�Τ���Ʋ���
-���� admin �����Ȥ˥��������Ǥ���Τϡ��������ĤΥե�����ɤ�����
-``True`` �Ǥ���桼�������Ǥ���
+ユーザネームとパスワードが本当に正しいのなら，ユーザアカウントが
+``is_active`` で，かつ ``is_staff`` が ``True`` になっているか確かめて下さ
+い． admin サイトにアクセスできるのは，これら二つのフィールドが共に
+``True`` であるユーザだけです．
 
 .. _How can I prevent the cache middleware from caching the admin site?:
 
-����å���ߥɥ륦������ admin �����Ȥ򥭥�å��夵���ʤ�����ˤϤɤ�����Ф褤�Ǥ�����
+キャッシュミドルウェアに admin サイトをキャッシュさせなくするにはどうすればよいですか？
 ---------------------------------------------------------------------------------------
 
-``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` ����� ``True`` �ˤ��Ƥ����������ܤ���
-�� `����å���Υɥ������`_ �򻲾Ȥ��Ƥ���������
+``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` 設定を ``True`` にしてください．詳しく
+は `キャッシュのドキュメント`_ を参照してください．
 
-.. _`����å���Υɥ������`: ../cache/#the-per-site-cache
+.. _`キャッシュのドキュメント`: ../cache/#the-per-site-cache
 
 .. _How do I automatically set a field's value to the user who last edited the object in the admin?:
 
-admin �ǡ��ե�����ɤ��ͤ򡤥��֥������Ȥ�Ǹ���Խ������桼���λ��ꤷ���ͤ�Ʊ���ˤ�����ˡ�ϡ�
+admin で，フィールドの値を，オブジェクトを最後に編集したユーザの指定した値と同じにする方法は？
 ----------------------------------------------------------------------------------------------
 
-�������Ǥϡ� Django �Ϥ�������Ԥ���������ˡ���󶡤��Ƥ��ޤ��󡥤�������
-����˾�Ϥ褯�ФƤ���Τǡ��ɤ���äƼ������뤫��������Ƥ���Ȥ����Ǥ�����
-��ϡ�(���ߤΥ桼����Ƚ�ꤹ��Τ�) ��ǥ�쥤��� admin �쥤��ȥꥯ������
-�쥤��򥫥åץ�󥰤������ʤ��Ȥ������ˤ���ޤ���������񤷤�����Ǥ���
+現時点では， Django はこの操作を行う正規の方法を提供していません．しかしこ
+の要望はよく出ているので，どうやって実装するかを議論しているところです．問
+題は，(現在のユーザを判定するのに) モデルレイヤと admin レイヤとリクエスト
+レイヤをカップリングしたくないという点にあります．これは難しい問題です．
 
-`solution that doesn't require patching Django`_ �Ȥ����ϥå����󶡤��Ƥ���
-�ͤ⤤�ޤ������������������ˡ�ǤϤʤ������褦�ޤ�Ư���ʤ��ʤ��ǽ��������
-�ޤ���
+`solution that doesn't require patching Django`_ というハックを提供している
+人もいますが，これは正規の方法ではなく，将来うまく働かなくなる可能性があり
+ます．
 
 .. _solution that doesn't require patching Django: http://lukeplant.me.uk/blog.php?id=1107301634
 
@@ -718,110 +718,110 @@ admin �ǡ��ե�����ɤ��ͤ򡤥��֥������Ȥ�Ǹ���Խ������桼���λ��ꤷ���ͤ�Ʊ��
 
 .. _How do I limit admin access so that objects can only be edited by the users who created them?:
 
-admin �ǡ����֥������Ȥ���������桼�����������֥������Ȥ��Խ��Ǥ���褦�˥������������¤�����ˡ�ϡ�
+admin で，オブジェクトを作成したユーザだけがオブジェクトを編集できるようにアクセスを制限する方法は？
 ----------------------------------------------------------------------------------------------------
 
-������μ���������򸫤Ʋ�������
+一つ前の質問の答えを見て下さい．
 
 .. _My admin-site CSS and images showed up fine using the development server, but they're not displaying when using mod_python.:
 
-��ȯ�����ФǤ� admin �����Ȥ� CSS ����������ޤ�ɽ�������Τˡ� mod_python ��Ȥ���ɽ������ޤ���
+開発サーバでは admin サイトの CSS や画像がうまく表示されるのに， mod_python を使うと表示されません．
 ----------------------------------------------------------------------------------------------------
 
-��mod_python �� Django ��Ȥ��פȤ����ɥ�����Ȥ� `admin �ե��������`_
+「mod_python で Django を使う」というドキュメントの `admin ファイルの提供`_
 
-.. _`admin �ե��������`: ../modpython/#serving-the-admin-files
+.. _`admin ファイルの提供`: ../modpython/#serving-the-admin-files
 .. _serving the admin files: ../modpython/#serving-the-admin-files
 
 .. _My "list_filter" contains a ManyToManyField, but the filter doesn't display.:
 
-"list_filter" �� ManyToManyField �����줿�Τˡ��ե��륿��ɽ������ޤ���
+"list_filter" に ManyToManyField を入れたのに，フィルタが表示されません．
 -------------------------------------------------------------------------
 
-Django �� ``ManyToManyField`` ���Ф��ƥե��륿��ɽ������Τϥ��֥������Ȥ�
-��İʾ�ΤȤ������Ǥ���
+Django が ``ManyToManyField`` に対してフィルタを表示するのはオブジェクトが
+二つ以上のときだけです．
 
-�㤨�С� ``list_filter`` �� ``sites`` �����äƤ��ꡤ�ǡ����١����ˤ��ä���
-�Ĥ��������Ȥ���Ͽ����Ƥ��ʤ���С� "Site" �ե��륿��ɽ������ޤ���
-���ξ����Ǥϡ������Ȥˤ��ե��륿��̵��̣������Ǥ���
+例えば， ``list_filter`` に ``sites`` が入っており，データベースにたった一
+つしかサイトが登録されていなければ， "Site" フィルタは表示されません．
+この状況では，サイトによるフィルタは無意味だからです．
 
 .. _How can I customize the functionality of the admin interface?:
 
-admin ���󥿥ե������ε�ǽ�򥫥����ޥ���������ˡ�ϡ�
+admin インタフェースの機能をカスタマイズする方法は？
 ----------------------------------------------------
 
-��ˡ�Ϥ����Ĥ�����ޤ���Django ����ư�������� add/change �ե���������Ѥ���
-�ڤ򤷤�����С���ǥ�� ``class Admin`` �� ``js`` �ѥ�᥿��Ȥäƥڡ�����
-Ǥ�դ� JavaScript �⥸�塼���Ž���դ��Ƥ����������ѥ�᥿��ʸ�����ɽ����
-URL ����ʤ�ꥹ�Ȥǡ� admin �ե������ <script> ������ȤäƼ�����
-JavaScript �⥸�塼���ؤ��Ƥ��ޤ���
+方法はいくつかあります．Django が自動生成する add/change フォームを利用して
+楽をしたければ，モデルの ``class Admin`` の ``js`` パラメタを使ってページに
+任意の JavaScript モジュールを貼り付けてください．パラメタは文字列で表した
+URL からなるリストで， admin フォームに <script> タグを使って取り込む
+JavaScript モジュールを指しています．
 
-ñ�˼�ư���������ե�����򤤤���ʾ�ν��𤵤�ɬ�פʾ��ˤϡ� admin �Ѥ�
-��������ӥ塼��񤤤Ʋ������� admin �Ϥ��켫�� Django �Ǻ���Ƥ��ꡤ����
-����Υӥ塼��񤤤�ǧ�ڥ����ƥ��ѡ��ߥå����Υ����å��˥եå���ݤ���
-ɬ�פʽ�����Ԥ��ޤ���
+単に自動生成されるフォームをいじる以上の柔軟さが必要な場合には， admin 用の
+カスタムビューを書いて下さい． admin はそれ自体 Django で作られており，カス
+タムのビューを書いて認証システムやパーミッションのチェックにフックを掛け，
+必要な処理を行えます．
 
-admin �Υ�å� & �ե�����򥫥����ޥ����������Τʤ顤���μ���˿ʤ�ǲ�������
+admin のルック & フィールをカスタマイズしたいのなら，次の質問に進んで下さい．
 
 .. _The dynamically-generated admin site is ugly! How can I change it?:
 
-ưŪ����������� admin �����Ȥ��ߤäȤ⤢��ޤ����ѹ���ˡ�ϡ�
+動的に生成される admin サイトがみっともありません！変更方法は？
 ---------------------------------------------------------------
 
-��ã�Ϲ����ʤ�Ǥ����������ϻפ�ʤ��Τʤ顤 CSS �������륷���Ȥ�����ե���
-����Խ����ơ� admin �����ȤΥץ쥼��ơ��������ѹ��Ǥ��ޤ��������Ȥϥ���
-��ƥ��å��� HTML ��Ȥäƽ񤫤�Ƥ���Τǡ���ꤿ���ѹ������� CSS ��������
-�����Ȥ��Խ��Ǽ¸��Ǥ��ޤ����Ƥۤɤ��� `admin �ǻȤ��Ƥ���CSS �Υ�����`_ 
-���Ѱդ��Ƥ���ޤ���
+私達は好きなんですが，そうは思わないのなら， CSS スタイルシートや画像ファイ
+ルを編集して， admin サイトのプレゼンテーションを変更できます．サイトはセマ
+ンティックな HTML を使って書かれているので，やりたい変更は全て CSS スタイル
+シートの編集で実現できます．てほどきに `admin で使われているCSS のガイド`_ 
+を用意してあります．
 
-.. _`admin �ǻȤ��Ƥ���CSS �Υ�����`: ../admin_css/
+.. _`admin で使われているCSS のガイド`: ../admin_css/
 .. _`guide to the CSS used in the admin`: ../admin_css/
 
 
 .. _How do I create users without having to edit password hashes?:
 
-�ѥ���ɥϥå�����Խ������˥桼�������������ˡ�ϡ�
+パスワードハッシュを編集せずにユーザを作成する方法は？
 ------------------------------------------------------
 
-admin �����Ȥǥ桼��������������Τʤ顤 Django �γ�ȯ�Ǥ�ȤäƤ���������
-��������� 2006 ǯ 8 �� 4 ���˽������줿�Τǡ�����ʹߤΥС������ɬ�פ�
-����
+admin サイトでユーザを作成したいのなら， Django の開発版を使ってください．
+この問題は 2006 年 8 月 4 日に修正されたので，それ以降のバージョンが必要で
+す．
 
-�桼���κ����ˤ� Python API �����ѤǤ��ޤ����ܤ����� `�桼���κ���`_ �򻲾�
-���Ƥ���������
+ユーザの作成には Python API も利用できます．詳しくは `ユーザの作成`_ を参照
+してください．
 
-.. _`�桼���κ���`: ../authentication/#creating-users
+.. _`ユーザの作成`: ../authentication/#creating-users
 .. _creating users: ../authentication/#creating-users
 
 .. _Contributing code:
 
-�����ɤؤι׸�
+コードへの貢献
 ==============
 
 .. _How can I get started contributing code to Django?:
 
-Django �ץ��������Ȥ˥����ɤ��£��������Ǥ������ɤ�����Ф褤�Ǥ�����
+Django プロジェクトにコードを寄贈したいんですが，どうすればよいですか？
 -----------------------------------------------------------------------
 
-�褯��ʹ���Ƥ���ޤ������ޤ��ˤ��μ���������뤿��Υɥ�����Ȥ��Ѱդ���
-����ޤ��� `Django �ץ��������Ȥؤι׸�`_ �Ȥ���ʸ��Ǥ���
+よくぞ聞いてくれました！まさにこの質問に答えるためのドキュメントを用意して
+あります． `Django プロジェクトへの貢献`_ という文書です．
 
-.. _`Django �ץ��������Ȥؤι׸�`: ../contributing/
+.. _`Django プロジェクトへの貢献`: ../contributing/
 .. _Contributing do Django: ../contributing/
 
 .. _I submitted a bug fix in the ticket system several weeks ago. Why are you ignoring my patch?:
 
-�����֤����˥����åȥ����ƥ�˥Х��ե���������Ф�����Ǥ��������ǻ�Υѥå���̵�뤹���Ǥ�����
+何週間も前にチケットシステムにバグフィクスを提出したんですが．何で私のパッチを無視するんですか？
 ------------------------------------------------------------------------------------------------
 
-���ۤ��ʤ��Ǥ���������̵�뤷�Ƥ���櫓�ǤϤʤ���Ǥ��衪
+心配しないでください．無視しているわけではないんですよ！
 
-�ޤ��ϡ֥����åȤ�̵�뤹��פ��Ȥȡ֤ޤ������åȤ�Ƥ���Ƥ��ʤ��פ��Ȥΰ�
-��������򤯤������� Django �Υ����åȥ����ƥ�ˤϥ����ץ���֤Υ����åȤ�
-��ɴ�⤢�ꡤ����ɥ桼���λȤ������Ϳ���륤��ѥ��Ȥ��͡��Ǥ������Τ��ᡤ
-Django �γ�ȯ��ã�ϥ����åȤ��ӥ塼���ơ�ͥ���̤���ͤФʤ�ʤ��ΤǤ���
+まずは「チケットを無視する」ことと「まだチケットを検討していない」ことの違
+いを御理解ください． Django のチケットシステムにはオープン状態のチケットが
+何百もあり，エンドユーザの使い勝手に与えるインパクトも様々です．そのため，
+Django の開発者達はチケットをレビューして，優先順位を決めねばならないのです．
 
-�ޤ������ʤ��Υꥯ�����Ȥ� Django �˼����ޤʤ��ȤϤä��ꤷ����硤������
-�Ȥ�̵�뤷����Ϥ�����ɬ�������������ޤ������äơ������åȤ��ޤ������ץ��
-���֤ʤ顤�ꥯ�����Ȥ�̵�뤵��Ƥ���ΤǤϤʤ������ް��Ū�˥ꥯ�����Ȥ���
-���̤����֤���ʤ��Ȥ������Ȥˤ����ʤ��ΤǤ���
+また，あなたのリクエストを Django に取り込まないとはっきりした場合，チケッ
+トを無視したりはせず，必ずクローズします．従って，チケットがまだオープンの
+状態なら，リクエストは無視されているのではなく，いま一時的にリクエストに目
+を通す時間を取れないということにすぎないのです．

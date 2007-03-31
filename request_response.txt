@@ -1,44 +1,44 @@
 ==============================================
-�ꥯ�����ȥ��֥������Ȥȥ쥹�ݥ󥹥��֥�������
+リクエストオブジェクトとレスポンスオブジェクト
 ==============================================
 
 :revision-up-to: 4805 (release 0.96)
 
 .. _`Quick overview`:
 
-��ñ�ʳ���
+簡単な概要
 ==========
 
-Django �ϥ����ƥ����Τ��Ϥꡤ�ꥯ�����Ȥȥ쥹�ݥ󥹥��֥������Ȥ�Ȥäƽ���
-���֤�����Ϥ��ޤ���
+Django はシステム全体に渡り，リクエストとレスポンスオブジェクトを使って処理
+状態を受け渡します．
 
-����ڡ����ؤΥꥯ�����Ȥ�������ȡ�Django �� ``HttpRequest`` ���֥�����
-�Ȥ��������ޤ������Υ��֥������Ȥˤϥꥯ�����ȤΥ᥿�ǡ��������äƤ��ޤ���
-���� Django ��Ŭ�ڤʥӥ塼������ɤ��ơ� ``HttpRequest`` ��ӥ塼�ؿ��κǽ�
-�ΰ������Ϥ��ޤ����ƥӥ塼�� ``HttpResponse`` ���֥������Ȥ��֤��ͤФʤ��
-����
+あるページへのリクエストを受け取ると，Django は ``HttpRequest`` オブジェク
+トを生成します．このオブジェクトにはリクエストのメタデータが入っています．
+次に Django は適切なビューをロードして， ``HttpRequest`` をビュー関数の最初
+の引数に渡します．各ビューは ``HttpResponse`` オブジェクトを返さねばなりま
+せん．
 
-���Υɥ�����ȤǤ�  ``HttpRequest`` ����� ``HttpResponse`` ���֥�������
-�� API �ˤĤ����������ޤ���
+このドキュメントでは  ``HttpRequest`` および ``HttpResponse`` オブジェクト
+の API について説明します．
 
 .. _HttpRequest objects:
 
-HttpRequest ���֥�������
+HttpRequest オブジェクト
 ========================
 
-°��
+属性
 ----
 
-``session`` �ʳ���°���������ɤ߽Ф����ѤǤ���
+``session`` 以外の属性は全て読み出し専用です．
 
 ``path``
-    �ꥯ�����Ȥ��Ƥ���ڡ����Υե�ѥ���ɽ�����ɥᥤ���ޤޤʤ�ʸ����Ǥ���
+    リクエストしているページのフルパスを表す，ドメインを含まない文字列です．
 
-    ��: ``"/music/bands/the_beatles/"``
+    例: ``"/music/bands/the_beatles/"``
 
 ``method``
-    �ꥯ�����Ȥ˻Ȥ�줿 HTTP �᥽�åɤ�ɽ��ʸ����Ǥ���ɬ����ʸ���ˤʤ�ޤ���
-    ��::
+    リクエストに使われた HTTP メソッドを表す文字列です．必ず大文字になります．
+    例::
 
         if request.method == 'GET':
             do_something()
@@ -47,169 +47,169 @@ HttpRequest ���֥�������
 
 
 ``GET``
-    ���Ƥ� HTTP GET �ѥ�᥿�����ä�����饤���ʥ��֥������ȤǤ�����Ҥ�
-    ``QueryDict`` �⻲�Ȥ��Ƥ���������
+    全ての HTTP GET パラメタが入った辞書ライクなオブジェクトです．後述の
+    ``QueryDict`` も参照してください．
 
 ``POST``
-    ���Ƥ� HTTP POST �ѥ�᥿�����ä�����饤���ʥ��֥������ȤǤ�����Ҥ�
-    ``QueryDict`` �⻲�Ȥ��Ƥ���������
+    全ての HTTP POST パラメタが入った辞書ライクなオブジェクトです．後述の
+    ``QueryDict`` も参照してください．
 
-    �ե������ POST HTTP �᥽�åɤ��׵ᤷ�����κݤ˲���ե�����ǡ�����ȼ��
-    �ʤ��褦�ʾ��ˤϡ��ꥯ�����Ȥ� POST �������Ƥ��ʤ���� ``POST`` ��
-    �񤬶��ˤʤ뤳�Ȥ�����ޤ������äơ��ꥯ�����Ȥ� POST �᥽�åɤǤ��뤫
-    �ɤ�����Ĵ�٤뤿��� ``if request.POST`` ��Ȥ��٤��ǤϤ���ޤ������
-    ��� ``if request.method == "POST"`` ��ȤäƤ������� (�廲��)��
+    フォームを POST HTTP メソッドで要求し，その際に何らフォームデータを伴わ
+    ないような場合には，リクエストが POST で送られていながらも ``POST`` 辞
+    書が空になることがあります．従って，リクエストが POST メソッドであるか
+    どうかを調べるために ``if request.POST`` を使うべきではありません．代わ
+    りに ``if request.method == "POST"`` を使ってください (上参照)．
 
-    ``POST`` �ˤϥե����륢�åץ����ɤ˴ؤ������� *���äƤ��ʤ�* �Τ�����
-    ���Ƥ��������� ``FILES`` �򻲾Ȥ��Ƥ���������
+    ``POST`` にはファイルアップロードに関する情報は *入っていない* ので注意
+    してください． ``FILES`` を参照してください．
 
 ``REQUEST``
-    �ص�Ū�ʼ��񥪥֥������Ȥǡ� ``POST`` �ѥ�᥿��ޤ��������Ƥ��顤����
-    ``GET`` �ѥ�᥿�򸡺����ޤ��� PHP �� ``$_REQUEST`` �˥��󥹥ѥ�������
-    ����ǽ�Ǥ���
+    便宜的な辞書オブジェクトで， ``POST`` パラメタをまず検索してから，次に
+    ``GET`` パラメタを検索します． PHP の ``$_REQUEST`` にインスパイアされ
+    た機能です．
 
-    �㤨�С� ``GET = {"name": "john"}`` �� ``POST = {"age": '34'}`` �ξ�硤
-    ``REQUEST["name"]`` �� ``"john"`` �ˤʤꡤ ``REQUEST["age"]`` ��
-    ``"34"`` �ˤʤ�ޤ���
+    例えば， ``GET = {"name": "john"}`` で ``POST = {"age": '34'}`` の場合，
+    ``REQUEST["name"]`` は ``"john"`` になり， ``REQUEST["age"]`` は
+    ``"34"`` になります．
 
-    �̾�� ``GET`` ����� ``POST`` ��Ȥ��褦�˶�������ޤ���������������Ū
-    ������Ǥ���
+    通常は ``GET`` および ``POST`` を使うように強く勧めます．その方が明示的
+    だからです．
 
 ``COOKIES``
-    ���ƤΥ��å��������ä�ɸ��� Python ���񥪥֥������ȤǤ����������ͤ�ʸ
-    ����Ǥ���
+    全てのクッキーが入った標準の Python 辞書オブジェクトです．キーと値は文
+    字列です．
 
 ``FILES``
-    ���åץ����ɤ��줿�ե��������Ƥ����äƤ��뼭��饤�����֥������ȤǤ���
-    ``FILES`` �γƥ����� ``<input type="file" name="" />`` �� ``name`` 
-    �Ǥ��� ``FILES`` �γ��ͤ�ɸ��� Python ���񥪥֥������Ȥǡ��ʲ��� 3 ��
-    �Υ�������äƤ��ޤ�:
+    アップロードされたファイル全てが入っている辞書ライクオブジェクトです．
+    ``FILES`` の各キーは ``<input type="file" name="" />`` の ``name`` 
+    です． ``FILES`` の各値は標準の Python 辞書オブジェクトで，以下の 3 つ
+    のキーを持っています:
 
-        * ``filename`` -- ���åץ����ɤ��줿�ե������̾���� Python ʸ����
-          ��ɽ������ΤǤ���
-        * ``content-type`` -- ���åץ����ɤ��줿�ե�����Υ���ƥ�ķ�����
-          ����
-        * ``content`` -- ���åץ����ɤ��줿�ե���������Ƥ��Τ�ΤǤ���
+        * ``filename`` -- アップロードされたファイルの名前を Python 文字列
+          で表したものです．
+        * ``content-type`` -- アップロードされたファイルのコンテンツ形式で
+          す．
+        * ``content`` -- アップロードされたファイルの内容そのものです．
 
-    ``FILES`` �˥ǡ���������Τϡ��ꥯ�����Ȥ� ``POST`` �Ǥ��ꡤ���ĥꥯ��
-    ���Ȥ�ݥ��Ȥ��� ``<form>`` �� ``enctype="multipart/form-data`` ������
-    �������Ǥ�������ʳ��ξ�硤 ``FILES`` �϶��μ���饤�����֥������Ȥ�
-    �ʤ�ޤ���
+    ``FILES`` にデータが入るのは，リクエストが ``POST`` であり，かつリクエ
+    ストをポストした ``<form>`` に ``enctype="multipart/form-data`` がある
+    場合だけです．それ以外の場合， ``FILES`` は空の辞書ライクオブジェクトに
+    なります．
 
 ``META``
-    ɸ��� Python ���񥪥֥������Ȥǡ����ѤǤ������Ƥ� HTTP �إå������ä�
-    ���ޤ������Ѳ�ǽ�ʥإå��ϥ��饤����Ȥȥ����Ф��Ȥ˰㤤�ޤ������㤨��
-    �ʲ��Τ褦�ʥإå������ѤǤ��ޤ�:
+    標準の Python 辞書オブジェクトで，利用できる全ての HTTP ヘッダが入って
+    います．利用可能なヘッダはクライアントとサーバごとに違いますが，例えば
+    以下のようなヘッダを利用できます:
 
         * ``CONTENT_LENGTH``
         * ``CONTENT_TYPE``
         * ``HTTP_ACCEPT_ENCODING``
         * ``HTTP_ACCEPT_LANGUAGE``
-        * ``HTTP_REFERER`` -- �ꥯ�������оݤΥڡ����򻲾Ȥ��Ƥ���ڡ�����
-          �����硤���Υڡ����� URL �Ǥ���
-        * ``HTTP_USER_AGENT`` -- ���饤����ȤΥ桼������������Ȥ�ɽ��ʸ��
-          ��Ǥ���
-        * ``QUERY_STRING`` -- �ѡ�������ñ��Υ�����ʸ����Ǥ���
-        * ``REMOTE_ADDR`` -- ���饤����Ȥ� IP ���ɥ쥹�Ǥ���
-        * ``REMOTE_HOST`` -- ���饤����ȤΥۥ���̾�Ǥ���
-        * ``REQUEST_METHOD`` -- ``"GET"`` �� ``"POST"`` �Τ褦��ʸ����Ǥ���
-        * ``SERVER_NAME`` -- �����ФΥۥ���̾�Ǥ���
-        * ``SERVER_PORT`` -- �����ФΥݡ����ֹ�Ǥ���
+        * ``HTTP_REFERER`` -- リクエスト対象のページを参照しているページが
+          ある場合，そのページの URL です．
+        * ``HTTP_USER_AGENT`` -- クライアントのユーザエージェントを表す文字
+          列です．
+        * ``QUERY_STRING`` -- パース前の単一のクエリ文字列です．
+        * ``REMOTE_ADDR`` -- クライアントの IP アドレスです．
+        * ``REMOTE_HOST`` -- クライアントのホスト名です．
+        * ``REQUEST_METHOD`` -- ``"GET"`` や ``"POST"`` のような文字列です．
+        * ``SERVER_NAME`` -- サーバのホスト名です．
+        * ``SERVER_PORT`` -- サーバのポート番号です．
 
 ``user``
-    ���ߥ������󤷤Ƥ���桼����ɽ�� ``django.models.auth.models.User`` ����
-    �������ȤǤ����桼�������ߥ������󤷤Ƥ��ʤ����ˤϡ� ``user`` �� 
-    ``django.contrib.auth.models.AnonymousUser`` �Υ��󥹥��󥹤ˤʤ�ޤ���
-    ``is_authenticated()`` ��Ȥ��ȡ�����������Υ桼������̤Ǥ��ޤ�::
+    現在ログインしているユーザを表す ``django.models.auth.models.User`` オブ
+    ジェクトです．ユーザが現在ログインしていない場合には， ``user`` は 
+    ``django.contrib.auth.models.AnonymousUser`` のインスタンスになります．
+    ``is_authenticated()`` を使うと，これら二種類のユーザを区別できます::
 
         if request.user.is_authenticated():
             # Do something for logged-in users.
         else:
             # Do something for anonymous users.
 
-    ``user`` �����ѤǤ���Τϡ� ���󥹥ȡ��뤷�� Django ��
-    ``AuthenticationMiddleware`` ��ͭ���ˤ����������Ǥ����ܤ�����
-    `Web �ꥯ�����Ȥ�ǧ��`_ �򻲾Ȥ��Ƥ���������
+    ``user`` を利用できるのは， インストールした Django で
+    ``AuthenticationMiddleware`` を有効にした場合だけです．詳しくは
+    `Web リクエストの認証`_ を参照してください．
 
-.. _`Web �ꥯ�����Ȥ�ǧ��`: ../authentication/#authentication-in-web-requests
+.. _`Web リクエストの認証`: ../authentication/#authentication-in-web-requests
 
 ``session``
-    �ɤ߽񤭲�ǽ�ʼ���饤�����֥������Ȥǡ����ߤΥ��å�����ɽ�����Ƥ��ޤ���
-    ���μ���ϥ��󥹥ȡ��뤵��Ƥ��� Django �ǥ��å����ͭ���ʾ��ˤΤ�
-    ���ѤǤ��ޤ����ܤ����� `���å����Υɥ������`_ �򻲾Ȥ��Ƥ���������
+    読み書き可能な辞書ライクオブジェクトで，現在のセッションを表現しています．
+    この辞書はインストールされている Django でセッションが有効な場合にのみ
+    利用できます．詳しくは `セッションのドキュメント`_ を参照してください．
 
-    .. _`���å����Υɥ������`: ../sessions/
+    .. _`セッションのドキュメント`: ../sessions/
     .. _`session documentation`: ../sessions/
 
 ``raw_post_data``
-    HTTP POST �ǡ������Τ�ΤǤ������٤ʽ�����Ԥ������Ȥ��������Ǥ�������
-    �� ``POST`` ��ȤäƤ���������
+    HTTP POST データそのものです．高度な処理を行いたいときに便利です．普段
+    は ``POST`` を使ってください．
 
-�᥽�å�
+メソッド
 --------
 
 ``__getitem__(key)``
-    �������Ф��� GET/POST �ͤ��֤��ޤ��� POST ��ޤ�Ĵ�١����� GET ��Ĵ�٤�
-    ����������¸�ߤ��ʤ����  ``KeyError`` �����Ф��ޤ���
+    キーに対する GET/POST 値を返します． POST をまず調べ，次に GET を調べま
+    す．キーが存在しなければ  ``KeyError`` を送出します．
 
-    ���Υ᥽�åɤˤ�äơ� ``HttpRequest`` ���󥹥��󥹤򼭽�Τ褦�˰�����
-    �����㤨�С� ``request.POST`` �ޤ��� ``request.GET`` �� ``"foo"`` �Ȥ�
-    ������������С� ```request["foo"]`` �� ``True`` ���֤��ޤ���
+    このメソッドによって， ``HttpRequest`` インスタンスを辞書のように扱えま
+    す．例えば， ``request.POST`` または ``request.GET`` に ``"foo"`` とい
+    うキーがあれば， ```request["foo"]`` は ``True`` を返します．
 
 ``has_key()``
-    ``request.GET`` �ޤ��� ``request.POST`` �˻�����ͤ����äƤ��뤫�ɤ���
-    �ˤ�ä� ``True`` �ޤ��� ``False`` ���֤��ޤ���
+    ``request.GET`` または ``request.POST`` に指定の値が入っているかどうか
+    によって ``True`` または ``False`` を返します．
 
 ``get_full_path()``
-    ``path`` �ȡ����Τ��Ȥ�³��������ʸ���󤬤�����֤��ޤ���
+    ``path`` と，そのあとに続くクエリ文字列があれば返します．
 
-    ��: ``"/music/bands/the_beatles/?print=true"``
+    例: ``"/music/bands/the_beatles/?print=true"``
 
 ``is_secure()``
-    �ꥯ�����Ȥ������奢�Ǥ��롤���ʤ�� HTTPS ��𤷤��ꥯ�����ȤΤȤ���
-    ``True`` ���֤��ޤ���
+    リクエストがセキュアである，すなわち HTTPS を介したリクエストのときに
+    ``True`` を返します．
 
 .. _QueryDict objects:
 
-QueryDict ���֥�������
+QueryDict オブジェクト
 ----------------------
 
-``HttpRequest`` ���֥���������Ǥϡ� ``GET`` �� ``POST`` °����
-``django.http.QueryDict`` �Υ��󥹥��󥹤Ǥ��� ``QueryDict`` �ϼ���饤����
-���饹�ǡ�Ʊ���������Ф���ʣ�����ͤ�������褦�˥������ޥ�������Ƥ��ޤ���
-����ϡ� HTML �Υե��������Ǥˤϡ��㤨�� ``<select multiple="multiple">``
-�Τ褦�ˡ�Ʊ���������Ф���ʣ�����ͤ��Ϥ���Τ����뤫��Ǥ���
+``HttpRequest`` オブジェクト内では， ``GET`` と ``POST`` 属性は
+``django.http.QueryDict`` のインスタンスです． ``QueryDict`` は辞書ライクな
+クラスで，同じキーに対して複数の値を取り得るようにカスタマイズされています．
+これは， HTML のフォーム要素には，例えば ``<select multiple="multiple">``
+のように，同じキーに対して複数の値を渡すものがあるからです．
 
-``QueryDict`` ���󥹥��󥹤ϡ� ``copy()`` ����ʤ��������ѹ��Ǥ��ޤ���
-����ϡ� ``request.POST`` �� ``request.GET`` ��°����ľ���ѹ��Ǥ��ʤ���
-�������ȤǤ���
+``QueryDict`` インスタンスは， ``copy()`` を作らないかぎり変更できません．
+これは， ``request.POST`` や ``request.GET`` の属性を直接変更できないと
+いうことです．
 
-``QueryDict`` �ϼ��񷿤Υ��֥��饹�ʤΤǡ����Ƥ�ɸ��Ū�ʼ��񷿤Υ᥽�åɤ�
-�������Ƥ��ޤ������������ʲ��������ۤʤ�ޤ�:
+``QueryDict`` は辞書型のサブクラスなので，全ての標準的な辞書型のメソッドを
+実装しています．ただし，以下の点が異なります:
 
-    * ``__getitem__(key)`` -- ����Υ������Ф����ͤ��֤��ޤ�����ĤΥ�����
-      ʣ�����ͤ�¸�ߤ����硤 ``__getitem__()`` �ϥꥹ�Ȥ��������ͤ��֤���
-      ����
+    * ``__getitem__(key)`` -- 指定のキーに対する値を返します．一つのキーに
+      複数の値が存在する場合， ``__getitem__()`` はリストの末尾の値を返しま
+      す．
 
-    * ``__setitem__(key, value)`` -- ����Υ������Ф����ͤ� ``[value]`` 
-      (``value`` �Ȥ����ͤ���Ĥ������ä��ꥹ��) �ˤ��ޤ��������Ѥ�Ȥ�ʤ�
-      ¾�δؿ���Ʊ���������Υ᥽�åɤ�ƤӽФ���Τ� (``copy()`` ��Ȥä���
-      ���������֥������ȤΤ褦��) �ѹ���ǽ�� ``QueryDict`` �����Ǥ���
+    * ``__setitem__(key, value)`` -- 指定のキーに対する値を ``[value]`` 
+      (``value`` という値が一つだけ入ったリスト) にします．副作用をともなう
+      他の関数と同じく，このメソッドを呼び出せるのは (``copy()`` を使って生
+      成したオブジェクトのような) 変更可能な ``QueryDict`` だけです．
 
-    * ``__contains__(key)`` -- ����Υ��������ꤵ��Ƥ������ ``True`` ��
-      �֤��ޤ�������ˤ�ꡤ ``if "foo" in request.GET`` �Τ褦�˽񤱤ޤ���
+    * ``__contains__(key)`` -- 指定のキーが設定されている場合に ``True`` を
+      返します．これにより， ``if "foo" in request.GET`` のように書けます．
 
-    * ``get(key, default)`` -- ��� ``__getitem__()`` ��Ʊ�������å��Ǥ�����
-      �������б������ͤ��ʤ��Ȥ��˥ǥե�����ͤ��֤��եå�������ޤ���
+    * ``get(key, default)`` -- 上の ``__getitem__()`` と同じロジックですが，
+      キーに対応する値がないときにデフォルト値を返すフックがあります．
 
     * ``has_key(key)``
 
-    * ``setdefault(key, default)`` -- ɸ��μ��񷿤� ``setdefault()`` ��Ʊ
-      ���Ǥ���������Ū�� ``__setitem__`` ��Ȥ��ޤ���
+    * ``setdefault(key, default)`` -- 標準の辞書型の ``setdefault()`` と同
+      じですが，内部的に ``__setitem__`` を使います．
 
-    * ``update(other_dict)`` -- ``QueryDict`` �ޤ���ɸ��μ��񷿤�����ˤ�
-      ��ޤ���ɸ��μ��񷿤� ``update()`` �᥽�åɤ�Ʊ���Ǥ��������ߤ��ͤ�
-      �֤�������ΤǤϤʤ������ߤ��ͤΥꥹ�Ȥ� *�ɲ�* ���ޤ����㤨��::
+    * ``update(other_dict)`` -- ``QueryDict`` または標準の辞書型を引数にと
+      ります．標準の辞書型の ``update()`` メソッドと同じですが，現在の値を
+      置き換えるのではなく，現在の値のリストに *追加* します．例えば::
 
           >>> q = QueryDict('a=1')
           >>> q = q.copy() # to make it mutable
@@ -219,54 +219,54 @@ QueryDict ���֥�������
           >>> q['a'] # returns the last
           ['2']
 
-    * ``items()`` -- ɸ��μ��񷿤� ``items()`` �᥽�åɤ�Ʊ���Ǥ�����
-      ``__getitem()__`` ��Ʊ�����Ǹ���ͤ��֤������å���Ȥ��ޤ����㤨��::
+    * ``items()`` -- 標準の辞書型の ``items()`` メソッドと同じですが，
+      ``__getitem()__`` と同じ，最後の値を返すロジックを使います．例えば::
 
            >>> q = QueryDict('a=1&a=2&a=3')
            >>> q.items()
            [('a', '3')]
 
-    * ``values()`` -- ɸ��μ��񷿤� ``values()`` �᥽�åɤ�Ʊ���Ǥ�����
-      ``__getitem()__`` ��Ʊ�����Ǹ���ͤ��֤������å���Ȥ��ޤ����㤨��::
+    * ``values()`` -- 標準の辞書型の ``values()`` メソッドと同じですが，
+      ``__getitem()__`` と同じ，最後の値を返すロジックを使います．例えば::
 
            >>> q = QueryDict('a=1&a=2&a=3')
            >>> q.values()
            ['3']
 
-�ä��ơ� ``QueryDict`` �ˤϰʲ��Υ᥽�åɤ�����ޤ�:
+加えて， ``QueryDict`` には以下のメソッドがあります:
 
-    * ``copy()`` -- Python ɸ��饤�֥��� ``copy.deepcopy()`` ��Ȥä�
-      ���֥������ȤΥ��ԡ������������֤��ޤ������ԡ����ѹ���ǽ�ˤʤꡤ
-      �ͤ��ѹ��Ǥ��ޤ���
+    * ``copy()`` -- Python 標準ライブラリの ``copy.deepcopy()`` を使って
+      オブジェクトのコピーを生成して返します．コピーは変更可能になり，
+      値を変更できます．
 
-    * ``getlist(key)`` -- �׵ᤵ�줿�������Ф��ơ� Python �Υꥹ�ȷ����֤�
-      �ޤ����������б������ͤ��ʤ���ж��Υꥹ�Ȥ��֤��ޤ������Υ᥽�åɤ�
-      �μ¤˲��餫�Υꥹ�Ȥ��֤��ޤ���
+    * ``getlist(key)`` -- 要求されたキーに対して， Python のリスト型を返し
+      ます．キーに対応する値がなければ空のリストを返します．このメソッドは
+      確実に何らかのリストを返します．
 
-    * ``setlist(key, list_)`` -- �������Ф��� ``list_`` ���б��Ť��ޤ� 
-      (``__setitem__()`` �Ȱ㤦�Ȥ����Ǥ�)��
+    * ``setlist(key, list_)`` -- キーに対して ``list_`` を対応づけます 
+      (``__setitem__()`` と違うところです)．
 
-    * ``appendlist(key, item)`` -- �����˴�Ϣ�Ť����Ƥ�������Ū�ʥꥹ�Ȥ�
-      ���Ǥ��ɲä��ޤ���
+    * ``appendlist(key, item)`` -- キーに関連づけられている内部的なリストに
+      要素を追加します．
 
-    * ``setlistdefault(key, default_list)`` -- ``setdefault`` �˻��Ƥ��ޤ�
-      ����ñ����ͤǤϤʤ��ͤΥꥹ�Ȥ�����ˤȤ�ޤ���
+    * ``setlistdefault(key, default_list)`` -- ``setdefault`` に似ています
+      が，単一の値ではなく値のリストを引数にとります．
 
-    * ``lists()`` -- ``items()`` �˻��Ƥ��ޤ��������Ƥ��ͤ�ꥹ�Ȥ��֤���
-      �����㤨��::
+    * ``lists()`` -- ``items()`` に似ていますが，全ての値をリストで返しま
+      す．例えば::
 
            >>> q = QueryDict('a=1&a=2&a=3')
            >>> q.lists()
            [('a', ['1', '2', '3'])]
 
-    * ``urlencode()`` -- �ǡ����򥯥���ʸ��������˥ե����ޥåȤ���ʸ�����
-      �֤��ޤ����㤨��: ``"a=2&b=3&b=5"`` �Τ褦�ˤʤ�ޤ���
+    * ``urlencode()`` -- データをクエリ文字列形式にフォーマットした文字列を
+      返します．例えば: ``"a=2&b=3&b=5"`` のようになります．
 
-������
+使用例
 ------
 
-HTML �ե��������ȡ�������Ф��� Django ���ɤΤ褦�����Ϥ򰷤������������
-���ޤ��礦::
+HTML フォームの例と，それに対して Django がどのように入力を扱うかを例で説明
+しましょう::
 
     <form action="/foo/bar/" method="post">
     <input type="text" name="your_name" />
@@ -278,9 +278,9 @@ HTML �ե��������ȡ�������Ф��� Django ���ɤΤ褦�����Ϥ򰷤������������
     <input type="submit" />
     </form>
 
-�桼���� ``your name`` �ե�����ɤ� ``"John Smith"`` ����ꤷ��ʣ������ܥ�
-������ "The Beatles" �� "The Zombies" �˥����å������줿�Ȥ��ޤ��� Django
-�Υꥯ�����ȥ��֥������Ȥϰʲ��Τ褦�ˤʤ�ޤ�::
+ユーザが ``your name`` フィールドに ``"John Smith"`` を指定し，複数選択ボッ
+クスで "The Beatles" と "The Zombies" にチェックを入れたとします． Django
+のリクエストオブジェクトは以下のようになります::
 
     >>> request.GET
     {}
@@ -297,50 +297,50 @@ HTML �ե��������ȡ�������Ф��� Django ���ɤΤ褦�����Ϥ򰷤������������
     >>> request.POST.get('nonexistent_field', 'Nowhere Man')
     'Nowhere Man'
 
-������˴ؤ�������
+実装上に関する注意
 ------------------
 
 ``GET``, ``POST``, ``COOKIES``, ``FILES``, ``META``, ``REQUEST``,
-``raw_post_data`` ����� ``user`` �Ȥ��ä�°���Ϥ��٤��ٱ��ɤ߹��� (lazily
-load) ����ޤ������ʤ���� Django �ϥ���������׵ᤵ���ޤǡ��������ͤ�
-�׻����뤿��˥꥽��������񤷤ޤ���
+``raw_post_data`` および ``user`` といった属性はすべて遅延読み込み (lazily
+load) されます．すなわち， Django はコード中で要求されるまで，これらの値を
+計算するためにリソースを消費しません．
 
 .. _HttpResponse objects:
 
-HttpResponse ���֥�������
+HttpResponse オブジェクト
 =========================
 
-Django �ˤ�äƼ�ư��������� ``HttpRequest`` ���֥������ȤȤ��о�Ū�ˡ�
-``HttpResponse`` ���֥������Ȥϼ�ʬ���������ͤФʤ�ޤ��󡥥ӥ塼��񤯤Ȥ�
-�ˤϤ��ĤǤ⡤ ``HttpResponse`` ���󥹥��󥹤��������ơ��ͤ����ꤷ�������
-�Ȥ����֤��ͤФʤ�ޤ���
+Django によって自動生成される ``HttpRequest`` オブジェクトとは対象的に，
+``HttpResponse`` オブジェクトは自分で生成せねばなりません．ビューを書くとき
+にはいつでも， ``HttpResponse`` インスタンスを生成して，値を設定し，戻り値
+として返さねばなりません．
 
 
-``HttpResponse`` ���饹������� ``django.http.HttpResponse``
-�ˤ���ޤ���
+``HttpResponse`` クラスの定義は ``django.http.HttpResponse``
+にあります．
 
-�Ȥ�����
+使いかた
 --------
 
 
-ʸ������Ϥ�
+文字列を渡す
 ~~~~~~~~~~~~
 
-``HttpResponse`` ��ŵ��Ū�ʻȤ����ϡ��ڡ��������Ƥ�ʸ����Ȥ��ƥ��󥹥ȥ饯
-�����Ϥ��Ȥ�����ΤǤ�::
+``HttpResponse`` の典型的な使い方は，ページの内容を文字列としてコンストラク
+タに渡すというものです::
 
     >>> response = HttpResponse("Here's the text of the Web page.")
     >>> response = HttpResponse("Text only, please.", mimetype="text/plain")
 
 
-����ƥ�Ĥ�����Ū���ɲä��Ƥ����������ˤϡ� ``response`` ��ե�����饤
-�����֥������ȤΤ褦�ˤ�Ȥ��ޤ�::
+コンテンツを累積的に追加していきたい場合には， ``response`` をファイルライ
+クオブジェクトのようにも使えます::
 
     >>> response = HttpResponse()
     >>> response.write("<p>Here's the text of the Web page.</p>")
     >>> response.write("<p>Here's another paragraph.</p>")
 
-�إå����ɲä����ϼ���Ȥ��ʤ���ˡ�ǽ񤱤ޤ�::
+ヘッダの追加や削除は辞書とおなじ書法で書けます::
 
     >>> response = HttpResponse()
     >>> response['X-DJANGO'] = "It's the best."
@@ -348,131 +348,131 @@ Django �ˤ�äƼ�ư��������� ``HttpRequest`` ���֥������ȤȤ��о�Ū�ˡ�
     >>> response['X-DJANGO']
     "It's the best."
 
-��������إå����ʤ��Ƥ⡤ ``del`` �� ``KeyError`` �����Ф��ʤ��Τǵ���Ĥ�
-�Ƥ���������
+該当するヘッダがなくても， ``del`` は ``KeyError`` を送出しないので気をつけ
+てください．
 
-���ƥ졼�����Ϥ�
+イテレータを渡す
 ~~~~~~~~~~~~~~~~
 
-�Ǹ�ˡ��ϡ��ɥ����ɤ��줿ʸ����ǤϤʤ����ƥ졼���� ``HttpResponse`` ����
-���ޤ������Υƥ��˥å���Ȥ����ϰʲ��Υ����ɥ饤��˽��äƲ�����:
+最後に，ハードコードされた文字列ではなくイテレータも ``HttpResponse`` に渡
+せます．このテクニックを使う場合は以下のガイドラインに従って下さい:
 
-    * ���ƥ졼����ʸ������֤��ͤФʤ�ޤ���
-    * ���ƥ졼���򥳥�ƥ�Ĥ˻��ꤷ�� ``HttpResponse`` ����������ȡ�
-      ``HttpResponse`` ���󥹥��󥹤�ե�����饤�����֥������ȤȤ��ư�����
-      ���ʤꡤ ``Exception`` �����Ф���褦�ˤʤ�ޤ���
+    * イテレータは文字列を返さねばなりません．
+    * イテレータをコンテンツに指定して ``HttpResponse`` を初期化すると，
+      ``HttpResponse`` インスタンスをファイルライクオブジェクトとして扱えな
+      くなり， ``Exception`` を送出するようになります．
 
-�᥽�å�
+メソッド
 --------
 
 ``__init__(content='', mimetype=DEFAULT_CONTENT_TYPE)``
-    ����Υڡ�������ƥ�� (ʸ����) �� MIME �����פ� ``HttpResponse`` ����
-    �������Ȥ򥤥󥹥��󥹲����ޤ��� ``DEFAULT_CONTENT_TYPE`` ��
-    ``'text/html'`` �Ǥ���
+    指定のページコンテンツ (文字列) と MIME タイプで ``HttpResponse`` オブ
+    ジェクトをインスタンス化します． ``DEFAULT_CONTENT_TYPE`` は
+    ``'text/html'`` です．
 
-    ``content`` �ϥ��ƥ졼���ޤ���ʸ����ˤǤ��ޤ������ƥ졼���ˤ����硤
-    ʸ������֤����ƥ졼���Ǥʤ���Фʤ�ޤ��󡥥��ƥ졼�����ʸ���������
-    ��礵�졤�쥹�ݥ󥹤����Ƥˤʤ�ޤ���
+    ``content`` はイテレータまたは文字列にできます．イテレータにする場合，
+    文字列を返すイテレータでなければなりません．イテレータ中の文字列は全て
+    結合され，レスポンスの内容になります．
 
 ``__setitem__(header, value)``
-    �إå�̾���ͤ����ꤷ�ޤ��� ``header`` �� ``value`` ��ʸ����ˤ��ͤФʤ�
-    �ޤ���
+    ヘッダ名と値を設定します． ``header`` と ``value`` は文字列にせねばなり
+    ません．
 
 ``__delitem__(header)``
-    �����̾���Υإå��������ޤ����إå���¸�ߤ��ʤ���С����ۤΤ����˼�
-    �Ԥ��ޤ����羮ʸ������̤��ޤ���
+    指定の名前のヘッダを削除します．ヘッダが存在しなければ，暗黙のうちに失
+    敗します．大小文字を区別します．
 
 ``__getitem__(header)``
-    ����Υإå�̾���б������ͤ��֤��ޤ����羮ʸ������̤��ޤ���
+    指定のヘッダ名に対応する値を返します．大小文字を区別します．
 
 ``has_header(header)``
-    �羮ʸ������̤����˻����̾���Υإå������뤫Ĵ�١� ``True`` �ޤ���
-    ``False`` ���֤��ޤ���
+    大小文字を区別せずに指定の名前のヘッダがあるか調べ， ``True`` または
+    ``False`` を返します．
 
 ``set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None)``
-    ���å��������ꤷ�ޤ����ѥ�᥿�� Python ɸ��饤�֥���
-    `Morsel ���֥�������`_ ��Ʊ�������Ǥ���
+    クッキーを設定します．パラメタは Python 標準ライブラリの
+    `Morsel オブジェクト`_ と同じ形式です．
 
-        * ``max_age`` �ˤ��ÿ��ޤ��� ``None`` (�ǥե������) ����ꤷ�ޤ���
-          �ǥե�����ͤǤϡ����å����ϥ��饤����ȥ֥饦���ȤΥ��å�����
-          �֤�����³���ޤ���
-        * ``expires`` �� ``"Wdy, DD-Mon-YY HH:MM:SS GMT"`` �η�����ʸ�����
-          ����
-        * �̤Υɥᥤ��Υ��å��� (cross-domain cookie) �����ꤷ�������ˤϡ�
-          ``domain`` ��Ȥ��ޤ����㤨�С� ``domain=".lawrence.com"`` �ˤ���
-          �ȡ� www.lawrence.com, blogs.lawrence.com, calendars.lawrence.com
-          �Ȥ��ä������ȤǤ����ɤ��褦�ˤʤ�ޤ�������ʳ��ξ�硤���å���
-          �ϥ��å��������ꤷ���ɥᥤ��Ǥ����ɤ�ޤ���
+        * ``max_age`` には秒数または ``None`` (デフォルト値) を指定します．
+          デフォルト値では，クッキーはクライアントブラウザとのセッションの
+          間だけ持続します．
+        * ``expires`` は ``"Wdy, DD-Mon-YY HH:MM:SS GMT"`` の形式の文字列で
+          す．
+        * 別のドメインのクッキー (cross-domain cookie) を設定したい場合には，
+          ``domain`` を使います．例えば， ``domain=".lawrence.com"`` にする
+          と， www.lawrence.com, blogs.lawrence.com, calendars.lawrence.com
+          といったサイトでだけ読めるようになります．それ以外の場合，クッキー
+          はクッキーを設定したドメインでしか読めません．
 
-    .. _`Morsel ���֥�������`: http://www.python.jp/doc/current/lib/morsel-objects.html
+    .. _`Morsel オブジェクト`: http://www.python.jp/doc/current/lib/morsel-objects.html
     .. _`cookie Morsel`: http://www.python.org/doc/current/lib/morsel-objects.html
 
 ``delete_cookie(key, path='/', domain=None)``
-    ����Υ������Ф��륯�å����������ޤ���������¸�ߤ��ʤ���С����ۤΤ�
-    ���˼��Ԥ��ޤ���
+    指定のキーに対するクッキーを削除します．キーが存在しなければ，暗黙のう
+    ちに失敗します．
 
-    cookie ��ư����塤 ``path`` �� ``domain`` �� ``set_cookie()`` �˻���
-    �����ͤ�Ʊ���ˤ��ʤ��ȡ����å��������Ǥ��ʤ��ʤ�ޤ���
+    cookie の動作原理上， ``path`` と ``domain`` を ``set_cookie()`` に指定
+    した値と同じにしないと，クッキーを削除できなくなります．
 
 ``content``
-    Python ʸ��������Ƥ��֤��ޤ���ɬ�פʤ�� Unicode ���֥������Ȥ˥��󥳡�
-    �ɤ��ޤ����᥽�åɤǤϤʤ��ץ��ѥƥ��ʤΤǡ� ``r.content()`` �ǤϤʤ� 
-    ``r.content`` �ˤʤ뤳�Ȥ����դ��Ʋ�������
+    Python 文字列の内容を返します．必要ならば Unicode オブジェクトにエンコー
+    ドします．メソッドではなくプロパティなので， ``r.content()`` ではなく 
+    ``r.content`` になることに注意して下さい．
 
 ``write(content)``, ``flush()``, ``tell()``
-    ``HttpResponse`` ���󥹥��󥹤�ե�����饤�����֥������ȤΤ褦�˰�����
-    ��Υ᥽�åɤǤ���
+    ``HttpResponse`` インスタンスをファイルライクオブジェクトのように扱うた
+    めのメソッドです．
 
 .. _HttpResponse subclasses:
 
-HttpResponse �Υ��֥��饹
+HttpResponse のサブクラス
 -------------------------
 
-Django �ˤϡ��͡��ʥ����פ� HTTP �쥹�ݥ󥹤򰷤������ ``HttpResponse`` ��
-���֥��饹������ޤ��������Υ��֥��饹�� ``HttpResponse`` ��Ʊ����
-``django.http`` �⥸�塼��ˤ���ޤ���
+Django には，様々なタイプの HTTP レスポンスを扱うための ``HttpResponse`` の
+サブクラスがあります．これらのサブクラスは ``HttpResponse`` と同じく
+``django.http`` モジュールにあります．
 
 ``HttpResponseRedirect``
-    ���󥹥ȥ饯���ϥ�����쥯����Υѥ��򼨤��������Ĥ������ޤ������
-    ���쥯����ϴ�������� URL (�㤨�� ``"http://www.yahoo.com/search/"``) 
-    �Ǥ⡤�ɥᥤ��̾�Τʤ����� URL ( ``"/search/"``) �Ǥ⤫�ޤ��ޤ��󡥤���
-    �쥹�ݥ󥹥��֥������Ȥ� HTTP ���֥����� 302 ���֤��ޤ���
+    コンストラクタはリダイレクト先のパスを示す引数を一つだけ取ります．リダ
+    イレクト先は完全指定の URL (例えば ``"http://www.yahoo.com/search/"``) 
+    でも，ドメイン名のない絶対 URL ( ``"/search/"``) でもかまいません．この
+    レスポンスオブジェクトは HTTP 状態コード 302 を返します．
 
 ``HttpResponsePermanentRedirect``
-    ``HttpResponseRedirect`` ��Ʊ���Ǥ�����"found" ������쥯�� (HTTP ����
-    ������ 302) �ǤϤʤ���³������쥯�� (���֥����� 301) ��Ȥ��ޤ���
+    ``HttpResponseRedirect`` と同じですが，"found" リダイレクト (HTTP 状態
+    コード 302) ではなく永続リダイレクト (状態コード 301) を使います．
 
 ``HttpResponseNotModified``
-    ���󥹥ȥ饯���ϰ�����Ȥ�ޤ��󡥥桼�����Ǹ�˥ꥯ�����Ȥ����Ȥ�����
-    �ڡ������ѹ�����Ƥ��ʤ����Ȥ��Τ餻�뤿��˻Ȥ��ޤ���
+    コンストラクタは引数をとりません．ユーザが最後にリクエストしたときから
+    ページが変更されていないことを知らせるために使います．
 
 ``HttpResponseNotFound``
-    ``HttpResponse`` ��Ʊ���Ǥ��������֥����� 404 ��Ȥ��ޤ���
+    ``HttpResponse`` と同じですが，状態コード 404 を使います．
 
 ``HttpResponseForbidden``
-    ``HttpResponse`` ��Ʊ���Ǥ��������֥����� 403 ��Ȥ��ޤ���
+    ``HttpResponse`` と同じですが，状態コード 403 を使います．
 
 ``HttpResponseNotAllowed``
-    ``HttpResponse`` ��Ʊ���Ǥ��������֥����� 405 ��Ȥ��ޤ������Ĥ���Ƥ�
-    �� HTTP �᥽�åɤΥꥹ�� (�㤨�� ``['GET', 'POST']``) ��ɬ�ܤΰ����Ȥ�
-    �ƤȤ�ޤ���
+    ``HttpResponse`` と同じですが，状態コード 405 を使います．許可されてい
+    る HTTP メソッドのリスト (例えば ``['GET', 'POST']``) を必須の引数とし
+    てとります．
 
 ``HttpResponseGone``
-    ``HttpResponse`` ��Ʊ���Ǥ��������֥����� 410 ��Ȥ��ޤ���
+    ``HttpResponse`` と同じですが，状態コード 410 を使います．
 
 ``HttpResponseServerError``
-    ``HttpResponse`` ��Ʊ���Ǥ��������֥����� 500 ��Ȥ��ޤ���
+    ``HttpResponse`` と同じですが，状態コード 500 を使います．
 
 
 .. _Returning errors:
 
-���顼���֤�
+エラーを返す
 ============
 
-Django �Ǥϡ���ñ�� HTTP ���顼�����ɤ��֤��ޤ������顼�����ϡ����Ǥ˽Ҥ٤�
+Django では，簡単に HTTP エラーコードを返せます．エラー応答は，すでに述べた
 ``HttpResponseNotFound``, ``HttpResponseForbidden``,
-``HttpResponseServerError`` �Ȥ��ä����֥��饹�Υ��󥹥��󥹤�������ơ���
-������Τ褦���̾�� ``HttpResponse`` ��������֤������Ǥ�::
+``HttpResponseServerError`` といったサブクラスのインスタンスを作成して，以
+下の例のように通常の ``HttpResponse`` の代わりに返すだけです::
 
     def my_view(request):
         # ...
@@ -481,25 +481,25 @@ Django �Ǥϡ���ñ�� HTTP ���顼�����ɤ��֤��ޤ������顼�����ϡ����Ǥ˽Ҥ٤�
         else:
             return HttpResponse('<h1>Page was found</h1>')
 
-�������� 404 ���顼��¾�� HTTP ���顼���Ϥ뤫���ɤ��Ȥ��륨�顼�ʤΤǡ�
-��äȴ�ñ�˰�����ˡ���󶡤��Ƥ��ޤ���
+ただし， 404 エラーは他の HTTP エラーよりはるかに良く使われるエラーなので，
+もっと簡単に扱う方法を提供しています．
 
 .. _The Http404 exception:
 
-Http404 �㳰
+Http404 例外
 ------------
 
-``HttpResponseNotFound`` �Τ褦�ʥ��顼���֤���硤�ʲ��Τ褦�ˡ����顼�ڡ�
-������Ȥˤʤ� HTML ����ꤻ�ͤФʤ�ޤ���::
+``HttpResponseNotFound`` のようなエラーを返す場合，以下のように，エラーペー
+ジの中身になる HTML を指定せねばなりません::
 
     return HttpResponseNotFound('<h1>Page not found</h1>')
 
-����Ϥ���ä����ؤǤ��͡�����ˡ����������Τǰ�Ӥ��� 404 ���顼�ڡ�������
-�դ��Ƥ������������Ǥ��������ǡ� Django �ˤ� ``Http404`` �㳰������ޤ���
-�ӥ塼�ؿ��Τɤ����� ``Http404`` �㳰�����Ф���ȡ� Django �Ϥ��Υ��顼����
-ª���ơ�������ɸ��Υ��顼�ڡ����� HTTP ���顼������ 404 ���֤��ޤ���
+これはちょっと不便ですね．それに，サイト全体で一貫した 404 エラーページを用
+意しておく方が賢明です．そこで， Django には ``Http404`` 例外があります．
+ビュー関数のどこかで ``Http404`` 例外を送出すると， Django はこのエラーを捕
+捉して，サイト標準のエラーページを HTTP エラーコード 404 で返します．
 
-��򼨤��ޤ��礦::
+例を示しましょう::
 
     from django.http import Http404
 
@@ -510,86 +510,86 @@ Http404 �㳰
             raise Http404
         return render_to_response('polls/detail.html', {'poll': p})
 
-``Http404`` �㳰��Ȥ��ˤϡ� 404 ���顼�����л���ɽ�������ƥ�ץ졼�Ȥ��
-�����Ƥ����ͤФʤ�ޤ��󡥤��Υƥ�ץ졼�Ȥ�̾���� ``404.html`` �ǡ��ƥ��
-�졼�ȥĥ꡼�ΰ��־�����֤��ͤФʤ�ޤ���
+``Http404`` 例外を使うには， 404 エラーの送出時に表示されるテンプレートを作
+成しておかねばなりません．このテンプレートの名前は ``404.html`` で，テンプ
+レートツリーの一番上に配置せねばなりません．
 
 .. _Customing error views:
 
-���顼�ӥ塼�Υ������ޥ���
+エラービューのカスタマイズ
 --------------------------
 
 .. _The 404 (page not found) view:
 
-404 (�ڡ��������Ĥ���ޤ���) �ӥ塼
+404 (ページが見つかりません) ビュー
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``Http404`` �㳰�����Ф���ȡ� Django �� 404 ���顼�����Ѥ��ü�ʥӥ塼�����
-�ɤ��ޤ����ǥե���ȤǤϡ����Υӥ塼��
-``django.views.defaults.page_not_found`` �����ꤵ��Ƥ��ޤ���
-``django.views.defaults.page_not_found`` �� ``404.html`` �Ȥ���̾���Υƥ��
-�졼�Ȥ�����ɤ��ƥ������ޤ���
+``Http404`` 例外を送出すると， Django は 404 エラー処理用の特殊なビューをロー
+ドします．デフォルトでは，このビューは
+``django.views.defaults.page_not_found`` に設定されています．
+``django.views.defaults.page_not_found`` は ``404.html`` という名前のテンプ
+レートをロードしてレンダします．
 
-���Τ��ᡤ�ƥ�ץ졼�ȥǥ��쥯�ȥ�κƾ峬�ؤ� ``404.html`` �Ȥ���̾���Υ�
-��ץ졼�Ȥ�������Ƥ����ͤФʤ�ޤ��󡥤��Υƥ�ץ졼�Ȥ����Ƥ� 404 ���顼
-���Ф����Ѥ����ޤ���
+このため，テンプレートディレクトリの再上階層に ``404.html`` という名前のテ
+ンプレートを作成しておかねばなりません．このテンプレートは全ての 404 エラー
+に対して用いられます．
 
-``page_not_found`` �ӥ塼�� 99% �� Web ���ץꥱ���������׵���������Ϥ���
- ������ 404 �ӥ塼�򼫺�������ˤϡ�URLconf �ǰʲ��Τ褦�ˤ���
- ``handler404`` ����ꤷ�ޤ�::
+``page_not_found`` ビューは 99% の Web アプリケーションの要求を満たすはずで
+ すが， 404 ビューを自作したい場合には，URLconf で以下のようにして
+ ``handler404`` を指定します::
 
     handler404 = 'mysite.views.my_custom_404_view'
 
-����΢�Ǥϡ� Django �� ``handler404`` ��𤷤� 404 �ӥ塼���ܤ��Ф��ޤ�����
-�ե���ȤǤϡ� URLconf �ΰʲ��ι�::
+舞台裏では， Django は ``handler404`` を介して 404 ビューを捜し出します．デ
+フォルトでは， URLconf の以下の行::
 
     from django.conf.urls.defaults import *
 
-�ˤ�äơ� ``handler404`` �����ߤΥ⥸�塼��˼����ޤ�ޤ���
-``django/conf/urls/defaults.py`` �򸫤��ʬ����ޤ����� ``handler404`` �Υ�
-�ե�����ͤ� ``'django.views.defaults.page_not_found'`` �����ꤵ��Ƥ��ޤ���
+によって， ``handler404`` が現在のモジュールに取り込まれます．
+``django/conf/urls/defaults.py`` を見れば分かりますが， ``handler404`` のデ
+フォルト値は ``'django.views.defaults.page_not_found'`` に設定されています．
 
-404 �ӥ塼�ˤĤ��ơ��ΤäƤ����ͤФʤ�ʤ����Ȥ� 3 �Ĥ���ޤ�:
+404 ビューについて，知っておかねばならないことが 3 つあります:
 
-    * 404 �ӥ塼�ϡ��ꥯ�����Ȥ��줿 URL ���Ф��ơ� Django �� URLconf ����
-      �Ƥ�����ɽ����Ĵ�٤���̡����פ����Τ�ߤĤ����ʤ��ä����ˤ��
-      �ӽФ���ޤ���
+    * 404 ビューは，リクエストされた URL に対して， Django が URLconf の全
+      ての正規表現を調べた結果，一致するものをみつけられなかった場合にも呼
+      び出されます．
 
-    * 404 �ӥ塼�򼫺���������ǥե���ȤΥӥ塼��Ȥ����Ǥ⡤��Ĥ���
-      ���ͤФʤ�ʤ����ȤȤ��ơ� ``404.html`` �Ȥ���̾���Υƥ�ץ졼�Ȥ�
-      �������ͤФʤ�ޤ��󡥥ǥե���Ȥ� 404 �ӥ塼�����Ƥ� 404 ���顼����
-      ����Ʊ���ƥ�ץ졼�Ȥ�Ȥ��ޤ���
+    * 404 ビューを自作せず，ただデフォルトのビューを使う場合でも，一つだけ
+      やらねばならないこととして， ``404.html`` という名前のテンプレートを
+      作成せねばなりません．デフォルトの 404 ビューは全ての 404 エラーに対
+      して同じテンプレートを使います．
 
-    * (settings �⥸�塼���) ``DEBUG`` �� ``True`` �ˤ���ȡ� 404 �ӥ塼��
-      �ƤӽФ��줺������˥ȥ졼���Хå���ɽ������ޤ���
+    * (settings モジュールで) ``DEBUG`` を ``True`` にすると， 404 ビューは
+      呼び出されず，代わりにトレースバックが表示されます．
 
 .. _The 500 (server error) view:
 
-500 (�����Х��顼) �ӥ塼
+500 (サーバエラー) ビュー
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-404 ���顼��Ʊ�ͤˡ� Django �ϥӥ塼�Υ����ɾ�Ǽ¹Ի����顼�������������
-�ε�ư�����̰������Ƥ��ޤ����ӥ塼��¹Ԥ�����̡��㳰�����Ф����ȡ�
-Django �ϥǥե���Ȥ� ``django.views.defaults.server_error`` �Ȥ����ӥ塼��
-�ƤӽФ��ޤ������Υӥ塼�� ``500.html`` �Ȥ����ƥ�ץ졼�Ȥ�����ɤ��ƥ��
-�����ޤ���
+404 エラーと同様に， Django はビューのコード上で実行時エラーに遭遇した場合
+の挙動も特別扱いしています．ビューを実行した結果，例外が送出されると，
+Django はデフォルトで ``django.views.defaults.server_error`` というビューを
+呼び出します．このビューは ``500.html`` というテンプレートをロードしてレン
+ダします．
 
-���Τ��ᡤ�ƥ�ץ졼�ȥǥ��쥯�ȥ�κƾ峬�ؤ� ``500.html`` �Ȥ���̾���Υ�
-��ץ졼�Ȥ�������Ƥ����ͤФʤ�ޤ��󡥤��Υƥ�ץ졼�Ȥ����Ƥ� 500 ���顼
-���Ф����Ѥ����ޤ���
+このため，テンプレートディレクトリの再上階層に ``500.html`` という名前のテ
+ンプレートを作成しておかねばなりません．このテンプレートは全ての 500 エラー
+に対して用いられます．
 
-``server_error`` �ӥ塼�� 99% �� Web ���ץꥱ���������׵���������Ϥ��Ǥ�
-���� 500 �ӥ塼�򼫺�������ˤϡ�URLconf �ǰʲ��Τ褦�ˤ��� 
-``handler500`` ����ꤷ�ޤ�::
+``server_error`` ビューは 99% の Web アプリケーションの要求を満たすはずです
+が， 500 ビューを自作したい場合には，URLconf で以下のようにして 
+``handler500`` を指定します::
 
     handler500 = 'mysite.views.my_custom_error_view'
 
-����΢�Ǥϡ� Django �� ``handler500`` ��𤷤� 500 �ӥ塼���ܤ��Ф��ޤ�����
-�ե���ȤǤϡ� URLconf �ΰʲ��ι�::
+舞台裏では， Django は ``handler500`` を介して 500 ビューを捜し出します．デ
+フォルトでは， URLconf の以下の行::
 
     from django.conf.urls.defaults import *
 
-�ˤ�äơ� ``handler500`` �����ߤΥ⥸�塼��˼����ޤ�ޤ���
-``django/conf/urls/defaults.py`` �򸫤��ʬ����ޤ����� ``handler500`` �Υ�
-�ե�����ͤ� ``'django.views.defaults.server_error'`` �����ꤵ��Ƥ��ޤ���
+によって， ``handler500`` が現在のモジュールに取り込まれます．
+``django/conf/urls/defaults.py`` を見れば分かりますが， ``handler500`` のデ
+フォルト値は ``'django.views.defaults.server_error'`` に設定されています．
 

@@ -1,69 +1,69 @@
 ==================
-URL �ǥ����ѥå���
+URL ディスパッチャ
 ==================
 
 :revision-up-to: 4805 (release 0.96)
 
-���ä��ꤷ�����ʷ������� URL ����������߷פϡ����ʼ��� Web ���ץꥱ������
-��ǤϽ��פ����ǤǤ���Django �Ǥϡ��ե졼���������¤ʤ��ˡ�˾���̤��
-URL ���߷פǤ��ޤ���
+すっきりした，簡潔で明解な URL スキームの設計は，高品質の Web アプリケーショ
+ンでは重要な要素です．Django では，フレームワークの制限なしに，望み通りの
+URL を設計できます．
 
-``.php`` �� ``.cgi`` �Ȥ��ä���ĥ�Ҥ�ɬ�פʤ��� ``0,2097,1-1-1928,00`` �Τ�
-���ʰ�̣������ URL �ˤ���ɬ�פ⤢��ޤ���
+``.php`` や ``.cgi`` といった拡張子は必要なく， ``0,2097,1-1-1928,00`` のよ
+うな意味不明の URL にする必要もありません．
 
-URL �Ϥ��ä��ꤷ�������䤹����Τˤ��٤��Ǥ���Ȥ�����ĥ�ˤĤ��Ƥϡ����
-�ɥ磻�ɥ����֤λ��ߤοƤǤ��� Tim Berners-Lee ��ͥ�줿���⡤
-`Cool URIs don't change`_ �򻲾Ȥ��Ƥ��������� 
+URL はすっきりした扱いやすいものにすべきであるという主張については，ワール
+ドワイドウェブの産みの親である Tim Berners-Lee の優れた解説，
+`Cool URIs don't change`_ を参照してください． 
 
 .. _Cool URIs don't change: http://www.w3.org/Provider/Style/URI
 
 .. _Overview:
 
-����
+概要
 ====
 
-���륢�ץꥱ������������ URL ���߷פ���ˤϡ� **URLconf** (URL ����: URL
-configuration) �ȸƤӤʤ�蘆��Ƥ��� Python �⥸�塼���������ޤ������Υ�
-���塼��� pure Python �Υ����ɤǡ���ˤϤ��� URL �ѥ����� (ñ�������ɽ��)
-���� Python �Υ�����Хå��ؿ� (����Υӥ塼) �ؤΥޥåԥ󥰤����äƤ����
-���Ǥ���
+あるアプリケーション向けの URL を設計するには， **URLconf** (URL 設定: URL
+configuration) と呼びならわされている Python モジュールを作成します．このモ
+ジュールは pure Python のコードで，中にはただ URL パターン (単純な正規表現)
+から Python のコールバック関数 (自作のビュー) へのマッピングが入っているだ
+けです．
 
-���Υޥåԥ󥰤�û����Ǥ��ޤ�����ɬ�פʤ���Ĺ����Ǥ��ޤ���¾�Υޥåԥ�
-�⻲�ȤǤ��ޤ����ޤ��� pure Python �����ɤʤΤǡ�ưŪ�������Ǥ��ޤ���
+このマッピングは短くもできますし，必要なだけ長くもできます．他のマッピング
+も参照できます．また， pure Python コードなので，動的に生成できます．
 
 
 .. _How Django processes a request:
 
-Django �Υꥯ�����Ƚ���
+Django のリクエスト処理
 =======================
 
-�桼���� Django �Ǻ��줿�����Ⱦ�Υڡ�����ꥯ�����Ȥ������ˡ��ɤ� Python
-�����ɤ��¹Ԥ���뤫�ϰʲ��Υ��르�ꥺ��Ƿ��ꤵ��ޤ�:
+ユーザが Django で作られたサイト上のページをリクエストした時に，どの Python
+コードが実行されるかは以下のアルゴリズムで決定されます:
 
-    1. Django �� `����ե�����`_ �� ``ROOT_URLCONF`` �����õ���ޤ���������
-       ��ϡ��㤨�� ``"mydjangoapps.urls"`` �Τ褦�ˡ� URLconf �� import ��
-       �뤿��δ����� Python �ѥ���ɽ��ʸ����ˤʤäƤ��ޤ���
-    2. Django �Ͼ嵭�� Python �⥸�塼�������ɤ��ơ� ``urlpatterns`` �Ȥ�
-       ��̾�����ѿ���õ���ޤ��������ѿ����ͤ� Python �Υꥹ�Ȥǡ�
-       ``django.conf.urls.defaults.patterns()`` ���֤��Τ�Ʊ�������Ǥ���
-    3. Django �� URL �ѥ��������Ĵ�٤ơ��ꥯ������ URL �˺ǽ�˥ޥå���
-       ���Ȥ����ǻߤޤ�ޤ���
-    4. ���餫������ɽ���˥ޥå������顤 Django �ϥޥåԥ󥰤���Ƥ���ӥ塼
-       �� import ���ƸƤӽФ��ޤ����ӥ塼��ñ��� Python �ؿ��Ǥ����ӥ塼��
-       �����������ˤ� `�ꥯ�����ȥ��֥�������`_ ��������ʹߤΰ����ˤ���
-       ��ɽ���ǥ���ץ��㤷���ͤ��Ϥ���ޤ���
+    1. Django は `設定ファイル`_ の ``ROOT_URLCONF`` 設定を探します．この設
+       定は，例えば ``"mydjangoapps.urls"`` のように， URLconf を import す
+       るための完全な Python パスを表す文字列になっています．
+    2. Django は上記の Python モジュールをロードして， ``urlpatterns`` とい
+       う名前の変数を探します．この変数の値は Python のリストで，
+       ``django.conf.urls.defaults.patterns()`` が返すのと同じ形式です．
+    3. Django は URL パターンを順に調べて，リクエスト URL に最初にマッチし
+       たところで止まります．
+    4. 何らかの正規表現にマッチしたら， Django はマッピングされているビュー
+       を import して呼び出します．ビューは単純な Python 関数です．ビュー関
+       数の第一引数には `リクエストオブジェクト`_ が，それ以降の引数には正
+       規表現でキャプチャした値が渡されます．
 
-.. _`����ե�����`: ../settings/
+.. _`設定ファイル`: ../settings/
 .. _settings file: ../settings/
-.. _`�ꥯ�����ȥ��֥�������`: ../request_response/#httprequest-objects
+.. _`リクエストオブジェクト`: ../request_response/#httprequest-objects
 .. _request object: ../request_response/#httprequest-objects
 
 .. _Examples:
 
-����
+凡例
 ====
 
-URLconf �ΰ���򼨤��ޤ�::
+URLconf の一例を示します::
 
     from django.conf.urls.defaults import *
 
@@ -74,59 +74,59 @@ URLconf �ΰ���򼨤��ޤ�::
         (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'news.views.article_detail'),
     )
 
-����:
+注意:
 
-    * ``from django.conf.urls.defaults import *`` �ˤ�äơ� ``patterns()``
-      �ؿ���Ȥ���褦�ˤʤ�ޤ���
+    * ``from django.conf.urls.defaults import *`` によって， ``patterns()``
+      関数を使えるようになります．
 
-    * URL ����ͤ���Ф��ˤϡ�ñ�˴ݳ�̤ǰϤ�����Ǥ���
+    * URL 中の値を取り出すには，単に丸括弧で囲むだけです．
 
-    * ��Ƭ�Υ���å����ɬ�פ���ޤ������Ƥ� URL �˶��̤�����Ǥ����㤨�С�
-      ``^/articles`` �ǤϤʤ� ``^articles`` �ˤ��ޤ���
+    * 先頭のスラッシュは必要ありません．全ての URL に共通だからです．例えば，
+      ``^/articles`` ではなく ``^articles`` にします．
 
-    * ����ɽ��ʸ����Υ�ƥ������� ``'r'`` ������ޤ��������ɬ�ܤǤϤ���
-      �ޤ��󤬡��դ��������褤�Ǥ��礦�� ``r`` �ϡ�"raw" ʸ���󡤤��ʤ��ʸ
-      ������Τ����ʤ�ʸ���⥨�������פ��ʤ����Ȥ�ɽ���ޤ��� 
-      `Dive Into Python's explanation`_ �⻲�ͤˤ��Ƥ���������
+    * 正規表現文字列のリテラルの前に ``'r'`` があります．これは必須ではあり
+      ませんが，付けた方がよいでしょう． ``r`` は，"raw" 文字列，すなわち文
+      字列中のいかなる文字もエスケープしないことを表します． 
+      `Dive Into Python's explanation`_ も参考にしてください．
 
-��Υꥯ�����Ȥ�󤲤��������ޤ��礦:
+例のリクエストを挙げて説明しましょう:
 
-    * ``/articles/2005/03/`` �ؤΥꥯ�����Ȥ� 3 �Ĥ�Υ���ȥ�˥ޥå�����
-      ���� Django �� ``news.views.month_archive(request, '2005', '03')`` ��
-      �ƤӽФ��ޤ���
+    * ``/articles/2005/03/`` へのリクエストは 3 つめのエントリにマッチしま
+      す． Django は ``news.views.month_archive(request, '2005', '03')`` を
+      呼び出します．
 
-    * ``/articles/2005/3/`` �Ϥɤ� UrL �ѥ�����ˤ�ޥå����ޤ��󡥥ꥹ�Ȥ�
-      3 �Ĥ�Υ���ȥ�ǤϷ��ֹ椬 2 ��ˤʤ�褦�׵ᤷ�Ƥ��뤫��Ǥ���
+    * ``/articles/2005/3/`` はどの UrL パターンにもマッチしません．リストの
+      3 つめのエントリでは月番号が 2 桁になるよう要求しているからです．
 
-    * ``/articles/2003/`` �ϥꥹ�Ȥ� 2 ���ܤǤϤʤ����ǽ�Υѥ�����˥ޥå�
-      ���ޤ����ѥ�����Ͻ��֤�Ĵ�٤�졤�ǽ�˥ƥ��Ȥ˥ѥ�������Τ��Ȥ��
-      �뤫��Ǥ�������ˡ§�����̰��������� URL �ν����˻ȤäƤ⤫�ޤ��ޤ�
-      ��
+    * ``/articles/2003/`` はリストの 2 番目ではなく，最初のパターンにマッチ
+      します．パターンは順番に調べられ，最初にテストにパスしたものが使われ
+      るからです．この法則を，特別扱いしたい URL の処理に使ってもかまいませ
+      ん．
 
-    * ``/articles/2003`` �� URL ������å���ǽ���äƤ��ʤ��Τǡ��ɤΥѥ���
-      ��ˤ�ޥå����ޤ���
+    * ``/articles/2003`` は URL がスラッシュで終わっていないので，どのパター
+      ンにもマッチしません．
 
-    * ``/articles/2003/03/3/`` �ϺǸ�Υѥ�����˥ޥå����ޤ��� Django ��
-      ``news.views.article_detail(request, '2003', '03', '3')`` ��ƤӽФ�
-      �ޤ���
+    * ``/articles/2003/03/3/`` は最後のパターンにマッチします． Django は
+      ``news.views.article_detail(request, '2003', '03', '3')`` を呼び出し
+      ます．
 
 .. _Dive Into Python's explanation: http://diveintopython.org/regular_expressions/street_addresses.html#re.matching.2.3
 
 .. _Named groups:
 
-̾���Ĥ����롼��
+名前つきグループ
 ================
 
-�����Ǥϡ� *̾���ʤ���* ��ñ������ɽ�����롼�פ� (�ݳ��ɽ����) �Ȥä�
-URL ����������Ф����ӥ塼�ؿ��� *�������* �Ȥ����Ϥ��Ƥ��ޤ��������
-���٤���ˡ�ˡ� *̾���Ĥ���* ����ɽ�����롼�פ� URL ����������Ф����ӥ塼
-�� *������ɰ���* ���Ϥ���Τ�����ޤ���
+上の例では， *名前なしの* 簡単な正規表現グループを (丸括弧表記で) 使って
+URL から情報を取り出し，ビュー関数に *固定引数* として渡していました．より
+高度な方法に， *名前つきの* 正規表現グループで URL から情報を取り出し，ビュー
+の *キーワード引数* に渡すものがあります．
 
-Python ������ɽ���Ǥϡ�̾���Ĥ�����ɽ�����롼�פϡ� ``name`` �򥰥롼�פ�̾
-���� ``pattern`` ��ޥå�������ѥ�����Ȥ��ơ� ``(?P<name>pattern)`` ��ɽ
-����ޤ���
+Python の正規表現では，名前つき正規表現グループは， ``name`` をグループの名
+前， ``pattern`` をマッチさせるパターンとして， ``(?P<name>pattern)`` で表
+されます．
 
-��� URLconf �����񤭴����ơ�̾���Ĥ����롼�פˤ�����Τ򼨤��ޤ�::
+上の URLconf の例を書き換えて，名前つきグループにしたものを示します::
 
     urlpatterns = patterns('',
         (r'^articles/2003/$', 'news.views.special_case_2003'),
@@ -135,129 +135,129 @@ Python ������ɽ���Ǥϡ�̾���Ĥ�����ɽ�����롼�פϡ� ``name`` �򥰥롼�פ�̾
         (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'news.views.article_detail'),
     )
 
-���� URLconf �������������Ʊ����ǽ��¸����ޤ�������Ĥ����Ϥä���㤦�Τϡ�
-���Ф����ͤ��������ǤϤʤ�������ɰ����Ȥ��ƥӥ塼�ؿ����Ϥ��Ȥ�����
-�Ǥ����㤨��:
+この URLconf は前の例と全く同じ機能を実現しますが，一つだけはっきり違うのは，
+取り出した値を固定引数ではなくキーワード引数としてビュー関数に渡すという点
+です．例えば:
 
-    * ``/articles/2005/03/`` �ؤΥꥯ�����Ȥϡ�
-      ``news.views.month_archive(request, year='2005', month='03')`` �ǤϤ�
-      �� ``news.views.month_archive(request, '2005', '03')`` ��ƤӽФ��ޤ���
+    * ``/articles/2005/03/`` へのリクエストは，
+      ``news.views.month_archive(request, year='2005', month='03')`` ではな
+      く ``news.views.month_archive(request, '2005', '03')`` を呼び出します．
 
-    * ``/articles/2003/03/3/`` �ؤΥꥯ�����Ȥ�
+    * ``/articles/2003/03/3/`` へのリクエストは
       ``news.views.article_detail(request, year='2003', month='03', day='3')``
-      ��ƤӽФ��ޤ���
+      を呼び出します．
 
-�ºݤˤϡ����Τ褦��̾���Ĥ����롼�פ�Ȥ��� URLconf ��������������Ū�ʽ�
-���ˤʤꡤ�����ν��֤˵�������Х��򵯤����ˤ����ʤ�ޤ� -- ����ˡ�����ӥ塼
-�δؿ�����ǰ�������ѹ��Ǥ��ޤ��������ޤǤ�ʤ��������������äϴʷ餵�ε�
-���ξ������Ω�äƤ��ޤ�: ��ȯ�Ԥ���ˤϡ�̾���Ĥ����롼�פι�ʸ�������ƾ�
-Ĺ���ȴ�����ͤ⤤�ޤ���
+実際には，このような名前つきグループを使うと URLconf が少しだけ明示的な書き
+方になり，引数の順番に起因するバグを起こしにくくなります -- それに，自作ビュー
+の関数定義で引数順を変更できます．いうまでもなく，こうした恩恵は簡潔さの犠
+牲の上に成り立っています: 開発者の中には，名前つきグループの構文が醜くて冗
+長だと感じる人もいます．
 
 .. _The matching/grouping algorithm:
 
-�ޥå�/���롼�ԥ󥰤Υᥫ�˥���
+マッチ/グルーピングのメカニズム
 -------------------------------
 
-URLconf �ѡ���������ɽ�����̾���Ĥ����롼�פ�̾���ʤ����롼�פ򰷤��ݤΥ�
-�르�ꥺ���ʲ��˼����ޤ�:
+URLconf パーザが正規表現中の名前つきグループと名前なしグループを扱う際のア
+ルゴリズムを以下に示します:
 
-̾���Ĥ��ΰ���������Ф����Ȥ��ޤ���̾���ʤ�������̵�뤷�ޤ���̾���Ĥ���
-�������ʤ���С����٤Ƥ�̾���ʤ��������������Ȥ��ƻȤ��ޤ���
+名前つきの引数があればそれを使います．名前なし引数は無視します．名前つきの
+引数がなければ，すべての名前なし引数を固定引数として使います．
 
-�ɤ���ξ��Ǥ⡤�ɲäΥ�����ɰ��������Ǥ��ޤ�����ҤΡ֥ӥ塼�ؿ���
-�ɲäΥ��ץ������Ϥ��פ򻲾Ȥ��Ƥ���������
+どちらの場合でも，追加のキーワード引数を指定できます．後述の「ビュー関数に
+追加のオプションを渡す」を参照してください．
 
 .. _What the URLconf searches against:
 
-URLconf �θ����о�
+URLconf の検索対象
 ==================
 
-URLconf �ϥꥯ�����Ȥ��줿 URL ���̾�� Python ʸ����Ȥ��Ƹ������ޤ�������
-ʸ����ˤ� GET �� POST �Υѥ�᥿�⡤�ɥᥤ��̾������ޤ���
+URLconf はリクエストされた URL を通常の Python 文字列として検索します．この
+文字列には GET や POST のパラメタも，ドメイン名も入りません．
 
-�㤨�С� ``http://www.example.com/myapp/`` URLconf �������оݤˤ���Τ�
-``/myapp/`` �Ǥ���
+例えば， ``http://www.example.com/myapp/`` URLconf が検索対象にするのは
+``/myapp/`` です．
 
-``http://www.example.com/myapp/?page=3`` �ؤΥꥯ�����Ȥξ��ˤ�
-``/myapp/`` �ˤʤ�ޤ���
+``http://www.example.com/myapp/?page=3`` へのリクエストの場合にも
+``/myapp/`` になります．
 
-URLconf �ϥꥯ�����ȥ᥽�åɤ�Ĵ�٤ޤ��󡥴�������С�Ʊ�� URL ���Ф���
-``POST``, ``GET``, ``HEAD`` �Ȥ��ä����ƤΥꥯ�����ȥ᥽�åɤ�Ʊ���ӥ塼��
-���������ޤ���
+URLconf はリクエストメソッドを調べません．換言すれば，同じ URL に対する
+``POST``, ``GET``, ``HEAD`` といった全てのリクエストメソッドは同じビュー関
+数に送られます．
 
 
 .. _Syntax of the urlpatterns variable:
 
-urlpatterns �ѿ��ι�ʸ
+urlpatterns 変数の構文
 ======================
 
-``urlpatterns`` �� ``django.conf.urls.defaults.patterns()`` ���֤�������
-Python �ꥹ�Ȥˤʤ�ޤ��� ``urlpatterns`` �ѿ����ͤ���Ȥ��ˤϡ���� 
-``patterns()`` ��Ȥ��褦�ˤ��Ʋ�������
+``urlpatterns`` は ``django.conf.urls.defaults.patterns()`` の返す形式の
+Python リストになります． ``urlpatterns`` 変数の値を作るときには，常に 
+``patterns()`` を使うようにして下さい．
 
-����Ū�ˡ�URLconf ����Ƭ�ˤ� ``from django.conf.urls.defaults import *`` ��
-�񤯤��ȤˤʤäƤ��ޤ�������ˤ�äơ��ʲ��Τ褦�ʥ��֥������Ȥ˥���������
-����褦�ˤʤ�ޤ�:
+慣習的に，URLconf の先頭には ``from django.conf.urls.defaults import *`` を
+書くことになっています．これによって，以下のようなオブジェクトにアクセスで
+きるようになります:
 
 patterns
 --------
 
-�ץ�ե����� (prefix) �����������Ǥ�դθĿ��� URL �ѥ������ȤꡤDjango
-��ɬ�פʷ����� URL �ѥ�����Υꥹ�Ȥ��֤��ؿ��Ǥ���
+プレフィクス (prefix) 引数，および任意の個数の URL パターンをとり，Django
+で必要な形式の URL パターンのリストを返す関数です．
 
-``patterns()`` �κǽ�ΰ����� ``�ץ�ե����� (prefix)`` ʸ����Ǥ�����Ҥ�
-�֥ӥ塼�ץ�ե������� �򻲾Ȥ��Ƥ���������
+``patterns()`` の最初の引数は ``プレフィクス (prefix)`` 文字列です．後述の
+「ビュープレフィクス」 を参照してください．
 
-�Ĥ�ΰ����ϰʲ��η����Υ��ץ�ˤ��ޤ�::
+残りの引数は以下の形式のタプルにします::
 
     (regular expression, Python callback function [, optional dictionary])
 
-``dictionary_of_extra_arguments`` �ϥ��ץ����Ǥ� (��ҤΡ� 
-`�ӥ塼�ؿ����ɲäΥ��ץ������Ϥ�`_ �פ򻲾Ȥ��Ƥ�������)��
+``dictionary_of_extra_arguments`` はオプションです (後述の「 
+`ビュー関数に追加のオプションを渡す`_ 」を参照してください)．
 
 handler404
 ----------
 
-�ޥå����� URL �ѥ����󤬤ʤ����˸ƤӽФ����ӥ塼�ؿ��ؤΡ�������
-Python �� import �ѥ������ä�ʸ����Ǥ���
+マッチする URL パターンがない場合に呼び出されるビュー関数への，完全な
+Python の import パスが入った文字列です．
 
-�ǥե�����ͤϡ� ``'django.views.defaults.page_not_found'`` �Ǥ������̤Ϥ�
-�Υǥե�����ͤǽ�ʬ�ΤϤ��Ǥ���
+デフォルト値は， ``'django.views.defaults.page_not_found'`` です．普通はこ
+のデフォルト値で十分のはずです．
 
 
 handler500
 ----------
 
-�����Х��顼�����������˸ƤӽФ����ӥ塼�ؿ��ؤΡ������� Python ��
-import �ѥ������ä�ʸ����Ǥ��������Х��顼�ϥӥ塼�ؿ��Υ�������Ǽ¹Ի���
-�顼���������Ȥ��˵����ޤ���
+サーバエラーが生じた場合に呼び出されるビュー関数への，完全な Python の
+import パスが入った文字列です．サーバエラーはビュー関数のコード中で実行時エ
+ラーが生じたときに起きます．
 
-�ǥե�����ͤϡ� ``'django.views.defaults.page_not_found'`` �Ǥ������̤Ϥ�
-�Υǥե�����ͤǽ�ʬ�ΤϤ��Ǥ���
+デフォルト値は， ``'django.views.defaults.page_not_found'`` です．普通はこ
+のデフォルト値で十分のはずです．
 
 include
 -------
 
-���ߤ� URLconf �ˡּ�������̤� URLconf �ؤδ����� Python �� import �ѥ�
-�����ä�ʸ����Ǥ�����ҤΡ� `¾�� URLconf �������`_ �פ򻲾Ȥ��Ƥ�����
-����
+現在の URLconf に「取り込む」別の URLconf への完全な Python の import パス
+が入った文字列です．後述の「 `他の URLconf を取り込む`_ 」を参照してくださ
+い．
 
 .. _Notes on capturing text in URLs:
 
-URL ��Υƥ����Ȥ���Ф��ݤ�����
+URL 中のテキストを取り出す際の注意
 ==================================
 
-�����Ȥ��Ƽ��Ф����ƥ����Ȥϡ�����ɽ�������˥ޥå����뤫�˴ط��ʤ��̾��
-Python ʸ���󷿤ˤʤ�ޤ����㤨�С����Τ褦�� URLconf �ι�::
+引数として取り出したテキストは，正規表現が何にマッチするかに関係なく通常の
+Python 文字列型になります．例えば，下のような URLconf の行::
 
     (r'^articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
 
-�Ǥϡ� ``news.views.year_archive()`` ���Ϥ���� ``year`` �����ϡ������ǤϤ�
-�������ޤǤ�ʸ����ˤʤ�ޤ��� ``\d{4}`` ��������ɽ��ʸ����ˤ����ޥå�����
-�����Ȥϴط�����ޤ���
+では， ``news.views.year_archive()`` に渡される ``year`` 引数は，整数ではな
+くあくまでも文字列になります． ``\d{4}`` が整数を表す文字列にしかマッチしな
+いことは関係ありません．
 
-�褯�Ȥ��ȥ�å��Ȥ��ơ��ӥ塼�ؿ��ΰ����˥ǥե���ȥѥ�᥿����ꤷ�Ƥ���
-�Ȥ�����ˡ������ޤ��� URLconf �ȥӥ塼�ΰ���򤢤����������ޤ��礦::
+よく使うトリックとして，ビュー関数の引数にデフォルトパラメタを指定しておく
+という方法があります． URLconf とビューの一例をあげて説明しましょう::
 
     # URLconf
     urlpatterns = patterns('',
@@ -269,29 +269,29 @@ Python ʸ���󷿤ˤʤ�ޤ����㤨�С����Τ褦�� URLconf �ι�::
     def page(request, num="1"):
         # Output the appropriate page of blog entries, according to num.
 
-�����Ǥϡ� URL �ѥ�����Ϥɤ����Ʊ���ӥ塼�� ``blog.views.page`` ��ؤ�
-�Ƥ��ޤ������������ǽ�Υѥ�����Ǥϡ� URL ���鲿�ξ������Ф��ޤ��󡥺�
-��Υѥ����󤬥ޥå�����ȡ� ``page()`` �ؿ��� ``num`` ���ͤȤ��ơ��ǥե���
-�Ȥ� ``"1"`` ��Ȥ��ޤ�����Ĥ�Υѥ����󤬥ޥå�����ȡ� ``page()`` ������
-ɽ���Ǽ��Ф��� ``num`` ���ͤ�Ȥ��ޤ���
+上の例では， URL パターンはどちらも同じビュー， ``blog.views.page`` を指し
+ています．しかし，最初のパターンでは， URL から何の情報も取り出しません．最
+初のパターンがマッチすると， ``page()`` 関数は ``num`` の値として，デフォル
+トの ``"1"`` を使います．二つめのパターンがマッチすると， ``page()`` は正規
+表現で取り出した ``num`` の値を使います．
 
 .. _Performance:
 
-�ѥե����ޥ�
+パフォーマンス
 ==============
 
-``urlpatterns`` ��γ�����ɽ���ϡ��ǽ�˥������������ݤ˥���ѥ��뤵��ޤ���
-����ˤ�äơ������ƥ�Ϸ�Ū�˹�®�ˤʤ�ޤ���
+``urlpatterns`` 内の各正規表現は，最初にアクセスした際にコンパイルされます．
+これによって，システムは劇的に高速になります．
 
 .. _The view prefix:
 
-�ӥ塼�ץ�ե�����
+ビュープレフィクス
 ==================
 
-�����ɤ򷫤��֤��񤫤ʤ��Ƥ�褤�褦�ˡ� ``patterns()`` �ƤӽФ�����Ƕ���
-�Υץ�ե����������Ǥ��ޤ���
+コードを繰り返し書かなくてもよいように， ``patterns()`` 呼び出しの中で共通
+のプレフィクスを指定できます．
 
-`Django �γ���`_ ����ȤäƤ��� URLconf ����򼨤��ޤ�::
+`Django の概要`_ からとってきた URLconf の例を示します::
 
     from django.conf.urls.defaults import *
 
@@ -301,12 +301,12 @@ Python ʸ���󷿤ˤʤ�ޤ����㤨�С����Τ褦�� URLconf �ι�::
         (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'mysite.news.views.article_detail'),
     )
 
-������Ǥϡ��ƥӥ塼�ˤ϶��̤Υץ�ե������� ``'mysite.news.views'`` ������
-�ޤ��� ``urlpatterns`` �γƥ���ȥ�˷����֤����Ϥ�������ˡ�
-``patterns()`` �ؿ��κǽ�ΰ����˥ץ�ե���������ꤷ�ơ��ƥӥ塼�ؿ���Ŭ��
-�Ǥ��ޤ���
+この例では，各ビューには共通のプレフィクス， ``'mysite.news.views'`` があり
+ます． ``urlpatterns`` の各エントリに繰り返し入力する代わりに，
+``patterns()`` 関数の最初の引数にプレフィクスを指定して，各ビュー関数に適用
+できます．
 
-���Τ��Ȥ�ǰƬ���֤��ơ��嵭������äȴʷ�˽񤯤Ȱʲ��Τ褦�ˤʤ�ޤ�::
+このことを念頭に置いて，上記の例をもっと簡潔に書くと以下のようになります::
 
     from django.conf.urls.defaults import *
 
@@ -316,25 +316,25 @@ Python ʸ���󷿤ˤʤ�ޤ����㤨�С����Τ褦�� URLconf �ι�::
         (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'article_detail'),
     )
 
-�ץ�ե������ˤ������Υɥå� (``"."``) ������Ƥ��ʤ����Ȥ����դ��Ƥ���������
-Django �ϥɥåȤ�ưŪ������ޤ���
+プレフィクスには末尾のドット (``"."``) を入れていないことに注意してください．
+Django はドットを自動的に入れます．
 
-.. _`Django �γ���`: ../overview/
+.. _`Django の概要`: ../overview/
 .. _Django overview: ../overview/
 
 
 .. _Multiple view prefixes:
 
-ʣ���Υӥ塼�ץ�ե�����
+複数のビュープレフィクス
 ------------------------
 
-����Ū�ˤϡ������ʥӥ塼���꺮���ƻȤ����Ȥˤʤꡤ ``urlpatterns`` �˶���
-�Υץ�ե���������������ʤ��ʤ뤳�ȤǤ��礦�����������ѥ�����ν�ʣ����
-���ӥ塼�ץ�ե������Υ��硼�ȥ��åȵ�ǽ�ˤϡ��⤦��Ĥ�����ˡ������ޤ���
-����ϡ��ʲ��Τ褦��ʣ���� ``patterns()`` ���֥������Ȥ�­����碌��Ȥ���
-��ΤǤ�:
+現実的には，色々なビューを取り混ぜて使うことになり， ``urlpatterns`` に共通
+のプレフィクスを持たせられなくなることでしょう．しかし，パターンの重複を防
+ぐビュープレフィクスのショートカット機能には，もう一つの利用法があります．
+それは，以下のように複数の ``patterns()`` オブジェクトを足し合わせるという
+ものです:
 
-�Ť�����::
+古い書き方::
 
     from django.conf.urls.defaults import *
 
@@ -344,7 +344,7 @@ Django �ϥɥåȤ�ưŪ������ޤ���
         (r'^tag/(?P<tag>\w+)/$', 'weblog.views.tag'),
     )
 
-�ϡ��ʲ��Τ褦�ʽ����˲�����ޤ�::
+は，以下のような書き方に改められます::
 
     from django.conf.urls.defaults import *
 
@@ -360,15 +360,15 @@ Django �ϥɥåȤ�ưŪ������ޤ���
 
 .. _Including other URLconfs:
 
-¾�� URLconf �������
+他の URLconf を取り込む
 =======================
 
-``urlpatterns`` �����ʾ��ǡ�¾�� URLconf �⥸�塼��������������ޤ���
-�������ϡ��ܼ�Ū�ˤϰ�Ϣ�� URL ��¾�� URLconf �β��ˡ֤���������(root)��
-���ˤʤ�ޤ���
+``urlpatterns`` 好きな場所で，他の URLconf モジュール上の定義を取り込めます．
+この操作は，本質的には一連の URL を他の URLconf の下に「すげかえる(root)」
+操作になります．
 
-��Ȥ��ơ� `Django �����֥�����`_ ���Τ� URLconf �򼨤��ޤ������� URLconf
-��¾�� URLconf �򤤤��Ĥ������Ǥ��ޤ�::
+例として， `Django ウェブサイト`_ 自体の URLconf を示します．この URLconf
+は他の URLconf をいくつも取り込んでいます::
 
     from django.conf.urls.defaults import *
 
@@ -378,20 +378,20 @@ Django �ϥɥåȤ�ưŪ������ޤ���
         (r'^comments/',      include('django.contrib.comments.urls.comments')),
     )
 
-�����������ɽ������``$`` (�����˥ޥå�����ʸ��) ��ȤäƤ��餺�������˥����
-������դ��Ƥ��뤳�Ȥ����դ��ޤ��礦�� Django �� ``include()`` ��ߤĤ���ȡ�
-URL ����ޥå�������ʬ�����ꡤ�Ĥ��ʸ����� include ���줿 URLconf ��
-���ä�³���ν�����Ԥ碌�ޤ���
+この例の正規表現が，``$`` (行末にマッチする文字) を使っておらず，末尾にスラッ
+シュを付けていることに注意しましょう． Django が ``include()`` をみつけると，
+URL からマッチした部分を取り去り，残りの文字列を include された URLconf に
+送って続きの処理を行わせます．
 
-.. _`Django �����֥�����`: http://www.djangoproject.com/
+.. _`Django ウェブサイト`: http://www.djangoproject.com/
 
 .. _Captured parameters:
 
 Captured parameters
 -------------------
 
-include ���줿¦�� URLconf �ϡ��ƤȤʤ� URLconf �Ǽ��Ф��줿���ƤΥѥ��
-��������Ѥ��ޤ������äơ��ʲ��Τ褦����Ϥ��ޤ�ư��ޤ�::
+include された側の URLconf は，親となる URLconf で取り出された全てのパラメ
+タを受け継ぎます．従って，以下のような例はうまく動作します::
 
     # In settings/urls/main.py
     urlpatterns = patterns('',
@@ -404,100 +404,100 @@ include ���줿¦�� URLconf �ϡ��ƤȤʤ� URLconf �Ǽ��Ф��줿���ƤΥѥ��
         (r'^archive/$', 'blog.archive'),
     )
 
-�����Ǥϡ� include ���줿¦�ˤ� ``"username"`` �ѿ������Ԥɤ�����Ϥ����
-����
+上の例では， include された側にも ``"username"`` 変数が期待どおりに渡されま
+す．
 
 .. _Passing extra options to view functions:
 
-�ӥ塼�ؿ����ɲäΥ��ץ������Ϥ�
+ビュー関数に追加のオプションを渡す
 ==================================
 
-URLconf �ˤϡ��ӥ塼�ؿ����ɲäΰ����� Python �μ��񷿤��Ϥ���褦�ˤ��뤿
-��Υեå�������ޤ���
+URLconf には，ビュー関数に追加の引数を Python の辞書型で渡せるようにするた
+めのフックがあります．
 
-URLconf ���ץ�ˤϥ��ץ����Ȥ��� 3 �Ĥ�����Ǥ����Ǥ��ޤ����������Ǥ�
-�ӥ塼���Ϥ������ɲäΰ�������ʤ뼭��ˤ��ޤ���
+URLconf タプルにはオプションとして 3 つめの要素を指定できます．この要素は
+ビューに渡したい追加の引数からなる辞書にします．
 
-�㤨��::
+例えば::
 
     urlpatterns = patterns('blog.views',
         (r'^/blog/(?P<year>\d{4})/$', 'year_archive', {'foo': 'bar'}),
     )
 
-������Ǥϡ� ``/blog/2005/`` �Ȥ����ꥯ�����Ȥ��Ф��� Django ��
-``blog.views.year_archive()`` �ӥ塼��ƤӽФ����ʲ��Υ�����ɰ������Ϥ�
-�ޤ�::
+この例では， ``/blog/2005/`` というリクエストに対し， Django は
+``blog.views.year_archive()`` ビューを呼び出し，以下のキーワード引数を渡し
+ます::
 
     year='2005', foo='bar'
 
-���Υƥ��˥å��� `���ѥӥ塼`_ �� `�ۿ��ե����ɥե졼����`_ �ǡ��᥿�ǡ�
-����ӥ塼�ؤΥ��ץ������Ϥ�����˻Ȥ��Ƥ��ޤ���
+このテクニックは `汎用ビュー`_ や `配信フィードフレームワーク`_ で，メタデー
+タやビューへのオプションを渡すために使われています．
 
-.. _`���ѥӥ塼`: ../generic_views/
+.. _`汎用ビュー`: ../generic_views/
 .. _generic views: ../generic_views/
-.. _`�ۿ��ե����ɥե졼����`: ../syndication_feeds/
+.. _`配信フィードフレームワーク`: ../syndication_feeds/
 .. _syndication framework: ../syndication/
 
-.. admonition:: ���ͤ��򤱤�
+.. admonition:: 衝突を避ける
 
-    URLconf ��񤯤Ȥ���̾���դ��Υ�����ɰ����򥭥�ץ��㤵����Ʊ������
-    �ð����μ����Ʊ̾�ι��ܤ��ɲä���褦�ʽ������Ǥ��Ƥ��ޤ��ޤ�������
-    ��硤��������ꤷ�����Ƥ�ͥ�褵��ޤ���
+    URLconf を書くとき，名前付きのキーワード引数をキャプチャさせ，同時に追
+    加引数の辞書に同名の項目を追加するような書き方ができてしまいます．この
+    場合，辞書に設定した内容が優先されます．
 
 
 .. _`Passing extra options to include()`:
 
-``include()`` ���ɲäΥ��ץ������Ϥ�
+``include()`` に追加のオプションを渡す
 --------------------------------------
 
-``include()`` �ˤ��ɲäΥ��ץ������Ϥ��ޤ��� ``include()`` ���ɲäΥ��ץ���
-����Ϥ��ȡ����Υ��ץ����� include ���줿¦�� URLconf �� 
-*���Ƥ� URL ����* ��Ŭ�Ѥ���ޤ���
+``include()`` にも追加のオプションを渡せます． ``include()`` に追加のオプショ
+ンを渡すと，そのオプションは include された側の URLconf の 
+*全ての URL 設定* に適用されます．
 
-�㤨�С��ʲ�����Ĥ� URLconf �ϵ�ǽŪ������Ʊ���Ǥ�:
+例えば，以下の二つの URLconf は機能的に全く同じです:
 
-���� 1::
+その 1::
 
-    # main.py: include ����¦
+    # main.py: include する側
     urlpatterns = patterns('',
         (r'^blog/', include('inner'), {'blogid': 3}),
     )
 
-    # inner.py: include �����¦
+    # inner.py: include される側
     urlpatterns = patterns('',
         (r'^archive/$', 'mysite.views.archive'),
         (r'^about/$', 'mysite.views.about'),
     )
 
-���� 2::
+その 2::
 
-    # main.py: include ����¦
+    # main.py: include する側
     urlpatterns = patterns('',
         (r'^blog/', include('inner')),
     )
 
-    # inner.py: include �����¦
+    # inner.py: include される側
     urlpatterns = patterns('',
         (r'^archive/$', 'mysite.views.archive', {'blogid': 3}),
         (r'^about/$', 'mysite.views.about', {'blogid': 3}),
     )
 
-�ɲå��ץ����ϡ��ӥ塼�����ץ�����ºݤ�ͭ���ʥ��ץ����Ȥ��Ƽ������
-���ɤ����˴ؤ�餺�� *���* include �����¦�� URLconf �� *���Ƥ�* �Ԥ��Ϥ�
-���Τ����դ��Ƥ������������Τ��ᡤ include ���ɲå��ץ������Ϥ��ƥ��˥�
-����ͭ���ʤΤϡ�include �����¦�� URLconf �����äƤ������ƤΥӥ塼�����ɲ�
-�Υ��ץ������������ȤϤä��ꤷ�Ƥ���������Ǥ���
+追加オプションは，ビューがオプションを実際に有効なオプションとして受け取る
+かどうかに関わらず， *常に* include される側の URLconf の *全ての* 行に渡さ
+れるので注意してください．このため， include に追加オプションを渡すテクニッ
+クが有効なのは，include される側の URLconf に入っている全てのビューが，追加
+のオプションを受け取れるとはっきりしている場合だけです．
 
 .. _Passing callable objects instead of strings:
 
-ʸ���������˸ƤӽФ���ǽ���֥������Ȥ��Ϥ�
+文字列の代わりに呼び出し可能オブジェクトを渡す
 ==============================================
 
-��ȯ�Ԥ���ˤϡ��ӥ塼�Υѥ������ä�ʸ���������ˡ��ӥ塼���Τ�Τ�ɽ��
-Python �ؿ����֥������Ȥ��Ϥ������������ȹͤ��Ƥ���Ԥ⤤�ޤ����������ذƤ�
-���ݡ��Ȥ���Ƥ��ꡤǤ�դθƤӽФ���ǽ���֥������Ȥ�ӥ塼���Ϥ��ޤ���
+開発者の中には，ビューのパスが入った文字列の代わりに，ビューそのものを表す
+Python 関数オブジェクトを渡す方が自然だと考えている者もいます．この代替案も
+サポートされており，任意の呼び出し可能オブジェクトをビューに渡せます．
 
-�㤨�С� �ʲ��Τ褦�ʡ�ʸ����Ρ�URLconf �����ä��Ȥ��ޤ�::
+例えば， 以下のような「文字列の」URLconf があったとします::
 
     urlpatterns = patterns('',
         (r'^archive/$', 'mysite.views.archive'),
@@ -505,8 +505,8 @@ Python �ؿ����֥������Ȥ��Ϥ������������ȹͤ��Ƥ���Ԥ⤤�ޤ����������ذƤ�
         (r'^contact/$', 'mysite.views.contact'),
     )
 
-ʸ���������˥��֥������Ȥ��Ϥ��ơ�Ʊ����ǽ�� URLconf ��¸��Ǥ��ޤ�����
-�֥������Ȥ�˺�줺 import ���Ƥ�������::
+文字列の代わりにオブジェクトを渡して，同じ機能の URLconf を実現できます．オ
+ブジェクトを忘れず import してください::
 
     from mysite.views import archive, about, contact
 
@@ -516,8 +516,8 @@ Python �ؿ����֥������Ȥ��Ϥ������������ȹͤ��Ƥ���Ԥ⤤�ޤ����������ذƤ�
         (r'^contact/$', contact),
     )
 
-�ʲ�����ⵡǽŪ������Ʊ���Ǥ����ġ��Υӥ塼����̤� import ��������˥ӥ塼
-�����ä��⥸�塼��� import ����ȡ��������������ä���񤱤ޤ�::
+以下の例も機能的に全く同じです．個々のビューを個別に import する代わりにビュー
+の入ったモジュールを import すると，すこしだけすっきり書けます::
 
     from mysite import views
 
@@ -527,7 +527,7 @@ Python �ؿ����֥������Ȥ��Ϥ������������ȹͤ��Ƥ���Ԥ⤤�ޤ����������ذƤ�
         (r'^contact/$', views.contact),
     )
 
-�ɤΥ��������Ȥ����ϼ�ͳ�Ǥ���
+どのスタイルを使うかは自由です．
 
-���Υƥ��˥å���Ȥä���� (ʸ���������˥��֥������Ȥ��Ϥ������)
-(�����������) `�ӥ塼�ץ�ե�����`_ �ϸ��̤�ڤܤ��ʤ��Τ����դ��Ƥ���������
+このテクニックを使った場合 (文字列の代わりにオブジェクトを渡した場合)
+(上で説明した) `ビュープレフィクス`_ は効果を及ぼさないので注意してください．
