@@ -2,7 +2,7 @@
 mod_python で Django を動かす
 =============================
 
-:revision-up-to: 4884 (0.96+ SVN)
+:revision-up-to: 4903 (0.96+ SVN)
 
 Django をプロダクションサーバ上で動かす設定として，現状では Apache_ と
 `mod_python`_ の組み合わせを推奨しています．
@@ -16,7 +16,7 @@ Django を mod_python で動かす場合， Apache 2.x と mod_python 3.x が必
 また， Apache を使う場合， `worker MPM`_ ではなく `prefork MPM`_ を使うよう
 勧めます．
 
-興味があれば `FastCGI で Django を動かす`_ もどうぞ。
+興味があれば `FastCGI, SCGI, AJP で Django を動かす <../fastcgi/>`_ もどうぞ．
 
 .. _Apache: http://httpd.apache.org/
 .. _mod_python: http://www.modpython.org/

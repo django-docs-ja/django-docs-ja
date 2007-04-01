@@ -2,7 +2,7 @@
 モデル API リファレンス
 =======================
 
-:revision-up-to: 4884 (release 0.96)
+:revision-up-to: 4903 (0.96+ SVN)
 
 モデルとは，サイトを構成するデータの，ただ一つかつ最終的なデータソースを指
 します．モデルには，保存したいデータに不可欠なデータフィールドと，その振舞
@@ -1423,7 +1423,7 @@ admin の変更リストページに表示するフィールドを制御する�
       ``list_display`` の要素が実際にデータベース上のあるフィールドを指して
       いる場合， ``admin_order_field`` という属性を使って， Django にそのこ
       とを教えられます．例えば::
-      
+
         class Person(models.Model):
             first_name = models.CharField(maxlength=50)
             color_code = models.CharField(maxlength=6)

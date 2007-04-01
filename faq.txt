@@ -2,7 +2,7 @@
 Django についてよくある質問
 ===========================
 
-:revision-up-to: 4805 (release 0.96)
+:revision-up-to: 4903 (0.96+ SVN)
 
 .. contents::
 
@@ -407,8 +407,9 @@ mod_python を使わねばならないのでしょうか？
 実際に運用する上では mod_python を使うよう勧めていますが， Django は WSGI_
 と呼ばれる構成を使っているため，必ずしも mod_python を使わねばならないわけ
 ではありません． Django は WSGI を有効化したサーバと通信できます．
-mod_python を使わない構成で最もよく使われる運用方式は FastCGI によるもので
-す．詳しい情報は `FastCGI で Django を使う`_ を参照してください．
+他にも， mod_python を使わない構成として， FastCGI, SCGI, AJP があります．
+詳しい情報は `FastCGI, SCGI, AJP で Django を使う <../fastcgi/>`_ を参照し
+てください．
 
 また，その他の運用方法については `サーバ構成に関する wikiページ`_ を参照し
 てください．

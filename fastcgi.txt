@@ -1,14 +1,21 @@
-========================
-FastCGI で Django を使う
-========================
+===================================
+FastCGI, SCGI, AJP で Django を使う
+===================================
 
-:revision-up-to: 4805 (release 0.96)
+:revision-up-to: 4903 (0.96+ SVN)
 
 Django を動作させる構成として `現在推奨されている`_ のは， Apache_ と
 `mod_python`_ の組合せですが，多くの人々が共有ホスティングサービスを使って
-おり， FastCGI しか選択肢がない場合もあります．また，構成によっては，
-FastCGI は mod_python よりも安全であり，パフォーマンスの点で mod_python
-をしのぐ場合もあります．
+おり，そこでは FastCGI や SCGI, AJP といったプロトコルしか選択肢がない場合
+もあります．また，構成によっては， FastCGI は mod_python よりも安全であり，
+パフォーマンスの点で mod_python をしのぐ場合もあります．
+
+.. admonition:: Note
+
+    このドキュメントでは， FastCGI に重点をおいて説明しています． SCGI や
+    AJP といったプロトコルも，Python パッケージ ``flup`` 経由でサポートして
+    います． SCGI や AJP 固有の設定は，後述の 「プロトコル」の節を参照して
+    ください．
 
 FastCGI の本質は，外部アプリケーションが効率的に Web サーバにページを提供で
 きるようにすることにあります． Web サーバは (socket を介して) 受け取った
@@ -43,8 +50,8 @@ FastCGI プロセスは Web サーバプロセスの中ではなく，別の永�
 
 .. _`Prerequisite: flup`:
 
-Prerequisite: flup
-==================
+必要なもの: flup
+================
 
 Django で FastCGI を使うには，まず flup_ をインストールせねばなりません．
 flup は FastCGI を使えるようにするための Python ライブラリです．古いバージョ
@@ -84,9 +91,29 @@ Unix ドメインソケット (Win32 システムにおける「名前付きパ�
 ``runfcgi`` に ``help`` オプションだけを指定すると，利用可能な全てのオプショ
 ンを表示します．
 
-引数として， ``socket`` または， ``host`` および ``port`` を指定せねばなり
-ません．さらに， Web サーバをセットアップする際に，FastCGI サーバを起動する
-ときに使ったソケット名か，ホスト/ポート番号の組合せを指定せねばなりません．
+引数として， ``socket``, ``protocol``, または， ``host`` および ``port`` を
+指定せねばなりません．さらに， Web サーバをセットアップする際に，FastCGI サー
+バを起動するときに使ったソケット名か，ホスト/ポート番号の組合せを指定せねば
+なりません．
+
+.. _Protocols:
+
+プロトコル
+----------
+
+Django は flup_ のサポートしている全てのプロトコル，すなわち fastcgi_,
+SCGI_, `AJP1.3`_ (Apache JServ プロトコルバージョン 1.3) をサポートしていま
+す．使いたいプロトコルを指定するには， ``protocol=<protocl_name>`` を
+``./manage.py runfcgi`` のオプションに指定します． ``<protocol_name>`` は
+``fcgi`` (デフォルト)， ``scgi`` または ``ajp`` のいずれかです．例を以下に
+示します::
+
+    ./manage.py runfcgi --protocol=scgi
+
+.. _flup: http://www.saddi.com/software/flup/
+.. _fastcgi: http://www.fastcgi.com/
+.. _SCGI: http://python.ca/scgi/protocol.txt
+.. _AJP1.3: http://tomcat.apache.org/connectors-doc/ajp/ajpv13a.html
 
 .. _Examples:
 
