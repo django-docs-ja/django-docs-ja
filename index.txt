@@ -8,7 +8,7 @@ Django オンラインドキュメント和訳
 底本
     SVN trunk (0.96+ SVN)
 追従済みリビジョン
-    4884 (2007/04/01)
+    4903 (2007/04/02)
 
 必読
 ----
@@ -110,7 +110,7 @@ Django オンラインドキュメント和訳
 
 `mod_python で Django を使う (Using Django with mod_python) <../modpython/>`__
 
-`FastCGI で Django を使う (Using Django with FastCGI) <../fastcgi/>`__
+`FastCGI, SCGI, AJP で Django を使う (How to use Django with FastCGI, SCGI or AJP) <../fastcgi/>`__
 
 特殊な話題
 ----------
