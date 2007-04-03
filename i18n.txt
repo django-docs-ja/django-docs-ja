@@ -658,9 +658,9 @@ Django は以下のアルゴリズムに従って翻訳を探します:
     イルのある場所を基準に ``locale`` ディレクトリの場所を調べますが，手動
     で設定を行うと設定ファイルが存在しなくなってしまうからです)．
 
-.. _`settings のドキュメント`: 
-    ../settings/#using-settings-without-the-django-settings-module-environment-variable
-.. _settings documentation: ../settings/#using-settings-without-the-django-settings-module-environment-variable
+.. _settings documentation:
+    ../settings/#using-settings-without-setting-django-settings-module
+.. _`settings のドキュメント`: `settings documentation`_
 
 
 メッセージファイルリポジトリも同じような構成になっています:

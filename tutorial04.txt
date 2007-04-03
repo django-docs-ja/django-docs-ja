@@ -245,11 +245,10 @@ URLconf に入れたことを思い出しましょう::
     行のレコードしか選択しません．
     
     この仕組みをもっと詳しく理解したければ，データベース API ドキュメントの
-    `QuerySet オブジェクトの遅延実行の説明 <../db_api/#queryset-are-lazy>`_
-    を参照してください．
+    `QuerySet オブジェクトの遅延実行の説明`_ を参照してください．
 
-.. _explains the lazy nature of QuerySet objects: ../db_api/#querysets-are-lazy
-
+.. _explains the lazy nature of QuerySet objects: ../db-api/#querysets-are-lazy
+.. _QuerySet オブジェクトの遅延実行の説明: `explains the lazy nature of QuerySet objects`_
 
 このチュートリアルの前の部分では， ``poll`` や ``latest_poll_list``
 といった変数の入ったコンテキスト (context) をテンプレートに渡していました．

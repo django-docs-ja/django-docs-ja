@@ -29,10 +29,9 @@ sitemaps は Django の `配信フレームワーク`_ によく似ています�
 の生成は簡単で，ただ ``Sitemap`` クラスを書いて， URLconf_ に指定するだけで
 す．
 
-.. _`配信フレームワーク`: ../syndication/
+.. _syndication framework: ../syndication_feeds/
 .. _URLconf: ../url_dispatch/
-.. .. _syndication framework: ../syndication/
-.. .. _URLconf: ../url_dispatch/
+.. _`配信フレームワーク`: `syndication framework`_
 
 .. _Installation:
 
@@ -53,12 +52,10 @@ sitemaps アプリケーションは以下の手順でインストールしま�
 ``load_template_source`` テンプレートローダがデフォルトのテンプレートを捜し
 出せるようにするためです．)
 
-.. _INSTALLED_APPS: ../settings#installed-apps
-.. _TEMPLATE_LOADERS: ../settings#template-loaders
-.. _`sites フレームワーク`: ../sites
-.. .. _INSTALLED_APPS: ../settings/#installed-apps
-.. .. _TEMPLATE_LOADERS: ../settings/#template-loaders
-.. .. _sites framework: ../sites/
+.. _INSTALLED_APPS: ../settings/#installed-apps
+.. _TEMPLATE_LOADERS: ../settings/#template-loaders
+.. _sites framework: ../sites/
+.. _`sites フレームワーク`: `sites framework`_
 
 .. _Initialization:
 

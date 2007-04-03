@@ -25,8 +25,8 @@
 が参考になるでしょう． (Django のソース配布物中では，これらの例は
 ``tests/modeltests`` ディレクトリに収められています．)
 
-.. _`モデル例の公式リポジトリ`: 
-    ../models/
+.. _`モデル例の公式リポジトリ`:
+    http://www.djangoproject.com/documentation/models/
 .. _`データベース API リファレンス`: ../db-api/
 
 .. _Quick example:
@@ -524,10 +524,9 @@ admin では， ``<input type="text">`` (一行の入力フィールド) で表�
 
 ``choices`` セットを持つモデルフィールド各々について， Django は特殊なメソッ
 ドを追加し，フィールドの現在値を人間可読な形式で取得できるようにします．デー
-タベース API ドキュメントの `get_FOO_display <../db_api/#get-foo-display>`_
-を参照してください．
+タベース API ドキュメントの `get_FOO_display`_ を参照してください．
 
-.. _get_FOO_display: ../db_api/#get-foo-display
+.. _get_FOO_display: ../db-api/#get-foo-display
 
 最後に， choices はリストやタプルでなくてもよく，任意の iterable オブジェク
 トでかまわないことに注意してください．つまり， choices は動的生成できるので
@@ -763,7 +762,8 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
 
 完全な使用例は `多対一のリレーションモデルの例`_ を参照してください．
 
-.. _`多対一のリレーションモデルの例`: ../models/many_to_one/
+.. _`多対一のリレーションモデルの例`:
+    http://www.djangoproject.com/documentation/models/many_to_one/
 
 ``ForeignKey`` フィールドはリレーションの動作を定義するための引数をいくつか
 とれます．これらは全てオプションです:
@@ -909,7 +909,8 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
 
 完全な例は `Many-to-many relationship model example`_ を参照してください．
 
-.. _Many-to-many relationship model example: ../models/many_to_many/
+.. _Many-to-many relationship model example:
+    http://www.djangoproject.com/documentation/models/many_to_many/
 
 ``ManyToManyField`` フィールドはリレーションの動作を定義するための引数を
 いくつかとれます．これらは全てオプションです:
@@ -996,7 +997,8 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
 
 完全な例は `One-to-one relationship model example`_ を参照してください．
 
-.. _One-to-one relationship model example: ../models/one_to_one/
+.. _One-to-one relationship model example:
+    http://www.djangoproject.com/documentation/models/one_to_one/
 
 .. _Meta options:
 
@@ -1048,7 +1050,8 @@ Django は背後でカラム名とテーブル名をクオートします．
 
 完全な例は `latest() のドキュメント`_ を参照してください．
 
-.. _`latest() のドキュメント`: ../models/get_latest/
+.. _`latest() のドキュメント`:
+    http://www.djangoproject.com/documentation/models/get_latest/
 
 
 ``order_with_respect_to``
@@ -1099,7 +1102,7 @@ Django は背後でカラム名とテーブル名をクオートします．
 しか使わないので注意してください．
 
 .. _Specifying ordering:
-   ../models/ordering/
+   http://www.djangoproject.com/documentation/models/ordering/
 
 ``permissions``
 ---------------
@@ -2086,8 +2089,8 @@ SQL ファイルは ``manage.py`` の ``sqlinitialdata``, ``sqlreset``,
 イルを実行する前に，必ずデータベーステーブルは作成されているということだけ
 です．
 
-.. _`manage.py のドキュメント`: ../django_admin/#sqlinitialdata-appname-appname
-.. _`manage.py documentation`: ../django_admin/#sqlinitialdata-appname-appname
+.. _`manage.py documentation`: ../django-admin/#sqlreset-appname-appname
+.. _`manage.py のドキュメント`: `manage.py documentation`_
 
 .. _Database-backend-specific SQL data:
 

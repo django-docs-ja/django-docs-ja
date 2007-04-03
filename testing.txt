@@ -456,10 +456,10 @@ Response オブジェクトを返します． Response オブジェクトには�
 スクラスに指定した全てのフィクスチャをインストールします．上の例では，
 ``mammals`` という名前の JSON フィクスチャと， ``birds`` という名前のフィク
 スチャがインストールされます．フィクスチャの定義とインストールに関する詳細
-は `フィクスチャの読み込み <../django_admin/#loaddata-fixture-fixture>`_
-を参照してください．
+は `フィクスチャの読み込み`_ を参照してください．
 
-.. _`loading fixtures`: ../django_admin/#loaddata-fixture-fixture
+.. _`loading fixtures`: ../django-admin/#loaddata-fixture-fixture
+.. _フィクスチャの読み込み: `loading fixtures`_
 
 このフラッシュ／ロードの作業はテストケースの実行毎に繰り返されるので，他の
 テストや以前のテスト実行の影響を受けることはありません．

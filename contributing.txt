@@ -215,7 +215,7 @@ stage)」というフィールドに関わる作業です．このステージ�
 かを示します:
 
     「パッチあり (has patch)」
-        チケットに `パッチ <#patch_style>`_ が添付されていることを示します．
+        チケットに `パッチ`_ が添付されていることを示します．
         このフラグのついたパッチはレビューされ，条件を満たした「よいパッチ」
         であるかどうか調べられます．
 
@@ -269,6 +269,7 @@ stage)」というフィールドに関わる作業です．このステージ�
 .. _required details: `Reporting bugs`_
 .. _good patch: `Patch style`_
 .. _patch: `Submitting patches`_
+.. _パッチ: `Patch style`_
 
 .. _Submitting and maintaining translations:
 

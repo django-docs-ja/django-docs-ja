@@ -36,7 +36,7 @@ Django では匿名セッション (anonymous session) を完全にサポート�
 ``'django.contrib.sessions'`` を削って下さい．セッションを無効にすると，ほ
 んのわずかだけオーバヘッドを軽減できます．
 
-.. _`ミドルウェア`: ../middileware/
+.. _`ミドルウェア`: ../middleware/
 
 .. _Using sessions in views:
 

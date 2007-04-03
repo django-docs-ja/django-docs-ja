@@ -120,13 +120,13 @@ Django を使った問題解決で手助けが必要になったときは? 配�
 開発者が常に集まっています．気さくな人達がいつもいて，手助けをしてくれたり，
 話相手になってくれます．
 
-.. _`オンラインで`: ../
-.. _`Django ウェブサイト`: http://www.djangoproject.com/
-.. _`日本語ドキュメント`: http://ymasuda.jp/python/django/docs/
-.. _online: ../
+.. _online: http://www.djangoproject.com/documentation/
 .. _Django website: http://www.djangoproject.com/
 .. _FAQ: ../faq/
 .. _django-users: http://groups.google.com/group/django-users
+.. _`オンラインで`: online_
+.. _`Django ウェブサイト`: `Django website`_
+.. _`日本語ドキュメント`: http://ymasuda.jp/python/django/docs/
 
 Django を使ってくれてありがとう！
 
