@@ -70,7 +70,7 @@ InnoDB_ エンジンは完全なトランザクション機能と外部キー参
 BDB_ エンジンは InnoDB と同様，完全なトランザクション機能を外部キー参照をサ
 ポートしていますが，やや時代送れになりつつあるようです．
 
-SolidDB_ や Falcon_ といった `その他のストレージエンジン <http://dev.mysql.com/doc/refman/5.1/en/storage-engines-other.htm>`_ 
+SolidDB_ や Falcon_ といった `その他のストレージエンジン`_ 
 まだまだ圏外の話です．現状では，おそらく InnoDB が最良の選択でしょう．
 
 .. _storage_engines: http://dev.mysql.com/doc/refman/5.0/en/storage-engines.html
@@ -81,6 +81,7 @@ SolidDB_ や Falcon_ といった `その他のストレージエンジン <http
 .. _Other storage engines: http://dev.mysql.com/doc/refman/5.1/en/storage-engines-other.html
 .. _SolidDB: http://forge.mysql.com/projects/view.php?id=139
 .. _Falcon: http://dev.mysql.com/doc/falcon/en/index.html
+.. _その他のストレージエンジン: `Other storage engines`_
 
 MySQLdb
 -------
@@ -98,21 +99,21 @@ MySQLdb はバージョン 1.2.1 から MySQL-4.1 以降をサポートするよ
 ----------------------
 
 コマンドラインツールを使って，以下の SQL を発行すれば 
-`データベースを作成 <http://dev.mysql.com/doc/refman/5.0/en/create-database.html>`_
-できます::
+`データベースを作成`_ できます::
 
   CREATE DATABASE <dbname> CHARACTER SET utf8;
   
 これで，全てのテーブルとカラムがデフォルトで UTF-8 を使うようになります．
   
 .. _create your database: http://dev.mysql.com/doc/refman/5.0/en/create-database.html
+.. _データベースを作成: `create your database`_
 
 .. _Connecting to the database:
 
 データベースに接続する
 ----------------------
 
-`設定に関するドキュメント <settings/#database-engine>`_ も参照してください．
+`設定に関するドキュメント`_ も参照してください．
 
 接続に関する設定は，以下の順に適用されます:
 
@@ -123,8 +124,7 @@ MySQLdb はバージョン 1.2.1 から MySQL-4.1 以降をサポートするよ
 
 別の言い方をするなら， ``DATABASE_OPTIONS`` 内にデータベースの名前を設定す
 ると，その内容は ``DATABASE_NAME`` よりも優先順位が高くなり，さらに
-``DATABASE_NAME`` は 
-`MySQL のオプション設定ファイル <http://dev.mysql.com/doc/refman/5.0/en/option-files.html>`_
+``DATABASE_NAME`` は `MySQL のオプション設定ファイル`_
 の内容をオーバライドするということです．
 
 MySQL のオプション設定ファイルを使う例を以下に示します::
@@ -144,12 +144,14 @@ MySQL のオプション設定ファイルを使う例を以下に示します::
 
 この他にも，MySQLdb の接続オプションには， ``ssl``, ``use_unicode``,
 ``init_command``, ``sql_mode`` といった便利なものがあります．詳しくは
-`MySQLdb のドキュメント <http://mysql-python.sourceforge.net/>`_ を参照して
-ください．
+`MySQLdb のドキュメント`_ を参照してください．
   
-.. _settings documentation: http://www.djangoproject.com/documentation/settings/#database-engine
+.. _settings documentation: ../settings/#database-engine
 .. _MySQL option file: http://dev.mysql.com/doc/refman/5.0/en/option-files.html
 .. _MySQLdb documentation: http://mysql-python.sourceforge.net/
+.. _設定に関するドキュメント: `settings documentation`_
+.. _`MySQL のオプション設定ファイル`: `MySQL option file`_
+.. _`MySQLdb のドキュメント`: `MySQLdb documentation`_
 
 .. _Creating your tables:
 
@@ -186,8 +188,7 @@ Django はスキーマを作成する際にストレージエンジンを指定�
     オプションを外しておかねばなりません．
 
   * もう一つ， syncdb 時にストレージエンジンを変更する方法が， Wiki の
-    `AlterModelOnSyncDB <http://code.djangoproject.com/wiki/AlterModelOnSyncDB>`_
-    にあります．
+    `AlterModelOnSyncDB`_ にあります．
 
 .. _AlterModelOnSyncDB: http://code.djangoproject.com/wiki/AlterModelOnSyncDB
 

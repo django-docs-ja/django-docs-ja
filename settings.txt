@@ -817,8 +817,8 @@ SITE_ID
 
 `sites のドキュメント`_ を参照してください．
 
-.. _`sites のドキュメント`: sites.txt
 .. _sites documentation: ../sites/
+.. _`sites のドキュメント`: `sites documentation`_
 
 TEMPLATE_CONTEXT_PROCESSORS
 ---------------------------
