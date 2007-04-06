@@ -477,10 +477,10 @@ DJANGO_SETTINGS_MODULE の import がらみのエラーがでるのはなぜ？
 以下の点を確認してください:
 
     * 環境変数 DJANGO_SETTINGS_MODULE が完全指定の Python モジュール名になっ
-      ていますか (たとえば "mysite.settings.main")．
+      ていますか (たとえば "mysite.settings")．
 
     * 設定モジュールは ``sys.path`` の上にありますか (``import
-      mysite.settings.main`` はうまくいきますか)．
+      mysite.settings`` はうまくいきますか)．
 
     * (言うまでもなく) モジュールに構文エラーはありませんか．
 

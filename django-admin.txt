@@ -387,8 +387,7 @@ sqlreset [appname appname ...]
 sqlsequencereset [appname appname ...]
 ----------------------------------------------
 
-指定した appname の PostgreSQL シークエンスをリセットするための
-SQL 文を出力します．
+指定した appname のシークエンスをリセットするためのSQL 文を出力します．
 
 詳しくは http://simon.incutio.com/archive/2004/04/21/postgres を参照し
 てください．
