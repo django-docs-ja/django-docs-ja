@@ -2,7 +2,7 @@
 mod_python で Django を動かす
 =============================
 
-:revision-up-to: 4903 (0.96+ SVN)
+:revision-up-to: 4985 (0.96+ SVN)
 
 Django をプロダクションサーバ上で動かす設定として，現状では Apache_ と
 `mod_python`_ の組み合わせを推奨しています．
@@ -171,7 +171,7 @@ Django は，自分ではメディアファイルの提供を行わず，ユー�
 アファイルを提供せざるを得ない場合には，以下のようにして特定の場所でだけ
 mod_python を切ります::
 
-    <Location "/media/">
+    <Location "/media">
         SetHandler None
     </Location>
 
@@ -189,7 +189,7 @@ mod_python を切ります::
         SetEnv DJANGO_SETTINGS_MODULE mysite.settings
     </Location>
 
-    <Location "media">
+    <Location "/media">
         SetHandler None
     </Location>
 

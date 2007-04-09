@@ -2,7 +2,7 @@
 django-admin.py と manage.py
 ============================
 
-:revision-up-to: 4828 (0.96+ SVN)
+:revision-up-to: 4985 (0.96+ SVN)
 
 ``django-admin.py`` は Django の管理タスクを行うためのコマンドライン
 ユーティリティです．このドキュメントでは ``django-admin.py`` の全ての
@@ -34,6 +34,9 @@ Windows を使っていて，シンボリックリンクを張れない場合に
 ``manage.py`` を使う方が簡単といえるでしょう． ``django-admin.py`` と
 ``DJANGO_SETTINGS_MODULE`` や ``--settings`` コマンドラインオプション
 を使えば，複数の Django 設定ファイルを切替えて操作できます．
+
+このドキュメント内でのコマンドライン例では，一貫して ``django-admin.py`` を
+使っていますが，実際には ``manage.py`` を使ってもかまいません．
 
 使い方
 ======
@@ -118,6 +121,7 @@ dumpdata [appname appname ...]
 式にしたければ， ``--format`` オプション (例えば ``format=xml``) を使ってく
 ださい． ``--format`` には， (``SERIALIZATION_MODULES`` 設定で指定したもの
 を含む) Django 対応のシリアライゼーションバックエンドを指定できます．
+``--indent`` オプションを使うと，出力をきれいにインデントできます．
 
 アプリケーション名を指定しなかった場合，インストール済みのアプリケーション
 全てのデータをダンプします．
@@ -225,6 +229,8 @@ Django は上記の場所に見つかった全てのフィクスチャファイ�
 クスチャに対する参照を持っていてもかまいません．データベースバックエンドが
 行レベルの制約 (row-level constraint) をサポートしているばあい，制約はトラ
 ンザクションの最後にチェックされます．
+
+``dumpdata`` コマンドを使うと， ``loaddata`` の入力データを生成できます．
 
 .. admonition:: MySQL とフィクスチャ
 
@@ -539,7 +545,7 @@ django-admin スクリプトを自動的に実行したい場合に便利です�
 
 使用例::
 
-    django-admin.py manage.py --adminmedia=/tmp/new-admin-style/
+    django-admin.py --adminmedia=/tmp/new-admin-style/
 
 開発サーバを起動する際に， admin インタフェース用の CSS や JavaScript ファ
 イルを探す場所を Django に教えます．通常，これらのファイルは Django のソー

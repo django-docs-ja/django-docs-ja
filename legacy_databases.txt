@@ -2,7 +2,7 @@
 古いデータベースの組み込み
 ==================================
 
-:revision-up-to: 4805 (release 0.96)
+:revision-up-to: 4985 (0.96+ SVN)
 
 Django が最も得意とするのは新たなアプリケーションですが，古いデータベースの
 組み込みも可能です． Django には組み込み作業を可能な限り自動化するための二
@@ -61,12 +61,12 @@ Django には，既存のデータベースにイントロスペクションを�
 きるユーティリティが付属しています．出力を見るには以下のコマンドを実行しま
 す::
 
-    django-admin.py inspectdb --settings=path.to.settings
+    python manage.py inspectdb
 
 標準の Unix 出力リダイレクションを使って，この内容をファイルに保存しておき
 ます::
 
-    django-admin.py inspectdb --settings=path.to.settings > appname.py
+    python manage.py inspectdb > appname.py
 
 この機能はショートカット目的で，正しいモデル生成を行うためのものではありま
 せん．詳しくは `django-admin.py のドキュメント`_ を参照してください．
@@ -86,7 +86,7 @@ Django のコアデータテーブルのインストール
 次に， ``django-admin.py syncdb`` コマンドを実行して， Django のコアデータ
 テーブルをデータベースにインストールします::
 
-    django-admin.py syncdb --settings=path.to.settings
+    python manage.py syncdb
 
 
 .. _See whether it worked:
