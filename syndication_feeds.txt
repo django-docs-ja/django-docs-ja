@@ -2,7 +2,7 @@
 配信フィードフレームワーク
 ==========================
 
-:revision-up-to: 4985 (0.96+ SVN)
+:revision-up-to: 4995 (0.96+ SVN)
 
 Django には高水準の配信フィード (syndication feed) 生成フレームワークがつい
 てきます．このフレームワークを使えば， RSS_ 形式や Atom_ 形式のフィードを簡
@@ -331,7 +331,7 @@ Atom フィードと RSS フィードを並行出力する
 ---------------------------------------------
 
 開発者によっては， Atom と RSS の *両方の* バージョンを利用できるようにした
-いと望むことでしょう． Django でこれを実現するのは簡単です: 自作の ``feed``
+いと望むことでしょう． Django でこれを実現するのは簡単です: 自作の ``Feed``
 クラスをサブクラス化して， ``feed_type`` を変更し， URLconf を更新して，
 他のバージョン向けのエントリを追加するだけです．
 
@@ -351,16 +351,21 @@ Atom フィードと RSS フィードを並行出力する
     
     class AtomSiteNewsFeed(RssSiteNewsFeed):
         feed_type = Atom1Feed
-	subtitle = description
+	subtitle = RssSiteNewsFeed.description
 
 .. Note::
-    Atom フィードでは，フィードレベルの ``description`` エレメントがありま
-    せん．その *代わりに* ``subtitle`` エレメントならあります． RSS フィー
-    ドの ``description`` は ``subtitle`` にするには冗長なので， Django では
-    ``description`` を自動的に ``subtitle`` に転用するような処理はおこない
-    ません．その代わり，適切な説明の入った文字列をモデルの ``subtitle`` 属
-    性として指定せねばなりません．上の例では，たまたま RSS フィードの
-    ``description`` は十分短いので，そのまま使っています．
+  上の例では，RSS フィードは ``description`` を使っています．一方，Atom フィー
+  ドでは ``subtitle`` を使っています．Atom フィードはフィードレベルの
+  ``description`` を持たず， ``subtitle`` 持っているからです．
+
+  ``Feed`` クラスに ``description`` を定義しておいても，Django は
+  ``description`` の値を自動的に ``subtitle`` エレメントに入れたりはしませ
+  ん． ``subtitle`` と ``description`` は必ずしも同じものを指さないからです．
+  その代わり，適切な説明の入った文字列をモデルの ``subtitle`` 属性として指
+  定せねばなりません．
+
+  上の例では，たまたま RSS フィードの ``description`` は十分短いので，その
+  まま使っています．
 
 対応する URLconf は以下のようにします::
 
