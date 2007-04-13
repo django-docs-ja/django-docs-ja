@@ -4,7 +4,7 @@
 
 .. contents::
 
-:revision-up-to: 4884 (0.96+ SVN)
+:revision-up-to: 5005 (0.96+ SVN)
 
 さあ，例を交えながら学んでゆきましょう．
 
@@ -426,7 +426,7 @@ Django では，こうした概念を簡単な Python クラスで表現でき�
     * ``python manage.py sqlindexes polls`` -- アプリケーション用の 
       ``CREATE INDEX`` 文を出力します．
 
-    * ``python manage.py sqlall polls`` -- 'sql', 'sqlinitialdata',
+    * ``python manage.py sqlall polls`` -- 'sql', 'sqlcustom',
       'sqlindexes' コマンドを合わせたものです．
 
 

@@ -2,7 +2,7 @@
 Django のインストール
 =====================
 
-:revision-up-to: 4805 (release 0.96)
+:revision-up-to: 5005 (release 0.96)
 
 このドキュメントを読めば Django を動かせるようになります．
 
@@ -78,6 +78,37 @@ Django のデータベース API 機能を使うのなら，データベース�
 .. _MySQLdb: http://sourceforge.net/projects/mysql-python
 .. _SQLite: http://www.sqlite.org/
 .. _pysqlite: http://initd.org/tracker/pysqlite
+
+.. _Remove any old versions of Django:
+
+旧バージョンの Django の除去
+============================
+
+以前のバージョンからアップグレードする形で Django をインストールする場合，
+新しいバージョンをインストールする前に，まず旧バージョンをアンインストール
+しておく必要があります．
+
+``setup.py install`` を使って Django をインストールした場合は簡単で，
+Python の ``site-packages`` ディレクトリから ``django`` ディレクトリを削除
+するだけです．
+
+Python Egg を使って Django をインストールした場合，Django の ``.egg`` ファ
+イルを削除するとともに， ``easy-install.pth`` から Django の ``.egg`` ファ
+イルパスが書かれたエントリを削除します． ``easy-install.pth`` や ``.egg``
+は，通常  ``site-packages`` ディレクトリ下にあります．
+
+.. admonition:: ``site-packages`` はどこにあるの？
+
+    ``site-packages`` の在処はオペレーティングシステムや Python のインストー
+    ル場所によって異なります．ただし，一般的には以下のような場所にインストー
+    ルされます:
+    
+    * Linux の場合: ``/usr/lib/python2.X/site-packages``
+
+    * Windows の場合: ``C:\Python2.X\lib\site-packages``
+
+    * MacOSX の場合: ``/Library/Python2.X/site-packages``
+
 
 .. _Install the Django code:
 

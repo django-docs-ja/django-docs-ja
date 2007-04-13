@@ -2,7 +2,7 @@
 モデル API リファレンス
 =======================
 
-:revision-up-to: 4985 (0.96+ SVN)
+:revision-up-to: 5005 (0.96+ SVN)
 
 モデルとは，サイトを構成するデータの，ただ一つかつ最終的なデータソースを指
 します．モデルには，保存したいデータに不可欠なデータフィールドと，その振舞
@@ -853,11 +853,11 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
 
 
 .. _`データベース API のリファレンス`: ../db-api/
-.. _`Database API reference`: ../db_api/
+.. _`Database API reference`: ../db-api/
 .. _`オブジェクトのリレーションに関する解説`:
     ../db-api/#related-objects
 .. _related objects documentation: 
-    ../db_api/#related-objects
+    ../db-api/#related-objects
 
 .. _Many-to-many relationships:
 
@@ -2080,7 +2080,7 @@ Django では， CREATE TABLE 文を実行した直後に任意の SQL をデー
 モデルのテーブルを生成する SQL が実行された直後にデータベースに直接パイプ入
 力されます．
 
-SQL ファイルは ``manage.py`` の ``sqlinitialdata``, ``sqlreset``,
+SQL ファイルは ``manage.py`` の ``sqlcustom``, ``sqlreset``,
 ``sqlall`` および ``reset`` コマンドの実行時に参照されます．詳しくは
 `manage.py のドキュメント`_ を参照してください．
 
