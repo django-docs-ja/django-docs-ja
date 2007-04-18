@@ -2,7 +2,7 @@
 テンプレート作者のための Django テンプレート言語ガイド
 =======================================================
 
-:revision-up-to: 5005 (0.96+ SVN)
+:revision-up-to: 5023 (0.96+ SVN)
 
 Django のテンプレート言語は，釣合いの取れたパワーと簡便さを実現するように，
 また HTML を扱いなれた人にとっては快適になるように設計されています．
@@ -1360,3 +1360,14 @@ django.contrib.markup
     * Textile
     * Markdown
     * ReST (ReStructured Text)
+
+
+django.contrib.webdesign
+------------------------
+
+「Lorem Ipsum...」のような例文を出力するタグなど，ウェブサイトをデザインす
+...るときに役立つテンプレートタグを集めたものです．
+`webdesign のドキュメント`_ も参照してください．
+
+.. webdesign documentation: ../webdesign/
+.. _`webdesign のドキュメント`: ../webdesign/
