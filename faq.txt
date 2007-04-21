@@ -341,7 +341,7 @@ Django 開発者はどこで雇えますか？
        `質問`_ してみましょう．
 
 .. _`コードをダウンロード`: http://www.djangoproject.com/download/
-.. _`インストールガイド`: ../instal0l/
+.. _`インストールガイド`: ../install/
 .. _`チュートリアル`:  ../tutorial01/
 .. _`ドキュメント`: ../index/
 .. _`質問`: http://www.djangoproject.com/community/
