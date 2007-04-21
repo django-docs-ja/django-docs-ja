@@ -2,14 +2,14 @@
 はじめての Django アプリ作成，その 3
 =====================================
 
-:revision-up-to: 4805 (release 0.96)
+:revision-up-to: 5052 (0.96+ SVN)
 
 このチュートリアルは `チュートリアルその 2`_ の続きです．ここでは，引続き
 Web 投票アプリケーションの開発を例にして，公開用のインタフェース，ビュー
 (view) の作成を焦点に解説します．
 
 .. _`チュートリアルその 2`: ../tutorial02/
-.. _Tutorial 2: ../tutorial2/
+.. _Tutorial 2: ../tutorial02/
 
 .. _Philosophy:
 
@@ -519,4 +519,4 @@ polls アプリケーションは絶対 URL ではなく相対 URL だけに注�
 理と汎用ビュー (generic view) の使い方を学びましょう．
 
 .. _`チュートリアルその 4`: ../tutorial04/
-.. _part 4 of this tutorial: ../tutorial4/
+.. _part 4 of this tutorial: ../tutorial04/

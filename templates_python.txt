@@ -2,7 +2,7 @@
 Python プログラマのための Django テンプレート言語ガイド
 =======================================================
 
-:revision-up-to: 4805 (release 0.96)
+:revision-up-to: 5052 (0.96+ SVN)
 
 このドキュメントでは， Django のテンプレートシステムを技術的な側面，すなわ
 ちどのように動作し，どうやって拡張するかという観点から解説します．テンプレー
@@ -1109,7 +1109,7 @@ Python 2.4 からは，デコレータ構文もうまく動作します::
 けは前述の ``inclusion_tag`` の例と異なります．
 
 .. _`チュートリアル`: ../tutorial01/#creating-models
-.. _tutorials: ../tutorial1/#creating-models
+.. _tutorials: ../tutorial01/#creating-models
 
 
 .. _Setting a variable in the context:

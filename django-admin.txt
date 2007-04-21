@@ -2,7 +2,7 @@
 django-admin.py と manage.py
 ============================
 
-:revision-up-to: 5005 (0.96+ SVN)
+:revision-up-to: 5052 (0.96+ SVN)
 
 ``django-admin.py`` は Django の管理タスクを行うためのコマンドライン
 ユーティリティです．このドキュメントでは ``django-admin.py`` の全ての

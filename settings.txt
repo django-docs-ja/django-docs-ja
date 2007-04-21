@@ -2,7 +2,7 @@
 Django の設定
 =============
 
-:revision-up-to: 4805 (release 0.96)
+:revision-up-to: 5052 (0.96+ SVN)
 
 Django の設定ファイルには，インストールした Django の使う全ての設定が入って
 います．このドキュメントでは，各設定の役割と，どのような設定を利用できるか
@@ -67,7 +67,7 @@ django-admin.py ユーティリティ
     django-admin.py runserver --settings=mysite.settings
 
 .. _django-admin.py: ../django-admin/
-.. django-admin.py: ../django_admin/
+.. django-admin.py: ../django-admin/
 
 .. _On the server (mod_python):
 
@@ -118,7 +118,7 @@ Django が設定をコンパイルする際には，以下のようなアルゴ�
 照してください．
 
 .. _`diffsettings のドキュメント`: ../django-admin/#diffsettings
-.. _diffsettings documentation: ../django_admin/#diffsettings
+.. _diffsettings documentation: ../django-admin/#diffsettings
 
 
 .. _`Using settings in Python code`:
@@ -510,7 +510,7 @@ INSTALLED_APPS
 ばなりません．
 
 .. _django-admin.py startapp: ../django-admin/#startapp-appname
-.. django-admin.py startapp: ../django_admin/#startapp-appname
+.. django-admin.py startapp: ../django-admin/#startapp-appname
 
 INTERNAL_IPS
 ------------

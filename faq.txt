@@ -2,7 +2,7 @@
 Django についてよくある質問
 ===========================
 
-:revision-up-to: 4903 (0.96+ SVN)
+:revision-up-to: 5052 (0.96+ SVN)
 
 .. contents::
 
@@ -341,14 +341,14 @@ Django 開発者はどこで雇えますか？
        `質問`_ してみましょう．
 
 .. _`コードをダウンロード`: http://www.djangoproject.com/download/
-.. _`インストールガイド`: ../install/
+.. _`インストールガイド`: ../instal0l/
 .. _`チュートリアル`:  ../tutorial01/
 .. _`ドキュメント`: ../index/
 .. _`質問`: http://www.djangoproject.com/community/
 
 .. _`Download the code`: http://www.djangoproject.com/download/
 .. _`installation guide`: ../install/
-.. _tutorial:  ../tutorial1/
+.. _tutorial:  ../tutorial01/
 .. _documentation: ../
 .. _ask questions: http://www.djangoproject.com/community/
 

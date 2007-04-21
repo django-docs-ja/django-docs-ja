@@ -2,7 +2,7 @@
 古いデータベースの組み込み
 ==================================
 
-:revision-up-to: 4985 (0.96+ SVN)
+:revision-up-to: 5052 (0.96+ SVN)
 
 Django が最も得意とするのは新たなアプリケーションですが，古いデータベースの
 組み込みも可能です． Django には組み込み作業を可能な限り自動化するための二
@@ -12,7 +12,7 @@ Django が最も得意とするのは新たなアプリケーションですが�
 Django の基礎を良く知っているものと仮定しています．
 
 .. _`公式チュートリアル`: ../tutorial01/
-.. _official tutorial: ../tutorial1/
+.. _official tutorial: ../tutorial01/
 
 .. _Give Django your database parameters:
 
@@ -76,7 +76,7 @@ Django には，既存のデータベースにイントロスペクションを�
 ``INSTALLED_APPS`` 設定にアプリケーションを追加しておきます．
 
 .. _django-admin.py のドキュメント: ../django-admin/
-.. _django-admin.py documentation: ../django_admin/
+.. _django-admin.py documentation: ../django-admin/
 
 .. _Install the core Django tables:
 

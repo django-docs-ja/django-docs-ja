@@ -4,7 +4,7 @@
 
 .. contents::
 
-:revision-up-to: 5005 (0.96+ SVN)
+:revision-up-to: 5052 (0.96+ SVN)
 
 さあ，例を交えながら学んでゆきましょう．
 
@@ -448,7 +448,7 @@ Django では，こうした概念を簡単な Python クラスで表現でき�
 `django-admin.py のドキュメント`_ を読んで下さい．
 
 .. _`django-admin.py のドキュメント`: ../django-admin/
-.. _django-admin.py documentation: ../django_admin/
+.. _django-admin.py documentation: ../django-admin/
 
 API で遊んでみる
 ================
@@ -634,5 +634,5 @@ Django の自動 admin を動かしてみましょう．
 
 .. _`データベース API リファレンス`: ../db-api/
 .. _`チュートリアル第 2 部`: ../tutorial02/
-.. _Database API reference: ../db_api/
+.. _Database API reference: ../db-api/
 .. _part 2 of this tutorial: ../tutorial02/
