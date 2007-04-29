@@ -158,7 +158,7 @@ API リファレンス
       profile) を返します．プロファイルを使えないサイトでは 
       ``django.contrib.auth.models.SiteProfileNotAvailable`` を送出します．
 
-.. _Django model: ../model_api/
+.. _Django model: ../model-api/
 .. _Django モデル: `Django model`_
 .. _DEFAULT_FROM_EMAIL: ../settings/#default-from-email
 
@@ -847,7 +847,7 @@ Django の admin サイトでは，以下のようなパーミッションを使
 
 .. _`モデルのメタ属性`: ../model-api/#meta-options
 .. _model Meta attribute: 
-    ../model_api/#meta-options
+    ../model-api/#meta-options
 
 API リファレンス
 -----------------
