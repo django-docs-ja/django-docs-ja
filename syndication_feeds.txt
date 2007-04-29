@@ -2,7 +2,7 @@
 配信フィードフレームワーク
 ==========================
 
-:revision-up-to: 4995 (0.96+ SVN)
+:revision-up-to: 5126 (0.96+ SVN)
 
 Django には高水準の配信フィード (syndication feed) 生成フレームワークがつい
 てきます．このフレームワークを使えば， RSS_ 形式や Atom_ 形式のフィードを簡
@@ -178,10 +178,10 @@ Feed クラス
 
 
 .. _chicagocrime.org: http://www.chicagocrime.org/
-.. _`Object-Relational マッパ`: ../db-api/
-.. _`Django テンプレート`: ../templates/
-.. _object-relational mapper: ../db_api/
+.. _object-relational mapper: ../db-api/
+.. _`Object-Relational マッパ`: `object-relational mapper`_
 .. _Django templates: ../templates/
+.. _`Django テンプレート`: `Django templates`_
 
 複雑な例
 -----------------

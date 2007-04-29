@@ -2,7 +2,7 @@
 汎用ビュー
 ==========
 
-:revision-up-to: 5052 (0.96+ SVN)
+:revision-up-to: 5126 (0.96+ SVN)
 
 Web アプリケーションの作成は，同じパターンを何度も何度も繰り返し書くことに
 なるため，退屈なものです． Django では，そんなパターンに共通する部分のほと
@@ -74,7 +74,8 @@ Django の汎用ビューには以下のようなものがあります:
 QuerySet を常に最新の状態にしておきたい場合には，関数やラムダ表記を使って
 QuerySet を返させるようにせねばなりません．
 
-.. _`データベース API のドキュメント`: ../db-api/
+.. _database API docs: ../db-api/
+.. _`データベース API のドキュメント`: `database API docs`_
 
 .. _"Simple" generic views:
 

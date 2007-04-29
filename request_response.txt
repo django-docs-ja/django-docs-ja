@@ -2,7 +2,7 @@
 リクエストオブジェクトとレスポンスオブジェクト
 ==============================================
 
-:revision-up-to: 4985 (0.96+ SVN)
+:revision-up-to: 5063 (0.96+ SVN)
 
 .. _`Quick overview`:
 
@@ -105,6 +105,7 @@ HttpRequest オブジェクト
         * ``CONTENT_TYPE``
         * ``HTTP_ACCEPT_ENCODING``
         * ``HTTP_ACCEPT_LANGUAGE``
+        * ``HTTP_HOST`` -- クライアントから送信された HTTP Host ヘッダです．
         * ``HTTP_REFERER`` -- リクエスト対象のページを参照しているページが
           ある場合，そのページの URL です．
         * ``HTTP_USER_AGENT`` -- クライアントのユーザエージェントを表す文字

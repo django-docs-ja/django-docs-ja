@@ -2,7 +2,7 @@
 flatpages アプリケーション
 ===========================
 
-:revision-up-to: 4805 (release 0.96)
+:revision-up-to: 5126 (0.96+ SVN)
 
 Django にはオプションのアプリケーション， "flatpages" がついてきます．
 "flatpages" を使うと，データベースに素 ("flat") の HTML コンテンツを Django
@@ -105,10 +105,10 @@ flatpage は標準の `Django モデル`_ で表現されており，コード�
 は `Django データベース API`_  を介してアクセスできます．
 
 .. _`Django モデル`: ../model-api/
-.. _Django model: ../model_api/
+.. _Django model: ../model-api/
 .. _django/contrib/flatpages/models.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/flatpages/models.py
 .. _`Django データベース API`: ../db-api/
-.. _Django database API: ../db_api/
+.. _Django database API: ../db-api/
 
 flatpage のテンプレート
 =======================

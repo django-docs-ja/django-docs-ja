@@ -2,7 +2,7 @@
 e-mail の送信
 ==============
 
-:revision-up-to: 4805 (release 0.96)
+:revision-up-to: 5126 (0.96+ SVN)
 
 Python の `smtplib ライブラリ`_ を使えば，比較的簡単に電子メールを送信でき
 ますが， Django ではこのライブラリへの軽量ラッパを二つ用意して，電子メール
@@ -26,14 +26,21 @@ Python の `smtplib ライブラリ`_ を使えば，比較的簡単に電子メ
     send_mail('Subject here', 'Here is the message.', 'from@example.com',
         ['to@example.com'], fail_silently=False)
 
+メールは `EMAIL_HOST`_ および `EMAIL_PORT`_ 設定で指定した SMTP ホストを介
+して送信されます． `EMAIL_HOST_USER`_ および `EMAIL_HOST_PASSWORD`_ が指定
+されていれば， SMTP サーバの認証に使われます．
+
 .. note::
 
     ``django.core.mail`` で送信される電子メールの文字セットは
-    `DEFAULT_CHARSET 設定`_ の値に設定されます．
+    `DEFAULT_CHARSET`_  設定の値に設定されます．
     
-.. _`DEFAULT_CHARSET 設定`: ../settings/#default-charset
+.. _`DEFAULT_CHARSET`: ../settings/#default-charset
 .. _DEFAULT_CHARSET setting: ../settings/#DEFAULT_CHARSET
-
+.. _`EMAIL_HOST`: ../settings/#email-host
+.. _`EMAIL_PORT`: ../settings/#email-port
+.. _`EMAIL_HOST_USER`: ../settings/#email-host-user
+.. _`EMAIL_HOST_PASSWORD`: ../settings/#email-host-password
 
 
 send_mail()

@@ -2,7 +2,7 @@
 redirects アプリケーション
 ==========================
 
-:revision-up-to: 4805 (release 0.96)
+:revision-up-to: 5126 (0.96+ SVN)
 
 Django にはオプションとして redirects アプリケーションがついてきます．この
 アプリケーションを使うと，リダイレクト先をデータベースに保存し，適切なリダ
@@ -86,8 +86,8 @@ Python API から
 `Django データベース API`_ を使ってリダイレクトオブジェクトにアクセスできま
 す．
 
-.. _Django モデル: ../model-api/
 .. _Django model: ../model_api/
+.. _Django モデル: `Django model`_
 .. _django/contrib/redirects/models.py: http://code.djangoproject.com/browser/django/branches/magic-removal/django/contrib/redirects/models.py
-.. _Django データベース API: ../db-api/
 .. _Django database API: ../db_api/
+.. _Django データベース API: `Django database API`_

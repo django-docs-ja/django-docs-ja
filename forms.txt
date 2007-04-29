@@ -2,7 +2,7 @@
 フォームとフィールド，マニピュレータ
 ====================================
 
-:revision-up-to: 4903 (0.96+ SVN)
+:revision-up-to: 5126 (0.96+ SVN)
 
 .. _Forwards-compatibility note:
 
@@ -662,14 +662,18 @@ Django のモデルとの類似性が見て取れます．自作のマニピュ�
     の場合，現在のフィールドに対して  ``validator_list`` に指定した全ての
     バリデータを適用します．
 
+``RequiredIfOtherFieldGiven``
+    他のフィールドの名前を引数にとり，そのフィールドの値に値が入っている場
+    合にのみ，現在のフィールドを必須フィールドにします．
+
+``RequiredIfOtherFieldsGiven``
+    ``RequiredIfOtherFieldNotGiven`` に似ていますが，フィールド名のリストを
+    引数にとり，いずれかのフィールドに値が入っている場合にのみ，現在のフィー
+    ルドを必須フィールドにします．
+
 ``RequiredIfOtherFieldNotGiven``
     他のフィールドの名前を引数にとり，そのフィールドの値に値が入っていない
     場合に，現在のフィールドを必須フィールドにします．
-
-``RequiredIfOtherFieldsNotGiven``
-    ``RequiredIfOtherFieldNotGiven`` に似ていますが，フィールド名のリストを
-    引数にとり，いずれのフィールドにも値がない場合にのみ，現在のフィールド
-    を必須フィールドにします．
 
 ``RequiredIfOtherFieldEquals`` および ``RequiredIfOtherFieldDoesNotEqual``
     これらのバリデータクラスは，フィールド名と値を引数にとります．フィール
@@ -736,9 +740,9 @@ Django のモデルとの類似性が見て取れます．自作のマニピュ�
     て， XML フラグメントがスキーマにしたがっているか検証します．
 
 .. _`generic views`: ../generic_views/
-.. _`汎用ビュー`: ../generic_views/
+.. _`汎用ビュー`: `generic views`_
 .. _`models API`: ../model_api/
-.. _`モデル API`: ../model_api/
+.. _`モデル API`: `models API`_
 .. _settings: ../settings/
-.. _`Django 設定ファイル`: ../settings/
+.. _`Django 設定ファイル`: settings_
 

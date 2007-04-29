@@ -2,7 +2,7 @@
 Django でのユーザ認証
 =============================
 
-:revision-up-to: 4805 (release 0.96)
+:revision-up-to: 5126 (0.96+ SVN)
 
 Django にはユーザ認証システムがついてきます． Django のユーザ認証システムは，
 ユーザアカウント，グループ，パーミッションとクッキーベースのユーザセッショ
@@ -159,10 +159,8 @@ API リファレンス
       ``django.contrib.auth.models.SiteProfileNotAvailable`` を送出します．
 
 .. _Django model: ../model_api/
-.. _Django モデル: ../model-api/
+.. _Django モデル: `Django model`_
 .. _DEFAULT_FROM_EMAIL: ../settings/#default-from-email
-.. DEFAULT_FROM_EMAIL: 
-    ../settings/#default-from-email
 
 .. _Manager functions:
 
@@ -232,9 +230,12 @@ API リファレンス
 (salt)，そしてハッシュ値 (hash) をドル記号 (``"$"``) で分割した文字列になり
 ます．
 
-ハッシュ形式は ``sha1`` (デフォルト) または ``md5`` であり，それぞれパスワー
-ドの一方向ハッシュ化アルゴリズムを表します．ソルトは生のパスワード文字列か
-らハッシュを生成するときに味付け (salt) しておくためのランダムな文字列です．
+ハッシュ形式は ``sha1`` (デフォルト) または ``md5`` ， ``crypt`` のいずれか
+で，それぞれパスワードの一方向ハッシュ化アルゴリズムを表します． salt は生
+のパスワード文字列からハッシュを生成するときに味付け (salt) しておくための
+ランダムな文字列です． ``crypt`` のサポートは， Python の標準モジュール
+``crypt`` がサポートされている環境だけで有効です．また， ``crypt`` のサポー
+トは開発版の Django でのみ利用できます．
 
 例えば::
 
@@ -446,14 +447,14 @@ Python 2.4 で登場したよりコンパクトなデコレータ構文を使っ
 
 ``login_required`` が行うのは以下のような処理です:
 
-    * ユーザがログインしていなければ， ``/accounts/login/`` にリダイレクト
-      します．このとき，現在のクエリの絶対 URL を ``next`` に入れ，例えば
+    * ユーザがログインしていなければ， ``settings.LOGIN_URL`` に指定した値
+      (デフォルトでは ``/accounts/login/``) にリダイレクトします．このとき，
+      現在のクエリの絶対 URL を ``next`` に入れ，例えば
       ``/accounts/login/?next=/polls/3/`` のようにします．
     * ユーザがログインしていれば， ビューを普通に実行します．ビューコードの
       中では，ユーザがログインしているものとみなして構いません．
 
-
-ただし，これを行うには ``/accounts/login/`` に適切な Django のビュー関数を
+ただし，これを行うには ``settings.LOGIN_URL`` に適切な Django のビュー関数を
 対応づけておかねばなりません．例えば URLconf に以下のような行を設定します::
 
     (r'^accounts/login/$', 'django.contrib.auth.views.login'),
@@ -466,9 +467,9 @@ Python 2.4 で登場したよりコンパクトなデコレータ構文を使っ
 
     * ``POST`` で呼び出されると，ユーザのログイン処理を試みます．ログインに
       成功すると，ビューは ``next`` に示された URL にリダイレクトします
-      ``next`` を指定しない場合， ``/accounts/profile/`` にリダイレクトしま
-      す (現状ではハードコードされたページです)．ログインに失敗すると，ログ
-      インフォームを再度表示します．
+      ``next`` を指定しない場合， ``settings.LOGIN_REDIRECT_URL`` (デフォル
+      ト値は ``/accounts/profile/``) にリダイレクトします．ログインに失敗す
+      ると，ログインフォームを再度表示します．
 
 開発者は ``registration/login.html`` という名前のテンプレート上でログイン
 フォームを提供せねばなりません． Django はこのテンプレートに，以下の 3 つの
@@ -554,7 +555,7 @@ Python 2.4 で登場したよりコンパクトなデコレータ構文を使っ
 **オプション引数:**
 
     * ``login_url``: ログインページへのリダイレクト先です．
-      この引数を省略すると，デフォルト値の ``/accounts/login/`` を使います．
+      この引数を省略すると，デフォルト値の ``settings.LOGIN_URL`` を使います．
 
 ``django.contrib.auth.views.password_change``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -636,7 +637,8 @@ Python 2.4 で登場したよりコンパクトなデコレータ構文を使っ
 **オプション引数:**
 
     * ``login_url``: ログインページへのリダイレクト先です．
-      この引数を省略すると，デフォルト値の ``/accounts/login/`` を使います．
+      この引数を省略すると，デフォルト値の ``settings.LOGIN_URL`` を使いま
+      す．
 
 .. _Built-in manipulators:
 
@@ -708,7 +710,7 @@ Python 2.4 のデコレータ構文ならこうなります::
 
 ``user_passes_test()`` はオプションの引数として ``login_url`` をとります．
 この引数を使うとログインページへの URL を指定できます (デフォルトでは
-``/accounts/login/`` になります)．
+``settings.LOGIN_URL`` になります)．
 
 Python 2.3 風の構文で書いた例を示します::
 
@@ -752,7 +754,7 @@ permission_required デコレータ
     my_view = permission_required('polls.can_vote', login_url='/loginpage/')(my_view)
 
 ``login_required`` デコレータと同様， ``login_url`` のデフォルト値は
-``'/accounts/login/'`` です．
+``settings.LOGIN_URL`` です．
 
 
 .. _Limiting access to generic views:

@@ -2,7 +2,7 @@
 国際化
 ======
 
-:revision-up-to: 4805 (release 0.96)
+:revision-up-to: 5126 (0.96+ SVN)
 
 Django はコードとテンプレートの双方で国際化をフルサポートしています．このド
 キュメントでは国際化の仕組みについて説明します．
@@ -195,8 +195,8 @@ import する必要はありません．
             verbose_name = _('my thing')
             verbose_name_plural = _('mythings')
 
-.. _`Django モデル`: ../model-api/
-.. _Django models: ../model_api/
+.. _Django models: ../model-api/
+.. _`Django モデル`: `Django models`_
 
 .. _Pluralization:
 

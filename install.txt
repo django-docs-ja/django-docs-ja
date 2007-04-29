@@ -2,7 +2,7 @@
 Django のインストール
 =====================
 
-:revision-up-to: 5023 (release 0.96)
+:revision-up-to: 5126 (0.96+ SVN)
 
 このドキュメントを読めば Django を動かせるようになります．
 
@@ -55,15 +55,16 @@ WSGI_ 仕様に従っているので，様々なサーバプラットフォー�
 ====================
 
 Django のデータベース API 機能を使うのなら，データベースサーバを動かす必要
-があります． Django は PostgreSQL_ (推奨), MySQL_, および SQLite_ で動作し
+があります． Django は PostgreSQL_, MySQL_, および SQLite_ で動作し
 ます．
 
 さらに，各データベースの Python バインディングをインストールしておく必要が
 あります．
 
-* PostgreSQL を使う場合， psycopg_ パッケージ (バージョン 2 の
-  ``postgresql_psycopg2`` バックエンドを推奨します．バージョン 1.1 の
-  ``postgresql`` バックエンドも使えます) が必要です．Windows 環境なら， 
+* PostgreSQL を使う場合， psycopg_ パッケージが必要です． Django はバージョ
+  ン 1 および 2 の psycopg をサポートしています (Django のデータベース設定
+  で， ``postgresql`` [バージョン 1 の場合] か， ``postgresql_psycopg2``
+  [バージョン 2 の場合] を選んでください．Windows 環境なら， 
   非公式の `Windows むけコンパイル済みパッケージ`_ を使って下さい．
 
 * MySQL を使う場合は，バージョン 1.2.1p2 以降の MySQLdb_ が必要です．

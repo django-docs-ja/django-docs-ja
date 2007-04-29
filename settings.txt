@@ -2,7 +2,7 @@
 Django の設定
 =============
 
-:revision-up-to: 5052 (0.96+ SVN)
+:revision-up-to: 5126 (0.96+ SVN)
 
 Django の設定ファイルには，インストールした Django の使う全ての設定が入って
 います．このドキュメントでは，各設定の役割と，どのような設定を利用できるか
@@ -436,8 +436,10 @@ EMAIL_HOST_PASSWORD
 
 デフォルト値: ``''`` (空文字列)
 
-``EMAIL_HOST`` で定義されている SMTP サーバへのアクセスに使われるユーザ名で
-す．空文字列の場合， Django は SMTP への認証を試みません．
+``EMAIL_HOST`` に指定した SMTP サーバにアクセスする際のパスワードです．この
+設定は ``EMAIL_HOST_USER`` と組み合わせて， SMTP サーバの認証に使われます．
+``EMAIL_HOST_USER`` と ``EMAIL_HOST_PASSWORD`` のどちらかが空文字列の場合，
+Django は SMTP への認証を試みません．
 
 ``EMAIL_HOST_USER`` も参照してください．
 
@@ -611,6 +613,37 @@ import を引き起こしてしまうからです．
 んと取り出せます．しかし，実行時に翻訳は行われません．従って，実行時に
 ``LANGUAGES`` を使うようなコードでは， *本当の* ``gettext()`` を使って
 言語名をラップするようにしてください．
+
+LOGIN_REDIRECT_URL
+------------------
+
+**開発バージョンの Django で新たに追加されました**
+
+デフォルト値: ``'/accounts/profile/'``
+
+``controb.auth.login`` ビューに ``next`` パラメタが指定されていない場合の，
+デフォルトのリダイレクト先 URL です．
+
+`@login_required`_ デコレータを利用するときなどに使う設定です．
+
+LOGIN_URL
+---------
+
+**開発バージョンの Django で新たに追加されました**
+
+デフォルト値: ``'/accounts/login/'``
+
+`@login_required`_ デコレータを利用するときなどに，ログインページへのリダイ
+レクト先として使う設定です．
+
+LOGOUT_URL
+----------
+
+**開発バージョンの Django で新たに追加されました**
+
+デフォルト値: ``'/accounts/logout/'``
+
+LOGIN_URL の対極にあたる，ログアウトページへのリダイレクト URL です．
 
 
 MANAGERS
@@ -791,7 +824,7 @@ SESSION_COOKIE_SECURE
 SESSION_EXPIRE_AT_BROWSER_CLOSE
 -------------------------------
 
-Default: ``False``
+デフォルト値: ``False``
 
 ブラウザを閉じたときにセッションを期限切れにするかどうかを決めます．
 `セッションのドキュメント`_ を参照してください．
@@ -1115,6 +1148,7 @@ configure() または DJANGO_SETTINGS_MODULE のいずれかが必要です
 してください」ということです．両方設定してはなりませんし，両方とも忘れても
 なりません．
 
+.. _@login_required: ../authentication/#the-login-required-decorator
 
 .. _Error reporting via e-mail:
 
