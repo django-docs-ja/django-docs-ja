@@ -27,7 +27,7 @@ databrowse の使い方
 ===================
 
     1. Django に databrowse のデフォルトのテンプレートを教えます．やり方は
-       いくつかあります::
+       いくつかあります:
 
        * ``'django.contrib.databrowse'`` を ``INSTALLED_APPS`` に追加します．
          この方法は， ``TEMPLATE_LOADERS`` 設定に ``app_directories`` テン

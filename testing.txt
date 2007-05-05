@@ -190,10 +190,10 @@ Django は，アプリケーションの様々な機能に対するテストを�
 ト自体やテスト環境の構築に使えるツールを提供しています．
 
 * `テストクライアント`_
-* `フィクスチャ`_
+* `TestCaseクラス`_
 
-_`テストクライアント`: `Test Client`_
-_`TestCaseクラス`: `TestCase`_
+.. _`テストクライアント`: `Test Client`_
+.. _`TestCaseクラス`: `TestCase`_
 
 .. _Test Client:
 
@@ -436,8 +436,6 @@ TestCaseクラス
 ``django.test.TestCase`` クラスのインスタンス内に入っているテストケースは全
 て，デフォルトの `テストクライアント`_ にアクセスできます．このテストクライ
 アントは ``self.client`` で参照でき，テストごとに再生成されます．
-
-.. _`テストクライアント`: `Test Client`_
 
 .. _Fixture loading:
 
