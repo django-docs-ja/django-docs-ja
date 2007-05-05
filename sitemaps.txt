@@ -2,7 +2,7 @@
 sitemaps フレームワーク
 =======================
 
-:revision-up-to: 4805 (release 0.96)
+:revision-up-to: 5150 (0.97pre SVN)
 
 **開発版の Django で新たに追加された機能です．**
 

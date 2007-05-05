@@ -6,9 +6,9 @@ Django オンラインドキュメント和訳
     Yasushi Masuda (ymasuda at ethercube dot com),
     Takanao Endoh (takanao at endoh dot tk)
 底本
-    SVN trunk (0.96+ SVN)
+    SVN trunk (0.97pre SVN)
 追従済みリビジョン
-    5126 (2007/04/29)
+    5150 (2007/05/05)
 
 必読
 ----

@@ -2,7 +2,7 @@
 配信フィードフレームワーク
 ==========================
 
-:revision-up-to: 5126 (0.96+ SVN)
+:revision-up-to: 5150 (0.97pre SVN)
 
 Django には高水準の配信フィード (syndication feed) 生成フレームワークがつい
 てきます．このフレームワークを使えば， RSS_ 形式や Atom_ 形式のフィードを簡
@@ -682,16 +682,17 @@ Feed クラスリファレンス
 
         def item_enclosure_mime_type(self, item):
             """
-            items() の返す item を引数に取り，item のエンクロージャ mime タ
+            items() の返す item を引数に取り，item のエンクロージャ MIME タ
             イプを返します．
             """
 
         def item_enclosure_mime_type(self):
             """
-            各 item のエンクロージャの mime タイプを返します．
+            各 item のエンクロージャの MIME タイプを返します．
             """
 
-        item_enclosure_mime_type = "audio/mpeg" # ハードコード形式の mime-type です．
+        item_enclosure_mime_type = "audio/mpeg" # ハードコード形式の MIME
+                                                # タイプです．
 
         # ITEM PUBDATE -- 以下の三つの形式のいずれか一つを指定できます．
         # 省略可能です．

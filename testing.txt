@@ -2,7 +2,7 @@
 Djangoアプリケーションのテスト
 ==============================
 
-:revision-up-to: 5052 (0.96+ SVN)
+:revision-up-to: 5150 (0.97pre SVN)
 
 今日の開発者にとって，テストの自動化はバグ潰しの工程で極めて有用な武器にな
 ります．テストスイートを使えば，最初にコードを書くときにコードが期待通りの
@@ -193,7 +193,7 @@ Django は，アプリケーションの様々な機能に対するテストを�
 * `フィクスチャ`_
 
 _`テストクライアント`: `Test Client`_
-_`フィクスチャ`: `Fixtures`_
+_`TestCaseクラス`: `TestCase`_
 
 .. _Test Client:
 
@@ -410,10 +410,39 @@ Response オブジェクトを返します． Response オブジェクトには�
             self.failUnlessEqual(len(response.context['customers']), 5)
 
 
-.. _Fixtures:
+.. _TestCase:
 
-フィクスチャ
-------------
+TestCaseクラス
+--------------
+
+通常， Python のユニットテストでは， ``unittest.testCase`` をテストケースク
+ラスのベースクラスとして拡張して使います． Django では，
+``unittest.testCase`` を更に拡張した独自のベースクラス，
+``django.test.TestCase`` を提供しています．このクラスは， Web サイトのテス
+ト時に便利な機能をいくつか追加しています．
+
+通常のユニットテストの TestCase から Django 独自の TestCase への以降は簡単
+で，単にベースクラスを ``unittest.TestCase`` から ``django.test.TestCase``
+に変更するだけです．``django.test.TestCase`` では，標準の Python ユニットテ
+スト機能はそのままに，さらに便利な機能が加わっています．
+
+.. _Default Test Client:
+
+デフォルトのテストクライアント
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**開発バージョンの Django で新たに追加されました**
+
+``django.test.TestCase`` クラスのインスタンス内に入っているテストケースは全
+て，デフォルトの `テストクライアント`_ にアクセスできます．このテストクライ
+アントは ``self.client`` で参照でき，テストごとに再生成されます．
+
+.. _`テストクライアント`: `Test Client`_
+
+.. _Fixture loading:
+
+フィクスチャの読み込み
+~~~~~~~~~~~~~~~~~~~~~~
 
 データベースがバックにあるウェブサイトのテストで，データベース上に何もデー
 タが入っていなければあまり意味はありません．データベースにテストデータを入
@@ -434,13 +463,12 @@ Response オブジェクトを返します． Response オブジェクトには�
     ます．
     
 さて，単体テストが目的なら，各テストの開始時にデータベースの中身が何らかの
-値になるよう保証せねばなりません．このため， Django はベースクラス TestCase
-を用意して，フィクスチャを組み込めるようにしています．
+値になるよう保証せねばなりません．
 
-従来の unittest の TestCase から Django の TestCase への乗り換えは簡単で，
-テストクラスのベースクラス名を変更し，使いたいフィクスチャのリストを定義す
-るだけです．例えば， `unittest を書く <#writing-unittests>`_ のテストケース
-は以下のようになります::
+あるテスト用にフィクスチャを定義するには，テストで使いたいフィクスチャの内
+容が入ったクラス属性を一つ定義します．例えば，例えば， 
+`unittest を書く <#writing-unittests>`_ のテストケースは以下のようになりま
+す::
 
     from django.test import TestCase
     from myapp.models import Animal
@@ -464,6 +492,27 @@ Response オブジェクトを返します． Response オブジェクトには�
 このフラッシュ／ロードの作業はテストケースの実行毎に繰り返されるので，他の
 テストや以前のテスト実行の影響を受けることはありません．
 
+.. _Assertions:
+
+アサーション
+~~~~~~~~~~~~
+
+**開発バージョンの Django で新たに追加されました**
+
+通常の Python ユニットテストには， ``assertTrue`` や ``assertEquals`` のよ
+うな様々なアサーションがあり，プログラムの挙動を検証するのに使えます．
+``django.TestCase`` では，Web サイトの挙動をテストするのに便利なアサーショ
+ンをさらにいくつか追加しています．
+
+``assertRedirects(response, expected_path)``
+    レスポンスを受け取ったブラウザが指定したパス ``expected_path`` へリダイ
+    レクトされ，その内容が取得されるべきであるとアサーションします．
+
+``assertContains(response, text, count=1)``
+    ページの取得が正しく行われたことを示すレスポンス (すなわち，HTTP 状態コー
+    ド 200) が生成され，レスポンスのコンテンツ内に ``text`` に指定した内容
+    が ``count`` 回登場すべきであるとアサーションします．
+    
 .. _Running tests:
 
 テストを実行する

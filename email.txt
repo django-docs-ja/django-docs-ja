@@ -2,7 +2,7 @@
 e-mail の送信
 ==============
 
-:revision-up-to: 5126 (0.96+ SVN)
+:revision-up-to: 5150 (0.97pre SVN)
 
 Python の `smtplib ライブラリ`_ を使えば，比較的簡単に電子メールを送信でき
 ますが， Django ではこのライブラリへの軽量ラッパを二つ用意して，電子メール
@@ -28,7 +28,8 @@ Python の `smtplib ライブラリ`_ を使えば，比較的簡単に電子メ
 
 メールは `EMAIL_HOST`_ および `EMAIL_PORT`_ 設定で指定した SMTP ホストを介
 して送信されます． `EMAIL_HOST_USER`_ および `EMAIL_HOST_PASSWORD`_ が指定
-されていれば， SMTP サーバの認証に使われます．
+されていれば， SMTP サーバの認証に使われます．また，SMTP サーバとの接続に
+TLS を使うかどうかを `EMAIL_USE_TLS`_ で設定できます．
 
 .. note::
 
@@ -36,11 +37,11 @@ Python の `smtplib ライブラリ`_ を使えば，比較的簡単に電子メ
     `DEFAULT_CHARSET`_  設定の値に設定されます．
     
 .. _`DEFAULT_CHARSET`: ../settings/#default-charset
-.. _DEFAULT_CHARSET setting: ../settings/#DEFAULT_CHARSET
 .. _`EMAIL_HOST`: ../settings/#email-host
 .. _`EMAIL_PORT`: ../settings/#email-port
 .. _`EMAIL_HOST_USER`: ../settings/#email-host-user
 .. _`EMAIL_HOST_PASSWORD`: ../settings/#email-host-password
+.. _`EMAIL_USE_TLS`: ../settings/#email-use-tls
 
 
 send_mail()
@@ -211,5 +212,73 @@ mail_managers()
             # 取得するべきでしょう．
             return HttpResponse('Make sure all fields are entered and valid.')
 
-.. _`ヘッダインジェクション`: http://securephp.damonkohler.com/index.php/Email_Injection
 .. _Header injection: http://securephp.damonkohler.com/index.php/Email_Injection
+.. _`ヘッダインジェクション`: `Header injection`_
+
+
+.. _The EmailMessage and SMTPConnection classes:
+
+EmailMessage および SMTPConnection クラス
+=========================================
+
+**開発版の Django で新たに追加された機能です**
+
+Django の ``send_mail()`` および ``send_mass_mail()`` 関数は，実際には
+``django.mail`` クラスの ``EmailMessage`` や ``SMTPConnection`` クラスに対
+して薄いラッパをかぶせたものにすぎません． Django からメールを送信する方法
+をカスタマイズしたければ，これらのクラスをサブクラス化してやりたいことを実
+現できます．
+
+.. note::
+    
+    ``send_mail()`` をはじめとしたラッパ関数から利用できる機能は，
+    ``EmailMessage`` クラスで提供している全ての機能をカバーしているわけでは
+    ありません．宛先を BCC にしたい場合や，マルチパート形式のメールを送信し
+    たい場合， ``EmailMessage`` インスタンスを直接生成する必要があります．
+
+一般に， ``EmailMessage`` はメールメッセージ自体の生成に関わります．
+``SMTPConnection`` はメール送信処理におけるネットワーク接続に関わっています．
+このことは，同じ接続 (``SMTPConnection`` インスタンス) を再利用すれば，複数
+のメッセージを一括送信できることを示しています．
+
+``EmailMessage`` クラスの初期化は以下のような形式で行います::
+
+    email = EmailMessage(subject, body, from_email, to, bcc, connection)
+
+パラメタはすべて省略可能です． ``from_email`` を省略すると，
+``settings.DEFAULT_FROM_EMAIL`` の値を使います． ``to`` および ``bcc``
+パラメタには，メールアドレスのリストを指定します．
+
+このクラスのインスタンスに対して，以下のメソッドを呼び出せます:
+
+ * ``send()`` メソッドを呼び出すと， ``connection`` 属性に指定した接続を使っ
+   てメッセージを送信します．接続がなければ，自動的に新たな接続を生成して使
+   います．
+ * ``message()`` は ``django.core.mail.SafeMIMEText`` クラスのインスタンス
+   を生成します (``django.core.mail.SafeMIMEText`` クラスは Python の
+   ``email.MIMEText.MIMEText`` クラスのサブクラスです)．このクラスには送信
+   すべきメッセージが入ります． ``EmailMessage`` クラスを拡張する必要がある
+   場合，おそらくこのメソッドをオーバライドして，所望の内容を MIME オブジェ
+   クト内に配置することになるでしょう．
+ * ``recipients()`` はメッセージの全ての宛先からなるリストを返します．この
+   宛先リストは， ``to`` と ``bcc`` に指定した全ての宛先が入ります．
+   ``EmailMessage`` をサブクラス化する際，このメソッドもオーバライドする必
+   要があるかもしれません．というのも， SMTP サーバはメッセージ送信時に全て
+   の宛先を知る必要があり，全ての宛先はこのメソッドを介して返さねばならない
+   からです．
+
+``SMTPConnection`` クラスの初期化は，SMTP サーバのホスト，ポート，SMTP 接続
+を行うユーザ名，そしてパスワードを指定して初期化でき，それぞれのパラメタは
+``host``, ``port``, ``username``, ``password`` オプションで指定します．パラ
+メタを省略すると，設定ファイルから値を読み出します．
+
+たくさんの数のメッセージを一度に送信したいなら， ``SMTPConnection`` クラス
+の ``send_messages()`` メソッドが便利です．このクラスは ``EmailMessage`` ク
+ラス (またはサブクラス) のインスタンスのリストを引数にとり，一つの SMTP 接
+続で一度に送信します．例えば， ``get_notification_email()`` という関数があ
+り，この関数が定期的に送信されるメールの入った ``EmailMessage`` オブジェク
+トのリストを返すとしましょう．メッセージは以下のようにして一括送信できます::
+
+    connection = SMTPConnection()   # デフォルトの設定で接続を作成
+    messages = get_notification_email()
+    connection.send_messages(messages)

@@ -2,7 +2,7 @@
 Django の設定
 =============
 
-:revision-up-to: 5126 (0.96+ SVN)
+:revision-up-to: 5150 (0.97pre SVN)
 
 Django の設定ファイルには，インストールした Django の使う全ての設定が入って
 います．このドキュメントでは，各設定の役割と，どのような設定を利用できるか
@@ -470,6 +470,16 @@ EMAIL_SUBJECT_PREFIX
 信するメールの題名に使われるプレフィクスです．末尾にはスペースを入れておいた
 方がよいでしょう．
 
+EMAIL_USE_TLS
+-------------
+
+**開発バージョンの Django で新たに追加されました**
+
+デフォルト値: ``False``
+
+SMTP サーバとの通信に TLS (安全な接続) を使うかどうかを指定します．
+
+
 FIXTURE_DIRS
 -------------
 
@@ -550,44 +560,18 @@ LANGUAGE_CODE
 LANGUAGES
 ---------
 
-デフォルト値: 利用可能な言語からなるタプルです．現在の設定は以下のようになっ
-ています::
+デフォルト値: 利用可能な言語からなるタプルです．このリストには頻繁に新たな
+言語が登場しているので，そのコピーをここに記載していてもすぐに古い情報になっ
+てしまいます．現在サポートされている言語のリストは手元のソースコード中の
+``django/conf/global_settings.py`` (または `オンラインのソースコード`_) を
+参照してください．
 
-    LANGUAGES = (
-        ('ar', _('Arabic')),
-        ('bn', _('Bengali')),
-        ('cs', _('Czech')),
-        ('cy', _('Welsh')),
-        ('da', _('Danish')),
-        ('de', _('German')),
-        ('el', _('Greek')),
-        ('en', _('English')),
-        ('es', _('Spanish')),
-        ('es_AR', _('Argentinean Spanish')),
-        ('fr', _('French')),
-        ('gl', _('Galician')),
-        ('hu', _('Hungarian')),
-        ('he', _('Hebrew')),
-        ('is', _('Icelandic')),
-        ('it', _('Italian')),
-        ('ja', _('Japanese')),
-        ('nl', _('Dutch')),
-        ('no', _('Norwegian')),
-        ('pt-br', _('Brazilian')),
-        ('ro', _('Romanian')),
-        ('ru', _('Russian')),
-        ('sk', _('Slovak')),
-        ('sl', _('Slovenian')),
-        ('sr', _('Serbian')),
-        ('sv', _('Swedish')),
-        ('ta', _('Tamil')),
-        ('uk', _('Ukrainian')),
-        ('zh-cn', _('Simplified Chinese')),
-        ('zh-tw', _('Traditional Chinese')),
-    )
+.. _online source: http://code.djangoproject.com/browser/django/trunk/django/conf/global_settings.py
+.. _`オンラインのソースコード`: `online source`_
 
-(言語コード, 言語名) の形式のタプルからなるタプルです．選択可能な言語を指定
-するための設定です．詳しくは `国際化のドキュメント`_ を参照してください．
+このリストは，例えば ('ja', 'Japanese') のように， (言語コード, 言語名) の
+形式のタプルでできており，国際化機能で選択可能な言語を指定するために使いま
+す．詳しくは `国際化のドキュメント`_ を参照してください．
 
 一般に，デフォルト値をいじる必要はありません．Django が提供している言語セッ
 トの選択肢を狭めたい場合のみ設定してください．

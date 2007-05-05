@@ -2,7 +2,7 @@
 Django ドキュメントの読み方
 ===========================
 
-:revision-up-to: 4985 (0.96+ SVN)
+:revision-up-to: 5150 (0.97pre SVN)
 
 私達は， Django のドキュメントが，有用で読みやすくできるだけ詳細であるよう
 多大な努力を投じています．ここでは，ドキュメントを活用するコツと，ドキュメ
@@ -101,13 +101,10 @@ Python コードの更新と同様， ``svn update`` を実行してください
 
 テキストドキュメントは ReST (ReStructuredText) 形式で書かれています． ReST
 はただ単体でも読みやすいだけでなく， HTML のような他のフォーマットにも簡単
-に変換できるようになっています． HTML に変換したければ， ReST のテキストド
-キュメントを djangoproject.com の HTML 形式に変換するスクリプトが， Django
-の Subversion リポジトリの
-`djangoproject.com/django_website/apps/docs/parts/build_documentation.py`_ 
-にあります．
+に変換できるようになっています． `reStructuredText`_ ライブラリをインストー
+ルしていれば， ``rst2html`` を使って HTML ファイルを生成できます．
 
-.. _djangoproject.com/django_website/apps/docs/parts/build_documentation.py: http://code.djangoproject.com/browser/djangoproject.com/django_website/apps/docs/parts/build_documentation.py
+.. _reStructuredText: http://docutils.sourceforge.net/rst.html
 
 .. _Differences between versions:
 

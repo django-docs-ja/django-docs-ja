@@ -2,7 +2,7 @@
 セッションの使い方
 ===================
 
-:revision-up-to: 4828 (0.96+ SVN)
+:revision-up-to: 5150 (0.97pre SVN)
 
 Django では匿名セッション (anonymous session) を完全にサポートしています．
 セッションフレームワークを使うと，任意のデータをサイト訪問者単位
@@ -124,7 +124,7 @@ Django では匿名セッション (anonymous session) を完全にサポート�
 以下のビューでは，「メンバ」をサイトにログインさせます::
 
     def login(request):
-        m = members.get_object(username__exact=request.POST['username'])
+        m = Member.objects.get(username__exact=request.POST['username'])
         if m.password == request.POST['password']:
             request.session['member_id'] = m.id
             return HttpResponse("You're logged in.")

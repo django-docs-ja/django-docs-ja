@@ -2,7 +2,7 @@
 Python プログラマのための Django テンプレート言語ガイド
 =======================================================
 
-:revision-up-to: 5052 (0.96+ SVN)
+:revision-up-to: 5150 (0.97pre SVN)
 
 このドキュメントでは， Django のテンプレートシステムを技術的な側面，すなわ
 ちどのように動作し，どうやって拡張するかという観点から解説します．テンプレー
@@ -374,7 +374,7 @@ django.core.context_processors.auth
       ``request.user.get_and_delete_messaages()`` は，ユーザ宛の全メッセー
       ジを集めて返し， ``Message`` オブジェクトを削除します．
 
-      メッセージは ``user.add_message()`` で設定されます．詳しくは 
+      メッセージは ``user.message_set.create`` で設定します．詳しくは 
       `メッセージのドキュメント`_ を参照してください．
 
     * ``perms`` -- 現在ログインしているユーザが有しているパーミッションを表

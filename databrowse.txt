@@ -2,7 +2,7 @@
 databrowse
 ==========
 
-:revision-up-to: 5023 (0.96+ SVN)
+:revision-up-to: 5150 (0.97pre SVN)
 
 databrowse は，データのブラウジングを実現するための Django アプリケーション
 です．
