@@ -2,7 +2,7 @@
 e-mail の送信
 ==============
 
-:revision-up-to: 5150 (0.97pre SVN)
+:revision-up-to: 5155 (0.97pre SVN)
 
 Python の `smtplib ライブラリ`_ を使えば，比較的簡単に電子メールを送信でき
 ますが， Django ではこのライブラリへの軽量ラッパを二つ用意して，電子メール
@@ -224,17 +224,17 @@ EmailMessage および SMTPConnection クラス
 **開発版の Django で新たに追加された機能です**
 
 Django の ``send_mail()`` および ``send_mass_mail()`` 関数は，実際には
-``django.mail`` クラスの ``EmailMessage`` や ``SMTPConnection`` クラスに対
-して薄いラッパをかぶせたものにすぎません． Django からメールを送信する方法
-をカスタマイズしたければ，これらのクラスをサブクラス化してやりたいことを実
-現できます．
+``django.core.mail`` クラスの ``EmailMessage`` や ``SMTPConnection`` クラス
+に対して薄いラッパをかぶせたものにすぎません． Django からメールを送信する
+方法をカスタマイズしたければ，これらのクラスをサブクラス化してやりたいこと
+を実現できます．
 
 .. note::
     
     ``send_mail()`` をはじめとしたラッパ関数から利用できる機能は，
     ``EmailMessage`` クラスで提供している全ての機能をカバーしているわけでは
-    ありません．宛先を BCC にしたい場合や，マルチパート形式のメールを送信し
-    たい場合， ``EmailMessage`` インスタンスを直接生成する必要があります．
+    ありません．BCC で宛先を指定したい場合やマルチパート形式のメールを送信
+    したい場合， ``EmailMessage`` インスタンスを直接生成する必要があります．
 
 一般に， ``EmailMessage`` はメールメッセージ自体の生成に関わります．
 ``SMTPConnection`` はメール送信処理におけるネットワーク接続に関わっています．
@@ -247,9 +247,15 @@ Django の ``send_mail()`` および ``send_mass_mail()`` 関数は，実際に�
 
 パラメタはすべて省略可能です． ``from_email`` を省略すると，
 ``settings.DEFAULT_FROM_EMAIL`` の値を使います． ``to`` および ``bcc``
-パラメタには，メールアドレスのリストを指定します．
+パラメタには，メールアドレスのリストを文字列で指定します．
 
-このクラスのインスタンスに対して，以下のメソッドを呼び出せます:
+例えば::
+
+    email = EmailMessage('Hello', 'Body goes here', 'from@example.com',
+                ['to1@example.com', 'to2@example.com'],
+                ['bcc@example.com'])
+
+``EmailMessage`` クラスのインスタンスには以下のようなメソッドがあります:
 
  * ``send()`` メソッドを呼び出すと， ``connection`` 属性に指定した接続を使っ
    てメッセージを送信します．接続がなければ，自動的に新たな接続を生成して使
