@@ -2,7 +2,7 @@
 Djangoアプリケーションのテスト
 ==============================
 
-:revision-up-to: 5155 (0.97pre SVN)
+:revision-up-to: 5174 (0.97pre SVN)
 
 今日の Web 開発者にとって，自動化されたテストはバグ潰しの工程で極めて有用な
 ツールです．複数のテストを集めた **テストスイート** を使えば，Web開発におけ
@@ -198,9 +198,12 @@ Django は，アプリケーションの様々な機能に対するテストを�
 
 * `テストクライアント`_
 * `TestCaseクラス`_
+* `電子メールサービス`_
+
 
 .. _`テストクライアント`: `Test Client`_
 .. _`TestCaseクラス`: `TestCase`_
+.. _`メールサービス`: `Email services`_
 
 .. _Test Client:
 
@@ -334,12 +337,12 @@ Django は，アプリケーションの様々な機能に対するテストを�
 
 .. _Testing Responses:
 
-応答のテスト
-~~~~~~~~~~~~
+レスポンスのテスト
+~~~~~~~~~~~~~~~~~~
 
-``get()``, ``post()`` および ``login()`` といったメソッドは，いずれも
-Response オブジェクトを返します． Response オブジェクトには以下のようなプロ
-パティがあり，テストに利用できます:
+``get()`` および ``post()`` メソッドは，いずれも Response オブジェクトを返
+します． Response オブジェクトには以下のようなプロパティがあり，テストに利
+用できます:
 
     ================  ========================================================
     プロパティ        説明
@@ -522,6 +525,19 @@ TestCaseクラス
 このフラッシュ／ロードの作業はテストケースの実行毎に繰り返されるので，他の
 テストや以前のテスト実行の影響を受けることはありません．
 
+.. _Emptying the test outbox:
+
+メール送信箱の内容抹消
+~~~~~~~~~~~~~~~~~~~~~~
+
+**開発バージョンの Django で新たに追加されました**
+
+Djangoは，各テストケースの開始時に，フィクスチャのインストールに加え，メー
+ルの送信箱に入っている内容を抹消します．
+
+テスト中のメールサービスの詳細は `メールサービス`_ を参照してください．
+
+
 .. _Assertions:
 
 アサーション
@@ -564,7 +580,53 @@ TestCaseクラス
     ``template_name`` に指定したテンプレートがレスポンスのレンダリングに使
     われているか調べるアサーションです．
 
+.. _Email services:
 
+メールサービス
+--------------
+**開発バージョンの Django で新たに追加されました**
+
+ビューが `Django のメールサービス`_ を使っている場合，ビューをテストするた
+びにメールが送信されてほしくはないでしょう．
+
+Django は，テストフレームワークを初期化する際，通常の `SMTPConnection`_ ク
+ラスをダミーの SMTPConnection 実装に切替えます．このダミーは，全てのメール
+をダミーの送信箱に転送します．送信箱は ``djnago.core.mail.outbox`` で参照で
+き，実体はその時点で送信された全ての `EmailMessage`_ インスタンスからなるリ
+ストです．この仕組みによって，テスト条件として，以下のようなコードを実行で
+きるようになります::
+
+    from django.core import mail
+
+    # Send message
+    mail.send_mail('Subject here', 'Here is the message.', 'from@example.com',
+        ['to@example.com'], fail_silently=False)
+
+    # One message has been sent
+    self.assertEqual(len(mail.outbox), 1)
+    # Subject of first message is correct
+    self.assertEqual(mail.outbox[0].subject, 'Subject here')
+
+``mail.outbox`` オブジェクトは，通常の実行条件下では存在しません．この送信
+箱はテスト設定のときに，ダミーの `SMTPConnection`_ と共に作成されます．
+テストフレームワークが実行を終了すると，通常の `SMTPConnection`_ クラスが復
+元され，送信箱は消去されます．
+
+`前節で`_ 述べたように，テスト用の送信箱の内容は TestCase 内の各テストケー
+スの開始時点で抹消されます．手動で送信箱の内容を空にしたければ，空のリスト
+を mail.outbox に代入します::
+
+    from django.core import mail
+
+    # Empty the test outbox
+    mail.outbox = []
+
+.. _`Django email services`: ../email/
+.. _`SMTPConnection`: ../email/#the-emailmessage-and-smtpconnection-classes
+.. _`EmailMessage`: ../email/#the-emailmessage-and-smtpconnection-classes
+.. _`previously`: #emptying-the-test-outbox
+.. _`Django のメールサービス`: `Django email services`_
+.. _`前節で`: `previously`_
     
 .. _Running tests:
 
@@ -695,11 +757,11 @@ Django は他のテストフレームワークを明にサポートしている�
 
 ``setup_test_environment()``
     テンプレートレンダリングシステム構成のインストールなど，テスト前の全
-    体的な準備を行います．
+    体的な準備を行い，ダミーの SMTP 接続をセットアップします．
 
 ``teardown_test_environment()``
     テンプレートレンダリングシステム構成の除去など，テスト後の全体的な後始
-    末を行います．
+    末を行い，メールサービスを通常の状態に復帰します．
 
 ``create_test_db(verbosity=1, autoclobber=False)``
     新たなテストデータベースを生成し， ``syncdb`` を実行します．
