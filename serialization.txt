@@ -2,7 +2,7 @@
 Django オブジェクトのシリアライズ
 =================================
 
-:revision-up-to: 5150 (0.97pre SVN)
+:revision-up-to: 5171 (0.97pre SVN)
 
 .. note::
     
@@ -124,7 +124,7 @@ UTF-8 (や，非 ASCII エンコーディング) でエンコードされたデ�
 
 例::
 
-    json_serializer = serializers.get_serializer("json")
+    json_serializer = serializers.get_serializer("json")()
     json_serializer.serialize(queryset, ensure_ascii=False, stream=response)
 
 .. _Writing custom serializers:

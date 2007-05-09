@@ -2,7 +2,7 @@
 Python プログラマのための Django テンプレート言語ガイド
 =======================================================
 
-:revision-up-to: 5150 (0.97pre SVN)
+:revision-up-to: 5171 (0.97pre SVN)
 
 このドキュメントでは， Django のテンプレートシステムを技術的な側面，すなわ
 ちどのように動作し，どうやって拡張するかという観点から解説します．テンプレー
@@ -231,6 +231,9 @@ Python でテンプレートを使うには，以下の 2 段階のプロセス�
 し違った挙動になります．これらのテンプレートタグ中では，無効な値は ``None``
 であると解釈されます．また，これらのテンプレートタグ中のフィルタは，無効な
 値に対しも常に適用されます．
+
+``TEMPLATE_STRING_IF_INVALID`` にフォーマット指示文字の ``'%s'`` が入ってい
+る場合， ``'%s'`` は不正な変数の変数名で置き換えられます．
 
 .. admonition:: デバッグ専用です!
 
@@ -948,7 +951,7 @@ Notes:
             try:
                 actual_date = resolve_variable(self.date_to_be_formatted, context)
                 return actual_date.strftime(self.format_string)
-            except VariableDoesNotExist:
+            except template.VariableDoesNotExist:
                 return ''
 
 これで， ``resolve_variable`` は ``blog_entry.date_updated`` の値を解決して，
