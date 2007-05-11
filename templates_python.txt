@@ -2,7 +2,7 @@
 Python プログラマのための Django テンプレート言語ガイド
 =======================================================
 
-:revision-up-to: 5171 (0.97pre SVN)
+:revision-up-to: 5194 (0.97pre SVN)
 
 このドキュメントでは， Django のテンプレートシステムを技術的な側面，すなわ
 ちどのように動作し，どうやって拡張するかという観点から解説します．テンプレー
@@ -793,7 +793,7 @@ Python モジュールを作成したら，実現したいフィルタやタグ�
             tag_name, format_string = token.split_contents()
         except ValueError:
             raise template.TemplateSyntaxError, \
-                "%r tag requires a single argument" % token.contents[0]
+                "%r tag requires a single argument" % token.contents.split()[0]
         if not (format_string[0] == format_string[-1] and \
             format_string[0] in ('"', "'")):
             raise template.TemplateSyntaxError, \
@@ -928,7 +928,7 @@ Notes:
             # split_contents() はクオート付き文字列を分解しない
             tag_name, date_to_be_formatted, format_string = token.split_contents()
         except ValueError:
-            raise template.TemplateSyntaxError, "%r tag requires exactly two arguments" % token.contents[0]
+            raise template.TemplateSyntaxError, "%r tag requires exactly two arguments" % token.contents.split()[0]
         if not (format_string[0] == format_string[-1] and format_string[0] in ('"', "'")):
             raise template.TemplateSyntaxError, "%r tag's argument should be in quotes" % tag_name
         return FormatTimeNode(date_to_be_formatted, format_string[1:-1])
@@ -1175,7 +1175,7 @@ Python 2.4 からは，デコレータ構文もうまく動作します::
             tag_name, arg = token.contents.split(None, 1)
         except ValueError:
             raise template.TemplateSyntaxError, \
-                  "%r tag requires arguments" % token.contents[0]
+                  "%r tag requires arguments" % token.contents.split()[0]
         m = re.search(r'(.*?) as (\w+)', arg)
         if not m:
             raise template.TemplateSyntaxError, \
