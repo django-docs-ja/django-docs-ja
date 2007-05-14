@@ -2,7 +2,7 @@
 Djangoアプリケーションのテスト
 ==============================
 
-:revision-up-to: 5194 (0.97pre SVN)
+:revision-up-to: 5213 (0.97pre SVN)
 
 今日の Web 開発者にとって，自動化されたテストはバグ潰しの工程で極めて有用な
 ツールです．複数のテストを集めた **テストスイート** を使えば，Web開発におけ
@@ -203,7 +203,7 @@ Django は，アプリケーションの様々な機能に対するテストを�
 
 .. _`テストクライアント`: `Test Client`_
 .. _`TestCaseクラス`: `TestCase`_
-.. _`メールサービス`: `Email services`_
+.. _`メールサービス`: `E-mail services`_
 
 .. _Test Client:
 
@@ -582,7 +582,7 @@ Djangoは，各テストケースの開始時に，フィクスチャのイン�
     ``template_name`` に指定したテンプレートがレスポンスのレンダリングに使
     われているか調べるアサーションです．
 
-.. _Email services:
+.. _E-mail services:
 
 メールサービス
 --------------
@@ -623,11 +623,11 @@ Django は，テストフレームワークを初期化する際，通常の `SM
     # Empty the test outbox
     mail.outbox = []
 
-.. _`Django email services`: ../email/
+.. _`Django e-mail services`: ../email/
 .. _`SMTPConnection`: ../email/#the-emailmessage-and-smtpconnection-classes
-.. _`EmailMessage`: ../email/#the-emailmessage-and-smtpconnection-classes
+.. _`E-mailMessage`: ../email/#the-emailmessage-and-smtpconnection-classes
 .. _`previously`: #emptying-the-test-outbox
-.. _`Django のメールサービス`: `Django email services`_
+.. _`Django のメールサービス`: `Django e-mail services`_
 .. _`前節で`: `previously`_
     
 .. _Running tests:

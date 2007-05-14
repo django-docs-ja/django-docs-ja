@@ -2,7 +2,7 @@
 newforms ライブラリ
 ===================
 
-:revision-up-to: 5150 (0.97pre SVN)
+:revision-up-to: 5213 (0.97pre SVN)
 
 ``django.newforms`` は， Django に新たに導入された画期的なフォーム処理ライ
 ブラリで，従来のフォーム／マニピュレータ／バリデータフレームワークである
@@ -934,6 +934,339 @@ Django の古いフォーム／検証フレームワークを使ったことが�
 ``__init__()`` メソッドが前述のコアとなる引数 (``required``, ``label``,
 ``initial``, ``widget``, ``help_text``) を持つことだけです．
 
+
+.. _Generating forms for models:
+
+モデルからフォームを生成する
+============================
+
+データベース指向のアプリケーションを開発しているなら， Django のモデルとほ
+ぼ同じ内容のフォームを作ることもあるでしょう．たとえば， ``BlogComment`` と
+いうモデルを作っておき，ユーザがコメントを入力できるようなフォームを作成し
+たいような場合です．こうした状況では，フォームの名かでフィールドタイプをい
+ちいち定義するのは二度手間というものです．なぜなら，モデル中にすでにフィー
+ルドを定義しているからです．
+
+そこで， Django では， Django モデルからフォームクラスを生成できるヘルパ関
+数をいくつか提供しています．
+
+``form_for_model()``
+--------------------
+
+``django.newforms.form_for_model()`` メソッドは，引数に指定したモデルの定義
+に従ってフォームを生成します．このメソッドは，モデルクラスを渡すとフォーム
+クラスを返します．フォームクラスの中には，モデル中の各フィールドに対応した
+フォームフィールドが入っています．
+
+例を示します::
+
+    >>> from django.newforms import form_for_model
+
+    # Create the form class.
+    >>> ArticleForm = form_for_model(Article)
+
+    # Create an empty form instance.
+    >>> f = ArticleForm()
+
+繰り返しになりますが， ``form_for_model()`` は，モデルのインスタンスでなく，
+*クラス* を引数にとり，フォームクラスのインスタンスではなく *クラス* を返し
+ます．
+
+.. _Field types:
+
+フィールド型
+~~~~~~~~~~~~
+
+生成されたフォームクラスは，各モデルフィールドに対応したフォームフィールド
+を持っています．各モデルフィールドは，デフォルトのフォームフィールドに対応
+しています．たとえば，モデルクラス上の ``CharField`` は，フォーム上でも
+``CharField`` 型のフォームフィールドとして表現されます ``ManyToManyField``
+は ``MultipleChoiceField`` として表現されます．モデルフィールド型からフォー
+ムフィールド型への変換表を以下に示します:
+
+    ===============================  ========================================
+    モデルフィールド                 フォームフィールド
+    ===============================  ========================================
+    ``AutoField``                    フィールド上に表示されません
+    ``BooleanField``                 ``BooleanField``
+    ``CharField``                    ``max_length`` がモデルフィールドの
+                                     ``maxlength`` と同じ値の ``CharField``
+    ``CommaSeparatedIntegerField``   ``CharField``
+    ``DateField``                    ``DateField``
+    ``DateTimeField``                ``DateTimeField``
+    ``EmailField``                   ``EmailField``
+    ``FileField``                    ``CharField``
+    ``FilePathField``                ``CharField``
+    ``FloatField``                   ``CharField``
+    ``ForeignKey``                   ``ModelChoiceField`` (下記参照)
+    ``ImageField``                   ``CharField``
+    ``IntegerField``                 ``IntegerField``
+    ``IPAddressField``               ``CharField``
+    ``ManyToManyField``              ``ModelMultipleChoiceField`` (下記参照)
+    ``NullBooleanField``             ``CharField``
+    ``PhoneNumberField``             (``django.contrib.localflavor.us`` の)
+                                     ``USPhoneNumberField``
+    ``PositiveIntegerField``         ``IntegerField``
+    ``PositiveSmallIntegerField``    ``IntegerField``
+    ``SlugField``                    ``CharField``
+    ``SmallIntegerField``            ``IntegerField``
+    ``TextField``                    ``widget=Textarea`` の ``CharField``
+    ``TimeField``                    ``TimeField``
+    ``URLField``                     ``verify_exists`` が モデルフィールド
+                                     の ``verify_exists`` と同じ値の 
+                                     ``URLField``
+    ``USStateField``                 ``widget=USStateSelect`` の ``CharField``
+                                     (``USStateSelect`` は
+                                     ``django.contrib.localflavor.us`` から)
+    ``XMLField``                     ``widget=Textarea`` の ``CharField``
+    ===============================  ========================================
+
+``ForeignKey`` と ``ManyToManyField`` モデルフィールド型は特別なケースとし
+て扱われます:
+
+    * ``ForeignKey`` は ``django.newforms.ModelChoiceField`` になります．
+      これは選択肢が ``QuerySet`` の内容であるような ``ChoiceField`` です．
+
+    * ``ManyToManyField`` は ``django.newforms.ModelMultipleChoiceField``
+      で表されます．これは選択肢が ``QuerySet`` の内容であるような
+      ``MultipleChoiceField`` です．
+
+加えて，各フォームフィールドには以下のような属性が追加されます:
+
+    * モデルフィールドが ``blank=True`` の場合，対応するフォームフィールド
+      の ``required`` 属性が ``False`` になります．それ以外の場合は
+      ``required=True`` です．
+
+    * フォームフィールドの ``label`` 属性は，モデルフィールドの
+      ``verbose_name`` の頭文字を大文字にしたものになります．
+
+    * フォームフィールドの ``help_text`` 属性は，モデルフィールドの
+      ``help_text`` の値になります．
+
+    * モデルフィールドに ``choices`` が設定されている場合，フォームフィール
+      ドの ``widget`` 型は ``Select`` になり，選択肢として ``choices`` の内
+      容が使われます．
+
+最後に，モデルフィールドから生成したフォームフィールドの値はオーバライドで
+きるということに注意してください．詳しくは後述の
+「 `デフォルトフィールド型のオーバライド`_ 」 を参照してください．
+
+.. _`デフォルトフィールド型のオーバライド`: `Overriding the default field types`_
+
+
+.. _A full example:
+
+詳細な例
+~~~~~~~~
+
+まず，以下のようなモデル群を想定します::
+
+    from django.db import models
+
+    TITLE_CHOICES = (
+        ('MR', 'Mr.'),
+        ('MRS', 'Mrs.'),
+        ('MS', 'Ms.'),
+    )
+
+    class Author(models.Model):
+        name = models.CharField(maxlength=100)
+        title = models.CharField(maxlength=3, choices=TITLE_CHOICES)
+        birth_date = models.DateField(blank=True, null=True)
+
+        def __str__(self):
+            return self.name
+
+    class Book(models.Model):
+        name = models.CharField(maxlength=100)
+        authors = models.ManyToManyField(Author)
+
+``form_for_model(Author)`` を呼び出すと，以下のクラスと等価なフォームクラス
+を返します::
+
+    class AuthorForm(forms.Form):
+        name = forms.CharField(max_length=100)
+        title = forms.CharField(max_length=3,
+                    widget=forms.Select(choices=TITLE_CHOICES))
+        birth_date = forms.DateField(required=False)
+
+``form_for_model(Book)`` を呼び出すと，以下のクラスと等価なフォームクラス
+を返します::
+
+    class BookForm(forms.Form):
+        name = forms.CharField(max_length=100)
+        authors = forms.ModelMultipleChoiceField(queryset=Author.objects.all())
+
+.. _`The save() method`:
+
+``save()`` メソッド
+~~~~~~~~~~~~~~~~~~~
+
+``form_for_model()`` で生成したフォームにも， ``save()`` メソッドがあります．
+``save()`` メソッドは，フォームに結びつけられたデータベースオブジェクトの生
+成と保存を行います．例えば::
+
+    # POST データからフォームインスタンスを生成する
+    >>> f = ArticleForm(request.POST)
+
+    # フォームのデータから新たな Article オブジェクトを生成して保存する
+    >>> new_article = f.save()
+
+``save()`` は，フォーム中のデータの検証に成功していない場合，つまり，
+``form.errors`` が真の場合に ``ValueError`` を送出します．
+
+.. _Using an alternate base class:
+
+フォームのベースクラスを変更する
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``form_for_model()`` が生成するフォームにカスタムのメソッドを追加したい場合，
+``django.newfdorms.BaseForm`` を拡張して，その中にカスタムメソッドを入れま
+す．そして， ``form_for_model()`` を呼び出す際に， ``form`` パラメタに自作
+のフォームを指定してベースクラスにさせます::
+
+    # 自作のベースクラスを作成する
+    >>> class MyBase(BaseForm):
+    ...     def my_method(self):
+    ...         # Do whatever the method does
+
+    # 自作のベースクラスを使ってフォームクラスを生成する
+    >>> ArticleForm = form_for_model(Article, form=MyBase)
+
+    # フォームのインスタンス化
+    >>> f = ArticleForm()
+
+    # ベースクラスのメソッドを使う
+    >>> f.my_method()
+
+.. _Using a subset of fields on the form:
+
+フォームの一部のフィールドだけを使う
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**開発版の Django で新たに追加された機能です**
+
+場合によっては，モデルからフォームを生成する際に，モデルの一部のフィールド
+だけを表示したいこともあるでしょう． ``form_for_model()`` に入れるフィール
+ドを，モデルフィールドのサブセットにするには，二つの方法があります:
+
+    1. モデルのフィールドに ``editable=False`` を設定しておくと，
+       ``form_for_model()`` から生成されたフォームは *常に* そのフィールド
+       を含まなくなります．
+
+    2. ``form_for_model()`` に ``fields`` 引数を指定します．この引数を指定
+       する場合，フォームに含めたいフィールド名のリストにせねばなりません．
+
+       例えば， ``Author`` モデルからフォームを生成するときに， ``name`` と
+       ``title`` フィールドだけをフォームに含めたいなら， ``fields`` を以下
+       のように定義します::
+
+           PartialArticleForm = form_for_model(Author, fields=('name', 'title'))
+
+.. note::
+
+    ``form_for_model()`` に ``fields`` を指定してフォームを生成する場合，
+    フォームに *含めない* フィールドは，デフォルト値を持つか ``None`` を値
+    にとりえるフィールドであるかよく確認してください．フォーム内に含まれな
+    いフィールドがあると，フォームを使ってオブジェクトを生成した際に，フィー
+    ルドから値が提供されないことがあり，そのためにインスタンスを保存できな
+    くなるからです．
+
+.. _Overriding the default field types:
+
+デフォルトのフィールド型をオーバライドする
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+上の `フィールド型 <#field_types>`_ に挙げたデフォルトフィールド型は，いわ
+ゆる「気の利いたデフォルト値」にすぎません．モデルに ``DateField`` が入って
+いる場合，普通はフォームにも ``DateField`` が入っていてほしいでしょう．
+とはいえ， ``form_for_model()`` は，特定のモデルフィールドに対してフォー
+ムのフィールド型を変更できるという柔軟さも備えています．フィールド型の変更
+は「フォームフィールドコールバック (formfield callback)」で行います．
+
+フォームフィールドコールバック関数は，モデルフィールドを指定して呼び出すと，
+フォームフィールドのインスタンスを返します．フォームを生成する際，
+``form_for_model()`` はフォームフィールドコールバックを使って，フォームフィー
+ルドの型を決定します．
+
+デフォルトでは， ``form_for_model()`` は，モデルフィールドの
+``formfield()`` メソッドを呼び出します::
+
+    def default_callback(field, **kwargs):
+        return field.formfield(**kwargs)
+
+``kwargs`` は， ``required=True`` や ``label='Foo'`` のような，フォームフィー
+ルドに渡されることになるキーワード引数です．
+
+例えば，モデル上の全ての ``DateField`` に対して ``MyDateFormField`` を使い
+たい場合，以下のようにコールバックを定義します::
+
+    >>> def my_callback(field, **kwargs):
+    ...     if isinstance(field, models.DateField):
+    ...         return MyDateFormField(**kwargs)
+    ...     else:
+    ...         return field.formfield(**kwargs)
+
+    >>> ArticleForm = form_for_model(formfield_callback=my_callback)
+
+コールバックは，自分がデフォルト設定に対して手を加えたい対象のフィールド以
+外も含めた， *全ての* モデルフィールドを扱えねばならないので注意が必要です．
+上の例で ``else`` 節にデフォルトの挙動を実装しているのはそのためです．
+
+.. _Finding the model associated with a form:
+
+フォームに関連づけられたモデルを取り出す
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+フォームの構築に使われたモデルクラスは，生成されたフォームの ``_model`` プ
+ロパティからアクセスできます::
+
+    >>> ArticleForm = form_for_model(Article)
+    >>> ArticleForm._model
+    <class 'myapp.models.Article'>
+
+``form_for_instance()``
+-----------------------
+
+``form_for_instance()`` は ``form_for_model()`` に似ていますが，モデルのク
+ラスではなく，モデルのインスタンスを引数にとります::
+
+    # Author オブジェクトを生成
+    >>> a = Author(name='Joe Smith', title='MR', birth_date=None)
+    >>> a.save()
+
+    # 特定の Author オブジェクト用のフォームを生成
+    >>> AuthorForm = form_for_instance(a)
+
+    # フォームのインスタンス化
+    >>> f = AuthorForm()
+
+``form_for_instance()`` で生成したフォームクラスでインスタンスを生成すると，
+フォームフィールドの初期値はインスタンスから取り出されます．ただし，このデー
+タはフォームに結びつけられていません．従って，フォームを保存する前に，デー
+タをフォームに結びつける必要があります．
+
+``form_for_instance()`` で生成したフォームのインスタンスに対して ``save()``
+を呼び出すと，データベース上のインスタンスが更新されます．
+``form_for_model()`` と同様，データの検証に失敗すると， ``save()`` は
+``ValueError`` 例外を送出します．
+
+``form_for_instance()`` は， ``form``, ``fields`` および
+``formfield_callback`` パラメタをとります．これらの引数の挙動は
+``form_for_model()`` の同名の引数と同じです．
+
+.. _When should you use form_for_model() and form_for_instance():
+
+``form_for_model()`` や ``form_for_instance()`` はいつ使うもの?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``form_for_model()`` や ``form_for_instance()`` は，一般的なケースを扱うた
+めのショートカットにすぎません．こうしたショートカットは，複数のモデルのフィー
+ルドをマップするフォームや，モデル上に *ない* フィールドの入ったフォームを
+生成したい場合には利用できません．それに，フォームクラスをこつこつ作成する
+のはちっとも難しい作業ではありません．
+
+
 .. _More coming soon:
 
 つづく
@@ -947,9 +1280,3 @@ http://code.djangoproject.com/browser/django/trunk/tests/regressiontests/forms/t
 このライブラリを使ってみたくてうずうずしているなら，もう少しだけ我慢してく
 ださいね．今，コードとドキュメントの仕上げにかかっているところなんです．
 
-.. _Widgets:
-
-ウィジェット
-============
-
-(この部分はまだ未完成です [4293], 2007/1/7.)

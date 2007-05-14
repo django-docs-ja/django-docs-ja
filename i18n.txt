@@ -2,7 +2,7 @@
 国際化
 ======
 
-:revision-up-to: 5171 (0.97pre SVN)
+:revision-up-to: 5213 (0.97pre SVN)
 
 Django はコードとテンプレートの双方で国際化をフルサポートしています．このド
 キュメントでは国際化の仕組みについて説明します．
@@ -263,7 +263,7 @@ Python コードとは少し違った方法で行います．テンプレート�
 複数形化するには， ``{% blocktrans %}`` と ``{% endblocktrans %}`` の間に
 ``{% plural %}`` タグで単数形と複数形の両方の形式を記述します::
 
-    {% blocktrans count list|count as counter %}
+    {% blocktrans count list|length as counter %}
     There is only one {{ name }} object.
     {% plural %}
     There are {{ counter }} {{ name }} objects.
