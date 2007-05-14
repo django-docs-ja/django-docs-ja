@@ -2,7 +2,7 @@
 newforms ライブラリ
 ===================
 
-:revision-up-to: 5213 (0.97pre SVN)
+:revision-up-to: 5221 (0.97pre SVN)
 
 ``django.newforms`` は， Django に新たに導入された画期的なフォーム処理ライ
 ブラリで，従来のフォーム／マニピュレータ／バリデータフレームワークである
@@ -14,25 +14,32 @@ newforms ライブラリ
 移行の計画
 ==========
 
-現在のところ， ``django.newforms`` を利用できるのはリリース 0.96 以降のバー
-ジョンの Django だけです．今後リリースに向けて，我々は以下のような移行計画
-を立てています:
+``django.newforms`` はリリース 0.96 で新たに採り入れられた機能ですが，もう
+「新しい(new)」機能ではなくなったので，将来 ``django.forms`` に名前を変更す
+る予定です．現在の ``django.forms`` は Django 1.0 までの間
+``django.oldforms`` という名前で利用でき，その後削除するのが適当だと考えて
+います．
 
-    * リビジョン [4208] で，現在の ``django.forms`` を ``django.oldforms``
-      にコピーしました．これで，互換性のない変更を座して待つことなく，
-      *今すぐ* コードの修正に取り掛かれます．修正は，各アプリケーションのコー
-      ドを以下のように書き換えるだけです::
+この変更は，現在皆さんが利用しているコードの将来のバージョンに対する互換性
+に直接的に関わってきます．以下の移行計画を良く読んで，それに沿ったコードを
+書くようにしてください:
+
+    * 従来のフォームフレームワーク (現在の ``django.forms``) は
+      ``django.oldforms`` にコピーされています．従って，互換性のない変更を
+      座して待つことなく， *今すぐ* コードの修正に取り掛かれます．修正は，
+      各アプリケーションのコードを以下のように書き換えるだけです::
 
           from django import forms             # 移行前
           from django import oldforms as forms # 移行後
 
-    * まだ具体的な日程は決まっていませんが，現在の ``django.newforms`` を
+    * 次の Django リリース (0.97) では，現在の ``django.newforms`` を
       ``django.forms`` に移動します．これは互換性のない変更なので，以前の
       ``django.forms`` を使い続けたい人は，上記に従って import 文を変更する
       必要があります．
 
     * 次の Django リリース，すなわち新たな ``django.forms`` が導入されたリ
-      リースの *後に* ， ``django.oldforms`` をコードから除去します．
+      リースの *後* ， 0.98 か 1.0 のいずれか先に出たバージョンで，
+      ``django.oldforms`` をコードから除去します．
 
 この移行計画を念頭に， ``django.newforms`` を使う場合には以下のような
 import 文を使うように勧めます::
@@ -199,8 +206,8 @@ Django コンポーネントに対してカップリングしていません． 
     >>> f.is_valid()
     False
 
-``Form`` の ``errors`` という属性にアクセスすると，エラーメッセージの入った
-辞書を参照できます::
+``errors`` という属性にアクセスすると，エラーメッセージの入った辞書を参照で
+きます::
 
     >>> f.errors
     {'sender': [u'Enter a valid e-mail address.'], 'subject': [u'This field is required.']}
@@ -212,6 +219,31 @@ Django コンポーネントに対してカップリングしていません． 
 ``is_valid()`` を呼ばなくても ``errors`` にはアクセスできます．
 ``is_valid()`` を呼び出すか， ``errors`` にアクセスすると，フォームのデータ
 は自動的に検証されます．
+
+``errors`` や ``is_invalid()`` に何度アクセスしても，検証のルーチンはたった
+一度しか呼ばれません．別の見方をすれば，検証の処理には副作用があり，その副
+作用はたった一度しか呼び出されないということです．
+
+``clean_data`` には， ``Form`` 内で定義されている *全ての* フィールドのキー
+と値が入ります．フォームに渡したデータに，必須でないフィールドの値が入って
+いない場合でもです．下の例では，データ辞書には ``nick_name`` フィールドの値
+が入っていませんが， ``clean_data`` には空の値が入っています::
+
+    >>> class OptionalPersonForm(Form):
+    ...     first_name = CharField()
+    ...     last_name = CharField()
+    ...     nick_name = CharField(required=False)
+    >>> data = {'first_name': u'John', 'last_name': u'Lennon'}
+    >>> f = OptionalPersonForm(data)
+    >>> f.is_valid()
+    True
+    >>> f.clean_data
+    {'nick_name': u'', 'first_name': u'John', 'last_name': u'Lennon'}
+
+この例で， ``clean_data`` の中の ``nick_name`` は空文字列なのは，
+``nick_name`` が ``CharField`` であり， ``CharField`` は空の値を空文字列と
+みなすからです．各フィールドタイプは「空の」値が設定されています．例えば，
+``DateField`` の場合，空の値は空文字列ではなく ``None`` になります．
 
 .. _Behavior of unbound forms:
 

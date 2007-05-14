@@ -2,7 +2,7 @@
 databrowse
 ==========
 
-:revision-up-to: 5150 (0.97pre SVN)
+:revision-up-to: 5221 (0.97pre SVN)
 
 databrowse は，データのブラウジングを実現するための Django アプリケーション
 です．
@@ -51,7 +51,11 @@ databrowse の使い方
        このコードは，何らかのタイミングで実行される場所であればどこに書いて
        もかまいません．例えば URLconf (``urls.py``) に書くのがよいでしょう．
 
-    3. URLconf に以下の一行を追加します::
+    3. URLconf を変更して， ``databrowse`` モジュールを import します::
+
+           from django.contrib import databrowse
+
+       そして，以下の一行を追加します::
 
            (r'^databrowse/(.*)', databrowse.site.root),
 
