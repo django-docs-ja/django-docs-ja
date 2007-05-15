@@ -594,7 +594,7 @@ Djangoは，各テストケースの開始時に，フィクスチャのイン�
 Django は，テストフレームワークを初期化する際，通常の `SMTPConnection`_ ク
 ラスをダミーの SMTPConnection 実装に切替えます．このダミーは，全てのメール
 をダミーの送信箱に転送します．送信箱は ``djnago.core.mail.outbox`` で参照で
-き，実体はその時点で送信された全ての `E-mailMessage`_ インスタンスからなるリ
+き，実体はその時点で送信された全ての `EmailMessage`_ インスタンスからなるリ
 ストです．この仕組みによって，テスト条件として，以下のようなコードを実行で
 きるようになります::
 
@@ -625,7 +625,7 @@ Django は，テストフレームワークを初期化する際，通常の `SM
 
 .. _`Django e-mail services`: ../email/
 .. _`SMTPConnection`: ../email/#the-emailmessage-and-smtpconnection-classes
-.. _`E-mailMessage`: ../email/#the-emailmessage-and-smtpconnection-classes
+.. _`EmailMessage`: ../email/#the-emailmessage-and-smtpconnection-classes
 .. _`previously`: #emptying-the-test-outbox
 .. _`Django のメールサービス`: `Django e-mail services`_
 .. _`前節で`: `previously`_
