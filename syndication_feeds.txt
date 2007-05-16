@@ -211,7 +211,7 @@ bit にどのような意味を与え，フィード公開する項目の選択�
 ドは以下のようになります::
 
     class BeatFeed(Feed):
-        def get(self, bits):
+        def get_object(self, bits):
             # In case of "/rss/beats/0613/foo/bar/baz/", or other such clutter,
             # check that bits has only one member.
             if len(bits) != 1:
