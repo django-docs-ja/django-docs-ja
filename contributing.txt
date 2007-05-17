@@ -2,7 +2,7 @@
 Django プロジェクトに協力するために
 ===================================
 
-:revision-up-to: 5171 (0.97pre SVN)
+:revision-up-to: 5272 (0.97pre SVN)
 
 Django を *使う* のを楽しいと思ってもらえたなら， *使い続ける* 前にすこし待っ
 てください．私達は多大な情熱をかけて，ユーザがコミュニティのメンバに貢献で
@@ -310,6 +310,17 @@ admin サイトやバリデータのエラーメッセージなど，Django は�
     * 国際化の必要な全ての文字列をマークしておいてください．詳しくは 
       `i18n ドキュメント`_ を参照してください．
 
+    * コード中に自分の名前を埋め込まないでください．Django プロジェクトでは，
+      コードの開発者や貢献者の名前がコード中に散逸しないようにするため，
+      ``AUTHORS`` ファイルにまとめて記載するというポリシを採用しています．
+      ほんのちょっとした変更でないかぎり，ご自分のパッチに ``AUTHORS`` への
+      変更を加えて頂いてもかまいません．
+
+.. _Template style:
+
+テンプレートのスタイル
+----------------------
+
     * Django テンプレートコード内では，波括弧とタグコンテンツの間に 1 個 (1
       個だけ) スペースをいれて下さい．
 
@@ -320,6 +331,12 @@ admin サイトやバリデータのエラーメッセージなど，Django は�
       [誤]::
 
           {{foo}}
+
+
+.. _View style:
+
+ビューのスタイル
+----------------
 
 
     * Django のビューを書くときには，最初のパラメタは必ず ``request`` とい
@@ -335,11 +352,76 @@ admin サイトやバリデータのエラーメッセージなど，Django は�
           def my_view(req, foo):
               # ...
 
-    * コード中に自分の名前を埋め込まないでください．Django プロジェクトでは，
-      コードの開発者や貢献者の名前がコード中に散逸しないようにするため，
-      ``AUTHORS`` ファイルにまとめて記載するというポリシを採用しています．
-      ほんのちょっとした変更でないかぎり，ご自分のパッチに ``AUTHORS`` への
-      変更を加えて頂いてもかまいません．
+.. _Model style:
+
+モデルのスタイル
+----------------
+
+    * フィールド名は全て小文字で，キャメルケース (camelCase のような書き方)
+      はせず，アンダースコアを使います．
+
+      以下のような書き方をします::
+
+          class Person(models.Model):
+              first_name = models.CharField(maxlength=20)
+              last_name = models.CharField(maxlength=40)
+
+      以下のような書き方をしてはなりません::
+
+          class Person(models.Model):
+              FirstName = models.CharField(maxlength=20)
+              Last_Name = models.CharField(maxlength=40)
+
+    * ``class Meta`` はフィールドの定義を書いた *後* に書きます．また，フィー
+      ルド定義とクラス定義の間には一行空行を入れます．
+
+      以下のように書きます::
+
+          class Person(models.Model):
+              first_name = models.CharField(maxlength=20)
+              last_name = models.CharField(maxlength=40)
+
+              class Meta:
+                  verbose_name_plural = 'people'
+
+      以下のような書き方をしてはなりません::
+
+          class Person(models.Model):
+              first_name = models.CharField(maxlength=20)
+              last_name = models.CharField(maxlength=40)
+              class Meta:
+                  verbose_name_plural = 'people'
+
+      以下のような書き方もよくありません::
+
+          class Person(models.Model):
+              class Meta:
+                  verbose_name_plural = 'people'
+
+              first_name = models.CharField(maxlength=20)
+              last_name = models.CharField(maxlength=40)
+
+    * モデルの内部クラスや標準メソッドの順番は以下のようにします (ただし，
+      どれも必須ではないので省略してもかまいません):
+
+        * 全てのデータベースフィールド
+        * ``class Meta``
+        * ``class Admin``
+        * ``def __str__()``
+        * ``def save()``
+        * ``def get_absolute_url()``
+        * カスタムのメソッド定義
+
+    * ``choices`` をモデルフィールドに定義する場合，選択肢は，各選択項目の
+      タプルからなるタプルで定義します．定義はモデルモジュールの冒頭か，各
+      モデルクラスのすぐ上に置き，全て大文字の変数名を付けます．例えば以下
+      のようにします::
+
+          GENDER_CHOICES = (
+              ('M', 'Male'),
+              ('F', 'Female'),
+          )
+
 
 .. _Committing code:
 
