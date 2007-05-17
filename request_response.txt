@@ -155,7 +155,7 @@ HttpRequest オブジェクト
 
     このメソッドによって， ``HttpRequest`` インスタンスを辞書のように扱えま
     す．例えば， ``request.POST`` または ``request.GET`` に ``"foo"`` とい
-    うキーがあれば， ```request["foo"]`` は ``True`` を返します．
+    うキーがあれば， ``request["foo"]`` は ``True`` を返します．
 
 ``has_key()``
     ``request.GET`` または ``request.POST`` に指定の値が入っているかどうか

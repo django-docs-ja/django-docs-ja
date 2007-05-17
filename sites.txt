@@ -337,7 +337,7 @@ Django における sites フレームワークの役割は以下の通りです
       オブジェクトの ``domain`` を使います．
 
     * `認証フレームワーク`_ では， ``django.contrib.auth.views.login`` ビュー
-      が現在の ``Site`` 名を ``{{{ site_name }}}``` という形でテンプレート
+      が現在の ``Site`` 名を ``{{{ site_name }}}`` という形でテンプレート
       に渡しています．
 
     * ショートカットビュー (``django.views.defaults.shortcut``) では，オブ
