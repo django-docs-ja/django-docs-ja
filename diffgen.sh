@@ -7,6 +7,17 @@ REPOS_PATH=http://code.djangoproject.com/svn/django/trunk/
 LOCAL_PATH=/Users/ymasuda/work/django/trunk/
 DOCJP_DIR=/Users/ymasuda/work/django/doc-jp/
 
+# move clean up finished diffs to done directory
+if [ ! -d $DOCJP_DIR/done ]; then
+    mkdir $DOCJP_DIR/done;
+    rm *.diff~
+    for i in $DOCJP_DIR/*.diff; do
+	if [ `head -n1 $i`=='done.' ]; then
+	    mv $i $DOCJP_DIR/zz_diff_done/
+	fi
+    done
+fi
+
 # find revision number.
 LOCAL_REV=`svn info $LOCAL_PATH| awk "/Revision:/ { print \\$NF}"`
 REPOS_REV=`svn info $REPOS_PATH| awk "/Revision:/ { print \\$NF}"`
