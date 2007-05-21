@@ -2,7 +2,7 @@
 フォームとフィールド，マニピュレータ
 ====================================
 
-:revision-up-to: 5150 (0.97pre SVN)
+:revision-up-to: 5302 (0.97pre SVN)
 
 .. _Forwards-compatibility note:
 
@@ -612,6 +612,7 @@ Django のモデルとの類似性が見て取れます．自作のマニピュ�
     * isValidANSIDate
     * isValidANSITime
     * isValidEmail
+    * isValidFloat
     * isValidImage
     * isValidImageURL
     * isValidPhone
@@ -711,9 +712,9 @@ Django のモデルとの類似性が見て取れます．自作のマニピュ�
 ``IsAPowerOf``
     整数の引数をとり，フィールドの値が指定値のべき乗であるか検証します．
 
-``IsValidFloat``
+``IsValidDecimal``
     整数桁数と小数桁数の最大値を (この順番に) 指定し，フィールドの値が
-    指定の桁数範囲内の浮動小数点数であるか検証します．
+    指定の桁数範囲を超えない浮動小数点数であるか検証します．
 
 ``MatchesRegularExpression``
     正規表現 (文字列) を引数にとり，フィールド値が正規表現にマッチするか検

@@ -2,7 +2,7 @@
 newforms ライブラリ
 ===================
 
-:revision-up-to: 5301 (0.97pre SVN)
+:revision-up-to: 5302 (0.97pre SVN)
 
 ``django.newforms`` は， Django に新たに導入された画期的なフォーム処理ライ
 ブラリで，従来のフォーム／マニピュレータ／バリデータフレームワークである
@@ -1403,10 +1403,11 @@ Django の古いフォーム／検証フレームワークを使ったことが�
     ``CommaSeparatedIntegerField``   ``CharField``
     ``DateField``                    ``DateField``
     ``DateTimeField``                ``DateTimeField``
+    ``DecimalField``                 ``DecimalField``
     ``EmailField``                   ``EmailField``
     ``FileField``                    ``CharField``
     ``FilePathField``                ``CharField``
-    ``FloatField``                   ``CharField``
+    ``FloatField``                   ``FloatField``
     ``ForeignKey``                   ``ModelChoiceField`` (下記参照)
     ``ImageField``                   ``CharField``
     ``IntegerField``                 ``IntegerField``
@@ -1429,6 +1430,12 @@ Django の古いフォーム／検証フレームワークを使ったことが�
                                      ``django.contrib.localflavor.us`` から)
     ``XMLField``                     ``widget=Textarea`` の ``CharField``
     ===============================  ========================================
+
+
+
+.. note::
+    ``FloatField`` フォームフィールドと， ``DecimalField`` モデルフィールド
+    およびフォームフィールドは，開発版で新たに登場した機能です．
 
 ``ForeignKey`` と ``ManyToManyField`` モデルフィールド型は特別なケースとし
 て扱われます:
