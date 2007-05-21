@@ -2,7 +2,7 @@
 Django のインストール
 =====================
 
-:revision-up-to: 5194 (0.97pre SVN)
+:revision-up-to: 5285 (0.97pre SVN)
 
 このドキュメントを読めば Django を動かせるようになります．
 
@@ -15,8 +15,8 @@ Django は Python の Web フレームワークなので Python が必要です�
 
 Django はバージョン 2.3 以上の Python で動作します．
 
-www.python.org から Python を取ってきましょう． Linux や Mac OSX を動かして
-いるのなら，おそらくインストール済みのはずです．
+http://www.python.org から Python を取ってきましょう． Linux や Mac OSX を
+動かしているのなら，おそらくインストール済みのはずです．
 
 .. _Install Apache and mod_python:
 

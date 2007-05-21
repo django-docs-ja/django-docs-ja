@@ -2,7 +2,7 @@
 newforms ライブラリ
 ===================
 
-:revision-up-to: 5241 (0.97pre SVN)
+:revision-up-to: 5301 (0.97pre SVN)
 
 ``django.newforms`` は， Django に新たに導入された画期的なフォーム処理ライ
 ブラリで，従来のフォーム／マニピュレータ／バリデータフレームワークである
@@ -344,6 +344,34 @@ Django コンポーネントに対してカップリングしていません． 
     AttributeError: 'ContactForm' object has no attribute 'cleaned_data'
 
 
+.. _Example View
+
+ビューの実装例
+~~~~~~~~~~~~~~
+
+これまでに紹介した内容をまとめる意味で，簡単な連絡フォームのビューメソッド
+の例を以下に示します::
+
+    from django.shortcuts import render_to_response
+    from django.http import HttpResponseRedirect
+    from django import newforms as forms
+
+    class ContactForm(forms.Form):
+        subject = forms.CharField(max_length=100)
+        message = forms.CharField()
+        sender = forms.EmailField()
+        cc_myself = forms.BooleanField()
+
+    def contact(request):
+        if request.POST:
+            f = ContactForm(request.POST)
+            if f.is_valid:
+                # ... do something with f.cleaned_data
+  		return HttpResponseRedirect('/url/on/success/')
+        else:
+            f = ContactForm()
+        return render_to_response('contact.html', {'form': f})
+
 .. _Outputting forms as HTML:
 
 フォームを HTML として出力する
@@ -425,6 +453,12 @@ Django コンポーネントに対してカップリングしていません． 
     <p><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" /></p>
     <p><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>
 
+``form`` をコンテキストに入れていれば，テンプレート上では以下のようにして出
+力できます::
+
+    {{ f.as_p }}
+
+
 ``as_ul()``
 ~~~~~~~~~~~
 
@@ -442,6 +476,11 @@ Django コンポーネントに対してカップリングしていません． 
     <li><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" /></li>
     <li><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></li>
 
+``form`` をコンテキストに入れていれば，テンプレート上では以下のようにして出
+力できます::
+
+    {{ f.as_ul }}
+
 ``as_table()``
 ~~~~~~~~~~~~~~
 
@@ -458,6 +497,15 @@ Django コンポーネントに対してカップリングしていません． 
     <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" /></td></tr>
     <tr><th><label for="id_sender">Sender:</label></th><td><input type="text" name="sender" id="id_sender" /></td></tr>
     <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>
+
+``form`` をコンテキストに入れていれば，テンプレート上では以下のようにして出
+力できます::
+
+    {{ f.as_table }}
+
+デフォルトの設定はテーブル出力なので，以下のようにしても出力できます::
+
+    {{ f }}
 
 .. _Configuring HTML ``<label>`` tags:
 
@@ -650,6 +698,113 @@ Django コンポーネントに対してカップリングしていません． 
 
     >>> str(f['subject'].errors)
     ''
+
+.. _Using forms in views and templates:
+
+ビューやテンプレートでフォームを使う
+------------------------------------
+
+では，先ほどの連絡フォームを Django のビューとテンプレートに組み込みましょ
+う．以下のビューは，デフォルトでは連絡フォームを表示し， POST リクエストで
+アクセスすると，入力値の検証と処理を行います::
+
+    def contact(request):
+        if request.method == 'POST':
+            form = ContactForm(request.POST)
+            if form.is_valid():
+                # Do form processing here...
+                return HttpResponseRedirect('/url/on_success/')
+        else:
+            form = ContactForm()
+        return render_to_response('contact.html', {'form': form})
+ 
+.. _Simple template output:
+
+簡単なテンプレート出力
+~~~~~~~~~~~~~~~~~~~~~~
+
+上の例で使っているテンプレート， ``contact.html`` は，フォームを HTML で出
+力する役割を担います．フォームの出力には，前述の 
+`フォームを HTML として出力する <#outputting_forms_as_html>`_ で述べたテク
+ニックを使えます．
+
+フォームを HTML 出力するもっとも簡単な方法は，以下のようにフォーム変数その
+ものを使うというものです::
+
+    <form method="post">
+    <table>{{ form }}</table>
+    <input type="submit" />
+    </form>
+
+上のテンプレートコードを使うと，フォームを ``form.as_table()`` メソッドによっ
+てHTML テーブルにして表示します．テーブルが表示されるのは，テンプレートシス
+テムがオブジェクトの ``__str__()`` 値を表示するようになっていて， ``Form``
+クラスの ``__str__()`` メソッドが自身の ``as_table()`` メソッドを呼び出すか
+らです．
+
+以下のコードも全く同じ出力を生成しますが，こちらの方がより明示的です::
+
+    <form method="post">
+    <table>{{ form.as_table }}</table>
+    <input type="submit" />
+    </form>
+
+もちろん， ``form.as_ul`` や ``form.as_p`` も使えます．
+
+上の二つの例では， ``<form>``, ``<table>``, ``<input type="submit" />``,
+``</table>`` および ``</form>`` といったタグが入っていることに注意してくだ
+さい．フォームの便宜メソッド (``as_table()``, ``as_ul()`` および
+``as_p()``) は，これらの HTML タグを出力しません．
+
+.. _Complex template output:
+
+複雑なテンプレート出力
+~~~~~~~~~~~~~~~~~~~~~~
+
+これまで何度か強調してきたように， ``as_table()``, ``as_ul()``, ``as_p()``
+といったメソッドは，よく使う例に対するショートカットにすぎません．個々のフィー
+ルドを操作すれば，完全にテンプレートを制御してフォームの設計を行えます．
+
+もっとも簡単な方法は， ``{% for field in form %}`` を使って，フォームのフィー
+ルドにわたって反復処理を行うというものです．例えば::
+
+    <form method="post">
+    <dl>
+    {% for field in form %}
+        <dt>{{ field.label }}</dt>
+        <dd>{{ field }}</dd>
+        {% if field.help_text %}<dd>{{ field.help_text }}</dd>{% endif %}
+        {% if field.errors %}<dd class="myerrors">{{ field.errors }}</dd>{% endif %}
+    {% endfor %}
+    </dl>
+    <input type="submit" />
+    </form>
+
+このような反復処理のテクニックは，各フィールドに対して同じ HTML のフォーマッ
+トを適用したい場合や，あらかじめフォームフィールドの名前が分からない状況で
+フォームを生成したい場合などに役立ちます．フィールドは ``Form`` クラスで定
+義されている順番に列挙されます．
+
+反復処理を使う代わりに，フォームのフィールドを名前で明示した調整も行えます．
+フォームフィールドを明示的に指定するには， ``{{ form.fieldname }}`` のよう
+にします． ``fieldname`` はフィールドの名前です．
+例を示します::
+
+    <form method="post">
+    <ul class="myformclass">
+        <li>{{ form.sender.label }} {{ form.sender.label }}</li>
+        <li class="helptext">{{ form.sender.help_text }}</li>
+        {% if form.sender.errors %}<ul class="errorlist">{{ form.sender.errors }}</dd>{% endif %}
+
+        <li>{{ form.subject.label }} {{ form.subject.label }}</li>
+        <li class="helptext">{{ form.subject.help_text }}</li>
+        {% if form.subject.errors %}<ul class="errorlist">{{ form.subject.errors }}</dd>{% endif %}
+
+        ...
+    </ul>
+    </form>
+
+
 
 .. _Subclassing forms:
 

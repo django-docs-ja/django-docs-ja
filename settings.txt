@@ -2,7 +2,7 @@
 Django の設定
 =============
 
-:revision-up-to: 5150 (0.97pre SVN)
+:revision-up-to: 5292 (0.97pre SVN)
 
 Django の設定ファイルには，インストールした Django の使う全ての設定が入って
 います．このドキュメントでは，各設定の役割と，どのような設定を利用できるか
@@ -1168,7 +1168,7 @@ configure() または DJANGO_SETTINGS_MODULE のいずれかが必要です
 対するレポート送信を抑制できます．例えば::
 
     IGNORABLE_404_ENDS = ('.php', '.cgi')
-    IGNORABLE_404_STARTS = ('/phpmyadmin/')
+    IGNORABLE_404_STARTS = ('/phpmyadmin/', )
 
 のようにすると， URL が ``.php`` や ``.cgi`` で終わるような URL や
 ``/phpmyadmin/`` で始まる URL に対する 404 は報告 *されません* ．
