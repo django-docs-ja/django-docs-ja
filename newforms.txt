@@ -344,7 +344,7 @@ Django コンポーネントに対してカップリングしていません． 
     AttributeError: 'ContactForm' object has no attribute 'cleaned_data'
 
 
-.. _Example View
+.. _Example View:
 
 ビューの実装例
 ~~~~~~~~~~~~~~
@@ -725,7 +725,7 @@ Django コンポーネントに対してカップリングしていません． 
 
 上の例で使っているテンプレート， ``contact.html`` は，フォームを HTML で出
 力する役割を担います．フォームの出力には，前述の 
-`フォームを HTML として出力する <#outputting_forms_as_html>`_ で述べたテク
+`フォームを HTML として出力する <#outputting-forms-as-html>`_ で述べたテク
 ニックを使えます．
 
 フォームを HTML 出力するもっとも簡単な方法は，以下のようにフォーム変数その
@@ -962,8 +962,6 @@ Django の古いフォーム／検証フレームワークを使ったことが�
     <tr><th>Your name:</th><td><input type="text" name="name" /></td></tr>
     <tr><th>Your Web site:</th><td><input type="text" name="url" /></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
-
-.. _`フォームを HTML として出力する`: `Outputting forms as HTML`_
 
 ``initial``
 ~~~~~~~~~~~
