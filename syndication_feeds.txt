@@ -248,7 +248,7 @@ bit にどのような意味を与え，フィード公開する項目の選択�
       ``django.core.exceptions.ObjectDoesNotExist`` を返さねばなりません．
       関数が失敗すると ``Beat.DoesNotExist`` を送出し，
       ``Beat.DoesNotExist`` は ``ObjectDoesNotExist`` のサブクラスなので，
-      `Beat.objects.get()`` 呼び出しの周りには ``try``/``except`` がありま
+      ``Beat.objects.get()`` 呼び出しの周りには ``try``/``except`` がありま
       せん． ``get()`` の中で ``ObjectDoesNotExist`` を送出すると， Django
       はリクエストに対して 404 エラーを返します．
     * フィードの ``<title>``, ``<link>``, および ``<description>`` を生成す
