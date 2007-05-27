@@ -2,7 +2,7 @@
 mod_python で Django を動かす
 =============================
 
-:revision-up-to: 5150 (0.97pre SVN)
+:revision-up-to: 5369 (0.97pre SVN)
 
 Django をプロダクションサーバ上で動かす設定として，現状では Apache_ と
 `mod_python`_ の組み合わせを推奨しています．
@@ -87,6 +87,8 @@ Apache を再起動しましょう． /mysite/ やその下の URL へのリク�
 
 Django で作られたサイトを mod_python 上で運営している場合， Python コードに
 対して変更を加える度に Apache を再起動する必要があります．
+
+.. _Multiple Django installations on the same Apache:
 
 ひとつの Apache に複数の Django をインストールする
 ==================================================
@@ -223,8 +225,48 @@ admin ファイルは Django 配布物の (``django/contrib/admin/media``) デ�
     2. または， admin メディアファイルをコピーして Apache のドキュメントルー
        トに入れます．
 
+.. Using eggs with mod_python
+
+mod_python 上で egg パッケージを使う
+====================================
+
+Django を Python egg_ でインストールしたり， Django から egg 化されたモジュー
+ルを使っている場合，いくつか追加の設定が必要です．プロジェクト中 (か，どこ
+か import できる場所) にファイルを作り，以下の内容を入れておきます::
+
+    import os
+    os.environ['PYTHON_EGG_CACHE'] = '/some/directory'
+
+``/some/directory`` は Apache httpd を動作させているプロセスが読み書き可能
+なディレクトリにします．このディレクトリは， egg がコードの展開を必要とする
+場合に使われます．
+
+次に， mod_python の PythonImport_ ディレクティブを使って， mod_python が一
+番最初にこのファイルを import するよう指定します．まず，前述の
+「 `ひとつの Apache で複数の Django を使う`_ 」の節で説明した
+``PythonInterpreter`` ディレクティブを設定しておきます (複数の Django をイ
+ンストールしない場合でも必要です)．次に， ``Location`` か ``VirtualHost``
+セクションの中に，以下のように ``PythonImport`` 行を追加します::
+    PythonInterpreter my_django
+    PythonImport /path/to/my/project/file.py my_django
+
+`mod_python マニュアル`_ で定義されている通り，モジュールの指定は絶対パス
+(またはドット区切りの import パス表記) で行えます．ここでは絶対パスを使って
+いますが，これは， ``PythonImport`` を処理する時点では，プロジェクトへの
+Python パスを変更する操作がまだ完了していないからです．
+
+.. _Egg: http://peak.telecommunity.com/DevCenter/PythonEggs
+.. PythonImport: http://www.modpython.org/live/current/doc-html/dir-other-pimp.html
+.. _PythonImport: http://www.python.jp/doc/contrib/modpython/dir-other-pimp.html
+.. _mod_python manual: PythonImport_
+.. _`mod_python マニュアル`: `mod_python manual`_
+.. __ `Multiple Django installations on the same Apache`_
+.. _`ひとつの Apache で複数の Django を使う`: `Multiple Django installations on the same Apache`_
+
+.. _Error handling:
+
 エラー処理
-==============
+==========
 
 Apache/mod_python を使っている場合，エラーは Django によって捕捉されます．
 別の言い方をすれば， エラーは Apache レベルまで伝播せず， Apache の

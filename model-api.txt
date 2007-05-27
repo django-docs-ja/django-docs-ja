@@ -287,6 +287,13 @@ admin では， ``<input type="file">`` (ファイルアップロードウィジ
 従って，ファイルを 2007 年の 1 月 15 日にアップロードすると，
 ``/home/media/photos/2007/01/15`` に保存されることになります．
 
+アップロードファイルのディスク上でのファイル名を取得したい場合や，ファイル
+にアクセスするための URL を調べたい場合，ファイルのサイズを知りたい場合は，
+それぞれ ``get_FOO_filename()``, ``get_FOO_url()``, ``get_FOO_size()``
+メソッドを使えます．詳しくは `get_FOO_ メソッド`_ の説明を参照してください．
+
+.. _`get_FOO_ メソッド`: ../db-api/#get-foo-filename
+
 ファイルのアップロードを処理するときには，常にアップロード先の場所やアップ
 ロードされるファイルに注意して，セキュリティホールを避けるようにしてくださ
 い． *アップロードされる全てのファイルをチェックして* ，予想外のファイルが
@@ -358,9 +365,15 @@ admin では， ``<input type="text">`` (一行の入力フィールド) で表�
 ``width_field`` をとり，これらの値が設定されている場合には，モデルのインス
 タンスを保存するときに画像の高さと幅も同時に保存します．
 
+ファイルフィールドで使える ``get_FOO_*`` メソッドの他に， ``ImageField`` で
+は ``get_FOO_height()`` および ``get_FOO_width()`` メソッドを使えます．詳し
+くは `get_FOO_height() と get_foo_width() の説明`_ を参照してください．
+
 `Python Imaging Library`_ が必要です．
 
 .. _Python Imaging Library: http://www.pythonware.com/products/pil/
+.. _`get_FOO_height() と get_foo_width() の説明`:
+   ../db-api/#get-foo-height-and-get-foo-width
 
 ``IntegerField``
 ~~~~~~~~~~~~~~~~

@@ -2,7 +2,7 @@
 はじめての Django アプリ作成，その 4
 =====================================
 
-:revision-up-to: 5150 (0.97pre SVN)
+:revision-up-to: 5369 (0.97pre SVN)
 
 このチュートリアルは `チュートリアルその 3`_ の続きです．ここでは，引続き
 Web 投票アプリケーションの開発を例にして，簡単なフォーム処理とコードの縮小
@@ -55,6 +55,7 @@ URLconf に入れたことを思い出しましょう::
 
     from django.shortcuts import get_object_or_404, render_to_response
     from django.http import HttpResponseRedirect
+    from django.core urlresolvers import reverse
     from mysite.polls.models import Choice, Poll
     #...
     def vote(request, poll_id):
@@ -73,7 +74,7 @@ URLconf に入れたことを思い出しましょう::
             # ユーザが Back ボタンを押して同じフォームを提出するのを防ぐ
             # ため，POST データを処理できた場合には，必ず
             # HttpResponseRedirect を返すようにします．
-            return HttpResponseRedirect('/polls/%s/results/' % p.id)
+            return HttpResponseRedirect(reverse('results', args=(p.id,)))
 
 このコードには，これまでのチュートリアルで扱っていなかったことがいくつか
 入っています:
@@ -95,13 +96,27 @@ URLconf に入れたことを思い出しましょう::
 
     * choice のカウントを増やした後で， ``HttpResponse`` ではなく
       ``HttpResponseRedirect`` を返しています． ``HttpResponseRedirect`` は
-      リダイレクト先の URL 一つだけを引数にとります．できるだけ "http://"
-      とドメイン名は入れないようにします．そうすることで，アプリケーション
-      をドメイン間で移植しやすくなります．
+      リダイレクト先の URL 一つだけを引数にとります (ここでは ``reverse``
+      を使って URL を生成していますが，これについては後で説明します)．
 
       上のコードの Python コメント文で指摘しているように， POST データの処
       理に成功したときは常に ``HttpResponseRedirect`` を返すようにしてくだ
       さい．これは Django 固有の話ではなく， Web 開発の王道です．
+
+    * 例では， ``HttpResponseRedirect`` のコンストラクタの中で
+      ``reverse()`` という関数を使っています．この関数を使うと，ビュー関数
+      中での URL のハードコードを防げます． ``reverse()`` にはビューの名前を
+      渡し，同時に URL パターンからビューにマップするときに取り出される変数
+      を指定します．上の例では， ``reverse()`` はチュートリアルその 3 で設
+      定した URLConfに従って::
+
+        '/polls/3/results/'
+
+      のような URL を返します． ``3`` は ``p.id`` の値です．リダイレクト先
+      の URL は ``'results'`` ビューを呼び出し，最終的なページを表示します．
+
+      ``reverse()`` の詳細は `URL ディスパッチャ`_ のドキュメントを参照して
+      ください．
 
 チュートリアルその 3 で触れたように， ``request`` は ``HTTPRequest`` オブジェ
 クトです． ``HTTPRequest`` の詳細は  
@@ -132,10 +147,13 @@ URLconf に入れたことを思い出しましょう::
 びに，結果のページが更新されていることがわかるはずです．選択肢を選ばずにフォー
 ムを提出すると，エラーメッセージを表示するはずです．
 
-.. _`リクエストオブジェクトとレスポンスオブジェクトのドキュメント`: 
-    ../request_response/
 .. _request and response documentation: 
     ../request_response/
+.. _`リクエストオブジェクトとレスポンスオブジェクトのドキュメント`: 
+    `request and response documentation`_
+.. _URL dispatcher: ../url_dispatch#reverse
+.. _`URL ディスパッチャ`: `URL dispatcher`_
+
 
 .. _Use generic views: Less code is better:
 
@@ -288,5 +306,11 @@ URLconf に入れたことを思い出しましょう::
     * 高度な admin 機能: パーミッション
     * 高度な admin 機能: カスタム JavaScript
 
-.. _`チュートリアルその 3`: ../tutorial03/
+さしあたっては， `Django ドキュメント`_ を読んでじ，自分でアプリケーション
+を書いてみましょう．
+
 .. _Tutorial 3: ../tutorial03/
+.. _`チュートリアルその 3`: `Tutorial 3`_
+.. _Django documentation: http://www.djangoproject.com/documentation/
+.. _`Django ドキュメント`: ../index/
+

@@ -2,7 +2,7 @@
 はじめての Django アプリ作成，その 3
 =====================================
 
-:revision-up-to: 5150 (0.97pre SVN)
+:revision-up-to: 5369 (0.97pre SVN)
 
 このチュートリアルは `チュートリアルその 2`_ の続きです．ここでは，引続き
 Web 投票アプリケーションの開発を例にして，公開用のインタフェース，ビュー
@@ -70,9 +70,10 @@ Django は先頭のタプルから順に，リクエストされた URL とタ�
 `リクエストオブジェクトとレスポンスオブジェクトのドキュメント`_ を参照して
 ください． URLconf の詳細は `URLconf のドキュメント`_ を参照してください．
 
-チュートリアルその 1 の冒頭で ``python manage.py startproject mysite``
-を実行していれば，URLconf が ``mysite/urls.py`` にできているはずです．
-また， ``ROOT_URLCONF`` 設定にも，自動的に値が入ります::
+チュートリアルその 1 の冒頭で 
+``python django-admin.py startproject mysite`` を実行していれば，URLconf が
+``mysite/urls.py`` にできているはずです．また，(``settings.py`` の)
+``ROOT_URLCONF`` 設定にも，自動的に値が入ります::
 
     ROOT_URLCONF = 'mysite.urls'
 
