@@ -2,7 +2,7 @@
 Django のインストール
 =====================
 
-:revision-up-to: 5285 (0.97pre SVN)
+:revision-up-to: 5370 (0.97pre SVN)
 
 このドキュメントを読めば Django を動かせるようになります．
 
@@ -112,7 +112,9 @@ Python Egg を使って Django をインストールした場合，Django の ``
 
     * Windows の場合: ``C:\Python2.X\lib\site-packages``
 
-    * MacOSX の場合: ``/Library/Python2.X/site-packages``
+    * MacOSX の場合: ``/Library/Python2.X/site-packages`` または (最近のバー
+      ジョンでは)
+      ``/Library/Frameworks/Python.framework/Versions/2.X/lib/python2.X/site-packages/`` 
 
 
 .. _Install the Django code:
