@@ -151,7 +151,7 @@ URLconf に入れたことを思い出しましょう::
     ../request_response/
 .. _`リクエストオブジェクトとレスポンスオブジェクトのドキュメント`: 
     `request and response documentation`_
-.. _URL dispatcher: ../url_dispatch#reverse
+.. _URL dispatcher: ../url_dispatch/#reverse
 .. _`URL ディスパッチャ`: `URL dispatcher`_
 
 

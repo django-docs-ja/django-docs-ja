@@ -247,6 +247,7 @@ Django を Python egg_ でインストールしたり， Django から egg 化�
 ``PythonInterpreter`` ディレクティブを設定しておきます (複数の Django をイ
 ンストールしない場合でも必要です)．次に， ``Location`` か ``VirtualHost``
 セクションの中に，以下のように ``PythonImport`` 行を追加します::
+
     PythonInterpreter my_django
     PythonImport /path/to/my/project/file.py my_django
 
@@ -260,7 +261,6 @@ Python パスを変更する操作がまだ完了していないからです．
 .. _PythonImport: http://www.python.jp/doc/contrib/modpython/dir-other-pimp.html
 .. _mod_python manual: PythonImport_
 .. _`mod_python マニュアル`: `mod_python manual`_
-.. __ `Multiple Django installations on the same Apache`_
 .. _`ひとつの Apache で複数の Django を使う`: `Multiple Django installations on the same Apache`_
 
 .. _Error handling:
