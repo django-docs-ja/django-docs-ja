@@ -2,7 +2,7 @@
 Django の設定
 =============
 
-:revision-up-to: 5369 (0.97pre SVN)
+:revision-up-to: 5385 (0.97pre SVN)
 
 Django の設定ファイルには，インストールした Django の使う全ての設定が入って
 います．このドキュメントでは，各設定の役割と，どのような設定を利用できるか
@@ -848,7 +848,8 @@ TEMPLATE_CONTEXT_PROCESSORS
 
     ("django.core.context_processors.auth",
     "django.core.context_processors.debug",
-    "django.core.context_processors.i18n")
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media")
 
 ``RequestContext`` のコンテキストに値を入れてゆく際に使われる呼び出し可能オ
 ブジェクトからなるタプルです．これらの呼び出し可能オブジェクトはリクエスト
@@ -903,16 +904,40 @@ TEMPLATE_STRING_IF_INVALID
 .. _`無効な変数の扱い`: ../templates_python/#how-invalid-variables-are-handled
 .. _How invalid variables are handled: ../templates_python/#how-invalid-variables-are-handled
 
-TEST_RUNNER
------------
+TEST_DATABASE_CHARSET
+---------------------
 
-デフォルト値: ``'django.test.simple.run_tests'``
+**開発バージョンの Django で新たに追加されました**
 
-テストスイートを起動するためのメソッドの名前です．
-`Django アプリケーションのテスト`_ を参照してください．
+デフォルト値: ``None``
 
-.. _Testing Django Applications: ../testing/
-.. _`Django アプリケーションのテスト`: ../testing/
+テストデータベースの作成に使われている文字セットエンコーディングです．この
+文字列の値はデータベースバックエンドに直接渡されるので，エンコーディングの
+名前や書式はバックエンドごとに異なります．
+
+この設定をサポートしているバックエンドは， PostgreSQL_ (``postgresql``,
+``postgresql_psycopg2``) と MySQL_ (``mysql``, ``mysql_old``) です．
+
+
+.. _PostgreSQL: http://www.postgresql.org/docs/8.2/static/multibyte.html
+.. _MySQL: http://www.mysql.org/doc/refman/5.0/en/charset-database.html
+
+TEST_DATABASE_COLLATION
+------------------------
+
+**開発バージョンの Django で新たに追加されました**
+
+デフォルト値: ``None``
+
+テストデータベースを生成する際のコレーション (collation) です．この値はデー
+タベースバックエンドに直接渡されるので，値の書式はバックエンドごとに異なり
+ます．
+
+``mysql`` および ``mysql_old`` バックエンドだけでサポートされています
+(くわしくは，MySQLマニュアルの `section 10.3.2`_ を参照してください)
+
+.. _section 10.3.2: http://www.mysql.org/doc/refman/5.0/en/charset-database.html
+.. _`10.3.2節`: http://www.mysql.org/doc/refman/5.0/ja/charset-database.html
 
 
 TEST_DATABASE_NAME
@@ -927,6 +952,18 @@ TEST_DATABASE_NAME
 す． `Django アプリケーションのテスト`_ を参照してください．
 
 .. _Testing Django Applications: ../testing/
+
+TEST_RUNNER
+-----------
+
+デフォルト値: ``'django.test.simple.run_tests'``
+
+テストスイートを起動するためのメソッドの名前です．
+`Django アプリケーションのテスト`_ を参照してください．
+
+.. _Testing Django Applications: ../testing/
+.. _`Django アプリケーションのテスト`: ../testing/
+
 
 
 TIME_FORMAT

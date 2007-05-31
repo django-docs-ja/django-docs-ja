@@ -2,7 +2,7 @@
 Python プログラマのための Django テンプレート言語ガイド
 =======================================================
 
-:revision-up-to: 5196 (0.97pre SVN)
+:revision-up-to: 5385 (0.97pre SVN)
 
 このドキュメントでは， Django のテンプレートシステムを技術的な側面，すなわ
 ちどのように動作し，どうやって拡張するかという観点から解説します．テンプレー
@@ -319,7 +319,8 @@ Django には ``django.template.RequestContext`` という特別なコンテキ�
 
     ("django.core.context_processors.auth",
     "django.core.context_processors.debug",
-    "django.core.context_processors.i18n")
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media")
 
 各プロセッサはタプルに列挙した順に適用されます．従って，あるプロセッサが
 ある変数をコンテキストに入れた後，別のプロセッサが同じ名前の変数を入れれば，
@@ -423,6 +424,16 @@ django.core.context_processors.i18n
 .. _LANGUAGES setting: ../settings/#languages
 .. _LANGUAGE_CODE setting: ../settings/#language-code
 .. _internationalization docs: ../i18n/
+
+django.core.context_processors.media
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``TEMPLATE_CONTEXT_PROCESSORS`` にこのコンテキストプロセッサを入れると，
+``RequestContext`` に ``MEDIA_URL`` というコンテキスト変数が入ります．
+``MEDIA_URL`` には `MEDIA_URL 設定`_ の値が入っています．
+
+.. _MEDIA_URL setting: ../settings/#media-url
+.. _`MEDIA_URL 設定`: `MEDIA_URL settings`_
 
 django.core.context_processors.request
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
