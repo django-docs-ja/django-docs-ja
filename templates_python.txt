@@ -432,7 +432,7 @@ django.core.context_processors.media
 ``RequestContext`` に ``MEDIA_URL`` というコンテキスト変数が入ります．
 ``MEDIA_URL`` には `MEDIA_URL 設定`_ の値が入っています．
 
-.. _MEDIA_URL setting: ../settings/#media-url
+.. _MEDIA_URL settings: ../settings/#media-url
 .. _`MEDIA_URL 設定`: `MEDIA_URL settings`_
 
 django.core.context_processors.request
