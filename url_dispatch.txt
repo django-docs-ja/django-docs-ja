@@ -2,7 +2,7 @@
 URL ディスパッチャ
 ==================
 
-:revision-up-to: 5369 (0.97pre SVN)
+:revision-up-to: 5418 (0.97pre SVN)
 
 すっきりした，簡潔で明解な URL スキームの設計は，高品質の Web アプリケーショ
 ンでは重要な要素です．Django では，フレームワークの制限なしに，望み通りの
@@ -622,9 +622,10 @@ Django では ``django.core.urlresolvers.reverse()`` を提供しています．
 
     reverse(viewname, urlconf=None, args=None, kwargs=None)
 
-``viewname`` は関数名か `URL パターン名`_ です．通常， ``urlconf`` パラメタ
-につついて考える必要はなく，以下のように，固定引数とキーワード引数だけを指
-定して url マッチングを行います::
+``viewname`` は関数名 (関数への参照か，関数名の文字列表記で，
+``urlpatterns`` 上で使っている形式) または  `URL パターン名`_ です．通常，
+``urlconf`` パラメタについて考える必要はなく，以下のように，固定引数とキー
+ワード引数だけを指定して url マッチングを行います::
 
     from django.core.urlresolvers import reverse
 

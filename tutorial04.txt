@@ -2,7 +2,7 @@
 はじめての Django アプリ作成，その 4
 =====================================
 
-:revision-up-to: 5369 (0.97pre SVN)
+:revision-up-to: 5418 (0.97pre SVN)
 
 このチュートリアルは `チュートリアルその 3`_ の続きです．ここでは，引続き
 Web 投票アプリケーションの開発を例にして，簡単なフォーム処理とコードの縮小
@@ -74,7 +74,7 @@ URLconf に入れたことを思い出しましょう::
             # ユーザが Back ボタンを押して同じフォームを提出するのを防ぐ
             # ため，POST データを処理できた場合には，必ず
             # HttpResponseRedirect を返すようにします．
-            return HttpResponseRedirect(reverse('results', args=(p.id,)))
+            return HttpResponseRedirect(reverse('mysite.polls.views.results', args=(p.id,)))
 
 このコードには，これまでのチュートリアルで扱っていなかったことがいくつか
 入っています:
@@ -114,6 +114,8 @@ URLconf に入れたことを思い出しましょう::
 
       のような URL を返します． ``3`` は ``p.id`` の値です．リダイレクト先
       の URL は ``'results'`` ビューを呼び出し，最終的なページを表示します．
+      (プレフィクスを含めた) ビューの完全な名前を指定せねばならないので注意
+      してください．
 
       ``reverse()`` の詳細は `URL ディスパッチャ`_ のドキュメントを参照して
       ください．
