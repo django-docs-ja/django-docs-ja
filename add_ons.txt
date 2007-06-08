@@ -2,14 +2,15 @@
 "django.contrib" 下のアドオン
 =============================
 
-:revision-up-to: 5150 (0.97pre SVN)
+:revision-up-to: 5442 (0.97pre SVN)
 
 Django は Python の `"batteries included" 哲学`_ を目指しています． Django
 には Web 開発における課題を解くための様々な外部オプションツールがついてきま
 す．
 
-これらのコードは Django 配布物中の ``django/contrib`` にあります．
-``contrib`` 下のパッケージの概要を以下に示します:
+これらのコードは Django 配布物中の ``django/contrib`` にあります．このドキュ
+メントでは， ``contrib`` 下のパッケージをざっと解説し，パッケージを利用する
+ときに必要な依存関係について説明します．
 
 .. admonition:: Note
 
@@ -28,6 +29,8 @@ Django の自動化管理インタフェースです．詳しくは `チュー�
 
 .. _`チュートリアルその 2`: ../tutorial02/
 .. _Tutorial 2: ../tutorial02/
+
+auth_ および contenttypes_ パッケージをインストールしておく必要があります．
 
 auth
 ====
@@ -153,6 +156,8 @@ flatpages
 
 .. _`flatpages のドキュメント`: ../flatpages/
 .. _flatpages documentation: ../flatpages/
+
+sites_ パッケージもインストールしておく必要があります．
 
 localflavor
 ===========

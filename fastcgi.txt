@@ -2,7 +2,7 @@
 FastCGI, SCGI, AJP で Django を使う
 ===================================
 
-:revision-up-to: 5150 (0.97pre SVN)
+:revision-up-to: 5442 (0.97pre SVN)
 
 Django を動作させる構成として `現在推奨されている`_ のは， Apache_ と
 `mod_python`_ の組合せですが，多くの人々が共有ホスティングサービスを使って
@@ -232,7 +232,7 @@ URL を ``mysite.fcgi`` (または ``FastCGIExternalServer`` ディレクティ�
       DocumentRoot /home/user/public_html
       Alias /media /home/user/python/django/contrib/admin/media
       RewriteEngine On
-      RewriteRule ^/(media.*)$ /$1 [QSA,L]
+      RewriteRule ^/(media.*)$ /$1 [QSA,L,PT]
       RewriteCond %{REQUEST_FILENAME} !-f
       RewriteRule ^(.*)$ mysite.fcgi/$1 [QSA,L]
     </VirtualHost>

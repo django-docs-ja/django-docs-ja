@@ -2,7 +2,7 @@
 newforms ライブラリ
 ===================
 
-:revision-up-to: 5369 (0.97pre SVN)
+:revision-up-to: 5442 (0.97pre SVN)
 
 ``django.newforms`` は， Django に新たに導入された画期的なフォーム処理ライ
 ブラリで，従来のフォーム／マニピュレータ／バリデータフレームワークである
@@ -244,14 +244,17 @@ Django コンポーネントに対してカップリングしていません． 
 ``nick_name`` が ``CharField`` であり， ``CharField`` は空の値を空文字列と
 みなすからです．各フィールドタイプは「空の」値が設定されています．例えば，
 ``DateField`` の場合，空の値は空文字列ではなく ``None`` になります．
+空の値を持ったフィールドの詳しい挙動は，「組み込みふぃーるどくらす」の節の
+各フィールドの説明中の「空のフォームデータに対する値」の項目を参照してくだ
+さい．
 
 .. _Behavior of unbound forms:
 
 非束縛フォームの動作
 ~~~~~~~~~~~~~~~~~~~~
 
-データを含まないようなフォームの検証は無意味でしかありませんが，参考までに
-非束縛フォームに対する検証を行ったときの動作を示しておきます::
+データを含まないフォームに対して "cleaned" を実行しても無意味でしかありませ
+んが，参考までに非束縛フォームに対して行ったときの動作を示しておきます::
 
     >>> f = ContactForm()
     >>> f.is_valid()
@@ -705,7 +708,14 @@ Django コンポーネントに対してカップリングしていません． 
 ------------------------------------
 
 では，先ほどの連絡フォームを Django のビューとテンプレートに組み込みましょ
-う．以下のビューは，デフォルトでは連絡フォームを表示し， POST リクエストで
+う．
+
+.. _Simple view example:
+
+簡単なビューの例
+~~~~~~~~~~~~~~~~
+
+以下のビューは，デフォルトでは連絡フォームを表示し， POST リクエストで
 アクセスすると，入力値の検証と処理を行います::
 
     def contact(request):
@@ -718,9 +728,9 @@ Django コンポーネントに対してカップリングしていません． 
             form = ContactForm()
         return render_to_response('contact.html', {'form': form})
  
-.. _Simple template output:
+.. _Simple template example:
 
-簡単なテンプレート出力
+簡単なテンプレートの例
 ~~~~~~~~~~~~~~~~~~~~~~
 
 上の例で使っているテンプレート， ``contact.html`` は，フォームを HTML で出
@@ -783,7 +793,7 @@ Django コンポーネントに対してカップリングしていません． 
 このような反復処理のテクニックは，各フィールドに対して同じ HTML のフォーマッ
 トを適用したい場合や，あらかじめフォームフィールドの名前が分からない状況で
 フォームを生成したい場合などに役立ちます．フィールドは ``Form`` クラスで定
-義されている順番に列挙されます．
+義されている順番に反復処理されます．
 
 反復処理を使う代わりに，フォームのフィールドを名前で明示した調整も行えます．
 フォームフィールドを明示的に指定するには， ``{{ form.fieldname }}`` のよう
@@ -811,9 +821,12 @@ Django コンポーネントに対してカップリングしていません． 
 フォームのサブクラス化
 ----------------------
 
-フォームクラスをサブクラス化して自作する場合，できたフォームクラスには親ク
-ラスの全てのフィールドが入っています．サブクラスで定義したフィールドは親ク
-ラスのフィールドの後に続きます．
+同じフィールドを持つようなフォームクラスをいくつも作りたい場合，サブクラス
+化を用いると冗長性を排除できます．
+
+フォームクラスをサブクラス化すると，できたフォームクラスには親クラスの全て
+のフィールドが入っています．サブクラスで定義したフィールドは親クラスのフィー
+ルドの後に続きます．
 
 以下の例では， ``ContactFormWithPriority`` には ``ContactForm`` の全てのフィー
 ルドと， ``priority`` という追加のフィールドが入っています．
@@ -1340,6 +1353,38 @@ Django の古いフォーム／検証フレームワークを使ったことが�
 フィールドクラスを定義する際の制約は， ``clean()`` メソッドを実装すること，
 ``__init__()`` メソッドが前述のコアとなる引数 (``required``, ``label``,
 ``initial``, ``widget``, ``help_text``) を持つことだけです．
+
+.. _A simple example:
+
+簡単な例
+~~~~~~~~
+
+入力値がカンマで区切られたメールアドレスになっていて，少なくとも一つアドレ
+スが入っているかどうか検証するカスタムフィールドの例を以下に示します．簡単
+のため，個々のメールアドレスの検証は ``is_valid_email()`` という関数で行っ
+ていることにします．クラスの全体像は以下のようになります::
+
+    from django import newforms as forms
+
+    class MultiEmailField(forms.Field):
+        def clean(self, value):
+            emails = value.split(',')
+            for email in emails:
+                if not is_valid_email(email):
+                    raise forms.ValidationError('%s is not a valid e-mail address.' % email)
+            if not emails:
+                raise forms.ValidationError('Enter at least one e-mail address.')
+            return emails
+
+件の ``ContactForm`` の例を使って，上のカスタムフィールドをフォームで使って
+みます．以下のように， ``forms.EmailField`` を ``MultiEmailField`` に置き換
+えてください::
+
+    class ContactForm(forms.Form):
+        subject = forms.CharField(max_length=100)
+        message = forms.CharField()
+        senders = MultiEmailField()
+        cc_myself = forms.BooleanField()
 
 
 .. _Generating forms for models:

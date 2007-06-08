@@ -2,7 +2,7 @@
 モデル API リファレンス
 =======================
 
-:revision-up-to: 5357 (0.97pre SVN)
+:revision-up-to: 5442 (0.97pre SVN)
 
 モデルとは，サイトを構成するデータの，ただ一つかつ最終的なデータソースを指
 します．モデルには，保存したいデータに不可欠なデータフィールドと，その振舞
@@ -2014,11 +2014,15 @@ URL と表示に使ったビューを結びつけられます．以前と同様�
         row = cursor.fetchone()
         return row
 
-``connection`` や ``cursor`` は標準の `Python DB-API`_ を使っています．
+``connection`` や ``cursor`` は標準の `Python DB-API`_ が提供する機能の
+(`トランザクションの扱い`_ を除いた) ほとんどを実装しています．
 Python DB-API に詳しくないのなら，上の SQL 文の ``cursor.execute()`` でパラ
 メタを直接 SQL に入れるのではなく，プレースホルダ ``"%s"`` を使っていること
 に注意して下さい．このテクニックを使うと，根底にあるデータベースライブラリ
 は必要に応じて自動的にパラメタをクオートしたりエスケープ処理したりします．
+(また，Django はプレースホルダ文字として SQLite の Python バインディングが
+使っている ``"?"`` **ではなく** ``"%s"`` を使うので注意してください．これは
+インタフェースに一貫性をもたせるための設計です．)
 
 注意: ``WHERE`` 節を自分で設定したいだけなら，標準の照合 API に ``where``
 や ``tables`` ， ``params`` といった引数を指定して実現できます．
@@ -2028,6 +2032,8 @@ Python DB-API に詳しくないのなら，上の SQL 文の ``cursor.execute()
 .. _`extra() のドキュメント`: 
     ../db-api/#extra-select-none-where-none-params-none-tables-none
 .. _Other lookup options: ../db_api/#other-lookup-options
+.. _transaction handling: ../transactions/
+.. _`トランザクションの扱い`: `transaction handling`_
 
 .. _Overriding default model methods:
 
