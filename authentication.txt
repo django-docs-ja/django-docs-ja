@@ -990,7 +990,7 @@ API リファレンス
     * メッセージの追加には， 
       ``user_obj.message_set.create(message='message_text')`` 
       を使います．
-    * メッセージの取得と削除には，``user_obj.get_and_delete_messages()``
+    * メッセージの取得と削除には， ``user_obj.get_and_delete_messages()``
       を使います．このメソッドは，該当ユーザのキューに溜っている
       ``Message`` オブジェクトがあれば，リストにして返し，キュー内の
       メッセージを削除します．

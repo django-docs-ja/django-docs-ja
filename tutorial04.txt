@@ -132,7 +132,7 @@ URLconf に入れたことを思い出しましょう::
         p = get_object_or_404(Poll, pk=poll_id)
         return render_to_response('polls/results.html', {'poll': p})
 
-テンプレート名が違うことだけを除き，`チュートリアルその 3` の ``detail()``
+テンプレート名が違うことだけを除き， `チュートリアルその 3` の ``detail()``
 とほとんど同じですね．この冗長さは後で修正することにします．
 
 今度は ``results.html`` テンプレートを作成します::

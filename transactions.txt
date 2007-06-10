@@ -34,7 +34,7 @@ HTTP リクエストとトランザクションを結び付ける
 トランザクションをコミットします．ビュー関数が例外を送出したら，ロールバッ
 クを起こします．
 
-この機能を有効にするには，``TransactionMiddleware`` ミドルウェアを
+この機能を有効にするには， ``TransactionMiddleware`` ミドルウェアを
 ``MIDDLEWARE_CLASSES`` 設定に追加します::
 
 

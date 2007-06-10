@@ -147,7 +147,7 @@ Django の *プロジェクト (project)* を構成するコードを自動生�
 Database の設定
 ---------------
 
-それでは ，``settings.py`` を編集しましょう． ``settings.py`` は Django の
+それでは， ``settings.py`` を編集しましょう． ``settings.py`` は Django の
 設定を表現する通常の Python モジュールです．設定を書き換えて，お使いのデー
 タベースへの接続パラメタに合わせましょう:
 
@@ -346,7 +346,7 @@ Django では，こうした概念を簡単な Python クラスで表現でき�
     ンは特定の Django インストールに結び付いていないので，アプリケーション
     を複数のプロジェクトで使ったり，単体で配布したりできます．
 
-再度 ``settings.py`` ファイルを編集して，``INSTALLED_APPS`` 設定を変更し，
+再度 ``settings.py`` ファイルを編集して， ``INSTALLED_APPS`` 設定を変更し，
 ``'mysite.polls'`` を入れます．以下のようになるはずです::
 
     INSTALLED_APPS = (
@@ -396,7 +396,7 @@ Django では，こうした概念を簡単な Python クラスで表現でき�
     * 外部キーのリレーションは ``REFERENCES`` 文で明示的に作成されます．
 
     * SQL 文は使っているデータベースに応じて細かく調整されます．従って，
-      ``auto_increment`` (MySQL)， `serial`` (PostgreSQL)， 
+      ``auto_increment`` (MySQL)， ``serial`` (PostgreSQL)， 
       ``integer primary key`` (SQLite) といったデータベース固有のフィールド
       タイプは自動的に指定されます．クオートの仕方，すなわち一重と二重のど
       ちらの引用符を使うか，といったことも自動で調整します．このチュートリ

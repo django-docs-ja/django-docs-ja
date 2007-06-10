@@ -154,7 +154,7 @@ mod_python 上で開発用サーバを動かす
 
 あなたが ``print`` 文を散りばめてデバッグするタイプのプログラマなら，
 ``print`` 文は mod_python では何の効果も及ぼさないということに注意しましょ
-う．``print`` 文を使っても， Apache のログには何も出力されません．
+う． ``print`` 文を使っても， Apache のログには何も出力されません．
 mod_python を使った設定でデバッグ情報を出力したいのなら::
 
     assert False, the_value_i_want_to_see
@@ -193,7 +193,7 @@ mod_python を切ります::
 せるようにもできます．
 
 以下の例では， Django をサイトのルートで設定し， ``media`` サブディレクトリ
-の下と， ``.jpg``， ``.gif`` ，および ``.png`` で終わる URL だけでは明示的
+の下と， ``.jpg`` ， ``.gif`` ，および ``.png`` で終わる URL だけでは明示的
 に Django を無効にしています::
 
     <Location "/">

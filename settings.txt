@@ -745,7 +745,7 @@ SEND_BROKEN_LINK_EMAILS
 デフォルト値: ``False``
 
 Django で作られたページに訪問した人が，リファラが空でないにも関わらず 404
-に遭遇した (すなわち，リンクが壊れていた) 場合に，``MANAGERS`` に e-mail を
+に遭遇した (すなわち，リンクが壊れていた) 場合に， ``MANAGERS`` に e-mail を
 送信するかどうかを決めます．この設定は ``CommonMiddleware`` がインストール
 されている場合にしか使われません．(`ミドルウェアのドキュメント`_ を参照して
 ください．) ``IGNORABLE_404_STARTS``, ``IGNORABLE_404_ENDS`` および

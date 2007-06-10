@@ -327,7 +327,7 @@ admin では， ``<input type="file">`` (ファイルアップロードウィジ
                      マッチしません．
 
     ``recursive``    オプションです． ``True`` または ``False`` です．デフォ
-                     ルトは ``False`` で，``path`` のサブディレクトリを含め
+                     ルトは ``False`` で， ``path`` のサブディレクトリを含め
                      るかどうかを指定します．
     ===============  =======================================================
 
@@ -452,7 +452,7 @@ admin では， ``<textarea>`` (複数行の入力フィールド) で表現さ�
 ``TimeField``
 ~~~~~~~~~~~~~
 
-時刻です．``DateField`` や ``DateTimeField`` と同じく，自動的に値を埋めるた
+時刻です． ``DateField`` や ``DateTimeField`` と同じく，自動的に値を埋めるた
 めのオプションを使えます．
 
 admin では，JavaScript のショートカットがついた ``<input type="text">`` で
@@ -504,7 +504,7 @@ admin では， ``<input type="text">`` (一行の入力フィールド) で表�
 かかわるパラメタなので，フォーム上で空の値を入力できるようにしたければ
 ``blank=True`` も指定する必要があるでしょう (blank_ については後で述べます)．
 
-特別な理由のない限り，``CharField`` や ``TextField`` のような，文字列ベース
+特別な理由のない限り， ``CharField`` や ``TextField`` のような，文字列ベース
 のフィールドには ``null`` を指定しないようにしてください．文字列ベースのフィー
 ルドが ``nill=True`` であるということは，「データがない」ことを表すのに
 ``NULL`` と空文字列という二つの値が存在することを示します．多くの場合，「デー
@@ -646,14 +646,14 @@ Django は必要に応じてカラム名やテーブル名をクオートしま�
 従って，デフォルトの主キーの振舞いを変更したいのでないかぎり，
 ``primary_key=True`` をフィールドに指定しておく必要はありません．
 
-``primary_key=True`` であるということは， ``blank=False``，``null=False``，
+``primary_key=True`` であるということは， ``blank=False`` ， ``null=False`` ，
 かつ ``unique=True`` であることを指します．一つのオブジェクトには一つしか主
 キーを指定できません．
 
 ``radio_admin``
 ~~~~~~~~~~~~~~~
 
-デフォルトでは，``ForeignKey`` のフィールドや ``choices`` の設定されたフィー
+デフォルトでは， ``ForeignKey`` のフィールドや ``choices`` の設定されたフィー
 ルドに対して， Django の admin は選択ボックスインタフェース (<select>) を使
 います． ``radio_admin`` を ``True`` にすると， Django はラジオボタンのイン
 タフェースを使います．
@@ -1152,7 +1152,7 @@ Django は背後でカラム名とテーブル名をクオートします．
 
 オブジェクトの生成時にパーミッションテーブルに追加するパーミッションのリス
 トです． ``admin`` セットをもつオブジェクトには，追加，削除，変更のパーミッ
-ションが自動的に生成されます．以下の例では，``can_deliver_pizzas`` という追
+ションが自動的に生成されます．以下の例では， ``can_deliver_pizzas`` という追
 加のパーミッションを定義しています::
 
     permissions = (("can_deliver_pizzas", "Can deliver pizzas"),)
@@ -1278,7 +1278,7 @@ admin の「追加 (add)」および「変更 (change)」ページのレイア�
 ります)．
 
 フィールドセットは ``(name, field_options)`` の形式をとります． ``name``
-はフィールドセットの名前を表す文字列で，``field_options`` はフィールドセッ
+はフィールドセットの名前を表す文字列で， ``field_options`` はフィールドセッ
 トに表示すフィールドの情報を入れた辞書です．
 
 ``django.contrib.flatpages.FlatPage`` モデルから抜き出した例を示します::
@@ -1747,7 +1747,7 @@ SQL に等価な検索を実行します::
         person_name = models.CharField(maxlength=50)
         response = models.TextField()
 
-この例では，``OpinionPoll.objects.with_counts()`` を使うと，
+この例では， ``OpinionPoll.objects.with_counts()`` を使うと，
 ``num_responses`` 属性を備えた ``OpinionPoll`` オブジェクトのリストを返しま
 す．
 
@@ -2100,7 +2100,7 @@ import しておき，必要なところでそのモデルクラスを参照し�
 ``INSTALLED_APPS`` 設定に追加してください．
 
 例えば，アプリケーションのモデルが ``mysite.myapp.models`` モジュール
-(``manage.py startapp``スクリプトで作成した，アプリケーションのパッケージ構
+( ``manage.py startapp`` スクリプトで作成した，アプリケーションのパッケージ構
 造) に収められている場合， ``INSTALLED_APPS`` は以下のようになります::
 
     INSTALLED_APPS = (
