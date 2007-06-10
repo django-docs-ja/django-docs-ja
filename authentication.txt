@@ -2,7 +2,7 @@
 Django でのユーザ認証
 =============================
 
-:revision-up-to: 5150 (0.97pre SVN)
+:revision-up-to: 5455 (0.97pre SVN)
 
 Django にはユーザ認証システムがついてきます． Django のユーザ認証システムは，
 ユーザアカウント，グループ，パーミッションとクッキーベースのユーザセッショ
@@ -810,7 +810,7 @@ Django の admin サイトでは，以下のようなパーミッションを使
 --------------------------
 
 ``class Admin`` セットを持つ Django モデルには，三つの基本的なパーミッショ
-ンである， add, create, delete が自動的に生成されます． 
+ンである， add, change, delete が自動的に生成されます． 
 ``manage.py syncdb`` を実行したとき，背後では，これらのパーミッションが自動
 的に ``auth_permission`` データベーステーブルに追加されます． 
 ``django-admin.py sqlinitialdata [app]`` を実行すると，追加を行っている
