@@ -2,7 +2,7 @@
 newforms ライブラリ
 ===================
 
-:revision-up-to: 5468 (0.97pre SVN)
+:revision-up-to: 5479 (0.97pre SVN)
 
 ``django.newforms`` は， Django に新たに導入された画期的なフォーム処理ライ
 ブラリで，従来のフォーム／マニピュレータ／バリデータフレームワークである
