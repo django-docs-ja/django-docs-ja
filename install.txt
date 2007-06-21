@@ -2,7 +2,7 @@
 Django のインストール
 =====================
 
-:revision-up-to: 5370 (0.97pre SVN)
+:revision-up-to: 5505 (0.97pre SVN)
 
 このドキュメントを読めば Django を動かせるようになります．
 
@@ -23,8 +23,8 @@ http://www.python.org から Python を取ってきましょう． Linux や Mac
 Apache と mod_python のインストール
 ===================================
 
-単に Django を試してみたいだけなら，この節は読み飛ばしてかまいません．
-Django には独自開発用 Web サーバがついてきます．
+単に Django を試してみたいだけなら，この節は読み飛ばして次の節を読んでくだ
+さい．Djangoにはテスト用の軽量なWebサーバが付属しているので，運用環境での動作が必要になるまでApacheをセットアップする必要はないのです．
 
 Django を実運用のサイトで使いたい場合， Apache と `mod_python`_ を使って下
 さい． mod_python は mod_perl のようなもので， Python を Apache の中に埋め
@@ -97,7 +97,7 @@ Django のデータベース API 機能を使うのなら，データベース�
 Python の ``site-packages`` ディレクトリから ``django`` ディレクトリを削除
 するだけです．
 
-Python Egg を使って Django をインストールした場合，Django の ``.egg`` ファ
+Python egg を使って Django をインストールした場合，Django の ``.egg`` ファ
 イルを削除するとともに， ``easy-install.pth`` から Django の ``.egg`` ファ
 イルパスが書かれたエントリを削除します． ``easy-install.pth`` や ``.egg``
 は，通常  ``site-packages`` ディレクトリ下にあります．
@@ -105,16 +105,13 @@ Python Egg を使って Django をインストールした場合，Django の ``
 .. admonition:: ``site-packages`` はどこにあるの？
 
     ``site-packages`` の在処はオペレーティングシステムや Python のインストー
-    ル場所によって異なります．ただし，一般的には以下のような場所にインストー
-    ルされます:
+    ル場所によって異なります． ``site-pacakges`` の場所を調べるには，以下の
+    コマンドを実行してみてください::
     
-    * Linux の場合: ``/usr/lib/python2.X/site-packages``
-
-    * Windows の場合: ``C:\Python2.X\lib\site-packages``
-
-    * MacOSX の場合: ``/Library/Python2.X/site-packages`` または (最近のバー
-      ジョンでは)
-      ``/Library/Frameworks/Python.framework/Versions/2.X/lib/python2.X/site-packages/`` 
+      python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()"
+ 
+    (このコマンドはPythonの対話プロンプトではなく，シェルプロンプトで実行し
+    てください．)
 
 
 .. _Install the Django code:
@@ -163,13 +160,17 @@ Django のコードを更新して最新のバグフィクスや改良を適用�
 
 1. Subversion_ がインストールされていることを確認してください．
 2. Django のコードを Python の ``site-packages`` ディレクトリにチェックアウ
-   トします． Linux / Mac OSX / Unix では，以下のコマンドを実行します::
+   トします． 
+
+   Linux / Mac OSX / Unix では，以下のコマンドを実行します::
 
       svn co http://code.djangoproject.com/svn/django/trunk/ django_src
-      ln -s `pwd`/django_src/django /usr/lib/python2.3/site-packages/django
+      ln -s `pwd`/django_src/django SITE-PACKAGES-DIR/django
 
-   (上の作業では，使っている Python のバージョンに合わせて ``python2.3`` を
-   適宜読み変えて下さい)
+   (上の作業では，使っているプラットフォームの ``site-packages``  ディレク
+   トリに合わせて SITE-PACKAGES-DIR を書き換えてください． 
+   ``site-packages`` の場所の探し方は，「 ``site-packages`` はどこにあるの？」
+   を参照してください)
 
    Windows では以下のようにします::
    
