@@ -2,7 +2,7 @@
 Django についてよくある質問
 ===========================
 
-:revision-up-to: 5150 (0.97pre SVN)
+:revision-up-to: 5519 (0.97pre SVN)
 
 .. contents::
 
@@ -375,7 +375,7 @@ Django を動かすには Python_ 2.3 以降が必要です．Django の初歩�
 
 Django をデータベースと合わせて使うならデータベースエンジンも必要です．
 我々は PostgreSQL_ ファンなので PostgreSQL をお勧めしますが， MySQL_ や
-`SQLite 3`_ もサポートしています．
+`SQLite 3`_, Oracle_ もサポートしています．
 
 .. _Python: http://www.python.org/
 .. _Apache 2: http://httpd.apache.org/
@@ -384,7 +384,7 @@ Django をデータベースと合わせて使うならデータベースエン�
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
 .. _`SQLite 3`: http://www.sqlite.org/
-
+.. _Oracle: http://www.oracle.com/
 
 .. _Do I lose anything by using Python 2.3 versus newer Python versions, such as Python 2.5?:
 

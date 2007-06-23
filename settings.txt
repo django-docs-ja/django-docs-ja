@@ -2,7 +2,7 @@
 Django の設定
 =============
 
-:revision-up-to: 5418 (0.97pre SVN)
+:revision-up-to: 5519 (0.97pre SVN)
 
 Django の設定ファイルには，インストールした Django の使う全ての設定が入って
 います．このドキュメントでは，各設定の役割と，どのような設定を利用できるか
@@ -279,7 +279,7 @@ DATABASE_ENGINE
 
 どのデータベースバックエンドを使うかを指定します． 
 ``'postgresql_psycopg2'``, ``'postgresql'``, ``'mysql'``, ``'mysql_old'``,
-``'sqlite3'`` あるいは ``'ado_mssql'`` のいずれかにします．
+``'sqlite3'``, ``'oracle'``, または ``'ado_mssql'`` のいずれかにします．
 
 DATABASE_HOST
 -------------
