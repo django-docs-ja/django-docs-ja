@@ -2,7 +2,7 @@
 Django のインストール
 =====================
 
-:revision-up-to: 5519 (0.97pre SVN)
+:revision-up-to: 5546 (0.97pre SVN)
 
 このドキュメントを読めば Django を動かせるようになります．
 
@@ -55,7 +55,7 @@ WSGI_ 仕様に従っているので，様々なサーバプラットフォー�
 ====================
 
 Django のデータベース API 機能を使うのなら，データベースサーバを動かす必要
-があります． Django は PostgreSQL_, MySQL_, および SQLite_ で動作し
+があります． Django は PostgreSQL_, MySQL_, Oracle_ および SQLite_ で動作し
 ます．
 
 さらに，各データベースの Python バインディングをインストールしておく必要が
@@ -87,6 +87,7 @@ Django のデータベース API 機能を使うのなら，データベース�
 .. _SQLite: http://www.sqlite.org/
 .. _pysqlite: http://initd.org/tracker/pysqlite
 .. _cx_Oracle: http://www.python.net/crew/atuining/cx_Oracle/
+.. _Oracle: http://www.oracle.com/
 
 .. _Remove any old versions of Django:
 
