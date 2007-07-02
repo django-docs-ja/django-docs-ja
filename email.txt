@@ -2,7 +2,7 @@
 e-mail の送信
 ==============
 
-:revision-up-to: 5155 (0.97pre SVN)
+:revision-up-to: 5583 (0.97pre SVN)
 
 Python の `smtplib ライブラリ`_ を使えば，比較的簡単に電子メールを送信でき
 ますが， Django ではこのライブラリへの軽量ラッパを二つ用意して，電子メール
@@ -233,45 +233,154 @@ Django の ``send_mail()`` および ``send_mass_mail()`` 関数は，実際に�
     
     ``send_mail()`` をはじめとしたラッパ関数から利用できる機能は，
     ``EmailMessage`` クラスで提供している全ての機能をカバーしているわけでは
-    ありません．BCC で宛先を指定したい場合やマルチパート形式のメールを送信
-    したい場合， ``EmailMessage`` インスタンスを直接生成する必要があります．
+    ありません．BCC への宛先を指定やファイルの添付，マルチパート形式メール
+    の送信を行いたい場合には， ``EmailMessage`` インスタンスを直接生成する
+    必要があります．
+
+    ``send_mail()`` がこのようないささかややこしい仕様なのは，設計上の事情
+    によるものです． ``send_mail()`` などの関数はもともと単なる Django 向け
+    の単純なメールインタフェースでしかありませんでした．その後，
+    ``send_mail()`` に指定できるパラメタが少しづつふえてきたのです．今となっ
+    ては，メールメッセージを扱うためのよりオブジェクト指向の設計に移行して，
+    ``send_mail()`` は互換性のためだけにおいておく方が有意義でしょう．
 
 一般に， ``EmailMessage`` はメールメッセージ自体の生成に関わります．
 ``SMTPConnection`` はメール送信処理におけるネットワーク接続に関わっています．
 このことは，同じ接続 (``SMTPConnection`` インスタンス) を再利用すれば，複数
 のメッセージを一括送信できることを示しています．
 
-``EmailMessage`` クラスの初期化は以下のような形式で行います::
 
-    email = EmailMessage(subject, body, from_email, to, bcc, connection)
+.. _E-mail messages:
 
-パラメタはすべて省略可能です． ``from_email`` を省略すると，
-``settings.DEFAULT_FROM_EMAIL`` の値を使います． ``to`` および ``bcc``
-パラメタには，メールアドレスのリストを文字列で指定します．
+メールメッセージクラス
+----------------------
 
-例えば::
+``EmailMessage`` クラスは以下のパラメタ (固定引数を使う場合には以下に示す順
+番に指定します) で初期化します．パラメタは全て省略可能で， ``send()`` メソッ
+ドを呼び出す前であればいつでも設定しなおせます．
+
+    * ``subject``: メールの題名です．
+
+    * ``body``: メール本文です．平文テキストのメッセージでなければなりませ
+      ん．
+
+    * ``from_email``: 送信者のアドレスです． ``fred@example.com`` 形式でも
+      ``Fred <fred@example.com>`` 形式でもかまいません．省略すると，
+      ``DEFAULT_FROM_EMAIL`` の設定値を使います．
+
+    * ``to``: 受信者アドレスのリストまたはタプルです．
+
+    * ``bcc``: メールを送信する際に "Bcc" ヘッダに指定するアドレスのリスト
+      またはタプルです． 
+
+    * ``connection``: ``SMTPConnection`` のインスタンスです．一つの SMTP 接
+      続を使い回して複数のメッセージを送信したい場合に指定します．省略する
+      と， ``send()`` を呼び出す瞬間に新しい接続を生成します．
+
+    * ``attachments``: メールに添付するデータのリストです．リストの各要素は，
+      ``email.MIMEBase.MIMEBase`` のインスタンスか， 
+      ``(filename, content, mimetype)`` からなるタプルです．
+
+    * ``headers``: メッセージに追加するヘッダの辞書です．ヘッダ名をキーに，
+      ヘッダ値を値にします．このパラメタを使うのなら，指定したヘッダがメー
+      ルメッセージ中で正しいヘッダとして扱われるように気をつけねばなりませ
+      ん．
+
+例を示します::
 
     email = EmailMessage('Hello', 'Body goes here', 'from@example.com',
-                ['to1@example.com', 'to2@example.com'],
-                ['bcc@example.com'])
+                ['to1@example.com', 'to2@example.com'], ['bcc@example.com'],
+                headers = {'Reply-To': 'another@example.com'})
 
 ``EmailMessage`` クラスのインスタンスには以下のようなメソッドがあります:
 
- * ``send()`` メソッドを呼び出すと， ``connection`` 属性に指定した接続を使っ
-   てメッセージを送信します．接続がなければ，自動的に新たな接続を生成して使
-   います．
- * ``message()`` は ``django.core.mail.SafeMIMEText`` クラスのインスタンス
-   を生成します (``django.core.mail.SafeMIMEText`` クラスは Python の
-   ``email.MIMEText.MIMEText`` クラスのサブクラスです)．このクラスには送信
-   すべきメッセージが入ります． ``EmailMessage`` クラスを拡張する必要がある
-   場合，おそらくこのメソッドをオーバライドして，所望の内容を MIME オブジェ
-   クト内に配置することになるでしょう．
- * ``recipients()`` はメッセージの全ての宛先からなるリストを返します．この
-   宛先リストは， ``to`` と ``bcc`` に指定した全ての宛先が入ります．
-   ``EmailMessage`` をサブクラス化する際，このメソッドもオーバライドする必
-   要があるかもしれません．というのも， SMTP サーバはメッセージ送信時に全て
-   の宛先を知る必要があり，全ての宛先はこのメソッドを介して返さねばならない
-   からです．
+  * ``send()`` メソッドを呼び出すと， ``connection`` 属性に指定した接続を使っ
+    てメッセージを送信します．接続がなければ，自動的に新たな接続を生成して使
+    います．
+
+  * ``message()`` は ``django.core.mail.SafeMIMEText`` クラス (Python の
+    ``email.MIMEText.MIMEText`` クラスのサブクラス) または
+    ``django.core.mail.SafeMIMEMultipart`` クラスのインスタンスを生成します．
+    このオブジェクトには送信するメッセージが入っています．
+    ``EmailMessage`` クラスを拡張する必要がある場合，おそらくこのメソッドを
+    オーバライドして，所望の内容を MIME オブジェクト内に配置することになるで
+    しょう．
+
+  * ``recipients()`` はメッセージの全ての宛先からなるリストを返します．この
+    宛先リストは， ``to`` と ``bcc`` に指定した全ての宛先が入ります．
+    ``EmailMessage`` をサブクラス化する際，このメソッドもオーバライドする必
+    要があるかもしれません．というのも， SMTP サーバはメッセージ送信時に全て
+    の宛先を知る必要があり，全ての宛先はこのメソッドを介して返さねばならない
+    からです．
+
+  * ``attach()`` を呼び出すと，新たなファイル添付用パートを生成してメッセー
+    ジに追加します． ``attach()`` の呼び出しかたは 2 通りあります:
+
+     * ``attach()`` に引数を一つだけ指定し， ``email.MIMBase.MIMEBase``
+       のインスタンスを渡します．このインスタンスの内容は最終的なメッセージ
+       に直接挿入されます．
+
+     * 別の方法として， ``attach()`` に 3 つの引数， ``filename``,
+       ``content`` および ``mimetype`` を渡します． ``filename`` は添付する
+       ファイルの名前で，これはメール中で表示される添付ファイルの名前になり
+       ます． ``content`` は添付パート中に入るデータで， ``mimetype`` は添
+       付内容の MIME タイプです． ``mimetype`` を省略すると，ファイル名を元
+       に推測を行います．
+
+       例を示します::
+
+          message.attach('design.png', img_data, 'image/png')
+
+  * ``attach_file()`` を呼び出すと，ファイルシステム上のファイルから添付パー
+    トを生成します． ``attach_file()`` の引数には添付したいファイルのパスを
+    指定します．オプションとして，添付ファイルの MIME タイプも指定できます．
+    MIME タイプを省略すると，ファイル名をもとに推測を行います．簡単な使い方
+    を示すと，以下のようになります::
+
+      message.attach_file('/images/weather_map.png')
+
+.. _Sending alternative content types:
+
+拡張コンテンツ形式のメールを送信する
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+メールの内容をいくつかのバージョンに分けて送信すると便利な場合があります．
+古典的な例でいえば，テキスト形式と HTML 形式の両方でメールを送信するような
+場合です．
+複数バージョンのメールを同時に送るには， ``EmailMultiAlternatives`` クラス
+を使います．このクラスは ``EmailMessage`` のサブクラスで，
+``attach_alternative()`` メソッドを使ってメールのメッセージ本文に別のバージョ
+ンの本文を追加できます． ``attach_alternative()`` 以外は，(クラスをインスタ
+ンス化するときの初期化メソッドも含めて) ``EmailMessage`` と全く同じです．
+
+テキストと HTML を組み合わせて送信したければ，以下のように書けます::
+
+    from django.core.mail import EmailMultiAlternatives
+
+    subject, from_email, to = 'hello', 'from@example.com', 'to@example.com'
+    text_content = 'This is an important message.'
+    html_content = '<p>This is an <strong>important</strong> message.'
+    msg = EmailMultiAlternatives(subject, text_content, from_email, to)
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
+
+デフォルトでは， ``EmailMessage`` の ``body`` パラメタの MIME タイプは
+``"text/plain"`` です．実践的には，このパラメタは変更せずにおいた方がよいで
+しょう．なぜなら，メールを受信した人が使っているメールクライアントソフトに
+関係なくメッセージを読めるよう保証できるからです．とはいえ，メールの読み手
+が拡張コンテンツ形式 (alternative content type) のメッセージを扱えると分かっ
+ている場合には， ``EmailMessage`` の ``content_subtype`` 属性を使って，主メッ
+セージのコンテンツタイプを変更できます．メールのメジャーコンテンツタイプは
+常に ``"text"`` ですが，サブタイプは以下のように変更できます::
+
+    msg = EmailMessage(subject, html_content, from_email, to)
+    msg.content_subtype = "html"  # Main content is now text/html
+    msg.send()
+
+.. _SMTP network connections:
+
+SMTP ネットワーク接続
+---------------------
 
 ``SMTPConnection`` クラスの初期化は，SMTP サーバのホスト，ポート，SMTP 接続
 を行うユーザ名，そしてパスワードを指定して初期化でき，それぞれのパラメタは

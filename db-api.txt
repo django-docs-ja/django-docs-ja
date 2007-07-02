@@ -2,7 +2,7 @@
 データベース API リファレンス
 =============================
 
-:revision-up-to: 5468 (0.97pre SVN)
+:revision-up-to: 5583 (0.97pre SVN)
 
 `データモデル`_ を作成したら，次はデータベースからデータを取り出す必要があ
 ります．このドキュメントでは，モデルから利用できるデータベース抽象化 API と，
@@ -1241,6 +1241,60 @@ search
 タベースを直接操作する必要があります。
 
 
+regex
+~~~~~
+
+**開発版の Django で新たに追加された機能です**
+
+正規表現による大小文字を区別した検索を行います．
+
+正規表現の構文は各データベースバックエンドで使われているものと同じです．
+正規表現による照合をサポートしない ``sqlite`` バックエンドの場合に，Python
+の ``re`` モジュールと同じ構文を使います．
+
+使い方の例を示します::
+
+    Entry.objects.get(title__regex=r'^(An?|The) +')
+
+同じ意味の SQL 文は以下のようになります::
+
+    SELECT ... WHERE title REGEXP BINARY '^(An?|The) +'; -- MySQL
+
+    SELECT ... WHERE REGEXP_LIKE(title, '^(an?|the) +', 'c'); -- Oracle
+
+    SELECT ... WHERE title ~ '^(An?|The) +'; -- PostgreSQL
+
+    SELECT ... WHERE title REGEXP '^(An?|The) +'; -- SQLite
+
+正規表現を指定する場合には raw 文字列を使う (``'foo'`` でなく ``r'foo'`` を
+使う)よう勧めます．
+
+正規表現によるマッチングは ``ado_mssql`` バックエンドではサポートされていま
+せん． ``ado_mssql`` で ``regex`` を使おうとすると ``NotImplementedError``
+を送出します．
+
+iregex
+~~~~~~
+
+**開発版の Django で新たに追加された機能です**
+
+正規表現による大小文字を区別しない検索を行います．
+
+使い方の例を示します::
+
+    Entry.objects.get(title__iregex=r'^(an?|the) +')
+
+同じ意味の SQL 文は以下のようになります::
+
+    SELECT ... WHERE title REGEXP '^(an?|the) +'; -- MySQL
+
+    SELECT ... WHERE REGEXP_LIKE(title, '^(an?|the) +', 'i'); -- Oracle
+
+    SELECT ... WHERE title ~* '^(an?|the) +'; -- PostgreSQL
+
+    SELECT ... WHERE title REGEXP '(?i)^(an?|the) +'; -- SQLite
+
+
 .. _Default lookups are exact:
 
 デフォルトの照合形式は exact
@@ -1910,8 +1964,8 @@ get_object_or_404()
 のように ``get_object_or_404()`` にマネジャオブジェクトを直接指定してくださ
 い::
 
-    # Blog モデルのインスタンス `e` に関連づけられている，名前が 'Fred' の
-    # 'Fred' の Author インスタンスを取得する
+    # Blog モデルのインスタンス ``e`` に関連づけられている，名前が 'Fred'
+    # の Author インスタンスを取得する
     a = get_object_or_404(e.authors, name='Fred')
 
     # カスタムマネジャ 'recent_entries' を使って，主キーが 3 のエントリを
