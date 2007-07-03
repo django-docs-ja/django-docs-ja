@@ -46,7 +46,7 @@ doctest には， docstring (ドキュメンテーション文字列) 内のテ�
 トランナは ``models.py`` ファイル内の doctest を探し，見つかったテストを実
 行します． Django はまた，アプリケーションのディレクトリ (``models.py`` ファ
 イルがあるのと同じディレクトリ) 内の ``test.py`` というファイルを探し，
-``tests.py`` があれば，その中に doctest がないか探します．
+``test.py`` があれば，その中に doctest がないか探します．
 
 
 .. admonition:: **docstring** とは?
