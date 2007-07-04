@@ -336,9 +336,10 @@ Django には ``django.template.RequestContext`` という特別なコンテキ�
 
     def some_view(request):
         # ...
-        return RequestContext(request, {
+        c = RequestContext(request, {
             'foo': 'bar',
         }, [ip_address_processor])
+	return t.render(c)
 
 .. Note:: 
 
