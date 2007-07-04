@@ -75,6 +75,8 @@ Django オンラインドキュメント和訳
 
 `国際化 (Internationalization) <../i18n/>`__
 
+`Django での Unicode の扱い (Unicode data in Django) <../unicode/>`__
+
 `ミドルウェア (Middlewares) <../middleware/>`__
 
 `設定ファイル (Settings files) <../settings/>`__

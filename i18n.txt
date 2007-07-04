@@ -2,7 +2,7 @@
 国際化
 ======
 
-:revision-up-to: 5213 (0.97pre SVN)
+:revision-up-to: 5613 (0.97pre SVN)
 
 Django はコードとテンプレートの双方で国際化をフルサポートしています．このド
 キュメントでは国際化の仕組みについて説明します．
@@ -84,24 +84,42 @@ Python コード内での指定
 標準的な翻訳
 ~~~~~~~~~~~~
 
-翻訳対象文字列を関数 ``_()`` で指定します．(関数名は「アンダースコア」です．
-念のため) この関数は Python モジュールのどこでも利用できます．
+翻訳対象文字列を関数 ``ugettext()`` で指定します．タイプ数を減らすため，
+``ugettext()`` を ``_`` という別名で import するのが慣習的なやり方です．
 
-import する必要はありません．
+.. note::
+    Python の標準ライブラリ ``gettext`` は，グローバルの名前空間に ``_()``
+    という名前で ``gettext()`` をインストールします． Django ではこの方法に
+    従っていませんが，それは以下の理由からです:
+
+      1. 国際化文字セット (Unicode) のサポート下では， ``gettext()`` よりも
+         ``ugettext()`` の方が便利だからです．また，ファイルによっては
+	  ``ugettext_lazy()`` をデフォルトの翻訳用メソッドに使った方がよい
+         場合もあります．グローバル名前空間に ``_()`` がなければ，開発者に
+	 場合に応じて適切な翻訳用メソッドを選ぶ自由を与えられます．
+
+      2. アンダースコア文字は， Python の対話シェルや doctest で書かれたテ
+         スト中では「直前の式の値」を表します．そのため，グローバル名前空間
+         に ``_()`` をインストールすると，干渉して問題を引き起こします．
+	 ``ugettext()`` を ``_()`` という名前で明示的に  import すれば，こ
+         の問題を回避できます．
+
 
 下の例では， ``"Welcome to my site."`` というテキストを翻訳文字列としてマー
 クします::
+
+    from django.utils.translation import ugettext as _
 
     def my_view(request):
         output = _("Welcome to my site.")
         return HttpResponse(output)
 
-``django.utils.translation.gettext()`` は ``_()`` と同じです．従って，下の
-例は上の例と全く同じになります::
+もちろん， ``ugettext()`` に別名を付けなくても使えます．従って，下の例は上
+の例と全く同じになります::
 
-    from django.utils.translation import gettext
+    from django.utils.translation import ugettext
     def my_view(request):
-        output = gettext("Welcome to my site.")
+        output = ugettext("Welcome to my site.")
         return HttpResponse(output)
 
 翻訳は計算済みの値に対して行われます．従って，下の例も上の 2 例と同じになり
@@ -123,7 +141,7 @@ import する必要はありません．
 出ユーティリティ ``make-messages.py`` はこれらの文字列を検出できないことに
 注意しておきましょう．詳しくは後に ``make-messages`` で説明します．)
 
-``_()`` や ``gettext()`` に渡す文字列には， Pyton の標準の名前付き補完構文
+``_()`` や ``ugettext()`` に渡す文字列には， Pyton の標準の名前付き補完構文
 によるプレースホルダを使えます．例えば::
 
     def my_view(request, n):
@@ -135,9 +153,11 @@ import する必要はありません．
 スペイン語では ``"Me llamo Adrian."`` であるように，プレースホルダの位置を
 翻訳文の前後で移動できます．
 
-この理由から，固定引数を使った補完 (``%s`` や ``%d``) ではなく，名前付きの
-補完 (``%(name)s``) を使うべきです．固定引数による補完を使った場合，プレー
-スホルダの順番によってうまく翻訳できない場合があります．
+この理由から，引数が複数ある場合には，固定引数を使った補完 (``%s`` や
+``%d``) ではなく，名前付きの補完 (``%(name)s``) を使ってください．固定引数
+による補完を使った場合，プレースホルダの順番によってうまく翻訳できない場合
+があります．
+
 
 .. _Marking strings as no-op:
 
@@ -145,7 +165,7 @@ import する必要はありません．
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 すぐには翻訳しない文字列のマークには 
-``django.utils.translation.gettext_noop()`` を使って下さい．マークした文字
+``django.utils.translation.ugettext_noop()`` を使って下さい．マークした文字
 列は後で変数として使われるときに翻訳されます．
 
 この関数は，ソース言語の中に定数として文字列を置いておきたい場合に使います．
@@ -159,25 +179,25 @@ import する必要はありません．
 ~~~~~~~~~~~~~~~~
 
 文字列の翻訳を遅延 (lazy) させるには，
-``django.utils.translation.gettext_lazy()`` を使います．翻訳を遅延させると，
-``gettext_lazy()`` を呼び出すまで翻訳文字列の値にアクセスしません．
+``django.utils.translation.ugettext_lazy()`` を使います．翻訳を遅延させると，
+``ugettext_lazy()`` を呼び出すまで翻訳文字列の値にアクセスしません．
 
 例えば，モデルの ``help_text`` を翻訳する場合に以下のようにします::
 
-    from django.utils.translation import gettext_lazy
+    from django.utils.translation import ugettext_lazy
 
     class MyThing(models.Model):
-        name = models.CharField(help_text=gettext_lazy('This is the help text'))
+        name = models.CharField(help_text=ugettext_lazy('This is the help text'))
 
-この例では，  ``gettext_lazy()`` は実際の翻訳文字列ではなく，文字列への遅延
+この例では，  ``ugettext_lazy()`` は実際の翻訳文字列ではなく，文字列への遅延
 参照 (lazy reference) を保存します．翻訳自体は文字列をコンテキストで使った
 時，例えば admin サイトでテンプレートをレンダリングしたときに初めて実行され
 ます．
 
-``gettext_lazy`` という名前が冗長で嫌なら，以下のようにして ``_`` (アンダー
+``ugettext_lazy`` という名前が冗長で嫌なら，以下のようにして ``_`` (アンダー
 スコア) にエイリアスできます::
 
-    from django.utils.translation import gettext_lazy as _
+    from django.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
         name = models.CharField(help_text=_('This is the help text'))
@@ -187,7 +207,7 @@ import する必要はありません．
 ``Meta`` クラスで明示的に ``verbose_name`` や ``verbose_name_plural`` オプ
 ションを指定するという作業になります::
 
-    from django.utils.translation import gettext_lazy as _
+    from django.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
         name = models.CharField(_('name'), help_text=_('This is the help text'))
@@ -203,17 +223,17 @@ import する必要はありません．
 複数形化
 ~~~~~~~~~~~~~
 
-複数形のメッセージを指定するには ``django.utils.translation.ngettext()`` を
+複数形のメッセージを指定するには ``django.utils.translation.ungettext()`` を
 使います．例えば::
 
-    from django.utils.translation import ngettext
+    from django.utils.translation import ungettext
     def hello_world(request, count):
-        page = ngettext('there is %(count)d object', 'there are %(count)d objects', count) % {
+        page = ungettext('there is %(count)d object', 'there are %(count)d objects', count) % {
             'count': count,
         }
         return HttpResponse(page)
 
-``ngettext`` は，単数形の翻訳文字列，複数形の翻訳文字列，そしてオブジェクト
+``ungettext`` は，単数形の翻訳文字列，複数形の翻訳文字列，そしてオブジェクト
 の数 (翻訳言語に ``count`` という変数で渡されます) という 3 つの引数をとり
 ます．
 
@@ -222,7 +242,7 @@ import する必要はありません．
 テンプレート内での翻訳
 ----------------------
 
-`Django テンプレート`_ の中での翻訳は，二つのテンプレートタグを使って
+`Django テンプレート`_ 中の翻訳は，二つのテンプレートタグを使って
 Python コードとは少し違った方法で行います．テンプレートで翻訳用のタグを使え
 るようにするには，テンプレートの上の方に ``{% load i18n %}`` を入れておきま
 す．
@@ -269,8 +289,8 @@ Python コードとは少し違った方法で行います．テンプレート�
     There are {{ counter }} {{ name }} objects.
     {% endblocktrans %}
 
-内部的には，ブロックおよびインラインの翻訳は全て適切な ``gettext`` /
-``ngettext`` 呼び出しを行います．
+内部的には，ブロックおよびインラインの翻訳は全て適切な ``ugettext`` /
+``ungettext`` 呼び出しを行います．
 
 ``RequestContext`` は二つの翻訳処理固有の変数にアクセスできます:
 
@@ -302,6 +322,80 @@ Python コードとは少し違った方法で行います．テンプレート�
 
 .. _`Django テンプレート`: ../templates_python/
 .. _Django templates: ../templates_python/
+
+
+.. _Working with lazy translation objects:
+
+遅延翻訳オブジェクトを操作する
+==============================
+
+モデルやユーティリティ関数では， ``ugettext_lazy()`` や
+``ungettext_lazy()`` を使って文字列をマークすることがよくあります．こうして
+マークした文字列をコードの他の部分で扱うときには，マークしてできた遅延翻訳
+オブジェクトをうっかり文字列に変換してしまわないよう気を付けてください．遅
+延翻訳オブジェクトの変換は (ロケールの影響下に入るように) できるだけ遅くせ
+ねばならないからです．遅延翻訳オブジェクトの変換を遅らせるために，以下の二
+つのヘルパ関数があります．
+
+.. _`Joining strings: string_concat()`:
+
+文字列の結合: string_concat()
+-----------------------------
+
+標準の Python 文字列型の join メソッド (``''.join([...])``) は，遅延翻訳オ
+...ブジェクトの入ったリストをうまく扱えません．その代わり， 
+``django.utils.translation.string_concat()`` を使ってください．このメソッド
+は，全ての内容を結合し， *かつ* 文字列中に値が取り込まれるまで実際に変換を
+行わないような遅延オブジェクトを生成して返します．例えば::
+
+    from django.utils.translation import string_concat
+    ...
+    name = ugettext_lazy(u'John Lennon')
+    instrument = ugettext_lazy(u'guitar')
+    result = string_concat([name, ': ', instrument])
+
+上のケースでは， ``result`` 中の遅延翻訳オブジェクトは， ``result`` 自体を
+文字列中で使った場合 (テンプレートのレンダリング時など) にしか文字列に変換
+されません．
+
+.. _The allow_lazy() decorator:
+
+allow_lazy() デコレータ
+-----------------------
+
+Django はたくさんのユーティリティ関数を (とりわけ ``django.utils`` パッケー
+ジで) 提供しています．これらの関数の多くは文字列を第一引数にとり，文字列に
+対して何らかの処理を行います．関数はテンプレートフィルタ内で使われたり，他
+のコードで直接呼び出されたりしています．
+
+同様の関数を自分で作成し，翻訳文字列を扱おうとした場合，第一引数が遅延翻訳
+オブジェクトの場合に問題に直面することでしょう．この関数はビューの外側 (つ
+まり，現在のスレッドのロケール設定が的確でないかもしれない場所) で使われる
+かもしれないので，関数内で遅延翻訳オブジェクトを文字列に変換したくないはず
+だからです．
+
+こうした場合のために， ``django.utils.functional.allow_lazy()`` デコレータ
+を使ってください．このデコレータで関数をラップすると，関数の第一引数に遅延
+翻訳オブジェクトを渡した場合，関数の評価を文字列に変換する瞬間まで遅延させ
+られます．
+
+例を示しましょう::
+
+    from django.utils.functional import allow_lazy
+
+    def fancy_utility_function(s, ...):
+        # Do some conversion on string 's'
+        ...
+    fancy_utility_function = allow_lazy(fancy_utility_function, unicode)
+
+``allow_lazy()`` デコレータは関数名に加えて追加の引数 (``*args``) をとりま
+す．この引数には，デコレーション対象の関数の戻り値の型 (複数可) を指定しま
+す．通常は， ``unicode`` だけを入れておき，関数が必ず Unicode 文字列を返す
+ようにしておけばよいでしょう．
+
+このデコレータを使えば，適切な文字列を入力として受け取る関数を書いておき，
+後で遅延翻訳オブジェクトのサポートを追加できます．
+
 
 .. _How to create language files:
 
@@ -524,25 +618,25 @@ Django をネイティブの言語で動かしたいだけで，かつ自分の�
 
     * 上の項で説明したように，カスタムの ``LANGUAGES`` 設定を行った場合，そ
       の言語を翻訳対象文字列に含めても構いません．ただし，
-      ``django.utils.translation`` の ``gettext()`` ではなく，「ダミーの」
-      ``gettext()`` でマークしてください．循環 import を防ぐため， *決して*
+      ``django.utils.translation`` の ``ugettext()`` ではなく，「ダミーの」
+      ``ugettext()`` でマークしてください．循環 import を防ぐため， *決して*
       設定ファイル中で ``django.utils.translation`` を import しないでくだ
       さい．
 
-      カスタム ``LANGUAGES`` のマークアップは「ダミーの」 ``gettext()`` 関
+      カスタム ``LANGUAGES`` のマークアップは「ダミーの」 ``ugettext()`` 関
       数で解決します．以下に設定ファイルでの記述例を示します::
 
-          gettext = lambda s: s
+          ugettext = lambda s: s
 
           LANGUAGES = (
-              ('de', gettext('German')),
-              ('en', gettext('English')),
+              ('de', ugettext('German')),
+              ('en', ugettext('English')),
           )
 
       このように設定しておいても， ``make-messages.py`` は翻訳文字列を検出
       して翻訳対象としてマークします．ただし，実行時の翻訳はおこなわれませ
       ん．したがって，実行時には ``LANGUAGES`` を使うコードを *本当の*
-      ``gettext()`` でラップしておかねばなりません．
+      ``ugettext()`` でラップしておかねばなりません．
 
     * ``LocaleMiddleware`` で選択できるのは， Django が基本的な部分の翻訳を
       提供している言語だけです． Django のソースツリーの翻訳セットに入って
@@ -771,22 +865,22 @@ JavaScript 翻訳カタログを使う
 
     document.write(gettext('this is to be translated'));
 
-文字列補完を行える ``ngettext`` インタフェースもあります::
+文字列補完を行える ``ungettext`` インタフェースもあります::
 
     d = {
         count: 10
     };
-    s = interpolate(ngettext('this is %(count)s object', 'this are %(count)s objects', d.count), d);
+    s = interpolate(ungettext('this is %(count)s object', 'this are %(count)s objects', d.count), d);
 
 ``interpolate`` 関数は，固定引数による補完と名前付き補完の両方をサポートし
 ています．従って，上のコードは以下のようにも書けます::
 
-    s = interpolate(ngettext('this is %s object', 'this are %s objects', 11), [11]);
+    s = interpolate(ungettext('this is %s object', 'this are %s objects', 11), [11]);
 
 補完の構文は Python から借りたものです．とはいえ，この文字列補完を派手に使
 わない方がよいでしょう: 補完機能は JavaScript で動いており，中では何度も正
 規表現置換を行っています．この処理は Python の文字列補完ほど高速ではないの
-で，本当に必要な場合 (例えば ``ngettext`` を使って適切な複数形表現を実現し
+で，本当に必要な場合 (例えば ``ungettext`` を使って適切な複数形表現を実現し
 たい場合) だけにしてください．
 
 .. _Creating JavaScript translation catalogs:
@@ -819,10 +913,6 @@ Django 翻訳の特徴
       Python とテンプレート翻訳文字列に使われ，グローバルな翻訳カタログ上に
       読み込まれます． ``djangojs`` は JavaScript だけで使うために，可能な
       かぎり小さくして分けてあります．
-    * Django では ``gettext`` と ``gettext_noop`` しか使っていません．これ
-      は， Django が常に ``DEFAULT_CHARSET`` を内部的に使っているためです．
-      ユーザは常に utf-8 を出力せねばならないので， ``ugettext`` はあまり役
-      に立たないのです．
     * Django は ``xgettext`` を単体では使いません． Django では，
       ``xgettext`` や ``msgfmt`` を Python ラッパ越しに使います．これは便宜
       上の理由によります．

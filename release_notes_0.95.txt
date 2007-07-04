@@ -2,7 +2,7 @@
 Django バージョン 0.95 リリースノート
 =====================================
 
-:revision-up-to: 5150 (0.97pre SVN)
+:revision-up-to: 5613 (0.97pre SVN)
 
 Django 0.95 リリースへようこそ．
 

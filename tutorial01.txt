@@ -4,7 +4,7 @@
 
 .. contents::
 
-:revision-up-to: 5583 (0.97pre SVN)
+:revision-up-to: 5613 (0.97pre SVN)
 
 さあ，例を交えながら学んでゆきましょう．
 
@@ -523,24 +523,39 @@ API で遊んでみる
 
 おっと，ちょっと待って下さい． ``<Poll: Poll object>`` なんて全然親切な表現
 ではありませんね．そこで (``polls/models.py`` ファイルに定義されている)
-polls 関係のモデルを少し修正して， ``Poll`` と ``Choice`` に ``__str__()``
-メソッドを追加しましょう::
+polls 関係のモデルを少し修正して， ``Poll`` と ``Choice`` に
+``__unicode__()`` メソッドを追加しましょう::
 
     class Poll(models.Model):
         # ...
-        def __str__(self):
+        def __unicode__(self):
             return self.question
 
     class Choice(models.Model):
         # ...
-        def __str__(self):
+        def __unicode__(self):
             return self.choice
 
-``__str__()`` をモデルに追加しておくのは，対話プロンプトで扱うときに精神的
-によいだけでなく，オブジェクトの表現 (representation) は Django 自動 admin
-のいたるところで使われているという点でも重要です．
+``__unicode__()`` をモデルに追加しておくのは，対話プロンプトで扱うときに精
+神的によいだけでなく，オブジェクトの表現 (representation) は Django 自動
+admin のいたるところで使われているという点でも重要です．
 
-``__str__()`` は通常の Python メソッドということに注意してください．デモ用
+.. admonition:: なぜ ``__str__()`` ではなく ``__unicode__()`` を使うの？
+
+    Python に詳しければ，普段は ``__str__()`` ではなく ``__unicode__()`` を
+    実装していることでしょう． ``__unicode__()`` を使うのは， Django のモデ
+    ルがデフォルトで Unicode を扱うようになっているからです． Django では，
+    データベース上に保存された文字列の情報は，取り出すときに全て Unicode 型
+    に変換されます．
+
+    Django のモデルは，デフォルトで ``__str__()`` メソッドを実装していて，
+    中で ``__unicode__()`` を呼び出して，得た結果を UTF-8 のバイト文字列に
+    変換しています．従って， ``unicode(p)`` は Unicode 文字列を返し，
+    ``str(p)`` は UTF-8 でエンコードされた通常の文字列を返します．
+    この仕様がよくわからなければ，とにかく ``__unicode__()`` をモデルに追加
+    するのだと覚えておいてください．なにはともあれ，それでうまく動作します．
+
+``__unicode__()`` は通常の Python メソッドということに注意してください．デモ用
 にカスタムのメソッドを追加してみましょう::
 
     import datetime
@@ -557,7 +572,7 @@ polls 関係のモデルを少し修正して， ``Poll`` と ``Choice`` に ``_
 
     >>> from mysite.polls.models import Poll, Choice
 
-    # __str__() がきちんと働いていることを確認します．
+    # __unicode__() がきちんと働いていることを確認します．
     >>> Poll.objects.all()
     [<Poll: What's up?>]
 

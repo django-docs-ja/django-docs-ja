@@ -2,7 +2,7 @@
 フォームとフィールド，マニピュレータ
 ====================================
 
-:revision-up-to: 5302 (0.97pre SVN)
+:revision-up-to: 5613 (0.97pre SVN)
 
 .. _Forwards-compatibility note:
 
@@ -58,7 +58,7 @@ Django の admin インタフェースをいじってみたことがあるなら
         class Admin:
             pass
 
-        def __str__(self):
+	def __unicode__(self):
             return self.name
 
 ``Place`` の admin インタフェースを作るには，上のようなクラスを定義するだけ

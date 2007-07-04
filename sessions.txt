@@ -2,7 +2,7 @@
 セッションの使い方
 ===================
 
-:revision-up-to: 5150 (0.97pre SVN)
+:revision-up-to: 5613 (0.97pre SVN)
 
 Django では匿名セッション (anonymous session) を完全にサポートしています．
 セッションフレームワークを使うと，任意のデータをサイト訪問者単位

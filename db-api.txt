@@ -2,7 +2,7 @@
 データベース API リファレンス
 =============================
 
-:revision-up-to: 5583 (0.97pre SVN)
+:revision-up-to: 5613 (0.97pre SVN)
 
 `データモデル`_ を作成したら，次はデータベースからデータを取り出す必要があ
 ります．このドキュメントでは，モデルから利用できるデータベース抽象化 API と，
@@ -18,14 +18,14 @@
         name = models.CharField(maxlength=100)
         tagline = models.TextField()
 
-        def __str__(self):
+        def __unicode__(self):
             return self.name
 
     class Author(models.Model):
         name = models.CharField(maxlength=50)
         email = models.URLField()
 
-        def __str__(self):
+        def __unicode__(self):
             return self.name
 
     class Entry(models.Model):
@@ -35,7 +35,7 @@
         pub_date = models.DateTimeField()
         authors = models.ManyToManyField(Author)
 
-        def __str__(self):
+        def __unicode__(self):
             return self.headline
 
 

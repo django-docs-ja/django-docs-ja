@@ -2,7 +2,7 @@
 モデル API リファレンス
 =======================
 
-:revision-up-to: 5583 (0.97pre SVN)
+:revision-up-to: 5613 (0.97pre SVN)
 
 モデルとは，サイトを構成するデータの，ただ一つかつ最終的なデータソースを指
 します．モデルには，保存したいデータに不可欠なデータフィールドと，その振舞
@@ -1470,11 +1470,11 @@ admin の変更リストページに表示するフィールドを制御する�
               born_in_fifties.boolean = True
 
 
-    * ``__str__()`` メソッドは他のモデルメソッドと同じように
-      ``list_display`` に入れられるので，以下のように書いても全く問題ありま
-      せん::
+    * ``__str__()`` および ``__unicode__()`` メソッドは他のモデルメソッドと
+      同じように ``list_display`` に入れられるので，以下のように書いても全
+      く問題ありません::
 
-          list_display = ('__str__', 'some_other_field')
+          list_display = ('__unicode__', 'some_other_field')
 
     * ``list_display`` の要素のうち，モデルのフィールドでないものには，変更
       リストページで並び順を変えるときのカラムには使えません．これは Django
@@ -1915,11 +1915,13 @@ SQL に等価な検索を実行します::
 
 ``__str__()`` は，オブジェクトに対して ``str()`` を呼び出した際に返す内容を
 定義するための Python の特殊メソッドです． Django はそこかしこで
-``str(obj)`` を使っています．ほとんどは， Django の admin サイトでオブジェ
-クトをレンダリングして表示したときの値として，またオブジェクトを表示すると
-きにテンプレートに挿入される値として使われています．従って，オブジェクトの
-``__str__`` は，人間可読なわかりやすい文字列を返さねばなりません．必須では
-ありませんが，強く推奨します．
+``str(obj)`` (または ``unicode(obj)`` -- 下記参照) を使っています．ほとんど
+は， Django の admin サイトでオブジェクトをレンダリングして表示したときの値
+として，またオブジェクトを表示するときにテンプレートに挿入される値として使
+われています．従って，オブジェクトの``__str__`` は，人間可読なわかりやすい
+文字列を返さねばなりません．必須ではありませんが，強く推奨します (ただし，
+そこかしこに ``__str__`` メソッドを突っ込んでしまう前に ``__unicode__`` の
+説明を良く読んでくださいね)．
 
 例えば::
 
@@ -1928,8 +1930,30 @@ SQL に等価な検索を実行します::
         last_name = models.CharField(maxlength=50)
 
         def __str__(self):
-            return '%s %s' % (self.first_name, self.last_name)
+            # first_name および last_name は Unicode 文字列なので，
+            # django.utils.encoding.smart_str() を使っています．
+            return smart_str('%s %s' % (self.first_name, self.last_name))
 
+``__unicode__``
+---------------
+
+``__unicode__()`` メソッドは，オブジェクトに対して ``unicode()`` を呼び出し
+た際に呼び出されます．Django のデータベースバックエンドはモデルの属性値とし
+て Unicode 文字列を返すので，通常はモデルの ``__unicode__()`` メソッドを定
+義するとよいでしょう．前節の例を ``__unicode__()`` を使って書き直すと，以下のように簡単になります::
+
+    class Person(models.Model):
+        first_name = models.CharField(maxlength=50)
+        last_name = models.CharField(maxlength=50)
+
+        def __unicode__(self):
+            return u'%s %s' % (self.first_name, self.last_name)
+
+モデルに ``__unicode__()`` メソッドだけを定義して， ``__str__()`` は定義し
+ないでおくと， Django が自動的に ``__str__()`` メソッドをモデルに追加します．
+この ``__str__()`` メソッドは， ``__unicode()__`` を呼び出して，その戻り値
+を UTF-8 でエンコードした文字列を返します．開発上はこの仕様に従い，
+``__unicode__()`` だけを定義して，文字列オブジェクトへの変換は Django 任せにするよう勧めます．
 
 ``get_absolute_url``
 ------------------------------------
@@ -1965,6 +1989,8 @@ Django はこのメソッドを admin インタフェースで使います．オ
     必要に応じて URL エンコードせねばなりません． ``get_absolute_url()`` を
     使うコードやテンプレートが， ``get_absolute_url()`` の返す文字列を，追
     加の処理を施さなくても直接利用できるようにせねばならないのです．
+    URI に Unicode 文字列を沢山使っているのなら，
+    ``django.utils.encoding.iri_to_uri`` も使うことになるでしょう．
 
 .. _RFC 2396: http://www.ietf.org/rfc/rfc2396.txt
 

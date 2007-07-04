@@ -2,7 +2,7 @@
 Django プロジェクトに協力するために
 ===================================
 
-:revision-up-to: 5583 (0.97pre SVN)
+:revision-up-to: 5613 (0.97pre SVN)
 
 Django を *使う* のを楽しいと思ってもらえたなら， *使い続ける* 前にすこし待っ
 てください．私達は多大な情熱をかけて，ユーザがコミュニティのメンバに貢献で
@@ -407,6 +407,7 @@ admin サイトやバリデータのエラーメッセージなど，Django は�
         * 全てのデータベースフィールド
         * ``class Meta``
         * ``class Admin``
+        * ``def __unicode__()``
         * ``def __str__()``
         * ``def save()``
         * ``def get_absolute_url()``

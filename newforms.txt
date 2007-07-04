@@ -2,7 +2,7 @@
 newforms ライブラリ
 ===================
 
-:revision-up-to: 5512 (0.97pre SVN)
+:revision-up-to: 5613 (0.97pre SVN)
 
 ``django.newforms`` は， Django に新たに導入された画期的なフォーム処理ライ
 ブラリで，従来のフォーム／マニピュレータ／バリデータフレームワークである
@@ -1619,7 +1619,7 @@ Django の古いフォーム／検証フレームワークを使ったことが�
         title = models.CharField(maxlength=3, choices=TITLE_CHOICES)
         birth_date = models.DateField(blank=True, null=True)
 
-        def __str__(self):
+        def __unicode__(self):
             return self.name
 
     class Book(models.Model):
