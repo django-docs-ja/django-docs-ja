@@ -1,0 +1,200 @@
+=====================
+Django のインストール
+=====================
+
+:revision-up-to: 5546 (0.97pre SVN)
+
+このドキュメントを読めば Django を動かせるようになります．
+
+.. _Install Python:
+
+Python のインストール
+=====================
+
+Django は Python の Web フレームワークなので Python が必要です．
+
+Django はバージョン 2.3 以上の Python で動作します．
+
+http://www.python.org から Python を取ってきましょう． Linux や Mac OSX を
+動かしているのなら，おそらくインストール済みのはずです．
+
+.. _Install Apache and mod_python:
+
+Apache と mod_python のインストール
+===================================
+
+単に Django を試してみたいだけなら，この節は読み飛ばして次の節を読んでくだ
+さい．Djangoにはテスト用の軽量なWebサーバが付属しているので，運用環境での動作が必要になるまでApacheをセットアップする必要はないのです．
+
+Django を実運用のサイトで使いたい場合， Apache と `mod_python`_ を使って下
+さい． mod_python は mod_perl のようなもので， Python を Apache の中に埋め
+込み，サーバの起動時に Python コードをメモリにロードします．コードは Apache
+プロセスが生きている間ずっとメモリ上に存在するので，他のサーバ構成よりも明
+らかに高いパフォーマンスを実現します． Django の動作には Apache 2.x および
+mod_python 3.x が必要です．
+
+mod_python をインストールしたら，設定に関する情報は 
+`mod_python で Django を動かす`_ を参照してください．
+
+何らかの理由で mod_python を使えない場合でも心配はいりません: Django は
+WSGI_ 仕様に従っているので，様々なサーバプラットフォームで動作させられます．
+個々のプラットフォームにおけるインストール方法の説明は 
+`サーバ構成に関する wiki ページ`_ を参照してください．
+
+.. _Apache: http://httpd.apache.org/
+.. _mod_python: http://www.modpython.org/
+.. _WSGI: http://www.python.org/peps/pep-0333.html
+.. _`mod_python で Django を動かす`: ../modpython/
+.. _`サーバ構成に関する wiki ページ`: http://code.djangoproject.com/wiki/ServerArrangements
+.. _How to use Django with mod_python: ../modpython/
+.. _server-arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
+
+.. _Get your database running:
+
+データベースを動かす
+====================
+
+Django のデータベース API 機能を使うのなら，データベースサーバを動かす必要
+があります． Django は PostgreSQL_, MySQL_, Oracle_ および SQLite_ で動作し
+ます．
+
+さらに，各データベースの Python バインディングをインストールしておく必要が
+あります．
+
+* PostgreSQL を使う場合， psycopg_ パッケージが必要です． Django はバージョ
+  ン 1 および 2 の psycopg をサポートしています (Django のデータベース設定
+  で， ``postgresql`` [バージョン 1 の場合] か， ``postgresql_psycopg2``
+  [バージョン 2 の場合] を選んでください．Windows 環境なら， 
+  非公式の `Windows むけコンパイル済みパッケージ`_ を使って下さい．
+
+* MySQL を使う場合は，バージョン 1.2.1p2 以降の MySQLdb_ が必要です．
+  `MySQL バックエンド <../databases/>`_ にまつわるデータベース固有の説明も
+  読んでおいたほうがよいでしょう．
+
+* SQLite を使う場合は pysqlite_ が必要です．バージョン 2.0.3 以上を使って下
+  さい．
+
+* Oracle を使っているなら， cx_Oracle_ が必要です．バージョン 4.3.1 以上を
+  使ってください．
+
+.. _PostgreSQL: http://www.postgresql.org/
+.. _MySQL: http://www.mysql.com/
+.. _Django's ticket system: http://code.djangoproject.com/report/1
+.. _psycopg: http://initd.org/projects/psycopg
+.. _`Windows むけコンパイル済みパッケージ`: http://stickpeople.com/projects/python/win-psycopg/
+.. _compiled Windows version: http://stickpeople.com/projects/python/win-psycopg/
+.. _MySQLdb: http://sourceforge.net/projects/mysql-python
+.. _SQLite: http://www.sqlite.org/
+.. _pysqlite: http://initd.org/tracker/pysqlite
+.. _cx_Oracle: http://www.python.net/crew/atuining/cx_Oracle/
+.. _Oracle: http://www.oracle.com/
+
+.. _Remove any old versions of Django:
+
+旧バージョンの Django の除去
+============================
+
+以前のバージョンからアップグレードする形で Django をインストールする場合，
+新しいバージョンをインストールする前に，まず旧バージョンをアンインストール
+しておく必要があります．
+
+``setup.py install`` を使って Django をインストールした場合は簡単で，
+Python の ``site-packages`` ディレクトリから ``django`` ディレクトリを削除
+するだけです．
+
+Python egg を使って Django をインストールした場合，Django の ``.egg`` ファ
+イルを削除するとともに， ``easy-install.pth`` から Django の ``.egg`` ファ
+イルパスが書かれたエントリを削除します． ``easy-install.pth`` や ``.egg``
+は，通常  ``site-packages`` ディレクトリ下にあります．
+
+.. admonition:: ``site-packages`` はどこにあるの？
+
+    ``site-packages`` の在処はオペレーティングシステムや Python のインストー
+    ル場所によって異なります． ``site-pacakges`` の場所を調べるには，以下の
+    コマンドを実行してみてください::
+    
+      python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()"
+ 
+    (このコマンドはPythonの対話プロンプトではなく，シェルプロンプトで実行し
+    てください．)
+
+
+.. _Install the Django code:
+
+Django コードのインストール
+===========================
+
+公式リリース版を入れる場合と，最新の開発バージョンを入れる場合では，
+インストール方法の説明が少し違います．
+
+どちらの方法も難しくはありません．
+
+.. _Installing the official version:
+
+公式リリースのインストール
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    1. `ディストリビューション固有の注意 <../distributions/>`_ を調べて，自
+       分のプラットフォーム/ディストリビューションで公式の Django パッケー
+       ジやインストーラが提供されていないか調べます．ディストリビューション
+       固有の配布パッケージは，たいてい依存関係のあるパッケージを自動的にイ
+       ンストールしてくれたり，パスの更新を行ってくれたりします．
+
+    2. `ダウンロードページ`_ から，最新版の Django をダウンロードします．
+
+    3. ダウンロードしたファイルを展開します 
+       (例: ``tar xzvf Django-NNN.tar.gz`` 
+
+    4. 展開先のディレクトリに移ります (例: ``cd Django-NNN``)
+
+    5. ``sudo python setup.py install`` を実行します．
+
+
+上のコマンドを実行すると， Django は Python インストールディレクトリの
+``site-packages`` ディレクトリ下にインストールされます．
+
+.. _distribution specific notes: ../distributions/
+
+.. _Installing the development version:
+
+開発バージョンのインストール
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django のコードを更新して最新のバグフィクスや改良を適用したいのなら，以下の
+説明に従って開発バージョンをインストールしてください．
+
+1. Subversion_ がインストールされていることを確認してください．
+2. Django のコードを Python の ``site-packages`` ディレクトリにチェックアウ
+   トします． 
+
+   Linux / Mac OSX / Unix では，以下のコマンドを実行します::
+
+      svn co http://code.djangoproject.com/svn/django/trunk/ django_src
+      ln -s `pwd`/django_src/django SITE-PACKAGES-DIR/django
+
+   (上の作業では，使っているプラットフォームの ``site-packages``  ディレク
+   トリに合わせて SITE-PACKAGES-DIR を書き換えてください． 
+   ``site-packages`` の場所の探し方は，「 ``site-packages`` はどこにあるの？」
+   を参照してください)
+
+   Windows では以下のようにします::
+   
+      svn co http://code.djangoproject.com/svn/django/trunk/django c:\Python24\lib\site-packages\django
+
+3. ``django_src/django/bin/django-admin.py`` ファイルを，システムパス上に
+   コピーします．例えば， Unix では ``/usr/local/bin`` ， Windows では 
+   ``C:\Python24\Scripts`` です．この作業は， ``django-admin.py`` を任意の
+   ディレクトリで実行するときに，毎回フルパスを入れなくてもよくするためのも
+   のです．
+
+``python setup.py install`` を *実行する必要はありません* ．
+``python setup.py install`` は，ステップ 2 および 3 を実行するためのコマン
+ドだからです．
+
+Django のソースコードを更新する際には， ``django`` ディレクトリで
+``svn update`` を実行してください．実行すると， Subversion が更新部分を自動
+的にダウンロードします．
+
+.. _`ダウンロードページ`: http://www.djangoproject.com/download/
+.. _`download page`: http://www.djangoproject.com/download/
+.. _Subversion: http://subversion.tigris.org/

@@ -1,0 +1,257 @@
+=============================
+"django.contrib" 下のアドオン
+=============================
+
+:revision-up-to: 5442 (0.97pre SVN)
+
+Django は Python の `"batteries included" 哲学`_ を目指しています． Django
+には Web 開発における課題を解くための様々な外部オプションツールがついてきま
+す．
+
+これらのコードは Django 配布物中の ``django/contrib`` にあります．このドキュ
+メントでは， ``contrib`` 下のパッケージをざっと解説し，パッケージを利用する
+ときに必要な依存関係について説明します．
+
+.. admonition:: Note
+
+    これらのアドオンの大半，特にモデルやテンプレートタグの定義が入っている
+    アドオンを使うには，パッケージ名 (例えば ``'django.contrib.admin'``) を
+    ``INSTALLED_APPS`` 設定に追加して， ``manage.py syncdb`` を再度実行する
+    必要があります．
+
+.. _`"batteries included" 哲学`: http://python.jp/doc/release/tut/node12.html#batteries-included                                                
+
+admin
+=====
+
+Django の自動化管理インタフェースです．詳しくは `チュートリアルその 2`_ を
+参照してください．
+
+.. _`チュートリアルその 2`: ../tutorial02/
+.. _Tutorial 2: ../tutorial02/
+
+auth_ および contenttypes_ パッケージをインストールしておく必要があります．
+
+auth
+====
+
+Django の認証フレームワークです．詳しくは `認証のドキュメント`_ を参照して
+下さい．
+
+.. _`認証のドキュメント`: ../authentication/
+
+comments
+========
+
+単純かつ柔軟なコメントシステムです．まだドキュメントはありません．
+
+contenttypes
+============
+
+コンテンツの「タイプ」をフックするための軽量フレームワークです．インストー
+ルした Django モデルはそれぞれ固有のコンテンツタイプになります．まだドキュ
+メントはありません．
+
+csrf
+====
+
+クロスサイトリクエストフォージェリ (Cross Site Request Forgeries) を阻止す
+るためのミドルウェアです．
+
+`csrf のドキュメント`_ を参照してください．
+
+.. _`csrf のドキュメント`: ../csrf/
+.. _csrf documentation: ../csrf/
+
+formtools
+=========
+
+Django の新しいフォーム (django.newforms) に対する高水準の抽象化インタフェー
+スです．
+
+django.contrib.formtools.preview
+--------------------------------
+
+「 HTML フォームを表示し，必ずプレビューを行ってからフォームデータを提出す
+る」というワークフローを抽象化したものです．
+
+この機能に関するドキュメントはまだありませんが，
+``django/contrib/formtools/preview.py`` のコードや docstring を手引きすると
+よいでしょう．
+
+humanize
+========
+
+データに「人間くささ (human touch)」を与えるための Django テンプレートフィ
+ルタです。これらのフィルタを有効にするには、 ``INSTALLED_APPS`` 設定に
+``'django.contrib.humanize'`` を加えます。インストール後、テンプレート上で
+``{% load humanize %}`` を呼び出せば、以下のフィルタを利用できるようになり
+ます:
+
+apnumber
+--------
+
+1-9 の数字に対して、数をアルファベットで表します。それ以外の数はそのまま数
+字で返します。これは Associated Press の書式に従っています。
+
+例:
+
+    * ``1`` は ``'one'`` になります
+    * ``2`` は ``'two'`` になります。
+    * ``10`` は ``10`` になります。
+
+渡す値は整数でも、整数を文字列で表したものでもかまいません。
+
+intcomma
+--------
+
+整数を三桁ごとにカンマで区切った形式の文字列に変換します。
+
+例:
+
+    * ``4500`` は ``'4,500'`` になります。
+    * ``45000`` は ``'45,000'`` になります。
+    * ``450000`` は ``'450,000'`` になります。
+    * ``4500000`` は ``'4,500,000'`` になります。
+
+渡す値は整数でも、整数を文字列で表したものでもかまいません。
+
+intword
+-------
+
+大きな整数を読みやすいテキスト表現に変換します。100 万を超えるような値を扱
+う場合に便利です。
+
+例:
+
+    * ``1000000`` は ``'1.0 million'`` になります。
+    * ``1200000`` は ``'1.2 million'``  になります。
+    * ``1200000000`` は ``'1.2 billion'``  になります。
+
+Values up to 1000000000000000 (one quadrillion) are supported.
+
+渡す値は整数でも、整数を文字列で表したものでもかまいません。
+
+ordinal
+-------
+
+整数を序数形式の文字列に変換します。
+
+例:
+
+    * ``1`` は ``'1st'`` になります。
+    * ``2`` は ``'2nd'`` になります。
+    * ``3`` は ``'3rd'`` になります。
+
+渡す値は整数でも、整数を文字列で表したものでもかまいません。
+
+
+flatpages
+=========
+
+「フラット (flat) な」 HTML コンテンツをデータベースで扱うためのフレームワー
+クです．
+
+`flatpages のドキュメント`_ を参照してください．
+
+.. _`flatpages のドキュメント`: ../flatpages/
+.. _flatpages documentation: ../flatpages/
+
+sites_ パッケージもインストールしておく必要があります．
+
+localflavor
+===========
+
+特定の国や文化でのみ有用な Django の短いコード (snippet) を集めたものです．
+例えば， ``django.contrib.localflavor.usa.forms`` には，米国の郵便番号
+(U.S. zip code) を検証するための ``USZipCodeField`` が入っています．
+
+
+markup
+======
+
+テンプレートフィルタのコレクションです．以下の 3 つのマークアップ言語に対す
+るフィルタを実装しています:
+
+    * ``textile`` -- `Textile`_ 用の実装です
+    * ``markdown``  -- `Markdown`_ 用の実装です
+    * ``restructuredtext`` -- `ReST (ReStructured Text)`_ 用の実装です
+
+どのフィルタも，各マークアップ言語で書かれたテキストの入った文字列を引数に
+とり，マークアップ処理済みのテキストの入った文字列を返します．例えば，
+``textile`` フィルタは Textile フォーマットで書かれたテキストを HTML に変換
+します．
+
+フィルタを有効にするには， ``'django.contrib.markup'`` を
+``INSTALLED_APPS`` 設定に追加します．その上で ``{% load markup %}`` をテン
+プレートに追加すれば，フィルタを使えるようになります．詳細は
+``django/contrib/markup/templatetags/markup.py`` のソースコードを参
+照してください．
+
+.. _Textile: http://en.wikipedia.org/wiki/Textile_%28markup_language%29
+.. _Markdown: http://en.wikipedia.org/wiki/Markdown
+.. _ReST (ReStructured Text): http://en.wikipedia.org/wiki/ReStructuredText
+
+redirects
+=========
+
+リダイレクトを管理するためのフレームワークです．
+
+`redirects のドキュメント`_ を参照してください．
+
+.. _`redirects のドキュメント`: ../redirects/
+.. _redirects documentation: ../redirects/
+
+
+sessions
+========
+
+セッション管理のためのフレームワークです．
+
+`セッションのドキュメント`_ を参照してください．
+
+.. _`セッションのドキュメント`: ../sessions/
+
+sites
+=====
+
+一つのデータベースと Django を使って複数のウェブサイトを操作できるようにす
+るための軽量フレームワークです．このフレームワークを使うと，オブジェクトを
+特定の (一つまたは複数の) サイトに関連づけできます．
+
+`sites のドキュメント`_ を参照してください．
+
+.. _`sites のドキュメント`: ../sites/
+.. _sites documentation: ../sites/
+
+sitemaps
+========
+
+Google サイトマップ XML ファイルを生成するためのフレームワークです．
+
+`sitemaps のドキュメント`_ を参照してください．
+
+.. _sitemaps documentation: ../sitemaps/
+.. _`sitemaps のドキュメント`: ../sitemaps/
+
+
+syndication
+===========
+
+RSS および Atom 形式の配信フィード (syndication feed) をごく簡単に生成する
+ためのフレームワークです．
+
+`配信フィードフレームワークのドキュメント`_ を参照してください．
+
+.. _`配信フィードフレームワークのドキュメント`: ../syndication_feeds/
+.. _syndication documentation: ../syndication/
+
+
+
+その他のアドオン
+=================
+
+``contrib`` に入れたらよいと思う機能について何かアイデアがあるなら，是非教
+えて下さい! コードを書いて， `django-users mailing list`_ に送って下さい．
+
+.. _django-users mailing list: http://groups.google.com/group/django-users

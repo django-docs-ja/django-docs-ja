@@ -1,0 +1,749 @@
+====================================
+フォームとフィールド，マニピュレータ
+====================================
+
+:revision-up-to: 5302 (0.97pre SVN)
+
+.. _Forwards-compatibility note:
+
+将来のバージョンでの互換性に関する注意
+======================================
+
+ここで説明しているフォーム／マニピュレータシステムは，次の Django リリース
+では別のシステムに置き換えられる予定です．スクラッチで新たなアプリケーショ
+ンを開発するつもりなら，このシステムを学ぶために時間を浪費しないよう強く勧
+めます．その代わりに，新たなフォームシステムである ``django.newforms`` の使
+い方を学んで利用しましょう． `newforms のドキュメント`_ は現在整備中です．
+
+すでに旧来のフォーム／マニピュレータを使ってコードを書いているなら，
+`newforms のドキュメント`_ の「移行計画」の節に目を通して，我々がどのように
+フォームシステムを切替えるかを理解してください．
+
+
+.. _newforms のドキュメント: ../newforms/
+.. _newforms documentation: ../newforms/
+
+.. _Introduction:
+
+はじめに
+========
+
+Django の admin インタフェースをいじってみたことがあるなら， admin インタ
+フェースで使われている素敵なフォーム検証フレームワークをユーザコードでも使
+えたらいいのに，と思ったかも知れませんね．もちろんそれは可能です．
+このドキュメントではフォーム検証フレームワークについて説明します．
+
+ここではトップダウンアプローチで Django のフォーム検証フレームワークを調べ
+てゆきましょう．というのも，ほとんどの場合，低水準の API を使おうとは考えな
+いはずだからです．このドキュメントでは，以下のようなモデル， "place" オブジェ
+クトを作成してゆきます::
+
+    from django.db import models
+
+    PLACE_TYPES = (
+        (1, 'Bar'),
+        (2, 'Restaurant'),
+        (3, 'Movie Theater'),
+        (4, 'Secret Hideout'),
+    )
+
+    class Place(models.Model):
+        name = models.CharField(maxlength=100)
+        address = models.CharField(maxlength=100, blank=True)
+        city = models.CharField(maxlength=50, blank=True)
+        state = models.USStateField()
+        zip_code = models.CharField(maxlength=5, blank=True)
+        place_type = models.IntegerField(choices=PLACE_TYPES)
+
+        class Admin:
+            pass
+
+	def __unicode__(self):
+            return self.name
+
+``Place`` の admin インタフェースを作るには，上のようなクラスを定義するだけ
+で十分です．では，一般のユーザが ``Place`` を入力したい場合にはどうすればよ
+いのでしょうか．
+
+.. _Automatic Manipulators:
+
+自動マニピュレータ
+==================
+
+**自動マニピュレータ (automatic manipulator)** フレームワークは，オブジェク
+トの生成や変更を行うための高水準のインタフェースです．自動マニピュレータは
+モデルに結びつけられたユーティリティクラスで，モデルのインスタンス生成や変
+更の方法，そしてオブジェクトのデータを検証する方法を知っています．
+自動マニピュレータには二つの形式， ``AddManipulators`` および
+``ChangeManipulators`` があります．二つは機能的にはほとんど同じですが，前者
+は新たなインスタンスを生成する方法を，後者は既存のインスタンスを変更する方
+法を知っています．二つのクラスはいずれも，新たなモデルクラスを定義すると自
+動的に生成されます::
+
+    >>> from mysite.myapp.models import Place
+    >>> Place.AddManipulator
+    <class 'django.models.manipulators.AddManipulator'>
+    >>> Place.ChangeManipulator
+    <class 'django.models.manipulators.ChangeManipulator'>
+
+.. _Using the AddManipulator:
+
+``AddManipulator`` を使う
+----------------------------
+
+まずは ``AddManipulator`` を使ってみましょう．以下に示すのは，ブラウザから
+POST されたデータを受け取って新たな ``Place`` オブジェクトを生成する，非常
+に簡単なビューです::
+
+    from django.shortcuts import render_to_response
+    from django.http import Http404, HttpResponse, HttpResponseRedirect
+    from django import forms
+    from mysite.myapp.models import Place
+
+    def naive_create_place(request):
+        """A naive approach to creating places; don't actually use this!"""
+        # Create the AddManipulator.
+        manipulator = Place.AddManipulator()
+
+        # Make a copy of the POSTed data so that do_html2python can
+        # modify it in place (request.POST is immutable).
+        new_data = request.POST.copy()
+
+        # Convert the request data (which will all be strings) into the
+        # appropriate Python types for those fields.
+        manipulator.do_html2python(new_data)
+
+        # Save the new object.
+        new_place = manipulator.save(new_data)
+
+        # It worked!
+        return HttpResponse("Place created: %s" % new_place)
+
+この ``naive_create_place`` の例は確かに動作しますが，おそらく読者はこのビュー
+にはいくつもの問題があると言うことでしょう:
+
+    * 何ら検証が行われていません．例えば， ``name`` フィールドが
+      ``request.POST`` にない場合， ``name`` は必須のフィールドであるため，
+      保存のステップでデータベースエラーが発生します．これはみっともありま
+      せん．
+
+    * たとえ検証を *行ったとしても* ，検証結果をユーザに提示する有効な方法
+      が全くありません．
+
+    * このページへの入力を行うフォーム (とビュー) を別に用意する必要があり
+      ます．苦痛で，冗長な作業です．
+
+さて，これらの問題を直ちに回避するために，上のオブジェクト生成ビューに対
+する入力フォームのビューをどうやって作ればよいか見てみましょう::
+
+    def naive_create_place_form(request):
+        """Simplistic place form view; don't actually use anything like this!"""
+        # Create a FormWrapper object that the template can use. Ignore
+        # the last two arguments to FormWrapper for now.
+        form = forms.FormWrapper(Place.AddManipulator(), {}, {})
+        return render_to_response('places/naive_create_form.html', {'form': form})
+
+(このビューも含め，以降のビューでは，最初の例と同じ import を行う必要があり
+ます)
+
+
+``forms.FormWrapper`` オブジェクトは，テンプレートから生成フォームを
+簡単に扱えるようにするためのラッパです． ``naive_create_form.html`` テンプ
+レートは以下のようになります::
+
+    {% extends "base.html" %}
+
+    {% block content %}
+    <h1>Create a place:</h1>
+
+    <form method="post" action="../do_new/">
+    <p><label for="id_name">Name:</label> {{ form.name }}</p>
+    <p><label for="id_address">Address:</label> {{ form.address }}</p>
+    <p><label for="id_city">City:</label> {{ form.city }}</p>
+    <p><label for="id_state">State:</label> {{ form.state }}</p>
+    <p><label for="id_zip_code">Zip:</label> {{ form.zip_code }}</p>
+    <p><label for="id_place_type">Place type:</label> {{ form.place_type }}</p>
+    <input type="submit" />
+    </form>
+    {% endblock %}
+
+ビューの問題点に戻る前に，上のテンプレートの特徴的な点について考察してみま
+しょう:
+
+    * 各フィールドの「ウィジェット」は自動的に生成されます: 
+      ``{{ form.field }}`` は各フォームに対する「適切な」型のウィジェットを
+      生成するので， ``place_type`` のフィールドなどが表示されます．
+
+    * フォーム全体を吐き出す方法がないので，フォームのレイアウトを定義する
+      必要があります．これは，全てのフォームはそれぞれに設計されるべきであ
+      るという発想にもとづく仕様です． Django はユーザをいかなる型にもはめ
+      ようとはしません．テーブルを定義したければ単にテーブルを使えばよく，
+      純セマンティック主義者なら，上の例よりもましな HTML テンプレートを書
+      けばよいのです．
+
+    * 名前の衝突を回避するために，各フォームエレメントの ``id`` は 
+      "id_*fieldname*" の形式をとっています．
+
+生成フォームを作成したことで，前記の 3 番目の問題は解決しましたが，以前とし
+て検証は何も行っていません．．検証を考慮に入れた新たな生成ビューを書いて，
+検証の問題を解決ましょう::
+
+    def create_place_with_validation(request):
+        manipulator = Place.AddManipulator()
+        new_data = request.POST.copy()
+
+        # Check for validation errors
+        errors = manipulator.get_validation_errors(new_data)
+        manipulator.do_html2python(new_data)
+        if errors:
+            return render_to_response('places/errors.html', {'errors': errors})
+        else:
+            new_place = manipulator.save(new_data)
+            return HttpResponse("Place created: %s" % new_place)
+
+この新しいバージョンでは，エラーが出るようになります．
+``manipulator.get_validation_errors`` を使うと，全ての検証を行い，
+エラーはエラーページに (もちろんテンプレートを使って) きれいに表示されます::
+
+    {% extends "base.html" %}
+
+    {% block content %}
+
+    <h1>Please go back and correct the following error{{ errors|pluralize }}:</h1>
+    <ul>
+        {% for e in errors.items %}
+        <li>Field "{{ e.0 }}": {{ e.1|join:", " }}</li>
+        {% endfor %}
+    </ul>
+
+    {% endblock %}
+
+さて，この段階でも，まだいくつか問題を解決しきれていません:
+
+    * 依然として，入力フォームを別に (つまり冗長に) 作成せねばならないとい
+      う問題があります．
+
+    * エラーは綺麗に表示されるようになりましたが，依然別のページにあるため，
+      ユーザはエラーを修正するために「戻る」ボタンを押さねばなりません．こ
+      れでは間抜けで不便です．
+
+これらの問題を解決する最良の方法は，二つのビュー，すなわちフォームと入力の
+ビューを統合して，一つのビューにすることです．統合されたビューはフォームを
+生成し， POST されたデータを検証し， (データの検証に成功した場合) 新たな
+オブジェクトを生成します．このアプローチには，エラーとフォームが同じページ
+に表示されるので，エラーの起きているフィールドを指示できるというおまけが付
+いて来ます．
+
+.. class:: philosophy
+.. admonition:: Django の設計哲学
+
+    結局のところ，純 HTTP 主義の読者 (そして作者) にとって，この設計は HTTP
+    の GET および POST の「真の」意味づけ，すなわち GET はフォームを取得し，
+    POST は新たなオブジェクトを生成する，という意味づけによく一致していると
+    感じられるはずです．
+
+最終的に，ビューは以下のようになります::
+
+    def create_place(request):
+        manipulator = Place.AddManipulator()
+
+        if request.method == 'POST':
+            # If data was POSTed, we're trying to create a new Place.
+            new_data = request.POST.copy()
+
+            # Check for errors.
+            errors = manipulator.get_validation_errors(new_data)
+            manipulator.do_html2python(new_data)
+
+            if not errors:
+                # No errors. This means we can save the data!
+                new_place = manipulator.save(new_data)
+
+                # Redirect to the object's "edit" page. Always use a redirect
+                # after POST data, so that reloads don't accidently create
+                # duplicate entires, and so users don't see the confusing
+                # "Repost POST data?" alert box in their browsers.
+                return HttpResponseRedirect("/places/edit/%i/" % new_place.id)
+        else:
+            # No POST, so we want a brand new form without any data or errors.
+            errors = new_data = {}
+
+        # Create the FormWrapper, template, context, response.
+        form = forms.FormWrapper(manipulator, new_data, errors)
+        return render_to_response('places/create_form.html', {'form': form})
+
+そして ``create_form`` テンプレートは以下のようになります::
+
+    {% extends "base.html" %}
+
+    {% block content %}
+    <h1>Create a place:</h1>
+
+    {% if form.has_errors %}
+    <h2>Please correct the following error{{ form.error_dict|pluralize }}:</h2>
+    {% endif %}
+
+    <form method="post" action=".">
+    <p>
+        <label for="id_name">Name:</label> {{ form.name }}
+        {% if form.name.errors %}*** {{ form.name.errors|join:", " }}{% endif %}
+    </p>
+    <p>
+        <label for="id_address">Address:</label> {{ form.address }}
+        {% if form.address.errors %}*** {{ form.address.errors|join:", " }}{% endif %}
+    </p>
+    <p>
+        <label for="id_city">City:</label> {{ form.city }}
+        {% if form.city.errors %}*** {{ form.city.errors|join:", " }}{% endif %}
+    </p>
+    <p>
+        <label for="id_state">State:</label> {{ form.state }}
+        {% if form.state.errors %}*** {{ form.state.errors|join:", " }}{% endif %}
+    </p>
+    <p>
+        <label for="id_zip_code">Zip:</label> {{ form.zip_code }}
+        {% if form.zip_code.errors %}*** {{ form.zip_code.errors|join:", " }}{% endif %}
+    </p>
+    <p>
+        <label for="id_place_type">Place type:</label> {{ form.place_type }}
+        {% if form.place_type.errors %}*** {{ form.place_type.errors|join:", " }}{% endif %}
+    </p>
+    <input type="submit" />
+    </form>
+    {% endblock %}
+
+``FormWrapper`` の二つの引数 (``new_data`` と ``errors``) についてはもう少
+し説明が必要でしょう．
+
+前者はフィールドの値に使われる何らかの「デフォルト値」です．上記の例のように
+``request.POST`` からデータを引き出しておくと，エラーが起きたときにすでにユー
+ザが入力していた値が失われないようにできます．上の例を試してみれば，どのよ
+うに動作するかを理解できるでしょう．
+
+二つ目の引数は ``manipulator.get_validation_errors`` から取り出したエラーの
+リストです．この値を ``FormWrapper`` に渡すと， 各フィールドに ``errors``
+という要素 (そのフィールドに関連づけられたエラーメッセージからなるリスト)
+と，エラーメッセージを ``<ul>`` でまとめた ``html_error_list`` という要素が
+渡されます．上のテンプレートでは，エラー項目を使って各フィールドの隣に
+簡単なエラーメッセージを表示しています．エラーリストは ``FormWrapper`` オブ
+ジェクトの ``error_dict`` 属性として保存されます．
+
+.. _Using the ChangeManipulator:
+
+``ChangeManipulator`` を使う
+-------------------------------
+
+上の例では， ``AddManipulator`` を使った新たなオブジェクトをカバーしました．
+では既存のオブジェクトの編集はどうでしょう? 実は新規作成とびっくりするくら
+い同じです::
+
+    def edit_place(request, place_id):
+        # Get the place in question from the database and create a
+        # ChangeManipulator at the same time.
+        try:
+            manipulator = Place.ChangeManipulator(place_id)
+        except Place.DoesNotExist:
+            raise Http404
+
+        # Grab the Place object in question for future use.
+        place = manipulator.original_object
+
+        if request.method == 'POST':
+            new_data = request.POST.copy()
+            errors = manipulator.get_validation_errors(new_data)
+            manipulator.do_html2python(new_data)
+            if not errors:
+                manipulator.save(new_data)
+
+                # Do a post-after-redirect so that reload works, etc.
+                return HttpResponseRedirect("/places/edit/%i/" % place.id)
+        else:
+            errors = {}
+            # This makes sure the form accurate represents the fields of the place.
+            new_data = manipulator.flatten_data()
+
+        form = forms.FormWrapper(manipulator, new_data, errors)
+        return render_to_response('places/edit_form.html', {'form': form, 'place': place})
+
+本当に違う部分は以下の点にすぎません:
+
+    * ``AddManipulator`` の代わりに ``ChangeManipulator`` を作成します．
+      ``ChangeManipulator`` の引数は変更したいオブジェクトの ID です．
+      ID が無効の場合， ``ObjectDoesNotExist`` 例外を送出します．
+
+    * ``ChangeManipulator.original_object`` には編集対象のオブジェクトのイ
+      ンスタンスが入っています．
+
+    * マニピュレータの ``flatten_data()`` を使って ``new_data`` を設定しま
+      す． ``flatten_data()`` はマニピュレーション中の元のオブジェクトから
+      データを取り出し，辞書データ型に変換して，フォームの各フィールドにオ
+      ブジェクトの現在の値を入れられるようにします．
+
+    * 上の例では別のテンプレートを使っているので，オブジェクトの生成と編集
+      は必要なら別の「スキン」にできます．しかしフォームを生成するためのチャ
+      ンク自体は生成フォームと全く同じです．
+
+明晰なプログラマなら，新規作成と編集の関数はほとんど同じで，実際には単一の
+ビューに統合できそうだと気づくでしょう．これはプログラマ自身の練習課題とし
+て残しておきます．
+
+(とはいえ，もっと明晰なプログラマならこのドキュメントの冒頭の説明を覚えてい
+て，この手の単に生成／更新を行う作業をしたいだけなら `汎用ビュー`_ を調べる
+ことでしょう．)
+
+.. _Custom forms and manipulators:
+
+フォームとマニピュレータの自作
+==============================
+
+自動生成されたマニピュレータを使いたいだけなら，これまでに説明したナイスな
+機能で十分でしょう．しかし，マニピュレータのクールなところはこれで終わりで
+はありません．自作のフォームを扱うために，マニピュレータも自作できるのです．
+
+マニピュレータの自作はとても簡単です．ウェブサイトの "contact" フォームに使
+えるようなマニピュレータの例を以下に示します::
+
+    from django import forms
+
+    urgency_choices = (
+        (1, "Extremely urgent"),
+        (2, "Urgent"),
+        (3, "Normal"),
+        (4, "Unimportant"),
+    )
+
+    class ContactManipulator(forms.Manipulator):
+        def __init__(self):
+            self.fields = (
+                forms.EmailField(field_name="from", is_required=True),
+                forms.TextField(field_name="subject", length=30, maxlength=200, is_required=True),
+                forms.SelectField(field_name="urgency", choices=urgency_choices),
+                forms.LargeTextField(field_name="contents", is_required=True),
+            )
+
+Django のモデルとの類似性が見て取れます．自作のマニピュレータで必要なメソッ
+ドは，マニピュレータ中に現れる全てのフィールドを定義する ``__init__`` だけ
+です． Django が提供している全てのフォームフィールドについて知りたければ
+``django.forms`` モジュールを参照してください．
+
+この自作のマニピュレータは，自動的に生成されるものと全く同じように扱えます．
+上のフォームを駆動するための簡単な関数を以下に示します．::
+
+    def contact_form(request):
+        manipulator = ContactManipulator()
+        if request.method == 'POST':
+            new_data = request.POST.copy()
+            errors = manipulator.get_validation_errors(new_data)
+            manipulator.do_html2python(new_data)
+            if not errors:
+
+                # Send e-mail using new_data here...
+
+                return HttpResponseRedirect("/contact/thankyou/")
+        else:
+            errors = new_data = {}
+        form = forms.FormWrapper(manipulator, new_data, errors)
+        return render_to_response('contact_form.html', {'form': form})
+
+        
+.. _Implementing flatten_data for custom manipulators:
+
+自作のマニピュレータ用に ``flatten_data`` を実装する
+----------------------------------------------------
+
+デフォルトで自動生成されるマニピュレータは，(必要な場合はごくまれですが) 自
+作のマニピュレータで置き換えられます．マニピュレータを置き換えた場合，汎用
+ビューでもそのマニピュレータを使うことになるので，置き換えた
+``ChangeManipulator`` の ``flatten_data`` メソッドを定義せねばなりません．
+自作の ``flatten_data`` は，デフォルトの ``flatten_data`` と同じく，以下の
+ようにフィールド名を値に対応づける辞書を返さねばなりません::
+
+    def flatten_data(self):
+        obj = self.original_object
+        return dict(
+            from = obj.from,
+            subject = obj.subject,
+            ...
+        )
+
+こうしておけば， ``ChangeManipulator`` はデフォルトのマニピュレータと同じよ
+うに動作します．
+
+.. _`FileField and ImageField special cases`:
+
+``FileField`` と ``ImageField`` の特殊な例
+==========================================
+
+``FileField`` オブジェクトと ``ImageField`` オブジェクトの扱いはちょっと難
+解です．
+
+まず，ファイルをアップロードさせるには ``<form>`` エレメントの ``enctype``
+を ``"multipart/form-data"`` と定義しておかねばなりません::
+
+  <form enctype="multipart/form-data" method="post" action="/foo/">
+
+次に，テンプレートを書くときに，少し変わったフィールドの扱い方をせねばなり
+ません． ``FileField`` や ``ImageField`` は *二つの* HTML 要素で表現します．
+
+例えば，モデル中に以下のようなフィールドがあったとしましょう::
+
+   photo = model.ImageField('/path/to/upload/location')
+
+テンプレートには二つのフォームフィールドを表示せねばなりません::
+
+   <p><label for="id_photo">Photo:</label> {{ form.photo }}{{ form.photo_file }}</p>
+
+最初の部分 (``{{ form.photo }}``) は，現在選択されているファイルを表し，実
+際のファイルアップロードのためのフォームフィールドは二つ目の部分 
+(``{{ form.photo_file }}``) に入ります．従って，バリデーションレイヤでは，
+``photo_file`` キーをチェックせねばなりません．
+
+最後に，ビューの中でアップロードされたファイルにアクセスする場合は，
+``request.POST`` ではなく ``request.FILES`` にアクセスするようにしてくださ
+い． ``request.POST`` はファイルアップロードに関するデータを格納していない
+からです．
+
+例えば， ``new_data`` を使ったお作法に従うと，以下のような書き方になります::
+
+   new_data = request.POST.copy()
+   new_data.update(request.FILES)
+
+
+
+.. _Validators:
+
+バリデータ
+==========
+
+マニピュレータの便利な機能の一つに自動的な検証機能があります．検証は簡単な
+検証 API，すなわち呼び出し可能オブジェクトであるバリデータ (Validator) で
+行われます．バリデータはデータにおかしな点が見つかると ``ValidationError``
+を送出します． ``django.core.validators`` では数多くのバリデータ関数を定義
+しています (以下を参照してください) が，自作するのも簡単です::
+
+    from django import forms
+    from django.core import validators
+
+    class ContactManipulator(forms.Manipulator):
+        def __init__(self):
+            self.fields = (
+                # ... snip fields as above ...
+                forms.EmailField(field_name="to", validator_list=[self.isValidToAddress])
+            )
+
+        def isValidToAddress(self, field_data, all_data):
+            if not field_data.endswith("@example.com"):
+                raise validators.ValidationError("You can only send messages to example.com e-mail addresses.")
+
+上の例では， "to" フィールドを連絡フォームに追加してありますが， 
+フィールドの ``validator_list`` に ``isValidToAddress`` バリデータを
+追加して， "to" のアドレスが "@example.com" で終わるように要求しています．
+
+バリデータ関数の引数を説明するのに多くの言葉は必要ありません．
+``field_data`` は検証対象のフィールドの値で， ``all_data`` は検証中の
+全てのデータの入った辞書です．
+
+.. admonition:: Note
+
+    バリデータが呼び出される段階では， (``do_html2python`` はまだ呼び出され
+    ていないので) 全てのデータは文字列型である点に注意して下さい．
+
+また，ユーザインタフェースの一貫性を保つため，バリデーションメッセージの末
+尾には読点を入れておくよう強く勧めます．
+
+.. _When Are validators Called?:
+
+バリデータはいつ呼び出されるのか
+--------------------------------
+
+ユーザがフォームを提出すると， Django 各フィールドを順番に検証してゆきます．
+まず，フィールドが必須のフィールドなら，フィールドのデータが存在し，なおか
+つ空になっていないか調べます．次に，最初のテストにパスしたフィールドで， 
+*提出されたフォームのデータに，フィールドのデータが入っている場合* ，
+そのフィールドの全てのバリデータを順に実行します．この強調した部分はとても
+重要です．すなわち，フォーム中のあるフィールドが提出されなかった場合 (デー
+タが入っていなかった場合，通常はそうなります)，そのフィールドに対するバリデー
+タは実行されないのです．
+
+この仕様は， ``models.BooleanField`` を使ってモデルを作成する場合や，
+``forms.CheckBoxField`` のようなフォームを使ってカスタムのマニピュレータを
+作成する場合にはとりわけ重要な問題です．というのも，チェックボックスを
+選択しなければ，そのフィールドの情報は提出されたフォーム内に含まれないから
+です．
+
+フィールドにデータが入っているかどうかに関わらず， *常に* バリデータを実行
+したいのなら，バリデータ関数に ``always_test`` 属性を設定してください．例え
+ば::
+
+    def my_custom_validator(field_data, all_data):
+        # ...
+
+    my_custom_validator.always_test = True
+
+このように書いておくと，このバリデータを使っているフォームでは，常にこのバ
+リデータによるチェックが実行されます．
+
+.. _Ready-made Validators:
+
+既成のバリデータ
+----------------
+
+バリデータの自作はさほど難しくはありませんが，同じようなバリデータがくりか
+えし必要になる状況はいくつもあるでしょう． Django には様々なバリデータが付
+属しており，コード中で直接使えます．これらのバリデータ関数やクラスは 
+``django/core/validators.py`` に収められています．
+
+以下のバリデータについては，名前からその機能を推測できるはすです．各々の
+バリデータは指定されたプロパティをチェックします:
+
+    * isAlphaNumeric
+    * isAlphaNumericURL
+    * isSlug
+    * isLowerCase
+    * isUpperCase
+    * isCommaSeparatedIntegerList
+    * isCommaSeparatedEmailList
+    * isValidIPAddress4
+    * isNotEmpty
+    * isOnlyDigits
+    * isNotOnlyDigits
+    * isInteger
+    * isOnlyLetters
+    * isValidANSIDate
+    * isValidANSITime
+    * isValidEmail
+    * isValidFloat
+    * isValidImage
+    * isValidImageURL
+    * isValidPhone
+    * isValidQuicktimeVideoURL
+    * isValidURL
+    * isValidHTML
+    * isWellFormedXml
+    * isWellFormedXmlFragment
+    * isExistingURL
+    * isValidUSState
+    * hasNoProfanities
+
+
+また，やや柔軟性のある一連のバリデータ (を生成する仕組み) もあります．これ
+らのバリデータに対しては，以下のようにパラメタを渡してバリデータインスタン
+スを作成できます．インスタンスは呼び出し可能オブジェクトで，バリデータとし
+て利用できます．
+
+例えば::
+
+    from django.core import validators
+    from django import forms
+
+    power_validator = validators.IsAPowerOf(2)
+
+    class InstallationManipulator(forms.Manipulator)
+        def __init__(self):
+            self.fields = (
+                ...
+                forms.IntegerField(field_name = "size", validator_list=[power_validator])
+            )
+
+ここで， ``validators.IsAPowerOf(...)`` はバリデータとして使えるオブジェク
+トを返します (上の場合には値が 2 のべき乗の数値であるかチェックします)．
+
+引数を取る形式の標準バリデータは，オプションの引数として，末尾に 
+(``error_message``) を取れます．この引数には，検証に失敗したときのメッセー
+ジを指定します．メッセージを指定しない場合，デフォルトのメッセージを使いま
+す．
+
+``AlwaysMatchesOtherField``
+    フィールド名を引数にとり，現在のフィールドが別のフィールドの値と一致し
+    ている場合にのみ検証をパスします．
+
+``ValidateIfOtherFieldEquals``
+    三つのパラメタ， ``other_field``, ``other_value`` および 
+    ``validator_list`` をとります． ``other_field`` の値が ``other_value``
+    の場合，現在のフィールドに対して  ``validator_list`` に指定した全ての
+    バリデータを適用します．
+
+``RequiredIfOtherFieldGiven``
+    他のフィールドの名前を引数にとり，そのフィールドの値に値が入っている場
+    合にのみ，現在のフィールドを必須フィールドにします．
+
+``RequiredIfOtherFieldsGiven``
+    ``RequiredIfOtherFieldNotGiven`` に似ていますが，フィールド名のリストを
+    引数にとり，いずれかのフィールドに値が入っている場合にのみ，現在のフィー
+    ルドを必須フィールドにします．
+
+``RequiredIfOtherFieldNotGiven``
+    他のフィールドの名前を引数にとり，そのフィールドの値に値が入っていない
+    場合に，現在のフィールドを必須フィールドにします．
+
+``RequiredIfOtherFieldEquals`` および ``RequiredIfOtherFieldDoesNotEqual``
+    これらのバリデータクラスは，フィールド名と値を引数にとります．フィール
+    ドの値が指定値を取る場合 (後者のバリデータでは指定値をとらない場合)，
+    現在のフィールドを必須フィールドにします．
+
+    オプションの ``other_label`` を指定すると，エラーメッセージで例外の値の
+    代わりに使われます．このオプションを使えば，例外自体だけでは説明不足の
+    場合に，より分かりやすいメッセージを提示できます．
+
+    バリデータは ``do_html2python()`` を呼び出す前に実行されるため，値は文
+    字列として比較されることに注意してください．従って，
+    ``RequiredIfOtherFieldEquals('choice', '1')`` は正しい書き方ですが，
+    ``RequiredIfOtherFieldEquals('choice', 1)`` のように書くと等値評価は
+    決して成功しないので注意してください．
+
+``IsLessThanOtherField``
+    フィールド名を引数にとり，そのフィールドの値より現在のフィールドの
+    値が小さい (または等しい) かどうか検証します．繰り返しますが，比較は文
+    字列で行われます．従って，文字列以外の型として扱われているデータとの比
+    較を行う場合には注意して下さい．例えば， "123" という文字列は "2" より
+    も小さいとみなされます．文字列比較をしたくないのなら，自分でバリデータ
+    を実装せねばなりません．
+
+``NumberIsInRange``
+    二つの境界値  ``lower`` と ``upper`` を引数にとり，フィールドの値が
+    ``lower`` より大きく ``upper`` より小さいかどうか検証します．
+    
+    値の範囲は包含的 (inclusive) です．従って，
+    ``NumberIsInRange(10, 20)`` は 10 や 20 といった値を正しい値とみなしま
+    す．このバリデータは数値型のフィールド (浮動小数や整数のフィールド) で
+    しか使えません．
+
+
+``IsAPowerOf``
+    整数の引数をとり，フィールドの値が指定値のべき乗であるか検証します．
+
+``IsValidDecimal``
+    整数桁数と小数桁数の最大値を (この順番に) 指定し，フィールドの値が
+    指定の桁数範囲を超えない浮動小数点数であるか検証します．
+
+``MatchesRegularExpression``
+    正規表現 (文字列) を引数にとり，フィールド値が正規表現にマッチするか検
+    証します．
+
+``AnyValidator``
+    バリデータのリストをパラメタに取ります．検証時に，いずれかのバリデータ
+    で検証に成功すれば検証をパスしたとみなします．バリデータはリストに指定
+    した順にテストされます．
+
+``URLMimeTypeCheck``
+    URL フィールドの検証に使います． MIME タイプ (``text/plain`` など)
+    のリストを引数にとります．検証時に，フィールド値が有効な URL であるか
+    調べ，続いて概要 URL の内容を取得しようと試みます．コンテンツを取得でき，
+    かつコンテンツのタイプがバリデータ初期化時に指定したリストに含まれてい
+    れば検証をパスしたとみなします．
+
+``RelaxNGCompact``
+    XML ドキュメントを Relax NG コンパクトスキーマで検証するために使います．
+    スキーマの場所を示すファイルパスを引数にとり，オプションでルートエレメ
+    ントを指定できます (指定した場合，検証前にルートエレメントで XML フラグ
+    メントをラップします)．検証時には， ``JING_PATH`` 設定 (詳しくは
+    `Django 設定ファイル`_ を参照してください) に指定されたプログラムを使っ
+    て， XML フラグメントがスキーマにしたがっているか検証します．
+
+.. _`generic views`: ../generic_views/
+.. _`汎用ビュー`: `generic views`_
+.. _`models API`: ../model_api/
+.. _`モデル API`: `models API`_
+.. _settings: ../settings/
+.. _`Django 設定ファイル`: settings_
+

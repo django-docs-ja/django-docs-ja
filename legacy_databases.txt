@@ -1,0 +1,101 @@
+==================================
+古いデータベースの組み込み
+==================================
+
+:revision-up-to: 5583 (0.97pre SVN)
+
+Django が最も得意とするのは新たなアプリケーションですが，古いデータベースの
+組み込みも可能です． Django には組み込み作業を可能な限り自動化するための二
+つのユーティリティが付属しています．
+
+このドキュメントでは，読者は `公式チュートリアル`_ でカバーされている
+Django の基礎を良く知っているものと仮定しています．
+
+.. _`公式チュートリアル`: ../tutorial01/
+.. _official tutorial: ../tutorial01/
+
+.. _Give Django your database parameters:
+
+Django にデータベースパラメタを指定する
+=======================================
+
+まず，データベースへの接続パラメタとデータベース名を Django に指示する必要
+があります． `設定ファイル`_ の以下の設定を編集してください:
+
+    * `DATABASE_NAME`_
+    * `DATABASE_ENGINE`_
+    * `DATABASE_USER`_
+    * `DATABASE_PASSWORD`_
+    * `DATABASE_HOST`_
+    * `DATABASE_PORT`_
+
+.. _`設定ファイル`: ../settings/
+.. _DATABASE_NAME: ../settings/#database-name
+.. _DATABASE_ENGINE: ../settings/#database-engine
+.. _DATABASE_USER: ../settings/#database-user
+.. _DATABASE_PASSWORD: ../settings/#database-password
+.. _DATABASE_HOST: ../settings/#database-host
+.. _DATABASE_PORT: ../settings/#database-port
+
+.. _settings file: 
+    ../settings/
+.. DATABASE_NAME: 
+    ../settings/#database-name
+.. DATABASE_ENGINE: 
+    ../settings/#database-engine
+.. DATABASE_USER: 
+    ../settings/#database-user
+.. DATABASE_PASSWORD: 
+    ../settings/#database-password
+.. DATABASE_HOST: 
+    ../settings/#database-host
+.. DATABASE_PORT: 
+    ../settings/#database-port
+
+.. _Auto-generate the models:
+
+モデルの自動生成
+================
+
+Django には，既存のデータベースにイントロスペクションを行ってモデルを生成で
+きるユーティリティが付属しています．出力を見るには以下のコマンドを実行しま
+す::
+
+    python manage.py inspectdb
+
+標準の Unix 出力リダイレクションを使って，この内容をファイルに保存しておき
+ます::
+
+    python manage.py inspectdb > appname.py
+
+この機能はショートカット目的で，正しいモデル生成を行うためのものではありま
+せん．詳しくは `django-admin.py のドキュメント`_ を参照してください．
+
+モデルを削除し終えたら，モジュールをアプリケーションの ``models.py`` 
+に入れ，アプリケーションを収めているパッケージ内に配置し，
+``INSTALLED_APPS`` 設定にアプリケーションを追加しておきます．
+
+.. _django-admin.py のドキュメント: ../django-admin/
+.. _django-admin.py documentation: ../django-admin/
+
+.. _Install the core Django tables:
+
+Django のコアデータテーブルのインストール
+=========================================
+
+次に， ``django-admin.py syncdb`` コマンドを実行して， Django のコアデータ
+テーブルをデータベースにインストールします::
+
+    python manage.py syncdb
+
+
+.. _See whether it worked:
+
+うまく動作するか確認する
+========================
+
+これだけです． Django データベース API を使ってアプリケーションのデータにア
+クセスしたり， Django admin サイトでオブジェクトを編集してみたりしてくださ
+い．
+
+

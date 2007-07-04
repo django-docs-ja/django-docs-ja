@@ -1,0 +1,372 @@
+=======================
+sitemaps フレームワーク
+=======================
+
+:revision-up-to: 5150 (0.97pre SVN)
+
+Django には， `サイトマップ`_ XML ファイルを簡単に生成できる高水準
+のサイトマップ生成フレームワークが付属しています．
+
+.. _sitemap: http://www.sitemaps.org/
+.. _`サイトマップ`: http://www.sitemaps.org/
+
+.. _Overview:
+
+概要
+====
+
+サイトマップ (sitemap) とは，自分のサイト上のページの更新頻度や特定のペー
+ジ間の「重要度」を検索エンジンのインデクサに対して知らせるために，Web サイ
+ト上に配置する XML ファイルです．この情報があると，検索エンジンがサイトのイ
+ンデクスを生成するときに役立ちます．
+
+Django のサイトマップフレームワークを使うと，この XML ファイルの情報を
+Python コードで表現でき，ファイルの生成を自動化できます．
+
+sitemaps は Django の `配信フレームワーク`_ によく似ています．サイトマップ
+の生成は簡単で，ただ ``Sitemap`` クラスを書いて， URLconf_ に指定するだけで
+す．
+
+.. _syndication framework: ../syndication_feeds/
+.. _URLconf: ../url_dispatch/
+.. _`配信フレームワーク`: `syndication framework`_
+
+.. _Installation:
+
+インストール
+============
+
+sitemaps アプリケーションは以下の手順でインストールします:
+
+    1. INSTALLED_APPS_ 設定に ``'django.contrib.sitemaps'`` を加えます．
+    2. TEMPLATE_LOADERS_ 設定に，
+       ``'django.template.loaders.app_directories.load_template_source'``
+       が入っているか確かめます．デフォルトの設定ファイルには入っているので，
+       注意が必要なのは設定を変更している時だけです．
+    3. `sites フレームワーク`_ をインストールしておいてください．
+
+(注意: sitemaps アプリケーションは，データベースに何らテーブルをインストール
+しません． ``INSTALLED_APPS`` に ``sitemaps`` を入れておかねばならないのは，
+``load_template_source`` テンプレートローダがデフォルトのテンプレートを捜し
+出せるようにするためです．)
+
+.. _INSTALLED_APPS: ../settings/#installed-apps
+.. _TEMPLATE_LOADERS: ../settings/#template-loaders
+.. _sites framework: ../sites/
+.. _`sites フレームワーク`: `sites framework`_
+
+.. _Initialization:
+
+初期化
+======
+
+自分の Django サイト上でサイトマップ生成を行わせるには， URLconf_ に以下の
+行を追加します::
+
+    (r'^sitemap.xml$', 'django.contrib.sitemaps.views.sitemap', 
+         {'sitemaps': sitemaps})
+
+これで， Django はクライアントが ``/sitemap.xml`` にアクセスしたときにサイ
+トマップを生成するようになります．
+
+サイトマップファイルの名前はさして重要ではありませんが，ファイルの場所は重
+要です．検索エンジンは，サイトマップ内のリンクをインデクス化する際，ファイ
+ルの置かれている URL レベルとその下のリンクしかたどりません．例えば，
+``sitemap.xml`` がルートディレクトリ下にあれば， Google はサイト上の全ての
+URL を参照します．一方，サイトマップの場所が ``/content/sitemap.xml`` であ
+れば， ``/content/`` で始まる URL しか参照しません．
+
+ビュー関数 ``sitemap()`` には，必須の引数 ``{'sitemaps': sitemaps}`` があり
+ます． ``sitemaps`` はセクションラベル (例えば ``blog`` や ``news``) を，
+``Sitemap`` クラス (例えば ``BlogSitemap`` や ``NewsSitemap``) に対応づける
+辞書にします．あるいは， ``Sitemap`` クラスの *インスタンス* (例えば
+``BlogSitemap(some_bar)``) でもかまいません．
+
+.. URLconf: ../url_dispatch/
+
+.. _Sitemap classes:
+
+Sitemap クラス
+==============
+
+``Sitemap`` クラスとは，サイトマップ上のエントリの「セクション」を表現する
+ための Python のクラスです．例えば，ある ``Sitemap`` クラスはブログ上の全て
+のエントリを表し，別のクラスはイベントカレンダー上の全てのイベントを表現す
+る，といった具合です．
+
+最も単純化すれば，全てのセクションは ``sitemap.xml`` という一つのファイルに
+まとめあげられることになります．とはいえ， sitemaps フレームワークを使えば，
+各セクションごとに個別のサイトマップファイルがあるようなサイトマップインデ
+クスを生成できます (後述の `サイトマップインデクスを生成する`_ を参照してく
+ださい)．
+
+``Sitemap`` クラスは ``django.contrib.sitemaps.Sitemap`` のサブクラスでなけ
+ればなりません．クラスはコードベースのどこに置いてもかまいません．
+
+.. _A simple example:
+
+簡単な例
+========
+
+ブログシステムを使っていて， ``Entry`` というモデルがあるとしましょう．
+サイトマップに全てのブログエントリへのリンクを含めたければ，サイトマップク
+ラスは以下のようになります::
+
+    from django.contrib.sitemaps import Sitemap
+    from mysite.blog.models import Entry
+
+    class BlogSitemap(Sitemap):
+        changefreq = "never"
+        priority = 0.5
+
+        def items(self):
+            return Entry.objects.filter(is_draft=False)
+
+        def lastmod(self, obj):
+            return obj.pub_date
+
+注意点:
+
+    * ``changefreq`` と ``priority`` はクラス属性で，それぞれ
+      ``<changefreq>`` および ``<priority>`` エレメントに対応しています．こ
+      れらの属性は，上の例の ``lastmod`` のように，メソッドとしても定義でき
+      ます．
+    * ``items()`` はオブジェクトのリストを返すだけのメソッドです．このメソッ
+      ドの返すオブジェクトは，サイトマップの各プロパティ (``location``,
+      ``lastmod``, ``changefreq``, ``priority``) に対応するメソッドに渡され
+      ます．
+    * ``lastmod`` は Python の ``datetime`` オブジェクトを返さねばなりませ
+      ん．
+    * この例には ``location`` メソッドがありませんが，自分でメソッドを定義
+      して，オブジェクトの URL を指定してもかまいません．デフォルトでは，
+      ``location()`` は各オブジェクトに対して ``get_absolute_url()`` を呼び
+      出し，その結果を返します．
+
+.. _Sitemap class reference:
+
+Sitemap クラスリファレンス
+==========================
+
+``Sitemap`` クラスのサブクラスでは，以下のメソッドや属性を定義できます:
+
+``items``
+---------
+
+**必須です．** オブジェクトのリストを返すメソッドです．フレームワークはオブ
+ジェクトの *型* が何であるかを問いません．重要なのは，オブジェクトが
+``location()``, ``lastmod()``, ``changefreq()``, ``priority()`` といったメ
+ソッドに渡されるという点だけです．
+
+``location``
+------------
+
+**省略可能です．** メソッドまたは属性です．
+
+メソッドとして定義する場合， ``items()`` の返すオブジェクトを引数にとり，オ
+ブジェクトに対する絶対 URLの文字列を計算して返さねばなりません．
+
+属性として定義する場合， ``items()`` の返す *全てのオブジェクトに共通して*
+使われる絶対 URL を表す文字列にします．
+
+いずれの場合も，「絶対 URL」とは，以下の例のようにプロトコルおよびドメイン
+部を含まない URLを指します:
+
+    * 正しい: ``'/foo/bar/'``
+    * 誤り: ``'example.com/foo/bar/'``
+    * 誤り: ``'http://example.com/foo/bar/'``
+
+``location`` を指定していない場合，フレームワークは ``items()`` の返す各オ
+ブジェクトに対して ``get_absolute_url()`` メソッドを呼び出します．
+
+``lastmod``
+-----------
+
+**省略可能です．** メソッドまたは属性です．
+
+メソッドとして定義する場合， ``items()`` の返すオブジェクトを引数にとり，オ
+ブジェクトの最終更新日時を Python の ``datetime.datetime`` オブジェクトで返
+さねばなりません．
+
+属性として定義する場合， ``items()`` の返す *全てのオブジェクトに共通して*
+使われるオブジェクトの最終更新日時を Python の ``datetime.datetime`` オブジェ
+クトで返さねばなりません．
+
+``changefreq``
+--------------
+
+**省略可能です．** メソッドまたは属性です．
+
+メソッドとして定義する場合， ``items()`` の返すオブジェクトを引数にとり，オ
+ブジェクトの更新頻度を Python の文字列型で返さねばなりません．
+
+属性として定義する場合， ``items()`` の返す *全てのオブジェクトに共通して*
+使われるオブジェクトの更新頻度を Python の文字列型で返さねばなりません．
+
+メソッド，属性を問わず， ``changefreq`` の値は以下のいずれかにします:
+
+    * ``'always'``
+    * ``'hourly'``
+    * ``'daily'``
+    * ``'weekly'``
+    * ``'monthly'``
+    * ``'yearly'``
+    * ``'never'``
+
+``priority``
+------------
+
+**省略可能です．** メソッドまたは属性です．
+
+メソッドとして定義する場合， ``items()`` の返すオブジェクトを引数にとり，オ
+ブジェクトの重要度 (priority) を Python の文字列型か浮動小数型で返さねばな
+りません．
+
+属性として定義する場合， ``items()`` の返す *全てのオブジェクトに共通して*
+使われるオブジェクトの重要度を Python の文字列型か浮動小数型で返さねばなり
+ません．
+
+``priority`` の値は ``0.4`` や ``1.0`` のようにします．デフォルトの重要度は
+``0.5`` です．重要度の詳細は `sitemaps.org のドキュメント`_ を参照してく
+ださい．
+
+.. _sitemaps.org documentation: http://www.sitemaps.org/protocol.html#prioritydef
+.. _`sitemaps.org のドキュメント`: http://www.sitemaps.org/protocol.html#prioritydef
+
+.. _Shortcuts:
+
+ショートカット
+==============
+
+sitemaps フレームワークでは，よく使われる状況向けに，二つの便宜クラスを用意
+しています:
+
+``FlatPageSitemap``
+-------------------
+
+``django.contrib.sitemaps.FlatPageSitemap`` クラスは，現在の ``SITE_ID`` 
+(`sites のドキュメント`_ 参照) 向けの全ての `フラットページ`_ を検索し，サ
+イトマップのエントリを生成します．各エントリには ``location`` 属性だけが設
+定され， ``lastmod``, ``changefreq``, ``priority`` は設定されません．
+
+.. _flatpages: ../flatpages/
+.. _sites documentation: ../sites/
+.. _`フラットページ`: ../flatpages/
+.. _`sites のドキュメント`: ../sites/
+
+``GenericSitemap``
+------------------
+
+``GenericSitemap`` クラスは任意の `汎用ビュー`_ と組み合わせて使えます．
+``GenericSitemap`` を使うには，汎用ビューに渡すのと同じ ``info_dict`` を
+``GenericSitemap`` に渡してインスタンスを生成します． ``info_dict`` には
+少なくとも ``queryset`` がなければなりません．また， ``info_dict`` に
+``queryset`` で取り出されるオブジェクトの日時のフィールドを指定する
+``date_field`` エントリがある場合，サイトマップ生成時にエントリの
+``lastmod`` 属性に使われます． ``GenericSitemap`` のコンストラクタには，
+``priority`` や ``changefreq`` といったキーワード引数も指定できます．
+これらの引数の値は，全ての URL に共通の属性になります．
+
+.. _generic views: ../generic_views/
+.. _`汎用ビュー`: ../generic_views/
+
+.. _Example:
+
+例
+----
+
+``FlatPageSitemap`` と ``GenericSitemap`` の両方を組み込んだ URLconf_ の例
+は以下のようになります::
+
+    from django.conf.urls.defaults import *
+    from django.contrib.sitemaps import FlatPageSitemap, GenericSitemap
+    from mysite.blog.models import Entry
+
+    info_dict = {
+        'queryset': Entry.objects.all(),
+        'date_field': 'pub_date',
+    }
+
+    sitemaps = {
+        'flatpages': FlatPageSitemap,
+        'blog': GenericSitemap(info_dict, priority=0.6),
+    }
+
+    urlpatterns = patterns('',
+        # info_dict を使った汎用ビューの設定
+        # ...
+
+        # サイトマップ
+        (r'^sitemap.xml$', 'django.contrib.sitemaps.views.sitemap', 
+            {'sitemaps': sitemaps})
+    )
+
+.. URLconf: ../url_dispatch/
+
+.. _Creating a sitemap index:
+
+サイトマップインデクスを生成する
+================================
+
+sitemap フレームワークには，個々のサイトマップファイルを参照するサイトマッ
+プインデクスを生成する機能もあります．サイトマップインデクスからサイトマッ
+プファイルへの参照は， ``sitemaps`` 辞書に定義されている各セクションごとに
+ひとつづつ作成されます．サイトマップインデクスを使うには，少しだけやり方を
+変えます:
+
+    * URLconf に， ``django.contrib.sitemaps.views.index`` と
+      ``django.contrib.sitemaps.views.sitemap`` という二つのビューを使いま
+      す．
+
+    * ``django.contrib.sitemaps.views.sitemap`` にキーワード引数
+      ``section`` を指定します．
+
+
+上の例にならうと，URLconf は以下のようになります::
+
+    (r'^sitemap.xml$', 'django.contrib.sitemaps.views.index', 
+        {'sitemaps': sitemaps})
+    (r'^sitemap-(?P<section>.+).xml$', 
+        'django.contrib.sitemaps.views.sitemap', 
+        {'sitemaps': sitemaps})
+
+この設定では， ``sitemap-flatpages.xml`` と ``sitemap-blog.xml`` への参照が
+入った ``sitemap.xml`` が自動生成されます． ``Sitemap`` クラスと
+``sitemaps`` 辞書に手を加える必要はありません．
+
+.. _Pinging Google:
+
+Google に ping を打つ
+=====================
+
+サイトマップの変更時に，Google に「ping を打」って，サイトのインデクスを再
+構築させたい場合もあるでしょう． sitemap フレームワークで ping を打つには，
+``django.contrib.sitemaps.ping_google()`` を呼び出します．
+
+``ping_google()`` にはオプションの引数 ``sitemap_url`` があります．この引数
+にはサイトのサイトマップの絶対 URL (例えば ``'/sitemap.xml'``) を指定します．
+``sitemap_url`` を指定しなかった場合， ``ping_google()`` は URLconf の逆引
+きを行って，サイトマップの在処を探します．
+
+サイトマップの URL を捜し出せなかった場合， ``ping_google()`` は
+``django.contrib.sitemaps.SitemapNotFound`` 例外を送出します．
+
+``ping_google()`` の用法として有用なのは，モデルの ``save()`` メソッドで呼
+び出すというものです::
+
+    from django.contrib.sitemaps import ping_google
+
+    class Entry(models.Model):
+        # ...
+        def save(self):
+            super(Entry, self).save()
+            try:
+                ping_google()
+            except Exception:
+                # HTTP にまつわる例外も送出され得るので，ここは空の
+                # 'except' 節にしておきます．
+                pass
+
+とはいえ， ``ping_google()`` は Google のサーバに HTTP リクエストを送信する
+ので， ``save()`` のたびにネットワークアクセスのオーバヘッドが生じます．もっ
+と効率的にやりたければ， cron 化されたスクリプトなど，一定の時点で実行する
+ようスケジュールしたタスクの中で ``ping_google()`` を呼び出すとよいでしょう．

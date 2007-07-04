@@ -1,0 +1,399 @@
+==============
+e-mail の送信
+==============
+
+:revision-up-to: 5583 (0.97pre SVN)
+
+Python の `smtplib ライブラリ`_ を使えば，比較的簡単に電子メールを送信でき
+ますが， Django ではこのライブラリへの軽量ラッパを二つ用意して，電子メール
+の送信を極めて素早くおこなえるようにしています．
+
+コードは: ``django.core.mail`` にあります．
+
+.. _`smtplib ライブラリ`: http://www.python.jp/doc/release/lib/module-smtplib.html
+.. _smtplib library: http://www.python.org/doc/current/lib/module-smtplib.html
+
+
+.. _Quick example:
+
+お手軽な例
+==========
+
+二行だけです::
+
+    from django.core.mail import send_mail
+
+    send_mail('Subject here', 'Here is the message.', 'from@example.com',
+        ['to@example.com'], fail_silently=False)
+
+メールは `EMAIL_HOST`_ および `EMAIL_PORT`_ 設定で指定した SMTP ホストを介
+して送信されます． `EMAIL_HOST_USER`_ および `EMAIL_HOST_PASSWORD`_ が指定
+されていれば， SMTP サーバの認証に使われます．また，SMTP サーバとの接続に
+TLS を使うかどうかを `EMAIL_USE_TLS`_ で設定できます．
+
+.. note::
+
+    ``django.core.mail`` で送信される電子メールの文字セットは
+    `DEFAULT_CHARSET`_  設定の値に設定されます．
+    
+.. _`DEFAULT_CHARSET`: ../settings/#default-charset
+.. _`EMAIL_HOST`: ../settings/#email-host
+.. _`EMAIL_PORT`: ../settings/#email-port
+.. _`EMAIL_HOST_USER`: ../settings/#email-host-user
+.. _`EMAIL_HOST_PASSWORD`: ../settings/#email-host-password
+.. _`EMAIL_USE_TLS`: ../settings/#email-use-tls
+
+
+send_mail()
+===========
+
+電子メールを送信する最も簡単な方法は ``django.core.mail.send_mail()``
+関数です．この関数の定義は以下のようになっています::
+
+    send_mail(subject, message, from_email, recipient_list,
+        fail_silently=False, auth_user=None,
+        auth_password=None)
+
+``subject``, ``message``, ``from_email`` および ``recipient_list`` は必須の
+パラメタです．
+
+    * ``subject``: 文字列です．
+    * ``message``: 文字列です．
+    * ``from_email``: 文字列です．
+    * ``recipient_list``: 文字列からなるリストで，各々が電子メールアドレス
+      を表します． ``recipient_list`` に入っているユーザは，お互いに他のユー
+      ザをメールの "To:" フィールドで見られます．
+    * ``fail_silently``: ブール型の値です． ``False`` なら ``send_mail`` は
+      ``smtplib.SMTPException`` 例外を出すようになります． 
+      送出されうる例外のリストは `smtplib のドキュメント`_ を参照してくださ
+      い．いずれの例外も ``SMTPException`` のサブクラスです．
+    * ``auth_user``: オプションです． SMTP サーバでの認証に使うユーザ名です．
+      この値を指定しなければ， Django は ``EMAIL_HOST_USER`` 設定を使います．
+    * ``auth_password``: オプションです． SMTP サーバでの認証に使うパスワー
+      ドです．この値を指定しなければ， Django は ``EMAIL_HOST_PASSWORD`` 設
+      定を使います．
+
+.. _`smtplib のドキュメント`:
+   http://www.python.jp/doc/release/lib/module-smtplib.html
+.. _smtplib docs:
+   http://www.python.org/doc/current/lib/module-smtplib.html
+
+
+send_mass_mail()
+================
+
+``django.core.mail.send_mass_mail()`` は一括電子メール (mass e-mail) の送信
+用の関数です．この関数の定義は以下のようになっています::
+
+    send_mass_mail(datatuple, fail_silently=False,
+        auth_user=None, auth_password=None):
+
+``datatuple`` はタプルで，各要素は以下の形式になっています::
+
+    (subject, message, from_email, recipient_list)
+
+``fail_silently``, ``auth_user`` および ``auth_password`` は
+``send_mail()`` と同じです．
+
+``datatuple`` の各要素ごとに個別の電子メールメッセージを作成して送信します．
+``send_mail()`` と同様，同じ ``recipient_list`` に入っている受信者は，他の
+受信者を "To:" フィールドで見られます．
+
+.. _`send_mass_mail() vs. send_mail()`:
+
+send_mass_mail() と send_mail()
+-------------------------------
+
+``send_mass_mail()`` と ``send_mail()`` の大きな違いは， ``send_mail()``
+は実行の度にメールサーバに接続するのに対し， ``send_mass_mail()`` は全ての
+メッセージの送信に一つの接続を使う点です．このため， ``send_mass_mail()`` 
+の方が少しだけ効率的です．
+
+.. _`mail_admins()`:
+
+mail_admins()
+=============
+
+``django.core.mail.mail_admins()`` は `ADMINS 設定`_ に書かれたサイト管理者へ
+の電子メール送信を行うためのショートカットです．関数の定義は以下の通りです::
+
+    mail_admins(subject, message, fail_silently=False)
+
+``mail_admins()`` はサブジェクトの先頭に `EMAIL_SUBJECT_PREFIX 設定`_ の値
+を付加します．デフォルトは ``"[Django] "`` です．
+
+電子メールの "From:" ヘッダは `SERVER_EMAIL 設定`_ の設定値になります．
+
+このメソッドは利便性と可読性のために用意されています．
+
+.. _ADMINS 設定: ../settings/#admins
+.. _EMAIL_SUBJECT_PREFIX 設定: ../settings/#email-subject-prefix
+.. _SERVER_EMAIL 設定: ../settings/#server-email
+.. _ADMINS setting: 
+   ../settings/#admins
+.. _EMAIL_SUBJECT_PREFIX setting: 
+   ../settings/#email-subject-prefix
+.. _SERVER_EMAIL setting: 
+   ../settings/#server-email
+
+
+mail_managers()
+===============
+
+``django.core.mail.mail_managers()`` は ``mail_admins`` と同じですが，
+電子メールを `MANAGERS 設定`_ に書かれたサイトマネジャに送信します
+関数は以下のように定義されています::
+
+    mail_managers(subject, message, fail_silently=False)
+
+.. _`MANAGERS 設定`: ../settings/#managers
+.. _MANAGERS setting: 
+   ../settings/#managers
+
+.. _Examples:
+
+例
+==
+
+以下の例は，単一の電子メールを john@example.com と jane@example.com に送信
+します．両方の宛先が "To:" に表示されます::
+
+    send_mail('Subject', 'Message.', 'from@example.com',
+        ['john@example.com', 'jane@example.com'])
+
+以下の例は，単一の電子メールを john@example.com と jane@example.com に送信
+しますが，受け取り人はそれぞれ別々のメッセージを受け取ります::
+
+    datatuple = (
+        ('Subject', 'Message.', 'from@example.com', ['john@example.com']),
+        ('Subject', 'Message.', 'from@example.com', ['jane@example.com']),
+    )
+    send_mass_mail(datatuple)
+
+
+.. _Preventing header injection:
+
+ヘッダインジェクションの抑制
+============================
+
+`ヘッダインジェクション`_ とは，スクリプトが生成したメッセージの "To:" や
+"From:" に，攻撃者が余分な電子メールヘッダを挿入するというセキュリティ侵害
+です．
+
+上記で解説した Django の電子メール機能では，ヘッダの値に改行を使えないよう
+にしてヘッダインジェクションを防御しています． ``subject``, ``from_email`` 
+および ``recipient_list`` が (Unix, Windows または Mac 形式の) 改行を含む場
+合，電子メール送信関数 (``send_mail()`` など) は
+``django.core.mail.BadHeaderError`` 例外 (``ValueError`` のサブクラス) を送
+出します．このため，電子メールは送信されません．電子メール送信関数に渡すデー
+タの検証はユーザに任されています．
+
+``message`` の文字列の先頭にヘッダが入っている場合，ヘッダは単に電子メッセー
+ジ本文の先頭部分として出力されます．
+
+以下に示すのは，  ``subject``, ``message`` および ``from_email`` をリクエス
+トの POST データから受け取り，メールを admin@example.com に送信し，終了した
+ら "/contact/thanks/" にリダイレクトする例です::
+
+    from django.core.mail import send_mail, BadHeaderError
+
+    def send_email(request):
+        subject = request.POST.get('subject', '')
+        message = request.POST.get('message', '')
+        from_email = request.POST.get('from_email', '')
+        if subject and message and from_email:
+            try:
+                send_mail(subject, message, from_email, ['admin@example.com'])
+            except BadHeaderError:
+                return HttpResponse('Invalid header found.')
+            return HttpResponseRedirect('/contact/thanks/')
+        else:
+            # 実際にはマニピュレータを使って適切な検証エラーを
+            # 取得するべきでしょう．
+            return HttpResponse('Make sure all fields are entered and valid.')
+
+.. _Header injection: http://securephp.damonkohler.com/index.php/Email_Injection
+.. _`ヘッダインジェクション`: `Header injection`_
+
+
+.. _The EmailMessage and SMTPConnection classes:
+
+EmailMessage および SMTPConnection クラス
+=========================================
+
+**開発版の Django で新たに追加された機能です**
+
+Django の ``send_mail()`` および ``send_mass_mail()`` 関数は，実際には
+``django.core.mail`` クラスの ``EmailMessage`` や ``SMTPConnection`` クラス
+に対して薄いラッパをかぶせたものにすぎません． Django からメールを送信する
+方法をカスタマイズしたければ，これらのクラスをサブクラス化してやりたいこと
+を実現できます．
+
+.. note::
+    
+    ``send_mail()`` をはじめとしたラッパ関数から利用できる機能は，
+    ``EmailMessage`` クラスで提供している全ての機能をカバーしているわけでは
+    ありません．BCC への宛先を指定やファイルの添付，マルチパート形式メール
+    の送信を行いたい場合には， ``EmailMessage`` インスタンスを直接生成する
+    必要があります．
+
+    ``send_mail()`` がこのようないささかややこしい仕様なのは，設計上の事情
+    によるものです． ``send_mail()`` などの関数はもともと単なる Django 向け
+    の単純なメールインタフェースでしかありませんでした．その後，
+    ``send_mail()`` に指定できるパラメタが少しづつふえてきたのです．今となっ
+    ては，メールメッセージを扱うためのよりオブジェクト指向の設計に移行して，
+    ``send_mail()`` は互換性のためだけにおいておく方が有意義でしょう．
+
+一般に， ``EmailMessage`` はメールメッセージ自体の生成に関わります．
+``SMTPConnection`` はメール送信処理におけるネットワーク接続に関わっています．
+このことは，同じ接続 (``SMTPConnection`` インスタンス) を再利用すれば，複数
+のメッセージを一括送信できることを示しています．
+
+
+.. _E-mail messages:
+
+メールメッセージクラス
+----------------------
+
+``EmailMessage`` クラスは以下のパラメタ (固定引数を使う場合には以下に示す順
+番に指定します) で初期化します．パラメタは全て省略可能で， ``send()`` メソッ
+ドを呼び出す前であればいつでも設定しなおせます．
+
+    * ``subject``: メールの題名です．
+
+    * ``body``: メール本文です．平文テキストのメッセージでなければなりませ
+      ん．
+
+    * ``from_email``: 送信者のアドレスです． ``fred@example.com`` 形式でも
+      ``Fred <fred@example.com>`` 形式でもかまいません．省略すると，
+      ``DEFAULT_FROM_EMAIL`` の設定値を使います．
+
+    * ``to``: 受信者アドレスのリストまたはタプルです．
+
+    * ``bcc``: メールを送信する際に "Bcc" ヘッダに指定するアドレスのリスト
+      またはタプルです． 
+
+    * ``connection``: ``SMTPConnection`` のインスタンスです．一つの SMTP 接
+      続を使い回して複数のメッセージを送信したい場合に指定します．省略する
+      と， ``send()`` を呼び出す瞬間に新しい接続を生成します．
+
+    * ``attachments``: メールに添付するデータのリストです．リストの各要素は，
+      ``email.MIMEBase.MIMEBase`` のインスタンスか， 
+      ``(filename, content, mimetype)`` からなるタプルです．
+
+    * ``headers``: メッセージに追加するヘッダの辞書です．ヘッダ名をキーに，
+      ヘッダ値を値にします．このパラメタを使うのなら，指定したヘッダがメー
+      ルメッセージ中で正しいヘッダとして扱われるように気をつけねばなりませ
+      ん．
+
+例を示します::
+
+    email = EmailMessage('Hello', 'Body goes here', 'from@example.com',
+                ['to1@example.com', 'to2@example.com'], ['bcc@example.com'],
+                headers = {'Reply-To': 'another@example.com'})
+
+``EmailMessage`` クラスのインスタンスには以下のようなメソッドがあります:
+
+  * ``send()`` メソッドを呼び出すと， ``connection`` 属性に指定した接続を使っ
+    てメッセージを送信します．接続がなければ，自動的に新たな接続を生成して使
+    います．
+
+  * ``message()`` は ``django.core.mail.SafeMIMEText`` クラス (Python の
+    ``email.MIMEText.MIMEText`` クラスのサブクラス) または
+    ``django.core.mail.SafeMIMEMultipart`` クラスのインスタンスを生成します．
+    このオブジェクトには送信するメッセージが入っています．
+    ``EmailMessage`` クラスを拡張する必要がある場合，おそらくこのメソッドを
+    オーバライドして，所望の内容を MIME オブジェクト内に配置することになるで
+    しょう．
+
+  * ``recipients()`` はメッセージの全ての宛先からなるリストを返します．この
+    宛先リストは， ``to`` と ``bcc`` に指定した全ての宛先が入ります．
+    ``EmailMessage`` をサブクラス化する際，このメソッドもオーバライドする必
+    要があるかもしれません．というのも， SMTP サーバはメッセージ送信時に全て
+    の宛先を知る必要があり，全ての宛先はこのメソッドを介して返さねばならない
+    からです．
+
+  * ``attach()`` を呼び出すと，新たなファイル添付用パートを生成してメッセー
+    ジに追加します． ``attach()`` の呼び出しかたは 2 通りあります:
+
+     * ``attach()`` に引数を一つだけ指定し， ``email.MIMBase.MIMEBase``
+       のインスタンスを渡します．このインスタンスの内容は最終的なメッセージ
+       に直接挿入されます．
+
+     * 別の方法として， ``attach()`` に 3 つの引数， ``filename``,
+       ``content`` および ``mimetype`` を渡します． ``filename`` は添付する
+       ファイルの名前で，これはメール中で表示される添付ファイルの名前になり
+       ます． ``content`` は添付パート中に入るデータで， ``mimetype`` は添
+       付内容の MIME タイプです． ``mimetype`` を省略すると，ファイル名を元
+       に推測を行います．
+
+       例を示します::
+
+          message.attach('design.png', img_data, 'image/png')
+
+  * ``attach_file()`` を呼び出すと，ファイルシステム上のファイルから添付パー
+    トを生成します． ``attach_file()`` の引数には添付したいファイルのパスを
+    指定します．オプションとして，添付ファイルの MIME タイプも指定できます．
+    MIME タイプを省略すると，ファイル名をもとに推測を行います．簡単な使い方
+    を示すと，以下のようになります::
+
+      message.attach_file('/images/weather_map.png')
+
+.. _Sending alternative content types:
+
+拡張コンテンツ形式のメールを送信する
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+メールの内容をいくつかのバージョンに分けて送信すると便利な場合があります．
+古典的な例でいえば，テキスト形式と HTML 形式の両方でメールを送信するような
+場合です．
+複数バージョンのメールを同時に送るには， ``EmailMultiAlternatives`` クラス
+を使います．このクラスは ``EmailMessage`` のサブクラスで，
+``attach_alternative()`` メソッドを使ってメールのメッセージ本文に別のバージョ
+ンの本文を追加できます． ``attach_alternative()`` 以外は，(クラスをインスタ
+ンス化するときの初期化メソッドも含めて) ``EmailMessage`` と全く同じです．
+
+テキストと HTML を組み合わせて送信したければ，以下のように書けます::
+
+    from django.core.mail import EmailMultiAlternatives
+
+    subject, from_email, to = 'hello', 'from@example.com', 'to@example.com'
+    text_content = 'This is an important message.'
+    html_content = '<p>This is an <strong>important</strong> message.'
+    msg = EmailMultiAlternatives(subject, text_content, from_email, to)
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
+
+デフォルトでは， ``EmailMessage`` の ``body`` パラメタの MIME タイプは
+``"text/plain"`` です．実践的には，このパラメタは変更せずにおいた方がよいで
+しょう．なぜなら，メールを受信した人が使っているメールクライアントソフトに
+関係なくメッセージを読めるよう保証できるからです．とはいえ，メールの読み手
+が拡張コンテンツ形式 (alternative content type) のメッセージを扱えると分かっ
+ている場合には， ``EmailMessage`` の ``content_subtype`` 属性を使って，主メッ
+セージのコンテンツタイプを変更できます．メールのメジャーコンテンツタイプは
+常に ``"text"`` ですが，サブタイプは以下のように変更できます::
+
+    msg = EmailMessage(subject, html_content, from_email, to)
+    msg.content_subtype = "html"  # Main content is now text/html
+    msg.send()
+
+.. _SMTP network connections:
+
+SMTP ネットワーク接続
+---------------------
+
+``SMTPConnection`` クラスの初期化は，SMTP サーバのホスト，ポート，SMTP 接続
+を行うユーザ名，そしてパスワードを指定して初期化でき，それぞれのパラメタは
+``host``, ``port``, ``username``, ``password`` オプションで指定します．パラ
+メタを省略すると，設定ファイルから値を読み出します．
+
+たくさんの数のメッセージを一度に送信したいなら， ``SMTPConnection`` クラス
+の ``send_messages()`` メソッドが便利です．このクラスは ``EmailMessage`` ク
+ラス (またはサブクラス) のインスタンスのリストを引数にとり，一つの SMTP 接
+続で一度に送信します．例えば， ``get_notification_email()`` という関数があ
+り，この関数が定期的に送信されるメールの入った ``EmailMessage`` オブジェク
+トのリストを返すとしましょう．メッセージは以下のようにして一括送信できます::
+
+    connection = SMTPConnection()   # デフォルトの設定で接続を作成
+    messages = get_notification_email()
+    connection.send_messages(messages)
