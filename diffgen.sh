@@ -4,7 +4,7 @@
 # and generates the diff.
 
 REPOS_PATH=http://code.djangoproject.com/svn/django/trunk/
-LOCAL_PATH=/Users/ymasuda/work/django/trunk/
+LOCAL_PATH=/Users/ymasuda/work/django/src/trunk/
 DOCJP_DIR=/Users/ymasuda/work/django/doc-jp/
 
 # move clean up finished diffs to done directory
