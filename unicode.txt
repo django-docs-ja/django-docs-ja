@@ -62,7 +62,7 @@ Unicode 文字列に変換します．変換の際に，いちいち Django に�
 う場面では， Unicode 文字列と UTF-8 でエンコードされた (string 型の) 文字列
 の 2 通りを選択できます．
 
-.. warning::
+.. admonition:: 注意
     バイト文字列 (string 型) 自体にはエンコーディングに関する情報は付随して
     いません．そのため， Django は全てのバイト文字列を UTF-8 でエンコードさ
     れているとみなします．
@@ -160,7 +160,8 @@ Django を使っていると， Unicode 文字列とバイト文字列の他に�
       Python の組み込み関数 ``str()`` と少し違った仕様ですが， Django 内部
       のいくつかの場所で必要な機能として実装されています．
 
-.. _`遅延翻訳オブジェクト`:
+.. _lazy translation: ../i18n/#lazy-translation
+.. _`遅延翻訳オブジェクト`: `lazy translation`_
 
 普段は， ``smart_unicode()`` しか必要ないでしょう．入力データが Unicode か
 バイト文字列であるような場合には，早い段階でこのメソッドを使って Unicode 化
@@ -276,7 +277,7 @@ URL に含めてよい文字は ASCII 文字だけです．従って，非 ASCII
 
 URL を手動で生成する場合 (``permalink()`` デコレータを *使わない* 場合)，
 作り手が自分でエンコーディングに気を配らねばなりません．この場合，
-`前述 <#uri_and_iri>`_ の ``iri_to_uri()`` および ``urlquote()`` 関数を使っ
+`前述の`_  ``iri_to_uri()`` および ``urlquote()`` 関数を使っ
 てください．例えば::
 
     from django.utils.encoding import iri_to_uri
@@ -291,7 +292,8 @@ URL を手動で生成する場合 (``permalink()`` デコレータを *使わ�
 は，最初の行のクオート処理で非 ASCII 文字が落ちるので，厳密には
 ``iri_to_uri()`` の呼び出しは不要です)
 
-.. _above: uri_and_iri_
+.. _above: `URI and IRI handling`_
+.. _`前述の`: abobe_
 
 .. _The database API:
 
