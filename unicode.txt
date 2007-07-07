@@ -2,7 +2,7 @@
 Django での Unicode の扱い
 ==========================
 
-:revision-up-to: 5613 (0.97pre SVN)
+:revision-up-to: 5631 (0.97pre SVN)
 
 **開発版の Django で新たに追加された機能です**
 
@@ -386,9 +386,7 @@ Django はフォームデータのデコードに「遅延的」アプローチ�
 
 デフォルトでは，データのエンコーディングは ``DEFAULT_CHARSET`` 設定値である
 と想定しています．特定のフォームに対してエンコーディングを変えたければ，
-``GET`` や ``POST`` データ構造に ``encoding`` 属性を設定できます．簡単のた
-め，例えば以下のように ``HttpRequest`` インスタンスの ``encoding`` 属性を変
-更すると， ``GET`` と ``POST`` の両方の ``encoding`` 属性を設定できます::
+以下のように ``HttpRequest`` インスタンスの ``encoding`` 属性を変更します::
 
     def some_view(request):
         # (何かの理由で) データが必ず KOI8-R でエンコードされている場合
