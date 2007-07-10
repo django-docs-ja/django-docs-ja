@@ -2,7 +2,7 @@
 Django の概要
 =============
 
-:revision-up-to: 5613 (0.97pre SVN)
+:revision-up-to: 5640 (0.97pre SVN)
 
 Django は変転の激しいニュースルーム環境で開発された経緯から，よくある
 Web 開発タスクを迅速かつ簡単化するように設計されました．ここでは Django に
@@ -182,9 +182,9 @@ URL のパターンを Python のコールバック関数に対応づけてい�
     from django.conf.urls.defaults import *
 
     urlpatterns = patterns('',
-        (r'^/articles/(\d{4})/$', 'mysite.views.year_archive'),
-        (r'^/articles/(\d{4})/(\d{2})/$', 'mysite.views.month_archive'),
-        (r'^/articles/(\d{4})/(\d{2})/(\d+)/$', 'mysite.views.article_detail'),
+        (r'^articles/(\d{4})/$', 'mysite.views.year_archive'),
+        (r'^articles/(\d{4})/(\d{2})/$', 'mysite.views.month_archive'),
+        (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'mysite.views.article_detail'),
     )
 
 上のコードは簡単な正規表現で書かれた URL を Python コールバック関数 (ビュー:

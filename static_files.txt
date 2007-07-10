@@ -2,7 +2,7 @@
 静的なファイルの提供方法
 ========================
 
-:revision-up-to: 5613 (0.97pre SVN)
+:revision-up-to: 5640 (0.97pre SVN)
 
 Django 自体では，画像やスタイルシート，ビデオといった静的な (メディア) ファ
 イルを提供しません．通常， Django はメディアファイルの提供を使っている Web
@@ -122,11 +122,11 @@ URLconf は単なる Python モジュールに過ぎないので，静的メデ�
     from django.conf import settings
 
     urlpatterns = patterns('',
-        (r'^/articles/2003/$', 'news.views.special_case_2003'),
-        (r'^/articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
-        (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 
+        (r'^articles/2003/$', 'news.views.special_case_2003'),
+        (r'^articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
+        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 
          'news.views.month_archive'),
-        (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 
+        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 
          'news.views.article_detail'),
     )
 

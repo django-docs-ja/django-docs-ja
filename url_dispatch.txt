@@ -2,7 +2,7 @@
 URL ディスパッチャ
 ==================
 
-:revision-up-to: 5613 (0.97pre SVN)
+:revision-up-to: 5640 (0.97pre SVN)
 
 すっきりした，簡潔で明解な URL スキームの設計は，高品質の Web アプリケーショ
 ンでは重要な要素です．Django では，フレームワークの制限なしに，望み通りの
@@ -356,7 +356,7 @@ Django はドットを自動的に入れます．
     from django.conf.urls.defaults import *
 
     urlpatterns = patterns('',
-        (r'^/?$', 'django.views.generic.date_based.archive_index'),
+        (r'^$', 'django.views.generic.date_based.archive_index'),
         (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/$', 'django.views.generic.date_based.archive_month'),
         (r'^tag/(?P<tag>\w+)/$', 'weblog.views.tag'),
     )
@@ -366,7 +366,7 @@ Django はドットを自動的に入れます．
     from django.conf.urls.defaults import *
 
     urlpatterns = patterns('django.views.generic.date_based',
-        (r'^/?$', 'archive_index'),
+        (r'^$', 'archive_index'),
         (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/$','archive_month'),
     )
 
@@ -438,7 +438,7 @@ URLconf タプルにはオプションとして 3 つめの要素を指定でき
 例えば::
 
     urlpatterns = patterns('blog.views',
-        (r'^/blog/(?P<year>\d{4})/$', 'year_archive', {'foo': 'bar'}),
+        (r'^blog/(?P<year>\d{4})/$', 'year_archive', {'foo': 'bar'}),
     )
 
 この例では， ``/blog/2005/`` というリクエストに対し， Django は

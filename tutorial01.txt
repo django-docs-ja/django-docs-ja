@@ -4,7 +4,7 @@
 
 .. contents::
 
-:revision-up-to: 5613 (0.97pre SVN)
+:revision-up-to: 5640 (0.97pre SVN)
 
 さあ，例を交えながら学んでゆきましょう．
 
@@ -30,7 +30,7 @@ Python 対話シェルを起動して ``import django`` を実行してみれば
     `django-users`_ や  ``irc.freenode.net`` の `#django`_ チャネルで質問し
     てみてください．
 
-.. _django-users: http://groups.google.com/group/django-users 
+.. _django-users: http://groups.google.com/group/django-users
 .. _#django: irc://irc.freenode.net/django
 
 
