@@ -2,7 +2,7 @@
 Python プログラマのための Django テンプレート言語ガイド
 =======================================================
 
-:revision-up-to: 5613 (0.97pre SVN)
+:revision-up-to: 5680 (0.97pre SVN)
 
 このドキュメントでは， Django のテンプレートシステムを技術的な側面，すなわ
 ちどのように動作し，どうやって拡張するかという観点から解説します．テンプレー
@@ -741,9 +741,9 @@ Python モジュールを作成したら，実現したいフィルタやタグ�
 たオブジェクトを，デコレーション対象の関数に渡す前に文字列に変換してくれま
 す::
 
-    from django import template
+    from.django.template.defaultfilters import stringfilter
 
-    @template.stringfilter
+    @stringfilter
     def lower(value):
     	return value.lower()
 

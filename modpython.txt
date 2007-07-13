@@ -2,7 +2,7 @@
 mod_python で Django を動かす
 =============================
 
-:revision-up-to: 5613 (0.97pre SVN)
+:revision-up-to: 5680 (0.97pre SVN)
 
 Django をプロダクションサーバ上で動かす設定として，現状では Apache_ と
 `mod_python`_ の組み合わせを推奨しています．
@@ -53,8 +53,8 @@ import パスになるよう，自分の環境に合わせて置き換えて下�
 トのURL 構造上の場所を指定するのに使います．従って， ``<Directory>`` を使っ
 た指定は意味をなさないのです．
 
-また， Django プロジェクトを ``PYTHONPATH`` に追加するよう設定している場合
-には，以下のような設定を mod_python に教えておく必要があります:
+また， Django プロジェクトがデフォルトの ``PYTHONPATH`` 上になければ，以下
+のような設定を mod_python に教えておく必要があります:
 
 .. parsed-literal::
 

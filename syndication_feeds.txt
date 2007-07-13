@@ -34,8 +34,16 @@ Django には低水準のフィード生成 API もついてきます． Web コ
 
 .. _URLconf: ../url_dispatch/
 
+.. _Initialization:
+
 初期化
 --------------
+
+最新の開発版の Django を使っていないのなら， sites フレームワークがインストー
+ルされていて，データベースのテーブルが生成されているか確認してください．
+(詳しくは `sites フレームワークのドキュメント`_ を参照してください)． sites
+への依存性は開発版の Django で変更され，現在では配信ふぃーどフレームワーク
+は sites フレームワークに依存していません．
 
 Django サイトで配信フィードを使うには， `URLconf <../url_dispatch/>`__ に
 以下のような行を追加します::
@@ -82,6 +90,8 @@ Django サイトで配信フィードを使うには， `URLconf <../url_dispatc
 
 セットアップしたら，あとは ``Feed`` クラス自体を定義するだけです．
 
+.. _sites framework documentation: ../sites/
+.. _`sites フレームワークのドキュメント`: `sites framework documentation`_
 .. _URLconf: ../url_dispatch/
 .. _settings file: ../settings/
 
@@ -150,7 +160,10 @@ Feed クラス
           * ``{{ site }}`` -- 現在のサイトを表現する，
             ``django.contrib.sites.models.Site`` オブジェクトです．この変数
             は ``{{ site.domain }}`` や ``{{ site.name }}`` を参照する際に
-            便利です．
+            便利です．最新の開発版の Django を使っていて， sites フレームワー
+            クを *使っていない* 場合，この値は
+	    ``django.contrib.sites.models.RequestSite`` オブジェクトになり
+            ます．詳しくは `RequestSite の説明`_ を参照してください．
 
       ``title`` や ``description`` のテンプレートを作成しなかった場合， RSS
       フレームワークは ``"{{ obj }}"`` で表されるテンプレートをデフォルト値
@@ -185,6 +198,9 @@ Feed クラス
 .. _`Object-Relational マッパ`: `object-relational mapper`_
 .. _Django templates: ../templates/
 .. _`Django テンプレート`: `Django templates`_
+.. _RequestSite section of the sites framework documentation: ../sites/#requestsite-objects
+.. _`RequestSite の説明`: 
+  `RequestSite section of the sites framework documentation`_
 
 複雑な例
 -----------------
@@ -449,8 +465,27 @@ Feed クラスリファレンス
 
         link = '/foo/bar/' # ハードコード形式のフィードのリンクです．
 
-        # DESCRIPTION -- 以下の三つの形式の少なくともいずれか一つが必要です．配信
-        # フレームワークは以下の順に値を探します．
+        # GUID -- 省略可能です．配信フレームワークは以下の順に値を探します．
+        # このプロパティは Atom フィード (のフィードレベルの ID エレメント)
+        # でしか使いません．省略すると，フィードのリンクを ID に使います．
+	#
+	# (開発バージョンの Django で新たに登場した機能です)
+
+        def feed_guid(self, obj):
+            """
+            get_object() の返すオブジェクトを引数にとり，一意なフィードの識
+            別子を Python 文字列として返します．
+            """
+
+        def feed_guid(self):
+            """
+	    一意なフィードの識別子を Python 文字列として返します．
+            """
+
+        feed_guid = '/foo/bar/1234' # ハードコード形式の guid です．
+
+        # DESCRIPTION -- 以下の三つの形式の少なくともいずれか一つが必要です．
+	# 配信フレームワークは以下の順に値を探します．
 
         def description(self, obj):
             """
@@ -590,6 +625,17 @@ Feed クラスリファレンス
         def item_link(self):
             """
             item への URL を返します．
+            """
+
+        # ITEM_GUID -- 以下のメソッドは省略可能です．
+        # このプロパティは Atom フィード (のフィードレベルの ID エレメント)
+        # でしか使いません．省略すると，item のリンクを ID に使います．
+	#
+	# (開発バージョンの Django で新たに登場した機能です)
+
+        def item_guid(self, obj):
+            """
+            items() の返す item を引数にとり， item の ID を返します．
             """
 
         # ITEM AUTHOR NAME -- 以下の三つの形式のいずれか一つを指定できます．配信

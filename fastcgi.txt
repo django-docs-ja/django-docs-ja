@@ -2,7 +2,7 @@
 FastCGI, SCGI, AJP で Django を使う
 ===================================
 
-:revision-up-to: 5613 (0.97pre SVN)
+:revision-up-to: 5680 (0.97pre SVN)
 
 Django を動作させる構成として `現在推奨されている`_ のは， Apache_ と
 `mod_python`_ の組合せですが，多くの人々が共有ホスティングサービスを使って
@@ -108,7 +108,7 @@ SCGI_, `AJP1.3`_ (Apache JServ プロトコルバージョン 1.3) をサポー�
 ``fcgi`` (デフォルト)， ``scgi`` または ``ajp`` のいずれかです．例を以下に
 示します::
 
-    ./manage.py runfcgi --protocol=scgi
+    ./manage.py runfcgi protocol=scgi
 
 .. _flup: http://www.saddi.com/software/flup/
 .. _fastcgi: http://www.fastcgi.com/

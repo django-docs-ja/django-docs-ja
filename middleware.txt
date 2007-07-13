@@ -2,7 +2,7 @@
 ミドルウェア
 ============
 
-:revision-up-to: 5613 (0.97pre SVN)
+:revision-up-to: 5680 (0.97pre SVN)
 
 ミドルゥェア (Middleware) とは， Django のリクエスト/レスポンス処理に対する
 フックの集まりです．ミドルウェアは Django の入出力を操作するための軽量かつ
@@ -124,6 +124,17 @@ django.middleware.http.SetRemoteAddrFromForwardedFor
 アが ``REMOTE_ADDR`` に基づいて ``HTTP_X_FORWARDED_FOR`` を設定すると，誰も
 が "偽の" IP アドレスを名乗れてしまうからです．このミドルウェアを使ってよい
 のは， ``HTTP_X_FORWARDED_FOR`` の値を完全に信用できる場合だけです．
+
+
+django.middleware.locale.LocaleMiddleware
+-----------------------------------------
+
+リクエストに基づいて言語の選択を行います．言語の選択によって，ユーザごとに
+提供するコンテンツをカスタマイズできます． `国際化のドキュメント`_ を参照し
+てください．
+
+.. _`internationalization documentation`: ../i18n/
+.. _`国際化のドキュメント`: ../i18n/
 
 
 django.contrib.sessions.middleware.SessionMiddleware

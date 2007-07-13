@@ -217,7 +217,7 @@ URLconf に入れたことを思い出しましょう::
          'django.views.generic.list_detail.object_detail', info_dict),
         (r'^(?P<object_id>\d+)/results/$', 
          'django.views.generic.list_detail.object_detail', 
-         dict(info_dict, template_name='polls/results.html')),
+         dict(info_dict, template_name='polls/results.html'), 'poll_results'),
         (r'^(?P<poll_id>\d+)/vote/$', 'mysite.polls.views.vote'),
     )
 
@@ -233,6 +233,13 @@ URLconf に入れたことを思い出しましょう::
     * ``object_detail`` 汎用ビューには， ``"object_id"`` という名前で URL
       から ID をキャプチャして渡すことになっています．そこで，汎用ビュー向
       けに ``poll_id`` を ``object_id`` に書き換えてあります．
+
+    * 結果を表示するビューに ``poll_results`` という名前をつけてあります．
+      こうすると，このビューを呼び出すような URL を後で生成できます
+      (詳しくは「 `名前付きパターン`_ 」の説明を参照してください．)
+      
+.. _naming URL patterns: http://www.djangoproject.com/documentation/url_dispatch/#naming-url-patterns
+.. _`名前付きパターン`: `naming URL patterns`_
 
 デフォルトでは， ``object_detail`` 汎用ビューは 
 ``<app name>/<model name>_detail.html`` という名前のテンプレートを使います．
@@ -285,6 +292,15 @@ URLconf に入れたことを思い出しましょう::
 合わせて修正せねばなりません． ``polls/detail.html`` というテンプレートの呼
 び出しを ``polls/poll_detail.html`` に変え， ``poll`` ではなく ``object``
 をコンテキストに渡すようにしてください．
+
+最後に， URL が汎用ビューを指すように修正します．上の ``vote`` ビューでは，
+``reverse()`` 関数を使って URL のハードコードを防いでいます．汎用ビューに切
+替えたので， ``reverse()`` を変更して，URL が新しく追加した汎用ビューを指す
+ようにします．汎用ビューのビュー関数を使えれば簡単なのですが，汎用ビューと
+いうものは一つのサイトの中で何度も使われることがあるので，そういうわけには
+いかないのです．そこで，先程指定しておいたビューの名前を使います::
+    
+    return HttpResponseRedirect(reverse('poll_results', args=(p.id,)))
 
 サーバを実行して，新しく汎用ビューベースにした投票アプリケーションを使って
 みましょう．
