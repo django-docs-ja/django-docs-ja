@@ -21,7 +21,7 @@ Django の汎用ビューには以下のようなものがあります:
 
     * オブジェクトの生成，編集，削除を行うためのビュー．
 
-.. _`documentation index`: ../
+.. _`documentation index`: ../index/
 .. _`detail pages`: ../faq/
 .. _year: http://www.djangoproject.com/weblog/2005/
 .. _month: http://www.djangoproject.com/weblog/2005/jul/

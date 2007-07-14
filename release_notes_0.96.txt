@@ -170,9 +170,10 @@ Django 0.96 は 1000 以上の新規コミットと， 400 以上のバグフィクスの結果です．
 はやめて，新たなフォームから学び始めましょう．
 
 ``django.newforms`` の詳細は 
-`newforms のドキュメント ../newforms/`_ を参照してください．
+`newforms のドキュメント`_ を参照してください．
 
-.. _newforms documentation: ../newforms/
+.. _`newforms documentation`: ../newforms/
+.. _`newforms のドキュメント`: `newforms documentation`_
 
 .. _URLconf improvements:
 
@@ -228,9 +229,8 @@ URLconf のコールバックに呼出し可能オブジェクトを使えるようになりました (以
 ついに Django にテストフレームワークが導入されました． (テストファーストの
 推進者 Kent Beck には悪いですが) これで，「心配を退屈な作業に」変えられます．
 テストは 
-`doctest <http://www.python.jp/doc/release/lib/module-doctest.html>`_ か
-`unittes <http://www.python.jp/doc/release/lib/module-unittest.html>`_ を使っ
-て作成でき，簡単なテストクライアントを使ったビューのテストもできます．
+`doctest`_ か `unittest`_ を使って作成でき，
+簡単なテストクライアントを使ったビューのテストもできます．
 
 また，「フィクスチャ」のサポートも追加されました．フィクスチャは Django の
 サポートする `シリアライゼーション形式 <../serialization/>`_ で保存された初

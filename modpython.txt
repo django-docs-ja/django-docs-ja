@@ -138,6 +138,8 @@ mod_python を使った設定でデバッグ情報を出力したいのなら::
     http://www.python.jp/doc/contrib/modpython/directives.html
 .. _mod_python documentation: http://modpython.org/live/current/doc-html/directives.html
 
+.. _Serving media files:
+
 メディアファイルの提供
 ========================
 
@@ -185,6 +187,8 @@ mod_python を切ります::
 .. _lighttpd: http://www.lighttpd.net/
 .. _TUX: http://en.wikipedia.org/wiki/TUX_web_server
 .. _Apache: http://httpd.apache.org/
+
+.. _Serving the admin files:
 
 admin ファイルの提供
 ====================

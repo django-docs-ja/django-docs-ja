@@ -108,21 +108,21 @@ APIの安定性とは
      
 .. _caching: ../cache/
 .. _custom template tags and libraries: ../templates_python/
-.. _database lookup: ../db_api/
-.. _django-admin utility: ../django_admin/
+.. _database lookup: ../db-api/
+.. _django-admin utility: ../django-admin/
 .. _fastcgi integration: ../fastcgi/
 .. _flatpages: ../flatpages/
 .. _generic views: ../generic_views/
 .. _internationalization: ../i18n/
 .. _legacy database integration: ../legacy_databases/
-.. _model definition: ../model_api/
+.. _model definition: ../model-api/
 .. _mod_python integration: ../modpython/
 .. _redirects: ../redirects/
 .. _request/response objects: ../request_response/
 .. _sending email: ../email/
 .. _sessions: ../sessions/
 .. _settings: ../settings/
-.. _syndication: ../syndication/
+.. _syndication: ../syndication_feeds/
 .. _template language: ../templates/
 .. _transactions: ../transactions/
 .. _url dispatch: ../url_dispatch/
@@ -130,26 +130,26 @@ APIの安定性とは
 .. _serialization: ../serialization/
 .. _authentication: ../authentication/
 
-.. _`キャッシュ`: ../cache/
-.. _`カスタムテンプレートタグとライブラリ`: ../templates_python/
-.. _`データベース照合`: ../db_api/
-.. _`django-admin ユーティリティ`: ../django_admin/
-.. _`FastCGI の組み込み`: ../fastcgi/
-.. _`フラットページ`: ../flatpages/
-.. _`汎用ビュー`: ../generic_views/
-.. _`国際化`: ../i18n/
-.. _`古いデータベースの組み込み`: ../legacy_databases/
-.. _`モデル定義`: ../model_api/
-.. _`mod_python の組み込み`: ../modpython/
-.. _`リダイレクション`: ../redirects/
-.. _`リクエスト／レスポンスオブジェクト`: ../request_response/
-.. _`メールの送信`: ../email/
-.. _`セッション`: ../sessions/
-.. _`設定ファイル`: ../settings/
-.. _`配信フィード`: ../syndication/
-.. _`テンプレート言語`: ../templates/
-.. _`トランザクション`: ../transactions/
-.. _`URL のディスパッチ`: ../url_dispatch/
-.. _`フォームとバリデータ`: ../forms/
-.. _`シリアライゼーション`: ../serialization/
-.. _`認証`: ../authentication/
+.. _`キャッシュ`: caching_
+.. _`カスタムテンプレートタグとライブラリ`: `custom template tags and libraries`_
+.. _`データベース照合`: `database lookup`_
+.. _`django-admin ユーティリティ`: `django-admin utility`_
+.. _`FastCGI の組み込み`: `fastcgi integration`_
+.. _`フラットページ`: flatpages_
+.. _`汎用ビュー`: `generic views`_
+.. _`国際化`: internationalization_
+.. _`古いデータベースの組み込み`: `legacy database integration`_
+.. _`モデル定義`: `model definition`_
+.. _`mod_python の組み込み`: `mod_python integration`_
+.. _`リダイレクション`: redirects_
+.. _`リクエスト／レスポンスオブジェクト`: `request/response objects`_
+.. _`メールの送信`: `sending email`_
+.. _`セッション`: sessions_
+.. _`設定ファイル`: settings_
+.. _`配信フィード`: syndication_
+.. _`テンプレート言語`: `template language`_
+.. _`トランザクション`: transactions_
+.. _`URL のディスパッチ`: `url dispatch`_
+.. _`フォームとバリデータ`: `forms and validation`_
+.. _`シリアライゼーション`: serialization_
+.. _`認証`: authentication_

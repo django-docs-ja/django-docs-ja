@@ -1294,7 +1294,8 @@ Python 2.4 からは，デコレータ構文もうまく動作します::
 とになるでしょう．設定可能な変数は， `設定ファイルのドキュメント`_ に書かれ
 ています．関係のある変数は *TEMPLATE_* で始まっている設定です．
 
-.. _`設定ファイル`: ../settings/#using-settings-without-the-django-settings-module-environment-variable
-.. _`設定ファイルのドキュメント`: ../settings/
-.. _settings file: ../settings/#using-settings-without-the-django-settings-module-environment-variable
+.. _settings file:
+    ../settings/#using-settings-without-setting-django-settings-module
 .. _settings documentation: ../settings/
+.. _`設定ファイル`: `settings file`_
+.. _`設定ファイルのドキュメント`: `settings documentation`_

@@ -757,7 +757,7 @@ Django の古いフォーム／検証フレームワークを使ったことがある人は，この
 ``label`` 引数を使うと，フィールドに「人間に優しい」ラベルを指定できます．
 このラベルはフォーム内でフィールドを表示するときに使われます．
 
-上の `フォームを HTML として出力する <#outputting_forms_as_html>`_ で説明し
+上の `フォームを HTML として出力する`_ で説明し
 たように，フィールドのデフォルトのラベルはフィールド名のアンダースコアを除
 去して，頭文字を大文字にしたものです．デフォルトのラベル命名規則が期待通り
 のラベルを出力しない場合には，この引数を指定してください．
@@ -774,6 +774,8 @@ Django の古いフォーム／検証フレームワークを使ったことがある人は，この
     <tr><th>Your name:</th><td><input type="text" name="name" /></td></tr>
     <tr><th>Your Web site:</th><td><input type="text" name="url" /></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
+
+.. _`フォームを HTML として出力する`: `Outputting forms as HTML`_
 
 ``initial``
 ~~~~~~~~~~~

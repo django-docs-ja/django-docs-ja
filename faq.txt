@@ -630,8 +630,8 @@ Django のコードに特殊なケースを追加したくないと考えています．こうしたオプショ
 `SQL の初期データファイル`_ でも説明していますが， SQL ファイルには任意の
 SQL コードを入れられるので，SQL で行なえる変更なら何でも実現できます．
 
-.. _`SQL の初期データファイル`: ../model_api/#providing-initial-sql-data
-.. _SQL initial data file: ../model_api/#providing-initial-sql-data
+.. _SQL initial data file: ../model-api/#providing-initial-sql-data
+.. _`SQL の初期データファイル`: `SQL initial data file`_
 
 Django がメモリリークを起こしているのですが，なぜですか？
 ---------------------------------------------------------
@@ -652,6 +652,7 @@ Django に既知のメモリリークはありません． Django プロセスがメモリをどんどん
     from django import db
     db.reset_queries()
 
+.. _The admin site:
 
 admin サイトに関する質問
 ========================
@@ -730,8 +731,8 @@ admin で，オブジェクトを作成したユーザだけがオブジェクトを編集できるようにアクセ
 
 「mod_python で Django を使う」というドキュメントの `admin ファイルの提供`_
 
-.. _`admin ファイルの提供`: ../modpython/#serving-the-admin-files
 .. _serving the admin files: ../modpython/#serving-the-admin-files
+.. _`admin ファイルの提供`: `serving the admin files`_
 
 .. _My "list_filter" contains a ManyToManyField, but the filter doesn't display.:
 
@@ -790,8 +791,8 @@ admin サイトでユーザを作成したいのなら， Django の開発版を使ってください．
 ユーザの作成には Python API も利用できます．詳しくは `ユーザの作成`_ を参照
 してください．
 
-.. _`ユーザの作成`: ../authentication/#creating-users
 .. _creating users: ../authentication/#creating-users
+.. _`ユーザの作成`: `creating users`_
 
 .. _Contributing code:
 

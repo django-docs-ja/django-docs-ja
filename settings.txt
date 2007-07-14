@@ -817,8 +817,8 @@ SITE_ID
 
 `sites のドキュメント`_ を参照してください．
 
-.. _`sites のドキュメント`: sites.txt
-.. _sites documentation: ../sites/
+.. _`sites のドキュメント`: `sites documentation`_
+.. _`sites documentation`: ../sites/
 
 TEMPLATE_CONTEXT_PROCESSORS
 ---------------------------
@@ -961,7 +961,7 @@ URL_VALIDATOR_USER_AGENT
 特定の URL が実在するかを Django が調べにゆく際に使う ``User-Agent`` ヘッダ
 の値です． (URLField_ の ``verify_exists`` を参照してください．)
 
-.. _URLField: ../model_api/#urlfield
+.. _URLField: ../model-api/#urlfield
 
 
 USE_ETAGS
