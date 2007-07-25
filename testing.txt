@@ -2,7 +2,7 @@
 Djangoアプリケーションのテスト
 ==============================
 
-:revision-up-to: 5613 (0.97pre SVN)
+:revision-up-to: 5754 (0.97pre SVN)
 
 今日の Web 開発者にとって，自動化されたテストはバグ潰しの工程で極めて有用な
 ツールです．複数のテストを集めた **テストスイート** を使えば，Web開発におけ
@@ -69,7 +69,7 @@ doctest の文字列は ``models.py`` の全てのオブジェクトに対して
 
 例を示します::
 
-    from django.db import model
+    from django.db import models
     
     class Animal(models.Model):
         """
@@ -131,10 +131,25 @@ unittest_ を使います． doctest と同様， Django のテストランナ�
             self.assertEquals(self.lion.speak(), 'The lion says "roar"')
             self.assertEquals(self.cat.speak(), 'The cat says "meow"')
             
-`テストを実行する`_ と，テストユーティリティは ``models.py`` と
-``tests.py`` に入っている全てのテストケース (``unittest.TestCase`` のサブク
-ラス) を探しだし，そこからテストスイートを自動的に構築して，スイートを実行
-します．
+`テストを実行する`_ と，テストユーティリティはデフォルトの動作として，
+``models.py`` と ``tests.py`` に入っている全てのテストケース (つまり
+``unittest.TestCase`` のサブクラス) を捜し出し，そこからテストスイートを自
+動的に構築して，スイートを実行します．
+
+**開発バージョンの Django で登場した機能**
+
+ただし， ``models.py`` や ``tests.py`` で ``suite()`` メソッドを定義してい
+る場合，モジュールのテストスイートの構築は ``suite()`` メソッドを使って行い
+ます．この仕様は，ユニットテストにおいて 
+`推奨されているテストスイートの構築方法`_ に従っています．複雑なテストスイー
+トの構築方法についての詳細は Python のドキュメントを参照してください．
+
+However, if you define a method called ``suite()`` in either ``models.py`` or
+``tests.py``, that method will be used to construct the test suite for that
+module. This follows the `suggested organization`_ for unit tests. See the
+Python documentation for more details on how to construct a complex test
+suite.
+
 
 ``unittest`` の詳細は `標準ライブラリドキュメントの unittest の項`_ を参照
 してください．
@@ -142,9 +157,12 @@ unittest_ を使います． doctest と同様， Django のテストランナ�
 .. unittest: http://docs.python.org/lib/module-unittest.html
 .. _standard library unittest documentation: unittest_
 .. _run your tests: `Running tests`_
+.. _suggested organization: http://docs.python.org/lib/organizing-tests.html
 .. _`テストを実行する`: `Running tests`_
 .. _unittest: http://python.jp/doc/release/lib/module-unittest.html
 .. _`標準ライブラリドキュメントの unittest の項`: unittest_
+.. _`推奨されているテストスイートの構築方法`: 
+  http://python.jp/doc/release/lib/organizing-tests.html
 
 .. _Which should I use?:
 
@@ -550,10 +568,11 @@ Djangoは，各テストケースの開始時に，フィクスチャのイン�
 ``django.TestCase`` では，Web サイトの挙動をテストするのに便利なアサーショ
 ンをさらにいくつか追加しています．
 
-``assertContains(response, text, count=1, status_code=200)``
-    ページの取得が行われ，指定の HTTP 状態コード 200 が生成され，レスポンス
-    のコンテンツ内に ``text`` に指定した内容が ``count`` 回登場するかどうか
-    調べるアサーションです．
+``assertContains(response, text, count=None, status_code=200)``
+    ページの取得が行われ，指定の HTTP 状態コードが生成され，レスポンス
+    のコンテンツ内に ``text`` が入っているかどうか調べるアサーションです．
+    ``count`` を指定すると， ``text`` は正確に ``count`` 回出現せねばなりま
+    せん．
 
 ``assertFormError(response, form, field, errors)``
     ``form`` に指定したフォーム上のフィールド ``field`` で， ``errors`` に
@@ -745,17 +764,29 @@ Django は他のテストフレームワークを明にサポートしている�
 ----------------------
 
 慣習的に，テストランナは ``run_tests`` と呼ぶことになっていますが，実際には
-どんな名前にしてもかまいません．ただし，テストランナは以下に示すように二つ
-の引数をとらねばなりません．
+どんな名前にしてもかまいません．ただし，テストランナは以下のように Django
+テストランナと同じ引数をとらねばなりません:
 
-``run_tests(module_list, verbosity=1)``
+``run_tests(module_list, verbosity=1, interactive=True, extra_tests=[])``
   ``module_list`` はテスト対象のモデルが入った Python モジュールのリストで，
   ``django.db.models.get_apps()`` が返すのと同じフォーマットです．
+  テストランナはこのリストに挙げたモジュールからテストを捜し出さねばなりま
+  せん．
 
   ``verbosity`` には，コンソールに出力される通知情報やデバッグ情報の量を指
   定します．  ``0`` にすると何も出力しません． ``1`` は通常の出力， ``2``
   は多めの出力です．
 
+  **開発バージョンの Django で新たに追加された機能** 
+  ``interactive`` を ``True`` にすると，テストスイートの実行時にテストラン
+  ナがユーザに指示を尋ねられるようにします．例えば，テストデータベースを削
+  除してよいか尋ねるといった使い方です． ``interactive`` が ``False`` の場
+  合，テストスイートは手動操作の介在なく実行できねばなりません．
+  
+  ``extra_tests`` には，このテストランナに追加で実行させたい ``TestCase``
+  インスタンスを指定します． ``extra_tests`` を指定すると， ``module_list``
+  から発見したテストに加えて，指定したテストを実行します．
+    
   このメソッドは失敗したテストの数を返さねばなりません．
 
 .. _Testing utilities:

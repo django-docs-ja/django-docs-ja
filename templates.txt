@@ -2,7 +2,7 @@
 テンプレート作者のための Django テンプレート言語ガイド
 =======================================================
 
-:revision-up-to: 5680 (0.97pre SVN)
+:revision-up-to: 5719 (0.97pre SVN)
 
 Django のテンプレート言語は，釣合いの取れたパワーと簡便さを実現するように，
 また HTML を扱いなれた人にとっては快適になるように設計されています．
@@ -786,10 +786,20 @@ regroup
 
 オブジェクトのリストから，属性値によって同種のオブジェクトをまとめます．
 
-この難解なタグを説明するには，例を使うのが一番でしょう: 仮に， ``Person``
-オブジェクトからなるリスト ``people`` があり， ``Person`` オブジェクトには
-``first_name``, ``last_name``, および ``gender`` という属性があるとします．
-リストを以下のように表示したいとしましょう:
+この難解なタグを説明するには，例を使うのが一番でしょう: 仮に，複数人の情報
+の入った ``people`` というリストがあり，各人の情報は ``first_name``,
+``last_name``, および ``gender`` といったキーを持つ辞書で表されているとしま
+しょう::
+
+    people = [
+        {'first_name': 'George', 'last_name': 'Bush', 'gender': 'Male'},
+        {'first_name': 'Bill', 'last_name': 'Clinton', 'gender': 'Male'},
+        {'first_name': 'Margaret', 'last_name': 'Thatcher', 'gender': 'Female'},
+        {'first_name': 'Condoleezza', 'last_name': 'Rice', 'gender': 'Female'},
+        {'first_name': 'Pat', 'last_name': 'Smith', 'gender': 'Unknown'},
+    ]
+
+このデータを，以下のように性別ごとに階層化して表示したいとします::
 
     * Male:
         * George Bush
@@ -800,35 +810,73 @@ regroup
     * Unknown:
         * Pat Smith
 
-以下のようなテンプレートを使うと，この小難しいタスクを実現してくれます::
+``{% regroup %}`` タグを使うと， ``people`` を性別ごとにグループ化できます．
+以下のようなテンプレートを使って実現します::
 
-    {% regroup people by gender as grouped %}
+    {% regroup people by gender as gender_list %}
     <ul>
-    {% for group in grouped %}
-        <li>{{ group.grouper }}
+    {% for gender in gender_list  %}
+        <li>{{ gender.grouper }}
         <ul>
-            {% for item in group.list %}
-            <li>{{ item }}</li>
+            {% for item in gender.list %}
+            <li>{{ item.first_name }} {{ item.last_name }}</li>
             {% endfor %}
         </ul>
         </li>
     {% endfor %}
     </ul>
 
-上で見たように， ``{% regroup %}`` は ``grouper`` および ``list`` 属性にオ
-ブジェクトのリストをつめこんでゆきます． ``grouper`` にはグループ化に使った
-項目が入ります． ``list`` には ``grouper`` を同じくするオブジェクトのリスト
-が入ります．
+例を順番に見てゆきましょう． ``{% regroup %}`` は 3 つの引数をとります．最
+初は再グループ化 (regroup) したいリスト，二つめはグループ化に使う属性やキー
+の名前，そして最後は再グループ化後のリストにつける名前です．ここでは，
+``gender`` キーを使って ``people`` を再グループ化し， ``gender_list`` とい
+う名前で参照できるようにしています．
 
-この場合， ``grouper`` は ``Male``, ``Female`` および ``Unknown`` になり，
-``list`` は各 ``grouper`` ごとのリストになります．
+``{% regroup %}`` は **グループオブジェクト** のリストを生成して返します
+(この場合は ``gender_list`` です)．グループオブジェクトには二つの属性があり
+ます:
 
-グループ化対象のリストがグループ化したいキーでソートされていない場合，
-``{% regroup %}`` はうまく働かないので注意して下さい! すなわち， ``People``
-のリストを ``gender`` で並べたければ，あらかじめ以下のようにして並べかえて
-おかねばなりません::
+    * ``grouper`` -- グループ化している項目 (例えば "Male" や "Female" といっ
+      た文字列) です．
+    * ``list`` -- グループ内の全ての要素からなるリスト (例えば，
+      ``gender='Male'`` の人全員からなるリスト) です．
 
-    {% regroup people|dictsort:"gender" by gender as grouped %}
+``{% regroup %}`` は入力をソートしないので注意してください! 上の例では，
+リスト ``people`` はあらかじめ ``gender`` でソート済みという前提に立ってい
+ます． ``people`` が ``gender`` の順に並んで *いない* 場合，再グループは何
+も考えずに一つの性別のグループを複数つくってしまいます．例えば， ``people``
+が以下のように (``'Male'`` がリスト内でまとまっていない状態に) なっていたと
+しましょう::
+
+    people = [
+        {'first_name': 'Bill', 'last_name': 'Clinton', 'gender': 'Male'},
+        {'first_name': 'Pat', 'last_name': 'Smith', 'gender': 'Unknown'},
+        {'first_name': 'Margaret', 'last_name': 'Thatcher', 'gender': 'Female'},
+        {'first_name': 'George', 'last_name': 'Bush', 'gender': 'Male'},
+        {'first_name': 'Condoleezza', 'last_name': 'Rice', 'gender': 'Female'},
+    ]
+
+この ``people`` を入力に使うと，上の ``{% regroup %}`` のテンプレートコード
+例は以下のような出力を生成します::
+
+    * Male:
+        * Bill Clinton
+    * Unknown:
+        * Pat Smith
+    * Female:
+        * Margaret Thatcher
+    * Male:
+        * George Bush
+    * Female:
+        * Condoleezza Rice
+
+こうした落し穴を解決したければ，ビューコード内であらかじめデータを表示した
+い順番に並べておくのが最も簡単でしょう．
+
+データが辞書の列の場合には，もう一つの解決策として，テンプレートの中で
+``dictsort`` フィルタを使ってデータを並べ変えられます::
+
+    {% regroup people|dictsort:"gender" by gender as gender_list %}
 
 spaceless
 ~~~~~~~~~
@@ -1023,14 +1071,13 @@ default_if_none
 dictsort
 ~~~~~~~~
 
-辞書のリストを入力にとり，引数に指定したプロパティに対応する値でリストをソー
-トして返します．
+辞書のリストを入力にとり，引数に指定したキーでリストをソートして返します．
 
 dictsortreversed
 ~~~~~~~~~~~~~~~~
 
-辞書のリストを入力にとり，引数に指定したプロパティに対応する値でリストを逆
-順にソートして返します．
+辞書のリストを入力にとり，引数に指定したキーでリストを逆順にソートして返し
+ます．
 
 divisibleby
 ~~~~~~~~~~~

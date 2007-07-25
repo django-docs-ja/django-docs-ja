@@ -2,7 +2,7 @@
 モデル API リファレンス
 =======================
 
-:revision-up-to: 5640 (0.97pre SVN)
+:revision-up-to: 5754 (0.97pre SVN)
 
 モデルとは，サイトを構成するデータの，ただ一つかつ最終的なデータソースを指
 します．モデルには，保存したいデータに不可欠なデータフィールドと，その振舞
@@ -1062,6 +1062,120 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
 
 .. _One-to-one relationship model example:
     http://www.djangoproject.com/documentation/models/one_to_one/
+
+.. _Custom field types:
+
+カスタムのフィールド型
+-----------------------
+
+**開発版の Django で新たに追加された機能です**
+
+Django の組み込みフィールド型は，データベースのカラムとして利用できる全ての
+データ型をサポートしているわけではなく， ``VARCHAR`` や ``INTEGER`` のよう
+な一般的な型しかサポートしていません．幾何多角形 (geographic polygon) 型や，
+`PostgreSQL カスタム型`_ のようなユーザ定義型といった特異な型を扱うには，
+``Field`` 型のサブクラスを定義する必要があります．
+
+.. _PostgreSQL custom types: http://www.postgresql.org/docs/8.2/interactive/sql-createtype.html
+.. _`PostgreSQL カスタム型`: `PostgreSQL custom types`_
+
+.. admonition:: Experimental territory
+
+  この分野は， Django の中でも伝統的にドキュメント化されて来なかった部分で
+  すが，これからは少しづつドキュメントを増やしていく予定です．というわけで，
+  当面は薄い内容ですがご容赦くださいね．
+
+  最先端の世界に住むのが好きで，不安定でドキュメント化されていない API を使
+  うリスクを気にしないのなら， ``django/db/models/fields/__init__.py`` の
+  コアの ``Field`` クラスのコードを読むとよいでしょう -- ただし，中身がごっ
+  そり変わっていても，そんなの聞いてないよなんて言わないでくださいね．
+
+カスタムのフィールド型を定義するには， ``django.db.models.Field`` をサブク
+ラス化します．サブクラスで実装せねばならないメソッドの一部を以下に示します:
+
+``db_type()``
+~~~~~~~~~~~~~
+
+``DATABASE_ENGINE`` 設定に指定されているデータベースで，フィールドのデータ
+を保存するために使うカラム型を返します．
+
+例えば， PostgreSQL 固有のカスタム型 ``mytype`` を作成したとしましょう．
+Django からこの型を使うには，以下のように ``Field`` をサブクラス化して， 
+``db_type()`` メソッドを実装します::
+
+    from django.db import models
+
+    class MytypeField(models.Field):
+        def db_type(self):
+            return 'mytype'
+
+``MytypeField`` を定義したら，他のフィールド型と同じようにモデルで利用でき
+ます::
+
+    class Person(models.Model):
+        name = models.CharField(maxlength=80)
+        gender = models.CharField(maxlength=1)
+        something_else = MytypeField()
+
+データベースに依存しないアプリケーションを構築したいなら，データベースごと
+のカラム型の違いに注意しておかねばなりません．例えば， PostgreSQL では日付
+や時間に関するカラム型は ``timestamp`` 型ですが， MySQL では ``datetime``
+型です．この違いを ``db_type()`` メソッドの中で吸収するには，Djangoの
+``settings`` モジュールを import しておいて，以下のように
+``DATABASE_ENGINE`` 設定をチェックします::
+
+    class MyDateField(models.Field):
+        def db_type(self):
+            from django.conf import settings
+            if settings.DATABASE_ENGINE == 'mysql':
+                return 'datetime'
+            else:
+                return 'timestamp'
+
+``db_type()`` メソッドは，Django がアプリケーションのテーブルを生成するため
+の ``CREATE TABLE``` 文を構築する瞬間，すなわち最初にテーブルを生成する瞬
+間しか呼び出されません．それ以外の場合に呼び出されることはないので，上記の
+``DATABASE_ENGINE`` をチェックする例のような多少ややこしいコードを書いても
+さして問題ではありません．
+
+カラムのデータ型にはパラメタをとるものがあります．例えば ``CHAR(25)`` は，
+``25`` がカラムの最大長を表しています．こうした場合には， ``db_type()`` メ
+ソッド内でハードコードしておくよりも，モデル内でパラメタを指定して使えるよ
+うになっていた方が柔軟性を高められます．例えば，以下に示すような
+``CharMaxlength25Field`` はあまり便利ではありません::
+
+    # パラメタをハードコードしているおバカな例
+    class CharMaxlength25Field(models.Field):
+        def db_type(self):
+            return 'char(25)'
+
+    # モデル内での使い方
+    class MyModel(models.Model):
+        # ...
+        my_field = CharMaxlength25Field()
+
+実行時，すなわちフィールドクラスをインスタンス化する時にパラメタを指定でき
+た方がよいでしょう．パラメタを指定できるようにするには，以下のように 
+``__init__()`` を実装します::
+
+    # より柔軟性のある例
+    class BetterCharField(models.Field):
+        def __init__(self, maxlength, *args, **kwargs):
+            self.maxlength = maxlength
+            super(BetterCharField, self).__init__(*args, **kwargs)
+
+        def db_type(self):
+            return 'char(%s)' % self.maxlength
+
+    # モデル内での使い方
+    class MyModel(models.Model):
+        # ...
+        my_field = BetterCharField(25)
+
+フィールドクラスの ``__init__()`` を実装する場合は，必ず親クラスの
+``Field.__init__()`` すなわち親クラスの ``__init__()`` メソッドを呼び出して
+ください．
+
 
 .. _Meta options:
 
