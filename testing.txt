@@ -2,7 +2,7 @@
 Djangoアプリケーションのテスト
 ==============================
 
-:revision-up-to: 5754 (0.97pre SVN)
+:revision-up-to: 5804 (0.97pre SVN)
 
 今日の Web 開発者にとって，自動化されたテストはバグ潰しの工程で極めて有用な
 ツールです．複数のテストを集めた **テストスイート** を使えば，Web開発におけ
@@ -86,8 +86,8 @@ doctest の文字列は ``models.py`` の全てのオブジェクトに対して
         'The cat says "meow"'
         """
         
-        name = models.CharField(maxlength=20)
-        sound = models.CharField(maxlength=20)
+        name = models.CharField(max_length=20)
+        sound = models.CharField(max_length=20)
         
         def speak(self):
             return 'The %s says "%s"' % (self.name, self.sound)
@@ -528,7 +528,10 @@ TestCaseクラス
         fixtures = ['mammals.json', 'birds']
         
         def setUp(self):
-            # test definitions as before
+            # 従来通りのテスト定義
+
+        def testFluffyAnimals(self):
+            # フィクスチャを使うテスト
 
 テストケースの開始時で，かつ ``setUp()`` の実行前に， Django はデータベース
 を一掃して，データベースを ``syncdb`` 直後の状態に戻します．次に，テストケー
@@ -665,6 +668,20 @@ Django は，テストフレームワークを初期化する際，通常の `SM
  
     $ ./manage.py test animals
 
+**開発バージョンの Django で新たに追加された機能:**
+単体テストを実行する際，どのテストを実行するかを指定できます．あるアプリケー
+ション用のテストケースを実行する場合 (例えば，上で解説した AnimalTestCase
+の場合) は，コマンドラインにテストケースの名前を追加してください::
+
+    $ ./manage.py test animals.AnimalTestCase
+
+**開発バージョンの Django で新たに追加された機能:**
+テストケース中の個別のテストメソッドを実行したければ，メソッド名を指定して
+ください::
+
+    $ ./manage.py test animals.AnimalTestCase.testFluffyAnimals
+
+
 テストを実行すると，テストデータベースの生成やモデルの初期化の過程を示すテ
 キストが表示されます．テストデータベースはテストを実行するたびに生成されま
 す．
@@ -767,17 +784,25 @@ Django は他のテストフレームワークを明にサポートしている�
 どんな名前にしてもかまいません．ただし，テストランナは以下のように Django
 テストランナと同じ引数をとらねばなりません:
 
-``run_tests(module_list, verbosity=1, interactive=True, extra_tests=[])``
-  ``module_list`` はテスト対象のモデルが入った Python モジュールのリストで，
-  ``django.db.models.get_apps()`` が返すのと同じフォーマットです．
-  テストランナはこのリストに挙げたモジュールからテストを捜し出さねばなりま
-  せん．
+``run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[])``
+
+  **開発バージョンの Django で新たに追加された機能:** ``test_labels`` には，
+  実行したいテストを表す文字列 (ラベル) のリストを指定します．ラベルは以下
+  の 3 つの形式で指定できます:
+
+    * ``app.TestCase.test_method`` - テストケース中の個別のテストメソッドを
+      実行します．
+    * ``app.TestCase`` - テストケース中の全てのテストメソッドを実行します．
+    * ``app`` - アプリケーション中の全てのテストを探して実行します．
+
+  ``test_labels`` が ``None`` の場合，テストランナは ``INSTALLED_APPS`` に
+  登録されている全てのアプリケーションからテストを探して実行します．
 
   ``verbosity`` には，コンソールに出力される通知情報やデバッグ情報の量を指
   定します．  ``0`` にすると何も出力しません． ``1`` は通常の出力， ``2``
   は多めの出力です．
 
-  **開発バージョンの Django で新たに追加された機能** 
+  **開発バージョンの Django で新たに追加された機能:** 
   ``interactive`` を ``True`` にすると，テストスイートの実行時にテストラン
   ナがユーザに指示を尋ねられるようにします．例えば，テストデータベースを削
   除してよいか尋ねるといった使い方です． ``interactive`` が ``False`` の場

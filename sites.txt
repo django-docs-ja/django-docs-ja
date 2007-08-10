@@ -2,7 +2,7 @@
 "sites" フレームワーク
 ======================
 
-:revision-up-to: 5613 (0.97pre SVN)
+:revision-up-to: 5804 (0.97pre SVN)
 
 Django にはオプションとして使える "sites" フレームワークが付属しています．
 "sites" はオブジェクトや機能を特定の Web サイトに関連付けるためのフックであ
@@ -52,7 +52,7 @@ Lawrence Journal-World newspaper が管理しています． LJWorld.com はニ�
     from django.contrib.sites.models import Site
 
     class Article(models.Model):
-        headline = models.CharField(maxlength=200)
+        headline = models.CharField(max_length=200)
         # ...
         sites = models.ManyToManyField(Site)
 
@@ -95,7 +95,7 @@ Lawrence Journal-World newspaper が管理しています． LJWorld.com はニ�
     from django.contrib.sites.models import Site
 
     class Article(models.Model):
-        headline = models.CharField(maxlength=200)
+        headline = models.CharField(max_length=200)
         # ...
         site = models.ForeignKey(Site)
 
@@ -247,7 +247,7 @@ Django の ``get_absolute_url()`` は，オブジェクトの URL をドメイ�
 
     class Photo(models.Model):
         photo = models.FileField(upload_to='/home/photos')
-        photographer_name = models.CharField(maxlength=100)
+        photographer_name = models.CharField(max_length=100)
         pub_date = models.DateField()
         site = models.ForeignKey(Site)
         objects = models.Manager()
@@ -277,7 +277,7 @@ Django の ``get_absolute_url()`` は，オブジェクトの URL をドメイ�
 
     class Photo(models.Model):
         photo = models.FileField(upload_to='/home/photos')
-        photographer_name = models.CharField(maxlength=100)
+        photographer_name = models.CharField(max_length=100)
         pub_date = models.DateField()
         publish_on = models.ForeignKey(Site)
         objects = models.Manager()

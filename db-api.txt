@@ -2,7 +2,7 @@
 データベース API リファレンス
 =============================
 
-:revision-up-to: 5754 (0.97pre SVN)
+:revision-up-to: 5804 (0.97pre SVN)
 
 `データモデル`_ を作成したら，次はデータベースからデータを取り出す必要があ
 ります．このドキュメントでは，モデルから利用できるデータベース抽象化 API と，
@@ -15,22 +15,22 @@
 す::
 
     class Blog(models.Model):
-        name = models.CharField(maxlength=100)
+        name = models.CharField(max_length=100)
         tagline = models.TextField()
 
         def __unicode__(self):
             return self.name
 
     class Author(models.Model):
-        name = models.CharField(maxlength=50)
-        email = models.URLField()
+        name = models.CharField(max_length=50)
+        email = models.EmailField()
 
         def __unicode__(self):
             return self.name
 
     class Entry(models.Model):
         blog = models.ForeignKey(Blog)
-        headline = models.CharField(maxlength=255)
+        headline = models.CharField(max_length=255)
         body_text = models.TextField()
         pub_date = models.DateTimeField()
         authors = models.ManyToManyField(Author)
@@ -1596,8 +1596,7 @@ Q オブジェクトを使った複雑な照合
 
 `OR lookups examples page`_ の例も参照してください．
 
-.. _OR lookups examples page:
-    http://www.djangoproject.com/documentation/models/or_lookups/
+.. _OR lookups examples page: ../models/or_lookups/
 
 .. _Related objects:
 
@@ -1935,8 +1934,8 @@ get_FOO_display()
         ('F', 'Female'),
     )
     class Person(models.Model):
-        name = models.CharField(maxlength=20)
-        gender = models.CharField(maxlength=1, choices=GENDER_CHOICES)
+        name = models.CharField(max_length=20)
+        gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
 
 では，各 ``Person`` インスタンスは ``get_gender_display()`` メソッド
 を持ちます::
@@ -1965,8 +1964,7 @@ get_next_by_FOO(\**kwargs) and get_previous_by_FOO(\**kwargs)
 いことが保証されています．完全なコードの例は `照合 API のサンプルモデル`_
 を参照してください．
 
-.. _lookup API sample model:
-    http://www.djangoproject.com/documentation/models/lookup/
+.. _lookup API sample model: ../models/lookup/
 .. _`照合 API のサンプルモデル`: `lookup API sample model`_
 
 get_FOO_filename()
@@ -2020,8 +2018,8 @@ get_FOO_height() and get_FOO_width()
 数として定義し，ビュー内の処理をすっきりと書けるようにしています．ショート
 カット関数は ``django.shortcuts`` モジュールに収められています．
 
-get_object_or_404()
--------------------
+``get_object_or_404()``
+-----------------------
 
 よく使われるイディオムの一つは， ``get()`` を呼び出し，オブジェクトが存在し
 ないときには ``Http404`` を送出するというものです． ``get_object_or_404()``
@@ -2047,16 +2045,17 @@ get_object_or_404()
     # 検索する
     e = get_object_or_404(Entry.recent_entries, pk=3)
 
-カスタムマネジャにカスタムメソッド追加して使いたい場合は，
-``get_object_or_404()`` にクエリセットを渡します::
+**開発版の Django で新たに追加された機能です:** カスタムマネジャにカスタム
+メソッドを追加して使いたい場合は， ``get_object_or_404()`` にクエリセット
+を渡します::
 
     # カスタムマネジャの 'published' メソッドが返すクエリセットを使って
     # 主キーの値が 5 のオブジェクトを検索する
     e = get_object_or_404(Entry.objects.published(), pk=5)
 
 
-get_list_or_404()
------------------
+``get_list_or_404()``
+---------------------
 
 ``get_list_or_404`` の動作は ``get_object_or_404()`` とほとんど同じですが，
 ``get()`` の代わりに ``filter()`` を使い，リストが空の場合に ``Http404`` を

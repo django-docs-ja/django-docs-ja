@@ -2,7 +2,7 @@
 Django バージョン 0.95 リリースノート
 =====================================
 
-:revision-up-to: 5613 (0.97pre SVN)
+:revision-up-to: 5804 (0.97pre SVN)
 
 Django 0.95 リリースへようこそ．
 
@@ -120,7 +120,7 @@ Django を使った問題解決で手助けが必要になったときは? 配�
 開発者が常に集まっています．気さくな人達がいつもいて，手助けをしてくれたり，
 話相手になってくれます．
 
-.. _online: http://www.djangoproject.com/documentation/
+.. _online: http://www.djangoproject.com/documentation/0.95/
 .. _Django website: http://www.djangoproject.com/
 .. _FAQ: ../faq/
 .. _django-users: http://groups.google.com/group/django-users

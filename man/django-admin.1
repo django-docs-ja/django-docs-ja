@@ -1,0 +1,167 @@
+.TH "django-admin.py" "1" "June 2007" "Django Project" ""
+.SH "NAME"
+django\-admin.py \- Django web フレームワークのためのユーティリティスクリプト
+.SH "文法"
+.B django\-admin.py
+.I <操作>
+.B [オプション]
+.sp
+.SH "説明"
+このユーティリティスクリプトを使うと， Django のプロジェクトや
+アプリケーションの生成やメンテナンスのためのコマンドを実行できます．
+.sp
+以下に示すコマンドは，
+.BI startproject
+を除いて， Django のプロジェクトディレクトリ直下にある
+.BI manage.py
+スクリプトを使っても実行できます．
+.sp
+.SH "操作"
+.TP
+.BI "adminindex [" "appname ..." "]"
+指定したアプリケーション向けに admin のインデクスページのテンプレートを
+出力します．
+.TP
+.BI "createcachetable [" "tablename" "]"
+SQL キャッシュバックエンドが使うキャッシュテーブルを生成します．
+.TP
+.B dbshell
+現在 DATABASE_ENGINE に指定しているデータベースのコマンドラインクライアント
+を起動します．
+.BI DATABASE_ENGINE.
+.TP
+.B diffsettings
+現在の
+.B settings.py
+と， Django のデフォルトの設定との差分を出力します．
+デフォルトの設定にない変数の行頭には "###" が出力されます．
+.TP
+.B inspectdb
+settings.py で指定したデータベーステーブルに対してイントロスペクションを行い，
+その結果を Django モデルモジュールにして出力します．
+.TP
+.BI "install [" "appname ..." "]"
+指定したアプリケーションに対して
+.B sqlall
+の内容を実行します．
+.TP
+.BI "reset [" "appname ..." "]"
+指定したアプリケーションに対して
+.B sqlreset
+の内容を実行します．
+.TP
+.BI "runfcgi [" "KEY=val" "] [" "KEY=val" "] " "..."
+プロジェクトを FastCGI のアプリケーションとして実行します．
+flup モジュールのインストールが必要です．
+.B runfcgi help
+を実行すると， KEY=val 対の説明を表示します．
+.TP
+.BI "runserver [" "\-\-noreload" "] [" "\-\-adminmedia=ADMIN_MEDIA_PATH" "] [" "port|ipaddr:port" "]"
+開発用の軽量 Web サーバを起動します．
+.TP
+.BI "shell [" "\-\-plain" "]"
+Python 対話シェルを起動します． IPython がインストールされていれば，
+IPython を使います．
+.BI \-\-plain
+オプションを指定すると，
+IPython がインストールされていても標準の Python 対話シェルを使います．
+.TP
+.BI "sql [" "appname ..." "]"
+指定したアプリケーション向けに CREATE TABLE を行うための SQL 文を生成します．
+.TP
+.BI "sqlall [" "appname ..." "]"
+指定したアプリケーション向けに CREATE TABLE と初期データの投入，および
+CREATE INDEX を行うための SQL 文を生成します．
+.TP
+.BI "sqlclear [" "appname ..." "]"
+指定したアプリケーション向けに DROP TABLE を行うための SQL 文を生成します．
+.TP
+.BI "sqlindexes [" "appname ..." "]"
+指定したアプリケーション向けに CREATE INDEX を行うための SQL 文を生成します．
+.TP
+.BI "sqlinitialdata [" "appname ..." "]"
+指定したアプリケーション向けに初期データの INSERT を行うための
+SQL 文を生成します．
+.TP
+.BI "sqlreset [" "appname ..." "]"
+指定したアプリケーション向けに DROP TABLE および CREATE TABLE を行うための
+SQL 文を生成します．
+.TP
+.BI "sqlsequencereset [" "appname ..." "]"
+指定したアプリケーション向けに PostgreSQL
+シークエンスをリセットするための SQL 文を出力します．
+.TP
+.BI "startapp [" "appname" "]"
+現在のディレクトリの直下に， 指定した名前の Django アプリケーション
+のディレクトリ構造を作成します．
+.TP
+.BI "startproject [" "projectname" "]"
+現在のディレクトリ下に，指定したディレクトリ名で
+Django のプロジェクトディレクトリ構造を作成します．
+.TP
+.BI syncdb
+INSTALLED_APPS に登録されている全てのアプリケーションの
+データベーステーブルを生成し，初期データを投入します．
+.TP
+.BI "test [" "\-\-verbosity" "] [" "appname ..." "]"
+指定したアプリケーション内の全てのテストを実行します．
+アプリケーションを指定しない場合，プロジェクト全体のテストを実行します．
+.TP
+.BI validate
+インストール済みの全てのモデルを検証します．
+.SH "オプション"
+.TP
+.I \-\-version
+プログラムのバージョン番号を出力して終了します．
+.TP
+.I \-h, \-\-help
+ヘルプメッセージを出力して終了します．
+.TP
+.I \-\-settings=SETTINGS
+設定モジュールのある場所への Python パスです．この変数を指定しない
+場合，環境変数 DJANGO_SETTINGS_MODULE を使います．
+.TP
+.I \-\-pythonpath=PYTHONPATH
+Python パスに加えたいディレクトリを指定します．
+"/home/djangoprojects/myproject" のように指定します．
+.TP
+.I \-\-plain
+IPython がインストールされている場合， "shell" コマンドで IPython が起動
+されるのを抑制し，通常の Python 対話シェルを使います．
+.TP
+.I \-\-noinput
+ユーザに入力プロンプトを表示しません．
+.TP
+.I \-\-noreload
+開発サーバの自動リロード機能を無効化します．
+.TP
+.I \-\-verbosity=VERBOSITY
+メッセージの出力レベルです: 0 は最小限， 1 は通常， 2 は全ての
+メッセージを出力します．
+.TP
+.I \-\-adminmedia=ADMIN_MEDIA_PATH
+開発サーバを起動する際に， admin メディアファイルの置場所として使う
+ディレクトリを指定します．
+.SH "環境変数"
+.TP
+.I DJANGO_SETTINGS_MODULE
+.BI \-\-settings
+オプションを指定しない場合，この環境変数で指定された
+設定ファイルモジュールを読み込みます． "myproject.settings" のように，
+Python の import パス表記で設定せねばなりません．
+.SH "参考"
+各オプションの詳しい説明と用例，および Django フレームワーク全般の
+解説は，Django 開発サイト:
+.sp
+.I http://www.djangoproject.com/documentation/
+.sp
+か，配布物中のドキュメントを参照してください．
+.SH "作者/クレジット"
+オリジナルのバージョンは米国カンザス州ローレンスの World Online
+によって開発されました．貢献者一覧は Django 配布物の AUTHORS ファイルを
+参照してください．
+.sp
+.SH "ライセンス"
+新 BSD ライセンスです．ライセンス全文は， Django 配布物の LICENSE
+ファイルを参照してください．
+

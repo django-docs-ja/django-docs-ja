@@ -2,7 +2,7 @@
 URL ディスパッチャ
 ==================
 
-:revision-up-to: 5640 (0.97pre SVN)
+:revision-up-to: 5804 (0.97pre SVN)
 
 すっきりした，簡潔で明解な URL スキームの設計は，高品質の Web アプリケーショ
 ンでは重要な要素です．Django では，フレームワークの制限なしに，望み通りの
@@ -450,10 +450,10 @@ URLconf タプルにはオプションとして 3 つめの要素を指定でき
 このテクニックは `汎用ビュー`_ や `配信フィードフレームワーク`_ で，メタデー
 タやビューへのオプションを渡すために使われています．
 
-.. _`汎用ビュー`: ../generic_views/
 .. _generic views: ../generic_views/
-.. _`配信フィードフレームワーク`: ../syndication_feeds/
-.. _syndication framework: ../syndication/
+.. _syndication framework: ../syndication_feeds/
+.. _`汎用ビュー`: `generic views`_
+.. _`配信フィードフレームワーク`: `syndication framework`_
 
 .. admonition:: 衝突を避ける
 
