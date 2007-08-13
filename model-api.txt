@@ -2,7 +2,7 @@
 モデル API リファレンス
 =======================
 
-:revision-up-to: 5832 (0.97pre SVN)
+:revision-up-to: 5878 (0.97pre SVN)
 
 モデルとは、サイトを構成するデータの、ただ一つかつ最終的なデータソースを指
 します。モデルには、保存したいデータに不可欠なデータフィールドと、その振舞
@@ -437,7 +437,8 @@ admin フォームで JavaScript を介してスラグを自動生成する際�
 
     models.SlugField(prepopulate_from=("pre_name", "name"))
 
-DateTimeField は ``prepopulate_from`` に入れられません。
+DateTimeField, ForeignKey, ManyToManyField は ``prepopulate_from`` に入れら
+れません。
 
 admin では、 ``SlugField`` は ``<input type="text">`` (一行の入力フィールド)
 で表現されます。

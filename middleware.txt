@@ -2,18 +2,18 @@
 ミドルウェア
 ============
 
-:revision-up-to: 5680 (0.97pre SVN)
+:revision-up-to: 5878 (0.97pre SVN)
 
-ミドルゥェア (Middleware) とは， Django のリクエスト/レスポンス処理に対する
-フックの集まりです．ミドルウェアは Django の入出力を操作するための軽量かつ
-低水準な「プラグイン」システムです．
+ミドルゥェア (Middleware) とは、 Django のリクエスト/レスポンス処理に対する
+フックの集まりです。ミドルウェアは Django の入出力を操作するための軽量かつ
+低水準な「プラグイン」システムです。
 
-各ミドルウェアコンポーネントはそれぞれ特定の機能を担っています．例えば，
-Django には ``XViewMiddleware`` ミドルウェアコンポーネントがありますが，こ
-れは全ての ``HEAD`` リクエストに対して ``"X-View"`` HTTP ヘッダを追加します．
+各ミドルウェアコンポーネントはそれぞれ特定の機能を担っています。例えば、
+Django には ``XViewMiddleware`` ミドルウェアコンポーネントがありますが、こ
+れは全ての ``HEAD`` リクエストに対して ``"X-View"`` HTTP ヘッダを追加します。
 
-このドキュメントでは， Django についてくる全てのミドルウェアコンポーネント
-の使用法と，自分で新たにミドルウェアを作る方法を説明します．
+このドキュメントでは、 Django についてくる全てのミドルウェアコンポーネント
+の使用法と、自分で新たにミドルウェアを作る方法を説明します。
 
 
 .. _Activating middleware:
@@ -21,10 +21,10 @@ Django には ``XViewMiddleware`` ミドルウェアコンポーネントがあ�
 ミドルウェアの有効化
 ====================
 
-ミドルウェアコンポーネントを有効化するには，Django 設定ファイルの
-``MIDDLEWARE_CLASSES`` リストにコンポーネントを追加します．
-コンポーネント名は文字列で指定し，ミドルウェアのクラス名を完全な Python パ
-スで表します．例えば， ``django-admin.py startproject`` が生成するデフォル
+ミドルウェアコンポーネントを有効化するには、Django 設定ファイルの
+``MIDDLEWARE_CLASSES`` リストにコンポーネントを追加します。
+コンポーネント名は文字列で指定し、ミドルウェアのクラス名を完全な Python パ
+スで表します。例えば、 ``django-admin.py startproject`` が生成するデフォル
 トの設定ファイルにある ``MIDDLEWARE_CLASSES`` は以下のようになっています::
 
     MIDDLEWARE_CLASSES = (
@@ -35,11 +35,11 @@ Django には ``XViewMiddleware`` ミドルウェアコンポーネントがあ�
     )
 
 Django は ``MIDDLEWARE_CLASSES`` に指定された順番でミドルウェアを適用してい
-きます．ただし，応答および例外ミドルウェアの場合は逆順に適用します．
+きます。ただし、応答および例外ミドルウェアの場合は逆順に適用します。
 
-Django をインストールする上で，必ずしもミドルウェアを指定しておく必要はあり
-ません -- 望むなら ``MIDDLEWARE_CLASSES`` は空でもよいのです．とはいえ，
-``CommonMiddleware`` を使うように強く勧めます．
+Django をインストールする上で、必ずしもミドルウェアを指定しておく必要はあり
+ません -- 望むなら ``MIDDLEWARE_CLASSES`` は空でもよいのです。とはいえ、
+``CommonMiddleware`` を使うように強く勧めます。
 
 .. _Available middleware:
 
@@ -49,9 +49,9 @@ Django をインストールする上で，必ずしもミドルウェアを指�
 django.middleware.cache.CacheMiddleware
 ---------------------------------------
 
-サイト全体にわたるキャッシュを有効にします．キャッシュを有効にすると，
+サイト全体にわたるキャッシュを有効にします。キャッシュを有効にすると、
 Django の管理下にあるページは ``CACHE_MIDDLEWARE_SECONDS`` 設定に定義した時
-間のキャッシュされます．`キャッシュのドキュメント`_ を参照してください．
+間のキャッシュされます。`キャッシュのドキュメント`_ を参照してください。
 
 .. _`キャッシュのドキュメント`: ../cache/#the-per-site-cache
 .. _`cache documentation`: ../cache/#the-per-site-cache
@@ -59,79 +59,85 @@ Django の管理下にあるページは ``CACHE_MIDDLEWARE_SECONDS`` 設定に�
 django.middleware.common.CommonMiddleware
 -----------------------------------------
 
-リクエスト処理に完全主義者むけの便宜機能を追加するミドルウェアです．
+リクエスト処理に完全主義者むけの便宜機能を追加するミドルウェアです。
 
 * ``DISALLOWED_USER_AGENTS`` に設定されたユーザエージェントからのアクセスを
-  禁止します． ``DISALLOWED_USER_AGENTS`` には文字列のリストを指定します．
+  禁止します。 ``DISALLOWED_USER_AGENTS`` には文字列のリストを指定します。
 
 * ``APPEND_SLASH`` および ``PREPEND_WWW`` に基づいて URL の書き換えを行いま
-  す． ``APPEND_SLASH`` が ``True`` であれば，末尾にスラッシュのない URL は
-  スラッシュ付きの URL にリダイレクトします． ただし，パスの最後の要素がピ
-  リオドを含む場合にはスラッシュを追加しません．このため， ``foo.com/bar``
-  は ``foo.com/bar/`` にリダイレクトされますが， ``foo.com/bar/file.txt``
-  は変更されず，そのまま次のレイヤに渡されます．
+  す。 ``APPEND_SLASH`` が ``True`` であれば、末尾にスラッシュのない URL は
+  スラッシュ付きの URL にリダイレクトします。 ただし、パスの最後の要素がピ
+  リオドを含む場合にはスラッシュを追加しません。このため、 ``foo.com/bar``
+  は ``foo.com/bar/`` にリダイレクトされますが、 ``foo.com/bar/file.txt``
+  は変更されず、そのまま次のレイヤに渡されます。
 
-  ``PREPEND_WWW`` が ``True`` であれば，先頭に,  "www." のない URL は先頭に
-  "www." を付けた URL にリダイレクトします．
+  ``PREPEND_WWW`` が ``True`` であれば、先頭に,  "www." のない URL は先頭に
+  "www." を付けた URL にリダイレクトします。
 
-  それぞれのオプションは URL を正規化するためのものです．これは， URL
-  (Uniform Resorce Location) がただひとつの，真にただひとつの場所
-  (Location) を表すべきであるという哲学に基づいています．技術的には，
-  ``foo.com/bar`` は ``foo.com/bar/`` とは別物です -- 例えば，検索エンジン
-  はこの二つの URL を別々の URL として扱うかもしれません -- ですから， URL
-  を正規化しておく方が得策なのです．
+  それぞれのオプションは URL を正規化するためのものです。これは、 URL
+  (Uniform Resorce Location) がただひとつの、真にただひとつの場所
+  (Location) を表すべきであるという哲学に基づいています。技術的には、
+  ``foo.com/bar`` は ``foo.com/bar/`` とは別物です -- 例えば、検索エンジン
+  はこの二つの URL を別々の URL として扱うかもしれません -- ですから、 URL
+  を正規化しておく方が得策なのです。
 
-* ``USE_ETAGS`` 設定に基づいて ETag を処理します． ``USE_ETAGS`` を
-  ``True`` に設定すると， Django は各リクエストごとにページ内容の MD-5 ハッ
-  シュを計算して ETag にし，必要なら ``Not Modified`` 応答を返します．
+* ``USE_ETAGS`` 設定に基づいて ETag を処理します。 ``USE_ETAGS`` を
+  ``True`` に設定すると、 Django は各リクエストごとにページ内容の MD-5 ハッ
+  シュを計算して ETag にし、必要なら ``Not Modified`` 応答を返します。
 
 django.middleware.doc.XViewMiddleware
 -------------------------------------
 
 ``INTERNAL_IPS`` 設定に定義されている IP アドレスから来た HEAD リクエストに
-対してカスタムの ``X-View`` HTTP ヘッダを送信します．このミドルウェアは
-Django の自動ドキュメントシステムで使われています．
+対してカスタムの ``X-View`` HTTP ヘッダを送信します。このミドルウェアは
+Django の自動ドキュメントシステムで使われています。
 
 django.middleware.gzip.GZipMiddleware
 -------------------------------------
 
-gzip 圧縮を受け付けるブラウザ (最近のほとんどのブラウザがそうです) 向けに，
-コンテンツを圧縮して送ります．
+gzip 圧縮を受け付けるブラウザ (最近のほとんどのブラウザがそうです) 向けに、
+コンテンツを圧縮して送ります。
+
+このミドルウェアは、ミドルウェアリストの先頭に置くよう勧めます。なぜなら、
+コンテンツの圧縮は最後に行うべきものだからです。このミドルウェアは、 200 バ
+イト未満のコンテンツを圧縮しません。また、状態コード 200 以外のレスポンス内
+のコンテンツ、Javascript ファイル (IE との互換性のため)、
+``Content-Encoding`` が指定されているレスポンスも圧縮しません。
 
 django.middleware.http.ConditionalGetMiddleware
 -----------------------------------------------
 
-条件付き GET 操作を処理します．レスポンスに  ``ETag`` または
-``Last-Modified`` ヘッダがあり，リクエストに ``If-None-Match`` または
-``If-Modified-Since`` がある場合，レスポンスは HttpNotModified に置き換えら
-れます．
+条件付き GET 操作を処理します。レスポンスに  ``ETag`` または
+``Last-Modified`` ヘッダがあり、リクエストに ``If-None-Match`` または
+``If-Modified-Since`` がある場合、レスポンスは HttpNotModified に置き換えら
+れます。
 
-また， HEAD リクエストに対する応答から本体部分を除去し， ``Date`` および
-``Content-Length`` 応答ヘッダを設定します．
+また、 HEAD リクエストに対する応答から本体部分を除去し、 ``Date`` および
+``Content-Length`` 応答ヘッダを設定します。
 
 django.middleware.http.SetRemoteAddrFromForwardedFor
 ----------------------------------------------------
 
-``request.META['HTTP_X_FORWARDED_FOR']`` が設定されていた場合，その値に基づ
-いて ``request.META['REMOTE_ADDR']`` をセットします．サーバがリバースプロキ
+``request.META['HTTP_X_FORWARDED_FOR']`` が設定されていた場合、その値に基づ
+いて ``request.META['REMOTE_ADDR']`` をセットします。サーバがリバースプロキ
 シの向こうにあるためにリクエストの ``REMOTE_ADDR`` が ``127.0.0.1`` にセッ
-トされてしまう場合に便利です．
+トされてしまう場合に便利です。
 
 **注意事項:** このミドルウェアは ``HTTP_X_FORWARDED_FOR`` を検証 
 **しません** ``HTTP_X_FORWARDED_FOR`` を自動的に設定するリバースプロキシ
-を経由していない場合には，このミドルウェアを使ってはなりません．なぜなら，
-``HTTP_X_FORWARDED_FOR`` の値はだれでも簡単に偽装できるので，このミドルウェ
-アが ``REMOTE_ADDR`` に基づいて ``HTTP_X_FORWARDED_FOR`` を設定すると，誰も
-が "偽の" IP アドレスを名乗れてしまうからです．このミドルウェアを使ってよい
-のは， ``HTTP_X_FORWARDED_FOR`` の値を完全に信用できる場合だけです．
+を経由していない場合には、このミドルウェアを使ってはなりません。なぜなら、
+``HTTP_X_FORWARDED_FOR`` の値はだれでも簡単に偽装できるので、このミドルウェ
+アが ``REMOTE_ADDR`` に基づいて ``HTTP_X_FORWARDED_FOR`` を設定すると、誰も
+が "偽の" IP アドレスを名乗れてしまうからです。このミドルウェアを使ってよい
+のは、 ``HTTP_X_FORWARDED_FOR`` の値を完全に信用できる場合だけです。
 
 
 django.middleware.locale.LocaleMiddleware
 -----------------------------------------
 
-リクエストに基づいて言語の選択を行います．言語の選択によって，ユーザごとに
-提供するコンテンツをカスタマイズできます． `国際化のドキュメント`_ を参照し
-てください．
+リクエストに基づいて言語の選択を行います。言語の選択によって、ユーザごとに
+提供するコンテンツをカスタマイズできます。 `国際化のドキュメント`_ を参照し
+てください。
 
 .. _`internationalization documentation`: ../i18n/
 .. _`国際化のドキュメント`: ../i18n/
@@ -140,8 +146,8 @@ django.middleware.locale.LocaleMiddleware
 django.contrib.sessions.middleware.SessionMiddleware
 ----------------------------------------------------
 
-セッションのサポートを有効にします． `セッションのドキュメント`_ も参照して
-ください．
+セッションのサポートを有効にします。 `セッションのドキュメント`_ も参照して
+ください。
 
 .. _`セッションのドキュメント`: ../sessions/
 .. _`session documentation`: 
@@ -150,8 +156,8 @@ django.contrib.sessions.middleware.SessionMiddleware
 django.contrib.auth.middleware.AuthenticationMiddleware
 -------------------------------------------------------
 
-入力される ``HttpRequest`` オブジェクト全てに，現在ログインしているユーザを
-表す ``user`` 属性を追加します． `Web リクエストの認証`_ を参照してください．
+入力される ``HttpRequest`` オブジェクト全てに、現在ログインしているユーザを
+表す ``user`` 属性を追加します。 `Web リクエストの認証`_ を参照してください。
 
 .. _`Web リクエストの認証`:
     ../authentication/#authentication-in-web-requests
@@ -162,17 +168,17 @@ django.contrib.auth.middleware.AuthenticationMiddleware
 django.middleware.transaction.TransactionMiddleware
 ---------------------------------------------------
 
-リクエスト／レスポンス処理フェイズに commit と rollback をバインドします．
-あるビュー関数の実行に成功した場合に commit を，例外を送出して失敗した場合
-には rollback を行わせます．
+リクエスト／レスポンス処理フェイズに commit と rollback をバインドします。
+あるビュー関数の実行に成功した場合に commit を、例外を送出して失敗した場合
+には rollback を行わせます。
 
-このミドルウェアでは，スタック中の順番が重要になります．このミドルウェアの
-外で動作する他のミドルウェアモジュールは，Django のデフォルトの挙動，すなわ
-ち commit-on-save モードで動作します．このミドルウェアの内側にある (スタッ
-クの後ろに位置している) ミドルウェアは，ビュー関数と同じトランザクション制
-御下に置かれます．
+このミドルウェアでは、スタック中の順番が重要になります。このミドルウェアの
+外で動作する他のミドルウェアモジュールは、Django のデフォルトの挙動、すなわ
+ち commit-on-save モードで動作します。このミドルウェアの内側にある (スタッ
+クの後ろに位置している) ミドルウェアは、ビュー関数と同じトランザクション制
+御下に置かれます。
 
-`トランザクション管理のドキュメント`_ を参照してください．
+`トランザクション管理のドキュメント`_ を参照してください。
 
 .. _`トランザクション管理のドキュメント`: ../transactions/
 .. _`transaction management documentation`: ../transactions/
@@ -183,7 +189,7 @@ django.middleware.transaction.TransactionMiddleware
 ミドルウェアを自作する
 ======================
 
-ミドルウェアの自作は簡単です．各ミドルウェアコンポーネントは，以下のメソッ
+ミドルウェアの自作は簡単です。各ミドルウェアコンポーネントは、以下のメソッ
 ドを少なくとも一つ定義しているような単一の Python クラスです:
 
 process_request
@@ -191,61 +197,61 @@ process_request
 
 インタフェース: ``process_request(self, request)``
 
-``request`` は ``HttpRequest`` オブジェクトです．このメソッドはリクエストご
-とに Django がどのビューを実行するか決定する前に呼び出されます．
+``request`` は ``HttpRequest`` オブジェクトです。このメソッドはリクエストご
+とに Django がどのビューを実行するか決定する前に呼び出されます。
 
 ``process_request()`` は ``None`` または ``HttpResponse`` オブジェクトのい
-ずれかを返さねばなりません． ``None`` を返した場合， Django はリクエストの
-処理を継続し，他のミドルウェアや適切なビューを実行します． ``HttpResponse``
-オブジェクトを返した場合， Django は他のミドルウェアやビューを呼び出さず，
-その ``HttpResponse`` オブジェクトを応答として返します．
+ずれかを返さねばなりません。 ``None`` を返した場合、 Django はリクエストの
+処理を継続し、他のミドルウェアや適切なビューを実行します。 ``HttpResponse``
+オブジェクトを返した場合、 Django は他のミドルウェアやビューを呼び出さず、
+その ``HttpResponse`` オブジェクトを応答として返します。
 
 process_view
 ------------
 
 インタフェース: ``process_view(self, request, view_func, view_args, view_kwargs)``
 
-``request`` は ``HttpRequest`` オブジェクトです． ``view_func`` は Django
-がビュー関数としてこれから呼び出そうとしている Python の関数です， (実際の
-関数オブジェクトで，関数名を表す文字列ではありません)． ``view_args`` には
-ビューに渡されることになる固定引数が， ``view_kwargs`` にはビューに渡される
-ことになるキーワード引数の辞書が入っています． ``view_args`` と
-``view_kwargs`` のいずれにも，ビューの第一引数 (``request``) は入っていませ
-ん．
+``request`` は ``HttpRequest`` オブジェクトです。 ``view_func`` は Django
+がビュー関数としてこれから呼び出そうとしている Python の関数です、 (実際の
+関数オブジェクトで、関数名を表す文字列ではありません)。 ``view_args`` には
+ビューに渡されることになる固定引数が、 ``view_kwargs`` にはビューに渡される
+ことになるキーワード引数の辞書が入っています。 ``view_args`` と
+``view_kwargs`` のいずれにも、ビューの第一引数 (``request``) は入っていませ
+ん。
 
-``process_view()`` は Django がビュー関数を呼び出す直前に呼び出されます．こ
-の関数は ``None`` または ``HttpResponse`` オブジェクトを返さねばなりません．
-``None`` を返した場合， Django は処理を継続し，他のミドルウェアの
-``process_view()`` を試した後，適切なビュー関数を呼び出します．
-``HttpResponse`` オブジェクトを返した場合， Django はそれ以上他のミドルウェ
-アやビューを呼び出さず，その ``HttpResponse`` オブジェクトを応答として返し
-ます．
+``process_view()`` は Django がビュー関数を呼び出す直前に呼び出されます。こ
+の関数は ``None`` または ``HttpResponse`` オブジェクトを返さねばなりません。
+``None`` を返した場合、 Django は処理を継続し、他のミドルウェアの
+``process_view()`` を試した後、適切なビュー関数を呼び出します。
+``HttpResponse`` オブジェクトを返した場合、 Django はそれ以上他のミドルウェ
+アやビューを呼び出さず、その ``HttpResponse`` オブジェクトを応答として返し
+ます。
 
 process_response
 ----------------
 
 インタフェース: ``process_response(self, request, response)``
 
-``request`` は ``HttpRequest`` オブジェクトです． ``response`` は Django の
-ビュー関数の返す ``HttpResponse`` オブジェクトです．
+``request`` は ``HttpRequest`` オブジェクトです。 ``response`` は Django の
+ビュー関数の返す ``HttpResponse`` オブジェクトです。
 
-``process_response()`` は ``HttpResponse`` オブジェクトを返さねばなりません．
-渡された ``response`` オブジェクトを変更して返しても，
-新たに ``HttpResponse`` オブジェクトを生成して返してもかまいません．
+``process_response()`` は ``HttpResponse`` オブジェクトを返さねばなりません。
+渡された ``response`` オブジェクトを変更して返しても、
+新たに ``HttpResponse`` オブジェクトを生成して返してもかまいません。
 
 process_exception
 -----------------
 
 インタフェース: ``process_exception(self, request, exception)``
 
-``request`` は ``HttpRequest`` オブジェクトです． ``exception`` はビュー関
-数の送出した ``Exception`` オブジェクトです．
+``request`` は ``HttpRequest`` オブジェクトです。 ``exception`` はビュー関
+数の送出した ``Exception`` オブジェクトです。
 
-Django はビューが例外を送出した際に ``process_exception()`` を呼び出します．
+Django はビューが例外を送出した際に ``process_exception()`` を呼び出します。
 ``process_exception()`` は ``None`` または ``HttpResponse`` オブジェクトの
-いずれかを返さねばなりません． ``HttpResponse`` オブジェクトを返した場合，
-その応答をそのままブラウザに返します．それ以外の場合，デフォルトの例外処理
-を起動します．
+いずれかを返さねばなりません。 ``HttpResponse`` オブジェクトを返した場合、
+その応答をそのままブラウザに返します。それ以外の場合、デフォルトの例外処理
+を起動します。
 
 
 .. _Guidelines:
@@ -253,16 +259,16 @@ Django はビューが例外を送出した際に ``process_exception()`` を呼
 ガイドライン
 ------------
 
-    * ミドルウェアのクラスはサブクラスでなくてもかまいません．
+    * ミドルウェアのクラスはサブクラスでなくてもかまいません。
 
-    * ミドルウェアのクラスはPython のモジュールパス上のどこにでも置けます．
+    * ミドルウェアのクラスはPython のモジュールパス上のどこにでも置けます。
       Django にとって必要なのは ``MIDDLEWARE_CLASSES`` にクラスへのパスが
-      指定されていることだけです．
+      指定されていることだけです。
 
-    * Django で使えるミドルウェアを参考にしてください．Django ミドルウェア
-      のデフォルトの置場は ``django/middleware/`` です．ただし，セッション
-      ミドルウェアは ``django/contrib/sessions`` にあります．
+    * Django で使えるミドルウェアを参考にしてください。Django ミドルウェア
+      のデフォルトの置場は ``django/middleware/`` です。ただし、セッション
+      ミドルウェアは ``django/contrib/sessions`` にあります。
 
     * 自分の書いたミドルウェアコンポーネントが他の人にとっても有用だと思っ
-      たなら，ぜひコミュニティにコントリビュートしてください！知らせてくだ
-      されば， Django に追加するか検討します．
+      たなら、ぜひコミュニティにコントリビュートしてください！知らせてくだ
+      されば、 Django に追加するか検討します。

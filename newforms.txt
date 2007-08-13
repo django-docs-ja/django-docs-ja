@@ -2,7 +2,7 @@
 newforms ライブラリ
 ===================
 
-:revision-up-to: 5832 (0.97pre SVN)
+:revision-up-to: 5878 (0.97pre SVN)
 
 ``django.newforms`` は、 Django に新たに導入された画期的なフォーム処理ライ
 ブラリで、従来のフォーム／マニピュレータ／バリデータフレームワークである
@@ -786,7 +786,7 @@ Django コンポーネントに対してカップリングしていません。 
     <form method="post" action="">
     <dl>
     {% for field in form %}
-        <dt>{{ field.label }}</dt>
+        <dt>{{ field.label_tag }}</dt>
         <dd>{{ field }}</dd>
         {% if field.help_text %}<dd>{{ field.help_text }}</dd>{% endif %}
         {% if field.errors %}<dd class="myerrors">{{ field.errors }}</dd>{% endif %}
@@ -807,11 +807,11 @@ Django コンポーネントに対してカップリングしていません。 
 
     <form method="post" action="">
     <ul class="myformclass">
-        <li>{{ form.sender.label }} {{ form.sender }}</li>
+        <li>{{ form.sender.label_tag }} {{ form.sender }}</li>
         <li class="helptext">{{ form.sender.help_text }}</li>
         {% if form.sender.errors %}<ul class="errorlist">{{ form.sender.errors }}</ul>{% endif %}
 
-        <li>{{ form.subject.label }} {{ form.subject }}</li>
+        <li>{{ form.subject.label_tag }} {{ form.subject }}</li>
         <li class="helptext">{{ form.subject.help_text }}</li>
         {% if form.subject.errors %}<ul class="errorlist">{{ form.subject.errors }}</ul>{% endif %}
 
@@ -1084,7 +1084,7 @@ Django の古いフォーム／検証フレームワークを使ったことが�
 ~~~~~~~~~~
 
 ``widget`` 引数を使うと、フィールドをレンダリングするときの ``Widget`` クラ
-スを指定できます。詳しくは後述の ``ウィジェット`` を参照してください。
+スを指定できます。詳しくは後述の `ウィジェット`_ を参照してください。
 
 ``help_text``
 ~~~~~~~~~~~~~
@@ -1264,6 +1264,22 @@ Django の古いフォーム／検証フレームワークを使ったことが�
     '%m/%d/%y %H:%M',        # '10/25/06 14:30'
     '%m/%d/%y',              # '10/25/06'
 
+``DecimalField``
+~~~~~~~~~~~~~~~~
+
+**開発版の Django で新たに追加された機能です**
+
+    * デフォルトのウィジェット: ``TextInput``
+    * 空のフォームデータに対する値: ``None``
+    * Python データへの正規化: Python の ``decimal`` オブジェクト
+    * 値が 10 進小数に変換可能か検証します。文字列の先頭および末尾の空白文
+      字は除去されます。
+
+``max_value``, ``min_value``, ``max_digits``, および ``decimal_places`` の
+4 つのオプション引数を取ります。 ``max_digits`` は最大の桁数 (先頭のゼロ詰
+め桁を除いた上での小数点前後の桁数の合計) です。 ``decimal_places`` は小数
+部の最大桁数です。
+
 ``EmailField``
 ~~~~~~~~~~~~~~
 
@@ -1334,6 +1350,9 @@ ImageField を使いたい場合、 `Python Imaging Library`_ をインストー
     * Python データへの正規化: Python 整数型または長整数型
     * 入力値が整数であるか検証します。 Python の ``int()`` 関数と同様、先頭
       や末尾に空白があってもかまいません。
+
+オプションの引数として、指定可能な数値の範囲を表す  ``max_value`` および
+``min_value`` をとります。
 
 ``MultipleChoiceField``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1565,6 +1584,165 @@ ImageField を使いたい場合、 `Python Imaging Library`_ をインストー
         senders = MultiEmailField()
         cc_myself = forms.BooleanField()
 
+.. _Widgets:
+.. _`ウィジェット`:
+
+ウィジェット(Widget)
+=====================
+
+ウィジェットとは、Django で HTML の入力エレメントを表現するためのオブジェク
+トです。ウィジェットは、 HTML のレンダリングや、個々のウィジェットに対応す
+るデータをGET/POST 辞書から抽出する処理を行います。
+
+Django は、基本的な HTML ウィジェットすべてと、よく使われるウィジェットグルー
+プを提供しています:
+
+    ============================  ===========================================
+    ウィジェット名                等価な HTML 表現
+    ============================  ===========================================
+    ``TextInput``                 ``<input type='text' ...``
+    ``PasswordInput``             ``<input type='password' ...``
+    ``HiddenInput``               ``<input type='hidden' ...``
+    ``MultipleHiddenInput``       複数の ``<input type='hidden' ...``
+    ``FileInput``                 ``<input type='file' ...``
+    ``Textarea``                  ``<textarea>...</textarea>``
+    ``CheckboxInput``             ``<input type='checkbox' ...``
+    ``Select``                    ``<select><option ...``
+    ``NullBooleanSelect``         「不明」, 「はい」, 「いいえ」 を
+                                  選択肢とする ``<select>``
+    ``SelectMultiple``            ``<select multiple='multiple'><option ...``
+    ``RadioSelect``               ``<ul><li><input type='radio' ...`` 
+    ``CheckboxSelectMultiple``    ``<ul><li><input type='checkbox' ...``
+    ``MultiWidget``               複数ウィジェットに対するラッパ
+    ``SplitDateTimeWidget``       日付と時刻を表す二つの ``TextInput``
+                                  ウィジェットに対するラッパ
+    ============================  ===========================================
+
+.. _Specifying widgets:
+
+ウィジェットの指定
+------------------
+
+フォームに何らかのフィールドを作成する場合、 Django は表示するデータの型に
+応じて、適切なデフォルトのウィジェットを使います。どのフィールドがどのウィ
+ジェットを使っているかは、組み込みフィールドクラスのドキュメントを参照して
+ください。
+
+とはいえ、デフォルトとは違うウィジェットを使いたい場合もあるでしょう。その
+場合には、以下の例のように、フィールドを定義する際に ``widget`` 引数を指定
+します::
+
+    class CommentForm(forms.Form):
+        name = forms.CharField()
+        url = forms.URLField()
+        comment = forms.CharField(widget=forms.TextArea)
+
+上のコードでは、 comment フィールドにデフォルトの TextInput ウィジェットで
+はなく、より大きな TextArea ウィジェットを使うように指定しています。
+
+.. _Customizing widget instances:
+
+ウィジェットインスタンスのカスタマイズ
+--------------------------------------
+
+ウィジェットを HTML としてレンダリングする際、 Django は最小限の HTML しか
+出力しません。すなわち、クラス定義やウィジェット固有の属性は一切付加しない
+のです。従って、例えばページ上にまったく同じ見栄えの 'TextInput' ウィジェッ
+トが並ぶわけです。
+
+ウィジェットごとに見栄えを変えたいのなら、各々のウィジェットを指定するとき
+に、HTML レンダリング時に追加したい属性のリストを指定してやる必要があります。
+
+例えば、以下のような簡単なフォームを考えましょう::
+
+    class CommentForm(forms.Form):
+        name = forms.CharField()
+        url = forms.URLField()
+        comment = forms.CharField()
+
+このフォームは 3 つの TextInput ウィジェットからなり、デフォルトのレンダリ
+ングでは CSS クラスや属性は指定されていません。従って、各ウィジェットは全く
+同じ入力ボックスとしてレンダリングされます::
+
+    >>> f = CommentForm(auto_id=False)
+    >>> f.as_table()
+    <tr><th>Name:</th><td><input type="text" name="name" /></td></tr>
+    <tr><th>Url:</th><td><input type="text" name="url"/></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
+
+現実の Web ページでは、全ウィジェットが同じに見えるような見栄えを期待しない
+でしょう。コメント欄をもうちょっと大きな入力ボックスにしたかったり、
+``'name'`` ウィジェットに特別な CSS クラスを指定したかったりするかもしれま
+せん。個々のウィジェットの属性こ細かく指定するには、フィールドにカスタムの
+ウィジェットを指定して、ウィジェットのレンダリング時に使われる属性を指定し
+ます::
+
+    class CommentForm(forms.Form):
+        name = forms.CharField(                   
+                    widget=forms.TextInput(attrs={'class':'special'}))
+        url = forms.URLField()
+        comment = forms.CharField(
+                   widget=forms.TextInput(attrs={'size':'40'}))
+
+これで、 Django はレンダリング結果に追加の属性を組み込むようになります::
+
+    >>> f = CommentForm(auto_id=False)
+    >>> f.as_table()
+    <tr><th>Name:</th><td><input type="text" name="name" class="special"/></td></tr>
+    <tr><th>Url:</th><td><input type="text" name="url"/></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" size="40"/></td></tr>
+
+.. _Custom Widgets:
+
+カスタムウィジェット
+--------------------
+
+フォームをたくさん書くようになれば、特定の属性が指定されたウィジェットを再
+利用したくなることでしょう。カスタムウィジェットを使えば、属性定義をキャプ
+チャできるので、毎回必要に応じて同じ属性定義を繰り返さなくてすみます。
+
+例えば、自分のコードでフォームにコメントフィールドをたくさん使っていること
+に気付いたとしましょう。固定の ``size`` 属性を持った ``TextInput`` は、
+``TextInput`` ウィジェットを拡張したカスタムウィジェットとしてキャプチャで
+きます::
+
+    class CommentWidget(forms.TextInput):
+        def __init__(self, *args, **kwargs):
+            kwargs.setdefault('attrs',{}).update({'size': '40'})
+            super(forms.TextInput, self).__init__(*args, **kwargs)
+
+
+そして、このウィジェットをフォームで使います::
+
+    class CommentForm(forms.Form):
+        name = forms.CharField()
+        url = forms.URLField()
+        comment = forms.CharField(widget=CommentWidget)
+
+カスタムウィジェットは、他のウィジェットと同様に更にカスタマイズできます。
+一回限りしか使わないような CSS クラス属性を ``CommentWidget`` に追加したけ
+れば、属性定義にパラメタを追加するだけです::
+
+    class CommentForm(forms.Form):
+        name = forms.CharField(max_length=20)
+        url = forms.URLField()
+        comment = forms.CharField(
+                    widget=CommentWidget(attrs={'class': 'special'}))
+
+また、カスタムウィジェットを使うカスタムのフィールド型を簡単に定義できます。
+例えば、コメント入力用のカスタムフィールドは以下のように定義できます::
+
+    class CommentInput(forms.CharField):
+        widget = CommentWidget
+        
+こうしておけば、コメント入力が必要なフォーム全般に CommentInput を利用でき
+ます::
+
+    class CommentForm(forms.Form):
+        name = forms.CharField()
+        url = forms.URLField()
+        comment = CommentInput()
+        
 
 .. _Generating forms for models:
 

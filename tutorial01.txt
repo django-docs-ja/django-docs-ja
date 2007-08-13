@@ -4,7 +4,7 @@
 
 .. contents::
 
-:revision-up-to: 5832 (0.97pre SVN)
+:revision-up-to: 5878 (0.97pre SVN)
 
 さあ、例を交えながら学んでゆきましょう。
 
@@ -492,8 +492,8 @@ API で遊んでみる
     []
 
     # 新たな Poll を作成しましょう。
-    >>> from datetime import datetime
-    >>> p = Poll(question="What's up?", pub_date=datetime.now())
+    >>> import datetime
+    >>> p = Poll(question="What's up?", pub_date=datetime.datetime.now())
 
     # 出来たオブジェクトをデータベースに保存します。 save() は明示的に呼ば
     # ねばなりません。
@@ -513,7 +513,7 @@ API で遊んでみる
     datetime.datetime(2007, 7, 15, 12, 00, 53)
 
     # 属性を変更して save() を呼び出すとカラムの値を変更します。
-    >>> p.pub_date = datetime(2007, 4, 1, 0, 0)
+    >>> p.pub_date = datetime.datetime(2007, 4, 1, 0, 0)
     >>> p.save()
 
     # objects.all() はデータベース上の全ての Poll を返します。

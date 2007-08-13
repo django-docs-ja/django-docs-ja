@@ -2,7 +2,7 @@
 リクエストオブジェクトとレスポンスオブジェクト
 ==============================================
 
-:revision-up-to: 5832 (0.97pre SVN)
+:revision-up-to: 5855 (0.97pre SVN)
 
 .. _`Quick overview`:
 
@@ -45,6 +45,17 @@ HttpRequest オブジェクト
         elif request.method == 'POST':
             do_something_else()
 
+``encoding``
+    **開発版の Django で新たに登場した機能です。**
+
+    提出されたフォームデータのデコードに使われる、現在のエンコーディングを
+    表す文字列です (``None`` の場合もありますが、この場合は
+    ``DEFAULT_CHARSET`` を使います)。この属性を変更すれば、フォームデータに
+    アクセスする際に使われるエンコーディングを指定できます。一度エンコーディ
+    ングを変更すると、変更後に (``GET`` や ``POST`` の) 属性へのアクセスは
+    すべて新しい ``encoding`` の値に従って行われます。フォームデータが
+    ``DEFAULT_CHARSET`` 以外の特定のエンコーディングと分かっている場合に便
+    利です。
 
 ``GET``
     全ての HTTP GET パラメタが入った辞書ライクなオブジェクトです。後述の
@@ -358,21 +369,33 @@ Django によって自動生成される ``HttpRequest`` オブジェクトと�
 せます。このテクニックを使う場合は以下のガイドラインに従って下さい:
 
     * イテレータは文字列を返さねばなりません。
-    * イテレータをコンテンツに指定して ``HttpResponse`` を初期化すると、
-      ``HttpResponse`` インスタンスをファイルライクオブジェクトとして扱えな
-      くなり、 ``Exception`` を送出するようになります。
+    * イテレータをコンテンツに指定して ``HttpResponse`` を初期化した場合、
+      ``HttpResponse`` インスタンスはファイルライクオブジェクトとして扱えず、
+      ファイルライクオブジェクトとして操作すると ``Exception`` を送出します。
+      
 
 メソッド
 --------
 
-``__init__(content='', mimetype=DEFAULT_CONTENT_TYPE)``
+``__init__(content='', mimetype=None, status=200, content_type=DEFAULT_CONTENT_TYPE)``
     指定のページコンテンツ (文字列) と MIME タイプで ``HttpResponse`` オブ
     ジェクトをインスタンス化します。 ``DEFAULT_CONTENT_TYPE`` は
     ``'text/html'`` です。
 
     ``content`` はイテレータまたは文字列にできます。イテレータにする場合、
-    文字列を返すイテレータでなければなりません。イテレータ中の文字列は全て
-    結合され、レスポンスの内容になります。
+    イテレータは文字列を返さねばなりません。イテレータを指定した場合、レス
+    ポンスの内容はイテレータの返す文字列を結合して生成されます。
+
+    ``status`` はレスポンスの  `HTTP 状態コード`_ です。
+
+    **(開発版の Django で新たに登場した機能)** ``content_type`` は
+    ``mimetype`` の別名にすぎません。以前、このパラメタには ``mimetype`` と
+    いう名前しかありませんでしたが、実際のところ、このパラメタに指定する値
+    は HTTP の ``Content-Type`` ヘッダに入る内容であり、MIME タイプ仕様には
+    ない文字セットエンコーディングの指定を含んでいました。そこで、
+    ``mimetype`` が指定されている (``None`` でない) 場合にはその値を使い、
+    それ以外の場合には ``content_type`` を使うように変更しました。どちらの
+    パラメタも省略すると、 ``DEFAULT_CONTENT_TYPE`` 設定を使います。
 
 ``__setitem__(header, value)``
     ヘッダ名と値を設定します。 ``header`` と ``value`` は文字列にせねばなり
@@ -422,6 +445,9 @@ Django によって自動生成される ``HttpRequest`` オブジェクトと�
 ``write(content)``, ``flush()``, ``tell()``
     ``HttpResponse`` インスタンスをファイルライクオブジェクトのように扱うた
     めのメソッドです。
+
+.. _HTTP Status code: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10
+.. _`HTTP 状態コード`: `HTTP Status code`_
 
 .. _HttpResponse subclasses:
 
