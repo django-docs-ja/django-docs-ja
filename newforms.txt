@@ -2,7 +2,7 @@
 newforms ライブラリ
 ===================
 
-:revision-up-to: 5878 (0.97pre SVN)
+:revision-up-to: 5922 (0.97pre SVN)
 
 ``django.newforms`` は、 Django に新たに導入された画期的なフォーム処理ライ
 ブラリで、従来のフォーム／マニピュレータ／バリデータフレームワークである
@@ -1635,7 +1635,7 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
     class CommentForm(forms.Form):
         name = forms.CharField()
         url = forms.URLField()
-        comment = forms.CharField(widget=forms.TextArea)
+        comment = forms.CharField(widget=forms.Textarea)
 
 上のコードでは、 comment フィールドにデフォルトの TextInput ウィジェットで
 はなく、より大きな TextArea ウィジェットを使うように指定しています。
