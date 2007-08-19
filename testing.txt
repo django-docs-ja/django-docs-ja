@@ -37,40 +37,91 @@ Web アプリケーションは、 HTTP レベルのリクエスト処理、フ�
 テストを書く
 ============
 
-Django におけるテストは doctest と単体テストの二つの形式をとります。
+Django でテストを書く方法は主に 2 つあり、それぞれ Python の標準ライブラリ
+についてくる二つのテストフレームワークに対応しています。フレームワークは以
+下の 2 つです:
+
+    * **doctest** -- 関数やクラスの docstring (ドキュメンテーション文字列)
+      に埋め込まれたテストで、例えば以下のように Python の対話インタプリタ
+      セッションを模した方法で書かれています::
+
+          def my_func(a_list, idx):
+              """
+              >>> a = ['larry', 'curly', 'moe']
+              >>> my_func(a, 0)
+              'larry'
+              >>> my_func(a, 1)
+              'curly'
+              """
+              return a_list[idx]
+
+    * **ユニットテスト (unit test)** -- 以下の例のように、テストを
+      ``unittest.TestCase``` のサブクラスのメソッドとして表現したものです::
+
+          import unittest
+
+          class MyFuncTestCase(unittest.TestCase)
+              def testBasic(self):
+                  a = ['larry', 'curly', 'moe']
+                  self.assertEquals(my_func(a, 0), 'larry')
+                  self.assertEquals(my_func(a, 1), 'curly')
+
+好みに応じて、どちらのテストを使ってもかまいませんし、両方のテストを組み合
+わせてもかまいません。また、後でほんの少しだけ説明しますが、他のテストフレー
+ムワークを使っても構いません。
 
 .. _Writing doctests:
 
 doctest を書く
 --------------
 
-doctest には、 docstring (ドキュメンテーション文字列) 内のテストを探して実
-行するための Python の標準モジュール、 doctest_ を使います。 Django のテス
-トランナは ``models.py`` ファイル内の doctest を探し、見つかったテストを実
-行します。 Django はまた、アプリケーションのディレクトリ (``models.py`` ファ
-イルがあるのと同じディレクトリ) 内の ``test.py`` というファイルを探し、
-``test.py`` があれば、その中に doctest がないか探します。
-
+doctest は、Python の標準モジュール、 doctest_ によるテストです。 doctest
+は docstring (ドキュメンテーション文字列) から、 Python の対話インタプリタ
+セッションの形式をとる部分を探し出して実行します。 doctest の詳しい構造につ
+いての解説はこのドキュメントの範囲を超えた話なので、公式ドキュメントを参照
+してください。
 
 .. admonition:: **docstring** とは?
 
     docstring の詳しい説明 (と、効果的な docstring の書き方) は、
-    :PEP:`257` (`和訳
-    <http://www.python.jp/doc/contrib/peps/pep-0257.txt>`__) に書かれていま
-    す:
+    :PEP:`257` (訳注: PEP 257 の和訳は 
+    http://www.python.jp/doc/contrib/peps/pep-0257.txt にあります) に書かれ
+    ています:
         
         docstring とは、モジュールや関数、クラス、メソッド定義のブロック中
         の先頭に置かれた文字列リテラルです。 docstring を定義すると、オブジェ
         クトの ``__doc__`` という特殊な属性になります。
         
-    テストはそれ自体が素晴らしいドキュメントになります。 doctest を使うと、
-    テストを直接 docstring の中に配置できます。
+
+    例えば、下の関数には、関数の説明の入った docstring があります::
+
+        def add_two(num):
+            "引数に指定した数に 2 を加えて返します。"
+            return num + 2
+
+    テストはそれ自体素晴らしいドキュメントになることも多いので、テストをそ
+    のまま docstring に入れておけば、ドキュメント化とコードのテストの 
+    *両方を* 効率的に行えます。
+
+テストランナは、 Django アプリケーションの中の以下のファイルから doctest を
+探して実行します:
+
+    * ``models.py`` ファイル。モジュールレベル、かつ/またはモデルレベルの
+      doctest を記述します。一般には、アプリケーションレベルの doctest はモ
+      ジュールの docstring として記述し、モデルレベルの docstring はモデル
+      クラスの docstring として記述します。
+
+    * アプリケーションディレクトリ、すなわち ``models.py`` の入ったディレク
+      トリ下に置かれた ``tests.py`` という名前のファイル。このファイルは、
+      モデルに関係しないような doctest を書きたい場合のフックとして使えます。
 
 doctest の文字列は ``models.py`` の全てのオブジェクトに対して記述できますが、
 慣習的には、アプリケーションレベルの doctest はモジュールの docstring に、
 モデルレベルの doctest は各モデルの docstring に配置します。
 
-例を示します::
+モデル定義で doctest を使った例を示します::
+
+    # models.py
 
     from django.db import models
     
@@ -100,6 +151,13 @@ doctest の文字列は ``models.py`` の全てのオブジェクトに対して
 Python の対話セッションに見える部分を検出し、そこに書かれた命令を実行して、
 docstring に書かれた結果と実際の実行結果が一致するかどうかを確かめます。
 
+モデルテストの場合、テストランナが独自にテストデータベースを作成します。す
+なわち、データベースに対してアクセスするテスト -- 例えば、モデルインスタン
+スを生成して保存するようなテスト -- が、実運用のためのデータベースに影響を
+及ぼすことはありません。 doctest はいずれも「白紙状態」、すなわち、各モデル
+のデータベーステーブルが空の状態で実行されます (詳しくは、後述のフィクスチャ
+の節を参照してください) 。
+
 doctest の詳しい動作原理は、 `標準ドキュメントの doctest の項`_
 を参照してください。
 
@@ -110,13 +168,27 @@ doctest の詳しい動作原理は、 `標準ドキュメントの doctest の�
 
 .. _Writing unittests:
 
-unittest を書く
----------------
+ユニットテストを書く
+--------------------
 
 Django の単体テストもまた、doctest と同様、標準ライブラリモジュールの
-unittest_ を使います。 doctest と同様、 Django のテストランナは、アプリケー
-ションディレクトリ内の ``models.py`` または ``test.py`` 内に定義されている
-単体テストを探します。
+unittest_ を使います。このモジュールは、 doctest_ とは違った、 クラスベース
+のやり方でテストを定義します。
+
+doctest と同様、 Django のテストランナは、以下の二つの場所からユニットテス
+トを探します:
+
+    * ``models.py`` ファイル。テストランナはこのモジュールから
+      ``unittest.TestCase`` のサブクラスを探します。
+
+    * アプリケーションディレクトリ、すなわち ``models.py`` の入ったディレク
+      トリ下に置かれた ``tests.py`` という名前のファイル。上と同様に、テス
+      トランナはこのモジュールから ``unittest.TestCase`` のサブクラスを探し
+      ます。
+
+以下の ``unittest.TestCase`` のサブクラスは、前節の doctest と同じテストを
+実現しています::
+
 
 上の例と同じ内容のテストを unittest のテストケースで書くと以下のようになり
 ます::
@@ -125,7 +197,7 @@ unittest_ を使います。 doctest と同様、 Django のテストランナ�
     from myapp.models import Animal
     
     class AnimalTestCase(unittest.TestCase):
-        
+
         def setUp(self):
             self.lion = Animal.objects.create(name="lion", sound="roar")
             self.cat = Animal.objects.create(name="cat", sound="meow")
@@ -139,20 +211,12 @@ unittest_ を使います。 doctest と同様、 Django のテストランナ�
 ``unittest.TestCase`` のサブクラス) を捜し出し、そこからテストスイートを自
 動的に構築して、スイートを実行します。
 
-**開発バージョンの Django で登場した機能**
-
-ただし、 ``models.py`` や ``tests.py`` で ``suite()`` メソッドを定義してい
-る場合、モジュールのテストスイートの構築は ``suite()`` メソッドを使って行い
-ます。この仕様は、ユニットテストにおいて 
+開発バージョンの Django には、あるモジュールのテストスイートを定義する方法
+をもう一つ提供しています:  ``models.py`` や ``tests.py`` で ``suite()`` メ
+ソッドを定義している場合、 Django のテストランナはこのメソッドを使ってテス
+トスイートを構築します。この仕様は、ユニットテストにおいて 
 `推奨されているテストスイートの構築方法`_ に従っています。複雑なテストスイー
 トの構築方法についての詳細は Python のドキュメントを参照してください。
-
-However, if you define a method called ``suite()`` in either ``models.py`` or
-``tests.py``, that method will be used to construct the test suite for that
-module. This follows the `suggested organization`_ for unit tests. See the
-Python documentation for more details on how to construct a complex test
-suite.
-
 
 ``unittest`` の詳細は `標準ライブラリドキュメントの unittest の項`_ を参照
 してください。
@@ -827,31 +891,37 @@ Django は他のテストフレームワークを明にサポートしている�
 
 ``setup_test_environment()``
     テンプレートレンダリングシステム構成のインストールなど、テスト前の全
-    体的な準備を行い、ダミーの SMTP 接続をセットアップします。
+    体的な準備を行い、ダミーの ``SMTPConnecton`` をセットアップします。
 
 ``teardown_test_environment()``
-    テンプレートレンダリングシステム構成の除去など、テスト後の全体的な後始
-    末を行い、メールサービスを通常の状態に復帰します。
+    テンプレートレンダリングシステムに組み込まれた黒魔術的なフックの除去な
+    ど、テスト後の全体的な後始末を行い、メールサービスを通常の状態に復帰し
+    ます。
 
 ``create_test_db(verbosity=1, autoclobber=False)``
     新たなテストデータベースを生成し、 ``syncdb`` を実行します。
 
-    ``verbosity`` はテストランナの同名の引数と同じ意味です。
+    ``verbosity`` は ``run_tests()`` の同名の引数と同じ意味です。
 
-    ``autoclobber`` には、テスト用データベースと同じ名前のデータベースが既
-    に存在する場合の挙動を指定します。 ``autoclobber`` が ``False`` なら、
-    既存のデータベースを破壊してもよいかユーザに尋ねます。ユーザが「いいえ」
-    を選択すると、その時点で ``sys.exit`` を呼び出して終了します。
-    ``autoclobber`` が ``True`` なら、既存のデータベースを破壊するときにユー
-    ザに了解を求めません。 
+    ``autoclobber`` には、テストデータベースと同名のデータベースが見つかっ
+    た際の挙動を指定します:
+
+        * ``autoclobber`` が ``False`` なら、既存のデータベースを破壊しても
+          よいかユーザに尋ねます。ユーザが「いいえ」を選択すると、その時点
+          で ``sys.exit`` を呼び出して終了します。
+
+        * ``autoclobber`` が ``True`` なら、既存のデータベースを破壊すると
+          きにユーザに了解を求めません。
 
     ``create_test_db()`` には ``settings.DATABASE_NAME`` を変更してテストデー
     タベースの名前にするという副作用があります。
 
-``destroy_test_db(old_database_name, verbosity=1)``
-    ``settings.DATABASE_NAME`` の名前 (通常は、 ``create_test_db`` でテスト
-    用に変更されているはずです) に一致するデータベースを破壊し、
-    ``settings.DATABASE_NAME`` の値を ``old_database_name`` に指定した名前
-    に戻します。
+    開発バージョンの Django では、この関数は生成されたテストデータベースの
+    名前を返します。
 
-    ``verbosity`` はテストランナの同名の引数と同じ意味です。
+``destroy_test_db(old_database_name, verbosity=1)``
+    このメソッドを呼び出した時点で ``DATABASE_NAME`` に設定されているデータ
+    ベースを破壊し、 ``DATABASE_NAME`` の値を ``old_database_name`` に指定
+    したデータベース名に戻します。
+
+    ``verbosity`` は ``run_tests()`` の同名の引数と同じ意味です。
