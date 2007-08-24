@@ -2,7 +2,7 @@
 newforms ライブラリ
 ===================
 
-:revision-up-to: 5922 (0.97pre SVN)
+:revision-up-to: 6000 (0.97pre SVN)
 
 ``django.newforms`` は、 Django に新たに導入された画期的なフォーム処理ライ
 ブラリで、従来のフォーム／マニピュレータ／バリデータフレームワークである
@@ -1566,12 +1566,12 @@ ImageField を使いたい場合、 `Python Imaging Library`_ をインストー
 
     class MultiEmailField(forms.Field):
         def clean(self, value):
+            if not value:
+                raise forms.ValidationError('Enter at least one e-mail address.')
             emails = value.split(',')
             for email in emails:
                 if not is_valid_email(email):
                     raise forms.ValidationError('%s is not a valid e-mail address.' % email)
-            if not emails:
-                raise forms.ValidationError('Enter at least one e-mail address.')
             return emails
 
 件の ``ContactForm`` の例を使って、上のカスタムフィールドをフォームで使って
@@ -2117,6 +2117,45 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
 ``form_for_instance()`` は、 ``form``, ``fields`` および
 ``formfield_callback`` パラメタをとります。これらの引数の挙動は
 ``form_for_model()`` の同名の引数と同じです。
+
+前に解説した「 `コンタクトフォーム`_ 」のビューを少し書き直してみましょう。
+以下のような ``Message`` モデルを使って、コンタクトフォームへの入力内容を保
+存しているとしましょう::
+
+    class Message(models.Model):
+        subject = models.CharField(max_length=100)
+        message = models.TextField()
+        sender = models.EmailField()
+        cc_myself = models.BooleanField()
+
+``form_for_model()`` を使えば、このモデルからフォームを作成できます。
+また、 ``form_for_instance()`` を使えば、 ``Message`` インスタンスを編集す
+るためのフォームも生成できます。前の `コンタクトフォーム`_ ビューをちょっと
+変えて、 ``Message`` の ``id`` 値を引数に取るようにして、保存されている
+``Message`` を編集できるようなフォームを作成してみます::
+
+    def contact_edit(request, msg_id):
+        # メッセージ id を使ってフォームを生成します。
+        message = get_object_or_404(Message, id=msg_id)
+        ContactForm = form_for_instance(message)
+
+        if request.method == 'POST':
+            form = ContactForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return HttpResponseRedirect('/url/on_success/')
+        else:
+            form = ContactForm()
+        return render_to_response('contact.html', {'form': form})
+
+このビューのポイントは、 ``ContactForm`` クラスの生成方法と、リクエストメソッ
+ドが ``POST`` でない場合のブロックでは、 ``message`` インスタンスの値がフォー
+ムフィールドの初期値に使われるということです。
+
+.. _contact form: `Simple view example`_
+.. _earlier: `Simple view example`_
+.. _`コンタクトフォーム`: `contact form`_
+
 
 .. _When should you use form_for_model() and form_for_instance():
 

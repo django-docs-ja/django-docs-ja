@@ -2,7 +2,7 @@
 はじめての Django アプリ作成、その 4
 =====================================
 
-:revision-up-to: 5804 (0.97pre SVN)
+:revision-up-to: 5947 (0.97pre SVN)
 
 このチュートリアルは `チュートリアルその 3`_ の続きです。ここでは、引続き
 Web 投票アプリケーションの開発を例にして、簡単なフォーム処理とコードの縮小
@@ -216,7 +216,7 @@ URLconf に入れたことを思い出しましょう::
         (r'^$', 'django.views.generic.list_detail.object_list', info_dict),
         (r'^(?P<object_id>\d+)/$', 
          'django.views.generic.list_detail.object_detail', info_dict),
-        (r'^(?P<object_id>\d+)/results/$', 
+        url(r'^(?P<object_id>\d+)/results/$', 
          'django.views.generic.list_detail.object_detail', 
          dict(info_dict, template_name='polls/results.html'), 'poll_results'),
         (r'^(?P<poll_id>\d+)/vote/$', 'mysite.polls.views.vote'),
@@ -238,8 +238,12 @@ URLconf に入れたことを思い出しましょう::
     * 結果を表示するビューに ``poll_results`` という名前をつけてあります。
       こうすると、このビューを呼び出すような URL を後で生成できます
       (詳しくは「 `名前付きパターン`_ 」の説明を参照してください。)
+      また、 ``django.conf.urls.defaults`` の `url()`_ 関数を使っています。
+      上の例のように、パターン名を指定する場合には、 ``url()`` を使うよう薦
+      めます。
       
 .. _naming URL patterns: ../url_dispatch/#naming-url-patterns
+.. _url(): ../url_dispatch/#url
 .. _`名前付きパターン`: `naming URL patterns`_
 
 デフォルトでは、 ``object_detail`` 汎用ビューは 

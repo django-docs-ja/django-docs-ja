@@ -428,11 +428,13 @@ Python のクラスです。テストクライアントを使うと、ビュー�
 .. _Twill: http://twill.idyll.org/
 .. _Selenium: http://www.openqa.org/selenium/
 
-Overview and a quick example
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _Overview and a quick example:
 
-To use the test client, instantiate ``django.test.client.Client`` and retrieve
-Web pages::
+テストの概要と簡単な例
+~~~~~~~~~~~~~~~~~~~~~~
+
+テストクライアントを使うには、 ``django.test.client.Client`` をインスタンス
+化して、 Web ページを取得します::
 
     >>> from django.test.client import Client
     >>> c = Client()
@@ -443,40 +445,43 @@ Web pages::
     >>> response.content
     '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 ...'
 
-As this example suggests, you can instantiate ``Client`` from within a session
-of the Python interactive interpreter.
+上の例でわかるように、 ``Client`` は Python 対話インタプリタのセッション中
+でもインスタンス化できます。
 
-Note a few important things about how the test client works:
+テストクライアントの動作には重要な点がいくつかあります:
 
-    * The test client does *not* require the Web server to be running. In fact,
-      it will run just fine with no Web server running at all! That's because
-      it avoids the overhead of HTTP and deals directly with the Django
-      framework. This helps make the unit tests run quickly.
+    * テストクライアントを実行するために Web サーバを起動する必要は
+      *ありません* 。実際、 Web サーバがまったく動いていなくても、テストは
+      何の問題もなく実行できるのです。というのも、テストクライアントは HTTP
+      通信のオーバヘッドを回避して、 Django フレームワークに直接アクセスし
+      ているからです。このからくりによって、ユニットテストを高速に実行でき
+      ます。
 
-    * When retrieving pages, remember to specify the *path* of the URL, not the
-      whole domain. For example, this is correct::
+    * ページを取得するときには、ドメインを含まない *パス部分だけ* を指定す
+      るよう気をつけてください。例えば、以下の呼び出し::
 
           >>> c.get('/login/')
 
-      This is incorrect::
+      は正しいですが、次の呼び出し::
 
           >>> c.get('http://www.example.com/login/')
 
-      The test client is not capable of retrieving Web pages that are not
-      powered by your Django project. If you need to retrieve other Web pages,
-      use a Python standard library module such as urllib_ or urllib2_.
+      は正しくありません。
 
-    * To resolve URLs, the test client uses whatever URLconf is pointed-to by
-      your ``ROOT_URLCONF`` setting.
+      Django のプロジェクトから生成されていない Web ページは、テストクライ
+      アントで取得できません。Django 以外の Web ページを取得したければ、
+      urllib_ や urllib2_ のような Python 標準ライブラリを使ってください。
 
-    * Although the above example would work in the Python interactive
-      interpreter, some of the test client's functionality, notably the
-      template-related functionality, is only available *while tests are running*.
+    * テストクライアントは URL の解決に ``ROOT_URLCONF`` に指定された
+      URLconf を使います。
 
-      The reason for this is that Django's test runner performs a bit of black
-      magic in order to determine which template was loaded by a given view.
-      This black magic (essentially a patching of Django's template system in
-      memory) only happens during test running.
+    * 上の例は Python の対話インタプリタ中でも動作しますが、一部のテンプレー
+      ト関連の機能などは *テストの実行中だけ* でしか使えません。
+
+      というのも、 Django のテストランナは、あるビューでどのテンプレートが
+      ロードされるかを決定するためにちょっとした黒魔術的なコードを使ってい
+      るからです。この黒魔術 (実際には、メモリ上のテンプレートシステムに対
+      するパッチ) は、テスト実行時にしか適用されません。
 
 .. _urllib: http://docs.python.org/lib/module-urllib.html
 .. _urllib2: http://docs.python.org/lib/module-urllib2.html
@@ -731,9 +736,6 @@ Note a few important things about how the test client works:
             # レンダリングされるコンテキストの customers の長さが 5 である
             # か確かます。
             self.failUnlessEqual(len(response.context['customers']), 5)
-
-
-    
 
 
 .. _TestCase:
