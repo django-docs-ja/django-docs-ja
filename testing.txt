@@ -166,7 +166,7 @@ doctest の詳しい動作原理は、 `標準ドキュメントの doctest の�
 .. _doctest: http://python.jp/doc/release/lib/module-doctest.html
 .. _`標準ドキュメントの doctest の項`: doctest_
 
-.. _Writing unittests:
+.. _Writing unit tests:
 
 ユニットテストを書く
 --------------------
@@ -188,10 +188,6 @@ doctest と同様、 Django のテストランナは、以下の二つの場所�
 
 以下の ``unittest.TestCase`` のサブクラスは、前節の doctest と同じテストを
 実現しています::
-
-
-上の例と同じ内容のテストを unittest のテストケースで書くと以下のようになり
-ます::
 
     import unittest
     from myapp.models import Animal
@@ -594,7 +590,7 @@ Python のクラスです。テストクライアントを使うと、ビュー�
     ``login()`` は、指定した認証情報が承認され、ログインに成功した場合に
     ``True`` を返します。
 
-    このメソッドを使には、事前にユーザを登録しておかねばなりません。上で説
+    このメソッドを使うには、事前にユーザを登録しておかねばなりません。上で説
     明したように、テストランナはテストデータベースを使ってテストを実行する
     ので、デフォルトではユーザが登録されていません。そのため、運用環境で使
     えるユーザはテスト環境では使えないのです。テストスイートの一環として、
@@ -644,7 +640,7 @@ Python のクラスです。テストクライアントを使うと、ビュー�
                       (``'admin/index.html'`` のような形式の文字列です)。
                       
                       複数のテンプレートをレンダリングしている場合 (例えば
-                      `テンプレート継承`_ を使っている場合) 、 
+                      `テンプレートの継承`_ を使っている場合) 、 
                       ``template`` はレンダリング順に並んだ  Template オブ
                       ジェクトのリストになります。
 
@@ -990,7 +986,7 @@ Django は、テストフレームワークを初期化する際、通常の `SM
 .. _`SMTPConnection`: ../email/#the-emailmessage-and-smtpconnection-classes
 .. _`EmailMessage`: ../email/#the-emailmessage-and-smtpconnection-classes
 .. _`previously`: #emptying-the-test-outbox
-.. _`Django のメールサービス`: `Django e-mail services`_
+.. _`Django のメールサービス`: `Django's e-mail functionality`_
 .. _`前節で`: `previously`_
 
 .. _Using a different testing framework:

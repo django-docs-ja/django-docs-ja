@@ -170,7 +170,7 @@ Django は以下の段階を踏んでオブジェクトを保存します:
        ジェクトが成功理に保存されたことを通知するために ``post_save`` シグ
        ナルが発行されます (シグナルのドキュメントはまだありません)．
 
-.. _Raw Saves
+.. _Raw Saves:
 
 生データの保存
 --------------
@@ -1596,7 +1596,8 @@ Q オブジェクトを使った複雑な照合
 
 `OR lookups examples page`_ の例も参照してください．
 
-.. _OR lookups examples page: ../models/or_lookups/
+.. _OR lookups examples page:
+    http://www.djangoproject.com/documentation/models/or_lookups/
 
 .. _Related objects:
 
@@ -1964,7 +1965,8 @@ get_next_by_FOO(\**kwargs) and get_previous_by_FOO(\**kwargs)
 いことが保証されています．完全なコードの例は `照合 API のサンプルモデル`_
 を参照してください．
 
-.. _lookup API sample model: ../models/lookup/
+.. _lookup API sample model:
+    http://www.djangoproject.com/documentation/models/lookup/
 .. _`照合 API のサンプルモデル`: `lookup API sample model`_
 
 get_FOO_filename()

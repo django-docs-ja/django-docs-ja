@@ -26,7 +26,8 @@
 ``tests/modeltests`` ディレクトリに収められています。)
 
 .. _`Database API reference`: ../db-api/
-.. _`official repository of model examples`: ../models/
+.. _`official repository of model examples`:
+    http://www.djangoproject.com/documentation/models/
 .. _`モデル例の公式リポジトリ`: `official repository of model examples`_
 .. _`データベース API リファレンス`: `Database API reference`_
 
@@ -838,7 +839,8 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
 
 完全な使用例は `多対一のリレーションを持つモデルの例`_ を参照してください。
 
-.. _`Many-to-one relationship model example`: ../models/many_to_one/
+.. _`Many-to-one relationship model example`:
+    http://www.djangoproject.com/documentation/models/many_to_one/
 .. _`多対一のリレーションを持つモデルの例`: `Many-to-one relationship model example`_
 
 ``ForeignKey`` フィールドはリレーションの動作を定義するための引数をいくつか
@@ -985,7 +987,8 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
 
 完全な例は `多対多のリレーションを持つモデルの例`_ を参照してください。
 
-.. _Many-to-many relationship model example: ../models/many_to_many/
+.. _Many-to-many relationship model example:
+    http://www.djangoproject.com/documentation/models/many_to_many/
 .. _`多対多のリレーションを持つモデルの例`: `Many-to-many relationship model example`_
 
 ``ManyToManyField`` フィールドはリレーションの動作を定義するための引数を
@@ -1073,7 +1076,8 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
 
 完全な例は `一対一のリレーションを持つモデルの例`_ を参照してください。
 
-.. _`One-to-one relationship model example`: ../models/one_to_one/
+.. _`One-to-one relationship model example`:
+    http://www.djangoproject.com/documentation/models/one_to_one/
 .. _`一対一のリレーションを持つモデルの例`: `One-to-one relationship model example`_
 
 .. _Custom field types:
@@ -1291,7 +1295,8 @@ Django は背後でカラム名とテーブル名をクオートします。
 ``ordering`` にいくつフィールドがあっても、 admin サイトは最初のフィールド
 しか使わないので注意してください。
 
-.. _Specifying ordering: ../models/ordering/
+.. _Specifying ordering:
+    http://www.djangoproject.com/documentation/models/ordering/
 .. _`並び順の指定例`: `Specifying ordering`_
 
 ``permissions``

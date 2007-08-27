@@ -167,7 +167,7 @@ naturalday
     * 引数を与えない場合、今日、昨日、明日以外の日付は `DATE_FORMAT`_ 設定
       に従ってフォーマットされます。
 
-.. _DATE_FORMAT: ../settings/#date_format
+.. _DATE_FORMAT: ../settings/#date-format
 
 
 flatpages

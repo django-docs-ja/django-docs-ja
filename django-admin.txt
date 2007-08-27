@@ -490,6 +490,7 @@ testserver [fixture fixture ...]
 や ``port`` パラメタを受け付けません。
 
 .. _unit tests: ../testing/
+.. _`ユニットテスト`: `unit tests`_
 
 validate
 --------
