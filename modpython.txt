@@ -2,7 +2,7 @@
 mod_python で Django を動かす
 =============================
 
-:revision-up-to: 5922 (0.97pre SVN)
+:revision-up-to: 6036 (0.97pre SVN)
 
 Django をプロダクションサーバ上で動かす設定として、現状では Apache_ と
 `mod_python`_ の組み合わせを推奨しています。
@@ -278,8 +278,9 @@ Django を Python egg_ でインストールしたり、 Django から egg 化�
 番最初にこのファイルを import するよう指定します。まず、前述の
 「 `ひとつの Apache で複数の Django を使う`_ 」の節で説明した
 ``PythonInterpreter`` ディレクティブを設定しておきます (複数の Django をイ
-ンストールしない場合でも必要です)。次に、 ``Location`` か ``VirtualHost``
-セクションの中に、以下のように ``PythonImport`` 行を追加します::
+ンストールしない場合でも必要です)。
+次に、メインのサーバ設定 (``Location`` や ``VirtualHost`` セクションの外)
+に、以下のように ``PythonImport`` 行を追加します::
 
     PythonInterpreter my_django
     PythonImport /path/to/my/project/file.py my_django

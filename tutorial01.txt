@@ -4,7 +4,7 @@
 
 .. contents::
 
-:revision-up-to: 5878 (0.97pre SVN)
+:revision-up-to: 6036 (0.97pre SVN)
 
 さあ、例を交えながら学んでゆきましょう。
 
@@ -288,6 +288,25 @@ Django では、こうした概念を簡単な Python クラスで表現でき�
         choice = models.CharField(max_length=200)
         votes = models.IntegerField()
 
+.. admonition:: ``max_length`` にまつわるエラー
+
+   Django が ``max_length`` が正しい引数でないというエラーを出す場合、古い
+   バージョンの Django を使っているはずです。 (チュートリアルのこのバージョ
+   ンは、最新の開発版 Django に準拠しています) Subversion を使って開発版の
+   Django をチェックアウトしている場合 (詳しい方法は `インストール方法`_ を
+   参照してください) 、エラーは起きないはずです。
+
+   古いバージョンの Django を使わねばならない場合、 
+   `バージョン 0.96 用のチュートリアル`_ を参照するよう勧めます。というのも、
+   このチュートリアルでは、開発版の Django にしかない機能をカバーしているか
+   らです。
+
+.. _the installation docs: ../install/
+.. _the Django 0.96 tutorial: ../0.96/tutorial01/
+.. _`インストール方法`: `the installation docs`_
+.. _`バージョン 0.96 用のチュートリアル`: `the Django 0.96 tutorial`_
+
+
 コードは単純明解ですね。各モデルは一つのクラスで表現され、いずれも
 ``django.db.models.Model`` のサブクラスになっています。各モデルには複数のク
 ラス変数があり、個々のクラス変数はモデルのデータベースフィールドを表現して
@@ -535,6 +554,25 @@ polls 関係のモデルを少し修正して、 ``Poll`` と ``Choice`` に
         # ...
         def __unicode__(self):
             return self.choice
+
+.. admonition:: ``__unicode__()`` がうまく動かない場合
+
+   モデルに ``__unicode__()`` メソッドを追加したのに、オブジェクトの表示が
+   何も変化しないのなら、古いバージョンの Django を使っているはずです。
+   (チュートリアルのこのバージョンは、最新の開発版 Django に準拠しています)
+   Subversion を使って開発版の Django をチェックアウトしている場合 (詳しい
+   方法は `インストール方法`_ を参照してください) 、うまく動作するはずです。
+
+   古いバージョンの Django を使わねばならない場合、 
+   `バージョン 0.96 用のチュートリアル`_ を参照するよう勧めます。というのも、
+   このチュートリアルでは、開発版の Django にしかない機能をカバーしているか
+   らです。
+
+.. _the installation docs: ../install/
+.. _the Django 0.96 tutorial: ../0.96/tutorial01/
+.. _`インストール方法`: `the installation docs`_
+.. _`バージョン 0.96 用のチュートリアル`: `the Django 0.96 tutorial`_
+
 
 ``__unicode__()`` をモデルに追加しておくのは、対話プロンプトで扱うときに精
 神的によいだけでなく、オブジェクトの表現 (representation) は Django 自動

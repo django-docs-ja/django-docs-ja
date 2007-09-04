@@ -2,7 +2,7 @@
 テンプレート作者のための Django テンプレート言語ガイド
 =======================================================
 
-:revision-up-to: 5947 (0.97pre SVN)
+:revision-up-to: 6036 (0.97pre SVN)
 
 Django のテンプレート言語は、釣合いの取れたパワーと簡便さを実現するように、
 また HTML を扱いなれた人にとっては快適になるように設計されています。
@@ -1364,9 +1364,13 @@ unordered_list
 unordered list) に変換します。**ただし**、最も外側の <ul> タグは表示しませ
 ん。
 
+**開発版の Django で変更された仕様**
+
+``unordered_list`` の引数の形式は、より分かりやすい形式に変更されました。
+
 リストは適切な形式になっているものとみなします。例えば、 ``var`` が
-``['States', [['Kansas', [['Lawrence', []], ['Topeka', []]]], ['Illinois', []]]]``
-であれば、 ``{{ var|unordered_list }}`` は以下のようになります::
+``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]`` であれば、
+``{{ var|unordered_list }}`` は以下のようになります::
 
     <li>States
     <ul>
@@ -1379,6 +1383,10 @@ unordered list) に変換します。**ただし**、最も外側の <ul> タグ
             <li>Illinois</li>
     </ul>
     </li>
+
+ノート: 以前の、より杓子定規で冗長な形式、 
+``['States', [['Kansas', [['Lawrence', []], ['Topeka', []]]], ['Illinois',[]]]]``
+も継続してサポートしています。
 
 upper
 ~~~~~

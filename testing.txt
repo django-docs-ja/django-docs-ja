@@ -2,7 +2,7 @@
 Djangoアプリケーションのテスト
 ==============================
 
-:revision-up-to: 5922 (0.97pre SVN)
+:revision-up-to: 6036 (0.97pre SVN)
 
 今日の Web 開発者にとって、自動化されたテストはバグ潰しの工程で極めて有用な
 ツールです。複数のテストを集めた **テストスイート** を使えば、Web開発におけ
@@ -913,9 +913,9 @@ Django 独自の ``TestCase`` クラスを使うと、テストランナは各�
     ``errors`` はエラー文字列か、エラー文字列のリストです。フォームの検証結
     果として返されるのと同じ形式です。
 
-``assertRedirects(response, expected_path, status_code=302, target_status_code=200)``
+``assertRedirects(response, expected_url, status_code=302, target_status_code=200)``
     レスポンスが ``status_code`` に指定したリダイレクト状態コードを持ち、か
-    つ ``expected_path`` へのリダイレクトを指示しており、さらにリダイレクト
+    つ ``expected_url`` へのリダイレクトを指示しており、さらにリダイレクト
     先の内容を HTTP 状態コード ``target_status_code`` で取得できるかどうか
     調べるアサーションです。
 

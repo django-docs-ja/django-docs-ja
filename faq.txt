@@ -2,7 +2,7 @@
 Django についてよくある質問
 ===========================
 
-:revision-up-to: 5832 (0.97pre SVN)
+:revision-up-to: 6036 (0.97pre SVN)
 
 .. contents::
 
@@ -248,13 +248,6 @@ Django を書き始めた約 2 年前、 Adrian と Simon は少し時間を取�
 を反映させたいと思っています。言い方を変えれば、 Django API はまだ変化する
 かもしれないので、それまではスクリーンキャストにまださほどエネルギーを使い
 たくないということです。
-
-とはいいながら、 `非公式の Django スクリーンキャスト`_ はあるのでチェックし
-てみてください。
-
-.. _`非公式の Django スクリーンキャスト`: http://www.throwingbeans.org/django_screencasts.html
-.. _unofficial Django screencast: http://www.throwingbeans.org/django_screencasts.html
-
 
 .. _Is Django a content-management-system (CMS)?:
 
