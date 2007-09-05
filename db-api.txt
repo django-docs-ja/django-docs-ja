@@ -239,7 +239,7 @@ ForeignKey や ManyToManyField の保存
 したい場合は ``add()`` メソッドを使います::
 
      joe = Author.objects.create(name="Joe")
-+    entry.authors.add(joe)
+     entry.authors.add(joe)
 
 間違った型のオブジェクトを外部キーに代入したり ``add()`` したりすると
 Django はエラーを出します。

@@ -302,7 +302,7 @@ Django では、こうした概念を簡単な Python クラスで表現でき�
    らです。
 
 .. _the installation docs: ../install/
-.. _the Django 0.96 tutorial: ../0.96/tutorial01/
+.. _the Django 0.96 tutorial: ../../doc-ja-0.96/tutorial01/
 .. _`インストール方法`: `the installation docs`_
 .. _`バージョン 0.96 用のチュートリアル`: `the Django 0.96 tutorial`_
 
@@ -567,11 +567,6 @@ polls 関係のモデルを少し修正して、 ``Poll`` と ``Choice`` に
    `バージョン 0.96 用のチュートリアル`_ を参照するよう勧めます。というのも、
    このチュートリアルでは、開発版の Django にしかない機能をカバーしているか
    らです。
-
-.. _the installation docs: ../install/
-.. _the Django 0.96 tutorial: ../0.96/tutorial01/
-.. _`インストール方法`: `the installation docs`_
-.. _`バージョン 0.96 用のチュートリアル`: `the Django 0.96 tutorial`_
 
 
 ``__unicode__()`` をモデルに追加しておくのは、対話プロンプトで扱うときに精
