@@ -62,6 +62,8 @@ Django オンラインドキュメント和訳
 `Python プログラマのための Django テンプレート言語ガイド
 (Guide for Python programmers)  <../templates_python/>`__
 
+`Django shortcut functions <../shortcuts/>`__
+
 `フォームとマニピュレータ
 (Forms, fields, and manipulators) <../forms/>`__
 
@@ -107,6 +109,10 @@ Django オンラインドキュメント和訳
   `Web デザイナーのための補助機能 (Web design helpers) <../webdesign/>`__
 
   `databrowse アプリケーション <../databrowse/>`__
+
+  `Form preview <../form_preview/>`__
+
+  `The contenttypes framework <../contenttypes/>`__
 
 運用関連
 --------
