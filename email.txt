@@ -224,7 +224,7 @@ EmailMessage および SMTPConnection クラス
 **開発版の Django で新たに追加された機能です**
 
 Django の ``send_mail()`` および ``send_mass_mail()`` 関数は、実際には
-``django.core.mail`` クラスの ``EmailMessage`` や ``SMTPConnection`` クラス
+``django.core.mail`` の ``EmailMessage`` クラスや ``SMTPConnection`` クラス
 に対して薄いラッパをかぶせたものにすぎません。 Django からメールを送信する
 方法をカスタマイズしたければ、これらのクラスをサブクラス化してやりたいこと
 を実現できます。
