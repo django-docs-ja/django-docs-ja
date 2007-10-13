@@ -53,6 +53,8 @@ Django オンラインドキュメント和訳
 
 `トランザクション (Managing database transactions) <../transactions/>`__
 
+`Model examples <http://www.djangoproject.com/documentation/models/>`__
+
 テンプレート
 ~~~~~~~~~~~~
 
