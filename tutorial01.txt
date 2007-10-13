@@ -431,7 +431,7 @@ Django では、こうした概念を簡単な Python クラスで表現でき�
 
 興味があるなら、以下のコマンドも実行してみてください:
 
-    * ``python manage.py validate polls`` -- モデルの構成にエラーがないか調
+    * ``python manage.py validate`` -- モデルの構成にエラーがないか調
       べます。
 
     * ``python manage.py sqlcustom polls`` -- 各アプリケーション向けに定義

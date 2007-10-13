@@ -56,7 +56,7 @@ URLconf に入れたことを思い出しましょう::
 
     from django.shortcuts import get_object_or_404, render_to_response
     from django.http import HttpResponseRedirect
-    from django.core urlresolvers import reverse
+    from django.core.urlresolvers import reverse
     from mysite.polls.models import Choice, Poll
     #...
     def vote(request, poll_id):
