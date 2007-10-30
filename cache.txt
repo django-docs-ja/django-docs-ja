@@ -202,10 +202,9 @@ memcached インスタンスでキャッシュを共有しています::
 
 ダミーキャッシュが便利になるのは，そこかしこで様々なキャッシュを使っている
 ような実運用サイトを構築していて，開発／テスト環境ではキャッシュを行いたく
-ないような場合です．
-cache. As a result, your development environment won't use caching and your
-production environment still will. To activate dummy caching, set
-``CACHE_BACKEND`` like so::
+ないような場合です．開発環境ではダミーキャッシュによってキャッシュしなくな
+りますが、実運用環境はそのままにしておけます。ダミーキャッシュを有効にする
+には、次のように ``CACHE_BACKEND`` の設定します::
  
     CACHE_BACKEND = 'dummy:///'
 

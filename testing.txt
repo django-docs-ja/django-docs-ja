@@ -625,8 +625,7 @@ Python のクラスです。テストクライアントを使うと、ビュー�
     ================  ========================================================
     属性              説明
     ================  ========================================================
-    ``client``        The test client that was used to make the request that
-                      resulted in the response.
+    ``client``        レスポンス要求の生成に使われたテストクライアントです。
 
     ``content``       レスポンスの本体部分 (body) です。ビューがレンダリン
                       グによって生成した最終的なページコンテンツか、エラー
@@ -639,9 +638,8 @@ Python のクラスです。テストクライアントを使うと、ビュー�
                       ``template`` と同様、複数のテンプレートを使ってレンダ
                       リングを行った場合、 ``context`` は Context オブジェ
                       クトをレンダリングで使った順に並べたリストになります。
-                      objects, in the order in which they were rendered.
  
-    ``request``       The request data that stimulated the response.
+    ``request``       レスポンスを得るために使用したリクエストデータです。
  
     ``status_code``   レスポンスの HTTP 状態コードです。全ての HTTP 状態コー
                       ドのリストは RFC2616_ を参照してください。

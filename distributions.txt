@@ -19,10 +19,10 @@
 FreeBSD
 =======
 
-The `FreeBSD`_ ports system offers both Django 0.96 (`py-django`_) and a more 
-recent, but not current, version based on Django's trunk (`py-django-devel`_). 
-These are installed in the normal FreeBSD way; for Django 0.96, for example, type: 
-``cd /usr/ports/www/py-django && sudo make install clean``.
+`FreeBSD`_ のportsではDjango 0.96 (`py-django`_)を提供しています。開発版のDjangoは
+`py-django-devel`_ にあります。
+一般的な構成のFreeBSDにDjango 0.96をインストールするには
+``cd /usr/ports/www/py-django && sudo make install clean`` とタイプします。
 
 .. _FreeBSD: http://www.freebsd.org/
 .. _py-django: http://www.freebsd.org/cgi/cvsweb.cgi/ports/www/py-django/
@@ -53,7 +53,7 @@ Fedora
 ------
 
 `Fedora Linux`_ 向けの Django ビルドは "Fedora Extras" リポジトリに入ってい
-ます． 
+ます．
 `現行の Fedora パッケージ <http://fedoraproject.org/extras/6/i386/repodata/repoview/Django-0-0.95.1-1.fc6.html>`_
 は0.95.1 に基づいており，インストールするには ``yum install Django`` とタイ
 プします．
@@ -65,7 +65,7 @@ Gentoo
 ------
 
 `Gentoo Linux`_ 向けの Django ビルドは 0.95.1 に基づいています．
-`現行の Gentoo ビルド <http://packages.gentoo.org/packages/?category=dev-python;name=django>`_ 
+`現行の Gentoo ビルド <http://packages.gentoo.org/packages/?category=dev-python;name=django>`_
 をインストールするには， ``emerge Django`` とタイプします．
 
 .. _Gentoo Linux: http://www.gentoo.org/
@@ -108,7 +108,7 @@ Python 2.5 なら， ``sudo port install py25-django-devel`` です． MacPorts
 `django-developers メーリングリスト <http://groups.google.com/group/django-developers/>`_
 に入って自己紹介してください．
 
-また，ディストリビューション作成者は， 
+また，ディストリビューション作成者は，
 `django-announce メーリングリスト <http://groups.google.com/group/django-announce/>`_
 にも入っておくよう勧めます．このメーリングリストは (とても) 流量の少ないメー
 リングリストで， Django の新しいリリースやバグフィクスに関するアナウンスが
