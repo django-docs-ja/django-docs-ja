@@ -2,7 +2,7 @@
 Django のキャッシュフレームワーク
 =================================
 
-:revision-up-to: 5613 (0.97pre SVN)
+:revision-up-to: 6049 (0.97pre SVN)
 
 動的な Web サイトの根本的なトレードオフ要因とは，まさに動的であるということ
 そのものです．ユーザがページをリクエストするたびに，サーバはデータベースへ
@@ -202,9 +202,12 @@ memcached インスタンスでキャッシュを共有しています::
 
 ダミーキャッシュが便利になるのは，そこかしこで様々なキャッシュを使っている
 ような実運用サイトを構築していて，開発／テスト環境ではキャッシュを行いたく
-ないような場合です．こうした状況では，開発環境向けの設定ファイルでは
-``CACHE_BACKEND`` を ``"dummy:///"``  にしておきます．その結果，開発環境で
-はキャッシュを行わなくなります．
+ないような場合です．
+cache. As a result, your development environment won't use caching and your
+production environment still will. To activate dummy caching, set
+``CACHE_BACKEND`` like so::
+ 
+    CACHE_BACKEND = 'dummy:///'
 
 .. _CACHE_BACKEND arguments:
 

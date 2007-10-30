@@ -4,7 +4,7 @@
 
 .. contents::
 
-:revision-up-to: 6036 (0.97pre SVN)
+:revision-up-to: 6040 (0.97pre SVN)
 
 さあ、例を交えながら学んでゆきましょう。
 
