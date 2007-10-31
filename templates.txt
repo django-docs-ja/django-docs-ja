@@ -2,7 +2,7 @@
 テンプレート作者のための Django テンプレート言語ガイド
 =======================================================
 
-:revision-up-to: 6036 (0.97pre SVN)
+:revision-up-to: 6070 (0.97pre SVN)
 
 Django のテンプレート言語は、釣合いの取れたパワーと簡便さを実現するように、
 また HTML を扱いなれた人にとっては快適になるように設計されています。
@@ -1483,3 +1483,16 @@ django.contrib.webdesign
 
 .. webdesign documentation: ../webdesign/
 .. _`webdesign のドキュメント`: ../webdesign/
+
+.. _Next steps:
+
+次のステップ
+============
+
+もしテンプレートシステムの技術的な展望（どのように動作し、どのように拡張するか）
+について学びたいなら、
+`Python プログラマのための Django テンプレート言語ガイド`_ を読んでください。
+
+.. _The Django template language: For Python programmers: ../templates_python/
+.. _`Python プログラマのための Django テンプレート言語ガイド`:
+        `The Django template language: For Python programmers`_
