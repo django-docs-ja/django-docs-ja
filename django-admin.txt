@@ -2,7 +2,7 @@
 django-admin.py と manage.py
 ============================
 
-:revision-up-to: 6050 (0.97pre SVN)
+:revision-up-to: 6075 (0.97pre SVN)
 
 ``django-admin.py`` は Django の管理タスクを行うためのコマンドライン
 ユーティリティです。このドキュメントでは ``django-admin.py`` の全ての
@@ -41,31 +41,59 @@ Windows を使っていて、シンボリックリンクを張れない場合に
 使い方
 ======
 
-``django-admin.py action [options]``
+``django-admin.py <subcommand> [options]``
 
-``manage.py action [options]``
+``manage.py <subcommand> [options]``
 
-``action`` には、このドキュメントで挙げているいずれかのアクション
+``subcommand`` には、このドキュメントで挙げているいずれかのサブコマンド
 を指定します。 ``options`` は省略可能で、このドキュメントで挙げている
-ゼロ個から複数個のオプションを指定します。
+ゼロ個から複数個の利用可能なオプションをサブコマンドに与えます。
 
-``django-admin.py --help`` を実行すると、利用できる全てのアクションと
-オプションの詳細なリストの入ったヘルプメッセージを出力します。
+.. _Getting runtime help:
 
-ほとんどのアクションは ``appname`` のリストを引数にとります。 ``appname``
+ランタイムヘルプを取得する
+--------------------------
+
+Django 0.96では、 ``django-admin.py --help`` を実行すると、利用できる全ての
+サブコマンドとオプションの詳細なリストの入ったヘルプメッセージを出力します。
+
+開発版のDjangoでは、 ``django-admin.py --help`` を実行すると、利用できる全ての
+サブコマンドを出力します。 ``django-admin.py help <subcommand>`` を実行すると
+与えられたサブコマンドで利用できるオプションの詳細なリストを出力します。
+
+.. _App names:
+
+アプリケーションの名前
+----------------------
+
+ほとんどのサブコマンドは ``appname`` のリストを引数にとります。 ``appname``
 はモデルの入ったパッケージの名前です。例えば ``INSTALLED_APPS`` に
 ``mysite.blog`` を追加している場合、このアプリケーションの ``appname``
 は ``blog`` です。
 
-.. _Available actions:
+.. _Determining the version:
 
-利用可能なアクション
-====================
+バージョンを表示する
+--------------------
 
-adminindex [appname appname ...]
-----------------------------------------
+``django-admin.py --version`` を実行すると、使用しているDjangoのバージョンを表示します。
 
-指定した appname に対する admin-index テンプレート断片 (snippet) を出力し
+表示例::
+
+    0.95
+    0.96
+    0.97-pre-SVN-6069
+
+
+.. _Available subcommands:
+
+利用可能なサブコマンド
+======================
+
+adminindex <appname appname ...>
+--------------------------------
+
+-指定した appname に対する admin-index テンプレート断片 (snippet) を出力し
 ます。
 
 admin-index テンプレート断片は、 admin のインデクスページのルック&フイー
@@ -74,7 +102,7 @@ admin-index テンプレート断片は、 admin のインデクスページの�
 
 .. _`チュートリアルその 2`: ../tutorial02/
 
-createcachetable [tablename]
+createcachetable <tablename>
 ----------------------------
 
 データベースキャッシュバックエンドで使うための、 ``tablename`` という
@@ -111,22 +139,40 @@ diffsettings
 ``django/conf/global_settings.py`` にある Django のデフォルト設定を参照して
 ください。
 
-dumpdata [appname appname ...]
+dumpdata <appname appname ...>
 ------------------------------
 
 指定したアプリケーション (複数指定可) に関係した全てのデータをデータベース
 から取り出し、標準出力に出力します。
 
-デフォルトでは、データベースの内容は JSON 形式で出力されます。出力を他の形
-式にしたければ、 ``--format`` オプション (例えば ``format=xml``) を使ってく
-ださい。 ``--format`` には、 (``SERIALIZATION_MODULES`` 設定で指定したもの
-を含む) Django 対応のシリアライゼーションバックエンドを指定できます。
-``--indent`` オプションを使うと、出力をきれいにインデントできます。
-
 アプリケーション名を指定しなかった場合、インストール済みのアプリケーション
 全てのデータをダンプします。
 
 ``dumpdata`` の出力は ``loaddata`` の入力に使えます。
+
+--format
+~~~~~~~~
+
+デフォルトでは、 ``dumpdata`` の形式は JSON で出力されますが、
+``--format`` オプションを使って別の形式を指定することもできます。現在サポート
+しているフォーマットは `Serialization formats`_ に列挙されています。
+
+使用例::
+
+    django-admin.py dumpdata --format=xml
+
+.. _Serialization formats: ../serialization/#Serialization-formats
+
+--indent
+~~~~~~~~
+
+デフォルトでは、 ``dumpdata`` はすべてのデータを1行で出力します。これは
+人間にとって読みやすくありません。出力を整形するためのインデント幅のスペース数の
+指定に ``--indent`` オプションを使うことができます。
+
+使用例::
+
+    django-admin.py dumpdata --indent=4
 
 flush
 -----
@@ -140,6 +186,27 @@ flush
 モデルに関係しているかどうかに関わらず)  *全て* 消去していましたが、開発版
 では、 ``INSTALLED_APPS`` で有効化しているモデルのテーブルだけを消去するよ
 うになりました。
+
+--noinput
+~~~~~~~~~
+
+ユーザプロンプトでの "Are you sure?" のような確認メッセージの出力の抑制には
+``--noinput`` オプションを使います。対話を必要とせずに ``django-admin.py``
+を実行する自動化されたスクリプトで役に立ちます。
+
+--verbosity
+~~~~~~~~~~~
+
+``django-admin.py`` の通知情報やデバッグ情報のコンソールへの出力量を指定する
+には ``--verbosity`` を使います。
+
+  * ``0`` means no input.
+  * ``1`` means normal input (default).
+  * ``2`` means verbose input.
+
+使用例::
+
+    django-admin.py flush --verbosity=2
 
 inspectdb [dbname]
 ------------------
@@ -181,7 +248,7 @@ PostgreSQL や MySQL を使っている場合、イントロスペクション�
 ``inspectdb`` は PostgreSQL, MySQL および SQLite で動作します。外部キー
 の検出は PostgreSQL と一部の MySQL テーブル形式でのみ有効です。
 
-loaddata [fixture fixture ...]
+loaddata <fixture fixture ...>
 ------------------------------
 
 名前付きのフィクスチャを探し、その中身をデータベースにロードします。
@@ -209,7 +276,8 @@ Django は上記の場所に見つかった全てのフィクスチャファイ�
 ます。フィクスチャの拡張子は、 (``json`` や ``xml`` のように) シリアライザ
 の登録名に対応していなければなりません。
 
-拡張子を省略すると、 Django は全ての形式にフィクスチャを対象にフィクスチャファイルを検索します。例えば::
+拡張子を省略すると、 Django は全ての形式にフィクスチャを対象にフィクスチャ
+ファイルを検索します。例えば::
 
     django-admin.py loaddata mydata
 
@@ -248,10 +316,31 @@ Django は上記の場所に見つかった全てのフィクスチャファイ�
     約のチェックをトランザクションコミット直前まで遅延するためのメカニズム
     を備えていないからです。
 
-reset [appname appname ...]
+--verbosity
+~~~~~~~~~~~
+
+``django-admin.py`` のメッセージの通知やデバッグ情報のコンソールへの出力量を
+指定するには ``--verbosity`` を使います。
+
+  * ``0`` means no input.
+  * ``1`` means normal input (default).
+  * ``2`` means verbose input.
+
+使用例::
+
+    django-admin.py loaddata --verbosity=2
+
+reset <appname appname ...>
 ---------------------------
 
 指定した appname に対して ``sqlreset`` と同じ操作を実行します。
+
+--noinput
+~~~~~~~~~
+
+ユーザプロンプトでの "Are you sure?" のような確認メッセージの出力の抑制には
+``--noinput`` オプションを使います。対話を必要とせずに ``django-admin.py``
+を実行する自動化されたスクリプトで役に立ちます。
 
 runfcgi [options]
 -----------------
@@ -296,6 +385,26 @@ IP アドレスやポート番号は明示的に指定できます。
 ンからは利用できません。開発サーバをネットワーク上の他のマシンから
 見えるようにするには、サーバホスト固有の IP アドレス (例えば
 ``192.168.2.1``) または ``0.0.0.0`` を使って下さい。
+
+--adminmedia
+~~~~~~~~~~~~
+
+Django 管理インタフェース用の CSS や JavaScript ファイルを探す場所を Django に
+教えるには ``--adminmedia`` オプションを使います。通常、これらのファイルは
+Django のソースツリーから探索されて配信されるようになっていますが、自作のサイト
+用に変更を加えた CSS や JavaScript を指定したい場合には、このオプションを使いま
+す。
+
+使用例::
+
+    django-admin.py runserver --adminmedia=/tmp/new-admin-style/
+
+--noreload
+~~~~~~~~~~
+
+自動リロード機能の使用を無効にするには ``--noreload`` オプションを使います。
+これが意味するところは、サーバの稼働中にいかなる Python コードの変更も検知
+*せず* 既にメモリ上に読み込まれている Python モジュールが利用されます。
 
 例:
 ~~~
@@ -345,12 +454,12 @@ IPython がインストールされていて、かつ「普通の」インタプ
 
 .. _IPython: http://ipython.scipy.org/
 
-sql [appname appname ...]
+sql <appname appname ...>
 -------------------------
 
 指定した appname の CREATE TABLE SQL 文を出力します。
 
-sqlall [appname appname ...]
+sqlall <appname appname ...>
 ----------------------------
 
 指定した appname の CREATE TABLE および初期カスタム SQL の発行、データ入力
@@ -358,22 +467,12 @@ sqlall [appname appname ...]
 
 初期カスタム SQL の指定方法は ``sqlcustom`` の説明を参照してください。
 
-sqlclear [appname appname ...]
+sqlclear <appname appname ...>
 ------------------------------
 
 指定した appname の DROP TABLE SQL 文を出力します。
 
-sqlflush
---------
-
-`flush`_ コマンドによって実行されるのと等価な SQL 文を出力します。
-
-sqlindexes [appname appname ...]
---------------------------------
-
-指定した appname の CREATE INDEX SQL 文を出力します。
-
-sqlcustom [appname appname ...]
+sqlcustom <appname appname ...>
 -------------------------------
 
 指定した appname のカスタム SQL 文を出力します。
@@ -390,18 +489,23 @@ sqlcustom [appname appname ...]
 されます。テーブルに対して変更を加えたり、 SQL 関数をデータベースに組み込む
 には、この SQL フックを使ってください。
 
-sqlindexes [appname appname ...]
+sqlflush
+--------
+
+`flush`_ コマンドによって実行されるのと等価な SQL 文を出力します。
+
+sqlindexes <appname appname ...>
 --------------------------------
 
 指定したアプリケーションに対する CREATE INDEX SQL 文を出力します。
 
-sqlreset [appname appname ...]
+sqlreset <appname appname ...>
 ------------------------------
 
 指定した appname に対する DROP TABLE SQL 文を出力し、
 その後で CREATE TABLE SQL 文を出力します。
 
-sqlsequencereset [appname appname ...]
+sqlsequencereset <appname appname ...>
 --------------------------------------
 
 指定した appname のシークエンスをリセットするためのSQL 文を出力します。
@@ -409,13 +513,13 @@ sqlsequencereset [appname appname ...]
 詳しくは http://simon.incutio.com/archive/2004/04/21/postgres を参照し
 てください。
 
-startapp [appname]
+startapp <appname>
 ------------------
 
 現在のディレクトリに、 appname に指定した名前の Django アプリケーショ
 ンディレクトリ階層を作成します。
 
-startproject [projectname]
+startproject <projectname>
 --------------------------
 
 現在のディレクトリに、 projectname に指定した名前の Django プロジェク
@@ -454,16 +558,58 @@ syncdb
 や ``xml`` など) のフィクスチャを探してインストールします。フィクスチャデー
 タファイルの詳細は ``loaddata`` のドキュメントを参照してください。
 
+--verbosity
+~~~~~~~~~~~
+
+``django-admin.py`` の通知情報やデバッグ情報のコンソールへの出力量を指定する
+には ``--verbosity`` を使います。
+
+  * ``0`` means no input.
+  * ``1`` means normal input (default).
+  * ``2`` means verbose input.
+
+使用例::
+
+    django-admin.py syncdb --verbosity=2
+
+--noinput
+~~~~~~~~~
+
+ユーザプロンプトでの "Are you sure?" のような確認メッセージの出力の抑制には
+``--noinput`` オプションを使います。対話を必要とせずに ``django-admin.py``
+を実行する自動化されたスクリプトで役に立ちます。
+
 test
 ----
 
-インストールされている全てのモデルからテストを捜し出して実行します。
+インストールされている全てのモデルについてテストを実行します。
 詳しくは `Django アプリケーションのテスト`_ を参照してください。
 
 .. _`testing Django applications`: ../testing/
 .. _`Django アプリケーションのテスト`: `testing Django applications`_
- 
-testserver [fixture fixture ...]
+
+--noinput
+~~~~~~~~~
+
+ユーザプロンプトでの "Are you sure?" のような確認メッセージの出力の抑制には
+``--noinput`` オプションを使います。対話を必要とせずに ``django-admin.py``
+を実行する自動化されたスクリプトで役に立ちます。
+
+--verbosity
+~~~~~~~~~~~
+
+``django-admin.py`` の通知情報やデバッグ情報のコンソールへの出力量を指定する
+には ``--verbosity`` を使います。
+
+  * ``0`` means no input.
+  * ``1`` means normal input (default).
+  * ``2`` means verbose input.
+
+使用例::
+
+    django-admin.py test --verbosity=2
+
+testserver <fixture fixture ...>
 --------------------------------
 
 **開発版の Django で新たに登場した機能です**
@@ -507,29 +653,34 @@ testserver [fixture fixture ...]
 .. _unit tests: ../testing/
 .. _`ユニットテスト`: `unit tests`_
 
+--verbosity
+~~~~~~~~~~~
+
+``django-admin.py`` の通知情報やデバッグ情報のコンソールへの出力量を指定する
+には ``--verbosity`` を使います。
+
+  * ``0`` means no input.
+  * ``1`` means normal input (default).
+  * ``2`` means verbose input.
+
+使用例::
+
+    django-admin.py testserver --verbosity=2
+
 validate
 --------
 
 インストールされている (``INSTALLED_APPS`` に登録されている) 全てのモ
 デルを検証 (validate) し、エラーがあれば標準出力に出力します。
 
-利用可能なオプション
-====================
 
---settings
-----------
+.. _Default options:
 
-使用例::
+デフォルトのオプション
+======================
 
-    django-admin.py init --settings=mysite.settings
-
-管理対象のプロジェクトの設定モジュールを明示的に指定します。設定モジュー
-ルは Python のパッケージ表現構文、すなわち "mysite.settings" のような形式で
-指定します。このオプションを指定しない場合、 ``django-admin.py`` は環境変数
-``DJANGO_SETTINGS_MODULE`` を使います。
-
-``manage.py`` は ``DJANGO_SETTINGS_MODULE`` をきちんと設定してくれるの
-で、このオプションは必要ありません。
+Although some subcommands may allow their own custom options, every subcommand
+allows for the following options:
 
 --pythonpath
 ------------
@@ -547,83 +698,21 @@ validate
 
 .. _`import 検索パス`: http://diveintopython.org/getting_to_know_python/everything_is_an_object.html
 
---plain
--------
-
-IPython をインストールしている場合、対話シェルの起動に IPython ではなく通常
-の Python 対話シェルを使います。
-
---format
---------
-
-使用例::
-
-    django-admin.py dumpdata --format=xml
-
-ダンプ出力に使う形式を指定します。出力形式の名前はシリアライザの登録名でな
-ければなりません。
-
-
---help
-------
-
-利用できる全てのアクションとオプションの詳細なリストの入ったヘルプメッ
-セージを出力します。
-
---indent
---------
-
-使用例::
-
-    django-admin.py dumpdata --indent=4
-
-出力を整形するためのインデント幅をスペースの個数で指定します。デフォルトで
-は、出力は整形 *されません* 。出力の整形が行われるのは、このオプションを指
-定したときだけです。
-
---noinput
----------
-
-django-admin の実行中に、ユーザに入力を促さないようにさせます。
-django-admin スクリプトを自動的に実行したい場合に便利です。
-
---noreload
+--settings
 ----------
 
-開発サーバ実行中の自動リロード機能を無効にします。
-
---version
----------
-
-現在の Django のバージョンを表示します。
-
-表示例::
-
-    0.9.1
-    0.9.1 (SVN)
-
---verbosity
------------
-
 使用例::
 
-    django-admin.py syncdb --verbosity=2
+    django-admin.py init --settings=mysite.settings
 
-コンソールに出力する通知情報やデバッグ情報の量を制御します。 ``0`` は出力な
-し、 ``1`` は通常の出力、 ``2`` は多めの出力です。
+管理対象のプロジェクトの設定モジュールを明示的に指定します。設定モジュー
+ルは Python のパッケージ表現構文、すなわち "mysite.settings" のような形式で
+指定します。このオプションを指定しない場合、 ``django-admin.py`` は環境変数
+``DJANGO_SETTINGS_MODULE`` を使います。
 
---adminmedia
-------------
+``manage.py`` は ``DJANGO_SETTINGS_MODULE`` をきちんと設定してくれるの
+で、このオプションは必要ありません。
 
-使用例::
-
-    django-admin.py --adminmedia=/tmp/new-admin-style/
-
-開発サーバを起動する際に、 admin インタフェース用の CSS や JavaScript ファ
-イルを探す場所を Django に教えます。通常、これらのファイルは Django のソー
-スツリーから取り出して使うようになっていますが、このオプションを使えば、自
-作のサイト用に変更を加えているデザイナがカスタムバージョンのスタイルシート
-や JavaScript をテストできるようになります。
 
 .. _Extra niceties:
 
@@ -650,4 +739,3 @@ bash シェルを使っているのなら、 Django の bash 補完スクリプ�
     * [TAB] を押すと、利用可能な全てのオプションを表示します。
     * ``sql`` とタイプして [TAB] を押すと、 ``sql`` で始まる全てのオプショ
       ンを表示します。
-
