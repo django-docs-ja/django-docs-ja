@@ -131,7 +131,7 @@ Unix ドメインソケットを使い， prefork モードでサーバを起動
 デーモン化 (バックグラウンド化) させずにプロセスを起動する場合 (デバッグ時
 に便利です)::
 
-    ./manage.py runfcgi daemonize=false socket=/tmp/mysite.sock
+    ./manage.py runfcgi daemonize=false socket=/tmp/mysite.sock maxrequests=1
 
 .. _Stopping the FastCGI daemon:
 
