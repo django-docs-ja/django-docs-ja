@@ -2070,7 +2070,7 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
     ...     else:
     ...         return field.formfield(**kwargs)
 
-    >>> ArticleForm = form_for_model(formfield_callback=my_callback)
+    >>> ArticleForm = form_for_model(Article, formfield_callback=my_callback)
 
 コールバックは、自分がデフォルト設定に対して手を加えたい対象のフィールド以
 外も含めた、 *全ての* モデルフィールドを扱えねばならないので注意が必要です。
