@@ -2,7 +2,7 @@
 モデル API リファレンス
 =======================
 
-:revision-up-to: 6069 (0.97pre SVN)
+:revision-up-to: 6566 (0.97pre SVN)
 
 モデルとは、サイトを構成するデータの、ただ一つかつ最終的なデータソースを指
 します。モデルには、保存したいデータに不可欠なデータフィールドと、その振舞
@@ -198,7 +198,8 @@ Django 内の検証の両方のレベルで行われます。
     =================  ====================================================
 
 admin では、 JavaScript のカレンダーと 「今日」へのショートカットのついた
-``<input type="text">`` として表現されます。
+``<input type="text">`` として表現されます。 JavaScript カレンダーは常に
+日曜日から週が始まります。
 
 ``DateTimeField``
 ~~~~~~~~~~~~~~~~~
@@ -240,9 +241,10 @@ admin では、 ``<input type="text">`` (一行のテキスト入力) で表現�
 ``EmailField``
 ~~~~~~~~~~~~~~
 
-値が有効な e-mail アドレスであるかチェックする ``CharField`` です。このフィー
-ルドには ``max_length`` を指定できません。 ``max_length`` は自動的に 75 にセッ
-トされるからです。
+値が有効な e-mail アドレスであるかチェックする ``CharField`` です。
+Django 0.96 では、 ``max_length`` を指定できません。 ``max_length`` は自動的に
+75 にセットされるからです。 開発版の Django では、 ``max_length`` はデフォルト
+で 75 にセットされますが、デフォルト値を書き換えるよう指定することができます。
 
 ``FileField``
 ~~~~~~~~~~~~~
@@ -313,6 +315,10 @@ admin では、 ``<input type="file">`` (ファイルアップロードウィジ
 .. _`strftime によるフォーマット`: 
     http://www.python.jp/doc/release/lib/module-time.html#l2h-1941
 
+**開発版の機能です:** デフォルトでは、 ``FileField`` インスタンスは
+``varchar(100)`` カラムをデータベースに作成します。他のフィールドにしたければ、
+``max_length`` 引数を使って最大長を変更することができます。
+
 ``FilePathField``
 ~~~~~~~~~~~~~~~~~
 
@@ -349,6 +355,10 @@ admin では、 ``<input type="file">`` (ファイルアップロードウィジ
 や ``bar.gif``) にマッチするため、 ``/home/images/foo/bar.gif`` にはマッチ
 しません。
 
+**開発版の機能です:** デフォルトでは、 ``FilePathField`` インスタンスは
+``varchar(100)`` カラムをデータベースに作成します。他のフィールドにしたければ、
+``max_length`` 引数を使って最大長を変更することができます。
+
 ``FloatField``
 ~~~~~~~~~~~~~~
 
@@ -381,6 +391,10 @@ admin では、 ``<input type="text">`` (一行の入力フィールド) で表�
 .. _Python Imaging Library: http://www.pythonware.com/products/pil/
 .. _`get_FOO_height() と get_foo_width() の説明`:
    ../db-api/#get-foo-height-and-get-foo-width
+
+**開発版の機能です:** デフォルトでは、 ``ImageField`` インスタンスは
+``varchar(100)`` カラムをデータベースに作成します。他のフィールドにしたければ、
+``max_length`` 引数を使って最大長を変更することができます。
 
 ``IntegerField``
 ~~~~~~~~~~~~~~~~
@@ -701,7 +715,9 @@ HTML を含めてもかまいません::
 
 ``True`` であれば、フィールドはテーブル全体で一意の値を取らねばなりません。
 
-この制約は、データベースレベルと Django の admin のレベルで適用されます。
+この制約は、データベースレベルと Django の admin のレベルで適用されます。もし
+重複した値を持つ ``unique`` フィールドを含んだモデルを追加保存しようとすると、
+モデルの ``save()`` メソッドによって ``django.db.IntegrityError`` が送出されます。
 
 ``unique_for_date``
 ~~~~~~~~~~~~~~~~~~~
@@ -1323,6 +1339,13 @@ Django は背後でカラム名とテーブル名をクオートします。
 この制約は Django の admin 上で使われるとともに、データベースレベルでも強制
 されます (すなわち、適切な ``UNIQUE`` 文が ``CREATE TABLE`` 文に入ります)。
 
+**開発版の Django で新たに追加された機能です**
+
+便宜上、 unique_together は一つのリストのときは単一セットのフィールドとして
+扱います::
+
+    unique_together = ("driver", "restaurant")
+
 ``verbose_name``
 ----------------
 
@@ -1380,6 +1403,17 @@ Django はモデルクラス名とモデルクラスの入っているアプリ�
 
 各モデルには必ず一つ ``primary_key=True`` のフィールドが必要です。
 
+.. _`The pk property`:
+
+``pk`` プロパティ
+-----------------
+**開発版の Django で新たに追加された機能です**
+
+プライマリキーを自前で定義しているか、 Django によって供給されているかに
+関係なく、それぞれのモデルは ``pk`` と呼ばれるプロパティを持ちます。 これは
+モデルの通常の属性のように振る舞いますが、実はモデルのプライマリキーフィールド
+のエイリアスです。その他の属性と同じように、この値は読み書き可能で、モデルの
+フィールドを修正し更新できます。
 
 .. _Admin options:
 
@@ -1671,9 +1705,10 @@ admin の変更リストページに表示するフィールドを制御する�
 ---------------
 
 admin の変更リストページの右側のサイドバーにあるフィルタを有効にするには、
-``list_filter`` を設定します。この値はフィールド名のリストにします。各フィー
-ルド名は ``BooleanField``, ``DateField``, ``DateTimeField``, ``ForeignKey``
-のいずれかでなければなりません。
+``list_filter`` を設定します。この値はフィールド名のリストにします。
+各フィールド名は ``BooleanField``, ``CharField``, ``DateField``,
+``DateTimeField``, ``IntegerField``, ``ForeignKey`` のいずれかでなければ
+なりません。
 
 以下の例は ``django.contrib.auth.models.User`` モデルからとったもので、
 ``list_display`` と ``list_filter`` の仕組みを示しています:: 
