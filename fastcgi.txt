@@ -2,7 +2,7 @@
 FastCGI, SCGI, AJP で Django を使う
 ===================================
 
-:revision-up-to: 5680 (0.97pre SVN)
+:revision-up-to: 7127 (0.97pre SVN)
 
 Django を動作させる構成として `現在推奨されている`_ のは， Apache_ と
 `mod_python`_ の組合せですが，多くの人々が共有ホスティングサービスを使って
@@ -54,9 +54,8 @@ FastCGI プロセスは Web サーバプロセスの中ではなく，別の永�
 ================
 
 Django で FastCGI を使うには，まず flup_ をインストールせねばなりません．
-flup は FastCGI を使えるようにするための Python ライブラリです．古いバージョ
-ンの flup を使っている場合，ページの生成が止まってしまうという問題が報告さ
-れているので，かならず最新の flup を Subversion から取得してください．
+flup は FastCGI を使えるようにするための Python ライブラリです． Django は
+バージョン0.5 以降の flup で動作します。
 
 .. _flup: http://www.saddi.com/software/flup/
 

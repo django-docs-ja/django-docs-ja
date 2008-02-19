@@ -2,7 +2,7 @@
 flatpages アプリケーション
 ===========================
 
-:revision-up-to: 5613 (0.97pre SVN)
+:revision-up-to: 7127 (0.97pre SVN)
 
 Django にはオプションのアプリケーション， "flatpages" がついてきます．
 "flatpages" を使うと，データベースに素 ("flat") の HTML コンテンツを Django
@@ -61,8 +61,8 @@ flatpages の仕組み
 ムに従って応答します:
 
     * flatpage にカスタムのテンプレートがある場合，テンプレートを読み込みま
-      す．それ以外の場合には， ``flatpages/default`` という名のテンプレート
-      を読み込みます．
+      す．それ以外の場合には， ``flatpages/default.html`` という名のテンプ
+      レートを読み込みます．
     * flatpage はテンプレートに唯一のコンテキスト変数， ``flatpage`` を渡し
       ます．この変数は，flatpage オブジェクトです．テンプレートのレンダリン
       グには `RequestContext オブジェクト`_ を使います．
@@ -135,3 +135,7 @@ flatpage テンプレートに渡されるコンテキスト変数は ``flatpage
     {{ flatpage.content }}
     </body>
     </html>
+
+flatpage の管理ページでは、生の HTML を入力しています。従って、
+テンプレート上で ``flatpage.title`` と ``flatpage.content`` は、
+`自動 HTML エスケープ`_ が必要なコンテンツとして **扱われません** 。

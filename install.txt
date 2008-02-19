@@ -2,7 +2,7 @@
 Django のインストール
 =====================
 
-:revision-up-to: 5934 (0.97pre SVN)
+:revision-up-to: 7127 (0.97pre SVN)
 
 このドキュメントを読めば Django を動かせるようになります。
 
@@ -71,11 +71,21 @@ Django のデータベース API 機能を使うのなら、データベース�
   `MySQL バックエンド <../databases/>`_ にまつわるデータベース固有の説明も
   読んでおいたほうがよいでしょう。
 
-* SQLite を使う場合は pysqlite_ が必要です。バージョン 2.0.3 以上を使って下
-  さい。
+* Python 2.3 または Python 2.4 で SQLite を使う場合、は pysqlite_ が必要で
+  す。バージョン 2.0.3 以上を使って下さい。 Python 2.5 は標準ライブラリに
+  sqlite のラッパモジュールが入っているので、特に追加でインストールするもの
+  はありません。
 
 * Oracle を使っているなら、 cx_Oracle_ が必要です。バージョン 4.3.1 以上を
-  使ってください。
+  使ってください。 `Oracle バックエンド`_ 固有の注意事項も参照してください。
+
+Django の ``manage.py syncdb`` を使って、モデルに対応するテーブルを自動生成
+するつもりなら、Django に対して、データベース上でテーブルの生成や ALTER を
+行える権限を付与せねばなりません。テーブルを手動で生成するのなら、Django に
+付与する権限は ``SELECT``, ``INSERT``, ``UPDATE`` および ``DELETE`` だけで
+かまいません。ただし、データベースによっては、 ``syncdb`` 時に 
+``ALTER TABLE`` 権限を付与しておく必要があります。 ``syncdb`` で一度テーブ
+ルを生成してしまえば、 ``syncdb`` は ``ALTER TABLE`` 文を発行しません。
 
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
@@ -86,8 +96,11 @@ Django のデータベース API 機能を使うのなら、データベース�
 .. _MySQLdb: http://sourceforge.net/projects/mysql-python
 .. _SQLite: http://www.sqlite.org/
 .. _pysqlite: http://initd.org/tracker/pysqlite
-.. _cx_Oracle: http://www.python.net/crew/atuining/cx_Oracle/
+.. _cx_Oracle: http://cx-oracle.sourceforge.net/
 .. _Oracle: http://www.oracle.com/
+.. _Oracle backend: ../databases/#oracle-notes
+.. _testing framework: ../testing/
+.. _`テストフレームワーク`: `testing framework`_
 
 .. _Remove any old versions of Django:
 
@@ -143,24 +156,32 @@ OS ごとのインストールパッケージによるインストール
 スの更新を行ってくれたりします。
  
 
-.. _Installing the official version:
+.. _Installing an official release
 
 公式リリースのインストール
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     1. `ダウンロードページ`_ から、最新版の Django をダウンロードします。
 
-    2. ダウンロードしたファイルを展開します 
-       (例: ``tar xzvf Django-NNN.tar.gz``)
+    2. ダウンロードしたファイルを tar で展開します 
+       (例: ``tar xzvf Django-NNN.tar.gz``)。 Windows を使っているのなら、
+       コマンドラインツール bsdtar_ を使うか、 7-zip_ のような GUI ベースの
+       ツールを使います。
 
-    3. 展開先のディレクトリに移ります (例: ``cd Django-NNN``)
+    3. ステップ 2 で生成された展開先のディレクトリに移ります
+       (例: ``cd Django-NNN``)
 
-    4. ``sudo python setup.py install`` を実行します。
-
+    4. Linux, Mac OS X, その他の Unix 系のオペレーティングシステムでは、
+       シェルプロンプトからコマンド ``sudo python setup.py install`` を入力
+       します。 Windows を使っているのなら、管理者権限でコマンドプロンプト
+       を起動して、コマンド ``setup.py install`` を実行します。
+       
 上のコマンドを実行すると、 Django は Python インストールディレクトリの
 ``site-packages`` ディレクトリ下にインストールされます。
 
 .. _distribution specific notes: ../distributions/
+.. _badtar: http://gnuwin32.sourceforge.net/packages/bsdtar.htm
+.. _7-zip: http://www.7-zip.org/
 
 .. _Installing the development version:
 
@@ -170,38 +191,63 @@ OS ごとのインストールパッケージによるインストール
 Django のコードを更新して最新のバグフィクスや改良を適用したいのなら、以下の
 説明に従って開発バージョンをインストールしてください。
 
-1. Subversion_ がインストールされていることを確認してください。
-2. Django のコードを Python の ``site-packages`` ディレクトリにチェックアウ
-   トします。 
+1. Subversion_ がインストールされていて、シェルからコマンドを実行できること
+   を確認してください。 (調べるには、シェルプロンプトで ``svn help`` を入力
+   します。)
 
-   Linux / Mac OSX / Unix では、以下のコマンドを実行します::
+2. 以下のようにして、Django のメイン開発ブランチ ('trunk') をチェックアウト
+   します::
 
-      svn co http://code.djangoproject.com/svn/django/trunk/ django_src
-      ln -s `pwd`/django_src/django SITE-PACKAGES-DIR/django
+     svn co http://code.djangoproject.com/svn/django/trunk/ django-trunk
+
+3. Python インタプリタが Django のコードをロードできるようにします。いくつ
+   か方法がありますが、 Linux や Mac OS X, Unix 系オペレーティングシステム
+   上では、以下のようにしてシンボリックリンクを張るのが最も便利な方法です::
+
+      ln -s `pwd`/django-trunk/django SITE-PACKAGES-DIR/django
 
    (上の作業では、使っているプラットフォームの ``site-packages``  ディレク
    トリに合わせて SITE-PACKAGES-DIR を書き換えてください。 
    ``site-packages`` の場所の探し方は、「 ``site-packages`` はどこにあるの？」
    を参照してください)
 
-   Windows では以下のようにします::
+   環境変数 ``PYTHONPATH`` に、 ``django-trunk`` ディレクトリを含めるよう設
+   定する方法もあります。 Windows システムではシンボリックリンクがサポート
+   されていないので、この方法が最も便利な方法です。 (Windows システムでは、
+   環境変数は、 `コントロールパネルから`_ 設定します)。
+
+   .. admonition:: Apache と mod_python の設定は？
+
+     ``PYTHONPATH`` を設定する方法をとる場合、同じ値を Apache の設定ファ
+     イルにも入れておくのを忘れないでください。 Apache で PYTHONPATH を設定
+     するには、 ``PythonPath`` ディレクティブを使います。
+
+     もちろん、 Apache と mod_python を使った運用に関する情報はこれだけでは
+     ありません。 `mod_python で Django を動かす`_ も参照してください。
+
+     .. _`mod_python で Django を動かす`: ../modpython/
+
+4. ``django_src/django/bin/django-admin.py`` を実行できるようにします。
+   Unix系のシステムでは、例えば以下のようにして、 ``/usr/local/bin`` のよう
+   なシステムパス上にシンボリックリンクを作成します::
+
+     ln -s `pwd`/django-trunk/django/bin/django-admin.py /usr/local/bin
+
+   これで、 ``django-admin.py`` とコマンド入力するだけで、どのディレクトリ
+   上でも ``django-admin.py`` を起動できるようになります。
+
+   Windows では、 ``django_src/django/bin/django-admin.py`` を、
+   ``C:\Python24\Scripts`` のようなシステムパス上にコピーします。
+
+ステップ 3 と 4 は ``python setup.py install`` と同じ作業を実行しているので、
+``python setup.py install`` を実行する必要は **ありません** 。
    
-      svn co http://code.djangoproject.com/svn/django/trunk/django c:\Python24\lib\site-packages\django
-
-3. ``django_src/django/bin/django-admin.py`` ファイルを、システムパス上に
-   コピーします。例えば、 Unix では ``/usr/local/bin`` 、 Windows では 
-   ``C:\Python24\Scripts`` です。この作業は、 ``django-admin.py`` を任意の
-   ディレクトリで実行するときに、毎回フルパスを入れなくてもよくするためのも
-   のです。
-
-``python setup.py install`` を *実行する必要はありません* 。
-``python setup.py install`` は、ステップ 2 および 3 を実行するためのコマン
-ドだからです。
-
-Django のソースコードを更新する際には、 ``django`` ディレクトリで
+Django のソースコードを更新する際には、 ``django-trunk`` ディレクトリで
 ``svn update`` を実行してください。実行すると、 Subversion が更新部分を自動
 的にダウンロードします。
 
 .. _`ダウンロードページ`: http://www.djangoproject.com/download/
 .. _`download page`: http://www.djangoproject.com/download/
 .. _Subversion: http://subversion.tigris.org/
+.. _from the Control Panel: http://www.microsoft.com/resources/documentation/windows/xp/all/proddocs/en-us/sysdm_advancd_environmnt_addchange_variable.mspx
+.. _`コントロールパネルから`: http://www.microsoft.com/resources/documentation/windows/xp/all/proddocs/ja/sysdm_advancd_environmnt_addchange_variable.mspx

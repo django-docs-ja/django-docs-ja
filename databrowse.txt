@@ -2,7 +2,7 @@
 databrowse
 ==========
 
-:revision-up-to: 5878 (0.97pre SVN)
+:revision-up-to: 7127 (0.97pre SVN)
 
 databrowse は、データのブラウジングを実現するための Django アプリケーション
 です。
@@ -64,5 +64,32 @@ databrowse の使い方
 
 4. Django サーバを起動して ``/databrowse/`` をブラウザで表示してください。
 
+.. _Requiring user login:
+
+ユーザにログインを要求する
+==========================
+
+たった数行追加するだけで、ビューへのアクセスをログインしているユーザに限定
+できます。まず、以下の import 行を URLconf に追加します::
+
+    from django.contrib.auth.decorators import login_required
+
+次に、 URLconf を変更して、 ``databrowse.site.root`` ビューを
+``login_required`` で修飾 (decorate) します::
+
+    (r'^databrowse/(.*)', login_required(databrowse.site.root)),
+
+`ユーザ認証のドキュメント`_ にあるような、ログインをサポートするための
+URLconf を設定していないのなら、以下のようなマッピングも追加しておきます::
+
+    (r'^accounts/login/$', 'django.contrib.auth.views.login'),
+
+最後のステップは、 ``django.contrib.auth.views.login`` で必要なログインフォー
+ムの作成です。 `ユーザ認証のドキュメント`_ には、テンプレートの詳細版と簡略
+版の両方を記載しています。
+
+
 .. _template loader docs: ../templates_python/#loader-types
 .. _`テンプレートローダのドキュメント`: ../templates_python/#loader-types
+.. _user authentication docs: ../authentication/
+.. _`ユーザ認証のドキュメント`: ../authentication/

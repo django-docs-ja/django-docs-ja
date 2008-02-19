@@ -2,7 +2,7 @@
 Django の設計思想
 ===================
 
-:revision-up-to: 5613 (0.97pre SVN)
+:revision-up-to: 7127 (0.97pre SVN)
 
 このドキュメントでは， Django の開発者たちがフレームワークの構築に取り入れ
 ている根本的な設計思想についていくつか解説します．それによって， Django の
@@ -75,7 +75,7 @@ DRY (Don't repeat yourself) 則
 しないような形で実装できる場合だけです．
 
 .. _`Python のコア原理`: http://www.python.jp/Zope/articles/misc/zen
-.. _`core Python principle`: http://www.python.org/doc/Humor.html#zen
+.. _`core Python principle`: http://www.python.org/dev/peps/pep-0020/
 
 .. _Consistency:
 

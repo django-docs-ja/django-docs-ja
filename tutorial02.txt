@@ -2,7 +2,7 @@
 はじめての Django アプリ作成、その 2
 =====================================
 
-:revision-up-to: 5832 (0.97pre SVN)
+:revision-up-to: 7127 (0.97pre SVN)
 
 このチュートリアルは `チュートリアルその 1`_ の続きです。ここでは、引続き
 Web 投票アプリケーションの開発を例にして、Django が自動生成する管理サイト
@@ -59,7 +59,7 @@ admin サイトの有効化
 http://127.0.0.1:8000/admin/ にアクセスします。以下のような admin のログイ
 ン画面が表示されるはずです:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin01.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin01.png
    :alt: Django admin login screen
 
 .. _Enter the admin site:
@@ -71,7 +71,7 @@ admin サイトに入る
 ントを作成したはずです。覚えていますか?) ログインしたら、 Django の admin
 インデクスページが表示されるはずです:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin02t.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin02t.png
    :alt: Django admin index page
    :target: http://media.djangoproject.com/img/doc/tutorial/admin02.png
 
@@ -120,7 +120,7 @@ admin の機能を探究してみる
 ``Poll`` に内部クラス ``Admin`` を持たせたことで、 Django は ``Poll`` を
 admin ページに表示するようになります:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin03t.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin03t.png
    :alt: Django admin index page, now with polls displayed
    :target: http://media.djangoproject.com/img/doc/tutorial/admin03.png
 
@@ -129,13 +129,13 @@ admin ページに表示するようになります:
 し、オブジェクトを選択して変更できるようになっています。前のチュートリアル
 で作成した 「What's up」という ``Poll`` オブジェクトがありますね。
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin04t.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin04t.png
    :alt: Polls change list page
    :target: http://media.djangoproject.com/img/doc/tutorial/admin04.png
 
 「What's up?」をクリックして編集してみましょう:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin05t.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin05t.png
    :alt: Editing form for poll object
    :target: http://media.djangoproject.com/img/doc/tutorial/admin05.png
 
@@ -167,7 +167,7 @@ admin ページに表示するようになります:
 このオブジェクトに対して行った全ての変更履歴を、変更時刻と変更を行ったユー
 ザの名前つきでリストにしたページを表示します:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin06t.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin06t.png
    :alt: History page for poll object
    :target: http://media.djangoproject.com/img/doc/tutorial/admin06.png
 
@@ -191,7 +191,7 @@ admin フォームのカスタマイズ
 これで、「Publication date」フィールドの表示位置が、 2 番目から先頭になりま
 す:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin07.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin07.png
    :alt: Fields have been reordered
 
 二つしかフィールドがないので、あまりぱっとした変化ではありませんね。しかし
@@ -210,7 +210,7 @@ admin フォームのカスタマイズ
 ``fields`` の各タプルの先頭の要素はフィールドセットのタイトルになります。
 フォームは以下のようになります:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin08t.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin08t.png
    :alt: Form has fieldsets now
    :target: http://media.djangoproject.com/img/doc/tutorial/admin08.png
 
@@ -226,7 +226,7 @@ admin フォームのカスタマイズ
                                       'classes': 'collapse'}),
             )
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin09.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin09.png
    :alt: Fieldset is initially collapsed
 
 .. _Adding related objects:
@@ -251,7 +251,7 @@ OK、 Poll の admin ページはできました。しかし ``Poll`` は複数�
 これで Django admin サイトで「Choice」 を選べるようになります。「Choice の
 追加」フォームは以下のようになります:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin10.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin10.png
    :alt: Choice admin page
 
 このフォームでは「Poll」フィールドは選択ボックスになり、データベース上の全
@@ -293,7 +293,7 @@ Django の受ける指示はこうなります: 「Choice を Poll の admin ペ
 
 「Poll を追加」ページをロードして、どんな表示になったか見てみましょう:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin11t.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin11t.png
    :alt: Add poll page now has choices on it
    :target: http://media.djangoproject.com/img/doc/tutorial/admin11.png
 
@@ -316,7 +316,7 @@ Poll を変更するときに、常に Choice フィールドを 3 つ余分に�
 ``edit_inline`` を ``models.STACKED`` から ``models.TABULAR`` に変更すると、
 リレーション相手のオブジェクトはよりコンパクトなテーブル形式で表示されます:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin12.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin12.png
    :alt: Add poll page now has more compact choices
 
 .. _Customize the admin change list:
@@ -330,7 +330,7 @@ admin の変更リストページをカスタマイズする
 
 作業前の change list ページは以下のようになっています:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin04t.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin04t.png
    :alt: Polls change list page
    :target: http://media.djangoproject.com/img/doc/tutorial/admin04.png
 
@@ -352,7 +352,7 @@ admin の変更リストページをカスタマイズする
 
 これで、 Poll の変更リストのページは以下のようになります:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin13t.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin13t.png
    :alt: Polls change list page, updated
    :target: http://media.djangoproject.com/img/doc/tutorial/admin13.png
 
@@ -376,7 +376,7 @@ admin の変更リストページをカスタマイズする
 これで、「フィルタ (Filter)」サイドバーができ、変更リストを ``pub_date``
 フィールドの値に従ってフィルタできるようになります:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin14t.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin14t.png
    :alt: Polls change list page, updated
    :target: http://media.djangoproject.com/img/doc/tutorial/admin14.png
 

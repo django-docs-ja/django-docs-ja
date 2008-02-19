@@ -2,7 +2,7 @@
 mod_python で Django を動かす
 =============================
 
-:revision-up-to: 6071 (0.97pre SVN)
+:revision-up-to: 7127 (0.97pre SVN)
 
 Django をプロダクションサーバ上で動かす設定として、現状では Apache_ と
 `mod_python`_ の組み合わせを推奨しています。
@@ -91,19 +91,18 @@ import パスになるよう、自分の環境に合わせて置き換えて下�
 ``PythonPath`` に加えねばなりません。 import したいモジュールの 
 **親ディレクトリ** を Python パスに入れねばならないことに注意してください。
 
-.. caution::
+.. note::
 
-    Windows を使っているなら、パスにバックスラッシュが入ることに注意しましょ
-    う。 PythonPath の文字列は Python の文字列パーザで 2 回処理されるので、
-    バックスラッシュは **二重に** エスケープせねばなりません::
+    Windows を使っているなら、パスの表記に注意してください。 Windows は通常
+    バックスラッシュをネイティブのパス区切り文字に使いますが、それでもスラッ
+    シュを使ってパスを表記するよう進めます。 Apache はスラッシュをプラット
+    フォームネイティブのパス区切り文字に変換する方法を知っているので、スラッ
+    シュを使った方が、可搬性や視認性を持たせられるのです。 (それに、バックス
+    ラッシュの二重エスケープのようなトリッキーな問題を回避できます)。
 
-        PythonPath "['c:\\\\path\\\\to\\\\project'] + sys.path"
+    Windows システムでも、以下のパス表記を利用できます::
 
-    あるいは、 raw 文字列を使ってください::
-
-        PythonPath "[r'c:\\path\\to\\project'] + sys.path"
-
-
+        PythonPath "['c:/path/to/project'] + sys.path"
 
 また、 ``PythonAutoReload Off`` のようなディレクティブを設定して、パフォー
 マンスを向上させられます。使えるオプションのリストは
@@ -158,7 +157,7 @@ mod_python のキャッシュが Django の動作を台無しにしないよう�
 
         <Location "/otherthing">
             SetEnv DJANGO_SETTINGS_MODULE mysite.other_settings
-            PythonInterpreter mysite_other
+            PythonInterpreter othersite
         </Location>
     </VirtualHost>
 

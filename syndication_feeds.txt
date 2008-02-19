@@ -2,7 +2,7 @@
 配信フィードフレームワーク
 ==========================
 
-:revision-up-to: 5613 (0.97pre SVN)
+:revision-up-to: 7127 (0.97pre SVN)
 
 Django には高水準の配信フィード (syndication feed) 生成フレームワークがつい
 てきます．このフレームワークを使えば， RSS_ 形式や Atom_ 形式のフィードを簡
@@ -229,6 +229,8 @@ bit にどのような意味を与え，フィード公開する項目の選択�
 例を挙げてわかりやすく説明しましょう．巡回区域単位のフィードを生成するコー
 ドは以下のようになります::
 
+    from django.contrib.syndication.feeds import FeedDoesNotExist
+ 
     class BeatFeed(Feed):
         def get_object(self, bits):
             # In case of "/rss/beats/0613/foo/bar/baz/", or other such clutter,
@@ -241,6 +243,8 @@ bit にどのような意味を与え，フィード公開する項目の選択�
             return "Chicagocrime.org: Crimes for beat %s" % obj.beat
     
         def link(self, obj):
+            if not obj:
+                raise FeedDoesNotExist
             return obj.get_absolute_url()
     
         def description(self, obj):
@@ -258,6 +262,7 @@ bit にどのような意味を与え，フィード公開する項目の選択�
       ドの引数に渡して呼び出します．上の例では， bit は ``['0613']`` になり
       ます．リクエストが ``/rss/beats/0613/foo/bar/`` であれば bit は
       ``['0613', 'foo', 'bar']`` です．
+
     * ``get_object()`` は指定された ``bit`` を使って適切な巡回区域を選択する役割を
       担っています．上の場合では， Django のデータベース API を使って巡回区
       域を決定しています． 無効なパラメタが指定された場合， ``get_object()`` は
@@ -267,6 +272,7 @@ bit にどのような意味を与え，フィード公開する項目の選択�
       ``Beat.objects.get()`` 呼び出しの周りには ``try``/``except`` がありま
       せん． ``get_object()`` の中で ``ObjectDoesNotExist`` を送出すると， Django
       はリクエストに対して 404 エラーを返します．
+
     * フィードの ``<title>``, ``<link>``, および ``<description>`` を生成す
       るために， Django はそれぞれ ``title()``, ``link()`` および
       ``description()`` といったメソッドを使います．こうしたメソッドは前述
@@ -279,6 +285,13 @@ bit にどのような意味を与え，フィード公開する項目の選択�
           * 失敗した場合，メソッドを引数無しで呼び出そうと試みます．
           * 失敗した場合，クラス属性を使います．
 
+      ``link()`` メソッドの中では、 ``obj`` が ``None`` の場合、すなわち
+      URL が完全に指定されなかった場合の処理を定義しておかねばなりません。
+      この部分で、 ``obj`` が存在するかどうかチェックしない場合には、他のメ
+      ソッドでも、 ``obj`` が ``None`` であるかチェックする必要があるでしょ
+      う (``link()`` メソッドは、フィード生成プロセスのきわめて初期段階で呼
+      び出されるので、例外ではじき出しておくのにいい場所です)。
+      
     * 最後に，上の例の ``items()`` には引数 ``obj`` があることに注意して下
       さい． ``items`` の内容を解決するアルゴリズムは上と同じです．すなわち，
       まず ``items(obj)``, 次いで ``items()``, そしてクラス属性 ``items`` 
@@ -584,6 +597,23 @@ Feed クラスリファレンス
         # 著作権表示のハードコード表現です．
         copyright = 'Copyright (c) 2007, Sally Smith'
 
+        # TTL -- 以下の三つの形式はいずれも省略可能です．
+        # フレームワークは以下に示した順番で値を探します．
+        # Atom フィードでは無視されます。
+
+        def ttl(self, obj):
+            """
+            get_object() が返すようなオブジェクトを引数 obj にとり，
+	    フィードの TTL (寿命) を 通常の Python 文字列型で返します．
+            """
+
+        def ttl(self):
+            """
+	    フィードの TTL (寿命) を 通常の Python 文字列型で返します．
+            """
+
+        ttl = 600 # TTL のハードコード表現です。
+
         # ITEMS -- 以下の三つの形式の少なくともいずれか一つが必要です．配信
         # フレームワークは以下の順に値を探します．
 
@@ -613,9 +643,9 @@ Feed クラスリファレンス
         # ITEM LINK -- 以下の三つの形式の少なくともいずれか一つが必要です．配信
         # フレームワークは以下の順に値を探します．
 
-        # まず，フレームワークは items() の返す各オブジェクトに対して
-        # get_absolute_url() を呼び出します．失敗すると，以下の二つのメソッ
-        # ドを試します:
+        # まず，フレームワークは以下の二つのメソッドを順に試します。失敗す
+        # ると、 items() の返す各オブジェクトに対して get_absolute_url() を
+        # 呼び出します．
 
         def item_link(self, item):
             """

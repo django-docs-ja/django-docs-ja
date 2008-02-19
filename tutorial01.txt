@@ -4,7 +4,7 @@
 
 .. contents::
 
-:revision-up-to: 6040 (0.97pre SVN)
+:revision-up-to: 7127 (0.97pre SVN)
 
 さあ、例を交えながら学んでゆきましょう。
 
@@ -47,6 +47,17 @@ Django の *プロジェクト (project)* を構成するコードを自動生�
 コマンドラインから、コードを置きたい場所に ``cd`` して、
 ``django-admin.py startproject mysite`` を実行してください。現在のディレク
 トリに ``mysite`` ディレクトリが作成されます。
+
+.. admonition:: Max OS X でのパーミッションに関するエラー
+   
+   Mac OS X を使っている場合、 ``django-admin.py startproject`` を実行しよ
+   うとすると、 "permission denied" というメッセージが出ることがあります。
+   OS X のような Unix ベースのシステムでは、ファイルをプログラムとして実行
+   したい場合に、ファイルに「プログラムとして実行可能」というマークをつけて
+   おく必要があるためです。ファイルに実行可能マークをつけるには、
+   Terminal.app を起動して、 ``django-admin.py`` を納めているディレクトリに
+   ( ``cd`` コマンドで) 移動して、 ``chmod +x django-admin.py`` を実行して
+   ください。
 
 .. note::
     
