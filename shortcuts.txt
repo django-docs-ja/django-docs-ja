@@ -1,42 +1,62 @@
-=========================
-Django shortcut functions
-=========================
+===================
+ショートカット関数
+===================
 
-The package ``django.shortcuts`` collects helper functions and classes that
-"span" multiple levels of MVC. In other words, these functions/classes
-introduce controlled coupling for convenience's sake.
+:revision-up-to: 7127 (0.97pre SVN)
+
+``django.shotcuts`` パッケージでは、MVC の複数のレベルを「橋渡し」するため
+のヘルパ関数やクラスを定義しています。言い換えると、これらの関数やクラスは、
+利便性を実現するために、きちんと制御された形でのカップリングを行えるように
+しているのです。
 
 ``render_to_response()``
 ========================
 
-``django.shortcuts.render_to_response`` renders a given template with a given
-context dictionary and returns an ``HttpResponse`` object with that rendered
-text.
+``django.shortcuts.render_to_response`` は、引数指定したテンプレートとコン
+テキストを使ってテンプレートをレンダし、レンダ結果のテキストの入った
+``HttpResponse`` オブジェクトを返します。
 
-Required arguments
-------------------
+必須の引数
+-----------
 
 ``template``
-    The full name of a template to use.
+    利用したいテンプレートの名前です。
 
-Optional arguments
-------------------
+省略可能な引数
+----------------
 
-``context``
-    A dictionary of values to add to the template context. By default, this
-    is an empty dictionary. If a value in the dictionary is callable, the
-    view will call it just before rendering  the template.
+``dictionary``
+    テンプレートコンテキストに追加したい値の入った辞書です。デフォルトでは、
+    この引数は空の辞書です。辞書の値が呼出可能オブジェクトである場合、ビュー
+    はテンプレートをレンダするの直前にこの値を呼び出します。
+
+``context_instance``
+    テンプレートをレンダするときに使うコンテキストインスタンスです。デフォ
+    ルトでは、テンプレートは (``dictionary`` の値が入った) ``Context`` イン
+    スタンスを使ってレンダされます。 `コンテキストプロセッサ`_ を使いたい場
+    合には、例えば以下のように ``RequestContext`` を使ってテンプレートをレ
+    ンダしてください::
+
+        return render_to_response('my_template.html',
+                                  my_data_dictionary,
+                                  context_instance=RequestContext(request))
 
 ``mimetype``
-    **New in Django development version:** The MIME type to use for the
-    resulting document. Defaults to the value of the ``DEFAULT_CONTENT_TYPE``
-    setting.
+    **開発版の Django で新たに追加された機能です** 
+    レンダ結果のドキュメントに対して指定する MIME タイプです。デフォルトの
+    値として、 ``DEFAULT_CONTENT_TYPE`` を使います。
 
-Example
+.. _`context processors`: ../templates_python/#subclassing-context-requestcontext
+.. _`コンテキストプロセッサ`:`context processors`_
+
+使用例
 -------
 
-The following example renders the template ``myapp/index.html`` with the
-MIME type ``application/xhtml+xml``::
+使用例
+-------
+
+以下の例では、 ``myapp/index.html`` を MIME タイプ
+``application/xhtml+xml`` でレンダしてます::::
 
     from django.shortcuts import render_to_response
 
@@ -45,7 +65,7 @@ MIME type ``application/xhtml+xml``::
         return render_to_response('myapp/index.html', {"foo": "bar"},
             mimetype="application/xhtml+xml")
 
-This example is equivalent to::
+上の例は、以下の例と等価です::
 
     from django.http import HttpResponse
     from django.template import Context, loader
@@ -57,86 +77,83 @@ This example is equivalent to::
         r = HttpResponse(t.render(c),
             mimetype="application/xhtml+xml")
 
-.. _an HttpResponse object: ../request_response/#httpresponse-objects
-
 ``get_object_or_404``
 =====================
 
-``django.shortcuts.get_object_or_404`` calls `get()`_ on a given model
-manager, but it raises ``django.http.Http404`` instead of the model's
-``DoesNotExist`` exception.
+``django.shortcuts.get_object_or_404`` は、指定したモデルマネジャに対して
+`get()`_ を呼出します。ただし、マネジャがモデルの ``DoesNotExist`` を送出し
+た場合には、 ``django.http.Http404`` を送出します。
 
-Required arguments
-------------------
+必須の引数
+-----------
 
 ``klass``
-    A ``Model``, ``Manager`` or ``QuerySet`` instance from which to get the
-    object.
+    オブジェクトの取得対象である、 ``Model``, ``Manager`` または
+    ``QuerySet`` インスタンスです。
 
 ``**kwargs``
-    Lookup parameters, which should be in the format accepted by ``get()`` and
-    ``filter()``.
+    検索パラメタです。 ``get()`` や  ``filter()`` と同じ引数を使えます。
 
-Example
+使用例
 -------
 
-The following example gets the object with the primary key of 1 from
-``MyModel``::
+以下の例では、 ``MyModel`` から主キーが 1 のオブジェクトを取得しています::
 
     from django.shortcuts import get_object_or_404
 
     def my_view(request):
         my_object = get_object_or_404(MyModel, pk=1)
 
-This example is equivalent to::
+この例は、以下の例と等価です::
 
     from django.http import Http404
 
     def my_view(request):
         try:
-            my_object = MyModel.object.get(pk=1)
+            my_object = MyModel.objects.get(pk=1)
         except MyModel.DoesNotExist:
             raise Http404
 
-Note: As with ``get()``, an ``AssertionError`` will be raised if more than
-one object is found.
+注意: ``get()`` と同様、オブジェクトが複数見つかった場合には、
+``MultipleObjectsReturned`` 例外が送出されます。
 
 .. _get(): ../db-api/#get-kwargs
 
 ``get_list_or_404``
 ===================
 
-``django.shortcuts.get_list_or_404`` returns the result of `filter()`_ on a
-given model manager, raising ``django.http.Http404`` if the resulting list is
-empty.
+``django.shortcuts.get_list_or_404`` 指定したモデルマネジャに対して
+`filter()`_ を呼び出します。戻り値のリストが空なら、
+``django.http.Http404`` を送出します。
 
-Required arguments
-------------------
+必須の引数
+-----------
 
 ``klass``
-    A ``Model``, ``Manager`` or ``QuerySet`` instance from which to get the
-    object.
+    オブジェクトの取得対象である、 ``Model``, ``Manager`` または
+    ``QuerySet`` インスタンスです。
 
 ``**kwargs``
-    Lookup parameters, which should be in the format accepted by ``get()`` and
-    ``filter()``.
+    検索パラメタです。 ``get()`` や  ``filter()`` と同じ引数を使えます。
 
-Example
+
+使用例
 -------
 
-The following example gets all published objects from ``MyModel``::
+以下の例では、 ``MyModel`` から published=True のオブジェクトを全て取得して
+います::
 
     from django.shortcuts import get_list_or_404
 
     def my_view(request):
         my_objects = get_list_or_404(MyModel, published=True)
 
-This example is equivalent to::
+この例は、以下の例と等価です::
 
     from django.http import Http404
 
     def my_view(request):
-        my_objects = MyModels.object.filter(published=True)
+        my_objects = MyModel.objects.filter(published=True)
         if not my_objects:
             raise Http404
 

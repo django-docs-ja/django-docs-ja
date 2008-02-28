@@ -2,7 +2,7 @@
 Django のキャッシュフレームワーク
 =================================
 
-:revision-up-to: 6049 (0.97pre SVN)
+:revision-up-to: 7127 (0.97pre SVN)
 
 動的な Web サイトの根本的なトレードオフ要因とは，まさに動的であるということ
 そのものです．ユーザがページをリクエストするたびに，サーバはデータベースへ
@@ -135,7 +135,7 @@ memcached インスタンスでキャッシュを共有しています::
 テム向けの適切な形式のテーブルを生成します．
 
 キャッシュ用のテーブルを作成したら， ``CACHE_BACKEND`` 設定を
-``"db://tablename/"`` にします． ``tablename`` はキャッシュ用テーブルの名前
+``"db://tablename"`` にします． ``tablename`` はキャッシュ用テーブルの名前
 です．以下の例では，キャッシュテーブル名を ``my_cache_table`` にしています::
 
     CACHE_BACKEND = 'db://my_cache_table'
@@ -190,6 +190,10 @@ memcached インスタンスでキャッシュを共有しています::
 スト環境だけで使うべきです．以下のようにして使います::
 
     CACHE_BACKEND = 'simple:///'
+
+**開発版の Django で新たに追加された機能:** このキャッシュバックエンドは撤
+廃されており、将来のリリースで除去されます。新たにコードを書く場合には、
+``locmem`` バックエンドを使ってください。
 
 .. _Dummy caching (for development):
 
@@ -262,8 +266,8 @@ In this example, ``timeout`` is ``30`` and ``max_entries`` is ``400``::
         'django.middleware.common.CommonMiddleware',
     )
 
-(``MIDDLEWARE_CLASSES`` の順番は重要です．後述の「MIDDLEWARE_CLASSES の順番」
-を参照してください)
+(``MIDDLEWARE_CLASSES`` の順番は重要です．後述の
+「 `MIDDLEWARE_CLASSES の順番`_ 」を参照してください)
 
 次に，以下の必須の設定を Django 設定ファイルに追加します:
 
@@ -298,6 +302,17 @@ In this example, ``timeout`` is ``30`` and ``max_entries`` is ``400``::
 .. _`ミドルウェアのドキュメント`: ../middleware/
 .. _`middleware documentation`: ../middleware/
 
+**開発版の Django で新たに追加された機能**
+
+ビューの中でキャッシュの有効期限を設定した場合 (``Cache-Control`` ヘッダの
+``max-age`` セクションを設定した場合)、ページは
+``CACHE_MIDDLEWARE_SECONDS`` の設定値ではなくビューで設定した有効期限の下で
+キャッシュされます。 ``django.views.decorators.cache`` モジュールのデコレー
+タを使えば、ビューの有効期限を設定  (``cache_control`` デコレータ) したり、
+ビューのキャッシュを抑制 (``never_cache`` デコレータ) できます。これらのデ
+コレータについては `Vary ヘッダ以外のヘッダを使ったキャッシュ制御`_ を参照
+してください。
+
 .. _The per-view cache:
 
 ビュー単位のキャッシュ
@@ -324,6 +339,41 @@ Python 2.4 のデコレータ構文を使うと以下のようになります::
 ``cache_page`` は単一の引数をとります．これはキャッシュのタイムアウトを秒で
 表したものです．上の例では，  ``slashdot_this()`` の出力結果は 15 分間キャッ
 シュされます．
+
+.. _Template fragment caching:
+
+テンプレートの部分的キャッシュ
+================================
+
+**開発版の Django で新たに追加された機能です**
+
+ページのキャッシュをもっと細かく制御したいなら、 ``cache`` テンプレートタグ
+を使って、テンプレートの一部分だけをキャッシュできます。 ``cache`` タグをテ
+ンプレート内で使えるようにするには、テンプレートの冒頭に
+``{% load cache %}`` を挿入しておきます。
+
+``{% cache %}`` テンプレートタグは、タグで囲まれたブロックの内容を、指定さ
+れた時間だけキャッシュします。 ``cahce`` タグは、必須の引数として、キャッシュ
+の有効期限 (秒単位) とキャッシュされた部分に付ける名前をとります。例えば、
+以下のように使います::
+
+    {% load cache %}
+    {% cache 500 sidebar %}
+        .. sidebar ..
+    {% endcache %}
+
+キャッシュ部分内で使われる変数に応じて、複数のキャッシュコピーを保存したい
+場合もあるでしょう。例えば、上の例で挙げたサイドバー部分を、ユーザ毎に個別
+にキャッシュしたい場合には、 ``{% cache %}`` テンプレートタグに追加の引数を
+指定して、キャッシュをユーザ毎に一意に識別できるようにします::
+
+    {% load cache %}
+    {% cache 500 sidebar request.user.username %}
+        .. sidebar for logged in user ..
+    {% endcache %}
+
+キャッシュ変数は、複数指定しても全く問題ありません。必要なだけの引数を
+``{% cache %}`` に指定してください。
 
 .. _The low-level cache API:
 
@@ -366,6 +416,17 @@ get() には ``default`` 引数を指定できます::
 
     >>> cache.get('my_key', 'has_expired')
     'has_expired'
+
+**開発版の Django で新たに追加された機能:** キーに使う値がまだキャッシュ辞
+書上に存在しない場合にのみ、 ``add()`` メソッドを使ってください。 ``add()``
+メソッドは、 ``set()`` と同じ引数をとりますが、指定したキーがすでに存在する
+場合には、キャッシュを更新しません::
+
+    >>> cache.set('add_key', 'Initial value')
+    >>> cache.add('add_key', 'New value')
+    >>> cache.get('add_key')
+    'Initial value'
+
 
 キャッシュを一度しかアクセスしない ``get_many()`` インタフェースもあります．
 ``get_many()`` は指定した全てのキーのうち，キャッシュ内に実在する (そして期
@@ -581,6 +642,17 @@ Cache-Control HTTP ディレクティブの説明は `Cache-Control の仕様`_ 
 タムの ``max_age`` を ``cache_control`` デコレータで使うと，デコレータの設
 定が優先され，ヘッダの値は正しくマージされます．)
 
+ヘッダを使ってキャッシュを抑制したい場合には、
+``django.views.decorators.cache.never_cache`` を使ってください。このデコレー
+タは、応答コンテンツがブラウザやその他のキャッシュ機構によってキャッシュさ
+れないようにヘッダを追加します::
+
+    from django.views.decorators.cache import never_cache
+    @never_cache
+    def myview(request):
+        ...
+
+.. _`Cache-Control spec`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
 .. _`Cache-Control の仕様`: 
     http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
 
@@ -620,3 +692,4 @@ MIDDLEWARE_CLASSES の順番
 
     * ``SessionMiddleware`` は ``Cookie`` を追加します．
     * ``GZipMiddleware`` は ``Accept-Encoding`` を追加します．
+    * ``LocaleMiddleware`` は ``Accept-Language`` を追加します．

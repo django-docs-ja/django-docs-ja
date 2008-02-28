@@ -2,7 +2,7 @@
 サードパーティによる Django ディストリビューション
 ==================================================
 
-:revision-up-to: 6048 (0.97pre SVN)
+:revision-up-to: 7127 (0.97pre SVN)
 
 最近，いくつかのサードパーティのディストリビューションプロバイダが，パッケー
 ジ管理システムに Django を含めるようになりました．パッケージ管理システムを
@@ -19,9 +19,9 @@
 FreeBSD
 =======
 
-`FreeBSD`_ のportsではDjango 0.96 (`py-django`_)を提供しています。開発版のDjangoは
-`py-django-devel`_ にあります。
-一般的な構成のFreeBSDにDjango 0.96をインストールするには
+`FreeBSD`_ の ports システムは、 Django 0.96 (`py-django`_) またはそれ以降
+のバージョン (`py-django-devel`_ 、ただし最新版ではない) を提供しています。
+一般的な構成の FreeBSD に Django 0.96 をインストールするには
 ``cd /usr/ports/www/py-django && sudo make install clean`` とタイプします。
 
 .. _FreeBSD: http://www.freebsd.org/
@@ -64,23 +64,23 @@ Fedora
 Gentoo
 ------
 
-`Gentoo Linux`_ 向けの Django ビルドは 0.95.1 に基づいています．
+`Gentoo Linux`_ 向けの Django ビルドは 0.96.1 を使っています。
 `現行の Gentoo ビルド <http://packages.gentoo.org/packages/?category=dev-python;name=django>`_
 をインストールするには， ``emerge Django`` とタイプします．
 
 .. _Gentoo Linux: http://www.gentoo.org/
-.. _current Gentoo build: http://packages.gentoo.org/packages/?category=dev-python;name=django
+.. _current Gentoo build: http://packages.gentoo.org/packages/django
 
 Ubuntu
 ------
 
 Debian の ``python-django`` パッケージは `Ubuntu Linux`_ でも利用でき，
-Ubuntu 7.04 ("Feisty Fawn") の "universe" リポジトリに入っています．
+Ubuntu 7.10 ("Gutsy Gibbon") の "universe" リポジトリに入っています．
 `現行の Ubuntu パッケージ <http://packages.ubuntu.com/feisty/python/python-django>`_
-は  Django 0.95.1 ベースで， Debian と同じ方法でインストールできます．
+は  Django 0.96.1 ベースで， Debian と同じ方法でインストールできます．
 
 .. _Ubuntu Linux: http://www.ubuntu.com/
-.. _current Ubuntu package: http://packages.ubuntu.com/feisty/python/python-django
+.. _current Ubuntu package: http://packages.ubuntu.com/gutsy/python/python-django
 
 
 Mac OS X

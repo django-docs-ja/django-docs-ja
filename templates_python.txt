@@ -2,7 +2,7 @@
 Python プログラマのための Django テンプレート言語ガイド
 =======================================================
 
-:revision-up-to: 5934 (0.97pre SVN)
+:revision-up-to: 7127 (0.97pre SVN)
 
 このドキュメントでは、 Django のテンプレートシステムを技術的な側面、すなわ
 ちどのように動作し、どうやって拡張するかという観点から解説します。テンプレー
@@ -341,7 +341,7 @@ Django には ``django.template.RequestContext`` という特別なコンテキ�
         }, [ip_address_processor])
 	return t.render(c)
 
-.. Note:: 
+.. note:: 
 
   Django の ``render_to_response()`` ショートカットを使っていて、辞書オブジェ
   クトを渡してコンテキストの変数を追加している場合、テンプレートはデフォル
@@ -611,6 +611,38 @@ Loader 型
 Django はテンプレートローダを ``TEMPLATE_LOADERS`` 設定の順番に従って
 試してゆき、マッチするテンプレートが見つかるまで探します。
 
+.. _`The render_to_string() shortcut`:
+
+``render_to_string()`` ショートカット
+======================================
+
+テンプレートのロードとレンダの反復を減らすため、 Django は作業を自動化する
+ためのショートカットとして、 ``django.template.loader`` で
+``render_to_string()`` を提供しています。このショートカットは、テンプレート
+をロードし、レンダして、結果を文字列として返します::
+
+    from django.template.loader import render_to_string
+    rendered = render_to_string('my_template.html', { 'foo': 'bar' })
+
+``render_to_string`` ショートカットは、必須の引数として、レンダリング時にロー
+ドするテンプレートの名前  ``template_name`` をとります。また、オプション引
+数を二つとります::
+
+    dictionary
+        テンプレートのコンテキストとして使う値の入った辞書です。第二固定引
+        数として渡しても構いません。
+
+    context_instance
+        ``Context`` またはサブクラス (例えば ``RequestContext``) のインスタ
+        ンスです。テンプレートのコンテキストとして使われます。第三固定引数
+        として渡してもかまいません。
+
+`render_to_response()`_ ショートカットも参照してください。このショートカッ
+トは、結果を ``HttpResponse`` に入れて、ビューからレンダ内容を直接返せるよ
+うにしています。
+
+.. _render_to_response(): ../shortcuts/#render-to-response
+
 .. _Extending the template system:
 
 テンプレートシステムの拡張
@@ -707,6 +739,29 @@ Python モジュールを作成したら、実現したいフィルタやタグ�
         "入力をすべて小文字にする"
         return value.lower()
 
+.. _Template filters that expect strings:
+
+テンプレートフィルタに文字列だけを処理させる
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+第一引数に文字列しかとらないテンプレートフィルタを書きたければ、
+``stringfilter`` デコレータを使ってください。このフィルタは、フィルタ処理の
+関数を呼び出す前に、第一引数のオブジェクトを文字列に変換します::
+
+    from django.template.defaultfilters import stringfilter
+
+    @stringfilter
+    def lower(value):
+        return value.lower()
+
+こうすれば、例えばフィルタに整数型を渡したとしても、(整数型に ``lower()``
+がないために) ``AttributeError`` が送出されるようなことはありません。
+
+.. _Registering custom filters:
+
+カスタムフィルタを登録する
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 フィルタ定義を書き終えたら、 Django テンプレート言語で使えるようにするため
 に ``Library`` インスタンスに登録する必要があります::
 
@@ -722,10 +777,12 @@ Python モジュールを作成したら、実現したいフィルタやタグ�
 デコレータを使えます::
 
     @register.filter(name='cut')
+    @stringfilter
     def cut(value, arg):
         return value.replace(arg, '')
 
     @register.filter
+    @stringfilter
     def lower(value):
         return value.lower()
 

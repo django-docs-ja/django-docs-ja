@@ -2,7 +2,7 @@
 Django の設定
 =============
 
-:revision-up-to: 6036 (0.97pre SVN)
+:revision-up-to: 7127 (0.97pre SVN)
 
 Django の設定ファイルには、インストールした Django の使う全ての設定が入って
 います。このドキュメントでは、各設定の役割と、どのような設定を利用できるか
@@ -200,7 +200,7 @@ ABSOLUTE_URL_OVERRIDES
 ADMIN_FOR
 ---------
 
-デフォルト値: ``()`` (空のリスト)
+デフォルト値: ``()`` (空のタプル)
 
 admin 用サイトの設定モジュールで設定します。このサイトの admin を他のサイト
 の admin にする場合、設定モジュールを (``'foo.bar.baz'`` の形式のタプルで) 
@@ -257,6 +257,29 @@ URL の末尾に常にスラッシュを追加するかどうかを決めます�
 (`ミドルウェアのドキュメント`_ を参照してください。) PREPEND_WWW_ も参
 照してください。
 
+AUTHENTICATION_BACKENDS
+-----------------------
+
+デフォルト値: ``('django.contrib.auth.backends.ModelBackend',)``
+
+認証バックエンドのクラス名を (文字列で) 列挙したタプルです。ユーザ認証を試
+みる際に使われます。詳しくは`認証バックエンドのドキュメント`_ を参照してく
+ださい。
+
+.. _authentication backends documentation: ../authentication/#other-authentication-sources
+.. _`認証バックエンドのドキュメント`: `authentication backends documentation`_
+
+AUTH_PROFILE_MODULE
+-------------------
+
+デフォルト値: 定義されていません
+
+サイト固有のユーザプロファイルモデルです。詳しくは 
+`ユーザプロファイルモデルのドキュメント`_ を参照してください。
+
+.. _documentation on user profile models: ../authentication/#storing-additional-information-about-users
+.. _`ユーザプロファイルモデルのドキュメント`: `documentation on user profile models`_
+
 CACHE_BACKEND
 -------------
 
@@ -286,9 +309,9 @@ DATABASE_ENGINE
 
 デフォルト値: ``''`` (空文字列)
 
-どのデータベースバックエンドを使うかを指定します。 
-``'postgresql_psycopg2'``, ``'postgresql'``, ``'mysql'``, ``'mysql_old'``,
-``'sqlite3'``, ``'oracle'``, または ``'ado_mssql'`` のいずれかにします。
+どのデータベースバックエンドを使うかを指定します。組み込みのデータベースバッ
+クエンドは、 ``'postgresql_psycopg2'``, ``'postgresql'``, ``'mysql'``,
+``'mysql_old'``, ``'sqlite3'``, ``'oracle'``, および ``'ado_mssql'`` です。
 
 DATABASE_HOST
 -------------
@@ -357,9 +380,8 @@ Django の admin サイトの変更履歴ページ (や、システムの他の�
 ルドの表示に使うデフォルトのフォーマットです。
 `利用可能な日付フォーマット文字`_ を参照してください。
 
-DATETIME_FORMAT_ , TIME_FORMAT_ , YEAR_MONTH_FORMAT_ および
-MONTH_DAY_FORMAT も参照してください。
-
+``DATETIME_FORMAT`` , ``TIME_FORMAT`` , ``YEAR_MONTH_FORMAT`` および
+``MONTH_DAY_FORMAT`` も参照してください。
 
 .. _`利用可能な日付フォーマット文字`: ../templates/#now
 .. _allowed date format strings: ../templates/#now
@@ -373,8 +395,8 @@ Django の admin サイトの変更履歴ページ (や、システムの他の�
 ルドの表示に使うデフォルトのフォーマットです。
 `利用可能な日時フォーマット文字`_ を参照してください。
 
-DATETIME_FORMAT_ , TIME_FORMAT_ , YEAR_MONTH_FORMAT_ および
-MONTH_DAY_FORMAT も参照してください。
+``DATE_FORMAT`` , ``TIME_FORMAT`` , ``YEAR_MONTH_FORMAT`` および
+``MONTH_DAY_FORMAT`` も参照してください。
 
 .. _`利用可能な日時フォーマット文字`: ../templates/#now
 .. _allowed date format strings: ../templates/#now
@@ -388,10 +410,10 @@ DEBUG
 
 settings に自作の設定項目を追加する場合、django/views/debug.py の
 ``HIDDEN_SETTINGS`` に注意してください。この変数は正規表現になっていて、デ
-フォルトでは ``SECRET``, ``PASSWORD``, ``PROFANITIES`` といった文字列を含む
-全ての設定の DEBUG ビューへの表示を抑制して、信頼されていないユーザがバック
-トレースから重要な (あるいは攻撃的な) 設定項目を見なくてすむようにしている
-からです。
+フォルトでは ``'SECRET'``, ``'PASSWORD'``, ``'PROFANITIES'`` といった文字列
+を含む全ての設定の DEBUG ビューへの表示を抑制して、信頼されていないユーザが
+バックトレースから重要な (あるいは攻撃的な) 設定項目を見なくてすむようにし
+ているからです。
 
 また、デバッグ出力の様々な情報は、いついかなる状況でも衆目に晒すべきもので
 はないということを心得ておきましょう。ファイルパス、各設定項目などは、攻撃
@@ -423,6 +445,26 @@ DEFAULT_FROM_EMAIL
 
 サイト管理者からのさまざまな自動応答で使われるデフォルトの e-mail アドレス
 です。
+
+DEFAULT_TABLESPACE
+------------------
+
+**開発版の Django で新たに追加された機能です**
+
+デフォルト値: ``''`` (空文字列)
+
+テーブルスペース名を明示していないモデルに使われるテーブルスペース
+名です。バックエンドがサポートしている場合に限って有効です。
+
+DEFAULT_INDEX_TABLESPACE
+------------------------
+
+**開発版の Django で新たに追加された機能です**
+
+デフォルト値: ``''`` (空文字列)
+
+テーブルスペース名を明示していないフィールドインデクスに使われるテーブルス
+ペース名です。バックエンドがサポートしている場合に限って有効です。
 
 DISALLOWED_USER_AGENTS
 ----------------------
@@ -621,6 +663,18 @@ import を引き起こしてしまうからです。
 ``LANGUAGES`` を使うようなコードでは、 *本当の* ``gettext()`` を使って
 言語名をラップするようにしてください。
 
+LOCALE_PATHS
+------------
+
+デフォルト値: ``()`` (空のタプル)
+
+Django が翻訳ファイルを探しに行く場所を指定するためのタプルです。
+この変数の詳細とデフォルトの動作については、 `国際化ドキュメントの節`_ を
+参照してください。
+
+.. _internationalization docs section: ../i18n/#using-translations-in-your-own-projects
+.. _`国際化ドキュメントの節`: `internationalization docs section`_
+
 LOGIN_REDIRECT_URL
 ------------------
 
@@ -713,8 +767,8 @@ Django の admin サイトにおける変更リストの日付フィールドの
 は、スペイン語では "1 Enero." になります。
 
 `利用可能な日時フォーマット文字`_ を参照してください。
-DATETIME_FORMAT_ , TIME_FORMAT_ , YEAR_MONTH_FORMAT_ および
-MONTH_DAY_FORMAT も参照してください。
+``DATE_FORMAT``, ``DATETIME_FORMAT`` , ``TIME_FORMAT`` ,
+``YEAR_MONTH_FORMAT`` も参照してください。
 
 
 PREPEND_WWW
@@ -791,6 +845,22 @@ SERVER_EMAIL
 ``ADMINS`` や ``MANAGERS`` にエラーメッセージを送信するときの送信元の
 e-mail アドレスです。
 
+SESSION_ENGINE
+--------------
+
+**開発版の Django で新たに追加された機能です**
+
+デフォルト値: ``django.contrib.sessions.backends.db``
+
+Django がセッションデータを保存する方法を指定します。利用できる値は以下の通
+りです:
+
+    * ``'django.contrib.sessions.backends.db'``
+    * ``'django.contrib.sessions.backends.file'``
+    * ``'django.contrib.sessions.backends.cache'``
+
+詳しくは `セッションのドキュメント`_ を参照してください。
+
 SESSION_COOKIE_AGE
 ------------------
 
@@ -817,6 +887,20 @@ SESSION_COOKIE_NAME
 セッションに使うクッキーの名前です。どんな名前にしてもかまいません。
 `セッションのドキュメント`_ も参照してください。
 
+SESSION_COOKIE_PATH
+-------------------
+
+**開発版の Django で新たに追加された機能です**
+
+デフォルト値: ``'/'``
+
+セッションクッキーをセットするパスです。 Django インスタンスの URL パスか、
+その上の階層の URL パスでなければなりません。
+
+この設定は、同じホスト名の下で、複数の Django インスタンスが稼働している場
+合に便利です。サイト毎に別々のクッキーパスを指定でき、その場合には各サイト
+のインスタンスが固有のセッションクッキーを参照するようになります。
+
 SESSION_COOKIE_SECURE
 ---------------------
 
@@ -836,6 +920,16 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE
 ブラウザを閉じたときにセッションを期限切れにするかどうかを決めます。
 `セッションのドキュメント`_ を参照してください。
 
+SESSION_FILE_PATH
+-----------------
+
+**開発版の Django で新たに追加された機能です**
+
+デフォルト値: ``/tmp/``
+
+ファイルベースのセッションストレージを使っている場合、この値でセッションデー
+タの保存場所を指定します。詳しくは `セッションのドキュメント`_ を参照してく
+ださい。
 
 SESSION_SAVE_EVERY_REQUEST
 --------------------------
@@ -887,7 +981,7 @@ TEMPLATE_DEBUG
 Django は ``DEBUG`` が ``True`` の場合にのみエラーページを表示するので、こ
 の設定の恩恵をうけたければ ``DEBUG`` を設定しておく必要があります。
 
-DEBUG_ も参照してください。
+``DEBUG`` も参照してください。
 
 TEMPLATE_DIRS
 -------------
@@ -958,7 +1052,6 @@ TEST_DATABASE_COLLATION
 .. _section 10.3.2: http://www.mysql.org/doc/refman/5.0/en/charset-database.html
 .. _`10.3.2節`: http://www.mysql.org/doc/refman/5.0/ja/charset-database.html
 
-
 TEST_DATABASE_NAME
 ------------------
 
@@ -966,9 +1059,14 @@ TEST_DATABASE_NAME
 
 デフォルト値: ``None``
 
-テストスイートを実行するときに使うデータベースの名前です。 ``None`` にする
-と、データベースの名前は ``'test_'`` + ``settings.DATABASE_NAME`` になりま
-す。 `Django アプリケーションのテスト`_ を参照してください。
+テストスイートを実行するときに使うデータベースの名前です。
+
+データベースエンジンが SQLite のときにデフォルト値 (``None``) を指定すると、
+テストのためのデータベースはメモリ上に展開されます。他のデータベースエンジ
+ンの場合、テストデータベースの名前として ``'test_'`` +
+``settings.DATABASE_NAME`` を使います。
+
+ `Django アプリケーションのテスト`_ を参照してください。
 
 .. _Testing Django Applications: ../testing/
 
@@ -994,8 +1092,8 @@ Django の admin サイトの変更履歴ページ (や、システムの他の�
 ルドの表示に使うデフォルトのフォーマットです。 
 `利用可能な時刻フォーマット文字`_ を参照してください。
 
-DATETIME_FORMAT_ , TIME_FORMAT_ , YEAR_MONTH_FORMAT_ および
-MONTH_DAY_FORMAT も参照してください。
+``DATE_FORMAT`` , ``DATETIMETIME_FORMAT`` , ``YEAR_MONTH_FORMAT`` および
+``MONTH_DAY_FORMAT`` も参照してください。
 
 .. _`利用可能な時刻フォーマット文字`: ../templates/#now
 
@@ -1078,9 +1176,8 @@ Django の admin サイトにおける変更リストの日付フィールドの
 "January 2006" は、別のロケールでは "2006/January" になるかもしれません。
 
 `利用可能な日時フォーマット文字`_ を参照してください。
-DATETIME_FORMAT_ , TIME_FORMAT_ , YEAR_MONTH_FORMAT_ および
-MONTH_DAY_FORMAT も参照してください。
-
+``DATE_FORMAT`` , ``DATETIME_FORMAT`` , ``TIME_FORMAT`` および
+``MONTH_DAY_FORMAT`` も参照してください。
 
 .. _`キャッシュのドキュメント`: ../cache/
 .. _`ミドルウェアのドキュメント`: ../middleware/
@@ -1178,12 +1275,12 @@ configure() または DJANGO_SETTINGS_MODULE のいずれかが必要です
 ません。
 
 環境変数 ``DJANGO_SETTINGS_MODULE`` を指定せず、 ``configure()`` も呼び出さ
-なかった場合、 Django は最初に設定にアクセスした時点で ``EnvironmentError``
+なかった場合、 Django は最初に設定にアクセスした時点で ``ImportError``
 例外を送出します。
 
 環境変数 ``DJANGO_SETTINGS_MODULE`` を指定して、何らかの設定にアクセスした
 後に ``configure()`` を呼び出すと、 Django は設定がすでに行われている旨の
-``EnvironmentError`` 例外を送出します。 
+``RuntimeError`` 例外を送出します。 
 
 また、 ``configure()`` を何度も呼び出したり、何らかの設定にアクセスした後に
 ``configure()`` を呼び出してもエラーになります。

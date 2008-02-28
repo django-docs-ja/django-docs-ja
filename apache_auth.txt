@@ -2,7 +2,7 @@
 Apache での認証に Django のユーザデータベースを使う
 ===================================================
 
-:revision-up-to: 5613 (0.97pre SVN)
+:revision-up-to: 7127 (0.97pre SVN)
 
 Apache を使っていると，同期を保ちながら複数の認証データベースを維持するとい
 う問題によくぶつかります．そこで， Django の `認証システム`_ に対して直接
@@ -27,13 +27,55 @@ mod_python の標準の ``Auth*`` および ``Require`` ディレクティブと
 ``PythonAuthenHandler`` ディレクティブを使います::
 
     <Location /example/>
-        AuthType basic
+        AuthType Basic
         AuthName "example.com"
         Require valid-user
 
         SetEnv DJANGO_SETTINGS_MODULE mysite.settings
         PythonAuthenHandler django.contrib.auth.handlers.modpython
     </Location>
+
+.. admonition:: Apache 2.2 で認証ハンドラを使う場合
+
+    Apache 2.2 を使っている場合には、あと 2 ステップほど作業が必要です。
+
+    まず、 ``mod_auth_basic`` と ``mod_authz_user`` をきちんとロードさせね
+    ばなりません。これらのモジュールは、 Apache のコンパイル時に静的に組み
+    込まれているか、 ``LoadModule`` を使って動的に組み込みます (この囲みの
+    末尾に例があります) 。
+
+    また、 Apache が他の認証用モジュールを使おうとしないように、設定のため
+    のディレクティブを挿入しておく必要があります。ロードした認証モジュール
+    によって、以下のいずれか、または複数のディレクティブが必要です::
+
+        AuthBasicAuthoritative Off
+        AuthDefaultAuthoritative Off
+        AuthzLDAPAuthoritative Off
+        AuthzDBMAuthoritative Off
+        AuthzDefaultAuthoritative Off
+        AuthzGroupFileAuthoritative Off
+        AuthzOwnerAuthoritative Off
+        AuthzUserAuthoritative Off
+
+    Apache 2.2 での設定全体を、2.0 との違いを太字にして表すと、以下のように
+    なります::
+
+    .. parsed-literal::
+
+        **LoadModule auth_basic_module modules/mod_auth_basic.so**
+        **LoadModule authz_user_module modules/mod_authz_user.so**
+
+        ...
+
+        <Location /example/>
+            AuthType Basic
+            AuthName "example.com"
+            **AuthBasicAuthoritative Off**
+            Require valid-user
+
+            SetEnv DJANGO_SETTINGS_MODULE mysite.settings
+            PythonAuthenHandler django.contrib.auth.handlers.modpython
+        </Location>
 
 デフォルトでは，認証ハンドラは staff のマークのついたメンバだけに
 ``/example/`` へのアクセスを制限します．この挙動を変更したければ，

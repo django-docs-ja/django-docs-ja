@@ -2,7 +2,7 @@
 Django バージョン 0.96 リリースノート
 =====================================
 
-:revision-up-to: 5613 (0.97pre SVN)
+:revision-up-to: 7127 (0.97pre SVN)
 
 Django 0.96 の世界へようこそ!
 

@@ -1,0 +1,707 @@
+==========================
+localflavor アドオン
+==========================
+
+:revision-up-to: 7127 (0.97pre SVN)
+
+Python の「バッテリ入り (batteries included)」哲学に従って、 Django には様々
+な国や文化のための有用なコードが付属しています。こうしたコードは
+「localflavor アドオン」と呼ばれ、 ``django.contrib.localflavor``
+パッケージに収められています。
+
+``localflavor`` パッケージは、各国、各文化圏のコードを、それぞれ
+`ISO 3166 国別コード`_ に従って名付けたサブパッケージにまとめています。
+
+``localflavor`` アドオンの大部分は、 newforms_ フレームワークから導出された、
+ローカライズされたフォームコンポーネントで占められています。例えば、
+``USStateField`` にはアメリカの州名略号を検証する方法が組み込まれていますし、
+``FISocialSecurityNumber`` は、フィンランドの社会保障番号の検証方法が組み
+込まれています。
+
+ローカライズコンポーネントは、サブパッケージを import するだけで使えます。
+例えば、フランスの電話番号を入力するためのフィールドを生成したければ、以下
+のようにします::
+
+    from django import newforms as forms
+    from django.contrib.localflavor import fr
+
+    class MyForm(forms.Form):
+        my_french_phone_no = fr.forms.FRPhoneNumberField()
+
+.. _Supported countries:
+
+localflavor でサポートされている国
+===================================
+
+``localflavor`` がサポートしている国や文化圏は、以下の通りです:
+
+    * アルゼンチン (Argentina_)
+    * オーストラリア (Australia_)
+    * ブラジル (Brazil_)
+    * カナダ (Canada_)
+    * チリ (Chile_)
+    * フィンランド (Finland_)
+    * フランス (France_)
+    * ドイツ (Germany_)
+    * オランダ (Holland_)
+    * アイスランド (Iceland_)
+    * インド (India_)
+    * イタリア (Italy_)
+    * 日本 (Japan_)
+    * メキシコ (Mexico_)
+    * ノルウェー (Norway_)
+    * ペルー (Peru_)
+    * ポーランド (Poland_)
+    * スロバキア (Slovakia_)
+    * 南アフリカ (`South Africa`_)
+    * スペイン (Spain_)
+    * スイス (Switzerland_)
+    * イギリス (`United Kingdom`_)
+    * アメリカ (`United States of America`_)
+
+``localfravor`` パッケージ内には、 ``generic`` というサブパッケージもありま
+す。このパッケージは、複数の国や文化で便利なコードをまとめています。現状
+では、このモジュールには、アメリカの標準をデフォルトとしない、 newforms_ に
+基づいた日付や時刻の入力フィールドが入っています。使い方を以下に示します::
+
+    from django import newforms as forms
+    from django.contrib.localflavor import generic
+
+    class MyForm(forms.Form):
+        my_date_field = generic.forms.DateField()
+
+.. _ISO 3166 country codes: http://www.iso.org/iso/country_codes/iso_3166_code_lists/english_country_names_and_code_elements.htm
+.. _ISO 3166 国別コード: `ISO 3166 country codes`_
+.. _Argentina: `Argentina (django.contrib.localflavor.ar)`_
+.. _Australia: `Australia (django.contrib.localflavor.au)`_
+.. _Brazil: `Brazil (django.contrib.localflavor.br)`_
+.. _Canada: `Canada (django.contrib.localflavor.ca)`_
+.. _Chile: `Chile (django.contrib.localflavor.cl)`_
+.. _Finland: `Finland (django.contrib.localflavor.fi)`_
+.. _France: `France (django.contrib.localflavor.fr)`_
+.. _Germany: `Germany (django.contrib.localflavor.de)`_
+.. _Holland: `Holland (django.contrib.localflavor.nl)`_
+.. _Iceland: `Iceland (django.contrib.localflavor.is\_)`_
+.. _India: `India (django.contrib.localflavor.in\_)`_
+.. _Italy: `Italy (django.contrib.localflavor.it)`_
+.. _Japan: `Japan (django.contrib.localflavor.jp)`_
+.. _Mexico: `Mexico (django.contrib.localflavor.mx)`_
+.. _Norway: `Norway (django.contrib.localflavor.no)`_
+.. _Peru: `Peru (django.contrib.localflavor.pe)`_
+.. _Poland: `Poland (django.contrib.localflavor.pl)`_
+.. _Slovakia: `Slovakia (django.contrib.localflavor.sk)`_
+.. _South Africa: `South Africa (django.contrib.localflavor.za)`_
+.. _Spain: `Spain (django.contrib.localflavor.es)`_
+.. _Switzerland: `Switzerland (django.contrib.localflavor.ch)`_
+.. _United Kingdom: `United Kingdom (django.contrib.localflavor.uk)`_
+.. _United States of America: `United States of America (django.contrib.localflavor.us)`_
+.. _newforms: ../newforms/
+
+.. _`Adding flavors`:
+
+新たなローカルフレーバを追加する
+====================================
+
+私達は、これからもローカルフレーバを充実させていきたいと考えています。ロー
+カルフレーバに取り込みたいコードがあるなら、 `チケットを作成`_ してください。
+ローカルフレーバの作成でお願いしたいのは、文字列を Unicode リテラルで表現
+(``u'mystring'``) し、ファイルのエンコーディングに頼って指定しないで欲しい
+ということです。既にあるローカルフレーバのコードが参考になるでしょう。
+
+.. _create a ticket: http://code.djangoproject.com/simpleticket
+.. _`チケットを作成`: http://code.djangoproject.com/simpleticket
+
+.. _`Argentina (django.contrib.localflavor.ar)`:
+
+アルゼンチン (``django.contrib.localflavor.ar``)
+===================================================
+
+ARPostalCodeField
+-----------------
+
+入力が正しい旧形式のアルゼンチン郵便番号または CPA_ であるか検証するフォー
+ムフィールドです。
+
+.. _CPA: http://www.correoargentino.com.ar/consulta_cpa/home.php
+
+ARDNIField
+----------
+
+入力が正しい Documento Nacional de Identidad (DNI) であるか検証するフォーム
+フィールドです。
+
+ARCUITField
+-----------
+
+入力が正しい Código Único de Identificación Tributaria (CUIT) 番号であるか
+検証するフォームフィールドです。
+
+ARProvinceSelect
+----------------
+
+アルゼンチンの州および自治領を選べる ``Select`` ウィジェットです。
+
+.. _`Australia (django.contrib.localflavor.au)`:
+
+Australia (``django.contrib.localflavor.au``)
+=============================================
+				     
+AUPostCodeField
+---------------
+
+入力が正しいオーストラリアの郵便番号であるか検証するフォームフィールドです。
+
+AUPhoneNumberField
+------------------
+
+入力がオーストラリアの電話番号であるか検証するフォームフィールドです。
+有効な番号は 10 桁の数字からなります。
+
+AUStateSelect
+-------------
+
+オーストラリアの州や領を選べる ``Select`` ウィジェットです。
+
+.. _`Brazil (django.contrib.localflavor.br)`:
+
+Brazil (``django.contrib.localflavor.br``)
+==========================================
+
+BRPhoneNumberField
+------------------
+
+入力が正しいブラジルの電話番号であるか検証するフォームフィールドです。
+正しい形式は XX-XXXX-XXXX です。
+
+
+BRZipCodeField
+--------------
+
+入力が正しいブラジルのZIPコードであるか検証するフォームフィールドです。
+正しい形式はXXXXX-XXXです。
+
+BRStateSelect
+-------------
+
+ブラジルの州や領を選べる ``Select`` ウィジェットです。
+
+.. _`Canada (django.contrib.localflavor.ca)`:
+
+Canada (``django.contrib.localflavor.ca``)
+==========================================
+
+CAPhoneNumberField
+------------------
+
+入力が正しいカナダの電話番号であるか検証するフォームフィールドです。
+正しい形式はXXX-XXX-XXXXです。
+
+CAPostalCodeField
+-----------------
+
+入力が正しいカナダの郵便番号であるか検証するフォームフィールドです。
+正しい形式はXXX XXXです。
+
+CAProvinceField
+---------------
+
+入力が正しいカナダの州名か、州名略号であるか検証するフォームフィールドです。
+
+CASocialInsuranceNumberField
+----------------------------
+
+入力が正しいカナダ社会保障番号 (SIN) であるか検証するフォームフィールドです。
+正しい SIN は、XXX-XXX-XXX の形式で、 `Luhn mod-10 checksum`_ にパスします。
+
+.. _Luhn mod-10 checksum: http://en.wikipedia.org/wiki/Luhn_algorithm
+
+CAProvinceSelect
+----------------
+
+カナダの州や領を選べる ``Select`` ウィジェットです。
+
+.. _`Chile (django.contrib.localflavor.cl)`:
+
+Chile (``django.contrib.localflavor.cl``)
+=========================================
+
+CLRutField
+----------
+
+入力が正しいチリ国民識別番号 ('Rol Unico Tributario' or RUT) であるか検証す
+るフォームフィールドです。正しい形式は XX.XXX.XXX-X です。
+
+
+CLRegionSelect
+--------------
+
+チリの地域 (Regiones) を選べる ``Select`` ウィジェットです。
+
+.. _`Finland (django.contrib.localflavor.fi)`:
+
+Finland (``django.contrib.localflavor.fi``)
+===========================================
+
+FISocialSecurityNumber
+----------------------
+
+入力が正しいフィンランド社会保障番号であるか検証するフォームフィールドです。
+
+FIZipCodeField
+--------------
+
+入力が正しいフィンランドのZIPコードであるか検証するフォームフィールドです。
+正しいコードは 5 桁の数字からなります。
+
+FIMunicipalitySelect
+--------------------
+
+フィンランドの市名 (municipality) を選べる ``Select`` ウィジェットです。
+
+.. _`France (django.contrib.localflavor.fr)`:
+
+France (``django.contrib.localflavor.fr``)
+==========================================
+
+FRPhoneNumberField
+------------------
+
+入力が正しいフランスの電話番号であるか検証するフォームフィールドです。
+正しい形式は、 0X XX XX XX XX, 0X.XX.XX.XX.XX, または 0XXXXXXXXX です。
+入力は 0X XX XX XX XX 形式に正規化されます。
+
+FRZipCodeField
+--------------
+
+入力が正しいフランスのZIPコードであるか検証するフォームフィールドです。
+正しいZIPコードは5桁の数字からなります。
+
+FRDepartmentSelect
+------------------
+
+フランスの県名 (department) を選べる ``Select`` ウィジェットです。
+
+.. _`Germany (django.contrib.localflavor.de)`:
+
+Germany (``django.contrib.localflavor.de``)
+===========================================
+
+DEIdentityCardNumberField
+-------------------------
+
+入力が正しいドイツの身分保障番号 (Personalausweis_) であるか検証するフォー
+ムフィールドです。正しい番号は XXXXXXXXXXX-XXXXXXX-XXXXXXX-X で、どの桁グルー
+プもゼロだけで構成されていてはなりません。
+
+.. _Personalausweis: http://de.wikipedia.org/wiki/Personalausweis
+
+DEZipCodeField
+--------------
+
+入力が正しいドイツのZIPコードであるか検証するフォームフィールドです。
+正しいコードは5桁の数字からなります。
+
+DEStateSelect
+-------------
+
+ドイツの州を選べる ``Select`` ウィジェットです。
+
+.. _`Holland (django.contrib.localflavor.nl)`:
+
+Holland (``django.contrib.localflavor.nl``)
+===========================================
+
+NLPhoneNumberField
+------------------
+
+入力が正しいオランダの電話番号であるか検証するフォームフィールドです。
+
+NLSofiNumberField
+-----------------
+
+入力が正しいオランダ社会保障番号 (SoFI/BSN) であるか検証するフォームフィー
+ルドです。
+
+NLZipCodeField
+--------------
+
+入力が正しいオランダのZIPコードであるか検証するフォームフィールドです。
+
+NLProvinceSelect
+----------------
+
+オランダの県 (province) を選べる ``Select`` ウィジェットです。
+
+.. _`Iceland (django.contrib.localflavor.is_)`:
+
+Iceland (``django.contrib.localflavor.is_``)
+============================================
+
+ISIdNumberField
+---------------
+
+入力が正しいアイスランドの身分証明番号 (kennitala) であるか検証するフォーム
+フィールドです。形式は XXXXXX-XXXX です。
+
+ISPhoneNumberField
+------------------
+
+入力が正しいアイスランド電話番号 (7 桁の数字で、最初の3桁以後にハイフンやス
+ペースが入っていてもよい) であるか検証するフォームフィールドです。
+
+ISPostalCodeSelect
+------------------
+
+アイスランドの郵便番号を選べる ``Select`` ウィジェットです。
+
+.. _`India (django.contrib.localflavor.in_)`:
+
+India (``django.contrib.localflavor.in_``)
+==========================================
+
+INStateField
+------------
+
+入力が正しいインドの州・領名または略号であるか検証するフォームフィールドで
+す。入力は車両番号登録に使われる標準の 2 文字略号形式に正規化されます。
+
+INZipCodeField
+--------------
+
+入力が正しいインドのZIPコードであるか検証するフォームフィールドです。
+形式は XXXXXXX です。
+
+INStateSelect
+-------------
+
+インドの州や領を選べる ``Select`` ウィジェットです。
+
+.. _`Italy (django.contrib.localflavor.it)`:
+
+Italy (``django.contrib.localflavor.it``)
+=========================================
+
+ITSocialSecurityNumberField
+---------------------------
+
+入力が正しいイタリア社会保障番号 (`codice fiscale`_) であるか検証するフォー
+ムフィールドです。
+
+.. _codice fiscale: http://www.agenziaentrate.it/ilwwcm/connect/Nsi/Servizi/Codice+fiscale+-+tessera+sanitaria/Codice+fiscale/NSI+Informazioni+sulla+codificazione+delle+persone+fisiche
+
+ITVatNumberField
+----------------
+
+入力が正しいイタリアの VAT 番号 (partita IVA) であるか検証するフォームフィー
+ルドです。
+
+ITZipCodeField
+--------------
+
+入力が正しいイタリアのZIPコードであるか検証するフォームフィールドです。
+正しいコードは 5 桁の数字です。
+
+ITProvinceSelect
+----------------
+
+イタリアの県 (province) を選べる ``Select`` ウィジェットです。
+
+ITRegionSelect
+--------------
+
+イタリアの地域名 (region) を選べる ``Select`` ウィジェットです。
+
+.. _`Japan (django.contrib.localflavor.jp)`:
+
+Japan (``django.contrib.localflavor.jp``)
+=========================================
+
+JPPostalCodeField
+-----------------
+
+入力が正しい日本の郵便番号であるか検証するフォームフィールドです。
+7 桁の数字で、ハイフンはあってもなくても構いません。
+
+JPPrefectureSelect
+------------------
+
+日本の県を選べる ``Select`` ウィジェットです。
+
+.. _`Mexico (django.contrib.localflavor.mx)`:
+
+Mexico (``django.contrib.localflavor.mx``)
+==========================================
+
+MXStateSelect
+-------------
+
+メキシコの州を選べる ``Select`` ウィジェットです。
+
+.. _`Norway (django.contrib.localflavor.no)`:
+
+Norway (``django.contrib.localflavor.no``)
+==========================================
+
+NOSocialSecurityNumber
+----------------------
+
+入力が正しいノルウェー社会保証番号 (personnummer_) であるか検証するフォーム
+フィールドです。
+
+.. _personnummer: http://no.wikipedia.org/wiki/Personnummer
+
+NOZipCodeField
+--------------
+
+入力が正しいノルウェーのZIPコードであるか検証するフォームフィールドです。
+正しいコードは 4 桁の数字です。
+
+NOMunicipalitySelect
+--------------------
+
+ノルウェーの市名 (municipality, fylker) を選べる ``Select`` ウィジェットです。
+
+.. _`Peru (django.contrib.localflavor.pe)`:
+
+Peru (``django.contrib.localflavor.pe``)
+========================================
+
+PEDNIField
+----------
+
+入力が正しいペルー国民識別番号 (DNI) であるか検証するフォームフィールドです。
+
+PERUCField
+----------
+
+入力が正しい納税登録番号 (Registro Unico de Contribuyentes, RUC) であるか検
+証するフォームフィールドです。正しい RUC 番号は 11 桁の数字形式です。
+
+PEDepartmentSelect
+------------------
+
+ペルーの県 (department) を選べる ``Select`` ウィジェットです。
+
+.. _`Poland (django.contrib.localflavor.pl)`:
+
+Poland (``django.contrib.localflavor.pl``)
+==========================================
+
+PLNationalIdentificationNumberField
+-----------------------------------
+
+入力が正しいポーランド国民識別番号 (PESEL_) であるか検証するフォームフィー
+ルドです。
+
+.. _PESEL: http://en.wikipedia.org/wiki/PESEL
+
+PLNationalBusinessRegisterField
+-------------------------------
+
+入力が正しいポーランド法人登記番号 (REGON_) であるか検証するフォームフィー
+ルドです。REGON は 7 桁または 9 桁の数字で、
+http://wipos.p.lodz.pl/zylla/ut/nip-rego.html のチェックサムアルゴリズムに
+従います。
+
+.. _REGON: http://www.stat.gov.pl/bip/regon_ENG_HTML.htm
+
+PLPostalCodeField
+-----------------
+
+入力が正しいポーランドの郵便番号であるか検証するフォームフィールドです。
+正しい郵便番号は XX-XXX 形式の数字です。
+
+PLTaxNumberField
+----------------
+
+入力が正しいポーランド納税者番号 (NIP) であるか検証するフォームフィールドで
+す。正しい形式は XXX-XXX-XX-XX または XX-XX-XXX-XXX です。NIP に使われるチェッ
+クサムアルゴリズムは http://wipos.p.lodz.pl/zylla/ut/nip-rego.html で定義さ
+れています。
+
+PLAdministrativeUnitSelect
+--------------------------
+
+ポーランドの行政単位 (administrative unit) を選べる ``Select`` ウィジェットです。
+
+PLVoivodeshipSelect
+-------------------
+
+ポーランドの郡 (voivodeship, 行政州) を選べる ``Select`` ウィジェットです。
+
+.. _`Slovakia (django.contrib.localflavor.sk)`:
+
+Slovakia (``django.contrib.localflavor.sk``)
+============================================
+
+SKPostalCodeField
+-----------------
+
+入力が正しいスロバキアの郵便番号であるか検証するフォームフィールドです。
+正しい番号は、 XXXXX または XXX XX の形式をとります。
+
+SKDistrictSelect
+----------------
+
+Slovak districtsを選べる ``Select`` ウィジェットです。
+
+SKRegionSelect
+--------------
+
+Slovak regionsを選べる ``Select`` ウィジェットです。
+
+.. _`South Africa (django.contrib.localflavor.za)`:
+
+South Africa (``django.contrib.localflavor.za``)
+================================================
+
+ZAIDField
+---------
+
+入力が正しい南アフリカ身分証明番号であるか検証するフォームフィールドです。
+検証では、 Luhn チェックサムと、簡単な (完全に厳密ではない) 誕生日のチェッ
+クを行います。
+
+ZAPostCodeField
+---------------
+
+入力が正しい南アフリカの郵便番号であるか検証するフォームフィールドです。
+正しい郵便番号は 4 桁からなります。
+
+.. _`Spain (django.contrib.localflavor.es)`:
+
+Spain (``django.contrib.localflavor.es``)
+=========================================
+
+ESIdentityCardNumberField
+-------------------------
+
+入力が正しいスペインの NIF/NIE/CIF (納税者識別番号) であるか検証するフォー
+ムフィールドです。
+
+ESCCCField
+----------
+
+入力が正しいスペイン銀行口座番号 (Codigo Cuenta Cliente, CCC) であるか検証
+するフォームフィールドです。正しい CCC 番号は、EEEE-OOOO-CC-AAAAAAAAAA の
+形式であり、 E, O, C および A はそれぞれ組織、支店、チェックサムおよび口座
+番号を示しています。チェックサムの上下の桁は、それぞれ支店番号および口座番
+号のチェックサム値です。区切り文字にスペースを使ってもよく、区切り文字がな
+くてもかまいません。
+
+ESPhoneNumberField
+------------------
+
+入力が正しいスペインの電話番号であるか検証するフォームフィールドです。
+正しい番号は、 9 桁からなり、先頭の番号は 6, 8, または 9 です。
+
+ESPostalCodeField
+-----------------
+
+入力が正しいスペインの郵便番号であるか検証するフォームフィールドです。
+正しい番号は 5 桁の数字からなり、先頭の二桁が州を表す 01 から 52 の間
+の値をとります。
+
+ESProvinceSelect
+----------------
+
+スペインの州名を選べる ``Select`` ウィジェットです。
+
+ESRegionSelect
+--------------
+
+スペインの領名を選べる ``Select`` ウィジェットです。
+
+.. _`Switzerland (django.contrib.localflavor.ch)`:
+
+Switzerland (``django.contrib.localflavor.ch``)
+===============================================
+
+CHIdentityCardNumberField
+-------------------------
+
+入力が正しいスイスの身分証明書番号であるか検証するフォームフィールドです。
+正しい番号は、 X1234567<0 または 1234567890 の形式であり、正しいチェックサ
+ム値を持たねばなりません。 http://adi.kousz.ch/artikel/IDCHE.htm を参照して
+ください。
+
+CHPhoneNumberField
+------------------
+
+入力が正しいスイスの電話番号であるか検証するフォームフィールドです。
+正しい電話番号の形式とは、 0XX XXX XX XX, 0XX.XXX.XX.XX, および 0XXXXXXXXX 
+です。番号は 0XX XXX XX XX 形式に正規化されます。
+
+CHZipCodeField
+--------------
+
+入力が正しいスイスのZIPコードであるかフォームフィールドです。正しいコードは
+4 桁からなります。
+
+CHStateSelect
+-------------
+
+スイスの州名を選べる ``Select`` ウィジェットです。
+
+.. _`United Kingdom (django.contrib.localflavor.uk)`:
+
+United Kingdom (``django.contrib.localflavor.uk``)
+==================================================
+
+UKPostcodeField
+---------------
+
+入力が正しいイギリスの郵便番号であるか検証するフォームフィールドです。
+検証に使われている正規表現は、
+http://www.govtalk.gov.uk/gdsc/schemas/bs7666-v2-0.xsd 
+British Standard BS7666 address types をもとにしています。
+
+UKCountySelect
+--------------
+
+イギリスの地域名を選べる ``Select`` ウィジェットです。
+
+UKNationSelect
+--------------
+
+イギリスの地方名を選べる ``Select`` ウィジェットです。
+
+.. _`United States of America (django.contrib.localflavor.us)`:
+
+United States of America (``django.contrib.localflavor.us``)
+============================================================
+
+USPhoneNumberField
+------------------
+
+入力が正しいアメリカの電話番号であるか検証するフォームフィールドです。
+
+USSocialSecurityNumberField
+---------------------------
+
+入力がアメリカの社会保障番号 (SSN) であるか検証するフォームフィールドです。
+正しい SSN 番号は、以下の規則に従います:
+
+    * XXX-XX-XXXX 形式であること
+    * 0 ばかりでできた桁グループがないこと
+    * 先頭の桁グループが 666 でないこと
+    * 広報に使われるブロック (987-65-4320 から 987-65-4329) の範囲内でないこと
+    * 広報で使われているために、明らかに無効であると知られている番号
+      (Woolworth 番号、または 1962 promotional number) でないこと
+
+USStateField
+------------
+
+入力がアメリカの州名または州名略号であるか検証するフォームフィールドです。
+入力を郵便向けの標準 2 文字州名略号に正規化します。
+
+USZipCodeField
+--------------
+
+入力が正しいアメリカの郵便番号であるか検証するフォームフィールドです。
+XXXXX または XXXXX-XXXX 形式の番号が有効です。
+
+USStateSelect
+-------------
+
+アメリカの州や領を選べる ``Select`` ウィジェットです。

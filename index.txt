@@ -8,7 +8,7 @@ Django オンラインドキュメント和訳
 底本
     SVN trunk (0.97pre SVN)
 追従済みリビジョン
-    6126 (2007/09/13)
+    6126 (2007/09/13) [7127 追従中]
 
 必読
 ----
@@ -78,6 +78,8 @@ Django オンラインドキュメント和訳
 `キャッシュ (Django's Cache Framework) <../cache/>`__
 
 `国際化 (Internationalization) <../i18n/>`__
+
+`ローカルフレーバ (Local flavors) <../localflavor/>`__
 
 `Django での Unicode の扱い (Unicode data in Django) <../unicode/>`__
 

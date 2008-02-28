@@ -2,7 +2,7 @@
 Django での Unicode の扱い
 ==========================
 
-:revision-up-to: 5631 (0.97pre SVN)
+:revision-up-to: 7127 (0.97pre SVN)
 
 **開発版の Django で新たに追加された機能です**
 
@@ -130,21 +130,23 @@ Django を使っていると， Unicode 文字列とバイト文字列の他に�
 ``django.utils.encoding`` モジュールには， Unicode 文字列とバイト文字列との
 間で相互に変換を行うための関数が入っています．
 
-    * ``smart_unicode(s, encoding='utf-8', errors='strict')`` は，入力
-      ``s`` を Unicode 文字列に変換します． ``encoding`` パラメタには入力文
-      字列のエンコーディングを指定します．(例えば， Django はフォームから入
-      力された UTF-8 でエンコードされていないデータを内部的に処理する際にこ
-      の関数を使っています．) ``errors`` はエラー処理時の動作を指定するため
-      のパラメタで，Python の ``unicode()`` 関数で使われているのと同じ値を
-      受け取ります．
+    * ``smart_unicode(s, encoding='utf-8', string_only=False, errors='strict')``
+      は，入力 ``s`` を Unicode 文字列に変換します． ``encoding`` パラメタ
+      には入力文字列のエンコーディングを指定します．(例えば， Django はフォー
+      ムから入力された UTF-8 でエンコードされていないデータを内部的に処理す
+      る際にこの関数を使っています．) ``strings_only`` パラメタが ``True``
+      の場合、数値型、ブール型、 ``None`` といった値を ``s`` に渡しても文字列
+      に変換しません (もとの型のままで値を返します) 。 ``errors`` はエラー
+      処理時の動作を指定するためのパラメタで，Python の ``unicode()`` 関数
+      で使われているのと同じ値を受け取ります．
 
       ``__unicode__`` メソッドを実装しているオブジェクトを
       ``smart_unicode()`` に渡すと， ``__unicode__`` メソッドを使って変換を
       行います．
 
-    * ``force_unicode(s, encoding='utf-8', errors='strict')`` は，ほとんど
-      の場合 ``smart_unicode()`` と同じように動作します．ただし，第一引数が
-      `遅延翻訳オブジェクト`_ の場合には動作が異なります．
+    * ``force_unicode(s, encoding='utf-8', string_only=False, errors='strict')``
+      は，ほとんどの場合 ``smart_unicode()`` と同じように動作します．ただし，
+      第一引数が `遅延翻訳オブジェクト`_ の場合には動作が異なります．
       ``smart_unicode()`` は遅延翻訳オブジェクトをそのままにしておきますが，
       ``force_unicode()`` を使うと，(その場で翻訳を行って) Unicode 文字列を
       返します．通常は ``smart_unicode()`` を使った方がよいでしょう．とはい
@@ -155,10 +157,10 @@ Django を使っていると， Unicode 文字列とバイト文字列の他に�
     * ``smart_str(s, encoding='utf-8', strings_only=False, errors='strict')``
       は本質的に ``smart_unicode()`` の対極にあたるメソッドです．このメソッ
       ドは，第一引数をバイト文字列に変換します． ``strings_only`` パラメタ
-      を True に設定すると，第一引数が Python の文字列，ブール値， ``None``
-      の場合に文字列化を行いません (もとの型のままにしておきます) これは
-      Python の組み込み関数 ``str()`` と少し違った仕様ですが， Django 内部
-      のいくつかの場所で必要な機能として実装されています．
+      の意味は、 ``smart_unicode()`` および ``force_unicode()`` の同名のパ
+      ラメタと同じです。これは Python の組み込み関数 ``str()`` と少し違った
+      仕様ですが， Django 内部のいくつかの場所で必要な機能として実装されて
+      います．
 
 .. _lazy translation: ../i18n/#lazy-translation
 .. _`遅延翻訳オブジェクト`: `lazy translation`_

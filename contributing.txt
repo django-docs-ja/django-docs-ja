@@ -2,7 +2,7 @@
 Django プロジェクトに協力するために
 ===================================
 
-:revision-up-to: 5922 (0.97pre SVN)
+:revision-up-to: 7127 (0.97pre SVN)
 
 Django を *使う* のを楽しいと思ってもらえたなら、 *使い続ける* 前にすこし待っ
 てください。私達は多大な情熱をかけて、ユーザがコミュニティのメンバに貢献で
@@ -122,60 +122,64 @@ Django に脆弱性が発見された場合、私達は以下のように行動�
 Django のコードに対するパッチはつねに大歓迎です。実際、パッチつきのバグ報告
 は、パッチのないものよりも *はるかに* 素早く修正されます。
 
-"Claiming" tickets
-------------------
+.. _"Claiming" tickets:
 
-In an open-source project with hundreds of contributors around the world, it's
-important to manage communication efficiently so that work doesn't get
-duplicated and contributors can be as effective as possible. Hence, our policy
-is for contributors to "claim" tickets in order to let other developers know
-that a particular bug or feature is being worked on.
+チケットをクレーム（審査請求）する
+-----------------------------------
 
-If you have identified a contribution you want to make and you're capable of
-fixing it (as measured by your coding ability, knowledge of Django internals
-and time availability), claim it by following these steps:
+世界中に何百人ものコントリビュータを擁するようなオープンソースプロジェクト
+では、コミュニケーションを効率的に進めることで、同じ作業が何度も繰り返され
+るのを防ぎ、コントリビュータができるだけ効果的に振る舞えるような配慮が重要
+です。そのため、コントリビュータがチケットをクレームし、他の開発者たちに、
+何らかのバグ報告や機能提案がなされていることを知らせるという方針をとります。
 
-    * `Create an account`_ to use in our ticket system.
-    * If a ticket for this issue doesn't exist yet, create one in our
-      `ticket tracker`_.
-    * If a ticket for this issue already exists, make sure nobody else has
-      claimed it. To do this, look at the "Assigned to" section of the ticket.
-      If it's assigned to "nobody," then it's available to be claimed.
-      Otherwise, somebody else is working on this ticket, and you either find
-      another bug/feature to work on, or contact the developer working on the
-      ticket to offer your help.
-    * Log into your account, if you haven't already, by clicking "Login" in the
-      upper right of the ticket page.
-    * Claim the ticket by clicking the radio button next to "Accept ticket"
-      near the bottom of the page, then clicking "Submit changes."
+Django プロジェクトに何らかの貢献をしたいと考えていて、 (コード作成能力や、
+Django の内部に関する知識、時間的な余裕から) 必要な修正を行えるのなら、以下
+のステップに従ってチケットをクレームしてください:
+
+    * チケットシステム上に `アカウントを作成`_ します。
+    * 自分の提起したい内容がまだ `チケットトラッカ`_ 上になければ、
+      新たに作成します。
+    * 自分の提起したい内容がすでにチケットトラッカ上にあるのなら、そのチケッ
+      トの "Assigned to" セクションを調べて、誰かによってクレーム済みでない
+      か確認してください。 "nobody" になっていれば、そのチケットはクレーム
+      できます。すでに誰かのアカウント名が入っているのなら、他のチケットを
+      探してクレームするか、その問題に関わっている開発者に連絡をとって、チ
+      ケット解決に手を貸してください。
+    * まだログインしていなければ、自分のアカウントでログインしてください。
+      ログインするには、チケットページの右上にある "Login" をクリックします。
+    * チケットをクレームするには、チケットページの下にある、"Accept ticket" 
+      の隣のラジオボタンをクリックしてから、 "Submit changes" をクリックします。
 
 .. _Create an account: http://www.djangoproject.com/accounts/register/
+.. _`アカウントを作成`: http://www.djangoproject.com/accounts/register/
 
-Ticket claimers' responsibility
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _`Ticket claimers' responsibility`:
 
-Once you've claimed a ticket, you have a responsibility to work on that ticket
-in a reasonably timely fashion. If you don't have time to work on it, either
-unclaim it or don't claim it in the first place!
+チケットをクレームしたら
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Core Django developers go through the list of claimed tickets from time to
-time, checking whether any progress has been made. If there's no sign of
-progress on a particular claimed ticket for a week or two after it's been
-claimed, we will unclaim it for you so that it's no longer monopolized and
-somebody else can claim it.
+チケットをクレームした人は、そのチケットが時代おくれにならないよう作業せね
+ばなりません。チケットに時間を割けないのなら、クレームを解除するか、そもそ
+もクレームしないようにしてください！
 
-If you've claimed a ticket and it's taking a long time (days or weeks) to code,
-keep everybody updated by posting comments on the ticket. That way, we'll know
-not to unclaim it. More communication is better than less communication!
+コア開発者たちは、クレーム済みのチケットを何度も調べて、各々のチケットに進
+捗があるかどうか調べます。クレーム状態にあるチケットが進捗しないまま 1 週間
+以上過ぎた場合、チケットが独占されつづけないようにクレームを解除します。
 
-Which tickets should be claimed?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+チケットをクレームしてから、コードを書くまでにしばらく (数日から数週間) 
+かかる場合、何らかのコメントをポストして、その旨を通知してください。知らせ
+があれば、クレームを解除しません。
 
-Of course, going through the steps of claiming tickets is overkill in some
-cases. In the case of small changes, such as typos in the documentation or
-small bugs that will only take a few minutes to fix, you don't need to jump
-through the hoops of claiming tickets. Just submit your patch and be done with
-it.
+.. _`Which tickets should be claimed?`:
+
+どのチケットをクレームすべきか
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+もちろん、わざわざチケットをクレームするまでもない場合もあります。ドキュメ
+ントのタイプミスや、ほんの数分あれば修正できるような小さなバグの場合には、
+チケットのクレームまでする必要はありません。単にパッチを投稿して、そのまま
+にしておいてください。
 
 .. _Patch style:
 
@@ -260,7 +264,7 @@ stage)」というフィールドに関わる作業です。このステージ�
     * トリアージ作業者: 個々チケットを追跡して、チケットが正しく分別された
       状態になるよう作業する人です。
 
-次に、トリアージ作業には以下の 4 つのステージがあります:
+次に、トリアージ作業には以下の 5 つのステージがあります:
 
     1. チケットは「未レビュー(unreviewed)」の状態からスタートします。この状
        態のチケットはまだトリアージ作業者によって検査されておらず、トリアー
@@ -273,7 +277,12 @@ stage)」というフィールドに関わる作業です。このステージ�
     3. チケットの内容に従った修正が受け入れられた場合、「承認 (accepted)」
        ステージに移行します。このステージは全ての作業が終わった状態です。
 
-    4. チケットにパッチが関連づけられている場合 (下記参照)、トリアージ作業
+    4. チケットは "Someday/Maybe" 状態に移行させられる場合があります。これ
+       は、該当チケットに述べられている内容に対して、素晴らしいパッチが提供
+       された時点でフレームワークに追加しようと考えていることを示します。こ
+       の状態に移行したチケットの優先度は高くありません。
+
+    5. チケットにパッチが関連づけられている場合 (下記参照)、トリアージ作業
        者はパッチをレビューします。パッチの内容が完璧なら、「チェックイン可
        (ready for checkin)」にマークされ、コア開発者にパッチをレビューし
        てチェックすべきであることを知らせます。
@@ -366,9 +375,9 @@ admin サイトやバリデータのエラーメッセージなど、Django は�
 
     * 特に指定のない限り `PEP 8`_ に従って下さい。
 
-      You could use  a tool like `pep8.py`_ to check for some problems in this
-      area, but remember that PEP 8 is only a guide, so respect the style of
-      the surrounding code as a primary goal.
+      `pep8.py`_ のようなツールを使えば、コーディング標準に従っているかどう
+      かをチェックできます。とはいえ、 PEP 8 はガイドにすぎません。まずは、
+      周辺のコードのスタイルを尊重してください。
 
     * インデントにはスペース 4 つを使います。
 
@@ -519,43 +528,44 @@ admin サイトやバリデータのエラーメッセージなど、Django は�
 私達は、ドキュメントの一貫性と読みやすさをとても重視しています (なんといっ
 ても、 Django はジャーナリズムの中で生まれましたからね！)
 
-How to document new features
+_How to document new features:
+
+新たな機能のドキュメント化
 ----------------------------
 
-We treat our documentation like we treat our code: we aim to improve it as
-often as possible. This section explains how writers can craft their
-documentation changes in the most useful and least error-prone ways.
+私達は、ドキュメントをコードと同じように扱います。すなわち、可能な限り改善
+を重ねたいと思っているのです。この節では、ドキュメントの書き手に、有意義で
+エラーの少ないドキュメントの変更方法を説明します。
 
-Documentation changes come in two forms:
+ドキュメントの変更には、二つの形式があります:
 
-    * General improvements -- Typo corrections, error fixes and better
-      explanations through clearer writing and more examples.
+    * 一般的な改善 -- タイプミス、誤った内容の修正、明確な文章への修正や、
+      例題の追加です。
 
-    * New features -- Documentation of features that have been added to the
-      framework since the last release.
+    * 新たな機能説明 -- 前回のリリース以降に追加された機能のドキュメントで
+      す。
 
-Our philosophy is that "general improvements" are something that *all* current
-Django users should benefit from, including users of trunk *and* users of the
-latest release. Hence, the documentation section on djangoproject.com points
-people by default to the newest versions of the docs, because they have the
-latest and greatest content. (In fact, the Web site pulls directly from the
-Subversion repository, converting to HTML on the fly.)
+「一般的な改善」は、 trunk バージョン *と* 最新リリースの両方を含む 
+*全ての* Django ユーザにとって有用であるというのが私達の哲学です。そのため、
+djangoproject.com のドキュメントのページは、デフォルトで最新版のドキュメン
+トを読めるようにしています。 (実際には、Web サイトが動的に Subversion リポ
+ジトリから直接コンテンツを取得して、HTML に変換表示しています) 。
 
-But this decision to feature bleeding-edge documentation has one large caveat:
-any documentation of *new* features will be seen by Django users who don't
-necessarily have access to those features yet, because they're only using the
-latest release. Thus, our policy is:
+しかしながら、最新版のドキュメントを表示することには、大きな問題点もありま
+す。それは、 *新しい* 機能のドキュメントが、最新版を使っているために、その
+機能を使えないバージョンを利用しているユーザの目にも触れてしまうということ
+です。このため、私達はドキュメントを以下のポリシに従って作成しています:
 
-    **All documentation of new features should be written in a way that clearly
-    designates the features are only available in the Django development
-    version. Assume documentation readers are using the latest release, not the
-    development version.**
+    **新たな機能に関するドキュメントを追加する場合、必ず該当機能が開発版の
+    Django でのみ使用可能な旨を明記せねばなりません。ドキュメントの読み手は、
+    開発版ではなく、最新のリリースを使っていると想定してください。**
 
-Our traditional way of marking new features is by prefacing the features'
-documentation with: "New in Django development version." Changes aren't
-*required* to include this exact text, but all documentation of new features
-should include the phrase "development version," so we can find and remove
-those phrases for the next release.
+これまでのやり方では、追加される機能のドキュメントの先頭に
+「開発版の Django で新たに登場した機能です (New in Django development
+version)」という一文を置くようにしています。新しい機能に関する説明全てでこ
+の文をそのまま使わねばならないわけでは *ありません* 。ただし、必ず「開発版
+(development version)」という文言を入れておき、次のリリースに先立ってこの文
+言を除去できるようにしてください。
 
 .. _Guidelines for ReST files:
 
@@ -720,31 +730,32 @@ Django のテストは全て、 Django に付属のアプリケーションテ�
 そうです。テストには設定モジュールが必要です。とはいえ、必要なのは
 ``DATABASE_ENGINE`` を含むデータベース接続に関する情報です。また、全てのテ
 ストをパスするには、 ``ROOT_URLCONF`` 設定 (この値は単にあればよいだけで、
-内容は無視されます)と、 ``SITE_ID`` 設定 (0 でない整数ならどんな値でもかま
-いません) も指定しておかねばなりません。
+内容は無視されます) を指定しておかねばなりません。
 
-If you're using the ``sqlite3`` database backend, no further settings are
-needed. A temporary database will be created in memory when running the tests.
+``sqlite3`` バックエンドを使っているなら、設定はこれだけで十分です。一時デー
+タベースはテスト実行時にメモリ上に生成されます。
  
-If you're using another backend:
+``sqlite3`` 以外のバックエンドを使っている場合は、以下のような設定が必要で
+す:
 
-    * Your ``DATABASE_USER`` setting needs to specify an existing user account
-      for the database engine.
+    * ``DATABASE_USER`` を、対象データベースに存在するユーザ名に設定する必
+      要があります。
 
-    * The ``DATABASE_NAME`` setting must be the name of an existing database to
-      which the given user has permission to connect. The unit tests will not
-      touch this database; the test runner creates a new database whose name is
-      ``DATABASE_NAME`` prefixed with ``test_``, and this test database is
-      deleted when the tests are finished. This means your user account needs
-      permission to execute ``CREATE DATABASE``.
+    * ``DATABASE_NAME`` を、実際に存在して、かつユーザが接続可能なデータベー
+      スの名前に設定せねばなりません。ただし、ユニットテストはこのデータベー
+      スを操作しません。テストランナは、 ``DATABASE_NAME`` の前に ``test_``
+      を付けた新たなデータベースを作成し、テスト終了後にこのデータベースを
+      削除します。従って、データベースユーザには、 ``CREATE DATABASE`` を実
+      行する権限がなければなりません。
 
-To run a subset of the unit tests, append the names of the test modules to the
-``runtests.py`` command line. See the list of directories in
-``tests/modeltests`` and ``tests/regressiontests`` for module names.
+ユニットテストの一部（サブセット）を実行したい場合は、 ``runtest.py`` コマ
+ンドラインの後にテストモジュールの名前を追加してください。モジュール名は、
+``tests/modeltests`` および ``tests/regressiontests`` 以下のディレクトリ名
+を参照してください。
 
-As an example, if Django is not in your ``PYTHONPATH``, you placed
-``settings.py`` in the ``tests/`` directory, and you'd like to only run tests
-for generic relations and internationalization, type::
+例えば、 Django が ``PYTHONPATH`` 上になく、 ``settings.py`` が ``tests/``
+ディレクトリにある場合で、汎用リレーション (generic relation) と国際化
+(internationalization) だけをテストしたければ、以下のようにタイプします::
 
     PYTHONPATH=..
     ./runtests.py --settings=settings generic_relations i18n

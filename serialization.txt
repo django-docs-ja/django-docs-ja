@@ -2,7 +2,7 @@
 Django オブジェクトのシリアライズ
 =================================
 
-:revision-up-to: 5613 (0.97pre SVN)
+:revision-up-to: 7127 (0.97pre SVN)
 
 .. note::
     
@@ -153,11 +153,22 @@ UTF-8 (や，非 ASCII エンコーディング) でエンコードされたデ�
     json_serializer = serializers.get_serializer("json")()
     json_serializer.serialize(queryset, ensure_ascii=False, stream=response)
 
-.. _Writing custom serializers:
+Django のソースコードには simplejson_ モジュールが付属しています。注意して
+ほしいのは、このモジュールを直接使ってシリアライズを実行すると、一部の
+Django オブジェクトは何らかの変更が加えられた上で simplejson に渡されてしま
+うということです。特に、 `遅延翻訳オブジェクト`_ をシリアライズする場合は、
+`特殊なエンコーダ`_ が必要です。以下のように書くと、うまくいくでしょう::
 
-.. XXX
+    from django.utils.functional import Promise
+    from django.utils.encoding import force_unicode
 
-  シリアライザの自作
-  ``````````````````
+    class LazyEncoder(simplejson.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, Promise):
+                return force_unicode(obj)
+            return obj
 
-  XXX ...
+.. _lazy translation objects: ../i18n/#lazy-translation
+.. _special encoder: http://svn.red-bean.com/bob/simplejson/tags/simplejson-1.7/docs/index.html
+.. _`遅延翻訳オブジェクト`: `lazy translation objects`_
+.. _`特殊なエンコーダ`:`special encoder`_

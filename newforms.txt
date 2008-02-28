@@ -2,7 +2,7 @@
 newforms ライブラリ
 ===================
 
-:revision-up-to: 6036 (0.97pre SVN)
+:revision-up-to: 7127 (0.97pre SVN)
 
 ``django.newforms`` は、 Django に新たに導入された画期的なフォーム処理ライ
 ブラリで、従来のフォーム／マニピュレータ／バリデータフレームワークである
@@ -111,7 +111,7 @@ Django コンポーネントに対してカップリングしていません。 
         subject = forms.CharField(max_length=100)
         message = forms.CharField()
         sender = forms.EmailField()
-        cc_myself = forms.BooleanField()
+        cc_myself = forms.BooleanField(required=False)
 
 フォームは ``Field`` オブジェクトの組み合わせでできています。今回の例では、
 ``subject`` (題名)、 ``message`` (メッセージ)、 ``sender`` (送信者)、そして
@@ -603,6 +603,26 @@ Django コンポーネントに対してカップリングしていません。 
 
 デフォルトでは、 ``auto_id`` は ``'id_%s'`` に設定されています。
 
+通常、フォームのレンダ時には、ラベル名の直後にコロン (``:``) が付加されます。
+このコロンを他の文字に変更したり、文字を出力しないようにするには、
+``label_suffix`` パラメタを使います::
+
+    >>> f = ContactForm(auto_id='id_for_%s', label_suffix='')
+    >>> print f.as_ul()
+    <li><label for="id_for_subject">Subject</label> <input id="id_for_subject" type="text" name="subject" maxlength="100" /></li>
+    <li><label for="id_for_message">Message</label> <input type="text" name="message" id="id_for_message" /></li>
+    <li><label for="id_for_sender">Sender</label> <input type="text" name="sender" id="id_for_sender" /></li>
+    <li><label for="id_for_cc_myself">Cc myself</label> <input type="checkbox" name="cc_myself" id="id_for_cc_myself" /></li>
+    >>> f = ContactForm(auto_id='id_for_%s', label_suffix=' ->')
+    >>> print f.as_ul()
+    <li><label for="id_for_subject">Subject -></label> <input id="id_for_subject" type="text" name="subject" maxlength="100" /></li>
+    <li><label for="id_for_message">Message -></label> <input type="text" name="message" id="id_for_message" /></li>
+    <li><label for="id_for_sender">Sender -></label> <input type="text" name="sender" id="id_for_sender" /></li>
+    <li><label for="id_for_cc_myself">Cc myself -></label> <input type="checkbox" name="cc_myself" id="id_for_cc_myself" /></li>
+
+ラベルの付加は、ラベルの最後の文字が区切り文字 (``.``, ``!``, ``?``, ``:``
+のいずれか) でない場合にのみ行われます。
+
 .. _Notes on field ordering:
 
 フィールドの並び順について
@@ -647,6 +667,32 @@ Django コンポーネントに対してカップリングしていません。 
     <p><ul class="errorlist"><li>Enter a valid e-mail address.</li></ul></p>
     <p>Sender: <input type="text" name="sender" value="invalid e-mail address" /></p>
     <p>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></p>
+
+.. _Customizing the error list format:
+
+エラーリストの出力形式をカスタマイズする
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+デフォルトでは、バリデーション時エラーの出力内容は、
+``django.newforms.util.ErrorList`` を使ってフォーマットされます。エラーの表
+示に他のクラスを使いたければ、以下のようにフォームの生成時に指定します::
+
+    >>> from django.newforms.util import ErrorList
+    >>> class DivErrorList(ErrorList):
+    ...     def __unicode__(self):
+    ...         return self.as_divs()
+    ...     def as_divs(self):
+    ...         if not self: return u''
+    ...         return u'<div class="errorlist">%s</div>' % ''.join([u'<div class="error">%s</div>' % e for e in self])
+    >>> f = ContactForm(data, auto_id=False, error_class=DivErrorList)
+    >>> f.as_p()
+    <div class="errorlist"><div class="error">This field is required.</div></div>
+    <p>Subject: <input type="text" name="subject" maxlength="100" /></p>
+    <p>Message: <input type="text" name="message" value="Hi there" /></p>
+    <div class="errorlist"><div class="error">Enter a valid e-mail address.</div></div>
+    <p>Sender: <input type="text" name="sender" value="invalid e-mail address" /></p>
+    <p>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></p>
+
 
 .. _More granular output:
 
@@ -819,6 +865,34 @@ Django コンポーネントに対してカップリングしていません。 
     </ul>
     </form>
 
+.. _Highlighting required fields in templates:
+
+必須のフィールドをテンプレート中でハイライト表示する
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ユーザに示必須のフィールドを示すという処理は、よく行われます。以下では、上
+の例を変更して、必須のフィールドの後ろにアスタリスクを挿入しています::
+
+    <form method="post" action="">
+    <dl>
+    {% for field in form %}
+        <dt>{{ field.label_tag }}{% if field.field.required %}*{% endif %}</dt>
+        <dd>{{ field }}</dd>
+        {% if field.help_text %}<dd>{{ field.help_text }}</dd>{% endif %}
+        {% if field.errors %}<dd class="myerrors">{{ field.errors }}</dd>{% endif %}
+    {% endfor %}
+    </dl>
+    <input type="submit" />
+    </form>
+
+``{% if field.field.required %}*{% endif %}`` という部分が新たに追加されて
+いる部分です。このコードは、フィールドが必須である場合にのみ、アスタリスク
+を追加します。
+
+Django は ``field.required`` ではなく、 ``field.field.required`` をチェック
+しているので注意してください。テンプレート上では、 ``field`` は
+``newforms.forms.BoundField`` のインスタンスであり、実際のフィールドインス
+タンスは  ``field`` 属性の中に保持しています。
 
 .. _Binding uploaded files to a form:
 
@@ -863,6 +937,30 @@ Django コンポーネントに対してカップリングしていません。 
 
     # Unbound form with a image field
     >>> f = ContactFormWithMugshot()
+
+.. _Testing for multipart forms:
+
+マルチパート形式のフォームをテストする
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+再利用可能なビューやテンプレートをを書いているのなら、フォームがマルチパー
+ト形式であるかどうか前もって分からない場合もあるでしょう。
+``is_multipart()`` メソッドを使うと、フォームがマルチパート形式でエンコード
+されたデータの提出を要求しているかどうかを調べられます::
+
+    >>> f = ContactFormWithMugshot()
+    >>> f.is_multipart()
+    True
+
+テンプレートの中では、以下のようにして使います::
+
+    {% if form.is_multipart %}
+        <form enctype="multipart/form-data" method="post" action="/foo/">
+    {% else %}
+        <form method="post" action="/foo/">
+    {% endif %}
+    {% form %}
+    </form>
 
 
 .. _Subclassing forms:
@@ -910,6 +1008,24 @@ Django コンポーネントに対してカップリングしていません。 
     <li>Last name: <input type="text" name="last_name" /></li>
     <li>Instrument: <input type="text" name="instrument" /></li>
     <li>Haircut type: <input type="text" name="haircut_type" /></li>
+
+.. _Prefixes for forms:
+
+フォームのプレフィクス
+-----------------------
+
+Django のフォームは、一つの ``<form>`` タグの中に複数入れられます。
+各々のフォームに独自の名前空間を持たせるには、 ``prefix`` キーワード引数を
+使います::
+
+    >>> mother = PersonForm(prefix="mother")
+    >>> father = PersonForm(prefix="father")
+    >>> print mother.as_ul()
+    <li><label for="id_mother-first_name">First name:</label> <input type="text" name="mother-first_name" id="id_mother-first_name" /></li>
+    <li><label for="id_mother-last_name">Last name:</label> <input type="text" name="mother-last_name" id="id_mother-last_name" /></li>
+    >>> print father.as_ul()
+    <li><label for="id_father-first_name">First name:</label> <input type="text" name="father-first_name" id="id_father-first_name" /></li>
+    <li><label for="id_father-last_name">Last name:</label> <input type="text" name="father-last_name" id="id_father-last_name" /></li>
 
 
 .. _Fields:
@@ -1101,7 +1217,7 @@ Django の古いフォーム／検証フレームワークを使ったことが�
     ...     subject = forms.CharField(max_length=100, help_text='100 characters max.')
     ...     message = forms.CharField()
     ...     sender = forms.EmailField(help_text='A valid e-mail address, please.')
-    ...     cc_myself = forms.BooleanField()
+    ...     cc_myself = forms.BooleanField(required=False)
     >>> f = HelpTextContactForm(auto_id=False)
     >>> print f.as_table()
     <tr><th>Subject:</th><td><input type="text" name="subject" maxlength="100" /><br />100 characters max.</td></tr>
@@ -1118,6 +1234,33 @@ Django の古いフォーム／検証フレームワークを使ったことが�
     <p>Message: <input type="text" name="message" /></p>
     <p>Sender: <input type="text" name="sender" /> A valid e-mail address, please.</p>
     <p>Cc myself: <input type="checkbox" name="cc_myself" /></p>
+
+``error_messages``
+~~~~~~~~~~~~~~~~~~
+
+**開発版の Django で新たに追加された機能です**
+
+``error_messages`` 引数を使うと、フィールドが送出するデフォルトのメッセージ
+をオーバライドできます。オーバライドしたいメッセージに対応する文字列をキー
+とし、メッセージを値に持つ辞書を渡してください。例えば、デフォルトのメッセー
+ジが以下のようだったとします::
+
+    >>> generic = forms.CharField()
+    >>> generic.clean('')
+    Traceback (most recent call last):
+      ...
+    ValidationError: [u'This field is required.']
+
+カスタムのエラーメッセージは以下のようにして設定します::
+
+    >>> name = forms.CharField(error_messages={'required': 'Please enter your name'})
+    >>> name.clean('')
+    Traceback (most recent call last):
+      ...
+    ValidationError: [u'Please enter your name']
+
+各フィールドで定義されているエラーメッセージのキーは、後述の
+`組み込みフィールドクラス`_ の節で定義しています。
 
 .. _Dynamic initial values:
 
@@ -1187,9 +1330,22 @@ Django の古いフォーム／検証フレームワークを使ったことが�
 ~~~~~~~~~~~~~~~~
 
     * デフォルトのウィジェット: ``CheckboxInput``
-    * 空のフォームデータに対する値: ``None``
+    * 空のフォームデータに対する値: ``False``
     * Python データへの正規化: Python の ``True`` または ``False`` 値
-    * バリデーションなし (``ValidationError`` を送出しない)
+    * ``required=True`` の場合、チェックボックスがチェックされているか (値
+      が ``True`` であるか) 検証します。
+    * エラーメッセージのキー: ``required``
+
+**開発版の Django で新たに追加された機能:**  ``CheckboxInput`` (および
+標準の ``BooleanField``) に空の値を指定した場合のデフォルト値は、開発版では
+``None`` から ``False`` に変更されました。
+
+.. note::
+    全てのフィールドのサブクラスにデフォルトで ``required=True`` が設定され
+    るようになったので、バリデーション条件の設定は重要です。チェックされる
+    場合とされない場合のあるチェックボックスをフォームに含めたい場合は、
+    ``BooleanField`` を生成する際に ``required=False`` を忘れずに指定せねば
+    なりません。
 
 ``CharField``
 ~~~~~~~~~~~~~
@@ -1197,8 +1353,8 @@ Django の古いフォーム／検証フレームワークを使ったことが�
     * デフォルトのウィジェット: ``TextInput``
     * 空のフォームデータに対する値: ``''`` (空文字列)
     * Python データへの正規化: Unicode 文字列オブジェクト
-    * ``max_length`` や ``min_length`` を指定しないかぎり、
-      バリデーションなし
+    * ``max_length`` または ``min_length`` が指定された場合、文字列長を検証
+      します。それ以外の場合、どのような入力も valid とみなします。
 
 オプションの引数として、 ``max_length`` と ``min_length`` の二つをとれます。
 これらの引数を指定すると、文字列長が最大、あるいは最小値の条件を満たしてい
@@ -1211,6 +1367,7 @@ Django の古いフォーム／検証フレームワークを使ったことが�
     * 空のフォームデータに対する値: ``''`` (空文字列)
     * Python データへの正規化: Unicode 文字列オブジェクト
     * 入力値が選択肢内にある値かどうか検証します。
+    * エラーメッセージのキー: ``required``, ``invalid_choice``
 
 追加の引数として、 ``choices`` 引数をとります。 ``choices`` 引数はイテレー
 ション可能オブジェクト (たとえばリストやタプルなど) で、各要素はフィールド
@@ -1224,6 +1381,7 @@ Django の古いフォーム／検証フレームワークを使ったことが�
     * Python データへの正規化: Python ``datetime.date`` オブジェクト
     * 入力値が ``datetime.date`` や ``datetime.datetime`` オブジェクト、ま
       たは特定の日付フォーマットの形式に従っているか検証します。
+    * エラーメッセージのキー: ``required``, ``invalid``
 
 オプションの引数として、 ``input_formats`` をとります。 ``input_formats``
 は、文字列から有効な ``datetime.date`` オブジェクトへの変換を試みるために使
@@ -1242,10 +1400,11 @@ Django の古いフォーム／検証フレームワークを使ったことが�
 ~~~~~~~~~~~~~~~~~
 
     * デフォルトのウィジェット: ``TextInput``
-    * 空のフォームデータに対する値: ``None``
+    * 空のフォームデータに対する値: ``DateTimeInput``
     * Python データへの正規化: Python ``datetime.datetime`` オブジェクト
     * 入力値が ``datetime.date`` や ``datetime.datetime`` オブジェクト、ま
       たは特定の日付フォーマットの形式に従っているか検証します。
+    * エラーメッセージのキー: ``required``, ``invalid``
 
 オプションの引数として、 ``input_formats`` をとります。 ``input_formats``
 は、文字列から有効な ``datetime.datetime`` オブジェクトへの変換を試みるため
@@ -1264,6 +1423,9 @@ Django の古いフォーム／検証フレームワークを使ったことが�
     '%m/%d/%y %H:%M',        # '10/25/06 14:30'
     '%m/%d/%y',              # '10/25/06'
 
+**開発版の Django で新たに追加された機能:** ``DateTimeField`` はデフォルト
+で ``TextInput`` を使っていましたが、変更されました。
+
 ``DecimalField``
 ~~~~~~~~~~~~~~~~
 
@@ -1274,6 +1436,9 @@ Django の古いフォーム／検証フレームワークを使ったことが�
     * Python データへの正規化: Python の ``decimal`` オブジェクト
     * 値が 10 進小数に変換可能か検証します。文字列の先頭および末尾の空白文
       字は除去されます。
+    * エラーメッセージのキー: ``required``, ``invalid``, ``max_value``,
+      ``min_value``, ``max_digits``, ``max_decimal_places``,
+      ``max_whole_digits``
 
 ``max_value``, ``min_value``, ``max_digits``, および ``decimal_places`` の
 4 つのオプション引数を取ります。 ``max_digits`` は最大の桁数 (先頭のゼロ詰
@@ -1288,6 +1453,7 @@ Django の古いフォーム／検証フレームワークを使ったことが�
     * Python データへの正規化: Unicode 文字列オブジェクト
     * やや複雑な正規表現を使って、入力値が有効なメールアドレスであるか検証
       します。
+    * エラーメッセージのキー: ``required``, ``invalid``
 
 オプションの引数として、 ``max_length`` と ``min_length`` の二つをとれます。
 これらの引数を指定すると、文字列長が最大、あるいは最小値の条件を満たしてい
@@ -1303,6 +1469,7 @@ Django の古いフォーム／検証フレームワークを使ったことが�
     * Python データへの正規化: ファイルコンテンツとファイル名を一つのオブジェ
       クトとしてラップする ``UploadedFile`` オブジェクト。
     * フォームに結びつけられているファイルデータが空でないか検証します。
+    * エラーメッセージのキー: ``required``, ``invalid``, ``missing``, ``empty``
 
 ``UploadedFile`` オブジェクトには、以下の 2 つの属性があります:
 
@@ -1332,6 +1499,8 @@ Django の古いフォーム／検証フレームワークを使ったことが�
       クトとしてラップする ``UploadedFile`` オブジェクト。
     * 空でないファイルデータがフォームに結びつけられていて、かつその内容が
       PIL で扱えるファイル形式であるか検証します。
+    * エラーメッセージのキー: ``required``, ``invalid``, ``missing``, ``empty``,
+      ``invalid_image``
 
 ImageField を使いたい場合、 `Python Imaging Library`_ をインストールしてお
 かねばなりません。
@@ -1350,9 +1519,21 @@ ImageField を使いたい場合、 `Python Imaging Library`_ をインストー
     * Python データへの正規化: Python 整数型または長整数型
     * 入力値が整数であるか検証します。 Python の ``int()`` 関数と同様、先頭
       や末尾に空白があってもかまいません。
+    * エラーメッセージのキー: ``required``, ``invalid``, ``max_value``,
+      ``min_value``
 
 オプションの引数として、指定可能な数値の範囲を表す  ``max_value`` および
 ``min_value`` をとります。
+
+``IPAddressField``
+~~~~~~~~~~~~~~~~~~
+
+    * デフォルトのウィジェット: ``TextInput``
+    * 空のフォームデータに対する値: ``''`` (空の文字列)
+    * Python データへの正規化: Unicode オブジェクト
+    * 正規表現を使って、値が正しい IPv4 アドレス形式であるか検証します。
+    * エラーメッセージのキー: ``required``, ``invalid``
+
 
 ``MultipleChoiceField``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1361,6 +1542,7 @@ ImageField を使いたい場合、 `Python Imaging Library`_ をインストー
     * 空のフォームデータに対する値: ``[]`` (空のリスト)
     * Python データへの正規化: Unicode 文字列オブジェクトのリスト
     * 入力値のリスト中の全ての値が選択肢内の値であるかどうか検証します。
+    * エラーメッセージのキー: ``required``, ``invalid_choice``, ``invalid_list``
 
 追加の引数として、 ``choices`` 引数をとります。 ``choices`` 引数はイテレー
 ション可能オブジェクト (たとえばリストやタプルなど) で、各要素はフィールド
@@ -1381,6 +1563,7 @@ ImageField を使いたい場合、 `Python Imaging Library`_ をインストー
     * 空のフォームデータに対する値: ``''`` (空文字列)
     * Python データへの正規化: Unicode 文字列オブジェクト
     * 入力値が特定の正規表現にマッチするかどうか検証します。
+    * エラーメッセージのキー: ``required``, ``invalid``
 
 必須の引数 ``regex`` をとります。 ``regex`` は正規表現を表す文字列またはコ
 ンパイル済みの正規表現オブジェクトです。
@@ -1392,10 +1575,12 @@ ImageField を使いたい場合、 `Python Imaging Library`_ をインストー
     ======================  =================================================
     ``max_length``          文字列の最大長です。
     ``min_length``          文字列の最小長です。
-    ``error_message``       バリデーションに失敗したときに返すエラーメッセー
-                            ジです。メッセージを指定しなければ、汎用のエラー
-              		    メッセージを使います。
     ======================  =================================================
+
+以前のバージョンとの互換性のため、オプション引数 ``error_message`` も指定で
+きるようになっています。エラーメッセージを指定したければ、
+``error_messages`` を使って、 ``'invalid'`` をキーにしたメッセージを指定す
+るよう薦めます。
 
 ``TimeField``
 ~~~~~~~~~~~~~
@@ -1405,6 +1590,7 @@ ImageField を使いたい場合、 `Python Imaging Library`_ をインストー
     * Python データへの正規化: Python ``datetime.time`` オブジェクト
     * 入力値が ``datetime.time`` オブジェクトまたは特定の日付フォーマットの
       形式に従っているか検証します。
+    * エラーメッセージのキー: ``required``, ``invalid``
 
 オプションの引数として、 ``input_formats`` をとります。 ``input_formats``
 は、文字列から有効な ``datetime.time`` オブジェクトへの変換を試みるために使
@@ -1423,6 +1609,7 @@ ImageField を使いたい場合、 `Python Imaging Library`_ をインストー
     * 空のフォームデータに対する値: ``''`` (空文字列)
     * Python データへの正規化: Unicode 文字列オブジェクト
     * 入力値が有効な URL であるかどうか検証します。
+    * エラーメッセージのキー: ``required``, ``invalid``, ``invalid_link``
 
 以下のオプションの引数をとります:
 
@@ -1582,7 +1769,7 @@ ImageField を使いたい場合、 `Python Imaging Library`_ をインストー
         subject = forms.CharField(max_length=100)
         message = forms.CharField()
         senders = MultiEmailField()
-        cc_myself = forms.BooleanField()
+        cc_myself = forms.BooleanField(required=False)
 
 .. _Widgets:
 .. _`ウィジェット`:
@@ -1605,6 +1792,7 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
     ``HiddenInput``               ``<input type='hidden' ...``
     ``MultipleHiddenInput``       複数の ``<input type='hidden' ...``
     ``FileInput``                 ``<input type='file' ...``
+    ``DateTimeInput``             ``<input type='text' ...``
     ``Textarea``                  ``<textarea>...</textarea>``
     ``CheckboxInput``             ``<input type='checkbox' ...``
     ``Select``                    ``<select><option ...``
@@ -1617,6 +1805,9 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
     ``SplitDateTimeWidget``       日付と時刻を表す二つの ``TextInput``
                                   ウィジェットに対するラッパ
     ============================  ===========================================
+
+**開発版の Django で新たに追加された機能:** ``DateTimeInput`` が追加されて
+います。
 
 .. _Specifying widgets:
 
@@ -1749,424 +1940,16 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
 モデルからフォームを生成する
 ============================
 
-データベース指向のアプリケーションを開発しているなら、 Django のモデルとほ
-ぼ同じ内容のフォームを作ることもあるでしょう。たとえば、 ``BlogComment`` と
-いうモデルを作っておき、ユーザがコメントを入力できるようなフォームを作成し
-たいような場合です。こうした状況では、フォームの中でフィールドタイプをい
-ちいち定義するのは二度手間というものです。なぜなら、モデル中にすでにフィー
-ルドを定義しているからです。
-
-そこで、 Django では、 Django モデルからフォームクラスを生成できるヘルパ関
-数をいくつか提供しています。
-
-``form_for_model()``
---------------------
-
-``django.newforms.form_for_model()`` メソッドは、引数に指定したモデルの定義
-に従ってフォームを生成します。このメソッドは、モデルクラスを渡すとフォーム
-クラスを返します。フォームクラスの中には、モデル中の各フィールドに対応した
-フォームフィールドが入っています。
-
-例を示します::
-
-    >>> from django.newforms import form_for_model
-
-    # Create the form class.
-    >>> ArticleForm = form_for_model(Article)
-
-    # Create an empty form instance.
-    >>> f = ArticleForm()
-
-繰り返しになりますが、 ``form_for_model()`` は、モデルのインスタンスでなく、
-*クラス* を引数にとり、フォームクラスのインスタンスではなく *クラス* を返し
-ます。
-
-.. _Field types:
-
-フィールド型
-~~~~~~~~~~~~
-
-生成されたフォームクラスは、各モデルフィールドに対応したフォームフィールド
-を持っています。各モデルフィールドは、デフォルトのフォームフィールドに対応
-しています。たとえば、モデルクラス上の ``CharField`` は、フォーム上でも
-``CharField`` 型のフォームフィールドとして表現されます ``ManyToManyField``
-は ``MultipleChoiceField`` として表現されます。モデルフィールド型からフォー
-ムフィールド型への変換表を以下に示します:
-
-    ===============================  ========================================
-    モデルフィールド                 フォームフィールド
-    ===============================  ========================================
-    ``AutoField``                    フィールド上に表示されません
-    ``BooleanField``                 ``BooleanField``
-    ``CharField``                    ``max_length`` がモデルフィールドの
-                                     ``max_length`` と同じ値の ``CharField``
-    ``CommaSeparatedIntegerField``   ``CharField``
-    ``DateField``                    ``DateField``
-    ``DateTimeField``                ``DateTimeField``
-    ``DecimalField``                 ``DecimalField``
-    ``EmailField``                   ``EmailField``
-    ``FileField``                    ``FileField``
-    ``FilePathField``                ``CharField``
-    ``FloatField``                   ``FloatField``
-    ``ForeignKey``                   ``ModelChoiceField`` (下記参照)
-    ``ImageField``                   ``ImageField``
-    ``IntegerField``                 ``IntegerField``
-    ``IPAddressField``               ``CharField``
-    ``ManyToManyField``              ``ModelMultipleChoiceField`` (下記参照)
-    ``NullBooleanField``             ``CharField``
-    ``PhoneNumberField``             (``django.contrib.localflavor.us`` の)
-                                     ``USPhoneNumberField``
-    ``PositiveIntegerField``         ``IntegerField``
-    ``PositiveSmallIntegerField``    ``IntegerField``
-    ``SlugField``                    ``CharField``
-    ``SmallIntegerField``            ``IntegerField``
-    ``TextField``                    ``widget=Textarea`` の ``CharField``
-    ``TimeField``                    ``TimeField``
-    ``URLField``                     ``verify_exists`` が モデルフィールド
-                                     の ``verify_exists`` と同じ値の 
-                                     ``URLField``
-    ``USStateField``                 ``widget=USStateSelect`` の ``CharField``
-                                     (``USStateSelect`` は
-                                     ``django.contrib.localflavor.us`` から)
-    ``XMLField``                     ``widget=Textarea`` の ``CharField``
-    ===============================  ========================================
-
-
-
-.. note::
-    ``FloatField`` フォームフィールドと、 ``DecimalField`` モデルフィールド
-    およびフォームフィールドは、開発版で新たに登場した機能です。
-
-``ForeignKey`` と ``ManyToManyField`` モデルフィールド型は特別なケースとし
-て扱われます:
-
-    * ``ForeignKey`` は ``django.newforms.ModelChoiceField`` になります。
-      これは選択肢が ``QuerySet`` の内容であるような ``ChoiceField`` です。
-
-    * ``ManyToManyField`` は ``django.newforms.ModelMultipleChoiceField``
-      で表されます。これは選択肢が ``QuerySet`` の内容であるような
-      ``MultipleChoiceField`` です。
-
-加えて、各フォームフィールドには以下のような属性が追加されます:
-
-    * モデルフィールドが ``blank=True`` の場合、対応するフォームフィールド
-      の ``required`` 属性が ``False`` になります。それ以外の場合は
-      ``required=True`` です。
-
-    * フォームフィールドの ``label`` 属性は、モデルフィールドの
-      ``verbose_name`` の頭文字を大文字にしたものになります。
-
-    * フォームフィールドの ``help_text`` 属性は、モデルフィールドの
-      ``help_text`` の値になります。
-
-    * モデルフィールドに ``choices`` が設定されている場合、フォームフィール
-      ドの ``widget`` 型は ``Select`` になり、選択肢として ``choices`` の内
-      容が使われます。
-
-最後に、モデルフィールドから生成したフォームフィールドの値はオーバライドで
-きるということに注意してください。詳しくは後述の
-「 `デフォルトフィールド型のオーバライド`_ 」 を参照してください。
-
-.. _`デフォルトフィールド型のオーバライド`: `Overriding the default field types`_
-
-
-.. _A full example:
-
-詳細な例
-~~~~~~~~
-
-まず、以下のようなモデル群を想定します::
-
-    from django.db import models
-
-    TITLE_CHOICES = (
-        ('MR', 'Mr.'),
-        ('MRS', 'Mrs.'),
-        ('MS', 'Ms.'),
-    )
-
-    class Author(models.Model):
-        name = models.CharField(max_length=100)
-        title = models.CharField(max_length=3, choices=TITLE_CHOICES)
-        birth_date = models.DateField(blank=True, null=True)
-
-        def __unicode__(self):
-            return self.name
-
-    class Book(models.Model):
-        name = models.CharField(max_length=100)
-        authors = models.ManyToManyField(Author)
-
-``form_for_model(Author)`` を呼び出すと、以下のクラスと等価なフォームクラス
-を返します::
-
-    class AuthorForm(forms.Form):
-        name = forms.CharField(max_length=100)
-        title = forms.CharField(max_length=3,
-                    widget=forms.Select(choices=TITLE_CHOICES))
-        birth_date = forms.DateField(required=False)
-
-``form_for_model(Book)`` を呼び出すと、以下のクラスと等価なフォームクラス
-を返します::
-
-    class BookForm(forms.Form):
-        name = forms.CharField(max_length=100)
-        authors = forms.ModelMultipleChoiceField(queryset=Author.objects.all())
-
-.. _`The save() method`:
-
-``save()`` メソッド
-~~~~~~~~~~~~~~~~~~~
-
-``form_for_model()`` で生成したフォームにも、 ``save()`` メソッドがあります。
-``save()`` メソッドは、フォームに結びつけられたデータベースオブジェクトの生
-成と保存を行います。例えば::
-
-    # POST データからフォームインスタンスを生成する
-    >>> f = ArticleForm(request.POST)
-
-    # フォームのデータから新たな Article オブジェクトを生成して保存する
-    >>> new_article = f.save()
-
-``save()`` は、フォーム中のデータの検証に成功していない場合、つまり、
-``form.errors`` が真の場合に ``ValueError`` を送出します。
-
-この ``save()`` メソッドには、オプションとして ``commit`` キーワード引数を
-渡せます。 ``commit`` には ``True`` または ``False`` を指定します。
-``commit=False`` を指定して ``save()`` を呼び出すと、まだデータベースに保存
-されていない状態のモデルインスタンスを返します。この場合、モデルインスタン
-スを保存するためには、明示的にインスタンスの ``save()`` を呼び出さねばなり
-ません。この機能は、モデルインスタンスを保存する前に何らかの前処理を行いた
-い場合に便利です。 ``commit`` のデフォルト値は ``True`` に設定されています。
-
-モデル内で多対多のリレーションを定義している場合、 ``commit=False`` を使っ
-た場合の副作用がもう一つ生じます。モデルが多対多のリレーションを持ち、フォー
-ムを保存するときに ``commit=False`` を指定すると、その時点で、 Django は多
-対多のリレーション先のオブジェクトを表現するフォームデータを保存できなくな
-ります。これは、データベース上にリレーション元のインスタンスが保存されてい
-ないため、多対多のデータを保存できないからです。
-
-この問題を回避するため、 Django は ``form_for_model`` で作成されたフォーム
-を ``commit=False`` で保存すると、 ``save_m2m()`` というメソッドをフォーム
-に追加します。フォームを手動で保存した後で、 ``save_m2m()`` を呼び出して、
-多対多のフォームデータを保存できます::
-
-    # POST データからフォームインスタンスを生成します。
-    >>> f = AuthorForm(request.POST)
-
-    # フォームから新たにインスタンスを生成しますが、保存はしません。
-    >>> new_author = f.save(commit=False)
-
-    # 作成した new_author を色々と操作します。
-    ...
-    # インスタンスを保存します。
-    >>> new_author.save()
-
-    # フォームの多対多の情報を保存します。
-    >>> f.save_m2m()
-
-``save_m2m()`` を呼び出す必要があるのは、あくまでも ``save(commit=False)``
-した時だけです。単にフォームの ``save()`` を呼び出した場合には、多対多のデー
-タを含む全てのデータが保存されるので、特に追加で何かのメソッドを呼び出す必
-要はありません。例えば::
- 
-    # POST データからフォームインスタンスを生成します。
-    >>> f = AuthorForm(request.POST)
-
-    # 新たな Author インスタンスを生成して保存します。これ以上特に必要な
-    # 操作はありません。
-    >>> new_author = f.save()
-
-
-.. _Using an alternate base class:
-
-フォームのベースクラスを変更する
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-``form_for_model()`` が生成するフォームにカスタムのメソッドを追加したい場合、
-``django.newfdorms.BaseForm`` を拡張して、その中にカスタムメソッドを入れま
-す。そして、 ``form_for_model()`` を呼び出す際に、 ``form`` パラメタに自作
-のフォームを指定してベースクラスにさせます::
-
-    # 自作のベースクラスを作成する
-    >>> class MyBase(BaseForm):
-    ...     def my_method(self):
-    ...         # Do whatever the method does
-
-    # 自作のベースクラスを使ってフォームクラスを生成する
-    >>> ArticleForm = form_for_model(Article, form=MyBase)
-
-    # フォームのインスタンス化
-    >>> f = ArticleForm()
-
-    # ベースクラスのメソッドを使う
-    >>> f.my_method()
-
-.. _Using a subset of fields on the form:
-
-フォームの一部のフィールドだけを使う
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-**開発版の Django で新たに追加された機能です**
-
-場合によっては、モデルからフォームを生成する際に、モデルの一部のフィールド
-だけを表示したいこともあるでしょう。 ``form_for_model()`` に入れるフィール
-ドを、モデルフィールドのサブセットにするには、二つの方法があります:
-
-    1. モデルのフィールドに ``editable=False`` を設定しておくと、
-       ``form_for_model()`` から生成されたフォームは *常に* そのフィールド
-       を含まなくなります。
-
-    2. ``form_for_model()`` に ``fields`` 引数を指定します。この引数を指定
-       する場合、フォームに含めたいフィールド名のリストにせねばなりません。
-
-       例えば、 ``Author`` モデルからフォームを生成するときに、 ``name`` と
-       ``title`` フィールドだけをフォームに含めたいなら、 ``fields`` を以下
-       のように定義します::
-
-           PartialArticleForm = form_for_model(Author, fields=('name', 'title'))
-
-.. note::
-
-    ``form_for_model()`` に ``fields`` を指定してフォームを生成する場合、
-    フォームに *含めない* フィールドは、デフォルト値を持つか ``None`` を値
-    にとりえるフィールドであるかよく確認してください。フォーム内に含まれな
-    いフィールドがあると、フォームを使ってオブジェクトを生成した際に、フィー
-    ルドから値が提供されないことがあり、そのためにインスタンスを保存できな
-    くなるからです。
-
-.. _Overriding the default field types:
-
-デフォルトのフィールド型をオーバライドする
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-上の `フィールド型 <#field-types>`_ に挙げたデフォルトフィールド型は、いわ
-ゆる「気の利いたデフォルト値」にすぎません。モデルに ``DateField`` が入って
-いる場合、普通はフォームにも ``DateField`` が入っていてほしいでしょう。
-とはいえ、 ``form_for_model()`` は、特定のモデルフィールドに対してフォー
-ムのフィールド型を変更できるという柔軟さも備えています。フィールド型の変更
-は「フォームフィールドコールバック (formfield callback)」で行います。
-
-フォームフィールドコールバック関数は、モデルフィールドを指定して呼び出すと、
-フォームフィールドのインスタンスを返します。フォームを生成する際、
-``form_for_model()`` はフォームフィールドコールバックを使って、フォームフィー
-ルドの型を決定します。
-
-デフォルトでは、 ``form_for_model()`` は、モデルフィールドの
-``formfield()`` メソッドを呼び出します::
-
-    def default_callback(field, **kwargs):
-        return field.formfield(**kwargs)
-
-``kwargs`` は、 ``required=True`` や ``label='Foo'`` のような、フォームフィー
-ルドに渡されることになるキーワード引数です。
-
-例えば、モデル上の全ての ``DateField`` に対して ``MyDateFormField`` を使い
-たい場合、以下のようにコールバックを定義します::
-
-    >>> def my_callback(field, **kwargs):
-    ...     if isinstance(field, models.DateField):
-    ...         return MyDateFormField(**kwargs)
-    ...     else:
-    ...         return field.formfield(**kwargs)
-
-    >>> ArticleForm = form_for_model(Article, formfield_callback=my_callback)
-
-コールバックは、自分がデフォルト設定に対して手を加えたい対象のフィールド以
-外も含めた、 *全ての* モデルフィールドを扱えねばならないので注意が必要です。
-上の例で ``else`` 節にデフォルトの挙動を実装しているのはそのためです。
-
-.. _Finding the model associated with a form:
-
-フォームに関連づけられたモデルを取り出す
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-フォームの構築に使われたモデルクラスは、生成されたフォームの ``_model`` プ
-ロパティからアクセスできます::
-
-    >>> ArticleForm = form_for_model(Article)
-    >>> ArticleForm._model
-    <class 'myapp.models.Article'>
-
-``form_for_instance()``
------------------------
-
-``form_for_instance()`` は ``form_for_model()`` に似ていますが、モデルのク
-ラスではなく、モデルのインスタンスを引数にとります::
-
-    # Author オブジェクトを生成
-    >>> a = Author(name='Joe Smith', title='MR', birth_date=None)
-    >>> a.save()
-
-    # 特定の Author オブジェクト用のフォームを生成
-    >>> AuthorForm = form_for_instance(a)
-
-    # フォームのインスタンス化
-    >>> f = AuthorForm()
-
-``form_for_instance()`` で生成したフォームクラスでインスタンスを生成すると、
-フォームフィールドの初期値はインスタンスから取り出されます。ただし、このデー
-タはフォームに結びつけられていません。従って、フォームを保存する前に、デー
-タをフォームに結びつける必要があります。
-
-``form_for_instance()`` で生成したフォームのインスタンスに対して ``save()``
-を呼び出すと、データベース上のインスタンスが更新されます。
-``form_for_model()`` と同様、データの検証に失敗すると、 ``save()`` は
-``ValueError`` 例外を送出します。
-
-``form_for_instance()`` は、 ``form``, ``fields`` および
-``formfield_callback`` パラメタをとります。これらの引数の挙動は
-``form_for_model()`` の同名の引数と同じです。
-
-前に解説した「 `コンタクトフォーム`_ 」のビューを少し書き直してみましょう。
-以下のような ``Message`` モデルを使って、コンタクトフォームへの入力内容を保
-存しているとしましょう::
-
-    class Message(models.Model):
-        subject = models.CharField(max_length=100)
-        message = models.TextField()
-        sender = models.EmailField()
-        cc_myself = models.BooleanField()
-
-``form_for_model()`` を使えば、このモデルからフォームを作成できます。
-また、 ``form_for_instance()`` を使えば、 ``Message`` インスタンスを編集す
-るためのフォームも生成できます。前の `コンタクトフォーム`_ ビューをちょっと
-変えて、 ``Message`` の ``id`` 値を引数に取るようにして、保存されている
-``Message`` を編集できるようなフォームを作成してみます::
-
-    def contact_edit(request, msg_id):
-        # メッセージ id を使ってフォームを生成します。
-        message = get_object_or_404(Message, id=msg_id)
-        ContactForm = form_for_instance(message)
-
-        if request.method == 'POST':
-            form = ContactForm(request.POST)
-            if form.is_valid():
-                form.save()
-                return HttpResponseRedirect('/url/on_success/')
-        else:
-            form = ContactForm()
-        return render_to_response('contact.html', {'form': form})
-
-このビューのポイントは、 ``ContactForm`` クラスの生成方法と、リクエストメソッ
-ドが ``POST`` でない場合のブロックでは、 ``message`` インスタンスの値がフォー
-ムフィールドの初期値に使われるということです。
-
-.. _contact form: `Simple view example`_
-.. _earlier: `Simple view example`_
-.. _`コンタクトフォーム`: `contact form`_
-
-
-.. _When should you use form_for_model() and form_for_instance():
-
-``form_for_model()`` や ``form_for_instance()`` はいつ使うもの?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-``form_for_model()`` や ``form_for_instance()`` は、一般的なケースを扱うた
-めのショートカットにすぎません。こうしたショートカットは、複数のモデルのフィー
-ルドをマップするフォームや、モデル上に *ない* フィールドの入ったフォームを
-生成したい場合には利用できません。それに、フォームクラスをこつこつ作成する
-のはちっとも難しい作業ではありません。
+モデルとフォームを組み合わせる方法として現在推奨されているのは、 
+``ModelForm`` を使う方法です。 `ModelForm のドキュメント`_ を参照してくださ
+い。
+
+``form_for_model`` や ``form_for_instance`` は撤廃されます。これらのドキュ
+メントは、 `別のドキュメント <../form_for_model>`_ に移されました。
+
+.. _ModelForms documentation: ../modelforms/
+.. _view the documentation: ../form_for_model/
+.. _`ModelForm のドキュメント`: `ModelForms documentation`_
 
 
 .. _More coming soon:
@@ -2175,9 +1958,10 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
 ======
 
 現時点でのドキュメントはこれだけです。詳しくは ``django.newforms`` のユニッ
-トテストである
-http://code.djangoproject.com/browser/django/trunk/tests/regressiontests/forms/tests.py
-を参照してください。 newforms でできることをよく理解できるはずです。
+トテスト、
+http://code.djangoproject.com/browser/django/trunk/tests/regressiontests/forms/
+を参照してください。  newforms でできることをよく理解できるはずです。（サブ
+モジュール毎に、個別のテストが入っています。）
 
 このライブラリを使ってみたくてうずうずしているなら、もう少しだけ我慢してく
 ださいね。今、コードとドキュメントの仕上げにかかっているところなんです。

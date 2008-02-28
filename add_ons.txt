@@ -2,7 +2,7 @@
 "django.contrib" 下のアドオン
 =============================
 
-:revision-up-to: 6000 (0.97pre SVN)
+:revision-up-to: 7127 (0.97pre SVN)
 
 Django は Python の `"batteries included" 哲学`_ を目指しています。 Django
 には Web 開発における課題を解くための様々な外部オプションツールがついてきま
@@ -48,9 +48,13 @@ comments
 contenttypes
 ============
 
-コンテンツの「タイプ」をフックするための軽量フレームワークです。インストー
-ルした Django モデルはそれぞれ固有のコンテンツタイプになります。まだドキュ
-メントはありません。
+コンテンツの「タイプ」をフックしするための軽量フレームワークです。
+コンテンツタイプは、インストールされている Django の個々のモデルを指します。
+
+`contenttypes のドキュメント`_ を参照してください。
+
+.. _contenttypes documentation: ../contenttypes/
+.. _`contenttypes のドキュメント`: `contenttypes documentation`_
 
 csrf
 ====
@@ -62,6 +66,19 @@ csrf
 
 .. _`csrf のドキュメント`: ../csrf/
 .. _csrf documentation: ../csrf/
+
+flatpages
+=========
+
+「フラット (flat) な」 HTML コンテンツをデータベースで扱うためのフレームワー
+クです。
+
+`flatpages のドキュメント`_ を参照してください。
+
+.. _`flatpages のドキュメント`: ../flatpages/
+.. _flatpages documentation: ../flatpages/
+
+sites_ パッケージもインストールしておく必要があります。
 
 formtools
 =========
@@ -75,9 +92,11 @@ django.contrib.formtools.preview
 「 HTML フォームを表示し、必ずプレビューを行ってからフォームデータを提出す
 る」というワークフローを抽象化したものです。
 
-この機能に関するドキュメントはまだありませんが、
-``django/contrib/formtools/preview.py`` のコードや docstring を手引きすると
-よいでしょう。
+`フォームプレビューのドキュメント`_ を参照してください。
+
+.. _form preview documentation: ../form_preview/
+ .. _`フォームプレビューのドキュメント`: `form preview documentation`_
+
 
 humanize
 ========
@@ -169,27 +188,17 @@ naturalday
 
 .. _DATE_FORMAT: ../settings/#date-format
 
-
-flatpages
-=========
-
-「フラット (flat) な」 HTML コンテンツをデータベースで扱うためのフレームワー
-クです。
-
-`flatpages のドキュメント`_ を参照してください。
-
-.. _`flatpages のドキュメント`: ../flatpages/
-.. _flatpages documentation: ../flatpages/
-
-sites_ パッケージもインストールしておく必要があります。
-
 localflavor
 ===========
 
 特定の国や文化でのみ有用な Django の短いコード (snippet) を集めたものです。
-例えば、 ``django.contrib.localflavor.usa.forms`` には、米国の郵便番号
+例えば、 ``django.contrib.localflavor.us.forms`` には、米国の郵便番号
 (U.S. zip code) を検証するための ``USZipCodeField`` が入っています。
 
+`localflavor のドキュメント`_ を参照してください。
+
+.. _localflavor documentation: ../localflavor/
+.. _`localfravor のドキュメント`: `localflavor documentation`_
 
 markup
 ======
@@ -270,6 +279,15 @@ RSS および Atom 形式の配信フィード (syndication feed) をごく簡�
 .. _`配信フィードフレームワークのドキュメント`: ../syndication_feeds/
 .. _syndication documentation: ../syndication_feeds/
 
+webdesign
+=========
+
+Web の *開発者* ではなく *デザイナ* のためのヘルパやユーティリティです。
+
+`webdesign のドキュメント`_ を参照してください。
+
+.. _Web design helpers documentation: ../webdesign/
+.. _`webdesign のドキュメント`: `Web design helpers documentation`_
 
 
 その他のアドオン
