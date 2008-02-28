@@ -4,48 +4,51 @@
 
 :revision-up-to: 7127 (0.97pre SVN)
 
-Django comes with an optional "form preview" application that helps automate
-the following workflow:
+Django には、フォームプレビュー (form preview) アプリケーションが付属してい
+ます。フォームプレビューは「HTMLフォームを表示し、プレビューを行わせ、フォー
+ム提出時に何らかの処理を行う」というワークフローを自動化する上で役立ちます:
 
-"Display an HTML form, force a preview, then do something with the submission."
+ちょっとした Python クラスを書くだけで、プレビューつきのフォームアプリケー
+ションを作成できます。
 
-To force a preview of a form submission, all you have to do is write a short
-Python class.
+.. _Overview:
 
-Overview
-=========
+概要
+=====
 
-Given a ``django.newforms.Form`` subclass that you define, this application
-takes care of the following workflow:
+フォームプレビューフレームワークは、
+``django.contrib.formtools.preview.FormPreview`` のサブクラスを定義すること
+で、以下のワークフローを管理できるようにします:
 
-    1. Displays the form as HTML on a Web page.
-    2. Validates the form data when it's submitted via POST.
-       a. If it's valid, displays a preview page.
-       b. If it's not valid, redisplays the form with error messages.
-    3. When the "confirmation" form is submitted from the preview page, calls
-       a hook that you define -- a ``done()`` method that gets passed the valid
-       data.
+    1. フォームを HTML 形式で Web ページ上に表示します。
+    2. フォームデータが POST で提出されると、データを検証します。
+       a. データの検証に成功したら、プレビューページを表示します。
+       b. 検証に失敗したら、エラーメッセージつきでフォームを再表示します。
+    3. プレビューページで「承認 (confirm)」フォームを提出すると、予め定義
+       しておいた ``done()`` メソッドをフックします。 ``dome()`` メソッドに
+       は、検証済みのデータが渡されます。
 
-The framework enforces the required preview by passing a shared-secret hash to
-the preview page via hidden form fields. If somebody tweaks the form parameters
-on the preview page, the form submission will fail the hash-comparison test.
+フォームプレビューフレームワークは、隠しフィールドを使って、プレビューペー
+ジに共有鍵のハッシュ値を渡します。プレビューページのフォームパラメタを変更
+してフォームを提出しようとすると、ハッシュ比較テストに失敗します。
 
-How to use ``FormPreview``
+.. _`How to use FormPreview`:
+
+``FormPreview`` の使い方
 ==========================
 
-    1. Point Django at the default FormPreview templates. There are two ways to
-       do this:
+    1. Django にデフォルトのフォームプレビューテンプレートの場所を設定します:
 
-       * Add ``'django.contrib.formtools'`` to your ``INSTALLED_APPS``
-         setting. This will work if your ``TEMPLATE_LOADERS`` setting includes
-         the ``app_directories`` template loader (which is the case by
-         default). See the `template loader docs`_ for more.
+       * ``INSTALLED_APPS`` 設定に ``'django.contrib.formtools'`` を追加し
+         ます。 ``TEMPLATE_LOADERS`` 設定に ``app_directories`` テンプレー
+         トローダを指定 (デフォルトで指定されています) しておく必要もありま
+         す。 `テンプレートローダのドキュメント`_ も参照してください。
 
-       * Otherwise, determine the full filesystem path to the
-         ``django/contrib/formtools/templates`` directory, and add that
-         directory to your ``TEMPLATE_DIRS`` setting.
+       * ``app_directories`` を使わない場合、 ``TEMPLATE_DIRS`` 設定に
+         ``django/contrib/formtools/templates`` の絶対パスを追加してください。
 
-    2. Create a ``FormPreview`` subclass that overrides the ``done()`` method::
+    2. ``FormPreview`` のサブクラスを作成し、 ``done()`` メソッドをオーバラ
+       イドします::
 
            from django.contrib.formtools.preview import FormPreview
            from myapp.models import SomeModel
@@ -53,47 +56,54 @@ How to use ``FormPreview``
            class SomeModelFormPreview(FormPreview):
 
                def done(self, request, cleaned_data):
-                   # Do something with the cleaned_data, then redirect
-                   # to a "success" page.
+                   # cleaned_data を使って何らかの処理を行い、
+                   # "success" ページにリダイレクトする
                    return HttpResponseRedirect('/form/success')
 
-       This method takes an ``HttpRequest`` object and a dictionary of the form
-       data after it has been validated and cleaned. It should return an
-       ``HttpResponseRedirect`` that is the end result of the form being
-       submitted.
+       このメソッドは ``HttpRequest`` オブジェクトと、バリデーション・クリー
+       ニング済みのフォームデータの入った辞書を引数にとります。メソッドは
+       プレビュー内容を承認した後に遷移する先のページにリダイレクトする
+       ``HttpResponseRedirect`` を返さねばなりません。
 
-    3. Change your URLconf to point to an instance of your ``FormPreview``
-       subclass::
+    3. URLconf を変更して、 ``FormPreview`` サブクラスを import します::
 
            from myapp.preview import SomeModelFormPreview
            from myapp.models import SomeModel
            from django import newforms as forms
 
-       ...and add the following line to the appropriate model in your URLconf::
+       そして、 URLconf に以下の行を追加します。モデルからフォームを生成す
+       るなら、以下のようにするとよいでしょう::
 
            (r'^post/$', SomeModelFormPreview(forms.models.form_for_model(SomeModel))),
 
-       Or, if you already have a Form class defined for the model::
+       独自にフォーム作成しているなら、以下のようにします::
 
            (r'^post/$', SomeModelFormPreview(SomeModelForm)),
 
-    4. Run the Django server and visit ``/post/`` in your browser.
+    4. Django のサーバを実行して、ブラウザで ``/post/`` にアクセスします。
 
 .. _template loader docs: ../templates_python/#loader-types
+.. _`テンプレートローダのドキュメント`: `template loader docs`_
 
-``FormPreview`` classes
-=======================
+.. _`FormPreview classes`:
 
-A ``FormPreview`` class is a simple Python class that represents the preview
-workflow.  ``FormPreview`` classes must subclass
-``django.contrib.formtools.preview.FormPreview`` and override the ``done()``
-method. They can live anywhere in your codebase.
-
-``FormPreview`` templates
+``FormPreview`` のクラス
 =========================
 
-By default, the form is rendered via the template ``formtools/form.html``, and
-the preview page is rendered via the template ``formtools.preview.html``.
-These values can be overridden for a particular form preview by setting
-``preview_template`` and ``form_template`` attributes on the FormPreview
-subclass. See ``django/contrib/formtools/templates`` for the default templates.
+フォームプレビュークラスは、プレビューのワークフローを表現する単純な Python
+のクラスです。 フォームプレビュークラスを作成するときには、
+``django.contrib.formtools.preview.FormPreview`` のサブクラスを作成して、
+``done()`` メソッドをオーバライドします。フォームプレビュークラスは、コード
+ベースのどこに置いても構いません。
+
+.. _`FormPreview templates`:
+
+``FormPreview`` のテンプレート
+===============================
+
+デフォルトでは、フォームは ``formtools/form.html`` を使ってレンダされます。
+また、プレビューページのレンダには ``foormtools/preview.html`` を使います。
+これらのテンプレートは、 ``FormPreview`` のサブクラスで、それぞれ
+``preview_template`` および ``fom_template`` 属性を設定すればオーバライド
+できます。デフォルトのテンプレートの内容は
+``django/contrib/formtools/templates`` を参照してください。

@@ -2,7 +2,7 @@
 モデル API リファレンス
 =======================
 
-:revision-up-to: 6566 (0.97pre SVN)
+:revision-up-to: 7127 (0.97pre SVN)
 
 モデルとは、サイトを構成するデータの、ただ一つかつ最終的なデータソースを指
 します。モデルには、保存したいデータに不可欠なデータフィールドと、その振舞
@@ -242,6 +242,7 @@ admin では、 ``<input type="text">`` (一行のテキスト入力) で表現�
 ~~~~~~~~~~~~~~
 
 値が有効な e-mail アドレスであるかチェックする ``CharField`` です。
+
 Django 0.96 では、 ``max_length`` を指定できません。 ``max_length`` は自動的に
 75 にセットされるからです。 開発版の Django では、 ``max_length`` はデフォルト
 で 75 にセットされますが、デフォルト値を書き換えるよう指定することができます。
@@ -406,7 +407,7 @@ admin では、 ``<input type="text">`` (一行の入力フィールド) で表�
 ``IPAddressField``
 ~~~~~~~~~~~~~~~~~~
 
-IP アドレスを 文字列形式で表したもの (i.e. "24.124.1.30") です。
+IP アドレスを 文字列形式で表したもの (例: "192.0.2.30") です。
 
 admin では、 ``<input type="text">`` (一行の入力フィールド) で表現されます。
 
@@ -653,9 +654,10 @@ Django は必要に応じてカラム名やテーブル名をクオートしま�
 **開発版の Django で新たに追加された機能です**
 
 このフィールドをインデクス化する際に、データベースのテーブルスペース上での
-フィールドのインデクスの名前に使います。デフォルトの値は、モデルの
-``db_tablespace`` です。テーブルスペースをサポートしていないバックエンドで
-は、このオプションは無視されます。
+フィールドのインデクスの名前に使います。デフォルトの値は、プロジェクトで
+設定されている ``DEFAULT_INDEX_TABLESPACE`` です。この値がなければ、
+モデルの ``db_tablespace`` を使います。テーブルスペースをサポートしていない
+バックエンドでは、このオプションは無視されます。
 
 ``default``
 ~~~~~~~~~~~
@@ -1101,114 +1103,13 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
 カスタムのフィールド型
 -----------------------
 
-**開発版の Django で新たに追加された機能です**
+既存のモデルフィールドが目的とするアプリケーションに合わない場合や、あまり
+一般的でないデータベースカラムタイプを活用したい場合のために、独自のフィー
+ルドクラスを作成できます。独自のフィールドの作成方法の詳細は
+`カスタムモデルフィールド`_ のドキュメントで説明しています。
 
-Django の組み込みフィールド型は、データベースのカラムとして利用できる全ての
-データ型をサポートしているわけではなく、 ``VARCHAR`` や ``INTEGER`` のよう
-な一般的な型しかサポートしていません。幾何多角形 (geographic polygon) 型や、
-`PostgreSQL カスタム型`_ のようなユーザ定義型といった特異な型を扱うには、
-``Field`` 型のサブクラスを定義する必要があります。
-
-.. _PostgreSQL custom types: http://www.postgresql.org/docs/8.2/interactive/sql-createtype.html
-.. _`PostgreSQL カスタム型`: `PostgreSQL custom types`_
-
-.. admonition:: Experimental territory
-
-  この分野は、 Django の中でも伝統的にドキュメント化されて来なかった部分で
-  すが、これからは少しづつドキュメントを増やしていく予定です。というわけで、
-  当面は薄い内容ですがご容赦くださいね。
-
-  最先端の世界に住むのが好きで、不安定でドキュメント化されていない API を使
-  うリスクを気にしないのなら、 ``django/db/models/fields/__init__.py`` の
-  コアの ``Field`` クラスのコードを読むとよいでしょう -- ただし、中身がごっ
-  そり変わっていても、そんなの聞いてないよなんて言わないでくださいね。
-
-カスタムのフィールド型を定義するには、 ``django.db.models.Field`` をサブク
-ラス化します。サブクラスで実装せねばならないメソッドの一部を以下に示します:
-
-``db_type()``
-~~~~~~~~~~~~~
-
-``DATABASE_ENGINE`` 設定に指定されているデータベースで、フィールドのデータ
-を保存するために使うカラム型を返します。
-
-例えば、 PostgreSQL 固有のカスタム型 ``mytype`` を作成したとしましょう。
-Django からこの型を使うには、以下のように ``Field`` をサブクラス化して、 
-``db_type()`` メソッドを実装します::
-
-    from django.db import models
-
-    class MytypeField(models.Field):
-        def db_type(self):
-            return 'mytype'
-
-``MytypeField`` を定義したら、他のフィールド型と同じようにモデルで利用でき
-ます::
-
-    class Person(models.Model):
-        name = models.CharField(max_length=80)
-        gender = models.CharField(max_length=1)
-        something_else = MytypeField()
-
-データベースに依存しないアプリケーションを構築したいなら、データベースごと
-のカラム型の違いに注意しておかねばなりません。例えば、 PostgreSQL では日付
-や時間に関するカラム型は ``timestamp`` 型ですが、 MySQL では ``datetime``
-型です。この違いを ``db_type()`` メソッドの中で吸収するには、Djangoの
-``settings`` モジュールを import しておいて、以下のように
-``DATABASE_ENGINE`` 設定をチェックします::
-
-    class MyDateField(models.Field):
-        def db_type(self):
-            from django.conf import settings
-            if settings.DATABASE_ENGINE == 'mysql':
-                return 'datetime'
-            else:
-                return 'timestamp'
-
-``db_type()`` メソッドは、Django がアプリケーションのテーブルを生成するため
-の ``CREATE TABLE``` 文を構築する瞬間、すなわち最初にテーブルを生成する瞬
-間しか呼び出されません。それ以外の場合に呼び出されることはないので、上記の
-``DATABASE_ENGINE`` をチェックする例のような多少ややこしいコードを書いても
-さして問題ではありません。
-
-カラムのデータ型にはパラメタをとるものがあります。例えば ``CHAR(25)`` は、
-``25`` がカラムの最大長を表しています。こうした場合には、 ``db_type()`` メ
-ソッド内でハードコードしておくよりも、モデル内でパラメタを指定して使えるよ
-うになっていた方が柔軟性を高められます。例えば、以下に示すような
-``CharMaxlength25Field`` はあまり便利ではありません::
-
-    # パラメタをハードコードしているおバカな例
-    class CharMaxlength25Field(models.Field):
-        def db_type(self):
-            return 'char(25)'
-
-    # モデル内での使い方
-    class MyModel(models.Model):
-        # ...
-        my_field = CharMaxlength25Field()
-
-実行時、すなわちフィールドクラスをインスタンス化する時にパラメタを指定でき
-た方がよいでしょう。パラメタを指定できるようにするには、以下のように 
-``__init__()`` を実装します::
-
-    # より柔軟性のある例
-    class BetterCharField(models.Field):
-        def __init__(self, maxlength, *args, **kwargs):
-            self.max_length = max_length
-            super(BetterCharField, self).__init__(*args, **kwargs)
-
-        def db_type(self):
-            return 'char(%s)' % self.max_length
-
-    # モデル内での使い方
-    class MyModel(models.Model):
-        # ...
-        my_field = BetterCharField(25)
-
-フィールドクラスの ``__init__()`` を実装する場合は、必ず親クラスの
-``Field.__init__()`` すなわち親クラスの ``__init__()`` メソッドを呼び出して
-ください。
-
+.. _Custom Model Fields: ../custom_model_fields/
+.. _`カスタムモデルフィールド`: `Custom Model Fields`_
 
 .. _Meta options:
 
@@ -1407,6 +1308,7 @@ Django はモデルクラス名とモデルクラスの入っているアプリ�
 
 ``pk`` プロパティ
 -----------------
+
 **開発版の Django で新たに追加された機能です**
 
 主キーを自前で定義しているか、 Django によって供給されているかに
@@ -2107,7 +2009,8 @@ SQL に等価な検索を実行します::
 ``__unicode__()`` メソッドは、オブジェクトに対して ``unicode()`` を呼び出し
 た際に呼び出されます。Django のデータベースバックエンドはモデルの属性値とし
 て Unicode 文字列を返すので、通常はモデルの ``__unicode__()`` メソッドを定
-義するとよいでしょう。前節の例を ``__unicode__()`` を使って書き直すと、以下のように簡単になります::
+義するとよいでしょう。前節の例を ``__unicode__()`` を使って書き直すと、以下
+のように簡単になります::
 
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
@@ -2118,9 +2021,10 @@ SQL に等価な検索を実行します::
 
 モデルに ``__unicode__()`` メソッドだけを定義して、 ``__str__()`` は定義し
 ないでおくと、 Django が自動的に ``__str__()`` メソッドをモデルに追加します。
-この ``__str__()`` メソッドは、 ``__unicode()__`` を呼び出して、その戻り値
+この ``__str__()`` メソッドは、 ``__unicode__()`` を呼び出して、その戻り値
 を UTF-8 でエンコードした文字列を返します。開発上はこの仕様に従い、
-``__unicode__()`` だけを定義して、文字列オブジェクトへの変換は Django 任せにするよう勧めます。
+``__unicode__()`` だけを定義して、文字列オブジェクトへの変換は Django 任せ
+にするよう勧めます。
 
 ``get_absolute_url``
 ------------------------------------

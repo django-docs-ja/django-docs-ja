@@ -1,0 +1,391 @@
+================================
+newforms とモデルを組み合わせる
+================================
+
+:revision-up-to: 7127 (0.97pre SVN)
+
+``ModelForm``
+=============
+
+データベース駆動のアプリケーションを構築しているのなら、 Django のモデルに
+対応したフォームが必要な場合があるでしょう。例えば、 ``BlogComment`` モデル
+を作っていて、読者がコメントを入力できるようなフォームを作成したいような場
+合です。こうしたケースでは、すでにモデルにフィールドを定義しているので、新
+たにフォームクラス用にフィールド方を定義するのは無駄な作業でしかありません。
+
+この理由から、 Django はモデルからフォームクラスを生成するためのヘルパクラ
+スを提供しています。
+
+以下に例を示します::
+
+    >>> from django.newforms import ModelForm
+
+    # フォームクラスを生成
+    >>> class ArticleForm(ModelForm):
+    ...     class Meta:
+    ...         model = Article
+
+    # 記事を追加するためのフォームを作成
+    >>> form = ArticleForm()
+
+    # 既存の記事を変更するためのフォームを作成
+    >>> article = Article.objects.get(pk=1)
+    >>> form = ArticleForm(instance=article)
+
+.. _Field types:
+
+フィールド型
+-------------
+
+モデルから生成されるフォームクラスは、モデルの各フィールドに対応したフォー
+ムフィールドを持ちます。モデルフィールドには、それぞれデフォルトのフォーム
+フィールド型が定義されています。例えば、モデルの ``CharField`` 型には、
+``CharField`` 型のフォームフィールドが対応しています。モデルの
+``ManyToManyField`` には、 ``MultipleChoiceField`` が対応しています。以下に
+対応の一覧表を示します:
+
+    ===============================  ========================================
+    モデルフィールド型               フォームフィールド型
+    ===============================  ========================================
+    ``AutoField``                    フォーム上では表現されていません
+    ``BooleanField``                 ``BooleanField``
+    ``CharField``                    ``CharField`` 。 ``max_length`` にはモ
+                                     デルフィールドの ``max_length`` 値が設
+                                     定されます。
+    ``CommaSeparatedIntegerField``   ``CharField``
+    ``DateField``                    ``DateField``
+    ``DateTimeField``                ``DateTimeField``
+    ``DecimalField``                 ``DecimalField``
+    ``EmailField``                   ``EmailField``
+    ``FileField``                    ``FileField``
+    ``FilePathField``                ``CharField``
+    ``FloatField``                   ``FloatField``
+    ``ForeignKey``                   ``ModelChoiceField`` (下記参照)
+    ``ImageField``                   ``ImageField``
+    ``IntegerField``                 ``IntegerField``
+    ``IPAddressField``               ``IPAddressField``
+    ``ManyToManyField``              ``ModelMultipleChoiceField`` (下記参照)
+    ``NullBooleanField``             ``CharField``
+    ``PhoneNumberField``             ``USPhoneNumberField``
+                                     (``django.contrib.localflavor.us``)
+    ``PositiveIntegerField``         ``IntegerField``
+    ``PositiveSmallIntegerField``    ``IntegerField``
+    ``SlugField``                    ``CharField``
+    ``SmallIntegerField``            ``IntegerField``
+    ``TextField``                    ``widget=Textarea`` の ``CharField``
+    ``TimeField``                    ``TimeField``
+    ``URLField``                     ``URLField`` 。 ``verify_exists`` には
+                                     モデルフィールドの ``verify_exists``
+                                     値が設定されます。
+    ``USStateField``                 ``widget=USStateSelect`` の
+                                     ``CharField`` 
+                                     (``USStateSelect`` は
+                                     ``django.contrib.localflavor.us``
+                                     で定義されています)
+    ``XMLField``                     ``widget=Textarea`` の ``CharField``
+    ===============================  ========================================
+
+
+.. note::
+    ``FloatField`` および ``DecimalField`` は、モデルフィールド、フォーム
+    フィールドともに開発版の Django で新たに定義されました。
+
+お気付きかもしれませんが、 ``ForeignKey`` や ``ManyToManyField`` といったモ
+デルフィールドは特別扱いされています:
+
+    * ``ForeignKey`` は ``django.newforms.ModelChoiceField`` で表現されてお
+      います。 ``ModelChoiceField`` は、選択肢がモデルの ``QuerySet`` であ
+      るような ``ChoiceField`` です。
+
+    * ``ManyToManyField`` は ``django.newforms.ModelMultipleChoiceField``
+       で表現されています。 ``ModelMultipleChoiceField`` は、選択肢がモデル
+       の ``QuerySet`` であるような ``MultipleChoiceField`` です。
+
+さらに、生成されるフォームフィールドには、以下の属性が付加されます:
+
+    * モデルフィールドに ``blank=True`` が設定されていると、フォームフィー
+      ルドの ``required`` は ``False`` に設定されます。それ以外の場合には、
+      ``required=True`` です。
+
+    * フォームフィールドの ``label`` にはモデルフィールドの
+      ``verbose_name`` の値を使います。このとき先頭の文字は大文字に変換され
+      ます。
+
+    * フォームフィールドの ``help_text`` にはモデルフィールドの
+      ``help_text`` の値を使います。
+
+    * モデルフィールドに ``choices`` が設定されている場合、フォームフィール
+      ドの ``widget`` は ``Select`` に設定されます。また、選択肢にはモデル
+      フィールドの ``choices`` の値を使います。通常、選択肢の中には、空の
+      選択肢が加えられ、フォームの表示時にデフォルトで選択されています。
+      フィールドが必須のフィールドである場合、ユーザは必ず空の選択肢以外か
+      ら選択せねばなりません。モデルフィールドが ``blank=False`` で、かつ
+      ``default`` 値が明に設定されている場合、空の選択肢は表示されません
+      (``default`` の値が選択された状態で表示されます)。
+
+
+あるモデルからフォームを作成する場合、モデルのフォームフィールドに対応する
+フォームフィールドをオーバライドできます。後述の
+`デフォルトのフィールド型をオーバライドする`_ を参照してください。
+
+.. _A full example:
+
+詳細な例
+---------
+
+以下のような一連のモデルを考えましょう::
+
+    from django.db import models
+
+    TITLE_CHOICES = (
+        ('MR', 'Mr.'),
+        ('MRS', 'Mrs.'),
+        ('MS', 'Ms.'),
+    )
+
+    class Author(models.Model):
+        name = models.CharField(max_length=100)
+        title = models.CharField(max_length=3, choices=TITLE_CHOICES)
+        birth_date = models.DateField(blank=True, null=True)
+
+        def __unicode__(self):
+            return self.name
+
+    class Book(models.Model):
+        name = models.CharField(max_length=100)
+        authors = models.ManyToManyField(Author)
+
+    class AuthorForm(ModelForm):
+        class Meta:
+            model = Author
+
+    class BookForm(ModelForm):
+        class Meta:
+            model = Book
+
+上に挙げた例中の ``ModelForm`` サブクラスは、以下のフォームクラスとほぼ同じ
+になります (違いは ``save()`` メソッドの動作だけです。これについてはすぐ後
+で説明します)::
+
+    class AuthorForm(forms.Form):
+        name = forms.CharField(max_length=100)
+        title = forms.CharField(max_length=3,
+                    widget=forms.Select(choices=TITLE_CHOICES))
+        birth_date = forms.DateField(required=False)
+
+    class BookForm(forms.Form):
+        name = forms.CharField(max_length=100)
+        authors = forms.ModelMultipleChoiceField(queryset=Author.objects.all())
+
+.. _The save() method:
+
+``save()`` メソッド
+---------------------
+
+``ModelForm`` から生成されたフォームは ``save()`` メソッドを備えています。
+このメソッドは、フォームに結びつけられたデータから、モデルオブジェクトを生
+成してデータベースに保存します。 ``ModelForm`` のサブクラスは既存のモデルイ
+ンスタンスをキーワード引数 ``instance`` にしてインスタンス化できます。
+``instance`` を指定してモデルフォームを生成すると、モデルフォームの
+``save()`` はこのインスタンスを更新して保存します。 ``instance`` を指定しな
+ければ、 ``save()`` はモデルフォームで指定しているモデルの新たなインスタン
+スを生成します::
+
+    # POST データから新たなフォームインスタンスを生成
+    >>> f = ArticleForm(request.POST)
+
+    # フォームデータから新たな Article オブジェクトを生成
+    >>> new_article = f.save()
+
+    # 既存の Article オブジェクトからフォームを生成
+    >>> a = Article.objects.get(pk=1)
+    >>> f = ArticleForm(instance=a)
+
+フォームの入力値の検証に失敗すると、 ``save()`` は ``ValueError`` を送出す
+るので注意してください。
+
+``save()`` メソッドはオプション ``commit`` キーワード引数を持っています。こ
+の引数には ``True`` または ``False`` を指定します。 ``save()`` を
+``commit=False`` で呼び出すと、データベースに保存する前のモデルオブジェクト
+を返します。返されたオブジェクトに対して、最終的に ``save()`` を呼び出すか
+どうかは自由です。この機能は、オブジェクトを実際に保存する前に何らかの処理
+を行いたい場合に便利です。 ``commit`` はデフォルトでは  ``True`` に設定され
+ています。
+
+モデルが他のモデルに対する多対多のリレーションをはっている場合、
+``commit=False`` を使うともう一つの副作用があります。多対多のリレーションを
+持つモデルから生成したフォームを保存する際、 Django は多対多のリレーション
+に対するデータをすぐに保存できません。なぜなら、 ``save(commit=False)`` の
+対象であるオブジェクトはまだデータベースに保存されていないため、オブジェク
+トに対する多対多の関係を保存するためのテーブルを更新できないからです。
+
+この問題を回避するために、Django は ``commit=False`` でフォームを保存した直
+後に、モデルフォームクラス ``save_m2m()`` メソッドを追加します。フォームの
+から生成したインスタンスを手動で保存した後で ``save_m2m()`` を呼び出せば、
+多対多のフォームデータを保存できます。以下に例を示します::
+
+    # POST データから新たなフォームインスタンスを生成
+    >>> f = AuthorForm(request.POST)
+
+    # インスタンスを生成、ただし保存はしない
+    >>> new_author = f.save(commit=False)
+
+    # new_author のフィールド値を変更
+    >>> new_author.some_field = 'some_value'
+
+    # 新たなインスタンスを保存
+    >>> new_author.save()
+
+    # 最後に、多対多のフォームデータを保存
+    >>> f.save_m2m()
+
+``save_m2m()`` の呼び出しが必要なのは、 ``save(commit=False)`` を使った場合
+だけです。単に ``save()`` を呼び出すだけなら、多対多のデータを含む全てのデー
+タが保存され、他に何らかのメソッドを呼び出す必要はありません。以下に例を示
+します::
+
+    # POST データから新たなフォームインスタンスを生成
+    >>> a = Author()
+    >>> f = AuthorForm(a, request.POST)
+
+    # 新たな Author インスタンスを生成して保存。他にはなにもしなくてよい
+    >>> new_author = f.save()
+
+.. _Using a subset of fields on the form:
+
+モデルの一部のフィールドだけからフォームを生成する
+---------------------------------------------------
+
+場合によっては、フォームを生成するときに、モデルの一部のフィールドだけを表
+示したいことでしょう。モデルフィールドの一部だけを使って ``ModelForm`` を作
+るには、以下の 3 つの方法があります:
+
+    1. モデルフィールドに ``editable=False`` を定義します。その結果、
+       モデルフォームを使って生成したフォームは *全て* このフィールドを含ま
+       なくなります。
+
+    2. ``ModelForm`` サブクラスで、内部クラス ``Meta`` の ``fields`` 属性を
+       設定します。この属性にはフィールド名からなるリストを設定します。設定
+       すると、指定されたフィールドだけを含むフォームを生成します。
+
+    3. ``ModelForm`` サブクラスで、内部クラス ``Meta`` の ``exclude`` 属性を
+       設定します。この属性にはフィールド名からなるリストを設定します。設定
+       すると、指定されたフィールドを含まないフォームを生成します。
+
+       例えば、 (上で定義した) ``Author`` モデルから、 ``name`` と
+       ``title`` フィールドだけを含むようなフォームを作成したければ、以下の
+       ようにして ``fields`` または ``exclude`` を指定します::
+
+          class PartialAuthorForm(ModelForm):
+              class Meta:
+                  model = Author
+                  fields = ('name', 'title')
+
+          class PartialAuthorForm(ModelForm):
+              class Meta:
+                  model = Author
+                  exclude = ('birth_date',)
+
+        Author モデルには ``'name'``, ``'title'``, ``'birth_date'`` の 3 つ
+        のフィールドしかないので、上のフォームは全く同じフォームフィールド
+        を持ちます。
+
+.. note::
+
+    ``ModelForm`` を使ってフォームを生成するときに ``fields`` や
+    ``exclude`` を指定すると、生成されたフォームの ``save()`` を呼び出した
+    ときに、フォームに含まれていないフィールドのデータは設定されません。
+    このため、フォームに含まれていないフィールドに対応するモデルフィールド
+    が、空の値を許さないように定義されていて、かつデフォルトの値が指定され
+    ていない場合、モデルインスタンスが不完全なために Django がオブジェクト
+    の保存を抑止し、 ``save()`` は失敗します。これを避けるには、フォームの
+    インスタンスを生成するときに、不足しているフィールドでかつ必須のフィー
+    ルドに対する初期値を指定してやるか、 ``save(commit=False)`` を使って、
+    必須のフィールドの値を手動で設定してください::
+
+        instance = Instance(required_field='value')
+        form = InstanceForm(request.POST, instance=instance)
+        new_instance = form.save()
+
+        instance = form.save(commit=False)
+        instance.required_field = 'new value'
+        new_instance = instance.save()
+
+    ``save(commit=False)`` については、 `「フォームの保存」`_ も参照してく
+    ださい。
+
+
+.. _section on saving forms: `The save() method`_
+.. _`「フォームの保存」`: `section on saving forms`_
+
+.. _Overriding the default field types:
+
+デフォルトのフィールド型をオーバライドする
+--------------------------------------------
+
+上の `フィールド型`_ で説明したデフォルトのフィールド型は、いわゆる気の利い
+たデフォルト値にすぎません。モデル上で ``DateField`` として定義されている
+フィールドは、フォーム上でも ``DateField`` として表現されてほしいというのが
+普通でしょう。とはいえ、 ``ModelForm`` は、あるモデルフィールドのフォーム
+フィールド型を変更できるという柔軟性を備えています。フォームフィールドの型
+を変更するには、通常のフォームクラスでしているように、クラス属性としてフォー
+ムフィールドを宣言します。宣言されたフィールドは、 ``model`` 属性から生成さ
+れたデフォルトのフィールドをオーバライドします。
+
+例えば、 ``pub_date`` フィールドに ``MyDateFormField`` を使いたければ、
+以下のようにして実現できます::
+
+    >>> class ArticleForm(ModelForm):
+    ...     pub_date = MyDateFormField()
+    ...
+    ...     class Meta:
+    ...         model = Article
+
+フィールドのデフォルトウィジェットをオーバライドしたければ、フォームフィー
+ルドを宣言するときに ``widget`` パラメタを指定します::
+
+   >>> class ArticleForm(ModelForm):
+   ...     pub_date = DateField(widget=MyDateWidget())
+   ...
+   ...     class Meta:
+   ...         model = Article
+
+.. _Form inheritance:
+
+フォームクラスの継承
+---------------------
+
+フォームクラスと同様、 ``ModelForm`` も継承によって再利用できます。フォーム
+クラスの継承は、一つのモデルからいくつもフォームを導出して、フォーム毎にフィー
+ルドを追加したり、メソッドを追加したりする際に便利です::
+
+    >>> class EnhancedArticleForm(ArticleForm):
+    ...     def clean_pub_date(self):
+    ...         ...
+
+上記のコードは、独自に ``pub_date`` フィールドの検証とクリーニングを行うほ
+かは、 ``ArticleForm`` と全く同じフォームを生成します。
+
+親クラスの内部クラス ``Meta`` をサブクラス化すれば、親クラスの
+``Meta.fields`` や ``Meta.excludes`` リストを変更できます::
+
+    >>> class RestrictedArticleForm(EnhancedArticleForm):
+    ...     class Meta(ArticleForm.Meta):
+    ...         exclude = ['body']
+
+上記のコードは、 ``EnhancedArticleForm`` を追加して、 ``ArticleForm.Meta``
+フィールドを変更することで、 ``body`` フィールドを除去しています。
+
+ただし、フォームクラスの継承にはいくつか注意すべき点もあります。
+
+ * 属性の名前解決には、通常の Python の名前解決規則が適用されます。すなわち、
+   内部クラス ``Meta`` を持つ複数の基底クラスを持つようなサブクラスを定義す
+   ると、最初のクラスの ``Meta`` だけを使います。従って、 ``Meta`` の解決は
+   まずサブクラスの ``Meta`` 、そして最初の親クラスの ``Meta`` の順に行われ
+   ます。
+
+ * 技術的な理由から、サブクラスは ``ModelForm`` と  ``Form`` を同時に継承で
+   きません。
+
+これらの注意点は、サブクラスを作成する際に何かトリッキーなことをしない限り
+は当てはまらないはずです。
