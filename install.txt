@@ -101,6 +101,7 @@ Django の ``manage.py syncdb`` を使って、モデルに対応するテーブ
 .. _Oracle backend: ../databases/#oracle-notes
 .. _testing framework: ../testing/
 .. _`テストフレームワーク`: `testing framework`_
+.. _`Oracle バックエンド`: `Oracle backend`_
 
 .. _Remove any old versions of Django:
 
@@ -156,7 +157,7 @@ OS ごとのインストールパッケージによるインストール
 スの更新を行ってくれたりします。
  
 
-.. _Installing an official release
+.. _Installing an official release:
 
 公式リリースのインストール
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -180,7 +181,7 @@ OS ごとのインストールパッケージによるインストール
 ``site-packages`` ディレクトリ下にインストールされます。
 
 .. _distribution specific notes: ../distributions/
-.. _badtar: http://gnuwin32.sourceforge.net/packages/bsdtar.htm
+.. _bsdtar: http://gnuwin32.sourceforge.net/packages/bsdtar.htm
 .. _7-zip: http://www.7-zip.org/
 
 .. _Installing the development version:
@@ -246,8 +247,8 @@ Django のソースコードを更新する際には、 ``django-trunk`` ディ�
 ``svn update`` を実行してください。実行すると、 Subversion が更新部分を自動
 的にダウンロードします。
 
-.. _`ダウンロードページ`: http://www.djangoproject.com/download/
 .. _`download page`: http://www.djangoproject.com/download/
 .. _Subversion: http://subversion.tigris.org/
 .. _from the Control Panel: http://www.microsoft.com/resources/documentation/windows/xp/all/proddocs/en-us/sysdm_advancd_environmnt_addchange_variable.mspx
+.. _`ダウンロードページ`: `download page`_
 .. _`コントロールパネルから`: http://www.microsoft.com/resources/documentation/windows/xp/all/proddocs/ja/sysdm_advancd_environmnt_addchange_variable.mspx

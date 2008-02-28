@@ -1260,7 +1260,7 @@ Django の古いフォーム／検証フレームワークを使ったことが�
     ValidationError: [u'Please enter your name']
 
 各フィールドで定義されているエラーメッセージのキーは、後述の
-`組み込みフィールドクラス`_ の節で定義しています。
+`組み込みフォームフィールドクラス`_ の節で定義しています。
 
 .. _Dynamic initial values:
 

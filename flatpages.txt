@@ -139,3 +139,6 @@ flatpage テンプレートに渡されるコンテキスト変数は ``flatpage
 flatpage の管理ページでは、生の HTML を入力しています。従って、
 テンプレート上で ``flatpage.title`` と ``flatpage.content`` は、
 `自動 HTML エスケープ`_ が必要なコンテンツとして **扱われません** 。
+
+.. _automatic HTML escaping: ../templates/#automatic-html-escaping
+.. _`自動 HTML エスケープ`: `automatic HTML escaping`_

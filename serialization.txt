@@ -133,7 +133,6 @@ Django には各種形式のシリアライザが付属しています:
     ==========  ==============================================================
 
 .. _json: http://json.org/
-.. _simplejson: http://undefined.org/python/#simplejson
 .. _PyYAML: http://www.pyyaml.org/
  
 .. _Notes For specific serialization formats:
@@ -168,7 +167,8 @@ Django オブジェクトは何らかの変更が加えられた上で simplejso
                 return force_unicode(obj)
             return obj
 
+.. _simplejson: http://undefined.org/python/#simplejson
 .. _lazy translation objects: ../i18n/#lazy-translation
 .. _special encoder: http://svn.red-bean.com/bob/simplejson/tags/simplejson-1.7/docs/index.html
 .. _`遅延翻訳オブジェクト`: `lazy translation objects`_
-.. _`特殊なエンコーダ`:`special encoder`_
+.. _`特殊なエンコーダ`: `special encoder`_

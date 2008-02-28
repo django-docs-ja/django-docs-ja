@@ -1493,6 +1493,6 @@ django.contrib.webdesign
 について学びたいなら、
 `Python プログラマのための Django テンプレート言語ガイド`_ を読んでください。
 
-.. _The Django template language: For Python programmers: ../templates_python/
+.. _`The Django template language: For Python programmers`: ../templates_python/
 .. _`Python プログラマのための Django テンプレート言語ガイド`:
         `The Django template language: For Python programmers`_

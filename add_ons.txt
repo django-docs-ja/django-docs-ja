@@ -95,7 +95,7 @@ django.contrib.formtools.preview
 `フォームプレビューのドキュメント`_ を参照してください。
 
 .. _form preview documentation: ../form_preview/
- .. _`フォームプレビューのドキュメント`: `form preview documentation`_
+.. _`フォームプレビューのドキュメント`: `form preview documentation`_
 
 
 humanize
@@ -198,7 +198,7 @@ localflavor
 `localflavor のドキュメント`_ を参照してください。
 
 .. _localflavor documentation: ../localflavor/
-.. _`localfravor のドキュメント`: `localflavor documentation`_
+.. _`localflavor のドキュメント`: `localflavor documentation`_
 
 markup
 ======

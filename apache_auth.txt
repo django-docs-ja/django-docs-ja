@@ -57,8 +57,7 @@ mod_python の標準の ``Auth*`` および ``Require`` ディレクティブと
         AuthzOwnerAuthoritative Off
         AuthzUserAuthoritative Off
 
-    Apache 2.2 での設定全体を、2.0 との違いを太字にして表すと、以下のように
-    なります::
+    Apache 2.2 での設定全体を、2.0 との違いを太字にして示します:
 
     .. parsed-literal::
 

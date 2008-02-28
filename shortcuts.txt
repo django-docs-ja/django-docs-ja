@@ -47,7 +47,7 @@
     値として、 ``DEFAULT_CONTENT_TYPE`` を使います。
 
 .. _`context processors`: ../templates_python/#subclassing-context-requestcontext
-.. _`コンテキストプロセッサ`:`context processors`_
+.. _`コンテキストプロセッサ`: `context processors`_
 
 使用例
 -------
