@@ -2,7 +2,7 @@
 Django でのユーザ認証
 =====================
 
-:revision-up-to: 5922 (0.97pre SVN)
+:revision-up-to: 7127 (0.97pre SVN)
 
 Django にはユーザ認証システムがついてきます。 Django のユーザ認証システムは、
 ユーザアカウント、グループ、パーミッションとクッキーベースのユーザセッショ
@@ -172,10 +172,14 @@ API リファレンス
     * ``get_profile()`` -- ユーザのサイト固有のプロファイル (site-specific
       profile) を返します。プロファイルを使えないサイトでは 
       ``django.contrib.auth.models.SiteProfileNotAvailable`` を送出します。
+      サイト固有のユーザプロファイルを定義するには、 
+      後述の `追加のユーザ情報の保存`_ を参照して下さい。
 
 .. _Django model: ../model-api/
 .. _Django モデル: `Django model`_
 .. _DEFAULT_FROM_EMAIL: ../settings/#default-from-email
+.. _storing additional user information: #storing-additional-information-about-users
+.. _`追加のユーザ情報の保存`: `storing additional user information`_
 
 .. _Manager functions:
 
@@ -279,6 +283,9 @@ MD5 ハッシュを使っていました。この形式は、以前のバージ�
 以下の点で ``User`` と異なります:
 
     * ``id`` は常に ``None`` です。
+    * ``is_staff`` および ``is_superuser`` は常に ``False`` です。
+    * ``is_active`` は常に ``False`` です。
+    * ``groups`` および ``user_permissions`` は常に空です。
     * ``is_anonymous()`` は ``False`` ではなく ``True`` を返します。
     * ``is_authenticated()`` は ``True`` ではなく ``False`` を返します。
     * ``has_perm()`` は常に ``False`` を返します。
@@ -304,6 +311,45 @@ MD5 ハッシュを使っていました。この形式は、以前のバージ�
 
 ``/path/to/`` は自分のシステムの Django コードベースへのパスに応じて読み変
 えて下さい。
+
+.. _Storing additional information about users:
+
+追加のユーザ情報の保存
+-----------------------
+
+ユーザに追加の情報をひもづけて保存したい場合のために、 Django ではサイトご
+とにユーザに関連付けられた「ユーザプロファイル」を取り出すためのメソッドを
+提供しています。
+
+ユーザプロファイルを利用するには、まず、ユーザにひもづけて保存したい情報を
+入れるためのフィールドや持たせたいメソッド、そして ``User`` モデルへの
+``ForeignKey`` を持ったモデルを定義します。 ``ForeignKey`` には
+``unique=True`` をセットし、ユーザごとにモデルが一つだけ生成されるようにし
+ます。
+
+このモデルをあるサイトのユーザプロファイルモデルにするには、
+``AUTH_PROFILE_MODULE`` に以下の内容をドット区切りの文字列で指定します:
+
+1. ユーザプロファイルモデルを定義している (小文字に変換した) アプリケーショ
+   ン名 (別の言い方をするなら、 ``manage.py startapp`` でアプリケーションを
+   作成するときに指定する名前を全て小文字にしたもの)。
+
+2. (小文字に変換した) モデルクラス名
+
+例えば、プロファイルモデルが ``UserProfile`` という名前のクラスで、
+``accounts`` というアプリケーションで定義されているなら、設定値は以下のよう
+になるでしょう::
+
+    AUTH_PROFILE_MODULE = 'accounts.userprofile'
+
+上記の方法でユーザプロファイルモデルを定義して指定すると、ユーザオブジェ
+クトには ``get_profile()`` というメソッドが付加されます。このメソッドは、
+ユーザに関連付けられているプロファイルモデルのインスタンスを返します。
+
+さらに詳しい情報は、 `Django book の 12 章`_ を参照してください。
+
+.. _Chapter 12 of the Django book: http://www.djangobook.com/en/beta/chapter12/#cn226
+.. _`Django book の 12 章`: `Chapter 12 of the Django book`_
 
 
 .. _Authentication in Web requests:
@@ -336,6 +382,17 @@ API について扱ってきました。より高水準の API では、 Django 
 .. _`セッションのドキュメント`: ../sessions/
 .. _request objects: ../request_response/#httprequest-objects
 .. _session documentation: ../sessions/
+
+.. admonition:: ``authenticate()`` は最初に呼び出してください
+    
+    ユーザを手動でログインさせる場合、 ``login()`` を呼び出す前に必ず
+    ``authenticate()`` を呼び出してください。 ``authenticate()`` は、
+    ``User`` オブジェクトに、そのユーザが認証バックエンドによって正しく認証
+    されたことを示す属性を付加 (詳しくは `認証バックエンドのドキュメント`_
+    を参照してください) し、この情報が ``login()`` の処理で必要だからです。
+    
+.. _backends documentation: #other-authentication-sources
+.. _`認証バックエンドのドキュメント`: `backends documentation`_
 
 .. _Manually checking a user's password:
 
@@ -465,12 +522,31 @@ Python 2.4 で登場したよりコンパクトなデコレータ構文を使っ
     def my_view(request):
         # ...
 
+開発版の Django では、 ``login_required`` はオプションの引数
+``redirect_field_name`` を取れます。例えば::
+    
+    from django.contrib.auth.decorators import login_required
+
+    def my_view(request):
+        # ...
+    my_view = login_required(redirect_field_name='redirect_to')(my_view)
+
+同様に、 Python 2.4 で登場したよりコンパクトなデコレータ構文を使った例を以
+下に示します::
+    
+    from django.contrib.auth.decorators import login_required
+
+    @login_required(redirect_field_name='redirect_to')
+    def my_view(request):
+        # ...
+
 ``login_required`` が行うのは以下のような処理です:
 
     * ユーザがログインしていなければ、 ``settings.LOGIN_URL`` に指定した値
       (デフォルトでは ``/accounts/login/``) にリダイレクトします。このとき、
-      現在のクエリの絶対 URL を ``next`` に入れ、例えば
-      ``/accounts/login/?next=/polls/3/`` のようにします。
+      現在のクエリの絶対 URL を ``next`` または ``redirect_field_name`` に
+      指定したパラメタの値に設定します。 URL は例えば
+      ``/accounts/login/?next=/polls/3/`` のようになります。
     * ユーザがログインしていれば、 ビューを普通に実行します。ビューコードの
       中では、ユーザがログインしているものとみなして構いません。
 
@@ -1108,11 +1184,11 @@ API リファレンス
 認証バックエンドを作成する
 --------------------------
 
-認証バックエンドの実体は、 ``get_user(id)`` と
+認証バックエンドの実体は、 ``get_user(user_id)`` と
 ``authenticate(**credentials)`` という二つのメソッドを実装したクラスです。
 
-``get_user`` メソッドはユーザ名、データベース ID などを表す引数 ``id`` とり、
-対応する ``User`` オブジェクトを返します。
+``get_user`` メソッドはユーザ名、データベース ID などを表す引数
+``user_id`` をとり、対応する ``User`` オブジェクトを返します。
 
 ``authenticate`` メソッドは証明情報、すなわちユーザ名とパスワードなどをキー
 ワード引数の形で受け取ります。ほとんどの場合、以下のような形式をとります::
@@ -1177,3 +1253,44 @@ Django の admin システムは、冒頭で説明した Django の ``User`` オ
                 return User.objects.get(pk=user_id)
             except User.DoesNotExist:
                 return None
+
+
+.. _Handling authorization in custom backends:
+
+カスタムのバックエンドでパーミッションを扱う
+----------------------------------------------
+
+カスタムの認証バックエンドから、独自のパーミッションを提供できます。
+
+認証バックエンドがパーミッション照会のための関数
+(``get_group_permissions()``, ``get_all_permissions()``, ``has_perm()``,
+および ``has_module_perms()``) をサポートしている場合、ユーザモデルは
+パーミッションの照会をバックエンドに移譲します。
+
+あるユーザに付与されるパーミッションの集合は、全てのバックエンドの返しうる
+パーミッションのスーパーセットです。すなわち、 Django はいずれかのバックエ
+ンドのパーミッションを、どのユーザにも付与できます。
+
+前述の単純なバックエンドで、万能の管理ユーザを作る方法は、以下のようにとても
+簡単です::
+        
+    class SettingsBackend:
+    
+        # ...
+
+        def has_perm(self, user_obj, perm):
+            if user_obj.username == settings.ADMIN_LOGIN:
+                return True
+            else:
+                return False
+                
+この書き方だと、上の例でアクセスを認可されたユーザにはあらゆるパーミッショ
+ンが許されます。バックエンドの認証関数はユーザオブジェクトを引数にとります。
+また、ユーザオブジェクトの代わりに、 ``User`` のコンストラクタと同じ引数も
+指定できます。
+
+認可の API は、 `django/contrib/auth/backends.py`_ で実装されています。この
+バックエンドはデフォルトのバックエンドであり、ほとんどの場合
+``auth_permission`` にパーミッションを問い合わせます。
+
+.. _django/contrib/auth/backends.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/auth/backends.py

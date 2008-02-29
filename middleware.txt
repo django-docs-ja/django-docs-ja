@@ -65,11 +65,21 @@ django.middleware.common.CommonMiddleware
   禁止します。 ``DISALLOWED_USER_AGENTS`` には文字列のリストを指定します。
 
 * ``APPEND_SLASH`` および ``PREPEND_WWW`` に基づいて URL の書き換えを行いま
-  す。 ``APPEND_SLASH`` が ``True`` であれば、末尾にスラッシュのない URL は
-  スラッシュ付きの URL にリダイレクトします。 ただし、パスの最後の要素がピ
-  リオドを含む場合にはスラッシュを追加しません。このため、 ``foo.com/bar``
-  は ``foo.com/bar/`` にリダイレクトされますが、 ``foo.com/bar/file.txt``
-  は変更されず、そのまま次のレイヤに渡されます。
+  す。 
+
+  ``APPEND_SLASH`` が ``True`` の場合、リクエストの URL の末尾がスラッシュ
+  で終わっておらず、 URLconf 上でもマッチしなければ、 スラッシュを付加した
+  URL を作成して、 URLconf でマッチするか確かめます。マッチすれば、スラッシュ
+  つきの URL にリダイレクトします。そうでなければ、 URL を通常の手順に従っ
+  て処理します。
+
+  例えば、 ``foo.com/bar`` に一致するパターンがなく、 ``foo.com/bar`` に一
+  致するパターンが *あれば* 、 ``foo.com/bar`` は ``foo.com/bar/`` にリダイ
+  レクトされます。
+
+  **開発版の Django で新たに追加された機能:** 開発版では、 ``APPEND_SLASH`` 
+  の挙動が若干変更されました。以前のバージョンでは、リクエストの URL が
+  URLconf とマッチするかどうかに関係なくスラッシュを付加していました。
 
   ``PREPEND_WWW`` が ``True`` であれば、先頭に,  "www." のない URL は先頭に
   "www." を付けた URL にリダイレクトします。
@@ -112,8 +122,7 @@ django.middleware.http.ConditionalGetMiddleware
 ``If-Modified-Since`` がある場合、レスポンスは HttpNotModified に置き換えら
 れます。
 
-また、 HEAD リクエストに対する応答から本体部分を除去し、 ``Date`` および
-``Content-Length`` 応答ヘッダを設定します。
+また、 ``Date`` および ``Content-Length`` ヘッダを設定します。
 
 django.middleware.http.SetRemoteAddrFromForwardedFor
 ----------------------------------------------------
@@ -164,6 +173,18 @@ django.contrib.auth.middleware.AuthenticationMiddleware
 .. _Authentication in Web requests: 
     ../authentication/#authentication-in-web-requests
 
+django.contrib.csrf.middleware.CsrfMiddleware
+---------------------------------------------
+
+**開発版の Django で新たに追加された機能です**
+
+POST フォームに隠しフォームフィールドを追加し、リクエストデータに正しい値が
+設定されているかチェックすることによりクロスサイトリクエストフォージェリ
+(CSRF) を防ぎます。詳しくは
+`クロスサイトリクエストフォージェリからの保護`_ を参照してください。
+
+.. _`Cross Site Request Forgery protection documentation`: ../csrf/
+.. _`クロスサイトリクエストフォージェリからの保護`: `Cross Site Request Forgery protection documentation`_
 
 django.middleware.transaction.TransactionMiddleware
 ---------------------------------------------------
@@ -203,8 +224,10 @@ process_request
 ``process_request()`` は ``None`` または ``HttpResponse`` オブジェクトのい
 ずれかを返さねばなりません。 ``None`` を返した場合、 Django はリクエストの
 処理を継続し、他のミドルウェアや適切なビューを実行します。 ``HttpResponse``
-オブジェクトを返した場合、 Django は他のミドルウェアやビューを呼び出さず、
-その ``HttpResponse`` オブジェクトを応答として返します。
+オブジェクトを返した場合、 Django は他のリクエストミドルウェア、ビューミド
+ルウェア、例外ミドルウェア、あるいは URLconf で設定されたビューを呼び出さず、
+``HttpResponse`` オブジェクトをそのまま返します。レスポンスミドルウェアは必
+ず呼び出されます。
 
 process_view
 ------------
@@ -223,9 +246,10 @@ process_view
 の関数は ``None`` または ``HttpResponse`` オブジェクトを返さねばなりません。
 ``None`` を返した場合、 Django は処理を継続し、他のミドルウェアの
 ``process_view()`` を試した後、適切なビュー関数を呼び出します。
-``HttpResponse`` オブジェクトを返した場合、 Django はそれ以上他のミドルウェ
-アやビューを呼び出さず、その ``HttpResponse`` オブジェクトを応答として返し
-ます。
+``HttpResponse`` オブジェクトを返した場合、 Django は他のリクエストミドルウェ
+ア、ビューミドルウェア、例外ミドルウェア、あるいは URLconf で設定されたビュー
+を呼び出さず、 ``HttpResponse`` オブジェクトをそのまま返します。レスポンス
+ミドルウェアは必ず呼び出されます。
 
 process_response
 ----------------

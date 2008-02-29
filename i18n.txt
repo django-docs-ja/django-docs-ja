@@ -2,7 +2,7 @@
 国際化
 ======
 
-:revision-up-to: 5832 (0.97pre SVN)
+:revision-up-to: 7127 (0.97pre SVN)
 
 Django はコードとテンプレートの双方で国際化をフルサポートしています。このド
 キュメントでは国際化の仕組みについて説明します。
@@ -31,22 +31,7 @@ Django が行っているのは、本質的には以下の二つの作業です:
     * 指定したフックを使って、特定のユーザの言語設定に従って Web アプリケー
       ションを翻訳します。
 
-.. _`How to internationalize your app: in three steps`:
-
-アプリケーションを国際化するための 3 ステップ
----------------------------------------------
-
-    1. 翻訳対象文字列を Python コードとテンプレートに埋め込みます。
-    2. サポートしたい言語に対して翻訳カタログを作成します。
-    3. Django 設定ファイルで locale ミドルウェアを有効にします。
-
-.. class:: behind-the-scenes
-.. admonition:: 舞台裏
-
-    Django の翻訳機構は Python に付属の標準の ``gettext`` モジュールを使っ
-    ています。
-
-.. _If you don't need internationalization:
+.. _If you don't need internationalization in your app:
 
 国際化が必要ない場合
 ====================
@@ -64,10 +49,25 @@ Django の国際化フックはデフォルトで有効になっているので�
 .. _`USE_I18N のドキュメント`: ../settings/#use-i18n
 .. _documentation for USE_I18N: ../settings/#use-i18n
 
-.. _How to specify translation strings:
+.. _`If you do need internationalization: three steps`:
 
-翻訳文字列の指定方法
-====================
+国際化が必要な場合: 3 つのステップ
+===================================
+
+    1. 翻訳対象文字列を Python コードやテンプレートに埋め込みます。
+    2. サポートしたい言語について、翻訳対象文字列に対応する翻訳を行います。
+    3. Django の設定でロケールミドルウェアを有効化します。
+
+.. admonition:: 舞台裏では
+
+    Django の翻訳機構は、 Python に付属の ``gettext`` モジュールを使ってい
+    ます。
+
+
+.. _`1. How to specify translation strings`:
+
+1. 翻訳文字列の指定方法
+========================
 
 翻訳文字列 (translation string) は、「このテキストを翻訳対象にする」という
 指定を行います。翻訳文字列は Python コードにもテンプレートにも現れます。翻
@@ -320,6 +320,13 @@ Python コードとは少し違った方法で行います。テンプレート�
 このばあい、タグとフィルタの両方は翻訳済みの文字列を扱うことになるので、翻
 訳の有無について気を配る必要がなくなります。
 
+.. note::
+    上の例では、翻訳インフラストラクチャには文字列 ``"yes,no"`` が渡されま
+    す。 ``"yes"`` と ``"no"`` の別々の文字列が渡されるわけではありません。
+    フィルタが引数の文字列を正しく分割できるように、翻訳済みの文字列にはカ
+    ンマが入っていなければなりません。例えば、ドイツ語の翻訳は、 (カンマを
+    そのまま残して) ``"yes,no"`` を ``"ja,nein"`` に翻訳せねばなりません。
+
 .. _`Django テンプレート`: ../templates_python/
 .. _Django templates: ../templates_python/
 
@@ -327,7 +334,7 @@ Python コードとは少し違った方法で行います。テンプレート�
 .. _Working with lazy translation objects:
 
 遅延翻訳オブジェクトを操作する
-==============================
+--------------------------------
 
 モデルやユーティリティ関数では、 ``ugettext_lazy()`` や
 ``ungettext_lazy()`` を使って文字列をマークすることがよくあります。こうして
@@ -340,7 +347,7 @@ Python コードとは少し違った方法で行います。テンプレート�
 .. _`Joining strings: string_concat()`:
 
 文字列の結合: string_concat()
------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 標準の Python 文字列型の join メソッド (``''.join([...])``) は、
 遅延翻訳オブジェクトの入ったリストをうまく扱えません。その代わり、 
@@ -361,7 +368,7 @@ Python コードとは少し違った方法で行います。テンプレート�
 .. _The allow_lazy() decorator:
 
 allow_lazy() デコレータ
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 
 Django はたくさんのユーティリティ関数を (とりわけ ``django.utils`` パッケー
 ジで) 提供しています。これらの関数の多くは文字列を第一引数にとり、文字列に
@@ -397,10 +404,10 @@ Django はたくさんのユーティリティ関数を (とりわけ ``django.u
 後で遅延翻訳オブジェクトのサポートを追加できます。
 
 
-.. _How to create language files:
+.. _`2. How to create language files`:
 
-言語ファイルの作成
-==================
+2. 言語ファイルの作成
+======================
 
 文字列に翻訳用のタグをつけたら、今度は翻訳文自体を書く (または手に入れる)
 必要があります。ここでは翻訳文を書く方法について示します。
@@ -497,11 +504,12 @@ Django には ``bin/make-messages.py`` というツールが付属していま�
 
 .. admonition:: 文字コードセットに注意
 
-    ``.po`` ファイルをテキストエディタで作成するときには、文字コードセット
+    PO ファイルをテキストエディタで作成するときには、文字コードセット
     の行 (``"CHARSET"`` を探して下さい) をまず編集して、これから編集に使う
-    文字セットにしてください。一般的に、ほとんどの言語では utf-8 を使えるは
-    ずですが、 ``gettext`` はどんな文字セットを投入してもうまく処理するはず
-    です。
+    文字セットにしてください。 ``gettext`` ツールの内部動作の仕組み上、また、
+    Django のコア部分やアプリケーションで非 ASCII のソース文字列を扱えるよ
+    うにするために、 PO ファイルのエンコーディングは必ず UTF-8 にしてくださ
+    い。
 
 全てのソースコードとテンプレートを新たな翻訳文字列でためし、 **全ての** 言
 語用にメッセージファイルを更新するには、以下のようにします::
@@ -531,15 +539,13 @@ Django には ``bin/make-messages.py`` というツールが付属していま�
     Django がサポートできないような翻訳を作成してしまったら、是非教えて下さ
     い! 手順は `翻訳の提出と維持`_ にあります。
 
-.. _`翻訳の提出と維持`: 
-    ../contributing/#submitting-and-maintaining-translations
-.. _Submitting and maintaining translations: 
-    ../
+.. _Submitting and maintaining translations: ../contributing/#submitting-and-maintaining-translations
+.. _`翻訳の提出と維持`: `Submitting and maintaining translations`_
 
-.. _How Django discovers language preference:
+.. _`3. How Django discovers language preference`:
 
-言語設定の検出メカニズム
-========================
+3. 言語設定の検出メカニズム
+============================
 
 翻訳の準備を完了した、あるいは Django 付属の翻訳を使いたいだけなら、あとは
 アプリケーションで翻訳を有効にするだけです。
@@ -682,48 +688,6 @@ Django をネイティブの言語で動かしたいだけで、かつ自分の�
 .. _session: ../sessions/
 .. _request object: ../request_response/#httprequest-objects
 
-.. The set_language redirect view:
-
-``set_language`` リダイレクトビュー
-===================================
-
-利便性のために、 Django には ``django.views.i18n.set_language`` というビュー
-が付属しています。このビューはユーザの言語設定を行った後、以前のページにリ
-ダイレクトして戻します。
-
-このビューを有効にするには、以下の行を URLconf に入れます::
-
-    (r'^i18n/', include('django.conf.urls.i18n')),
-
-(注: この例ではビューを ``/i18n/setlang/`` で使えるようにしています)
-
-このビューは ``GET`` メソッドで呼び出されるようになっています。また、クエリ
-文字列中に ``language`` パラメタが設定されているものと想定しています。セッ
-ションのサポートが有効であれば、ビューはユーザのセッション情報に言語設定を
-保存します。セッションが有効でない場合、言語設定は ``django_language`` クッ
-キーに保存されます。
-
-言語設定を行った後、 Django は以下のアルゴリズムに従ってユーザをリダイレク
-トします:
-
-    * Django はクエリ文字列中に ``next`` パラメタがないか探します。
-    * ``next`` パラメタがないか空の場合、 Django は ``Referer`` ヘッダに
-      URL が指定されていないか調べます。
-    * ``Referer`` ヘッダが空の場合、すなわちユーザのブラウザがリファラヘッ
-      ダを抑制している場合、ユーザは ``/`` (サイトのルート) にリダイレクト
-      されます。
-
-HTML テンプレートコードの例を示します::
-    <form action="/i18n/setlang/" method="get">
-    <input name="next" type="hidden" value="/next/page/" />
-    <select name="language">
-    {% for lang in LANGUAGES %}
-    <option value="{{ lang.0 }}">{{ lang.1 }}</option>
-    {% endfor %}
-    </select>
-    <input type="submit" value="Go" />
-    </form>
-
 .. _Using translations in your own projects:
 
 自作のプロジェクトで翻訳を使う
@@ -753,8 +717,7 @@ Django は以下のアルゴリズムに従って翻訳を探します:
     イルのある場所を基準に ``locale`` ディレクトリの場所を調べますが、手動
     で設定を行うと設定ファイルが存在しなくなってしまうからです)。
 
-.. _settings documentation:
-    ../settings/#using-settings-without-setting-django-settings-module
+.. _settings documentation: ../settings/#using-settings-without-setting-django-settings-module
 .. _`settings のドキュメント`: `settings documentation`_
 
 
@@ -772,6 +735,9 @@ Django は以下のアルゴリズムに従って翻訳を探します:
 ションメッセージやプロジェクトメッセージの場合) ディレクトリのあるディレク
 トリで行わねばなりません。また、 ``gettext`` の使うバイナリ形式の
 ``django.mo`` ファイルを生成するには ``compile-messages.py`` を使います。
+
+``compile-message.py --settings=path.to.settings`` を実行すれば、コンパイラ
+に ``LOCALE_PATHS`` に設定された全てのディレクトリを処理させられます。
 
 アプリケーションメッセージファイルを発見するメカニズムはやや複雑で、
 ``LocaleMiddleware`` が必要になります。従って、このミドルウェアを使わない場
@@ -792,6 +758,50 @@ Django は以下のアルゴリズムに従って翻訳を探します:
 くというものです。こうすれば、プロジェクトレベルで ``make-messages`` を実行
 しても、自分のプロジェクトに明に関係する部分の文字列だけを翻訳し、別個に配
 布されたアプリケーションの文字列を対象にしなくなります。
+
+.. _The set_language redirect view:
+
+``set_language`` リダイレクトビュー
+=====================================
+
+利便性のために、 Django には ``django.views.i18n.set_language`` ビューが定
+義されています。このビューはユーザの言語プリファレンスを設定して、遷移前の
+ページにリダイレクトします。
+
+このビューを有効にするには、以下の行を URLconf に追加します::
+
+    (r'^i18n/', include('django.conf.urls.i18n')),
+
+(この例では ``/i18n/setlang/`` でビューを使えるようにします)
+
+ビューは、リクエストに ``language`` が設定された状態で、  ``POST`` メソッド
+で呼び出すようになっています。セッションのサポートが有効であれば、ビューは
+ユーザのセッションに選択した言語を保存します。セッションのサポートがなけれ
+ば、言語設定を ``django_language``` クッキーに保存します。
+
+選択された言語に設定した後、 Django は以下のアルゴリズムに従ってリダイレク
+トを行います:
+
+    * Django は ``POST`` データから ``next`` パラメタを探します。
+    * ``next`` がないか、空の値なら、 ``Referer`` ヘッダを使って遷移元を決
+      定しようとします。
+    * ``Referer`` の値も空の場合、例えばユーザのブラウザがリファラの送信を
+      抑制している場合には、フォールバックとして、ユーザは ``/`` (サイトの
+      ルート URL) にリダイレクトします。
+
+以下に HTML テンプレートのコード例を示します::
+
+    <form action="/i18n/setlang/" method="post">
+    <input name="next" type="hidden" value="/next/page/" />
+    <select name="language">
+    {% for lang in LANGUAGES %}
+    <option value="{{ lang.0 }}">{{ lang.1 }}</option>
+    {% endfor %}
+    </select>
+    <input type="submit" value="Go" />
+    </form>
+
+.. _`Translations and JavaScript`:
 
 翻訳と JavaScript
 =================
@@ -816,7 +826,7 @@ Django では、これらの問題に対する解決策を組み込みで提供�
 
 前述の問題に対する解決策は、 ``javascript_catalog`` ビューにあります。この
 ビューは ``gettext`` インタフェースをまねた関数の入った JavaScript コードと、
-翻訳文字列のアレイを送信します。翻訳文字列のアレイは {{{info_dict}}} や URL
+翻訳文字列のアレイを送信します。翻訳文字列のアレイは ``info_dict`` や URL
 の指定に従ってアプリケーションやプロジェクト、Django コア部分から取り出され
 ます。
 
@@ -889,7 +899,7 @@ JavaScript の翻訳カタログを作成する
 -----------------------------------
 
 JavaScript の翻訳カタログの作成と更新方法、他の Django の翻訳カタログの場合
-と同じで、 {{{make-messages.py}}} ツールを使います。ただし、
+と同じで、 ``make-messages.py`` ツールを使います。ただし、
 ``-d djangojs`` パラメタを指定してください。例えば:: 
 
     make-messages.py -d djangojs -l de
@@ -898,7 +908,7 @@ JavaScript の翻訳カタログの作成と更新方法、他の Django の翻�
 ます。翻訳カタログを更新したら、通常の Django 翻訳カタログと同じように、
 ``compile-messages.py`` を実行してください。
 
-.. _Specialities of Django translation:
+.. _Specialties of Django translation:
 
 Django 翻訳の特徴
 =================
