@@ -2,7 +2,7 @@
 django-admin.py と manage.py
 ============================
 
-:revision-up-to: 6075 (0.97pre SVN)
+:revision-up-to: 7127 (0.97pre SVN)
 
 ``django-admin.py`` は Django の管理タスクを行うためのコマンドライン
 ユーティリティです。このドキュメントでは ``django-admin.py`` の全ての
@@ -150,18 +150,28 @@ dumpdata <appname appname ...>
 
 ``dumpdata`` の出力は ``loaddata`` の入力に使えます。
 
+``dumpdata`` は、ダンプするレコードを取り出すときに、モデルのデフォルトマネ
+ジャを使います。デフォルトマネジャに `カスタムマネジャ`_ を使っていて、
+カスタムマネジャ内でレコードの一部をフィルタしていると、一部のオブジェクト
+がダンプされなくなるので注意してください。
+
+.. _custom manager: ../model-api/#custom-managers
+.. _`カスタムマネジャ`: `custom manager`_
+
+
 --format
 ~~~~~~~~
 
 デフォルトでは、 ``dumpdata`` の形式は JSON で出力されますが、
 ``--format`` オプションを使って別の形式を指定することもできます。現在サポート
-しているフォーマットは `Serialization formats`_ に列挙されています。
+しているフォーマットは `シリアライズ形式一覧`_ に列挙されています。
 
 使用例::
 
     django-admin.py dumpdata --format=xml
 
 .. _Serialization formats: ../serialization/#serialization-formats
+.. _`シリアライズ形式一覧`: `Serialization formats`_
 
 --indent
 ~~~~~~~~
@@ -200,9 +210,9 @@ flush
 ``django-admin.py`` の通知情報やデバッグ情報のコンソールへの出力量を指定する
 には ``--verbosity`` を使います。
 
-  * ``0`` means no input.
-  * ``1`` means normal input (default).
-  * ``2`` means verbose input.
+  * ``0`` だと、何も出力しません。
+  * ``1`` だと、通常の出力 (デフォルト) です。
+  * ``2`` だと、詳細に出力します。
 
 使用例::
 
@@ -322,9 +332,9 @@ Django は上記の場所に見つかった全てのフィクスチャファイ�
 ``django-admin.py`` のメッセージの通知やデバッグ情報のコンソールへの出力量を
 指定するには ``--verbosity`` を使います。
 
-  * ``0`` means no input.
-  * ``1`` means normal input (default).
-  * ``2`` means verbose input.
+  * ``0`` だと、何も出力しません。
+  * ``1`` だと、通常の出力 (デフォルト) です。
+  * ``2`` だと、詳細に出力します。
 
 使用例::
 
@@ -572,9 +582,9 @@ syncdb
 ``django-admin.py`` の通知情報やデバッグ情報のコンソールへの出力量を指定する
 には ``--verbosity`` を使います。
 
-  * ``0`` means no input.
-  * ``1`` means normal input (default).
-  * ``2`` means verbose input.
+  * ``0`` だと、何も出力しません。
+  * ``1`` だと、通常の出力 (デフォルト) です。
+  * ``2`` だと、詳細に出力します。
 
 使用例::
 
@@ -651,9 +661,6 @@ testserver <fixture fixture ...>
       操作を行っても、変更はテストデータベースにしか加えられないので、好き
       にデータベースを「汚せ」ます。
 
-このサーバはローカルホスト上でデフォルトのポートでしか起動せず、 ``host``
-や ``port`` パラメタを受け付けません。
-
 ``runserver`` は動作中に Python のソースコード上に加えられた変更を自動的に
 検出しますが、 ``testserver`` は検出しません。ただし、テンプレートへの変更
 は検出します。
@@ -661,15 +668,35 @@ testserver <fixture fixture ...>
 .. _unit tests: ../testing/
 .. _`ユニットテスト`: `unit tests`_
 
+--addrport [port number or ipaddr:port]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+IP アドレスやポート番号を 127.0.0.1:8000 から変更するには、 ``--addrport``
+を使います。この値は、 ``runserver`` サブコマンドの引数と同じ形式で指定し、
+意味も同じです。
+
+テストサーバをポート 7000 で起動し、 ``fixture1`` および ``fixture2`` のテ
+ストを実施するには、以下のようにします::
+
+    django-admin.py testserver --addrport 7000 fixture1 fixture2
+    django-admin.py testserver fixture1 fixture2 --addrport 7000
+
+(上の二つのコマンドは互いに等価です。オプションはフィクスチャを指定するため
+の引数の前にきても後ろに来てもかまいません。)
+
+``test`` フィクスチャを 1.2.3.4:7000 で実行するには、以下のようにします::
+
+    django-admin.py testserver --addrport 1.2.3.4:7000 test
+
 --verbosity
 ~~~~~~~~~~~
 
 ``django-admin.py`` の通知情報やデバッグ情報のコンソールへの出力量を指定する
 には ``--verbosity`` を使います。
 
-  * ``0`` means no input.
-  * ``1`` means normal input (default).
-  * ``2`` means verbose input.
+  * ``0`` だと、何も出力しません。
+  * ``1`` だと、通常の出力 (デフォルト) です。
+  * ``2`` だと、詳細に出力します。
 
 使用例::
 
@@ -718,8 +745,8 @@ allows for the following options:
 指定します。このオプションを指定しない場合、 ``django-admin.py`` は環境変数
 ``DJANGO_SETTINGS_MODULE`` を使います。
 
-``manage.py`` は ``DJANGO_SETTINGS_MODULE`` をきちんと設定してくれるの
-で、このオプションは必要ありません。
+``manage.py`` はデフォルトで現在のプロジェクトの ``settings.py`` を使うので、
+通常はこのオプションは必要ありません。
 
 
 .. _Extra niceties:
@@ -747,3 +774,40 @@ bash シェルを使っているのなら、 Django の bash 補完スクリプ�
     * [TAB] を押すと、利用可能な全てのオプションを表示します。
     * ``sql`` とタイプして [TAB] を押すと、 ``sql`` で始まる全てのオプショ
       ンを表示します。
+
+
+.. _Customized actions:
+
+アクションを自作する
+=====================
+
+**開発版の Django で新たに登場した機能です**
+
+アプリケーションごとに独自のアクションを定義して、 ``manage.py`` で使える
+ようにできます。例えば、配布したいアプリケーションの中に、 ``manage.py`` ア
+クションを追加したい場合があるとします。
+
+アクションを追加するには、アプリケーション内に ``management/commands`` ディ
+レクトリを作成します。このディレクトリ内のモジュールは、 ``manage.py`` の実
+行時に呼び出せるアクションとして自動的に検出されます::
+
+    blog/
+        __init__.py
+        models.py
+        management/
+            __init__.py
+            commands/
+                __init__.py
+                explode.py
+        views.py
+
+上の例では、 ``blog`` アプリケーションを ``settings.INSTALLED_APPS`` に登録
+してあるプロジェクトで ``explode`` というコマンドを使えるようになります。
+
+コマンドモジュールの必須の条件として、 ``explode.py`` は
+``django.core.management.base.BaseCommand`` を拡張した ``Command`` という名
+前のクラスを定義していなければなりません。
+
+自作のコマンドを定義する詳しい方法は、既存の ``django-admin.py`` コマンドの
+ソースコードを参照してください。ソースは
+``/django/core/management/commands`` にあります。

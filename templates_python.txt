@@ -1015,7 +1015,7 @@ Notes:
         def __init__(self, date_to_be_formatted, format_string):
             self.date_to_be_formatted = date_to_be_formatted
             self.format_string = format_string
-        
+
         def render(self, context):
             try:
                 actual_date = resolve_variable(self.date_to_be_formatted, context)
@@ -1087,7 +1087,7 @@ Python 2.4 からは、デコレータ構文もうまく動作します::
 テンプレートを使って現在のオブジェクトに応じた値を埋めるのが最良の方法と言
 えます。 (admin の ``submit_raw`` がそのタグです)。
 
-こうしたタグのことを `埋め込みタグ` (`inclusion tag`) と呼びます。
+こうしたタグのことを 「埋め込みタグ (inclusion tag)」 と呼びます。
 
 埋め込みタグの書き方を説明するには、例を挙げるのがベストでしょう。
 `チュートリアル`_ で作成した ``Poll`` オブジェクトを例に、ある ``Poll`` オ
