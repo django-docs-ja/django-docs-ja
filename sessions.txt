@@ -362,21 +362,6 @@ Django がセッションデータを保存する方法を指定します。利�
 
 詳しくは `セッションエンジンの設定`_ を参照してください。
 
-SESSION_ENGINE
---------------
-
-**New in Django development version**
-
-Default: ``django.contrib.sessions.backends.db``
-
-Controls where Django stores session data. Valid values are:
-
-    * ``'django.contrib.sessions.backends.db'``
-    * ``'django.contrib.sessions.backends.file'``
-    * ``'django.contrib.sessions.backends.cache'``
-
-See `configuring the session engine`_ for more details.
-
 SESSION_FILE_PATH
 -----------------
 
