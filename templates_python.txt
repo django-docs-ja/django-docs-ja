@@ -789,20 +789,149 @@ Python モジュールを作成したら、実現したいフィルタやタグ�
 上の例の下の定義のようにして ``name`` 引数を省略すると、 Django は関数名を
 そのままフィルタ名として使います。
 
-.. _Template filters which expect strings:
+.. _Filters and auto-escaping:
 
-文字列を引数に取るテンプレートフィルタ
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-第一引数として文字列をとるだけのテンプレートフィルタを書くために、
-``stringfilter`` というデコレータがあります。このデコレータは、引数に指定し
-たオブジェクトを、デコレーション対象の関数に渡す前に文字列に変換してくれま
-す::
+フィルタと自動エスケープ
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    from.django.template.defaultfilters import stringfilter
+カスタムフィルタを書く場合、フィルタが Django の自動エスケープとどう関わっ
+ているかに少し配慮しておく必要があります。
 
-    @stringfilter
-    def lower(value):
-    	return value.lower()
+まず、テンプレートのコード内では、 3 種類の文字列が受け渡しされています:
+
+    * **生の文字列** とは、 Python ネイティブの ``str`` や ``unicode`` 型の
+      オブジェクトです。出力時、自動エスケープが有効であればエスケープされ、
+      そうでなければ変更されません。
+
+    * **safe 文字列** とは、出力時にさらなるエスケープ処理を行わなくてもよ
+      い文字列です。safe 文字列は、必要なエスケープが済んでいる文字列です。
+      クライアント側でそのまま解釈されるべき生の HTML を含んだ文字列を表現
+      するのに使われます。
+
+      内部的には、これらの文字列は ``SafeString`` や ``SafeUnicode`` 型で表
+      現されています。 ``SafeString`` と ``SafeUnicode`` は ``SafeData`` を
+      共通の基底クラスに持つので、以下のようにすれば判別できます::
+
+          if isinstance(value, SafeData):
+              # "safe" 文字列を扱う処理をここに
+
+    * **"エスケープが必要" であるとマークされている文字列** は、
+      ``autoescape`` ブロックの指定に関係なく、必ずエスケープされます。
+      マークされている文字列は、自動エスケープの設定に関係なく、一度だけエ
+      スケープ処理を受けます。
+
+      内部的には、エスケープ必要文字列は、 ``EscapeString`` や
+      ``EscapeUnicode`` 型で表現されています。通常、これらの型のことを気に
+      する必要はありません。 ``EscapeString`` や ``EscapeUnicode`` は、
+      ``escape`` フィルタの実装のために用意されています。
+
+テンプレートフィルタのコードは、以下の二つのうちどちらかに落ち着きます:
+
+    1. フィルタコードの出力が、 HTML 出力として安全でない文字 (``<``,
+       ``>``, ``'``, ``"`` or ``&``) を含まない場合。この場合、自動エスケー
+       プの処理は全て Django に任せられます。必要なのは、フィルタ関数の
+       ``is_safe`` 属性に  ``True`` を設定しておくことだけです::
+
+           @register.filter
+           def myfilter(value):
+               return value
+           myfilter.is_safe = True
+
+       この属性を設定しておくと、このフィルタは「安全な」文字列を渡したとき
+       には出力は「安全な」ままであり、「安全でない」文字列を渡した時には、
+       必要に応じて自動的にエスケープします。
+       
+       ``is_safe`` は、「このフィルタは安全 (safe) であり、安全でない HTML
+       を生成する危険性がない」という意味だと考えてください。
+
+       ``is_safe`` が必要なのは、通常の文字列操作で、 ``SafeData`` オブジェ
+       クトを  ``str`` や ``unicode`` オブジェクトに変換するものが数多くあ
+       るためです。全てを try と catch で拾うのは難しいので、 Django はフィ
+       ルタ処理が完了した時点でダメージを回復する戦略を取っています。
+
+       例えば、入力の末尾に ``xx`` を追加するようなフィルタを書くとします。
+       このフィルタは危険な HTML 文字を出力しないので、フィルタ関数を
+       ``is_safe`` でマークしておきます::
+
+        @register.filter
+        def add_xx(value):
+            return '%sxx' % value
+        add_xx.is_safe = True
+
+       このフィルタをテンプレート上の自動エスケープが有効な部分で使うと、
+       Django は "safe" にマークされていない入力の時にフィルタの出力をエス
+       ケープします。
+
+       デフォルトでは、  ``is_safe`` は  ``False`` なので、 ``is_safe`` が
+       必要でなければ無視してかまいません。
+
+       フィルタを作成するときには、フィルタが本当に安全な文字を安全なままに
+       出力するのかをよく考えてください。例えば、フィルタが文字を *削除* す
+       る場合、出力結果に、対応の取れていないタグや不完全なエンティティ表現
+       が意図せず混じる可能性があります。例えば、 ``>`` を入力から削ってし
+       まうと、 ``<a>`` の出力は  ``<a`` になってしまい、問題を起こさないよ
+       うにするためには、出力をエスケープせねばならなくなってしまいます。同
+       様に、セミコロン (``;``) を除去すると、 ``&amp;`` は ``&amp`` になっ
+       てしまい、有効なエンティティ表現でないために、エスケープが必要になっ
+       てしまいます。たいていのケースでは、このようなトリッキーなことは起こ
+       りませんが、コードをレビューする際にはこの手のことが起こらないように
+       よく確認してください。
+
+    2. もう一つは、フィルタのコードで必要なエスケープを行うというものです。
+       出力に新たな HTML マークアップを含めたい場合に必要です。この場合、
+       出力する HTML マークアップがそれ以上エスケープされないよう、出力を
+       safe にする必要があるので、入力は自分で扱わねばなりません。
+
+       出力を safe 文字列としてマークするには、
+       ``django.utils.safestring.mark_safe()`` を使います。
+       ただし、注意してください。出力を safe であるとマークするだけでは十分
+       ではありません。出力が本当に safe *である* ことを保証せねばならず、
+       それは自動エスケープが有効か無効かで変わります。自動エスケープがオン
+       でもオフでも使え、テンプレートの作者が簡単に扱えるフィルタを書くのが
+       理想です。
+
+       現在の自動エスケープ状態をフィルタに教えるには、関数の
+       ``needs_autoescape`` 属性を ``True`` に設定します (この属性を設定
+       しない場合のデフォルト値は ``False`` です)。 ``needs_autoescape``
+       を ``True`` にすると、フィルタ関数には ``autoescape`` という追加の引
+       数が渡されます。自動エスケープが有効な状況でフィルタが呼び出されると、
+       ``autoescape`` には ``True`` が渡され、そうでない場合には ``False``
+       が渡されます。
+
+       例えば、文字列の先頭の文字を強調表示にするようなフィルタを書いてみま
+       しょう::
+
+           from django.utils.html import conditional_escape
+           from django.utils.safestring import mark_safe
+
+           def initial_letter_filter(text, autoescape=None):
+               first, other = text[0], text[1:]
+               if autoescape:
+                   esc = conditional_escape
+               else:
+                   esc = lambda x: x
+               result = '<strong>%s</strong>%s' % (esc(first), esc(other))
+               return mark_safe(result)
+           initial_letter_filter.needs_autoescape = True
+
+       フィルタ関数の ``needs_autoescape`` 属性と ``autoescape`` キーワード
+       引数の存在によって、フィルタ関数は自身が呼び出されたときの自動エスケー
+       プ状態を検知できます。上の例では、 ``autoescape`` を使って、入力デー
+       タを ``django.utils.html.conditional_escape`` で処理するべきかどうか
+       判定しています。 (``conditional_escape`` が不要の場合、 ``esc`` を
+       アイデンティティ関数にしています) ``conditional_escape()`` は
+       ``escape()`` に似ていますが、入力が ``SafeData`` インスタンスで
+       **ない** 場合にのみエスケープを適用します。 ``conditional_escape()``
+       に ``SafeData`` を渡すと、データは変更されません。
+       
+       最後に、上の例では、フィルタ結果を ``mark_safe`` で safe にマークし
+       て、出力結果の HTML をこれ以上エスケープせず、最終的なテンプレート出
+       力に挿入させています。
+
+       このケースでは、 ``is_safe`` 属性について触れていません (実際には、
+       設定しても何の影響もありません)。自動エスケープの問題を手動で解決し
+       て、 safe 文字列を返している場合、 ``is_safe`` 属性は何ら影響をもた
+       ないのです。
 
 
 .. _Writing custom template tags:
@@ -938,6 +1067,45 @@ Notes:
 レンダリングすることがあるので、このようなコンパイルとレンダリングの脱カッ
 プリングは究極的には効率的なテンプレートシステムを実現します。
 
+.. _Auto-escaping considerations:
+
+自動エスケープについての注意点
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**開発版の Django で新たに登場した機能**
+
+テンプレートタグの出力は、自動エスケープフィルタで自動的に処理され
+*ません* 。とはいえ、テンプレートタグを書くときには、二つのことを心に留めて
+置く必要があります。
+
+まず、テンプレートタグの ``render()`` が結果をコンテキスト変数に保存する場
+合 (文字列でそのまま返さない場合) には、必要なら ``mark_safe()`` を呼び出し
+ておく必要があります。その変数を最終的にレンダした時点で、変数は自動エスケー
+プの設定の影響を受けるので、自動エスケープから保護したい変数はそのようにマー
+クしておく必要があるのです。
+
+また、テンプレートタグがサブレンダリングのために新たなコンテキストを生成す
+る場合、そのコンテキスト変数に ``autoescape`` 属性を設定してください。
+``Context`` クラスの ``__init__`` メソッドは、この目的のために、
+``autoescape`` というパラメタをとれるようになっています。例えば::
+
+    def render(self, context):
+        # ...
+        new_context = Context({'var': obj}, autoescape=context.autoescape)
+        # ... 新しいコンテキストで何かする ...
+
+このような状況はあまりありませんが、テンプレートタグ内で別のテンプレートを
+レンダする場合には便利です。例えば::
+
+    def render(self, context):
+        t = template.load_template('small_fragment.html')
+        return t.render(Context({'var': obj}, autoescape=context.autoescape))
+
+上の例で、 ``context.autoescape`` の値を渡しわすれると、出力の変数は
+*全て* 自動エスケープされてしまい、その結果、テンプレートタグを
+``{% autoescape off %}`` ブロック内で使った場合の出力が期待とは違うものになっ
+てしまいます。
+
 .. _Registering the tag:
 
 タグの登録
@@ -1031,6 +1199,36 @@ Notes:
     キストから解決できなかった場合に ``VariableDoesNotExist`` 例外を送出し
     ます。
 
+
+.. admonition:: 開発版の Django で新たに登場した機能
+
+    開発版の Django では、変数の解決方法が変更されました。
+    ``template.resolve_variable()`` はまだ使えますが、撤廃され、
+    ``template.Variable`` に取って代わられました。たいていは、このクラスを
+    使った方が、 ``template.resolve_variable`` より高速です。
+
+    ``Variable`` クラスを使うには、解決したい名前を指定してインスタンスを生
+    成し、 ``variable.resolve(context)`` を呼び出します。つまり、開発版では、
+    上の例を以下のように書き換える必要があります::
+
+    .. parsed-literal::
+
+        class FormatTimeNode(template.Node):
+            def __init__(self, date_to_be_formatted, format_string):
+                self.date_to_be_formatted = **Variable(date_to_be_formatted)**
+                self.format_string = format_string
+
+            def render(self, context):
+                try:
+                    actual_date = **self.date_to_be_formatted.resolve(context)**
+                    return actual_date.strftime(self.format_string)
+                except template.VariableDoesNotExist:
+                    return ''
+
+    変更点は太字で示してあります。
+
+現在のページのコンテキストに、 ``Variable`` に渡した名前がなかった場合、
+名前解決の際に ``VariableDoesNotExist`` 例外が送出されます。
 
 .. _Shortcut for simple tags:
 
