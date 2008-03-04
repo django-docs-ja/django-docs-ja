@@ -4,181 +4,201 @@ contenttypes フレームワーク
 
 :revision-up-to: 7127 (0.97pre SVN)
 
-Django includes a "contenttypes" application that can track all of
-the models installed in your Django-powered project, providing a
-high-level, generic interface for working with your models.
+Django には、 ``contenttypes`` アプリケーションが付属しています。
+このアプリケーションを使うと、 Django で作成したプロジェクト中に存在する全
+てのモデルを追跡できます。また、 ``contenttypes`` では、モデルを扱うための
+高水準かつ汎用的なインタフェースを提供しています。
 
-Overview
-========
+.. _Overview:
 
-At the heart of the contenttypes application is the ``ContentType``
-model, which lives at
-``django.contrib.contenttypes.models.ContentType``. Instances of
-``ContentType`` represent and store information about the models
-installed in your project, and new instances of ``ContentType`` are
-automatically created whenever new models are installed.
+概要
+=====
 
-Instances of ``ContentType`` have methods for returning the model
-classes they represent and for querying objects from those models.
-``ContentType`` also has a `custom manager`_ that adds methods for
-working with ``ContentType`` and for obtaining instances of
-``ContentType`` for a particular model.
+``contenttypes`` アプリケーションの心臓部は、 ``ContentType`` モデル
+であり、 ``django.contrib.contenttypes.models.ContentType`` で定義されてい
+ます。 ``ContentType`` のインスタンスは、プロジェクト上にインストールされて
+いるモデルの情報を表現したり保存したりしています。新たにモデルをインストー
+ルすると、 ``ContentType`` が自動的に生成されます。
 
-Relations between your models and ``ContentType`` can also be used to
-enable "generic" relationships between an instance of one of your
-models and instances of any model you have installed.
+``ContentType`` のインスタンスは、インスタンスの表現するモデルクラス
+を返したり、そのモデルクラスに対してオブジェクトをクエリするためのメソッド
+を提供しています。また、 ``ContentType`` モデルは ``ContentType`` を扱った
+り、特定のモデルの ``ContentType`` を取り出すための `カスタムマネジャ`_ を
+持っています。
+
+あるモデルから ``ContentType`` にリレーションを張れば、そのモデルからインス
+トール済みの任意のモデルのインスタンスとの間に、「一般化リレーション
+(generic relation)」を張れます。
 
 .. _custom manager: ../model-api/#custom-managers
+.. _`カスタムマネジャ`: `custom manager`_
 
-Installing the contenttypes framework
-=====================================
+.. _Installing the contenttypes framework:
 
-The contenttypes framework is included in the default
-``INSTALLED_APPS`` list created by ``django-admin.py startproject``,
-but if you've removed it or if you manually set up your
-``INSTALLED_APPS`` list, you can enable it by adding
-``'django.contrib.contenttypes'`` to your ``INSTALLED_APPS`` setting.
+``contenttypes`` フレームワークのインストール
+================================================
 
-It's generally a good idea to have the contenttypes framework
-installed; several of Django's other bundled applications require it:
+``contenttypes`` フレームワークは、 ``django-admin.py startproject``
+の生成するデフォルトの ``settings.py`` の ``INSTALLED_APPS`` リストに
+入っています。リストから除外してしまっている場合や、 ``INSTALLED_APPS`` を
+自分で設定した場合には、 ``INSTALLED_APPS`` に
+``'django.contrib.contenttypes'`` を追加してフレームワークをインストールし
+てください。
 
-    * The admin application uses it to log the history of each object
-      added or changed through the admin interface.
+通常は、 ``contenttypes`` フレームワークをインストールしておいた方がよいで
+しょう。 Django にバンドルされている以下のアプリケーションには、
+``contenttypes`` フレームワークが必要だからです:
 
-    * Django's `authentication framework`_ uses it to tie user permissions
-      to specific models.
+    * ``admin`` アプリケーションは、管理インタフェース上で追加変更したオブ
+      ジェクトの履歴を管理するために ``contenttypes`` を使います。
 
-    * Django's comments system (``django.contrib.comments``) uses it to
-      "attach" comments to any installed model.
+    * Django の `認証フレームワーク`_ はユーザパーミッションをモデルに結び
+      つけるさために ``contenttypes`` を使います。
+
+    * Django のコメントシステム (``django.contrib.comments``) は、インストー
+      ルされている任意のモデルに対してコメントを付けられる機能を
+      ``contenttypes`` で実現しています。
 
 .. _authentication framework: ../authentication/
+.. _`認証フレームワーク`: `authentication framework`_
 
-The ``ContentType`` model
+.. _The ContentType model:
+
+``ContentType`` モデル
 =========================
 
-Each instance of ``ContentType`` has three fields which, taken
-together, uniquely describe an installed model:
+``ContentType`` のインスタンスには 3 つのフィールドがあり、 3 つを組み合わ
+せると、インストールされているモデルを一意に表現できます:
 
     ``app_label``
-        The name of the application the model is part of. This is taken from
-        the ``app_label`` attribute of the model, and includes only the *last*
-        part of the application's Python import path;
-        "django.contrib.contenttypes", for example, becomes an ``app_label``
-        of "contenttypes".
+        モデルの入っているアプリケーションの名前です。この名前はモデルの
+	``app_label`` 属性から取り出され、通常は Python の import パス
+	の *末尾* の部分が入っています。例えば、アプリケーションが
+	``django.contrib.contenttypes`` なら、 ``app_label``
+        は ``contenttypes`` です。
 
     ``model``
-        The name of the model class.
+        モデルクラスの名前です。
 
     ``name``
-        The human-readable name of the model. This is taken from
-        `the verbose_name attribute`_ of the model.
+        人間可読なモデル名です。この値は、モデルの `verbose_name 属性`_
+	から取り出されます。
 
-Let's look at an example to see how this works. If you already have
-the contenttypes application installed, and then add `the sites
-application`_ to your ``INSTALLED_APPS`` setting and run ``manage.py
-syncdb`` to install it, the model ``django.contrib.sites.models.Site``
-will be installed into your database. Along with it a new instance
-of ``ContentType`` will be created with the following values:
+例を挙げて、 ``contenttypes`` の仕組みをみてみましょう。 ``contenttypes``
+アプリケーションをインストールしておき、 ``INSTALLED_APPS`` 設定に
+`sites アプリケーション`_ を追加してから、 ``manage.py syncdb`` を実行して
+みてください。 ``django.contrib.sites.models.Site`` モデルがデータベースに
+インストールされるはずです。それに伴って、以下の値 ``ContentType`` の新たな
+インスタンスが生成されているはずです:
 
-    * ``app_label`` will be set to ``'sites'`` (the last part of the Python
-      path "django.contrib.sites").
+    * ``app_label`` は ``'sites'`` (``django.contrib.sites`` の末尾) に設定
+      されています。
 
-    * ``model`` will be set to ``'site'``.
+    * ``model`` は ``'site'`` に設定されています。
 
-    * ``name`` will be set to ``'site'``.
+    * ``name`` は ``'site'`` に設定されています。
 
 .. _the verbose_name attribute: ../model-api/#verbose_name
 .. _the sites application: ../sites/
+.. _`verbose_name 属性`: `the verbose_name attribute`_
+.. _`sites アプリケーション`: `the sites application`_
 
-Methods on ``ContentType`` instances
-====================================
+.. _Methods on ContentType instances:
 
-Each ``ContentType`` instance has methods that allow you to get from a
-``ContentType`` instance to the model it represents, or to retrieve objects
-from that model:
+``ContentType`` インスタンスのメソッド
+=======================================
+
+``ContentType`` インスタンスには、インスタンスの表現しているモデルクラスを
+取得したり、モデルクラスのインスタンスを取り出したりするためのメソッドがあ
+ります:
 
     ``get_object_for_this_type(**kwargs)``
-        Takes a set of valid `lookup arguments`_ for the model the
-        ``ContentType`` represents, and does `a get() lookup`_ on that
-        model, returning the corresponding object.
+        ``ContentType`` インスタンスの表現しているモデルでサポートされてい
+        る `照合メソッドの引数`_ をとり、モデルインスタンスの `get() 照合`_
+	を行って対応するオブジェクトを返します。
 
     ``model_class()``
-        Returns the model class represented by this ``ContentType``
-        instance.
+        ``ContentType`` インスタンスの表現しているモデルクラスを返します。
 
-For example, we could look up the ``ContentType`` for the ``User`` model::
+例を挙げましょう。まず ``ContentType`` から、 ``User`` モデルの
+``ContentType`` インスタンスを照合します::
 
     >>> from django.contrib.contenttypes.models import ContentType
     >>> user_type = ContentType.objects.get(app_label="auth", model="user")
     >>> user_type
     <ContentType: user>
 
-And then use it to query for a particular ``User``, or to get access
-to the ``User`` model class::
+取り出した ``User`` の ``ContentType`` から、 ``User`` モデルクラスを取り出
+したり、 ``User`` インスタンスを照合したりできます::
 
     >>> user_type.model_class()
     <class 'django.contrib.auth.models.User'>
     >>> user_type.get_object_for_this_type(username='Guido')
     <User: Guido>
 
-Together, ``get_object_for_this_type`` and ``model_class`` enable two
-extremely important use cases:
+``get_object_for_this_type`` と ``model_class`` を組み合わせると、非常に重
+要なユースケースを実現できます:
 
-    1. Using these methods, you can write high-level generic code that
-       performs queries on any installed model -- instead of importing and
-       using a single specific model class, you can pass an ``app_label``
-       and ``model`` into a ``ContentType`` lookup at runtime, and then
-       work with the model class or retrieve objects from it.
+    1. 二つのメソッドを使えば、特定のモデルクラスを import して使うのではな
+       く、インストールされている全てのモデルに対して操作を行えるような一般
+       化された高水準のコードを書けます。実行時に ``app_label`` と
+       ``model`` を指定して  ``ContentType`` を照合し、得られたモデルクラス
+       からオブジェクトを取り出せるのです。
 
-    2. You can relate another model to ``ContentType`` as a way of tying
-       instances of it to particular model classes, and use these methods
-       to get access to those model classes.
+    2. 別のモデルから ``ContentType`` にリレーションを張って、モデルのイン
+       スタンスと、 ``ContentType`` の表すモデルクラスを結びつけ、モデルク
+       ラスのメソッドにアクセスできます。
 
-Several of Django's bundled applications make use of the latter
-technique. For example, `the permissions system`_ in Django's
-authentication framework uses a ``Permission`` model with a foreign
-key to ``ContentType``; this lets ``Permission`` represent concepts
-like "can add blog entry" or "can delete news story".
+Django にバンドルされているアプリケーションには、後者のテクニックを使ってい
+るものがいくつかあります。例えば、 Django の認証フレームワークに入っている
+`パーミッションのシステム`_ は、 ``ContentType`` への外部キーを張っています。
+そうすることで、 ``Permission`` は「ブログにエントリを追加」や「ニュースス
+トーリーを削除」といった権限を表現できます。
 
 .. _lookup arguments: ../db-api/#field-lookups
 .. _a get() lookup: ../db-api/#get-kwargs
 .. _the permissions system: ../authentication/#permissions
+.. _`照合メソッドの引数`: `lookup arguments`_
+.. _`get() 照合`: `a get() lookup`_
+.. _`パーミッションのシステム`: `the permissions system`_
 
-The ``ContentTypeManager``
---------------------------
+.. _The ContentTypeManager:
 
-``ContentType`` also has a custom manager, ``ContentTypeManager``,
-which adds the following methods:
+``ContentTypeManager`` カスタムマネジャ
+-----------------------------------------
+
+``ContentType`` には ``ContentTypeManager`` というカスタムマネジャがありま
+す。このカスタムマネジャには、以下のメソッドがあります:
 
     ``clear_cache()``
-        Clears an internal cache used by ``ContentType`` to keep track of which
-        models for which it has created ``ContentType`` instances. You probably
-        won't ever need to call this method yourself; Django will call it
-        automatically when it's needed.
+        ロード済みの ``ContentType`` インスタンスを保持しておくための内部
+        キャッシュをクリアします。このメソッドを自分で呼ぶことはほとんどな
+        いでしょう。 Django は必要に応じて自動的にメソッドを呼び出します。
 
     ``get_for_model(model)``
-        Takes either a model class or an instance of a model, and returns the
-        ``ContentType`` instance representing that model.
+        モデルクラスやモデルのインスタンスを引数にとり、そのモデルを表す
+        ``ContentType`` インスタンスを返します。
 
-The ``get_for_model`` method is especially useful when you know you
-need to work with a ``ContentType`` but don't want to go to the
-trouble of obtaining the model's metadata to perform a manual lookup::
+``ContentType`` を扱いたいけれども、わざわざモデルのメタデータを取り出し
+て ``ContentType`` を手動で照合するのは面倒な場合には ``get_for_model`` 
+メソッドが特に便利です::
 
     >>> from django.contrib.auth.models import User
     >>> user_type = ContentType.objects.get_for_model(User)
     >>> user_type
     <ContentType: user>
 
-Generic relations
-=================
+.. _Generic relations:
 
-Adding a foreign key from one of your own models to ``ContentType``
-allows your model to effectively tie itself to another model class, as
-in the example of the ``Permission`` model above. But it's possible to
-go one step further and use ``ContentType`` to enable truly generic
-(sometimes called "polymorphic") relationships between models.
+一般化リレーション
+===================
 
-A simple example is a tagging system, which might look like this::
+上で述べた ``Permission`` モデルの例のように、自作のモデルから
+``ContentType`` に外部キーを張れば、モデルを別のモデルクラスに結びつけられ
+ます。しかし、もう一歩踏み込めば、 ``ContentType`` を使って真の
+一般化リレーション (または多態性: polymorphic リレーション) を実現できます。
+
+簡単な例として、以下のようなタグシステムを挙げましょう::
 
     from django.db import models
     from django.contrib.contenttypes.models import ContentType
@@ -193,29 +213,29 @@ A simple example is a tagging system, which might look like this::
         def __unicode__(self):
             return self.tag
 
-A normal ``ForeignKey`` can only "point to" one other model, which
-means that if the ``TaggedItem`` model used a ``ForeignKey`` it would have to
-choose one and only one model to store tags for. The contenttypes
-application provides a special field type --
-``django.contrib.contenttypes.generic.GenericForeignKey`` -- which
-works around this and allows the relationship to be with any
-model. There are three parts to setting up a ``GenericForeignKey``:
+通常の ``ForeignKey`` は、他のモデルを「指し示す」だけに過ぎません。従って、
+``TaggedItem`` モデルで ``ForeignKey`` を使う場合、ただ一つのモデルに対して
+しかタグを保存できません。この問題を解決し、任意のモデルにリレーションを張
+れるようにするために、 ``contenttypes`` アプリケーションでは、特殊なフィー
+ルドタイプ、 ``django.contrib.contenttypes.generic.GenericForeignKey`` を提
+供しています。 ``GenericForeignKey`` のセットアップは、以下の 3 つのパート
+に分かれています:
 
-    1. Give your model a ``ForeignKey`` to ``ContentType``.
+    1. ``ContentType`` への ``ForeignKey`` を定義します。
 
-    2. Give your model a field that can store a primary-key value from the
-       models you'll be relating to. (For most models, this means an
-       ``IntegerField`` or ``PositiveIntegerField``.)
+    2. リレーション先のモデルインスタンスの主キー値を保存するためのモデル
+       フィールドを定義します (ほとんどのモデルでは、 ``IntegerField`` また
+       は ``PositiveIntegerField`` です)。
 
-    3. Give your model a ``GenericForeignKey``, and pass it the names of
-       the two fields described above. If these fields are named
-       "content_type" and "object_id", you can omit this -- those are the
-       default field names ``GenericForeignKey`` will look for.
+    3. ``GenericForeignKey`` を定義します。 ``GenericForeignKey`` の引数に、
+       上で定義したフィールドの名前を指定します。フィールド名が
+       ``GenericForeignKey`` の探すデフォルトの名前である ``content_type``
+       や ``object_id`` の場合には、引数を省略してかまいません。
 
-This will enable an API similar to the one used for a normal ``ForeignKey``;
-each ``TaggedItem`` will have a ``content_object`` field that returns the
-object it's related to, and you can also assign to that field or use it when
-creating a ``TaggedItem``::
+これで、通常の ``ForeignKey`` に似た API を実現できます。 ``TaggedItem``
+はリレーションを張っている対象のモデルインスタンスを返す ``content_object``
+フィールドを持つようになります。 ``content_object`` の値は、
+``TaggedItem`` を生成するときに指定できます::
 
     >>> from django.contrib.auth.models import User
     >>> guido = User.objects.get(username='Guido')
@@ -224,18 +244,22 @@ creating a ``TaggedItem``::
     >>> t.content_object
     <User: Guido>
 
-Reverse generic relations
--------------------------
+.. _Reverse generic relations:
 
-If you know which models you'll be using most often, you can also add
-a "reverse" generic relationship to enable an additional API. For example::
+逆方向の一般化リレーション
+----------------------------
+
+リレーション対象にどのモデルがよく使われるのかが分かっていれば、
+「逆方向の」一般化リレーションを張って、 API を追加できます。例を挙げましょ
+う::
 
     class Bookmark(models.Model):
         url = models.URLField()
         tags = generic.GenericRelation(TaggedItem)
 
-``Bookmark`` instances will each have a ``tags`` attribute, which can
-be used to retrieve their associated ``TaggedItems``::
+これで、 ``Bookmark`` インスタンスは ``tags`` 属性をそなえます。この属性を
+使うと、インスタンスにリレーションを張っている ``TaggedItems`` を取り出せま
+す::
 
     >>> b = Bookmark(url='http://www.djangoproject.com/')
     >>> b.save()
@@ -246,7 +270,7 @@ be used to retrieve their associated ``TaggedItems``::
     >>> b.tags.all()
     [<TaggedItem: django>, <TaggedItem: python>]
 
-If you don't add the reverse relationship, you can do the lookup manually::
+逆方向のリレーションを張らなければ、手動で照合する必要があります::
 
     >>> b = Bookmark.objects.get(url='http://www.djangoproject.com/)
     >>> bookmark_type = ContentType.objects.get_for_model(b)
@@ -254,7 +278,8 @@ If you don't add the reverse relationship, you can do the lookup manually::
     ...                           object_id=b.id)
     [<TaggedItem: django>, <TaggedItem: python>]
 
-Note that if you delete an object that has a ``GenericRelation``, any objects
-which have a ``GenericForeignKey`` pointing at it will be deleted as well. In
-the example above, this means that if a ``Bookmark`` object were deleted, any
-``TaggedItem`` objects pointing at it would be deleted at the same time.
+``GenericRelation`` を持つオブジェクトを削除すると、このオブジェクトに
+``GenericForeignKey`` でリレーションを張っているオブジェクトも全て削除され
+るので注意してください。つまり、上の例では、 ``Bookmark`` オブジェクト
+``b`` を削除すると、 ``b`` にリレーションを張っている ``t1`` や ``t2`` といっ
+た ``TaggedItem``  も同時に削除されるのです。
