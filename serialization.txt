@@ -2,7 +2,7 @@
 Django オブジェクトのシリアライズ
 =================================
 
-:revision-up-to: 7127 (0.97pre SVN)
+:revision-up-to: 7193 (0.97pre SVN)
 
 .. note::
     
@@ -99,11 +99,11 @@ Django の整列化フレームワークを使うと， Django オブジェク�
 
     for deserialized_object in serializers.deserialize("xml", data):
         if object_should_be_saved(deserialized_object):
-            obj.save()
+            deserialized_object.save()
             
-換言すれば，通常はデシリアライズしたオブジェクトを保存する場合，前もって保
-存に適しているかどうかを調べます．もちろん，データソースを信頼できるのなら，
-単にデータを保存してもかまいません．
+すなわち，デシリアライズしたオブジェクトを保存する場合，前もって保存に適し
+ているかどうかを調べるのが普通のやり方なのです．もちろん，データソースを信
+頼できるのなら，単にデータを保存してもかまいません．
 
 Django オブジェクト自体に対するインスペクションは，
 ``deserialized_object.object`` で行えます．

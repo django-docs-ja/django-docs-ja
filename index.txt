@@ -8,14 +8,14 @@ Django オンラインドキュメント和訳
 底本
     SVN trunk (0.97pre SVN)
 追従済みリビジョン
-    6126 (2007/09/13) [7127 追従中]
+    7139 (2008/03/05)
 
 必読
 ----
 
 `Django の概要 (Django overview) <../overview/>`__
 
-`インストールガイド <../install/>`__
+`インストールガイド (How to install Django) <../install/>`__
 
 `サードパーティによる Django ディストリビューション (Third-party distributions of Django) <../distributions/>`__
 
@@ -49,11 +49,13 @@ Django オンラインドキュメント和訳
 
 `モデルの作成 (Creating models) <../model-api/>`__ 
 
+`カスタムのモデルフィールド (Custom model fields) <../custom_model_fields/>`__ 
+
 `データベース API (The database API) <../db-api/>`__
 
 `トランザクション (Managing database transactions) <../transactions/>`__
 
-`Model examples <http://www.djangoproject.com/documentation/models/>`__
+`モデル例 (Model examples) <http://www.djangoproject.com/documentation/models/>`__
 
 テンプレート
 ~~~~~~~~~~~~
@@ -64,12 +66,16 @@ Django オンラインドキュメント和訳
 `Python プログラマのための Django テンプレート言語ガイド
 (Guide for Python programmers)  <../templates_python/>`__
 
-`Django shortcut functions <../shortcuts/>`__
+`ショートカット関数 (Django shortcut functions) <../shortcuts/>`__
 
 `フォームとマニピュレータ
 (Forms, fields, and manipulators) <../forms/>`__
 
-`newforms ライブラリ <../newforms/>`__
+`newforms ライブラリ (The newforms library) <../newforms/>`__
+
+`モデルに対応したフォームの生成 (Generating forms for models) <../form_for_model/>`__
+
+`newforms とモデルを組み合わせる (Using newforms with models) <../modelforms/>`__
 
 `Django アプリケーションのテスト (Writing tests for Django applications) <../testing/>`__
 
@@ -114,9 +120,9 @@ Django オンラインドキュメント和訳
 
   `databrowse アプリケーション <../databrowse/>`__
 
-  `Form preview <../form_preview/>`__
+  `フォームプレビューアプリケーション (Form preview) <../form_preview/>`__
 
-  `The contenttypes framework <../contenttypes/>`__
+  `contenttypes フレームワーク <../contenttypes/>`__
 
 運用関連
 --------
@@ -153,10 +159,10 @@ Django オンラインドキュメント和訳
 
 `Django の設計思想 (Design philosophies) <../design_philosophies/>`__
 
-`Django プロジェクトに協力するために
+`Django プロジェクトに協力する
 (How to contribute to Django) <../contributing/>`__
 
-`Django admin CSS guide <../admin_css/>`__
+`管理インタフェースのカスタマイズ (Customizing the Django admin interface) <../admin_css/>`__
 
 `API の安定性 <../api_stability/>`__
 

@@ -2,7 +2,7 @@
 データベース API リファレンス
 =============================
 
-:revision-up-to: 7127 (0.97pre SVN)
+:revision-up-to: 7193 (0.97pre SVN)
 
 `データモデル`_ を作成したら、次はデータベースからデータを取り出す必要があ
 ります。このドキュメントでは、モデルから利用できるデータベース抽象化 API と、
@@ -494,7 +494,7 @@ Django データベースオブジェクトがオブジェクトの作成と変�
 .. _QuerySet methods that return new QuerySets:
 
 新たなクエリセットを返すクエリセットメソッド
---------------------------------------------
+---------------------------------------------
 
 Django では、クエリセットの返す結果の形式や、 SQL クエリの実行方法を変更す
 るためのリファインメソッドを幅広く提供しています。
@@ -1714,8 +1714,8 @@ Django はまた、リレーションの「相手側」へのアクセス API、
     print e.blog  # Doesn't hit the database; uses cached version.
     print e.blog  # Doesn't hit the database; uses cached version.
 
-``select_related()`` のドキュメントは、前述の「 新たなクエリセットを返すク
-エリセットメソッド」の節にあります。
+``select_related()`` のドキュメントは、前述の
+「 `新たなクエリセットを返すクエリセットメソッド`_ 」の節にあります。
 
 .. _Backward:
 
