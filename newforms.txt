@@ -1945,11 +1945,12 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
 い。
 
 ``form_for_model`` や ``form_for_instance`` は撤廃されます。これらのドキュ
-メントは、 `別のドキュメント <../form_for_model>`_ に移されました。
+メントは、 `別のドキュメント`_ に移されました。
 
 .. _ModelForms documentation: ../modelforms/
 .. _view the documentation: ../form_for_model/
 .. _`ModelForm のドキュメント`: `ModelForms documentation`_
+.. _`別のドキュメント`: `view the documentation`_
 
 
 .. _More coming soon:

@@ -445,8 +445,8 @@
 ドが ``POST`` でない場合のブロックでは、 ``message`` インスタンスの値がフォー
 ムフィールドの初期値に使われるということです。
 
-.. _contact form: ../newforms/#simple_view_example
-.. _earlier: ../newforms/#simple_view_example
+.. _contact form: ../newforms/#simple-view-example
+.. _`simple example view`: ../newforms/#simple-view-example
 .. _`コンタクトフォーム`: `contact form`_
 
 

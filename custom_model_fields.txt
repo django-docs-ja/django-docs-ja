@@ -75,7 +75,7 @@ Our example object
     た標準の Python データを扱いたいという場合もあるでしょう。このケースも
     ``Hand`` の例とほぼ同様で、違いは後で説明します。
 
-.. _model reference: ../model_api/
+.. _model reference: ../model-api/
 .. _PostgreSQL custom types: http://www.postgresql.org/docs/8.2/interactive/sql-createtype.html
 .. _Bridge: http://en.wikipedia.org/wiki/Contract_bridge
 .. _`モデルリファレンス`: `model reference`_

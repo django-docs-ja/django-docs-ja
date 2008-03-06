@@ -865,7 +865,7 @@ pagination に関する注意
 
 ペジネーションの用例は、 `object pagination`_ のモデルサンプルにあります。
 	 
-.. _`object pagination`: ../models/pagination/
+.. _`object pagination`: http://www.djangoproject.com/documentation/models/pagination/
 
 **開発版の Django で登場した機能:** 
 

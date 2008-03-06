@@ -386,12 +386,12 @@ django.core.context_processors.auth
       す、 ``django.core.context_processors.PermWrapper`` のインスタンスで
       す。 `パーミッションのドキュメント`_ を参照してください。
 
-.. _`ユーザ認証のドキュメント`: ../authentication/#users
-.. _`パーミッションのドキュメント`: ../authentication/#permissions
-.. _`メッセージのドキュメント`: ../authentication/#messages
-.. _user authentication docs: ../models/authentication/#users
+.. _user authentication docs: ../authentication/#users
 .. _message docs: ../authentication/#messages
-.. _permissions docs: ../models/authentication/#permissions
+.. _permissions docs: ../authentication/#permissions
+.. _`ユーザ認証のドキュメント`: `user authentication docs`_
+.. _`メッセージのドキュメント`: `message docs`_
+.. _`パーミッションのドキュメント`: `permissions docs`_
 
 django.core.context_processors.debug
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

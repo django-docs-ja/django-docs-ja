@@ -98,7 +98,7 @@ Django には、 ``contenttypes`` アプリケーションが付属していま�
 
     * ``name`` は ``'site'`` に設定されています。
 
-.. _the verbose_name attribute: ../model-api/#verbose_name
+.. _the verbose_name attribute: ../model-api/#verbose-name
 .. _the sites application: ../sites/
 .. _`verbose_name 属性`: `the verbose_name attribute`_
 .. _`sites アプリケーション`: `the sites application`_
