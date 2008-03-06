@@ -1103,7 +1103,7 @@ Notes:
         t = template.loader.get__template('small_fragment.html')
         return t.render(Context({'var': obj}, autoescape=context.autoescape))
 
-上の例で、 ``context.autoescape`` の値を渡しわすれると、出力の変数は
+上の例で、 ``context.autoescape`` の値を渡し忘れると、出力の変数は
 *全て* 自動エスケープされてしまい、その結果、テンプレートタグを
 ``{% autoescape off %}`` ブロック内で使った場合の出力が期待とは違うものになっ
 てしまいます。

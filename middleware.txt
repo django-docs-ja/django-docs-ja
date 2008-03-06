@@ -73,7 +73,7 @@ django.middleware.common.CommonMiddleware
   つきの URL にリダイレクトします。そうでなければ、 URL を通常の手順に従っ
   て処理します。
 
-  例えば、 ``foo.com/bar`` に一致するパターンがなく、 ``foo.com/bar`` に一
+  例えば、 ``foo.com/bar`` に一致するパターンがなく、 ``foo.com/bar/`` に一
   致するパターンが *あれば* 、 ``foo.com/bar`` は ``foo.com/bar/`` にリダイ
   レクトされます。
 
