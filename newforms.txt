@@ -2,7 +2,7 @@
 newforms ライブラリ
 ===================
 
-:revision-up-to: 7127 (0.97pre SVN)
+:revision-up-to: 7197 (0.97pre SVN)
 
 ``django.newforms`` は、 Django に新たに導入された画期的なフォーム処理ライ
 ブラリで、従来のフォーム／マニピュレータ／バリデータフレームワークである
@@ -297,6 +297,10 @@ Django コンポーネントに対してカップリングしていません。 
     True
     >>> f.cleaned_data
     {'cc_myself': True, 'message': u'Hi there', 'sender': u'foo@example.com', 'subject': u'hello'}
+
+.. note::
+    **開発版の機能です** ``cleaned_data`` 属性は、以前のリリースでは
+    ``clean_data`` と呼ばれていました。
 
 ``CharField`` や ``EmailField`` のようなテキストベースのフィールドは、常に
 入力を Unicode 文字列に変換します。エンコーディングに関する解説は、このドキュ
