@@ -2,7 +2,7 @@
 flatpages アプリケーション
 ===========================
 
-:revision-up-to: 7127 (0.97pre SVN)
+:revision-up-to: 7210 (0.97pre SVN)
 
 Django にはオプションのアプリケーション， "flatpages" がついてきます．
 "flatpages" を使うと，データベースに素 ("flat") の HTML コンテンツを Django
@@ -30,15 +30,19 @@ Django を使ったサイトの中にも， flatpages を使ったサイトが�
 
 flatpages アプリケーションをインストールするには，以下の手順に従って下さい:
 
-    1. ``'django.contrib.flatpages'`` を `INSTALLED_APPS`_ に加えます．
-    2. ``'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'``
+    1. もし追加されていなければ， ``'django.contrib.sites'`` を INSTALLED_APPS_
+       設定へ追加し `sites フレームワーク`_ をインストールします．
+    2. ``'django.contrib.flatpages'`` を `INSTALLED_APPS`_ に加えます．
+    3. ``'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'``
        を `MIDDLEWARE_CLASSES`_ に加えます．
-    3. ``python manage.py syncdb`` を実行します．
+    4. ``python manage.py syncdb`` を実行します．
 
+.. _sites framework: ../sites/
 .. _`INSTALLED_APPS`: ../settings/#installed-apps
 .. _`MIDDLEWARE_CLASSES`: ../settings/#middleware-classes
 .. INSTALLED_APPS: ../settings/#installed-apps
 .. MIDDLEWARE_CLASSES: ../settings/#middleware-classes
+.. _`sites フレームワーク`: `sites framework`_
 
 .. _How it works:
 
