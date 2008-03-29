@@ -2,7 +2,7 @@
 newforms とモデルを組み合わせる
 ================================
 
-:revision-up-to: 7127 (0.97pre SVN)
+:revision-up-to: 7223 (0.97pre SVN)
 
 ``ModelForm``
 =============
@@ -246,7 +246,7 @@ newforms とモデルを組み合わせる
 
     # POST データから新たなフォームインスタンスを生成
     >>> a = Author()
-    >>> f = AuthorForm(a, request.POST)
+    >>> f = AuthorForm(request.POST, instance=a)
 
     # 新たな Author インスタンスを生成して保存。他にはなにもしなくてよい
     >>> new_author = f.save()
@@ -260,35 +260,35 @@ newforms とモデルを組み合わせる
 示したいことでしょう。モデルフィールドの一部だけを使って ``ModelForm`` を作
 るには、以下の 3 つの方法があります:
 
-    1. モデルフィールドに ``editable=False`` を定義します。その結果、
-       モデルフォームを使って生成したフォームは *全て* このフィールドを含ま
-       なくなります。
+1. モデルフィールドに ``editable=False`` を定義します。その結果、
+   モデルフォームを使って生成したフォームは *全て* このフィールドを含ま
+   なくなります。
 
-    2. ``ModelForm`` サブクラスで、内部クラス ``Meta`` の ``fields`` 属性を
-       設定します。この属性にはフィールド名からなるリストを設定します。設定
-       すると、指定されたフィールドだけを含むフォームを生成します。
+2. ``ModelForm`` サブクラスで、内部クラス ``Meta`` の ``fields`` 属性を
+   設定します。この属性にはフィールド名からなるリストを設定します。設定
+   すると、指定されたフィールドだけを含むフォームを生成します。
 
-    3. ``ModelForm`` サブクラスで、内部クラス ``Meta`` の ``exclude`` 属性を
-       設定します。この属性にはフィールド名からなるリストを設定します。設定
-       すると、指定されたフィールドを含まないフォームを生成します。
+3. ``ModelForm`` サブクラスで、内部クラス ``Meta`` の ``exclude`` 属性を
+   設定します。この属性にはフィールド名からなるリストを設定します。設定
+   すると、指定されたフィールドを含まないフォームを生成します。
 
-       例えば、 (上で定義した) ``Author`` モデルから、 ``name`` と
-       ``title`` フィールドだけを含むようなフォームを作成したければ、以下の
-       ようにして ``fields`` または ``exclude`` を指定します::
+例えば、 (上で定義した) ``Author`` モデルから、 ``name`` と
+``title`` フィールドだけを含むようなフォームを作成したければ、以下の
+ようにして ``fields`` または ``exclude`` を指定します::
 
-          class PartialAuthorForm(ModelForm):
-              class Meta:
-                  model = Author
-                  fields = ('name', 'title')
+    class PartialAuthorForm(ModelForm):
+        class Meta:
+            model = Author
+            fields = ('name', 'title')
 
-          class PartialAuthorForm(ModelForm):
-              class Meta:
-                  model = Author
-                  exclude = ('birth_date',)
+    class PartialAuthorForm(ModelForm):
+        class Meta:
+            model = Author
+            exclude = ('birth_date',)
 
-        Author モデルには ``'name'``, ``'title'``, ``'birth_date'`` の 3 つ
-        のフィールドしかないので、上のフォームは全く同じフォームフィールド
-        を持ちます。
+Author モデルには ``'name'``, ``'title'``, ``'birth_date'`` の 3 つ
+のフィールドしかないので、上のフォームは全く同じフォームフィールド
+を持ちます。
 
 .. note::
 

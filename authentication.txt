@@ -2,7 +2,7 @@
 Django でのユーザ認証
 =====================
 
-:revision-up-to: 7127 (0.97pre SVN)
+:revision-up-to: 7229 (0.97pre SVN)
 
 Django にはユーザ認証システムがついてきます。 Django のユーザ認証システムは、
 ユーザアカウント、グループ、パーミッションとクッキーベースのユーザセッショ
@@ -95,12 +95,12 @@ API リファレンス
 できます::
 
     myuser.groups = [group_list]
-    myuser.groups.add(group, group,...)
-    myuser.groups.remove(group, group,...)
+    myuser.groups.add(group, group, ...)
+    myuser.groups.remove(group, group, ...)
     myuser.groups.clear()
     myuser.user_permissions = [permission_list]
     myuser.user_permissions.add(permission, permission, ...)
-    myuser.user_permissions.remove(permission, permission, ...]
+    myuser.user_permissions.remove(permission, permission, ...)
     myuser.user_permissions.clear()
 
 自動的に生成されるこれらの API に加え、 ``User`` オブジェクトには以下のカス
@@ -384,13 +384,13 @@ API について扱ってきました。より高水準の API では、 Django 
 .. _session documentation: ../sessions/
 
 .. admonition:: ``authenticate()`` は最初に呼び出してください
-    
+
     ユーザを手動でログインさせる場合、 ``login()`` を呼び出す前に必ず
     ``authenticate()`` を呼び出してください。 ``authenticate()`` は、
     ``User`` オブジェクトに、そのユーザが認証バックエンドによって正しく認証
     されたことを示す属性を付加 (詳しくは `認証バックエンドのドキュメント`_
     を参照してください) し、この情報が ``login()`` の処理で必要だからです。
-    
+
 .. _backends documentation: #other-authentication-sources
 .. _`認証バックエンドのドキュメント`: `backends documentation`_
 
@@ -524,7 +524,7 @@ Python 2.4 で登場したよりコンパクトなデコレータ構文を使っ
 
 開発版の Django では、 ``login_required`` はオプションの引数
 ``redirect_field_name`` を取れます。例えば::
-    
+
     from django.contrib.auth.decorators import login_required
 
     def my_view(request):
@@ -533,7 +533,7 @@ Python 2.4 で登場したよりコンパクトなデコレータ構文を使っ
 
 同様に、 Python 2.4 で登場したよりコンパクトなデコレータ構文を使った例を以
 下に示します::
-    
+
     from django.contrib.auth.decorators import login_required
 
     @login_required(redirect_field_name='redirect_to')
@@ -1273,9 +1273,9 @@ Django の admin システムは、冒頭で説明した Django の ``User`` オ
 
 前述の単純なバックエンドで、万能の管理ユーザを作る方法は、以下のようにとても
 簡単です::
-        
+
     class SettingsBackend:
-    
+
         # ...
 
         def has_perm(self, user_obj, perm):
@@ -1283,7 +1283,7 @@ Django の admin システムは、冒頭で説明した Django の ``User`` オ
                 return True
             else:
                 return False
-                
+
 この書き方だと、上の例でアクセスを認可されたユーザにはあらゆるパーミッショ
 ンが許されます。バックエンドの認証関数はユーザオブジェクトを引数にとります。
 また、ユーザオブジェクトの代わりに、 ``User`` のコンストラクタと同じ引数も
