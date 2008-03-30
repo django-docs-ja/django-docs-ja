@@ -2,7 +2,7 @@
 Django の設定
 =============
 
-:revision-up-to: 7193 (0.97pre SVN)
+:revision-up-to: 7238 (0.97pre SVN)
 
 Django の設定ファイルには、インストールした Django の使う全ての設定が入って
 います。このドキュメントでは、各設定の役割と、どのような設定を利用できるか
@@ -625,12 +625,13 @@ LANGUAGE_CODE
 LANGUAGE_COOKIE_NAME
 --------------------
 
+**開発版の Django で新たに追加された機能です**
+
 デフォルト値: ``'django_language'``
 
 言語情報を記憶するために使うクッキーの名前です。 ``SESSION_COOKIE_NAME``
 の設定値と同じでなければ、どんな名前にしてもかまいません。詳しくは
 `国際化のドキュメント`_ を参照してください。
-
 
 LANGUAGES
 ---------
