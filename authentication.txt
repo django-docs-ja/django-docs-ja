@@ -2,7 +2,7 @@
 Django でのユーザ認証
 =====================
 
-:revision-up-to: 7229 (0.97pre SVN)
+:revision-up-to: 7243 (0.97pre SVN)
 
 Django にはユーザ認証システムがついてきます。 Django のユーザ認証システムは、
 ユーザアカウント、グループ、パーミッションとクッキーベースのユーザセッショ
@@ -348,7 +348,7 @@ MD5 ハッシュを使っていました。この形式は、以前のバージ�
 
 さらに詳しい情報は、 `Django book の 12 章`_ を参照してください。
 
-.. _Chapter 12 of the Django book: http://www.djangobook.com/en/beta/chapter12/#cn226
+.. _Chapter 12 of the Django book: http://www.djangobook.com/en/1.0/chapter12/#cn222
 .. _`Django book の 12 章`: `Chapter 12 of the Django book`_
 
 
