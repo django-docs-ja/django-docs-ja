@@ -69,6 +69,8 @@ Django オンラインドキュメント和訳
 
 `newforms ライブラリ (The newforms library) <../newforms/>`__
 
+`フォームウィザード` (Form wizard) <../form_wizard/>`__
+
 `モデルに対応したフォームの生成 (Generating forms for models) <../form_for_model/>`__
 
 `newforms とモデルを組み合わせる (Using newforms with models) <../modelforms/>`__

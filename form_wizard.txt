@@ -2,7 +2,9 @@
 Form wizard
 ===========
 
-**New in Django development version.**
+:revision-up-to: 7294 (0.97pre SVN)
+
+**開発版の Django で新たに登場した機能です。**
 
 Django comes with an optional "form wizard" application that splits forms_
 across multiple Web pages. It maintains state in hashed HTML
