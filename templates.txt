@@ -2,7 +2,7 @@
 テンプレート作者のための Django テンプレート言語ガイド
 =======================================================
 
-:revision-up-to: 7127 (0.97pre SVN)
+:revision-up-to: 7276 (0.97pre SVN)
 
 .. admonition:: このドキュメントについて
 
@@ -1299,6 +1299,12 @@ add
 
 入力値に対して引数を加算します。
 
+使用例::
+
+    {{ value|add:2 }}
+
+``value`` が 4 なら、出力は 6 になるでしょう。
+
 addslashes
 ~~~~~~~~~~
 
@@ -1323,36 +1329,88 @@ cut
 
 入力値の中から引数に指定した値を全て除去します。
 
+使用例::
+
+    {{ value|cut:" "}}
+
+``value`` が "String with spaces" なら、出力は ``Stringwithspaces``
+になるでしょう。
+
 date
 ~~~~
 
 引数に指定した書式で日付をフォーマットします。 (`now`_ タグと同じです)
+
+使用例::
+
+    {{ value|date:"D d M Y" }}
+
+``value`` が datetime オブジェクト (例えば、 datetime.datetime.now()
+) ならば、 出力は ``Wed 09 Jan 2008`` のような形式になります。
 
 default
 ~~~~~~~
 
 値がない場合、引数に指定したデフォルト値を使います。
 
+使用例::
+
+    {{ value|default:"nothing" }}
+
+``value`` が ``Undefined`` ならば、出力は ``nothing`` になります。
+
 default_if_none
 ~~~~~~~~~~~~~~~
 
 値が ``None`` の場合、引数に指定したデフォルト値を使います。
+
+使用例::
+
+    {{ value|default_if_none:"nothing" }}
+
+``value`` が ``None`` ならば、出力は ``nothing`` になります。
 
 dictsort
 ~~~~~~~~
 
 辞書のリストを入力にとり、引数に指定したキーでリストをソートして返します。
 
+使用例::
+
+    {{ value|dictsort:"name" }}
+
+``value`` が::
+
+    [
+        {'name': 'zed', 'age': 19}
+        {'name': 'amy', 'age': 22},
+        {'name': 'joe', 'age': 31},
+    ]
+
+であれば、出力はこうなるでしょう。::
+
+    [
+        {'name': 'amy', 'age': 22},
+        {'name': 'joe', 'age': 31},
+        {'name': 'zed', 'age': 19}
+    ]
+
 dictsortreversed
 ~~~~~~~~~~~~~~~~
 
 辞書のリストを入力にとり、引数に指定したキーでリストを逆順にソートして返し
-ます。
+ます。上のフィルタと全く同じ処理をしますが、返す値は逆順です。
 
 divisibleby
 ~~~~~~~~~~~
 
 値を引数で除算できる場合に真を返します。
+
+使用例::
+
+    {{ value|divisibleby:3 }}
+
+``value`` が ``21`` なら、出力は ``True`` になります。
 
 escape
 ~~~~~~
@@ -1395,15 +1453,39 @@ filesizeformat
 ファイルサイズを「目に優しい (human-readable)」表現 (``'13 KB'``, 
 ``'4.1 MB'``, ``'102 bytes'`` など) に変換します。 
 
+使用例::
+
+    {{ value|filesizeformat }}
+
+``value`` が 123456789 なら、出力は ``117.7 MB`` になります。
+
 first
 ~~~~~
 
 リスト中の最初の要素を返します。
 
+使用例::
+
+    {{ value|first }}
+
+``value`` が ``['a', 'b', 'c']`` なら、出力は `a` になります。
+
 fix_ampersands
 ~~~~~~~~~~~~~~
 
 アンパーサンド ("&") を ``&amp;`` エンティティで置き換えます。
+
+使用例::
+
+    {{ value|fix_ampersands }}
+
+``value`` が ``Tom & Jerry`` なら、出力は ``Tom &amp; Jerry``
+になります。
+
+**開発版の Django で新たに追加された機能です**:
+アンパーサンドが自動的にエスケープされるようになって
+からは、おそらくこのフィルタの使用を必要とすることは
+ないでしょう。
 
 floatformat
 ~~~~~~~~~~~
@@ -1462,6 +1544,12 @@ get_digit
 から 2 つ目の桁、といった具合に指定します。入力が整数でない場合には、入力値
 をそのまま返します。
 
+使用例::
+
+    {{ value|get_digit:2 }}
+
+``value`` が 123456789 なら、出力は ``8`` になります。
+
 iriencode
 ~~~~~~~~~
 
@@ -1476,6 +1564,13 @@ join
 ~~~~
 
 Python の ``str.join(list)`` と同じく、リストを文字列でつなぎます。
+ 
+使用例::
+
+    {{ value|join:" // " }}
+
+``value`` が ``['a', 'b', 'c']`` なら、出力は ``a // b // c`` になり
+ます。
 
 last
 ~~~~
@@ -1484,15 +1579,33 @@ last
 
 リストの末尾の要素を返します。
 
+使用例::
+
+    {{ value|last }}
+
+``value`` が ``['a', 'b', 'c', 'd']`` なら、出力は ``d`` になります。
+
 length
 ~~~~~~
 
 入力値の長さを返します。リストを扱う場合に便利です。
 
+使用例::
+
+    {{ value|length }}
+
+``value`` が ``['a', 'b', 'c', 'd']`` なら、出力は ``4`` になります。
+
 length_is
 ~~~~~~~~~
 
 入力値の長さと引数が等しいかどうかを返します。
+
+使用例::
+
+    {{ value|length_is:4 }}
+
+``value`` が ``['a', 'b', 'c', 'd']`` なら、出力は ``True`` になります。
 
 linebreaks
 ~~~~~~~~~~
@@ -1500,6 +1613,13 @@ linebreaks
 プレーンテキストの改行を適切な HTML タグに変換します。
 改行 1 つは HTML 改行 (``<br />``) タグ、改行と空行はパラグラフ
 改行 (``<p>``) に変換します。
+
+使用例::
+
+    {{ value|linebreaks }}
+
+``value`` が ``Joel\nis a slug`` なら、出力は ``<p>Joe<br>is a slug</p>``
+になります。
 
 linebreaksbr
 ~~~~~~~~~~~~
@@ -1523,11 +1643,25 @@ lower
 
 文字列を全て小文字に変換します。
 
+使用例::
+
+    {{ value|lower }}
+
+``value`` が ``Joel Is a Slug`` なら、出力は ``joel is a slug`` になり
+ます。
+
 make_list
 ~~~~~~~~~
 
 入力値をリストに変換します。整数の場合には各桁の数字からなるリストに、文字
 列の場合は各文字からなるリストに変換します。
+
+使用例::
+
+    {{ value|make_list }}
+
+``value`` が "Joe" なら、出力は ``[u'J', u'o', u'e']`` になります。
+``value`` が 123 なら、出力は ``[1, 2, 3]`` になります。
 
 phone2numeric
 ~~~~~~~~~~~~~
@@ -1565,18 +1699,34 @@ pluralize
 pprint
 ~~~~~~
 
-pprint.pprint のラッパです -- 単なるデバッグ用にすぎません。
+``pprint.pprint``__  のラッパです -- 単なるデバッグ用にすぎません。
+ 
+__ http://www.python.org/doc/2.5/lib/module-pprint.html
 
 random
 ~~~~~~
 
 リストからランダムな要素を返します。
 
+使用例::
+
+    {{ value|random }}
+
+``value`` が ``['a', 'b', 'c', 'd']`` なら、出力は ``b`` かもしれま
+せん。
+
 removetags
 ~~~~~~~~~~
 
 入力から引数に指定された [X]HTML タグを除去します。タグはスペースで区切って
 指定します。
+
+使用例::
+
+    {{ value|removetags:"b span"|safe }}
+
+``value`` が ``<b>Joel</b> <button>is</button> a <span>slug</span>`` なら、
+出力は ``Joel <button>is</button> a slug`` になります。
 
 rjust
 ~~~~~
@@ -1609,6 +1759,12 @@ slugify
 入力を小文字に変換し、語でない (英数字またはアンダースコアでない) 文字を除
 去し、スペースをハイフンに変換します。また、先頭と末尾の空白をはぎとります。
 
+使用例::
+
+    {{ value|slugify }}
+
+``value`` が ``Joel is a slug`` なら、出力は ``joel-is-a-slug`` になります。
+
 stringformat
 ~~~~~~~~~~~~
 
@@ -1620,10 +1776,23 @@ Python の文字列フォーマットについては
 http://www.python.jp/doc/release/lib/typesseq-strings.html を参照してくださ
 い。
 
+使用例::
+
+    {{ value|stringformat:"s" }}
+
+``value`` が ``Joel is a slug`` なら、出力は ``Joel is a slug`` になります。
+
 striptags
 ~~~~~~~~~
 
 [X]HTML タグを全てはぎとります。
+
+使用例::
+
+    {{ value|striptags }}
+
+``value`` が ``<b>Joel</b> <button>is</button> a <span>slug</span>`` なら、
+出力は ``Joel is a slug`` になります。
 
 time
 ~~~~
@@ -1632,6 +1801,13 @@ time
 ``time`` フィルタの引数は、時刻に関するフォーマット文字しか受け付けません
 (理由は言うまでもありませんよね)。日付のフォーマットを行いたければ `date`_
 フィルタを使ってください。
+
+使用例::
+
+    {{ value|time:"H:i" }}
+
+``value`` が ``datetime.datetime.now()`` なら、出力は ``01:23`` の
+ような形式になります。
 
 timesince
 ~~~~~~~~~
@@ -1677,6 +1853,12 @@ truncatewords
 文字列を指定語数以下になるように切り詰めます。
 
 **引数:** 文字列を切り詰めるまでの語数
+
+使用例::
+
+    {{ value|truncatewords:2 }}
+
+``value`` が ``Joel is a slug`` なら、出力は ``Joel is ...`` になります。
 
 truncatewords_html
 ~~~~~~~~~~~~~~~~~~
@@ -1724,6 +1906,12 @@ upper
 
 入力値をすべて大文字に変換します。
 
+使用例::
+
+    {{ value|upper }}
+
+``value`` が ``Joel is a slug`` なら、出力は ``JOEL IS A SLUG`` になります。
+
 urlencode
 ~~~~~~~~~
 
@@ -1738,6 +1926,14 @@ HTML マークアップの入ったテキストに ``urlize`` を適用すると
 を得られない場合があるので注意してください。このフィルタは *素の* テキスト
 に対してだけ使ってください。
 
+使用例::
+
+    {{ value|urlize }}
+
+``value`` が ``Check out www.djangoproject.com`` なら、出力は
+``Check out <a
+href="http://www.djangoproject.com">www.djangoproject.com</a>`` になります。
+
 urlizetrunc
 ~~~~~~~~~~~
 
@@ -1748,6 +1944,13 @@ URL をクリック可能なリンクに変換します。このとき、指定�
 
 **引数:** URL を切り詰める長さ
 
+使用例::
+
+    {{ value|urlizetrunc:15 }}
+
+``value`` が ``Check out www.djangoproject.com`` なら、出力は
+``Check out <a
+href="http://www.djangoproject.com">www.djangopr...</a>`` になります。
 
 wordcount
 ~~~~~~~~~
@@ -1760,6 +1963,16 @@ wordwrap
 指定した行幅で語列をラップします。
 
 **引数:** テキストをラップするまでの語数
+
+使用例::
+
+    {{ value|wordwrap:5 }}
+
+``value`` が ``Joel is a slug`` なら、出力はこうなります::
+
+    Joel
+    is a
+    slug
 
 yesno
 ~~~~~
