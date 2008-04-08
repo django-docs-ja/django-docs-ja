@@ -1301,9 +1301,9 @@ add
 
 使用例::
 
-    {{ value|add:2 }}
+    {{ value|add:"2" }}
 
-``value`` が 4 なら、出力は 6 になるでしょう。
+``value`` が ``4`` なら、出力は ``6`` になるでしょう。
 
 addslashes
 ~~~~~~~~~~
@@ -1333,8 +1333,8 @@ cut
 
     {{ value|cut:" "}}
 
-``value`` が "String with spaces" なら、出力は ``Stringwithspaces``
-になるでしょう。
+``value`` が ``"String with spaces"`` なら、出力は ``"Stringwithspaces"`` に
+なるでしょう。
 
 date
 ~~~~
@@ -1345,35 +1345,40 @@ date
 
     {{ value|date:"D d M Y" }}
 
-``value`` が datetime オブジェクト (例えば、 datetime.datetime.now()
-) ならば、 出力は ``Wed 09 Jan 2008`` のような形式になります。
+``value`` が ``datetime`` オブジェクト (例えば、 ``datetime.datetime.now()``
+の返り値) ならば、 出力は文字列 ``'Wed 09 Jan 2008'`` になります。
 
 default
 ~~~~~~~
 
-値がない場合、引数に指定したデフォルト値を使います。
+値が ``False`` と評価される場合、引数に指定したデフォルト値を使います。そうで
+なければ、入力値を使います。
 
 使用例::
 
     {{ value|default:"nothing" }}
 
-``value`` が ``Undefined`` ならば、出力は ``nothing`` になります。
+``value`` が ``""`` (空文字列)ならば、出力は ``nothing`` になります。
 
 default_if_none
 ~~~~~~~~~~~~~~~
 
-値が ``None`` の場合、引数に指定したデフォルト値を使います。
+値が ``None`` の場合 (and only if) 、引数に指定したデフォルト値を使います。
+そうでなければ、入力値を使います。
+ 
+注釈。もし空文字列が渡されたら、デフォルト値は使われ **ません** 。 空文字列を
+フォールバックしたければ ``default`` フィルタを使ってください。
 
 使用例::
 
     {{ value|default_if_none:"nothing" }}
 
-``value`` が ``None`` ならば、出力は ``nothing`` になります。
+``value`` が ``None`` ならば、出力は文字列 ``"nothing"`` になります。
 
 dictsort
 ~~~~~~~~
 
-辞書のリストを入力にとり、引数に指定したキーでリストをソートして返します。
+辞書のリストを入力に取って引数に指定したキーでリストをソートして返します。
 
 使用例::
 
@@ -1382,7 +1387,7 @@ dictsort
 ``value`` が::
 
     [
-        {'name': 'zed', 'age': 19}
+        {'name': 'zed', 'age': 19},
         {'name': 'amy', 'age': 22},
         {'name': 'joe', 'age': 31},
     ]
@@ -1392,32 +1397,28 @@ dictsort
     [
         {'name': 'amy', 'age': 22},
         {'name': 'joe', 'age': 31},
-        {'name': 'zed', 'age': 19}
+        {'name': 'zed', 'age': 19},
     ]
 
 dictsortreversed
 ~~~~~~~~~~~~~~~~
 
-辞書のリストを入力にとり、引数に指定したキーでリストを逆順にソートして返し
-ます。上のフィルタと全く同じ処理をしますが、返す値は逆順です。
+辞書のリストを入力に取って引数に指定したキーでリストを逆順にソートして返します。
+上のフィルタと全く同じ処理をしますが、返す値は逆順です。
 
 divisibleby
 ~~~~~~~~~~~
 
-値を引数で除算できる場合に真を返します。
+値を引数で除算できる場合に ``True`` を返します。
 
 使用例::
 
-    {{ value|divisibleby:3 }}
+    {{ value|divisibleby:"3" }}
 
 ``value`` が ``21`` なら、出力は ``True`` になります。
 
 escape
 ~~~~~~
-
-**開発版の Django で新たに登場した機能:** 開発版では、このフィルタの挙動は
-少し変更されています (フィルタの適用が、他の全てのフィルタを適用した後に行
-われます)
 
 入力文字中の HTML 特有の文字をエスケープします。具体的には、以下のような置
 換を行います:
@@ -1437,6 +1438,10 @@ escape
 度しかエスケープを行いません。従って、自動エスケープ環境で ``escape``
 を呼び出しても問題はありません。意図的に複数回エスケープを施したければ、
 ``force_escape`` フィルタを使ってください。
+
+**開発版の Django で新たに登場した機能**: 自動エスケープすることになって、この
+フィルタの挙動は少し変更されています。置き換えは、他の (前後のフィルタを含め)
+全てのフィルタを適用した後に一度だけ行われます。
 
 escapejs
 ~~~~~~~~
@@ -1468,7 +1473,7 @@ first
 
     {{ value|first }}
 
-``value`` が ``['a', 'b', 'c']`` なら、出力は `a` になります。
+``value`` がリスト ``['a', 'b', 'c']`` なら、出力は ``'a'`` になります。
 
 fix_ampersands
 ~~~~~~~~~~~~~~
@@ -1479,13 +1484,11 @@ fix_ampersands
 
     {{ value|fix_ampersands }}
 
-``value`` が ``Tom & Jerry`` なら、出力は ``Tom &amp; Jerry``
-になります。
+``value`` が ``Tom & Jerry`` なら、出力は ``Tom &amp; Jerry`` になります。
 
-**開発版の Django で新たに追加された機能です**:
-アンパーサンドが自動的にエスケープされるようになって
-からは、おそらくこのフィルタの使用を必要とすることは
-ないでしょう。
+**開発版の Django で新たに追加された機能です**: アンパーサンドはテンプレートに
+おいて自動的にエスケープされるため、このフィルタはたいていの場合役に立ちません。
+自動エスケープがどのように作用するかについての詳細は escape_ を参照してください。
 
 floatformat
 ~~~~~~~~~~~
@@ -1546,9 +1549,9 @@ get_digit
 
 使用例::
 
-    {{ value|get_digit:2 }}
-
-``value`` が 123456789 なら、出力は ``8`` になります。
+    {{ value|get_digit:"2" }}
+ 
+``value`` が ``123456789`` なら、出力は ``8`` になります。
 
 iriencode
 ~~~~~~~~~
@@ -1569,8 +1572,8 @@ Python の ``str.join(list)`` と同じく、リストを文字列でつなぎ�
 
     {{ value|join:" // " }}
 
-``value`` が ``['a', 'b', 'c']`` なら、出力は ``a // b // c`` になり
-ます。
+``value`` がリスト ``['a', 'b', 'c']`` なら、出力は文字列 ``"a // b // c"`` に
+なります。
 
 last
 ~~~~
@@ -1583,12 +1586,13 @@ last
 
     {{ value|last }}
 
-``value`` が ``['a', 'b', 'c', 'd']`` なら、出力は ``d`` になります。
+``value`` がリスト ``['a', 'b', 'c', 'd']`` なら、出力は文字列 ``"d"`` になり
+ます。
 
 length
 ~~~~~~
 
-入力値の長さを返します。リストを扱う場合に便利です。
+入力値の長さを返します。文字列とリストいずれにも作用します。
 
 使用例::
 
@@ -1599,11 +1603,12 @@ length
 length_is
 ~~~~~~~~~
 
-入力値の長さと引数が等しいかどうかを返します。
+入力値の長さと引数が等しければ ``True`` を返し、そうでなければ ``False`` を返し
+ます。
 
 使用例::
 
-    {{ value|length_is:4 }}
+    {{ value|length_is:"4" }}
 
 ``value`` が ``['a', 'b', 'c', 'd']`` なら、出力は ``True`` になります。
 
@@ -1647,8 +1652,7 @@ lower
 
     {{ value|lower }}
 
-``value`` が ``Joel Is a Slug`` なら、出力は ``joel is a slug`` になり
-ます。
+``value`` が ``Still MAD At Yoko`` なら、出力は ``still mad at yoko`` になります。
 
 make_list
 ~~~~~~~~~
@@ -1660,8 +1664,8 @@ make_list
 
     {{ value|make_list }}
 
-``value`` が "Joe" なら、出力は ``[u'J', u'o', u'e']`` になります。
-``value`` が 123 なら、出力は ``[1, 2, 3]`` になります。
+``value`` が文字列 ``"Joe"`` なら、出力はリスト ``[u'J', u'o', u'e']`` になります。
+``value`` が ``123`` なら、出力はリスト ``[1, 2, 3]`` になります。
 
 phone2numeric
 ~~~~~~~~~~~~~
@@ -1706,14 +1710,13 @@ __ http://www.python.org/doc/2.5/lib/module-pprint.html
 random
 ~~~~~~
 
-リストからランダムな要素を返します。
+与えられたリストからランダムな要素を返します。
 
 使用例::
 
     {{ value|random }}
 
-``value`` が ``['a', 'b', 'c', 'd']`` なら、出力は ``b`` かもしれま
-せん。
+``value`` がリスト ``['a', 'b', 'c', 'd']`` なら、出力は ``"b"`` かもしれません。
 
 removetags
 ~~~~~~~~~~
@@ -1725,8 +1728,8 @@ removetags
 
     {{ value|removetags:"b span"|safe }}
 
-``value`` が ``<b>Joel</b> <button>is</button> a <span>slug</span>`` なら、
-出力は ``Joel <button>is</button> a slug`` になります。
+``value`` が ``"<b>Joel</b> <button>is</button> a <span>slug</span>"`` なら、
+出力は ``"Joel <button>is</button> a slug"`` になります。
 
 rjust
 ~~~~~
@@ -1763,7 +1766,7 @@ slugify
 
     {{ value|slugify }}
 
-``value`` が ``Joel is a slug`` なら、出力は ``joel-is-a-slug`` になります。
+``value`` が ``"Joel is a slug"`` なら、出力は ``"joel-is-a-slug"`` になります。
 
 stringformat
 ~~~~~~~~~~~~
@@ -1780,7 +1783,7 @@ http://www.python.jp/doc/release/lib/typesseq-strings.html を参照してくだ
 
     {{ value|stringformat:"s" }}
 
-``value`` が ``Joel is a slug`` なら、出力は ``Joel is a slug`` になります。
+``value`` が ``"Joel is a slug"`` なら、出力は ``"Joel is a slug"`` になります。
 
 striptags
 ~~~~~~~~~
@@ -1791,8 +1794,8 @@ striptags
 
     {{ value|striptags }}
 
-``value`` が ``<b>Joel</b> <button>is</button> a <span>slug</span>`` なら、
-出力は ``Joel is a slug`` になります。
+``value`` が ``"<b>Joel</b> <button>is</button> a <span>slug</span>"`` なら、
+出力は ``"Joel is a slug"`` になります。
 
 time
 ~~~~
@@ -1806,15 +1809,13 @@ time
 
     {{ value|time:"H:i" }}
 
-``value`` が ``datetime.datetime.now()`` なら、出力は ``01:23`` の
-ような形式になります。
+``value`` が ``datetime.datetime.now()`` と同等な値なら、出力は文字列
+``"01:23"`` なります。
 
 timesince
 ~~~~~~~~~
 
-日付を経過時間の形式にフォーマットします。 (例: "4 days, 6 hours").
-
-オプションの引数をとります。
+日付を経過時間の形式にフォーマットします (例えば、 "4 days, 6 hours") 。
 
 オプションの引数として、 比較対象として使う時刻をとります (引数を省略すると
 *現在時刻* を使います)。例えば、 ``blog_date`` が ``1 June 2006`` を表す日
@@ -1858,7 +1859,7 @@ truncatewords
 
     {{ value|truncatewords:2 }}
 
-``value`` が ``Joel is a slug`` なら、出力は ``Joel is ...`` になります。
+``value`` が ``"Joel is a slug"`` なら、出力は ``"Joel is ..."`` になります。
 
 truncatewords_html
 ~~~~~~~~~~~~~~~~~~
@@ -1877,9 +1878,8 @@ unordered_list
 unordered list) に変換します。**ただし**、最も外側の <ul> タグは表示しませ
 ん。
 
-**開発版の Django で変更された仕様**
-
-``unordered_list`` の引数の形式は、より分かりやすい形式に変更されました。
+**開発版の Django の新機能です**: ``unordered_list`` の引数の形式は、より分かり
+やすく変更されました。
 
 リストは適切な形式になっているものとみなします。例えば、 ``var`` が
 ``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]`` であれば、
@@ -1910,7 +1910,7 @@ upper
 
     {{ value|upper }}
 
-``value`` が ``Joel is a slug`` なら、出力は ``JOEL IS A SLUG`` になります。
+``value`` が ``"Joel is a slug"`` なら、出力は ``"JOEL IS A SLUG"`` になります。
 
 urlencode
 ~~~~~~~~~
@@ -1930,9 +1930,9 @@ HTML マークアップの入ったテキストに ``urlize`` を適用すると
 
     {{ value|urlize }}
 
-``value`` が ``Check out www.djangoproject.com`` なら、出力は
-``Check out <a
-href="http://www.djangoproject.com">www.djangoproject.com</a>`` になります。
+``value`` が ``"Check out www.djangoproject.com"`` なら、出力は
+``"Check out <a
+href="http://www.djangoproject.com">www.djangoproject.com</a>"`` になります。
 
 urlizetrunc
 ~~~~~~~~~~~
@@ -1948,9 +1948,9 @@ URL をクリック可能なリンクに変換します。このとき、指定�
 
     {{ value|urlizetrunc:15 }}
 
-``value`` が ``Check out www.djangoproject.com`` なら、出力は
-``Check out <a
-href="http://www.djangoproject.com">www.djangopr...</a>`` になります。
+``value`` が ``"Check out www.djangoproject.com"`` なら、出力は
+``'Check out <a
+href="http://www.djangoproject.com">www.djangopr...</a>'`` になります。
 
 wordcount
 ~~~~~~~~~
