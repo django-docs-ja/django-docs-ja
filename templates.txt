@@ -1703,8 +1703,8 @@ pluralize
 pprint
 ~~~~~~
 
-``pprint.pprint``__  のラッパです -- 単なるデバッグ用にすぎません。
- 
+`pprint.pprint`__  のラッパです -- 単なるデバッグ用にすぎません。
+
 __ http://www.python.org/doc/2.5/lib/module-pprint.html
 
 random

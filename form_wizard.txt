@@ -125,7 +125,7 @@ example::
 See the section "Advanced ``FormWizard`` methods" below to learn about more
 ``FormWizard`` hooks.
 
-.. _HttpRequest: request_response/#httprequest-objects
+.. _HttpRequest: ../request_response/#httprequest-objects
 
 Creating templates for the forms
 ================================
