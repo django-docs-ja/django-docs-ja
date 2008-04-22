@@ -6,23 +6,22 @@ Form wizard
 
 **開発版の Django で新たに登場した機能です。**
 
-Django comes with an optional "form wizard" application that splits forms_
-across multiple Web pages. It maintains state in hashed HTML
-``<input type="hidden">`` fields, and the data isn't processed server-side
-until the final form is submitted.
+Django には、複数のページに跨がったフォームへ分割する "フォームウィザード" のア
+プリケーションがオプションで付いています。 HTML の ``<input type="hidden">``
+フィールドにハッシュ化したステートを保持し、最終的にフォ ームが送信されるま
+で、サーバサイドへデータが渡ることはありません。
 
-You might want to use this if you have a lengthy form that would be too
-unwieldy for display on a single page. The first page might ask the user for
-core information, the second page might ask for less important information,
-etc.
+単一ページに表示させるには扱い難いような非常に長いフォームを必要としているなら、
+この機能を使いたいと思うかもしれません。最初のページで中核となる情報をユー
+ザに尋ね、２番目のページで重要度の低い情報を尋ねたいかもしれません。
 
-The term "wizard," in this context, is `explained on Wikipedia`_.
+専門用語 "wizard" については、 `explained on Wikipedia`_ を参照してください。
 
 .. _explained on Wikipedia: http://en.wikipedia.org/wiki/Wizard_%28software%29
 .. _forms: ../newforms/
 
-How it works
-============
+どのように動作するか
+====================
 
 Here's the basic workflow for how a user would use a wizard:
 
