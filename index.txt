@@ -1,13 +1,19 @@
-=================================
-Django オンラインドキュメント和訳
-=================================
+====================
+Django ドキュメント
+====================
+
+.. admonition:: 和訳ドキュメントについて
+
+   このドキュメントは、 Django ユーザ有志の手による、
+   `Django <http://djangoproject.com/>`_ の標準ドキュメント和訳です。
 
 :底本: SVN trunk (0.97pre SVN)
 :翻訳: Yasushi Masuda (ymasuda at ethercube dot com), Takanao Endoh (takanao at endoh dot tk)
-:追従済みリビジョン: 7243 (2008/03/14)
+:追従済みリビジョン: 7392 (2008/03/14)
 
 必読
-----
+======
+
 
 `Django の概要 (Django overview) <../overview/>`__
 
@@ -36,7 +42,7 @@ Django オンラインドキュメント和訳
 
 
 リファレンス
-------------
+=============
 
 `django-admin.py と manage.py (django-admin.py and manage.py) <../django-admin/>`__
 
@@ -123,14 +129,14 @@ Django オンラインドキュメント和訳
   `contenttypes フレームワーク <../contenttypes/>`__
 
 運用関連
---------
+==========
 
 `mod_python で Django を使う (Using Django with mod_python) <../modpython/>`__
 
 `FastCGI, SCGI, AJP で Django を使う (How to use Django with FastCGI, SCGI or AJP) <../fastcgi/>`__
 
 特殊な話題
-----------
+===========
 
 `Apache での認証に Django ユーザデータベースを使う
 (Authenticating against Django's user database from Apache) <../apache_auth/>`__
@@ -153,7 +159,7 @@ Django オンラインドキュメント和訳
 `Django オブジェクトのシリアライズ (Serializing Django objects) <../serialization/>`__
 
 その他
-------
+========
 
 `Django の設計思想 (Design philosophies) <../design_philosophies/>`__
 
@@ -166,7 +172,7 @@ Django オンラインドキュメント和訳
 
 
 リリースノート
---------------
+================
 
 `バージョン 0.96 リリースノート <../release_notes_0.96/>`__
 

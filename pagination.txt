@@ -1,0 +1,156 @@
+=========================
+ペジネータ (paginator)
+=========================
+
+:revision-up-to: 7392 (0.97pre SVN)
+
+**開発版の Django で新たに登場した機能**
+
+Django は、ページ分割された (paginated) データを扱うためのペジネータ
+(paginator) クラスを提供しています。ページ分割とは、データが複数のページに
+わたって表示され、それぞれのページに「前へ／次へ」といったリンクがある状態
+を指します。ペジネータのクラスは、 ``django/core/paginator.py`` モジュール
+で定義されています。
+
+.. _Example:
+
+例
+=======
+
+ペジネータを使うには、まず ``Paginator`` クラスにオブジェクトのリストと、各
+ページに表示したい要素数を指定してインスタンスを生成します。生成されるイン
+スタンスは、各ページの要素にアクセスするためのメソッドを提供しています::
+
+    >>> from django.core.paginator import Paginator
+    >>> objects = ['john', 'paul', 'george', 'ringo']
+    >>> p = Paginator(objects, 2)
+
+    >>> p.count
+    4
+    >>> p.num_pages
+    2
+    >>> p.page_range
+    [1, 2]
+
+    >>> page1 = p.page(1)
+    >>> page1
+    <Page 1 of 2>
+    >>> page1.object_list
+    ['john', 'paul']
+
+    >>> page2 = p.page(2)
+    >>> page2.object_list
+    ['george', 'ringo']
+    >>> page2.has_next()
+    False
+    >>> page2.has_previous()
+    True
+    >>> page2.has_other_pages()
+    True
+    >>> page2.next_page_number()
+    3
+    >>> page2.previous_page_number()
+    1
+    >>> page2.start_index() # The 1-based index of the first item on this page
+    3
+    >>> page2.end_index() # The 1-based index of the last item on this page
+    4
+
+    >>> p.page(0)
+    Traceback (most recent call last):
+    ...
+    InvalidPage
+    >>> p.page(3)
+    Traceback (most recent call last):
+    ...
+    InvalidPage
+
+.. _Paginator objects:
+
+``Paginator`` オブジェクト
+===========================
+
+.. _Paginator Methods:
+
+メソッド
+---------
+
+``page(number)`` -- 指定ページの ``Page`` オブジェクトを返します。ページ番
+号は 1 から始まる数です。存在しないページを指定すると ``InvalidPage`` を送
+出します。
+
+.. _Paginator Attributes:
+
+属性
+----------
+
+``count`` -- 全てのページにわたるオブジェクトの合計数です。
+
+``num_pages`` -- 全ページ数です。
+
+``page_range`` -- ``[1, 2, 3, 4]`` のように、 1 から始まるページ番号です。
+
+.. _Page objects:
+
+``Page`` オブジェクト
+=====================
+
+.. _Page Methods:
+
+メソッド
+---------
+
+``has_next()`` -- 次のページがある場合に ``True`` を返します。
+
+``has_previous()`` -- 前のページがある場合に ``True`` を返します。
+
+``has_other_pages()`` -- 前後 *いずれか* のページがある場合に ``True`` を返
+します。
+
+``next_page_number()`` -- 次のページが存在するかどうかに関係なく、
+「次のページ」のページ番号を返します。
+
+``previous_page_number()`` -- 前のページが存在するかどうかに関係なく、
+「前のページ」のページ番号を返します。
+
+``start_index()`` -- ページの先頭のオブジェクトの通番を、ペジネータ全体にわ
+たるオブジェクトのリストの通番で返します。通番は 1 から始まります。例えば、
+ページあたり 2 個のオブジェクトを表示するペジネータで 5 個のオブジェクトを
+ページ分割している場合、2 ページ目の ``start_index()`` は ``3`` を返します。
+
+``end_index()`` -- ページの末尾のオブジェクトの通番を、ペジネータ全体にわ
+たるオブジェクトのリストの通番で返します。通番は 1 から始まります。例えば、
+ページあたり 2 個のオブジェクトを表示するペジネータで 5 個のオブジェクトを
+ページ分割している場合、2 ページ目の ``end_index()`` は ``4`` を返します。
+
+.. _Page Attributes:
+
+属性
+------
+
+``object_list`` -- ページ上のオブジェクトのリストです。
+
+``number`` -- 1 から数えたページ番号です。
+
+``paginator`` -- ページが結びついている ``Paginator`` オブジェクトです。
+
+.. _QuerySetPaginator objects:
+
+``QuerySetPaginator`` オブジェクト
+===================================
+
+Django のデータベース API から取得した ``QuerySet`` の内容を使ってペジネー
+ションを行いたい場合には、 ``Paginator`` ではなく ``QuerySetPaginator`` を
+使ってください。 ``QuerySetPaginator`` の方がわずかに効率的で、
+``Paginator`` との間に API 上の違いはありません。
+
+.. _The legacy ObjectPaginator class:
+
+古い ``ObjectPaginator`` クラスについて
+=========================================
+
+``Paginator`` および ``Page`` クラスは、開発版の Django、リビジョン 7306 で
+新たに登場しました。以前のバージョンの Django では ``ObjectPaginator`` が同
+様の機能を担っていましたが、あまり便利ではありませんでした。
+以前のバージョンとの互換性を保つために ``ObjectPaginator`` はまだ残されてい
+ますが、使おうとすると ``DeprecationWarning`` を送出します。

@@ -2,7 +2,7 @@
 Django のインストール
 =====================
 
-:revision-up-to: 7127 (0.97pre SVN)
+:revision-up-to: 7392 (0.97pre SVN)
 
 このドキュメントを読めば Django を動かせるようになります。
 
@@ -188,6 +188,21 @@ OS ごとのインストールパッケージによるインストール
 
 開発バージョンのインストール
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. admonition:: Django の開発版を追いかける
+    
+    最新版の Django を使うと決めたのなら、 `開発の進行状況`_ によく注意して、
+    `以前のバージョンと互換性のない変更`_ がないか気をつけておく必要がある
+    でしょう。これらのリンク先のページに注意していれば、使ってみたい新たな
+    機能や、手元の Django をアップデートする際に、自分のコードのどこを修正
+    する必要があるか追いかけられます。 (安定版では、 Django のアップデート
+    時に必要な変更は全てドキュメントに記載されています。)
+
+.. _the development timeline: http://code.djangoproject.com/timeline
+.. _`開発の進行状況`: `the development timeline`_
+.. _the list of backwards-incompatible changes: http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
+.. _`以前のバージョンと互換性のない変更`: `the list of backwards-incompatible changes`_
+
 
 Django のコードを更新して最新のバグフィクスや改良を適用したいのなら、以下の
 説明に従って開発バージョンをインストールしてください。

@@ -2,7 +2,7 @@
 Djangoアプリケーションのテスト
 ==============================
 
-:revision-up-to: 7127 (0.97pre SVN)
+:revision-up-to: 7392 (0.97pre SVN)
 
 今日の Web 開発者にとって、自動化されたテストはバグ潰しの工程で極めて有用な
 ツールです。複数のテストを集めた **テストスイート** を使えば、Web開発におけ
@@ -84,7 +84,7 @@ doctest は、Python の標準モジュール、 doctest_ によるテストで�
 .. admonition:: **docstring** とは?
 
     docstring の詳しい説明 (と、効果的な docstring の書き方) は、
-    :PEP:`257` (訳注: PEP 257 の和訳は 
+    :pep:`257` (訳注: PEP 257 の和訳は 
     http://www.python.jp/doc/contrib/peps/pep-0257.txt にあります) に書かれ
     ています:
         

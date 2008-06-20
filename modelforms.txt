@@ -2,7 +2,7 @@
 newforms とモデルを組み合わせる
 ================================
 
-:revision-up-to: 7223 (0.97pre SVN)
+:revision-up-to: 7392 (0.97pre SVN)
 
 ``ModelForm``
 =============
@@ -250,6 +250,16 @@ newforms とモデルを組み合わせる
 
     # 新たな Author インスタンスを生成して保存。他にはなにもしなくてよい
     >>> new_author = f.save()
+
+``save()`` および ``save_m2m()`` メソッド以外は、 ``ModelForm``
+``newforms`` で作られたフォームと全く同じように動作します。例えば、
+データの検証は ``is_valid()`` で行えますし、 ``is_multipart()``
+メソッドを使えばフォームがマルチパートのファイルアップロードを要求している
+かどうか (そして ``request.FILES`` をフォームに渡さなければならないかどうか)判
+別できます。詳しくは、 `newforms のドキュメント`_ を参照してください。
+
+.. _the standard newforms documentation: ../newforms/
+.. _`newforms のドキュメント`: `the standard newforms documentation`_
 
 .. _Using a subset of fields on the form:
 

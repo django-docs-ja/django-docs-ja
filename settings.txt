@@ -2,7 +2,7 @@
 Django の設定
 =============
 
-:revision-up-to: 7238 (0.97pre SVN)
+:revision-up-to: 7392 (0.97pre SVN)
 
 Django の設定ファイルには、インストールした Django の使う全ての設定が入って
 います。このドキュメントでは、各設定の役割と、どのような設定を利用できるか
@@ -214,8 +214,10 @@ ADMIN_MEDIA_PREFIX
 
 デフォルト値: ``'/media/'``
 
-admin メディア (CSS, JavaScript, 画像) への URL プレフィクスです。必ず
-末尾にスラッシュをつけてください。
+Django の管理インタフェース上で使われている CSS, JavaScript, 画像といった、
+いわゆる admin メディアへの URL プレフィクスです。必ず末尾にスラッシュをつ
+けてください。また、この値は ``MEDIA_URL`` と同じにしないでください (さもな
+いと、二つのファイルに同じ URL がマップされてしまいます)。
 
 ADMINS
 ------
@@ -311,7 +313,7 @@ DATABASE_ENGINE
 
 どのデータベースバックエンドを使うかを指定します。組み込みのデータベースバッ
 クエンドは、 ``'postgresql_psycopg2'``, ``'postgresql'``, ``'mysql'``,
-``'mysql_old'``, ``'sqlite3'``, ``'oracle'``, および ``'ado_mssql'`` です。
+``'mysql_old'``, ``'sqlite3'``, ``'oracle'`` です。
 
 DATABASE_HOST
 -------------
@@ -807,8 +809,9 @@ ROOT_URLCONF
 デフォルト値: 定義されていません
 
 ルート URLconf への完全な Python import パスを表す表す文字列です。例えば、
-``"mydjangoapps.urls"`` です。 `Django のリクエスト処理`_ を参照してくださ
-い。
+``"mydjangoapps.urls"`` です。ルート URLconf は、 ``HttpRequest`` オブジェ
+クトに ``urlconf`` 属性を設定することで変更できます。
+詳しくは `Django のリクエスト処理`_ を参照してください。
 
 .. _`Django のリクエスト処理`: ../url_dispatch/#how-django-processes-a-request
 .. _How Django processes a request: ../url_dispatch/#how-django-processes-a-request

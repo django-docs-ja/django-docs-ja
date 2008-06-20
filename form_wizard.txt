@@ -1,70 +1,82 @@
-===========
-Form wizard
-===========
+=================================
+フォームウィザード (Form wizard)
+=================================
 
-:revision-up-to: 7294 (0.97pre SVN)
+:revision-up-to: 7392 (0.97pre SVN)
 
 **開発版の Django で新たに登場した機能です。**
 
-Django には、複数のページに跨がったフォームへ分割する "フォームウィザード" のア
-プリケーションがオプションで付いています。 HTML の ``<input type="hidden">``
-フィールドにハッシュ化したステートを保持し、最終的にフォ ームが送信されるま
-で、サーバサイドへデータが渡ることはありません。
+Django には、`フォーム`_ を複数のページに分割する「フォームウィザード」
+アプリケーションがオプションで付いています。フォームウィザードは、フォーム
+の状態を HTML の ``<input type="hidden">`` フィールドにハッシュ化して保存し、
+最終的にフォームを提出するまで、サーバでフォームデータを処理させません。
 
-単一ページに表示させるには扱い難いような非常に長いフォームを必要としているなら、
-この機能を使いたいと思うかもしれません。最初のページで中核となる情報をユー
-ザに尋ね、２番目のページで重要度の低い情報を尋ねたいかもしれません。
+フォームウィザードは、とても長いフォームを扱う必要があって、フォームを一つ
+のページに納めると不格好になってしまうような場合に使うとよいでしょう。
+例えば、最初のページではユーザに重要な情報を尋ね、次のページでは比較的些細
+な情報を訪ねるといったフォームで、フォームウィザードを使います。
 
-専門用語 "wizard" については、 `explained on Wikipedia`_ を参照してください。
+「ウィザード (wizard)」という用語の意味は、 
+`Wikipedia で解説されています`_ 。
+
 
 .. _explained on Wikipedia: http://en.wikipedia.org/wiki/Wizard_%28software%29
+.. _`Wikipedia で解説されています`: http://ja.wikipedia.org/wiki/ウィザード_%28ソフトウェア%29
 .. _forms: ../newforms/
+.. _`フォーム`: ../newforms/
 
-どのように動作するか
-====================
+.. _How it works:
 
-Here's the basic workflow for how a user would use a wizard:
+フォームウィザードの仕組み
+====================================
 
-    1. The user visits the first page of the wizard, fills in the form and
-       submits it.
-    2. The server validates the data. If it's invalid, the form is displayed
-       again, with error messages. If it's valid, the server calculates a
-       secure hash of the data and presents the user with the next form,
-       saving the validated data and hash in ``<input type="hidden">`` fields.
-    3. Step 1 and 2 repeat, for every subsequent form in the wizard.
-    4. Once the user has submitted all the forms and all the data has been
-       validated, the wizard processes the data -- saving it to the database,
-       sending an e-mail, or whatever the application needs to do.
+ユーザがウィザードを使うときの基本的なワークフローは、以下の通りです:
 
-Usage
-=====
+    1. ユーザはウィザードの最初のページを訪問し、フォームを入力して内容を提
+       出 (submit) します。
+    2. サーバは提出されたデータを検証します。データが有効でなければ、エラー
+       メッセージつきでフォームを再表示します。データが有効なら、データのセ
+       キュアなハッシュを計算して、ユーザに次のフォームを表示し、検証済みの
+       データとハッシュを ``<input type="hidden">`` フィールドに保存します。
+    3. 以降のウィザード上の全フォームでステップ 1 と 2 を繰り返します。
+    4. ユーザが全てのフォームを提出し、提出されたデータが全て有効であった場
+       合、ウィザードはデータを処理します。すなわち、データベースへの保存や
+       電子メールの送信といった、アプリケーションで必要な処理を実施します。
 
-This application handles as much machinery for you as possible. Generally, you
-just have to do these things:
+.. _Usage:
 
-    1. Define a number of ``django.newforms`` ``Form`` classes -- one per wizard
-       page.
-    2. Create a ``FormWizard`` class that specifies what to do once all of your
-       forms have been submitted and validated. This also lets you override some
-       of the wizard's behavior.
-    3. Create some templates that render the forms. You can define a single,
-       generic template to handle every one of the forms, or you can define a
-       specific template for each form.
-    4. Point your URLconf at your ``FormWizard`` class.
+使い方
+========
 
-Defining ``Form`` classes
+このアプリケーションは、可能な限り処理を自動化しています。基本的には、開発
+者側で行う必要があるのは以下の 4 つの作業だけです:
+
+    1. ``django.newforms`` のフォームクラスをウィザードの各ページごとに作成
+       します。
+    2. ``FormWizard`` クラスを作成して、全てのフォームが提出され、フォーム
+       データが有効だった場合の処理を記述します。同時に、ウィザードの挙動も
+       いくつかオーバライドできます。
+    3. フォームをレンダリングするためのテンプレートを作成します。全部のフォー
+       ムの表示に使うテンプレートを一つだけ作成してもよいですし、各フォーム
+       に対して固有のテンプレートを定義してもかまいません。
+    4. URLconf が ``FormWizard`` クラスを指すように設定します。
+
+.. _Defining Form classes:
+
+フォームクラスを定義する
 =========================
 
-The first step in creating a form wizard is to create the ``Form`` classes.
-These should be standard ``django.newforms`` ``Form`` classes, covered in the
-`newforms documentation`_.
+フォームウィザード作成の最初のステップは、フォームクラスの作成です。
+フォームの作成には ``django.newforms`` の ``Form`` クラスを使わねばなりませ
+ん。 ``Form`` クラスの開設は `newforms のドキュメント`_ を参照してください。
 
-These classes can live anywhere in your codebase, but convention is to put them
-in a file called ``forms.py`` in your application.
+フォームクラスはコードベースのどこに置いてもかまいませんが、慣習的には
+アプリケーションフォルダの ``forms.py`` に置くことになっています。
 
-For example, let's write a "contact form" wizard, where the first page's form
-collects the sender's e-mail address and subject, and the second page collects
-the message itself. Here's what the ``forms.py`` might look like::
+例として、「コンタクトフォーム」のウィザードを作成してみましょう。このウィ
+ザードは、最初のページで送り手の e-mail アドレスとタイトルを入力させ、次の
+ページでメッセージ本体を入力させます。 ``forms.py`` は以下のようになるでしょ
+う::
 
     from django import newforms as forms
 
@@ -75,30 +87,36 @@ the message itself. Here's what the ``forms.py`` might look like::
     class ContactForm2(forms.Form):
         message = forms.CharField(widget=forms.Textarea)
 
-**Important limitation:** Because the wizard uses HTML hidden fields to store
-data between pages, you may not include a ``FileField`` in any form except the
-last one.
+**重要な制限事項:** ウィザードは、ページ間のデータの受け渡しに HTML の隠し
+フィールドを使うため、最後のページに表示するフォーム以外では ``FileField``
+を使えません。
 
-.. _newforms documentation: ../newforms/
+.. _newforms documentation: ../newforms
+..  _`newforms のドキュメント`: `newforms documentation`_
 
-Creating a ``FormWizard`` class
-===============================
+.. _Creating a FormWizard class:
 
-The next step is to create a ``FormWizard`` class, which should be a subclass
-of ``django.contrib.formtools.wizard.FormWizard``.
+フォームウィザードクラスを作成する
+===================================
 
-As your ``Form`` classes, this ``FormWizard`` class can live anywhere in your
-codebase, but convention is to put it in ``forms.py``.
+次のステップはフォームウィザードクラスの作成です。 フォームウィザードクラス
+は、 ``django.contrib.formtools.wizard.FormWizard`` のサブクラスにせねばな
+りません。
 
-The only requirement on this subclass is that it implement a ``done()`` method,
-which specifies what should happen when the data for *every* form is submitted
-and validated. This method is passed two arguments:
+フォームクラスと同様、フォームウィザードクラスはコードベースのどこに配置し
+てもかまいませんが、慣習的には ``forms.py`` の中に書きます。
 
-    * ``request`` -- an HttpRequest_ object
-    * ``form_list`` -- a list of ``django.newforms`` ``Form`` classes
+サブクラスの定義で唯一必ず行わなければならないのは ``done()`` メソッドの実
+装です。 ``done()`` メソッドは、 *全ての* フォームが提出され、フォームデー
+タが有効であった場合に何をするかを決めるメソッドです。このメソッドには二つ
+の引数が渡されます:
 
-In this simplistic example, rather than perform any database operation, the
-method simply renders a template of the validated data::
+    * ``request`` -- HttpRequest_ オブジェクトです。
+    * ``form_list`` -- ``django.newforms`` のフォームクラスからなるリストで
+      す。
+
+以下の簡単な例では、データベースの操作を行わずに、単に検証済みのデータをテ
+ンプレートに表示しています::
 
     from django.shortcuts import render_to_response
     from django.contrib.formtools.wizard import FormWizard
@@ -109,9 +127,8 @@ method simply renders a template of the validated data::
                 'form_data': [form.cleaned_data for form in form_list],
             })
 
-Note that this method will be called via ``POST``, so it really ought to be a
-good Web citizen and redirect after processing the data. Here's another
-example::
+このメソッドは ``POST`` で送信されるので、よき Web 市民たるべく、データの処
+理後にはリダイレクトすべきでしょう。というわけで、もう一つの例を示します::
 
     from django.http import HttpResponseRedirect
     from django.contrib.formtools.wizard import FormWizard
@@ -121,43 +138,47 @@ example::
             do_something_with_the_form_data(form_list)
             return HttpResponseRedirect('/page-to-redirect-to-when-done/')
 
-See the section "Advanced ``FormWizard`` methods" below to learn about more
-``FormWizard`` hooks.
+フォームウィザードの提供しているフックを詳しく知りたければ、後の
+`フォームウィザードの特殊なメソッド`_ を参照してください。
 
-.. _HttpRequest: ../request_response/#httprequest-objects
+.. _HttpRequest: request_response/#httprequest-objects
 
-Creating templates for the forms
+.. _Creating templates for the forms:
+
+フォームのテンプレートを作成する
 ================================
 
-Next, you'll need to create a template that renders the wizard's forms. By
-default, every form uses a template called ``forms/wizard.html``. (You can
-change this template name by overriding ``FormWizard.get_template()``, which is
-documented below. This hook also allows you to use a different template for
-each form.)
+次に、ウィザードのフォームをレンダリングするためのテンプレートを作成する必
+要があります。デフォルトでは、全てのフォームは ``forms/wizard.html`` という
+名前のテンプレートを使います。 (このテンプレート名は、後で説明する
+``FormWizard.get_template()`` をオーバライドして変更できます。このフックを
+使えば、各フォームで別々のテンプレートを使えます。)
 
-This template expects the following context:
+テンプレートには、以下のコンテキストが渡されます:
 
-    * ``step_field`` -- The name of the hidden field containing the step.
-    * ``step0`` -- The current step (zero-based).
-    * ``step`` -- The current step (one-based).
-    * ``step_count`` -- The total number of steps.
-    * ``form`` -- The ``Form`` instance for the current step (either empty or
-      with errors).
-    * ``previous_fields`` -- A string representing every previous data field,
-      plus hashes for completed forms, all in the form of hidden fields. Note
-      that you'll need to run this through the ``safe`` template filter, to
-      prevent auto-escaping, because it's raw HTML.
+    * ``step_field`` -- ウィザードのステップ情報を格納している隠しフィール
+      ドの名前です。
+    * ``step0`` -- 現在のステップ (ゼロから始まる数です)。
+    * ``step`` -- 現在のステップ (1 から始まる数です)。
+    * ``step_count`` -- 全ステップ数です。
+    * ``form`` -- 現在のステップのフォームインスタンスです (空の場合と、エ
+      ラーつきの場合がありえます)。
+    * ``previous_fields`` -- 現在のステップよりも前のデータフィールドと、検
+      証済みフォームのハッシュ値の入ったフィールドを表現する文字列です。こ
+      れらのフィールドは全て隠しフィールドです。フィールドの内容は生の HTML
+      なので、内容を処理するには ``safe`` テンプレートフィルタを使って自動
+      エスケープを抑制する必要があります。
 
-It will also be passed any objects in ``extra_context``, which is a dictionary
-you can specify that contains extra values to add to the context. You can
-specify it in two ways:
+辞書オブジェクト ``extra_context`` にオブジェクトを渡せば、コンテキストに任
+意のオブジェクトを追加できます。 ``extra_context`` の指定には以下の二つの方
+法があります:
 
-    * Set the ``extra_context`` attribute on your ``FormWizard`` subclass to a
-      dictionary.
+    * フォームウィザードのサブクラスの ``extra_context`` 属性に辞書を指定し
+      ます。
 
-    * Pass ``extra_context`` as extra parameters in the URLconf.
+    * URLconf に追加のパラメタとして ``extra_context`` を渡します。
 
-Here's a full example template::
+テンプレート例の全体像は以下のようになります::
 
     {% extends "base.html" %}
 
@@ -173,14 +194,16 @@ Here's a full example template::
     </form>
     {% endblock %}
 
-Note that ``previous_fields``, ``step_field`` and ``step0`` are all required
-for the wizard to work properly.
+ウィザードを正しく動作させるには、 ``previous_fields``, ``step_field`` およ
+び ``step0`` を全て表示せねばなりません。
 
-Hooking the wizard into a URLconf
+.. _Hooking the wizard into a URLconf:
+
+ウィザードを URLconf に組み込む
 =================================
 
-Finally, give your new ``FormWizard`` object a URL in ``urls.py``. The wizard
-takes a list of your form objects as arguments::
+最後に、 ``urls.py`` にフォームウィザードオブジェクトを追加します。
+ウィザードはフォームオブジェクトを引数に取ります::
 
     from django.conf.urls.defaults import *
     from mysite.testapp.forms import ContactForm1, ContactForm2, ContactWizard
@@ -189,36 +212,40 @@ takes a list of your form objects as arguments::
         (r'^contact/$', ContactWizard([ContactForm1, ContactForm2])),
     )
 
-Advanced ``FormWizard`` methods
-===============================
+.. _Advanced FormWizard methods:
 
-Aside from the ``done()`` method, ``FormWizard`` offers a few advanced method
-hooks that let you customize how your wizard works.
+フォームウィザードの特殊なメソッド
+===================================
 
-Some of these methods take an argument ``step``, which is a zero-based counter
-representing the current step of the wizard. (E.g., the first form is ``0`` and
-the second form is ``1``.)
+``done()`` メソッドの他にも、フォームウィザードは特殊なメソッドをいくつか提
+供しており、ウィザードの動作をカスタマイズできます。
+
+こうしたメソッドには ``step`` という引数をとるものがあります。 ``step`` は
+ゼロから始まるカウンタで、ウィザードの現在のステップを表しています。
+(例えば、最初のフォームは ``0`` で、2 番目のフォームは ``1`` です。)
 
 ``prefix_for_step``
 ~~~~~~~~~~~~~~~~~~~
 
-Given the step, returns a ``Form`` prefix to use. By default, this simply uses
-the step itself. For more, see the `form prefix documentation`_.
+ステップを指定すると、フォームのプレフィクス文字列を返します。
+デフォルトでは、単にステップ番号そのものを使います。詳しくは
+`フォームプレフィクスのドキュメント`_ を参照してください。
 
-Default implementation::
+デフォルトの実装は以下の通りです::
 
     def prefix_for_step(self, step):
         return str(step)
 
 .. _form prefix documentation: ../newforms/#prefixes-for-forms
+.. _`フォームプレフィクスのドキュメント`: `form prefix documentation`_
 
 ``render_hash_failure``
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Renders a template if the hash check fails. It's rare that you'd need to
-override this.
+ハッシュチェックに失敗した際にテンプレートをレンダするためのメソッドです。
+このメソッドをオーバライドする必要はほとんどありません。
 
-Default implementation::
+デフォルトの実装は以下の通りです::
 
     def render_hash_failure(self, request, step):
         return self.render(self.get_form(step), request, step,
@@ -227,27 +254,29 @@ Default implementation::
 ``security_hash``
 ~~~~~~~~~~~~~~~~~
 
-Calculates the security hash for the given request object and ``Form`` instance.
+受け取ったリクエストオブジェクトとフォームインスタンスに対するセキュリティ
+ハッシュを計算します。
 
-By default, this uses an MD5 hash of the form data and your
-`SECRET_KEY setting`_. It's rare that somebody would need to override this.
+デフォルトでは、フォームデータの MD5 ハッシュと `SECRET_KEY 設定`_ を使いま
+す。このメソッドをオーバライドする必要はほとんどありません。
 
-Example::
+実装例を示します::
 
     def security_hash(self, request, form):
         return my_hash_function(request, form)
 
 .. _SECRET_KEY setting: ../settings/#secret-key
+.. _`SECRET_KEY 設定`: `SECRET_KEY setting`_
 
 ``parse_params``
 ~~~~~~~~~~~~~~~~
 
-A hook for saving state from the request object and ``args`` / ``kwargs`` that
-were captured from the URL by your URLconf.
+リクエストオブジェクトと、 URLconf を使って URL からキャプチャした ``args``
+/ ``kwargs`` を元に、ウィザードの状態を保存するためのフックです。
 
-By default, this does nothing.
+デフォルトでは何もしません。
 
-Example::
+実装例を示します::
 
     def parse_params(self, request, *args, **kwargs):
         self.my_state = args[0]
@@ -255,51 +284,56 @@ Example::
 ``get_template``
 ~~~~~~~~~~~~~~~~
 
-Returns the name of the template that should be used for the given step.
+指定されたステップのページ表示に使うテンプレート名を返します。
 
-By default, this returns ``'forms/wizard.html'``, regardless of step.
+デフォルトでは、ステップに関係なく ``'forms/wizard.html'`` を返します。
 
-Example::
+実装例を示します::
 
     def get_template(self, step):
         return 'myapp/wizard_%s.html' % step
 
-If ``get_template`` returns a list of strings, then the wizard will use the
-template system's ``select_template()`` function, `explained in the template docs`_.
-This means the system will use the first template that exists on the filesystem.
-For example::
+``get_template`` が文字列のリストを返す場合、ウィザードはテンプレートシステ
+ムの ``select_template()`` 関数を使います。つまり、リスト中から最初に見つかっ
+たテンプレートを使います。 ``select_template()`` については
+`テンプレートのドキュメントで解説しています`_ 。
+
+実装例を示します::
 
     def get_template(self, step):
         return ['myapp/wizard_%s.html' % step, 'myapp/wizard.html']
 
 .. _explained in the template docs: ../templates_python/#the-python-api
+.. _テンプレートのドキュメントで解説しています: `explained in the template docs`_
 
 ``render_template``
 ~~~~~~~~~~~~~~~~~~~
 
-Renders the template for the given step, returning an ``HttpResponse`` object.
+指定したステップのテンプレートをレンダし、 ``HttpResponse`` オブジェクトを
+返します。
 
-Override this method if you want to add a custom context, return a different
-MIME type, etc. If you only need to override the template name, use
-``get_template()`` instead.
+カスタムのコンテキストを追加したり、 MIME タイプを変更したりしたければ、こ
+のメソッドをオーバライドしてください。テンプレート名をオーバライドしたいだ
+けなら、 ``get_template()`` を使ってください。
 
-The template will be rendered with the context documented in the
-"Creating templates for the forms" section above.
+テンプレートは `フォームのテンプレートを作成する`_ で解説したコンテキストを
+使ってレンダされます。
 
 ``process_step``
 ~~~~~~~~~~~~~~~~
 
-Hook for modifying the wizard's internal state, given a fully validated ``Form``
-object. The Form is guaranteed to have clean, valid data.
+ウィザードの内部状態を変更するためのフックです。このフックには検証済みのフォー
+ムオブジェクトが渡されます。フォームには、必ずクリーニング済みで有効なデー
+タが入っています。
 
-This method should *not* modify any of that data. Rather, it might want to set
-``self.extra_context`` or dynamically alter ``self.form_list``, based on
-previously submitted forms.
+このメソッドでフォームデータの内容を変更しては *なりません* 。内容に変更を
+加えたければ、 ``self.extra_context`` を設定するか、 ``self.form_list`` に
+入っている提出済みフォームを入れ替えてください。
 
-Note that this method is called every time a page is rendered for *all*
-submitted steps.
+このメソッドは、フォームを提出する *全ての* ステップでページのレンダリング
+時に呼び出されるので注意してください。
 
-The function signature::
+関数シグネチャを以下に示します::
 
     def process_step(self, request, form, step):
         # ...

@@ -2,7 +2,7 @@
 国際化
 ======
 
-:revision-up-to: 7238 (0.97pre SVN)
+:revision-up-to: 7392 (0.97pre SVN)
 
 Django はコードとテンプレートの双方で国際化をフルサポートしています。このド
 キュメントでは国際化の仕組みについて説明します。
@@ -592,9 +592,10 @@ Django をネイティブの言語で動かしたいだけで、かつ自分の�
     * まず、現在のユーザの `セッション`_ に ``django_language`` キーがない
       か探します。
     * なければ、 ``LANGUAGE_COOKIE`` 設定に指定した名前の HTTP cookie を探
-      します。(開発版の Django で新たに登場した設定で、 ``LANGUAGE_COOKIE``
-      のデフォルト値は ``django_language`` です。 Django 0.96 以前のバージョン
-      では、クッキーの名前は ``django_language`` にハードコードされています。)
+      します。(クッキーのデフォルト名は ``django_language`` です。
+      ``LANGUAGE_COOKIE`` は開発版の Django で新たに登場した設定で、バージョ
+      ン 0.96 以前の Djangoでは、クッキーの名前は ``django_language`` にハー
+      ドコードされています。)
     * なければ、 ``Accept-Language`` HTTP ヘッダを探します。このヘッダはブ
       ラウザから送信され、サーバに対して順位つきで言語設定を知らせてきます。
       Djang はこの設定を順に調べ、利用可能な翻訳のある言語を探します。
@@ -781,7 +782,7 @@ Django は以下のアルゴリズムに従って翻訳を探します:
 で呼び出すようになっています。セッションのサポートが有効であれば、ビューは
 ユーザのセッションに選択した言語を保存します。セッションのサポートがなけれ
 ば、言語設定を ``django_language``` クッキーに保存します。
-(開発版の Django を使っているならば、クッキーの名前は ``LANGUAGE_COOKIE_NAME``
+(開発版の Django を使っているなら、クッキーの名前は ``LANGUAGE_COOKIE_NAME``
 設定で変更できます。)
 
 選択された言語に設定した後、 Django は以下のアルゴリズムに従ってリダイレク
@@ -854,7 +855,7 @@ Django では、これらの問題に対する解決策を組み込みで提供�
 URL パターンにパッケージ名を入れておけば、ビューを動的にできます::
 
     urlpatterns = patterns('',
-        (r'^jsi18n/(?P<packages>\S+?)/$, 'django.views.i18n.javascript_catalog'),
+        (r'^jsi18n/(?P<packages>\S+?)/$', 'django.views.i18n.javascript_catalog'),
     )
 
 こうしておいて、パッケージ名を '+' で区切ったパッケージ名リストとして指定で
@@ -880,23 +881,51 @@ JavaScript 翻訳カタログを使う
 
     document.write(gettext('this is to be translated'));
 
-文字列補完を行える ``ungettext`` インタフェースもあります::
+``ngettext`` インタフェースもあります::
 
-    d = {
-        count: 10
-    };
-    s = interpolate(ungettext('this is %(count)s object', 'this are %(count)s objects', d.count), d);
+    var object_cnt = 1 // or 0, or 2, or 3, ...
+    s = ngettext('literal for the singular case',
+            'literal for the plural case', object_cnt);
+
+文字列補完を行う関数もあります::
+ 
+    function interpolate(fmt, obj, named);
 
 ``interpolate`` 関数は、固定引数による補完と名前付き補完の両方をサポートし
 ています。従って、上のコードは以下のようにも書けます::
 
     s = interpolate(ungettext('this is %s object', 'this are %s objects', 11), [11]);
 
-補完の構文は Python から借りたものです。とはいえ、この文字列補完を派手に使
-わない方がよいでしょう: 補完機能は JavaScript で動いており、中では何度も正
-規表現置換を行っています。この処理は Python の文字列補完ほど高速ではないの
-で、本当に必要な場合 (例えば ``ungettext`` を使って適切な複数形表現を実現し
-たい場合) だけにしてください。
+補完の構文は Python から借りたもので、固定引数と名前つきの文字列補完をサポー
+トしています:
+
+    * 固定引数型の補完: ``obj`` には JavaScript の Array オブジェクトが入り
+      ます。 ``interpolate`` は Array の各要素を使って、 ``fmt`` 内のプレー
+      スホルダを順番に置換してゆきます。例えば::
+
+        fmts = ngettext('There is %s object. Remaining: %s',
+                'There are %s objects. Remaining: %s', 11);
+        s = interpolate(fmts, [11, 20]);
+        // s is 'There are 11 objects. Remaining: 20'
+
+    * 名前つき補完: このモードは、オプションの ``named`` パラメタに
+      ``true`` を指定して選択します。 ``obj`` には JavaScript のオブジェク
+      トか、連想配列が入ります。例えば::
+
+        d = {
+            count: 10
+            total: 50
+        };
+
+        fmts = ngettext('Total: %(total)s, there is %(count)s object',
+        'there are %(count)s of a total of %(total)s objects', d.count);
+        s = interpolate(fmts, d, true);
+
+
+とはいえ、この文字列補完を派手に使わない方がよいでしょう: 補完機能は
+JavaScript で動いており、中では何度も正規表現置換を行っています。この処理は
+Python の文字列補完ほど高速ではないので、本当に必要な場合 (例えば
+``ngettext`` を使って適切な複数形表現を実現したい場合) だけにしてください。
 
 .. _Creating JavaScript translation catalogs:
 

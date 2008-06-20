@@ -2,7 +2,7 @@
 Django についてよくある質問
 ===========================
 
-:revision-up-to: 7209 (0.97pre SVN)
+:revision-up-to: 7392 (0.97pre SVN)
 
 .. contents::
 
@@ -204,8 +204,8 @@ Django はわれわれにとって最も理にかなった方法で問題を解�
 世の中には他にも素晴らしい Web フレームワークがあるのは良く知っていますし、
 必要であればそこからアイデアを借りるのにやぶさかではありません。とはいえ、
 Django はまさに私達が旧態然の Web フレームワークに不満だったからこそ開発さ
-れたのであって、「<Framework X> ができるから」という理由は Django に機能を
-追加する十分な理由にはならないということに注意して下さい。
+れたのであって、「<Framework X> だとできるから」という理由は Django に機能
+を追加する十分な理由にはならないということに注意して下さい。
 
 .. _Why did you write all of Django from scratch, instead of using other Python libraries?:
 

@@ -2,7 +2,7 @@
 URL ディスパッチャ
 ==================
 
-:revision-up-to: 7127 (0.97pre SVN)
+:revision-up-to: 7392 (0.97pre SVN)
 
 すっきりした、簡潔で明解な URL スキームの設計は、高品質の Web アプリケーショ
 ンでは重要な要素です。 Django では、フレームワークの制限なしに、望み通りの
@@ -40,9 +40,11 @@ Django のリクエスト処理
 ユーザが Django で作られたサイト上のページをリクエストした時に、どの Python
 コードが実行されるかは以下のアルゴリズムで決定されます:
 
-    1. Django は `設定ファイル`_ の ``ROOT_URLCONF`` 設定を探します。この設
-       定は、例えば ``"mydjangoapps.urls"`` のように、 URLconf を import す
-       るための完全な Python パスを表す文字列になっています。
+    1. まず、Django は、どのモジュールをルート URLconf として使うか決定しま
+       す。もともとは、この値は `設定ファイル`_ の ``ROOT_URLCONF`` に設定
+       されています。ただし、 ``HttpRequest`` オブジェクトに ``urlconf`` と
+       いう属性が設定されていた場合、その値を ``ROOT_URLCONF`` の代わりに使
+       います。
     2. Django は上記の Python モジュールをロードして、 ``urlpatterns`` とい
        う名前の変数を探します。この変数の値は Python のリストで、
        ``django.conf.urls.defaults.patterns()`` が返すのと同じ形式です。

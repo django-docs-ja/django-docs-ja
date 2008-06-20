@@ -2,7 +2,7 @@
 リクエストオブジェクトとレスポンスオブジェクト
 ==============================================
 
-:revision-up-to: 7127 (0.97pre SVN)
+:revision-up-to: 7392 (0.97pre SVN)
 
 .. _`Quick overview`:
 
@@ -157,6 +157,16 @@ HttpRequest オブジェクト
     HTTP POST データそのものです。高度な処理を行いたいときに便利です。普段
     は ``POST`` を使ってください。
 
+``urlconf``
+    Django 自体はこの属性を設定しませんが、他のコード（自作のミドルウェアな
+    ど）でこの属性を設定した場合、Djangoはその値を ``ROOT_URLCONF`` の代わ
+    りにルート URLconf モジュール名として使います。
+    詳しくは 「 `Django のリクエスト処理`_ 」を参照してください。
+
+.. _How Django processes a request: ../url_dispatch/#how-django-processes-a-request
+.. _`Django のリクエスト処理`: `How Django processes a request`_
+
+
 メソッド
 --------
 
@@ -203,6 +213,26 @@ HttpRequest オブジェクト
 ``is_secure()``
     リクエストがセキュアである、すなわち HTTPS を介したリクエストのときに
     ``True`` を返します。
+
+``is_ajax()``
+   **開発版の Django で新たに登場した機能です。**
+
+   リクエストが ``XMLHttpRequest`` である場合には ``True`` に設定されます。
+   リクエストが ``XMLHttpRequest`` であるかどうかは、 
+   ``HTTP_X_REQUESTED_WITH`` ヘッダに文字列 ``XMLHttpRequest`` があるかどう
+   かで判別します。このヘッダは、以下のような主要 JavaScript ライブラリでサ
+   ポートされています:
+
+       * jQuery
+       * Dojo
+       * MochiKit
+       * MooTools
+       * Prototype
+       * YUI
+
+   ブラウザ側で XMLHttpRequest を呼び出す独自のコードを書いている場合、
+   ``is_ajax()`` を正しく機能させたいなら、 ``HTTP_X_REQUESTED_WITH`` ヘッ
+   ダを適切に設定してください。
 
 .. _QueryDict objects:
 

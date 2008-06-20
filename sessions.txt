@@ -2,7 +2,7 @@
 セッションの使い方
 ===================
 
-:revision-up-to: 7127 (0.97pre SVN)
+:revision-up-to: 7392 (0.97pre SVN)
 
 Django では匿名セッション (anonymous session) を完全にサポートしています。
 セッションフレームワークを使うと、任意のデータをサイト訪問者単位
@@ -61,8 +61,9 @@ Django では匿名セッション (anonymous session) を完全にサポート�
 ``"django.contrib.sessions.backends.file"`` にします。
 
 また、必要に応じて ``SESSION_FILE_PATH`` も設定してください (デフォルト値は
-``/tmp`` です)。 Web サーバが ``SESSION_FILE_PATH`` の場所にファイルの読書
-き権限を持っているか確かめてください。
+``tempfile.gettempdir()`` の戻り値で、たいていは ``/tmp`` です)。 Web サー
+バが ``SESSION_FILE_PATH`` の場所にファイルの読書き権限を持っているか確かめ
+てください。
 
 .. _Using cache-based sessions:
 

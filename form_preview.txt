@@ -76,7 +76,7 @@ Django には、フォームプレビュー (form preview) アプリケーショ
 
            (r'^post/$', SomeModelFormPreview(forms.models.form_for_model(SomeModel))),
 
-       独自にフォーム作成しているなら、以下のようにします::
+       独自にフォームを作成しているなら、以下のようにします::
 
            (r'^post/$', SomeModelFormPreview(SomeModelForm)),
 
