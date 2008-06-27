@@ -4,177 +4,131 @@ Django ドキュメント
 
 .. admonition:: 和訳ドキュメントについて
 
-   このドキュメントは、 Django ユーザ有志の手による、
-   `Django <http://djangoproject.com/>`_ の標準ドキュメント和訳です。
+   このドキュメントは、 Django ユーザ有志によって、
+   `Django <http://djangoproject.com/>`_ の標準ドキュメントを和訳したもので
+   す。
 
 :底本: SVN trunk (0.97pre SVN)
 :翻訳: Yasushi Masuda (ymasuda at ethercube dot com), Takanao Endoh (takanao at endoh dot tk)
-:追従済みリビジョン: 7392 (2008/03/14)
+:追従済みリビジョン: 7392 (2008/06/20)
 
-必読
-======
+必須のドキュメント
+=====================
 
-
-`Django の概要 (Django overview) <../overview/>`__
-
-`インストールガイド (How to install Django) <../install/>`__
-
-`サードパーティによる Django ディストリビューション (Third-party distributions of Django) <../distributions/>`__
-
-`Django ドキュメントの読み方 (How to read the Django documentation) <../documentation/>`__
-
-チュートリアル
-~~~~~~~~~~~~~~
-
-`はじめての Django アプリ作成，その 1: 
-初期化，モデル作成，データベース API <../tutorial01/>`__  
-
-`はじめての Django アプリ作成，その 2: 
-自動生成の admin サイトを探究する <../tutorial02/>`__ 
-
-`はじめての Django アプリ作成，その 3: 
-公開用のインタフェースビューを作成する <../tutorial03/>`__ 
-
-`はじめての Django アプリ作成，その 4: 
-簡単なフォームデータ処理と汎用ビュー <../tutorial04/>`__ 
-
-`Django についてよくある質問 (Django FAQ) <../faq/>`__ 
-
-
+.. toctree::
+   :maxdepth: 1
+   
+   overview
+   install
+   tutorial01
+   tutorial02
+   tutorial03
+   tutorial04
+   faq
+   documentation
+   
 リファレンス
-=============
+==============
 
-`django-admin.py と manage.py (django-admin.py and manage.py) <../django-admin/>`__
+.. toctree::
+   :maxdepth: 1
+   
+   django-admin
+   model-api
+   db-api
+   transactions
+   templates
+   templates_python
+   newforms
+   modelforms
+   testing
+   sessions
+   cache
+   settings
+   url_dispatch
+   request_response
+   generic_views
+   authentication
+   shortcuts
+   unicode
+   pagination
+   serialization
+   i18n
+   middleware
+   custom_model_fields
+   databases
+   
+``django.contrib`` のアドオン
+-------------------------------
 
-モデル
-~~~~~~
+.. toctree::
+   :maxdepth: 1
+   
+   add_ons
+   contenttypes
+   csrf
+   databrowse
+   flatpages
+   form_preview
+   form_wizard
+   localflavor
+   redirects
+   sites
+   sitemaps
+   syndication_feeds
+   webdesign
+   
+デプロイ
+----------
 
-`モデルの作成 (Creating models) <../model-api/>`__ 
+.. toctree::
+   :maxdepth: 1
 
-`カスタムのモデルフィールド (Custom model fields) <../custom_model_fields/>`__ 
+   modpython
+   fastcgi
+    
+特殊な問題の解決法
+------------------
 
-`データベース API (The database API) <../db-api/>`__
+.. toctree::
+   :maxdepth: 1
 
-`トランザクション (Managing database transactions) <../transactions/>`__
-
-`モデル例 (Model examples) <http://www.djangoproject.com/documentation/models/>`__
-
-テンプレート
-~~~~~~~~~~~~
-
-`テンプレート作者のための Django テンプレート言語ガイド
-(Guide for HTMLauthors)  <../templates/>`__
-
-`Python プログラマのための Django テンプレート言語ガイド
-(Guide for Python programmers)  <../templates_python/>`__
-
-`ショートカット関数 (Django shortcut functions) <../shortcuts/>`__
-
-`フォームとマニピュレータ
-(Forms, fields, and manipulators) <../forms/>`__
-
-`newforms ライブラリ (The newforms library) <../newforms/>`__
-
-`フォームウィザード (Form wizard) <../form_wizard/>`__
-
-`モデルに対応したフォームの生成 (Generating forms for models) <../form_for_model/>`__
-
-`newforms とモデルを組み合わせる (Using newforms with models) <../modelforms/>`__
-
-`Django アプリケーションのテスト (Writing tests for Django applications) <../testing/>`__
-
-`セッション (Sessions) <../sessions/>`__
-
-`キャッシュ (Django's Cache Framework) <../cache/>`__
-
-`国際化 (Internationalization) <../i18n/>`__
-
-`ローカルフレーバ (Local flavors) <../localflavor/>`__
-
-`Django での Unicode の扱い (Unicode data in Django) <../unicode/>`__
-
-`ミドルウェア (Middlewares) <../middleware/>`__
-
-`設定ファイル (Settings files) <../settings/>`__
-
-`URL の設定 (URL configuration) <../url_dispatch/>`__
-
-`リクエストオブジェクトとレスポンスオブジェクト
-(Request and response objects) <../request_response/>`__
-
-`汎用ビュー (Generic views) <../generic_views/>`__
-
-`認証 (Authentication) <../authentication/>`__
-
-`アドオン (Add-on applications (contrib)) <../add_ons/>`__
-
-  `配信フィード (Syndication feeds (RSS and Atom)) <../syndication_feeds/>`__
-
-  `flatpages アプリケーション <../flatpages/>`__
-
-  `リダイレクト (Redirects) <../redirects/>`__
-
-  `クロスサイトリクエストフォージェリ (CSRF) の阻止 <../csrf/>`__
-
-  `サイト (Sites) <../sites/>`__
-
-  `サイトマップ (Sitemaps) <../sitemaps/>`__
-
-  `Web デザイナーのための補助機能 (Web design helpers) <../webdesign/>`__
-
-  `databrowse アプリケーション <../databrowse/>`__
-
-  `フォームプレビューアプリケーション (Form preview) <../form_preview/>`__
-
-  `contenttypes フレームワーク <../contenttypes/>`__
-
-運用関連
-==========
-
-`mod_python で Django を使う (Using Django with mod_python) <../modpython/>`__
-
-`FastCGI, SCGI, AJP で Django を使う (How to use Django with FastCGI, SCGI or AJP) <../fastcgi/>`__
-
-特殊な話題
-===========
-
-`Apache での認証に Django ユーザデータベースを使う
-(Authenticating against Django's user database from Apache) <../apache_auth/>`__
-
-`静的ファイルの提供方法 (Serving static/media files) <../static_files/>`__
-
-`e-mail の送信 (Sending e-mail) <../email/>`__
-
-`データベースのサポート状況 (Notes about supported databases) <../databases/>`__
-
-`古いデータベースの組み込み 
-(Integrating with (introspecting) a legacy database) <../legacy_databases/>`__
-
-`複数のデータベースを使う (Using Multiple Databases (in multi-db branch)) <../multiple_database_support/>`__
-
-`動的な PDF の生成 (Outputting PDFs dynamically) <../outputting_pdf/>`__
-
-`動的な CSV の生成 (Outputting CSV dynamically) <../outputting_csv/>`__
-
-`Django オブジェクトのシリアライズ (Serializing Django objects) <../serialization/>`__
-
+   apache_auth
+   static_files
+   email
+   legacy_databases
+   outputting_pdf
+   outputting_csv
+    
 その他
-========
+-------
 
-`Django の設計思想 (Design philosophies) <../design_philosophies/>`__
+.. toctree::
+   :maxdepth: 1
 
-`Django プロジェクトに協力する
-(How to contribute to Django) <../contributing/>`__
-
-`管理インタフェースのカスタマイズ (Customizing the Django admin interface) <../admin_css/>`__
-
-`API の安定性 <../api_stability/>`__
-
+   design_philosophies
+   contributing
+   admin_css
+   api_stability
 
 リリースノート
-================
+----------------
 
-`バージョン 0.96 リリースノート <../release_notes_0.96/>`__
+.. toctree::
+   :maxdepth: 1
 
-`バージョン 0.95 リリースノート <../release_notes_0.95/>`__
+   release_notes_0.96
+   release_notes_0.95
+
+リリース間の違いは、 `互換性のない変更`_ を参照してください。
+.. _`互換性のない変更`: http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
+
+インデクスとテーブル
+=======================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
+
 
