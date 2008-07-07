@@ -2,7 +2,7 @@
 Djangoアプリケーションのテスト
 ==============================
 
-:revision-up-to: 7392 (0.97pre SVN)
+:revision-up-to: 7710 (0.97pre SVN)
 
 今日の Web 開発者にとって、自動化されたテストはバグ潰しの工程で極めて有用な
 ツールです。複数のテストを集めた **テストスイート** を使えば、Web開発におけ
@@ -930,6 +930,11 @@ Django 独自の ``TestCase`` クラスを使うと、テストランナは各�
     サーションです。 ``count`` を指定すると、 ``text`` は正確に ``count``
     回出現せねばなりません。
 
+``assertNotContains(response, text, status_code=200)``
+    ``status_code`` に指定した状態コードで ``Response`` インスタンスが生成
+    され、レスポンスのコンテンツ内に ``text`` が入っていないことを確認する
+    アサーションです。
+
 ``assertFormError(response, form, field, errors)``
     ``form`` に指定したフォーム上のフィールド ``field`` で、 ``errors`` に
     指定したエラーリストと同じエラーが送出されるかどうか調べるアサーション
@@ -953,15 +958,18 @@ Django 独自の ``TestCase`` クラスを使うと、テストランナは各�
     先の内容を HTTP 状態コード ``target_status_code`` で取得できるかどうか
     調べるアサーションです。
 
-``assertTemplateNotUsed(response, template_name)``
-    ``template_name`` に指定したテンプレートがレスポンスのレンダリングに使
-    われて *いない* かどうか調べるアサーションです。
-
-   ``template_name`` は ``'admin/index.html'`` のような文字列です。
-
 ``assertTemplateUsed(response, template_name)``
     ``template_name`` に指定したテンプレートがレスポンスのレンダリングに使
-    われているか調べるアサーションです。
+    われていることを確認するアサーションです。
+
+    ``template_name`` は ``'admin/index.html'`` のような文字列です。
+
+``assertTemplateNotUsed(response, template_name)``
+    ``template_name`` に指定したテンプレートがレスポンスのレンダリングに使
+    われて *いない* ことを確認するアサーションです。
+
+    ``template_name`` は ``'admin/index.html'`` のような文字列です。
+
 
 .. _E-mail services:
 

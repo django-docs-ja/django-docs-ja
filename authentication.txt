@@ -2,7 +2,7 @@
 Django でのユーザ認証
 =====================
 
-:revision-up-to: 7392 (0.97pre SVN)
+:revision-up-to: 7710 (0.97pre SVN)
 
 Django にはユーザ認証システムがついてきます。 Django のユーザ認証システムは、
 ユーザアカウント、グループ、パーミッションとクッキーベースのユーザセッショ
@@ -304,13 +304,25 @@ MD5 ハッシュを使っていました。この形式は、以前のバージ�
 
 ``INSTALLED_APPS`` に ``'django.contrib.auth'`` を追加した直後の
 ``manage.py syncdb`` では、スーパユーザの作成を促すプロンプトを表示します。
-また、後でスーパユーザを作成したい場合には、 ``creater_superuser.py`` ユー
-ティリティを使えます。以下のコマンドを実行してください::
+後でスーパユーザを作成したい場合には、以下のようにコマンドラインユーティリ
+ティを使います。
+
+**開発バージョンの Django で登場した方法**::
+
+    manage.py createsuperuser --username=joe --email=joe@example.com
+
+ユーティリティはパスワードの入力を促します。入力すると、ユーザは即座に作成
+されます。 ``--username`` や ``--email`` オプションを省略すると、ユーティリ
+ティはそれらの値を入力するよう促します。
+
+古い Django も使っている場合、以前からあるコマンドラインのスーパユーザ作成
+方法も使えます::
 
     python /path/to/django/contrib/auth/create_superuser.py
 
 ``/path/to/`` は自分のシステムの Django コードベースへのパスに応じて読み変
-えて下さい。
+えて下さい。 ``manage.py`` は自動的に正しいパスと環境変数を決定するので、
+``manage.py`` を使うよう推奨します。
 
 .. _Storing additional information about users:
 

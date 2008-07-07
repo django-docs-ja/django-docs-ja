@@ -4,7 +4,7 @@
 
 .. contents::
 
-:revision-up-to: 7127 (0.97pre SVN)
+:revision-up-to: 7710 (0.97pre SVN)
 
 さあ、例を交えながら学んでゆきましょう。
 
@@ -27,8 +27,8 @@ Python 対話シェルを起動して ``import django`` を実行してみれば
 .. admonition:: 困ったときは:
 
     このチュートリアルを進めてゆく上で困ったことがあったら、 
-    `django-users`_ や  ``irc.freenode.net`` の `#django`_ チャネルで質問し
-    てみてください。
+    `django-users`_ や  ``irc.freenode.net`` の `#django`_ チャネルで誰か助
+    けてくれそうな人と話してみてください。
 
 .. _django-users: http://groups.google.com/group/django-users
 .. _#django: irc://irc.freenode.net/django

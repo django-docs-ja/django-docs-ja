@@ -33,6 +33,7 @@ Django ドキュメント
 .. toctree::
    :maxdepth: 1
    
+   distributions
    django-admin
    model-api
    db-api
@@ -110,6 +111,13 @@ Django ドキュメント
    contributing
    admin_css
    api_stability
+
+ブランチの機能、または撤廃された機能
+-------------------------------------
+
+   form_for_model
+   forms
+   multiple_database_support
 
 リリースノート
 ----------------

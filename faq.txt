@@ -2,7 +2,7 @@
 Django についてよくある質問
 ===========================
 
-:revision-up-to: 7392 (0.97pre SVN)
+:revision-up-to: 7710 (0.97pre SVN)
 
 .. contents::
 
@@ -278,12 +278,16 @@ Django はコンテンツ管理システム (CMS) なのでしょうか?
 短い答え: Django の API 構成に問題がなくなり、 "1.0" に必要と考えている全て
 の機能を追加し、以前のバージョンとの互換性を維持できるようになった時点、です。
 
-Django の `magic-removal ブランチ`_ のマージにより、Django 1.0 への道のりは
-大分進みました。
+Django の `QuerySet Refactor ブランチ`_ のマージにより、Django 1.0 への道のりは
+大分進みました。もう一つの重要なステップは `Newforms Admin ブランチ`_ です。
 
 1.0 になっていないからといってがっかりしないで下さいね。
 
-.. _magic-removal ブランチ: http://code.djangoproject.com/wiki/RemovingTheMagic
+.. _Queryset Refactor branch: http://code.djangoproject.com/wiki/QuerysetRefactorBranch
+.. _`Queryset Refactor ブランチ`: `Queryset Refactor branch`_
+.. _Newforms Admin branch: http://code.djangoproject.com/wiki/NewformsAdminBranch
+.. _Newforms Admin branch: http://code.djangoproject.com/wiki/NewformsAdminBranch
+.. `Newforms Admin ブランチ`: `Newforms Admin branch`_
 .. _quite a few production sites: http://code.djangoproject.com/wiki/DjangoPoweredSites
 
 .. How can I download the Django documentation to read it offline?:
@@ -314,7 +318,9 @@ Django 開発者はどこで雇えますか？
 `求職中の開発者リスト`_ には、喜んであなたの力になってくれる Django 開発者
 のリストがあります。
 
-また、求人を http://www.gypsyjobs.com/ に出してみてもよいかもしれません。
+また、求人を http://djangogigs.com/ に出してみるのもよいでしょう。
+地元で Django を扱える人を探しているなら、 http://djangopeople.net/ を調べ
+てみてください。
 
 .. _`求職中の開発者リスト`: http://code.djangoproject.com/wiki/DevelopersForHire
 .. _developers for hire page: http://code.djangoproject.com/wiki/DevelopersForHire
@@ -351,15 +357,15 @@ Django 開発者はどこで雇えますか？
 
 .. _How do I fix the "install a later version of setuptools" error?:
 
-"install a later version of setuptools" の解決方法は？
-------------------------------------------------------
+"install a later version of setuptools" と表示されます。どうすればよいですか？
+------------------------------------------------------------------------------
 
 Django 配布物に入っている ``ez_setup.py`` を実行してください。
 
 .. _What are Django's prerequisites?:
 
-Django を動かすには何が必要？
------------------------------
+Django を動かすには何が必要ですか？
+-------------------------------------
 
 Django を動かすには Python_ 2.3 以降が必要です。Django の初歩的な利用では、
 それ以外の Python ライブラリは不要です。
@@ -423,8 +429,8 @@ Django を試してみたり、ローカルのコンピュータ上で開発す�
 
 .. _How do I install mod_python on Windows?:
 
-Windows への mod_python のインストール方法は？
-----------------------------------------------
+どうすれば Windows に mod_python をインストールできますか？
+-------------------------------------------------------------
 
     * Python 2.4 を使っているなら
       `Python 2.4 向け mod_python の win32 ビルド`_ を入手してください。
@@ -470,8 +476,8 @@ Django を使う上での質問
 
 .. _Why do I get an error about importing DJANGO_SETTINGS_MODULE?:
 
-DJANGO_SETTINGS_MODULE の import がらみのエラーがでるのはなぜ？
----------------------------------------------------------------
+なぜ、 DJANGO_SETTINGS_MODULE を import できないというエラーが出るのですか？
+----------------------------------------------------------------------------
 
 以下の点を確認してください:
 
@@ -517,8 +523,8 @@ admin サイトを利用できなくなります。 admin だけは Django の�
 
 .. _How do I use image and file fields?:
 
-画像やファイルのフィールドの使い方は？
---------------------------------------
+画像やファイルのフィールドはどう使うのですか？
+-----------------------------------------------
 
 モデルで ``FileField`` や ``ImageField`` を使うには、いくつかのステップを踏
 む必要があります:
@@ -582,8 +588,8 @@ Django が実行している生の SQL クエリを見られますか？
 
 .. _If I make changes to a model, how do I update the database?:
 
-モデルを変更した場合のデータベースの更新方法は？
-------------------------------------------------
+モデルを変更したとき、どうやってデータベースを更新すればよいですか？
+---------------------------------------------------------------------
 
 データが消えてもかまわないのなら、 ``manage.py`` ユーティリティを使って、特
 定のアプリケーションをリセットする SQL を発行できます::
@@ -701,8 +707,8 @@ Django の発行するクッキーのドメインと、ブラウザに格納さ�
 
 .. _How do I automatically set a field's value to the user who last edited the object in the admin?:
 
-admin で、フィールドの値を、オブジェクトを最後に編集したユーザの指定した値と同じにする方法は？
-----------------------------------------------------------------------------------------------
+admin 上でフィールドの値をオブジェクトを最後に編集したユーザの指定した値と同じにするにはどうすればよいですか？
+-----------------------------------------------------------------------------------------------------------------
 
 現時点では、 Django はこの操作を行う正規の方法を提供していません。しかしこ
 の要望はよく出ているので、どうやって実装するかを議論しているところです。問
@@ -719,8 +725,8 @@ admin で、フィールドの値を、オブジェクトを最後に編集し�
 
 .. _How do I limit admin access so that objects can only be edited by the users who created them?:
 
-admin で、オブジェクトを作成したユーザだけがオブジェクトを編集できるようにアクセスを制限する方法は？
-----------------------------------------------------------------------------------------------------
+admin でオブジェクトを作成したユーザだけがオブジェクトを編集できるようにアクセス制限するにはどうすればよいですか？
+-------------------------------------------------------------------------------------------------------------------
 
 一つ前の質問の答えを見て下さい。
 
@@ -748,8 +754,8 @@ Django が ``ManyToManyField`` に対してフィルタを表示するのはオ�
 
 .. _How can I customize the functionality of the admin interface?:
 
-admin インタフェースの機能をカスタマイズする方法は？
-----------------------------------------------------
+admin インタフェースの機能をカスタマイズするにはどうすればよいですか？
+------------------------------------------------------------------------
 
 方法はいくつかあります。Django が自動生成する add/change フォームを利用して
 楽をしたければ、モデルの ``class Admin`` の ``js`` パラメタを使ってページに
@@ -766,10 +772,10 @@ admin のルック & フィールをカスタマイズしたいのなら、次�
 
 .. _The dynamically-generated admin site is ugly! How can I change it?:
 
-動的に生成される admin サイトがみっともありません！変更方法は？
----------------------------------------------------------------
+動的に生成される admin サイトがみっともありません！どうすれば変更できますか？
+------------------------------------------------------------------------------
 
-私達は好きなんですが、そうは思わないのなら、 CSS スタイルシートや画像ファイ
+私達は好きなんですが。そうは思わないのなら、 CSS スタイルシートや画像ファイ
 ルを編集して、 admin サイトのプレゼンテーションを変更できます。サイトはセマ
 ンティックな HTML を使って書かれているので、やりたい変更は全て CSS スタイル
 シートの編集で実現できます。てほどきに `admin で使われているCSS のガイド`_ 
@@ -781,8 +787,8 @@ admin のルック & フィールをカスタマイズしたいのなら、次�
 
 .. _How do I create users without having to edit password hashes?:
 
-パスワードハッシュを編集せずにユーザを作成する方法は？
-------------------------------------------------------
+パスワードハッシュを編集せずにユーザを作成するにはどうすればよいですか？
+-------------------------------------------------------------------------
 
 admin サイトでユーザを作成したいのなら、 Django の開発版を使ってください。
 この問題は 2006 年 8 月 4 日に修正されたので、それ以降のバージョンが必要で
@@ -793,6 +799,98 @@ admin サイトでユーザを作成したいのなら、 Django の開発版を
 
 .. _creating users: ../authentication/#creating-users
 .. _`ユーザの作成`: `creating users`_
+
+
+.. _Getting help:
+
+助けを求める
+============
+
+.. _`How do I do X? Why doesn't Y work? Where can I go to get help?`:
+
+何かをしたいとき、うまくいかないときは、どこで助けを求めればよいですか？
+-------------------------------------------------------------------------
+
+疑問の答えが FAQ に書かれていないのなら、 `django-users メーリングリスト`_
+で質問するとよいでしょう。インストール方法、使い方、デバッグ方法に関する質
+問は遠慮なくどうぞ。
+
+IRC の方がよいなら、 freenode IRC ネットワークの `#django IRC チャネル`_
+をお勧めします。便りになるメンバのいる活発なコミュニティで、あなたの問題を
+解決してくれるでしょう。
+
+.. _`django-users mailing list`: http://groups.google.com/group/django-users
+.. _`django-users メーリングリスト`: `django-users mailing list`_
+.. _`#django IRC channel`: irc://irc.freenode.net/django
+.. _`#django IRC チャネル`: `#django IRC channel`_
+
+.. _`Why hasn't my message appeared on django-users?`:
+
+メッセージを django-users に送ったのに表示されないのはなぜですか？
+--------------------------------------------------------------------
+
+django-users_ にはたくさんの読者がいます。質問に答えてくれる人が沢山いると
+いう点ではいいことですが、残念ながら、それは同時に django-users_ がスパム屋
+の格好の標的たりえることも意味しています。
+
+スパムに対抗するため、私たちは新たに参加したメンバの送信した最初のメッセー
+ジを手動で検査しています。これにより、スパム屋は排除できますが、同時にあな
+たの最初の質問に回答するには少し時間がかかるのです。このポリシによって不便
+な思いをさせてごめんなさい。
+
+.. _django-users: http://groups.google.com/group/django-users
+
+.. _`Nobody on django-users answered my question! What should I do?`:
+
+django-users で質問したのに誰も答えてくれません。どうすればよいですか？
+-------------------------------------------------------------------------
+
+質問をもっと具体的に説明するか、もっと分かりやすい例を示しましょう。
+
+たいていのオープンソースプロジェクトのメーリングリストと同様、
+django-users_ の中の人はボランティアです。誰も質問に答えないときは、だれも
+答えを知らないか、質問の意図を理解できないか、答えを知っている人が忙しくて
+答えられないのでしょう。そんなときは、 IRC で質問してみてもよいでしょう。
+freenode IRC ネットワークの `#django IRC チャネル`_ に行ってみてください。
+
+参考までに、 django-developers_ というメーリングリストもあります。ただ、こ
+のメーリングリストにはサポート質問のメールを送信しないでください。
+django-developers は Django 自体の開発に関する議論のためのメーリングリスト
+で、ここで技術的なサポートの質問をすると、とても不躾な発言とみなされてしま
+うからです。
+
+.. _django-developers: http://groups.google.com/group/django-developers
+
+.. _`I think I've found a bug! What should I do?`:
+
+バグを見つけたように思います。どうすればよいですか？
+------------------------------------------------------
+
+明らかなバグを発見したときの手順は、 
+`Django プロジェクトに貢献するためのガイドライン`_ で詳しく解説しています。
+
+.. _`Guide to contributing to Django`: ../contributing/#reporting-bugs
+.. _`Django プロジェクトに貢献するためのガイドライン`: `Guide to contributing to Django`_
+
+.. _`I think I've found a security problem! What should I do?`:
+
+セキュリティホールを見つけたように思います。どうすればよいですか？
+---------------------------------------------------------------------
+
+Django のセキュリティ上の問題を発見したと思ったら、
+security@djangoproject.com にメッセージを送信してください。このアドレスは、
+長い間 Django に関わっている信頼の篤い開発者だけに公開されているメーリング
+リストで、アーカイブも一般の人には読めません。
+
+セキュリティ問題は極めてデリケートなので、セキュリティ上の問題を発見したと
+きは *決して* 公開のメーリングリストにメッセージを送信しないでください。
+Django プロジェクトでは `セキュリティ上の問題に関するポリシ`_ を定め、
+欠陥が解決されないうちは、その欠陥が公知になることを防ぐことでダメージを最
+小限にとどめたいと考えています。
+
+.. _`policy for handling security issues`: ../contributing/#reporting-security-issues
+.. _`セキュリティ上の問題に関するポリシ`: `policy for handling security issues`_
+
 
 .. _Contributing code:
 
@@ -821,6 +919,11 @@ Django プロジェクトにコードを寄贈したいんですが、どうす�
 いを御理解ください。 Django のチケットシステムにはオープン状態のチケットが
 何百もあり、エンドユーザの使い勝手に与えるインパクトも様々です。そのため、
 Django の開発者達はチケットをレビューして、優先順位を決めねばならないのです。
+
+なにより、 Django プロジェクトに関わっている人たちは全てボランティアです。
+その結果、彼らがプロジェクトにかけられる労力には限界があるし、彼らがプロジェ
+クトに割ける時間もその時々で変化します。忙しいときには、十分な時間をかけら
+れず、なかなか要望に応えられない場合もあるのです。
 
 また、あなたのリクエストを Django に取り込まないとはっきりした場合、チケッ
 トを無視したりはせず、必ずクローズします。従って、チケットがまだオープンの

@@ -2,7 +2,7 @@
 newforms とモデルを組み合わせる
 ================================
 
-:revision-up-to: 7392 (0.97pre SVN)
+:revision-up-to: 7710 (0.97pre SVN)
 
 ``ModelForm``
 =============
@@ -136,6 +136,7 @@ newforms とモデルを組み合わせる
 以下のような一連のモデルを考えましょう::
 
     from django.db import models
+    from django.newforms import ModelForm
 
     TITLE_CHOICES = (
         ('MR', 'Mr.'),

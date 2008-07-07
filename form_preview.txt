@@ -2,7 +2,7 @@
 フォームプレビュー
 ==================
 
-:revision-up-to: 7127 (0.97pre SVN)
+:revision-up-to: 7710 (0.97pre SVN)
 
 Django には、フォームプレビュー (form preview) アプリケーションが付属してい
 ます。フォームプレビューは「HTMLフォームを表示し、プレビューを行わせ、フォー
@@ -74,14 +74,12 @@ Django には、フォームプレビュー (form preview) アプリケーショ
        そして、 URLconf に以下の行を追加します。モデルからフォームを生成す
        るなら、以下のようにするとよいでしょう::
 
-           (r'^post/$', SomeModelFormPreview(forms.models.form_for_model(SomeModel))),
-
-       独自にフォームを作成しているなら、以下のようにします::
-
            (r'^post/$', SomeModelFormPreview(SomeModelForm)),
 
-    4. Django のサーバを実行して、ブラウザで ``/post/`` にアクセスします。
+       ``SomeModelForm`` はモデルのフォームまたはモデルフォームクラスです。
 
+    4. Django のサーバを実行して、ブラウザで ``/post/`` にアクセスします。
+    
 .. _template loader docs: ../templates_python/#loader-types
 .. _`テンプレートローダのドキュメント`: `template loader docs`_
 

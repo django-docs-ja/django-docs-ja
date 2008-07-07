@@ -2,7 +2,7 @@
 Django で PDF を出力する
 ===========================
 
-:revision-up-to: 5613 (0.97pre SVN)
+:revision-up-to: 7710 (0.97pre SVN)
 
 このドキュメントでは， Django のビューを使って動的に PDF ファイルを生成する
 方法について説明します． PDF の生成は，優れたオープンソースの Python 用 PDF
@@ -161,11 +161,14 @@ cStringIO_ ライブラリを使ってください． cStringIO ライブラリ�
     * Python バインディングを持つ別の PDF 生成ライブラリに PDFlib_ がありま
       す． Django から使うには，このドキュメントで述べたのと同じ方法を使い
       ます．
+    * `Pisa HTML2PDF`_ もまた、 PDF 生成のためのライブラリです。 Pisa には、
+      Django と Pisa を組み合わせ方の例が付属しています。
     * HTMLdoc_ は HTML を PDF に変換できるコマンドラインスクリプトです．
       HTMLdoc に Python インタフェースはありませんが， ``system`` や
       ``popen`` のようなシェルを実行して，出力を Python から取り出せます．
     * `forge_fdf in Python`_ はファイルを PDF 形式にするライブラリです．
 
 .. _PDFlib: http://www.pdflib.org/
+.. _`Pisa HTML2PDF`: http://www.htmltopdf.org/
 .. _HTMLdoc: http://www.htmldoc.org/
 .. _forge_fdf in Python: http://www.accesspdf.com/article.php/20050421092951834

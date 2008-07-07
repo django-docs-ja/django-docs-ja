@@ -2,7 +2,7 @@
 URL ディスパッチャ
 ==================
 
-:revision-up-to: 7392 (0.97pre SVN)
+:revision-up-to: 7710 (0.97pre SVN)
 
 すっきりした、簡潔で明解な URL スキームの設計は、高品質の Web アプリケーショ
 ンでは重要な要素です。 Django では、フレームワークの制限なしに、望み通りの
@@ -178,10 +178,10 @@ URLconf はリクエストされた URL を通常の Python 文字列として�
 文字列には GET や POST のパラメタも、ドメイン名も入りません。
 
 例えば、 ``http://www.example.com/myapp/`` URLconf が検索対象にするのは
-``/myapp/`` です。
+``myapp/`` です。
 
-``http://www.example.com/myapp/?page=3`` へのリクエストの場合にも
-``/myapp/`` になります。
+``http://www.example.com/myapp/?page=3`` へのリクエストの場合でも
+``myapp/`` です。
 
 URLconf はリクエストメソッドを調べません。換言すれば、同じ URL に対する
 ``POST``, ``GET``, ``HEAD`` といった全てのリクエストメソッドは同じビュー関

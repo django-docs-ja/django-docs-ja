@@ -2,7 +2,7 @@
 flatpages アプリケーション
 ===========================
 
-:revision-up-to: 7392 (0.97pre SVN)
+:revision-up-to: 7710 (0.97pre SVN)
 
 Django にはオプションのアプリケーション、 "flatpages" が付属しています。
 "flatpages" を使うと、データベースに素 ("flat") の HTML コンテンツを Django
@@ -81,6 +81,16 @@ HTTP 状態コードでは有効になりません。
 トの末尾において下さい。
 
 ミドルウェアの詳細は `ミドルウェアのドキュメント`_ を参照してください。
+
+.. admonition:: 404 テンプレートがEnsure that your 404 template works
+
+    Django が ``FlatpageFallbackMiddleware`` ビューを踏むのは、別のビューが
+    404 応答が生成されたときだけだということに注意しましょう。他のビューや
+    ミドルウェアで 404 を生成させようとして、実際には別の例外を送出してしまっ
+    た場合 (例えば、 404 例外に対応する適切なテンプレートを用意していなかっ
+    た場合には、 ``TemplateDoesNotExist`` が送出されます)、応答は HTTP 500
+    ("Internal Server Error") であり、 ``FlatpageFallbackMiddleware`` はフ
+    ラットページを提供しようとしません
 
 .. _`SITE_ID 設定`: ../settings/#site-id
 .. _SITE_ID: ../settings/#site-id

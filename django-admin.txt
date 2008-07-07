@@ -2,7 +2,7 @@
 django-admin.py と manage.py
 ============================
 
-:revision-up-to: 7127 (0.97pre SVN)
+:revision-up-to: 7710 (0.97pre SVN)
 
 ``django-admin.py`` は Django の管理タスクを行うためのコマンドライン
 ユーティリティです。このドキュメントでは ``django-admin.py`` の全ての
@@ -109,7 +109,33 @@ createcachetable <tablename>
 名前のキャッシュテーブルを生成します。詳しくは
 `cache のドキュメント`_ を参照してください。
 
-.. _`cache のドキュメント`: ../cache/
+.. _cache documentation: ../cache/
+.. _`cache のドキュメント`: `cache documentation`_
+
+createsuperuser
+---------------
+
+**開発版の Django で新たに登場した機能です**
+
+スーパユーザアカウント (全てのパーミッションを保有するユーザ) を作成します。
+初期スーパユーザを ``syncdb`` の実行時以外の場所で作成したい場合や、プログ
+ラム上でスーパユーザアカウントを生成したい場合に便利です。
+
+対話的に実行すると、 ``django-admin.py`` コマンドはスーパユーザアカウントの
+パスワードを入力するよう促します。非対話的に実行した場合、パスワードは設定
+されず、パスワードを手動で設定するまで、作成されたスーパユーザはログインで
+きません。
+
+新たに作成するアカウントのユーザ名と e-mail アドレスは、それぞれ
+コマンドラインの ``--username`` および ``--email`` 引数で指定できます。
+どちらの引数も指定しなければ、 ``createsuperuser`` は対話モードでの実行時に
+入力を促します。
+
+このコマンドは Django の `認証システム`_ (``django.contrib.auth``) がインス
+トールされている時にのみ利用可能です。
+
+.. _authentication system: ../authentication/
+.. _`認証システム`: `authentication system`_
 
 dbshell
 -------
@@ -157,6 +183,22 @@ dumpdata <appname appname ...>
 
 .. _custom manager: ../model-api/#custom-managers
 .. _`カスタムマネジャ`: `custom manager`_
+
+--exclude
+~~~~~~~~~
+
+**開発版の Django で新たに登場した機能です**
+
+出力から、特定のアプリケーションに関するコンテンツを除外します。例えば、
+``auth`` アプリケーションのコンテンツを出力から除外したければ、以下のように
+実行します::
+
+	django-admin.py dumpdata --exclude=auth
+
+複数のアプリケーションを除外したければ、複数回 ``--exclude`` ディレクティブ
+を使います::
+
+	django-admin.py dumpdata --exclude=auth --exclude=contenttype
 
 
 --format
@@ -416,6 +458,12 @@ Django のソースツリーから探索されて配信されるようになっ�
 これが意味するところは、サーバの稼働中にいかなる Python コードの変更も検知
 *せず* 既にメモリ上に読み込まれている Python モジュールが利用されます。
 
+使用例::
+
+    django-admin.py runserver --noreload
+
+.. _Examples of using different ports and addresses:
+
 異なる IP アドレスとポート番号を使用する例
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
@@ -449,15 +497,6 @@ IP アドレス 1.2.3.4、ポート番号 7000::
 .. _serving static files: ../static_files/
 
 .. _Turning off auto-reload:
-
-自動リロードを切る
-~~~~~~~~~~~~~~~~~~
-
-開発サーバに実行中にコードを自動リロードさせたくなければ、以下のように
-``--noreload`` オプションを使ってください::
-
-    django-admin.py runserver --noreload
-
 
 shell
 -----
@@ -619,9 +658,9 @@ test
 ``django-admin.py`` の通知情報やデバッグ情報のコンソールへの出力量を指定する
 には ``--verbosity`` を使います。
 
-  * ``0`` means no input.
-  * ``1`` means normal input (default).
-  * ``2`` means verbose input.
+  * ``0`` だと、何も出力しません。
+  * ``1`` だと、通常の出力 (デフォルト) です。
+  * ``2`` だと、詳細に出力します。
 
 使用例::
 
@@ -748,6 +787,16 @@ allows for the following options:
 ``manage.py`` はデフォルトで現在のプロジェクトの ``settings.py`` を使うので、
 通常はこのオプションは必要ありません。
 
+--traceback
+-----------
+
+使用例::
+
+    django-admin.py syncdb --traceback
+
+デフォルトでは、 ``django-admin.py`` はエラーが起きるたびに簡単なエラーメッ
+セージを表示します。 ``--traceback`` を指定すると ``django-admin.py`` は
+例外が送出された際に完全なスタックトレースを出力します。
 
 .. _Extra niceties:
 
