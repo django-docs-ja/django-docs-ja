@@ -9,7 +9,7 @@ Django ドキュメント
 
 :底本: SVN trunk (0.97pre SVN)
 :翻訳: Yasushi Masuda (ymasuda at ethercube dot com), Takanao Endoh (takanao at endoh dot tk)
-:追従済みリビジョン: 7392 (2008/03/14)
+:追従済みリビジョン: 7871 (2008/07/10)
 
 必読
 ======
@@ -20,11 +20,6 @@ Django ドキュメント
 `インストールガイド (How to install Django) <../install/>`__
 
 `サードパーティによる Django ディストリビューション (Third-party distributions of Django) <../distributions/>`__
-
-`Django ドキュメントの読み方 (How to read the Django documentation) <../documentation/>`__
-
-チュートリアル
-~~~~~~~~~~~~~~
 
 `はじめての Django アプリ作成，その 1: 
 初期化，モデル作成，データベース API <../tutorial01/>`__  
@@ -40,27 +35,21 @@ Django ドキュメント
 
 `Django についてよくある質問 (Django FAQ) <../faq/>`__ 
 
+`Django ドキュメントの読み方 (How to read the Django documentation) <../documentation/>`__
+
 
 リファレンス
 =============
 
+`サードパーティによる Django ディストリビューション <../distributions/>`__
+
 `django-admin.py と manage.py (django-admin.py and manage.py) <../django-admin/>`__
 
-モデル
-~~~~~~
-
 `モデルの作成 (Creating models) <../model-api/>`__ 
-
-`カスタムのモデルフィールド (Custom model fields) <../custom_model_fields/>`__ 
 
 `データベース API (The database API) <../db-api/>`__
 
 `トランザクション (Managing database transactions) <../transactions/>`__
-
-`モデル例 (Model examples) <http://www.djangoproject.com/documentation/models/>`__
-
-テンプレート
-~~~~~~~~~~~~
 
 `テンプレート作者のための Django テンプレート言語ガイド
 (Guide for HTMLauthors)  <../templates/>`__
@@ -68,16 +57,7 @@ Django ドキュメント
 `Python プログラマのための Django テンプレート言語ガイド
 (Guide for Python programmers)  <../templates_python/>`__
 
-`ショートカット関数 (Django shortcut functions) <../shortcuts/>`__
-
-`フォームとマニピュレータ
-(Forms, fields, and manipulators) <../forms/>`__
-
 `newforms ライブラリ (The newforms library) <../newforms/>`__
-
-`フォームウィザード (Form wizard) <../form_wizard/>`__
-
-`モデルに対応したフォームの生成 (Generating forms for models) <../form_for_model/>`__
 
 `newforms とモデルを組み合わせる (Using newforms with models) <../modelforms/>`__
 
@@ -86,14 +66,6 @@ Django ドキュメント
 `セッション (Sessions) <../sessions/>`__
 
 `キャッシュ (Django's Cache Framework) <../cache/>`__
-
-`国際化 (Internationalization) <../i18n/>`__
-
-`ローカルフレーバ (Local flavors) <../localflavor/>`__
-
-`Django での Unicode の扱い (Unicode data in Django) <../unicode/>`__
-
-`ミドルウェア (Middlewares) <../middleware/>`__
 
 `設定ファイル (Settings files) <../settings/>`__
 
@@ -106,37 +78,67 @@ Django ドキュメント
 
 `認証 (Authentication) <../authentication/>`__
 
+`ショートカット関数 (Django shortcut functions) <../shortcuts/>`__
+
+`Django での Unicode の扱い (Unicode data in Django) <../unicode/>`__
+
+`ペジネーション <../pagination/>`__
+
+`Django オブジェクトのシリアライズ (Serializing Django objects) <../serialization/>`__
+
+`国際化 (Internationalization) <../i18n/>`__
+
+`ミドルウェア (Middlewares) <../middleware/>`__
+
+`カスタムのモデルフィールド (Custom model fields) <../custom_model_fields/>`__ 
+
+`データベースのサポート状況 (Notes about supported databases) <../databases/>`__
+
+`ファイルアップロード (Upload Files) <../upload_handling/>`__
+
+`モデル例 (Model examples) <http://www.djangoproject.com/documentation/models/>`__
+
+
+``django.contrib`` のアドオン
+==============================
+
 `アドオン (Add-on applications (contrib)) <../add_ons/>`__
 
-  `配信フィード (Syndication feeds (RSS and Atom)) <../syndication_feeds/>`__
+`contenttypes フレームワーク <../contenttypes/>`__
 
-  `flatpages アプリケーション <../flatpages/>`__
+`クロスサイトリクエストフォージェリ (CSRF) の阻止 <../csrf/>`__
 
-  `リダイレクト (Redirects) <../redirects/>`__
+`databrowse アプリケーション <../databrowse/>`__
 
-  `クロスサイトリクエストフォージェリ (CSRF) の阻止 <../csrf/>`__
+`flatpages アプリケーション <../flatpages/>`__
 
-  `サイト (Sites) <../sites/>`__
+`フォームプレビューアプリケーション (Form preview) <../form_preview/>`__
 
-  `サイトマップ (Sitemaps) <../sitemaps/>`__
+`フォームウィザード (Form wizard) <../form_wizard/>`__
 
-  `Web デザイナーのための補助機能 (Web design helpers) <../webdesign/>`__
+`ローカルフレーバ (Local flavors) <../localflavor/>`__
 
-  `databrowse アプリケーション <../databrowse/>`__
+`リダイレクト (Redirects) <../redirects/>`__
 
-  `フォームプレビューアプリケーション (Form preview) <../form_preview/>`__
+`サイト (Sites) <../sites/>`__
 
-  `contenttypes フレームワーク <../contenttypes/>`__
+`サイトマップ (Sitemaps) <../sitemaps/>`__
 
-運用関連
+`配信フィード (Syndication feeds (RSS and Atom)) <../syndication_feeds/>`__
+
+`Web デザイナーのための補助機能 (Web design helpers) <../webdesign/>`__
+
+
+デプロイ
 ==========
 
 `mod_python で Django を使う (Using Django with mod_python) <../modpython/>`__
 
 `FastCGI, SCGI, AJP で Django を使う (How to use Django with FastCGI, SCGI or AJP) <../fastcgi/>`__
 
-特殊な話題
-===========
+
+特殊な話題の解決法
+====================
 
 `Apache での認証に Django ユーザデータベースを使う
 (Authenticating against Django's user database from Apache) <../apache_auth/>`__
@@ -145,18 +147,12 @@ Django ドキュメント
 
 `e-mail の送信 (Sending e-mail) <../email/>`__
 
-`データベースのサポート状況 (Notes about supported databases) <../databases/>`__
-
 `古いデータベースの組み込み 
 (Integrating with (introspecting) a legacy database) <../legacy_databases/>`__
-
-`複数のデータベースを使う (Using Multiple Databases (in multi-db branch)) <../multiple_database_support/>`__
 
 `動的な PDF の生成 (Outputting PDFs dynamically) <../outputting_pdf/>`__
 
 `動的な CSV の生成 (Outputting CSV dynamically) <../outputting_csv/>`__
-
-`Django オブジェクトのシリアライズ (Serializing Django objects) <../serialization/>`__
 
 その他
 ========
@@ -171,6 +167,17 @@ Django ドキュメント
 `API の安定性 <../api_stability/>`__
 
 
+ブランチ、または撤廃された機能
+================================
+
+`モデルに対応したフォームの生成 (Generating forms for models) <../form_for_model/>`__
+
+`複数のデータベースを使う (Using Multiple Databases (in multi-db branch)) <../multiple_database_support/>`__
+
+`フォームとマニピュレータ
+(Forms, fields, and manipulators) <../forms/>`__
+
+
 リリースノート
 ================
 
@@ -178,3 +185,6 @@ Django ドキュメント
 
 `バージョン 0.95 リリースノート <../release_notes_0.95/>`__
 
+
+リリース間の違いは、 `互換性のない変更`_ を参照してください。
+.. _`互換性のない変更`: http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
