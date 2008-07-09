@@ -2,7 +2,7 @@
 汎用ビュー
 ==========
 
-:revision-up-to: 7392 (0.97pre SVN)
+:revision-up-to: 7869 (0.97pre SVN)
 
 Web アプリケーションの作成は、同じパターンを何度も何度も繰り返し書くことに
 なるため、退屈なものです。 Django では、そんなパターンに共通する部分のほと
@@ -876,9 +876,10 @@ pagination に関する注意
 ``page`` や ``page_range`` は 0 ではなく 1 から始まる数で指定します。従って
 最初のページのページ番号は ``1`` です。
 
-ペジネーションの用例は、 `object pagination`_ のモデルサンプルにあります。
+ペジネーションの詳細は、 `Pagination のドキュメント`_ を参照してください。
 	 
-.. _`object pagination`: http://www.djangoproject.com/documentation/models/pagination/
+.. _`pagination documentation`: ../pagination/
+.. _`Pagination のドキュメント`: `pagination documentation`_
 
 **開発版の Django で登場した機能:** 
 

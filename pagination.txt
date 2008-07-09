@@ -2,7 +2,7 @@
 ペジネータ (paginator)
 =========================
 
-:revision-up-to: 7392 (0.97pre SVN)
+:revision-up-to: 7869 (0.97pre SVN)
 
 **開発版の Django で新たに登場した機能**
 
@@ -65,6 +65,11 @@ Django は、ページ分割された (paginated) データを扱うためのペ
     ...
     InvalidPage
 
+``Paginator`` には Django の ``QuerySet`` のリストやタプルを渡せることに注
+意してください。 ``QuerySet`` を渡したときの挙動の違いは実装にしかありませ
+ん。 ``QuerySet`` を渡すと、 ``Paginator`` は ``len()`` でなく、より効率的
+な ``count()`` を呼び出します。
+
 .. _Paginator objects:
 
 ``Paginator`` オブジェクト
@@ -89,6 +94,25 @@ Django は、ページ分割された (paginated) データを扱うためのペ
 ``num_pages`` -- 全ページ数です。
 
 ``page_range`` -- ``[1, 2, 3, 4]`` のように、 1 から始まるページ番号です。
+
+.. _`InvalidPage exceptions`:
+
+``InvalidPage`` 例外
+==========================
+
+リクエストされたページが無効なページ (整数でないページ番号) であったり、ペー
+ジにオブジェクトが含まれていない場合、 ``page()`` メソッドは
+``InvalidPage`` を送出します。通常はこの ``InvalidPage`` 例外をトラップする
+だけですみますが、より細かく例外処理するには、以下の例外をトラップしてくだ
+さい:
+
+``PageNotAnInteger`` -- ``page()`` に整数でない値を渡したときに送出されます。
+
+``EmptyPage`` -- ``page()`` には有効な値が渡されているが、ページにオブジェ
+クトが含まれない場合に送出されます。
+
+どちらの例外も ``InvalidPage`` のサブクラスなので、単に
+``except InvalidPage`` としておけば両方の例外を捕捉できます。
 
 .. _Page objects:
 
@@ -133,16 +157,6 @@ Django は、ページ分割された (paginated) データを扱うためのペ
 ``number`` -- 1 から数えたページ番号です。
 
 ``paginator`` -- ページが結びついている ``Paginator`` オブジェクトです。
-
-.. _QuerySetPaginator objects:
-
-``QuerySetPaginator`` オブジェクト
-===================================
-
-Django のデータベース API から取得した ``QuerySet`` の内容を使ってペジネー
-ションを行いたい場合には、 ``Paginator`` ではなく ``QuerySetPaginator`` を
-使ってください。 ``QuerySetPaginator`` の方がわずかに効率的で、
-``Paginator`` との間に API 上の違いはありません。
 
 .. _The legacy ObjectPaginator class:
 
