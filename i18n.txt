@@ -2,7 +2,7 @@
 国際化
 ======
 
-:revision-up-to: 7392 (0.97pre SVN)
+:revision-up-to: 7857 (0.97pre SVN)
 
 Django はコードとテンプレートの双方で国際化をフルサポートしています。このド
 キュメントでは国際化の仕組みについて説明します。
@@ -138,8 +138,11 @@ Python コード内での指定
         return HttpResponse(output)
 
 (上の 2 つの例のように変数や計算済みの値を使う場合、 Django の翻訳文字列検
-出ユーティリティ ``make-messages.py`` はこれらの文字列を検出できないことに
-注意しておきましょう。詳しくは後に ``make-messages`` で説明します。)
+出ユーティリティ ``django-admin.py makemessages`` はこれらの文字列を検出で
+きないので注意しておきましょう。詳しくは後の ``makemessages`` の節で説明し
+ます。)
+
+
 
 ``_()`` や ``ugettext()`` に渡す文字列には、 Pyton の標準の名前付き補完構文
 によるプレースホルダを使えます。例えば::
@@ -294,8 +297,8 @@ Python コードとは少し違った方法で行います。テンプレート�
 
 ``RequestContext`` は 3 つの翻訳処理固有の変数にアクセスできます:
 
-    * ``LANGUAGES`` は各言語の言語コードと言語名からなるタプルでできた言語
-      のリストです。
+    * ``LANGUAGES`` は各言語の言語コードと (現在有効なロケールを使って翻訳
+      した) 言語名からなるタプルでできた言語のリストです。
     * ``LANGUAGE_CODE`` は現在のユーザ設定言語で、文字列です。例: ``en-us``
       (後述の "言語設定の検出メカニズム" を参照してください)。
     * ``LANGUAGE_BIDI`` は現在の言語の表記方向 (direction) です。 ``True``
@@ -433,12 +436,18 @@ Django はたくさんのユーティリティ関数を (とりわけ ``django.u
 全てと、言語ごとの対応する表現が収められています。メッセージファイルの拡張
 子は ``.po`` です。
 
-Django には ``bin/make-messages.py`` というツールが付属しています。このツー
-ルはメッセージファイルの作成や維持を自動化します。
+Django には ``django-admin.py makemessages`` というツールが付属しています。
+このツールはメッセージファイルの作成や維持を自動化します。
+
+.. admonition:: ベテラン Django ユーザへの注意
+
+    以前からある ``bin/make-messages.py`` ツールの機能は、 Django の操作に
+    一貫性をもたせるために、 ``django-admin.py makemessages`` に移動しまし
+    た。
 
 メッセージファイルの作成や更新を行うには、以下のようにコマンドを実行します::
 
-    bin/make-messages.py -l de
+    django-admin.py makemessages -l de
 
 ここで、 ``de`` は作成したいメッセージファイルの言語コードです。言語コード
 はロケール表示の形式にします。例えば、ブラジル系ポルトガル語の場合には
@@ -465,9 +474,10 @@ Django には ``bin/make-messages.py`` というツールが付属していま�
 .. admonition:: gettext がなかったら?
 
     ``gettext`` ユーティリティをインストールしていない場合、
-    ``make-messages.py`` は空のファイルを作成します。この場合、 ``gettext``
-    ユーティリティをインストールするか、英語用の空のメッセージファイル
-    (``conf/locale/en/LC_MESSAGES/django.po``) をコピーして使って下さい。
+    ``django-admin.py makemessages`` は空のファイルを作成します。その場合、
+    ``gettext`` ユーティリティをインストールするか、英語用の空のメッセージ
+    ファイル (``conf/locale/en/LC_MESSAGES/django.po``) をコピーして使って
+    下さい。
 
 ``.po`` ファイルは素直な形式で書かれています。 ``.po`` ファイルには翻訳メン
 テナのコンタクト情報のようなわずかなメタデータが入っています。それ以外の大
@@ -479,8 +489,8 @@ Django には ``bin/make-messages.py`` というツールが付属していま�
 
     _("Welcome to my site.")
 
-``make-messages.py`` を実行すると、以下のようなコード断片を含む ``.po`` ファ
-イルを作成するはずです::
+``django-admin.py makemessages`` を実行すると、以下のようなコード断片を含む
+``.po`` ファイルを作成するはずです::
 
     #: path/to/python/module.py:23
     msgid "Welcome to my site."
@@ -514,7 +524,7 @@ Django には ``bin/make-messages.py`` というツールが付属していま�
 全てのソースコードとテンプレートを新たな翻訳文字列でためし、 **全ての** 言
 語用にメッセージファイルを更新するには、以下のようにします::
 
-    make-messages.py -a
+    django-admin.py makemessages -a
 
 .. _Compiling message files:
 
@@ -523,16 +533,23 @@ Django には ``bin/make-messages.py`` というツールが付属していま�
 
 メッセージファイルを作成して、変更し終えたら ``gettext`` を使ってメッセージ
 ファイルをより効率的な形式にコンパイルします。作業は
-``bin/compile-messages.py`` ユーティリティで行いましょう。
+``django-admin.py makemessages`` ユーティリティで行いましょう。
 
 このツールは全ての ``.po`` ファイルをコンパイルして ``.mo`` ファイルを作成
 します。 ``.mo`` ファイルはバイナリファイルで、 ``gettext`` で使うために最
-適化されています。 ``make-messages.py`` を実行したのと同じディレクトリで、
-以下のように ``compile-messages.py`` を実行してください::
+適化されています。 ``django-admin.py makemessages`` を実行したのと同じディ
+レクトリで、以下のように ``django-admin.py compilemessages`` を実行してくだ
+さい::
 
-   bin/compile-messages.py
+   django-admin.py compilemessages
 
 これで終わりです。もう翻訳を使えるようになっているはずです。
+
+.. admonition:: ベテラン Django ユーザへの注意
+
+    以前からある ``bin/compile-messages.py`` ツールの機能は、 Django の操作
+    に一貫性をもたせるために、 ``django-admin.py compilemessages`` に移動し
+    ました。
 
 .. admonition:: 翻訳者への注意
 
@@ -643,10 +660,10 @@ Django をネイティブの言語で動かしたいだけで、かつ自分の�
               ('en', ugettext('English')),
           )
 
-      このように設定しておいても、 ``make-messages.py`` は翻訳文字列を検出
-      して翻訳対象としてマークします。ただし、実行時の翻訳はおこなわれませ
-      ん。したがって、実行時には ``LANGUAGES`` を使うコードを *本当の*
-      ``ugettext()`` でラップしておかねばなりません。
+      このように設定しておいても、 ``django-admin.py makemessages`` は翻訳
+      文字列を検出して翻訳対象としてマークします。ただし、実行時の翻訳はお
+      こなわれません。したがって、実行時には ``LANGUAGES`` を使うコードを 
+      *本当の* ``ugettext()`` でラップしておかねばなりません。
 
     * ``LocaleMiddleware`` で選択できるのは、 Django が基本的な部分の翻訳を
       提供している言語だけです。 Django のソースツリーの翻訳セットに入って
@@ -734,14 +751,16 @@ Django は以下のアルゴリズムに従って翻訳を探します:
     * ``$PYTHONPATH/django/conf/locale/<language>/LC_MESSAGES/django.(po|mo)``
 
 メッセージファイルの作成には、 Django メッセージファイルと同じ
-``make-messages.py`` ツールを使って下さい。ツールの実行は正しい場所、すなわ
-ち ``conf/locale`` (ソースツリーの場合) か、あるいは ``locale`` (アプリケー
-ションメッセージやプロジェクトメッセージの場合) ディレクトリのあるディレク
-トリで行わねばなりません。また、 ``gettext`` の使うバイナリ形式の
-``django.mo`` ファイルを生成するには ``compile-messages.py`` を使います。
+``django-admin.py makemessages`` ツールを使って下さい。ツールの実行は正しい
+場所、すなわち ``conf/locale`` (ソースツリーの場合) か、あるいは ``locale``
+(アプリケーションメッセージやプロジェクトメッセージの場合) ディレクトリのあ
+るディレクトリで行わねばなりません。また、 ``gettext`` の使うバイナリ形式の
+``django.mo`` ファイルを生成するには ``django-admin.py compilemessages`` を
+使います。
 
-``compile-message.py --settings=path.to.settings`` を実行すれば、コンパイラ
-に ``LOCALE_PATHS`` に設定された全てのディレクトリを処理させられます。
+``django-admin.py compilemessages --settings=path.to.settings`` を実行すれ
+ば、コンパイラに ``LOCALE_PATHS`` に設定された全てのディレクトリを処理させ
+られます。
 
 アプリケーションメッセージファイルを発見するメカニズムはやや複雑で、
 ``LocaleMiddleware`` が必要になります。従って、このミドルウェアを使わない場
@@ -752,16 +771,17 @@ Django は以下のアルゴリズムに従って翻訳を探します:
 す。自分の作ったアプリケーションを他のユーザに配ったり、他のプロジェクトで
 利用したりするなら、アプリケーション固有の翻訳が必要になるでしょう。しかし、
 アプリケーション固有のメッセージやプロジェクトごとの翻訳は
-``make-messages`` にまつわる困った問題を引き起こすことがあります:
-``make-messages`` は現在のパス以下の全てのディレクトリを検索してしまうので、
+``makemessages`` にまつわる困った問題を引き起こすことがあります:
+``makemessages`` は現在のパス以下の全てのディレクトリを検索してしまうので、
 すでにアプリケーションメッセージファイルに入っているメッセージ ID が、プロ
 ジェクトのメッセージファイルに入ってしまうことがあるのです。
 
 この問題の最も簡単な解決法は、プロジェクトを直接的に構築しない (なおかつ独
 自の翻訳を備えている) アプリケーションをプロジェクトツリーの外に配置してお
-くというものです。こうすれば、プロジェクトレベルで ``make-messages`` を実行
-しても、自分のプロジェクトに明に関係する部分の文字列だけを翻訳し、別個に配
-布されたアプリケーションの文字列を対象にしなくなります。
+くというものです。こうすれば、プロジェクトレベルで
+``django-admin.py make-messages`` を実行しても、自分のプロジェクトに明に関
+係する部分の文字列だけを翻訳し、別個に配布されたアプリケーションの文字列を
+対象にしなくなります。
 
 .. _The set_language redirect view:
 
@@ -933,14 +953,14 @@ JavaScript の翻訳カタログを作成する
 -----------------------------------
 
 JavaScript の翻訳カタログの作成と更新方法、他の Django の翻訳カタログの場合
-と同じで、 ``make-messages.py`` ツールを使います。ただし、
+と同じで、 ``django-admin.py makemessages`` ツールを使います。ただし、
 ``-d djangojs`` パラメタを指定してください。例えば:: 
 
-    make-messages.py -d djangojs -l de
+    django-admin.py makemessages -d djangojs -l de
 
 上の例では、ドイツ語向けの JavaScript の翻訳カタログを作成または更新してい
 ます。翻訳カタログを更新したら、通常の Django 翻訳カタログと同じように、
-``compile-messages.py`` を実行してください。
+``django-admin.py compilemessages`` を実行してください。
 
 .. _Specialties of Django translation:
 

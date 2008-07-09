@@ -1,0 +1,36 @@
+.TH "daily_cleanup.py" "1" "August 2007" "Django Project" ""
+.SH "NAME"
+daily_cleanup.py \- Django ウェブフレームワークのためのデータベース整
+理ユーティリティ
+.SH "SYNOPSIS"
+.B daily_cleanup.py
+
+.SH "DESCRIPTION"
+Django データベースから、無効なセッションデータを除去します。すなわち、
+このスクリプトの実行時刻より前に有効期限の切れているセッションデータを
+全て削除します。
+.sp
+このスクリプトは手動でも実行できますし、
+.BI cron
+ジョブの形で定期実行させてもかまいません。
+
+.SH "ENVIRONMENT"
+.TP
+.I DJANGO_SETTINGS_MODULE
+スクリプトが読むべき設定モジュールを指定するための環境変数です。
+"myproject.settings" のように Python のモジュール import 形式で指定し
+ます。
+
+.SH "SEE ALSO"
+セッションのドキュメント:
+.sp
+.I http://www.djangoproject.com/documentation/sessions/
+
+.SH "AUTHORS/CREDITS"
+このプログラムの最初のバージョンは、米国カンザス州ローレンスの World
+Online 社で開発されました。プログラムに寄与した開発者たちのリストは
+Django 配布物中の AUTHORS ファイルを参照してください。
+
+.SH "LICENSE"
+新 BSD ライセンス (New BSD license) です。完全な形式のライセンステキストは、 Django 配布物中の LICENSE ファイルを参照してください。
+

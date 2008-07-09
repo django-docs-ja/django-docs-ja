@@ -2,7 +2,7 @@
 flatpages アプリケーション
 ===========================
 
-:revision-up-to: 7710 (0.97pre SVN)
+:revision-up-to: 7857 (0.97pre SVN)
 
 Django にはオプションのアプリケーション、 "flatpages" が付属しています。
 "flatpages" を使うと、データベースに素 ("flat") の HTML コンテンツを Django
@@ -18,9 +18,14 @@ flatpage ではカスタムのテンプレートも使えますし、デフォ�
 使われるフラットページテンプレートも使えます。フラットページは単一のサイト
 にも、複数のサイトにも関連づけできます。
 
-Django を使ったサイトの中にも、 flatpages を使ったサイトがいくつかあります:
+**開発版の Django で新たに追加された機能**
 
-    * http://www.chicagocrime.org/about/
+自作のテンプレートにコンテンツを入れる場合、 ``content`` フィールドを空
+(blank) にしておいてもよくなりました。
+
+Django で構築されたサイトの中にも、 flatpages を使っているものがあります:
+
+    * http://www.everyblock.com/about/
     * http://www.lawrence.com/about/contact/
 
 .. _Installation:
@@ -40,8 +45,6 @@ flatpages アプリケーションをインストールするには、以下の�
 .. _sites framework: ../sites/
 .. _`INSTALLED_APPS`: ../settings/#installed-apps
 .. _`MIDDLEWARE_CLASSES`: ../settings/#middleware-classes
-.. INSTALLED_APPS: ../settings/#installed-apps
-.. MIDDLEWARE_CLASSES: ../settings/#middleware-classes
 .. _`sites フレームワーク`: `sites framework`_
 
 .. _How it works:

@@ -2,7 +2,7 @@
 Apache での認証に Django のユーザデータベースを使う
 ===================================================
 
-:revision-up-to: 7127 (0.97pre SVN)
+:revision-up-to: 7857 (0.97pre SVN)
 
 Apache を使っていると，同期を保ちながら複数の認証データベースを維持するとい
 う問題によくぶつかります．そこで， Django の `認証システム`_ に対して直接
@@ -45,8 +45,9 @@ mod_python の標準の ``Auth*`` および ``Require`` ディレクティブと
     末尾に例があります) 。
 
     また、 Apache が他の認証用モジュールを使おうとしないように、設定のため
-    のディレクティブを挿入しておく必要があります。ロードした認証モジュール
-    によって、以下のいずれか、または複数のディレクティブが必要です::
+    のディレクティブを挿入しておき、``AuthUserFile`` を ``/dev/null`` に指
+    定しておく必要があります。ロードした認証モジュールによって、以下のいず
+    れか、または複数のディレクティブが必要です::
 
         AuthBasicAuthoritative Off
         AuthDefaultAuthoritative Off
@@ -69,6 +70,7 @@ mod_python の標準の ``Auth*`` および ``Require`` ディレクティブと
         <Location /example/>
             AuthType Basic
             AuthName "example.com"
+            **AuthUserFile /dev/null**
             **AuthBasicAuthoritative Off**
             Require valid-user
 

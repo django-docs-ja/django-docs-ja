@@ -2,7 +2,7 @@
 Djangoアプリケーションのテスト
 ==============================
 
-:revision-up-to: 7710 (0.97pre SVN)
+:revision-up-to: 7857 (0.97pre SVN)
 
 今日の Web 開発者にとって、自動化されたテストはバグ潰しの工程で極めて有用な
 ツールです。複数のテストを集めた **テストスイート** を使えば、Web開発におけ
@@ -899,6 +899,36 @@ Web サイトのテスト時に便利な機能をいくつか追加していま�
 .. _loaddata documentation: ../django-admin/#loaddata-fixture-fixture
 .. _`dumpdata のドキュメント`: `dumpdata documentation`_
 .. _`loaddata のドキュメント`: `loaddata documentation`_
+
+.. _URLconf configuration:
+
+URLconf の設定
+~~~~~~~~~~~~~~~~~~~~~
+
+**開発版の Django で新たに追加されました**
+
+アプリケーションでビューを定義している場合、テストクライアントを使ってビュー
+を検査するテストを組み込みたいことがあるでしょう。しかし、エンドユーザはア
+プリケーションのビューを自分の好きな URL でデプロイできるので、テストを行う
+際には、ビューが特定の URL でアクセスできると期待してはなりません。
+
+テスト用の URL 空間を指定するために、 ``django.test.TestCase`` はテストスイー
+ト実行中に使われる URLconf をカスタマイズできる仕組みを提供しています。
+``TestCase`` インスタンスに ``urls`` 属性を指定しておくと、 ``TestCase``
+はその値をテスト実行中だけ ``ROOT_URLCONF`` に使います。
+
+使い方を示しましょう::
+
+    from django.test import TestCase
+    
+    class TestMyViews(TestCase):
+        urls = 'myapp.test_urls'
+
+        def testIndexPageView(self):
+            #  ``Client`` を使ってビューをテストする
+
+このテストケースは、ケースの実行中だけ、 ``myapp.test_urls`` を URLconf と
+して使います。
 
 .. _Emptying the test outbox:
 

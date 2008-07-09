@@ -1,4 +1,4 @@
-.TH "django-admin.py" "1" "June 2007" "Django Project" ""
+.TH "django-admin.py" "1" "March 2008" "Django Project" ""
 .SH "NAME"
 django\-admin.py \- Django web フレームワークのためのユーティリティスクリプト
 .SH "文法"
@@ -22,6 +22,14 @@ django\-admin.py \- Django web フレームワークのためのユーティリ�
 指定したアプリケーション向けに admin のインデクスページのテンプレートを
 出力します．
 .TP
+.BI cleanup
+データベースから古いデータ (現状では期限切れのセッションデータのみ) を
+除去します。
+.TP
+.BI "compilemessages [" "\-\-locale=LOCALE" "]"
+組み込みの gettext で使うために、 .po ファイルを .mo ファイルにコン
+パイルします。
+.TP
 .BI "createcachetable [" "tablename" "]"
 SQL キャッシュバックエンドが使うキャッシュテーブルを生成します．
 .TP
@@ -44,6 +52,12 @@ settings.py で指定したデータベーステーブルに対してイント�
 指定したアプリケーションに対して
 .B sqlall
 の内容を実行します．
+.TP
+.BI "makemessages [" "\-\-locale=LOCALE" "] [" "\-\-domain=DOMAIN" "] [" "\-\-all" "]"
+カレントディレクトリ以下のソースツリー全体を走査して、翻訳対象としてマー
+クされている文字列を抽出します。Django のソースツリーなら conf/locale
+以下、プロジェクトまたはアプリケーションなら locale ディレクトリ以下に、
+作成あるいは更新されたメッセージファイルを保存します。
 .TP
 .BI "reset [" "appname ..." "]"
 指定したアプリケーションに対して
@@ -142,6 +156,16 @@ IPython がインストールされている場合， "shell" コマンドで IP
 .I \-\-adminmedia=ADMIN_MEDIA_PATH
 開発サーバを起動する際に， admin メディアファイルの置場所として使う
 ディレクトリを指定します．
+.TP
+.I \-l, \-\-locale=LOCALE
+ロケールです。makemessages や compilemessages で使われます。
+.TP
+.I \-d, \-\-domain=DOMAIN
+メッセージファイルのドメイン (デフォルトは "django") です。
+makemessages で使われます。
+.TP
+.I \-a, \-\-all
+makemessages にこのオプションを指定すると、全てのロケールを処理します。
 .SH "環境変数"
 .TP
 .I DJANGO_SETTINGS_MODULE

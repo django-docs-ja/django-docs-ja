@@ -2,7 +2,7 @@
 newforms ライブラリ
 ===================
 
-:revision-up-to: 7710 (0.97pre SVN)
+:revision-up-to: 7857 (0.97pre SVN)
 
 ``django.newforms`` は、 Django に新たに導入された画期的なフォーム処理ライ
 ブラリです。従来のフォーム／マニピュレータ／バリデータフレームワークである
@@ -922,12 +922,12 @@ Django は ``field.required`` ではなく、 ``field.field.required`` をチェ
 顔写真 (mugshot) のファイルデータをフォームに結びつけます::
 
     # 画像ファイルフィールドつきの束縛フォーム
+    >>> from django.core.files.uploadedfile import SimpleUploadedFile
     >>> data = {'subject': 'hello',
     ...         'message': 'Hi there',
     ...         'sender': 'foo@example.com',
     ...         'cc_myself': True}
-    >>> file_data = {'mugshot': {'filename':'face.jpg'
-    ...                          'content': <file data>}}
+    >>> file_data = {'mugshot': SimpleUploadedFile('face.jpg', <file data>)}
     >>> f = ContactFormWithMugshot(data, file_data)
 
 実践的には、 ``request.FILES`` をファイルデータのソースとして指定することに
@@ -1557,7 +1557,7 @@ Django の古いフォーム／検証フレームワークを使ったことが�
 ImageField を使いたい場合、 `Python Imaging Library`_ をインストールしてお
 かねばなりません。
 
-``FileField`` をフォームで使う場合、 `フォームにファイルデータを束縛する`_
+``ImageField`` をフォームで使う場合、 `フォームにファイルデータを束縛する`_
 のを忘れないようにしてください。
 
 .. _Python Imaging Library: http://www.pythonware.com/products/pil/
@@ -1979,16 +1979,19 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
 利用したくなることでしょう。カスタムウィジェットを使えば、属性定義をキャプ
 チャできるので、毎回必要に応じて同じ属性定義を繰り返さなくてすみます。
 
-例えば、自分のコードでフォームにコメントフィールドをたくさん使っていること
-に気付いたとしましょう。固定の ``size`` 属性を持った ``TextInput`` は、
-``TextInput`` ウィジェットを拡張したカスタムウィジェットとしてキャプチャで
-きます::
+例えば、自分のコードでコメント入力フィールドの必要なフォームをたくさん使っ
+ていることに気付いたとしましょう。そんなときは、デフォルトの ``size`` 値を
+特定の値にした ``TextInput`` を、 ``TextInput`` ウィジェットを拡張したカス
+タムウィジェットとして定義できます::
 
     class CommentWidget(forms.TextInput):
         def __init__(self, *args, **kwargs):
             kwargs.setdefault('attrs',{}).update({'size': '40'})
             super(CommentWidget, self).__init__(*args, **kwargs)
 
+このウィジェットでは、ユーザが ``size`` 属性をオーバライドできるようになっ
+てはいますが、デフォルトの挙動では常にコンストラクタに
+``attrs={'size': 40}`` を渡しています。
 
 そして、このウィジェットをフォームで使います::
 

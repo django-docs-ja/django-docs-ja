@@ -2,7 +2,7 @@
 django-admin.py と manage.py
 ============================
 
-:revision-up-to: 7710 (0.97pre SVN)
+:revision-up-to: 7857 (0.97pre SVN)
 
 ``django-admin.py`` は Django の管理タスクを行うためのコマンドライン
 ユーティリティです。このドキュメントでは ``django-admin.py`` の全ての
@@ -101,6 +101,33 @@ admin-index テンプレート断片は、 admin のインデクスページの�
 `チュートリアルその 2`_ を参照してください。
 
 .. _`チュートリアルその 2`: ../tutorial02/
+
+cleanup 
+-------
+
+**開発版の Django で新たに登場した機能です**
+
+``cron`` によるジョブとして実行したり、直接実行したりして、データベースから
+古いデータ (現時点では、有効期限の切れたセッションのみ) を消去します。
+
+compilemessages
+---------------
+
+**開発版の Django で新たに登場した機能です**
+
+``makemessages`` で作成した .po ファイルをコンパイルして、組み込みの
+gettext サポートで使えるようにします。詳しくは  `i18n のドキュメント`_
+を参照してください。
+
+--locale
+~~~~~~~~
+
+処理したいロケールを指定するには ``--locale`` または ``-l`` オプションを使
+います。指定しなければ、全てのロケールを処理します。
+
+使い方::
+
+    django-admin.py compilemessages --locale=br_PT
 
 createcachetable <tablename>
 ----------------------------
@@ -381,6 +408,67 @@ Django は上記の場所に見つかった全てのフィクスチャファイ�
 使用例::
 
     django-admin.py loaddata --verbosity=2
+
+makemessages
+------------
+
+**開発版の Django で新たに登場した機能です**
+
+現在のディレクトリ以下にあるソースツリー全体を走査して、翻訳対象にマークさ
+れている文字列全てを取り出します。django のソースツリー上で行った場合には
+``conf/locale`` 下に、プロジェクトやアプリケーションのソースツリー上で行っ
+た場合には ``locale`` 下にメッセージファイルを作成します。メッセージファイ
+ルに変更があった場合、 ``compilemessages`` でファイルをコンパイルして、組み
+込みの gettext サポートで利用できるようにしてください。詳しくは 
+`i18n のドキュメント`_ を参照してください。
+
+.. _i18n documentation: ../i18n/#how-to-create-language-files
+.. _`i18n のドキュメント`: `i18n documentation`_
+
+--all
+~~~~~
+
+全ての言語のメッセージファイルを更新するには ``--all`` または ``-a`` を使っ
+てください。
+
+使い方::
+
+    django-admin.py makemessages --all
+
+--locale
+~~~~~~~~
+
+処理したいロケールを指定するには ``--locale`` または ``-l`` オプションを使
+います。
+
+使い方::
+
+    django-admin.py makemessages --locale=br_PT
+
+--domain
+~~~~~~~~
+
+メッセージファイルのドメインを変更するには ``--domain`` または ``-d`` オプ
+ションを使ってください。
+
+現在サポートしているのは、以下のドメインです:
+
+	* ``django``: ``*.py`` ファイルと ``*.html`` ファイル (デフォルト)
+	* ``djangojs``: ``*.js`` ファイル
+
+--verbosity
+~~~~~~~~~~~
+
+``django-admin.py`` の通知情報やデバッグ情報のコンソールへの出力量を指定する
+には ``--verbosity`` または ``-v`` を使います。
+
+  * ``0`` だと、何も出力しません。
+  * ``1`` だと、通常の出力 (デフォルト) です。
+  * ``2`` だと、詳細に出力します。
+
+使い方::
+
+    django-admin.py makemessages --verbosity=2
 
 reset <appname appname ...>
 ---------------------------

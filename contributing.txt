@@ -2,7 +2,7 @@
 Django プロジェクトに協力するために
 ===================================
 
-:revision-up-to: 7710 (0.97pre SVN)
+:revision-up-to: 7857 (0.97pre SVN)
 
 Django を *使う* のを楽しいと思ってもらえたなら、 *使い続ける* 前にすこし待っ
 てください。私達は多大な情熱をかけて、ユーザがコミュニティのメンバに貢献で
@@ -418,8 +418,8 @@ admin サイトやバリデータのエラーメッセージなど、Django は�
     * `Django i18n メーリングリスト`_ に参加して自己紹介してください。
     * `i18n のドキュメント`_ に従って翻訳を作成してください。
     * 最新の Subversion trunk に対して ``.po`` ファイルを作成してください。
-    * `` bin/compile-messages.py -l <lang>`` を実行して、警告がでないのを確
-      認してください。
+    * ``django-admin.py compilemessages -l <lang>`` を実行して、警告がでな
+      いのを確認してください。
     * Django のチケットシステムのチケットにパッチを添付してください。
 
 .. _`Django i18n メーリングリスト`: http://groups.google.com/group/django-i18n/
@@ -758,16 +758,9 @@ Django には独自のテストスイートが付属しています。テスト�
 テストでは以下の項目をカバーしています:
 
     * モデル API とデータベース API (``tests/modeltests/``)。
-    * キャッシュシステム (``tests/regressiontests/cache.py``)。
-    * ``django.utils.dateformat`` モジュール
-      (``tests/regressiontests/dateformat/``)。
-    * データベースの型キャスト (``tests/regressiontests/db_typecasts/``)。
-    * テンプレートシステム (``tests/regressiontests/templates/`` および
-      ``tests/regressiontests/defaultfilters/``)。
-    * ``QueryDict`` オブジェクト (``tests/regressiontests/httpwrappers/``)。
-    * markup テンプレートタグ (``tests/regressiontests/markup/``)。
-    * ``django.utils.timesince`` モジュール
-      (``tests/regressiontests/timesince.py``)。
+    * その他、Django のコア内にあるテスト (``tests/regressiontests``)
+    * contrib アプリケーション (``django/contrib/<contribapp>/tests``, 下記
+      参照)
 
 テストスイートに対する協力は何でも歓迎します!
 
@@ -808,6 +801,24 @@ Django のテストは全て、 Django に付属のアプリケーションテ�
       削除します。従って、データベースユーザには、 ``CREATE DATABASE`` を実
       行する権限がなければなりません。
 
+テストを全て実行したければ、以下の依存モジュール全てをインストールしておく
+必要があります:
+
+    *  PyYAML_
+    *  Markdown_
+    *  Textile_
+    *  Docutils_
+    *  setuptools_
+
+これらの依存モジュールはなくても構いませんが、インストールされていなければ、
+関連するテストは飛ばして実行されます。
+
+.. _PyYAML: http://pyyaml.org/wiki/PyYAML
+.. _Markdown: http://pypi.python.org/pypi/Markdown/1.7
+.. _Textile: http://pypi.python.org/pypi/textile
+.. _docutils: http://pypi.python.org/pypi/docutils/0.4
+.. _setuptools: http://pypi.python.org/pypi/setuptools/
+
 ユニットテストの一部（サブセット）を実行したい場合は、 ``runtest.py`` コマ
 ンドラインの後にテストモジュールの名前を追加してください。モジュール名は、
 ``tests/modeltests`` および ``tests/regressiontests`` 以下のディレクトリ名
@@ -819,6 +830,25 @@ Django のテストは全て、 Django に付属のアプリケーションテ�
 
     PYTHONPATH=..
     ./runtests.py --settings=settings generic_relations i18n
+
+.. _Contrib apps:
+
+contrib アプリケーション
+--------------------------
+
+``django/contrib`` 以下のアプリケーションのテストは、 ``django/contrib/``
+以下のそれぞれのディレクトリ下にある ``test.py`` に収められています。
+(テストを複数のモジュールに分割したければ、 ``tests`` ディレクトリを使って
+ください。)
+
+アプリケーションのテストを見つけさせるには、アプリケーション内に
+``models.py`` を入れていなければなりません (ファイルは空でもかまいません)。
+URL をマップする必要があるのなら、 ``tests/urls.py`` を入れてください。
+
+特定の contrib アプリケーション (例えば ``markup``) だけをテストするには、
+上で述べたのと同じ方法を使います::
+
+    ./runtests.py --settings=settings markup
 
 .. _Requesting features:
 

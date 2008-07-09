@@ -2,7 +2,7 @@
 newforms とモデルを組み合わせる
 ================================
 
-:revision-up-to: 7710 (0.97pre SVN)
+:revision-up-to: 7857 (0.97pre SVN)
 
 ``ModelForm``
 =============
@@ -201,6 +201,14 @@ newforms とモデルを組み合わせる
     # 既存の Article オブジェクトからフォームを生成
     >>> a = Article.objects.get(pk=1)
     >>> f = ArticleForm(instance=a)
+    >>> f.save()
+
+    # 既存の Article オブジェクトを編集するためのフォームを作成します。
+    # ただし、 POST データを使ってフォームに値を設定します。
+    # POST data to populate the form.
+    >>> a = Article.objects.get(pk=1)
+    >>> f = ArticleForm(request.POST, instance=a)
+    >>> f.save()
 
 フォームの入力値の検証に失敗すると、 ``save()`` は ``ValueError`` を送出す
 るので注意してください。
