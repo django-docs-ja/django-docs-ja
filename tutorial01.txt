@@ -4,7 +4,7 @@
 
 .. contents::
 
-:revision-up-to: 7710 (0.97pre SVN)
+:revision-up-to: 7947 (0.97pre SVN)
 
 さあ、例を交えながら学んでゆきましょう。
 
@@ -179,6 +179,9 @@ Database の設定
     PostgreSQL や MySQL を使っている場合、この時点でデータベースを作成して
     おいてください。データベースを作成するには、データベースの対話プロンプ
     トで "``CREATE DATABASE database_name;``" を実行します。
+
+    SQLite を使う場合には、予め何か作成しておく必要はありません。データベー
+    スファイルは、必要に応じて自動的に生成されます。
 
 ``settings.py`` を編集する際、ファイルの末尾近くにある ``INSTALLED_APPS``
 設定に注意してください。この変数には、現在の Django インスタンスで有効になっ
