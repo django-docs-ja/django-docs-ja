@@ -168,4 +168,5 @@ Django ドキュメント
 
 
 リリース間の違いは、 `互換性のない変更`_ を参照してください。
+
 .. _`互換性のない変更`: http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
