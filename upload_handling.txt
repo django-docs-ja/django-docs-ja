@@ -249,45 +249,48 @@ Django がアップロードされたファイルを扱うとき、ファイル�
 アップロードハンドラをオンザフライで変更する
 ----------------------------------------------
 
-Sometimes particular views require different upload behavior. In these cases,
-you can override upload handlers on a per-request basis by modifying
-``request.upload_handlers``. By default, this list will contain the upload
-handlers given by ``FILE_UPLOAD_HANDLERS``, but you can modify the list as you
-would any other list.
+ビューごとに別々のアップロード処理を行いたい場合があります。その場合、
+リクエストごとに ``request.upload_handlers`` を変更してアップロードハンドラ
+のチェインをオーバライドできます。デフォルトでは、
+``request.upload_handlers`` には ``FILE_UPLOAD_HANDLERS`` に指定したハンド
+ラのリストが入っていますが、これを他のリストに変更できます。
 
-For instance, suppose you've written a ``ProgressBarUploadHandler`` that
-provides feedback on upload progress to some sort of AJAX widget. You'd add this
-handler to your upload handers like this::
+
+例えば、 ``ProgressBarUploadHandler`` というハンドラを書いて、 Ajax 
+ウィジェットに何らかのアップロード状態のフィードバックを返させたいとしましょ
+う。以下のようにすれば、アップロードハンドラチェインに自作のハンドラを付加
+できます::
 
     request.upload_handlers.insert(0, ProgressBarUploadHandler())
 
-You'd probably want to use ``list.insert()`` in this case (instead of
-``append()``) because a progress bar handler would need to run *before* any
-other handlers. Remember, the upload handlers are processed in order.
+この場合は、プログレスバーのハンドラを他のハンドラ *よりも前に* 実行したい
+ので、 (``append()`` ではなく) ``list.insert()`` を使うことになるでしょう。
+アップロードハンドラチェインは、順番に実行されることを思い出してください。
 
-If you want to replace the upload handlers completely, you can just assign a new
-list::
+完全にアップロードハンドラチェインを置き換えてしまいたければ、単にリストを
+代入してください::
 
    request.upload_handlers = [ProgressBarUploadHandler()]
 
 .. note::
 
-    You can only modify upload handlers *before* accessing ``request.FILES`` --
-    it doesn't make sense to change upload handlers after upload handling has
-    already started. If you try to modify ``request.upload_handlers`` after
-    reading from ``request.FILES`` Django will throw an error.
+    アップロードハンドラチェインを変更できるのは、 ``request.FILES`` にアク
+    セスする *よりも前* だけです。アップロードの処理が始まってしまった後で
+    ハンドラを変更しても何の意味もありません。 ``request.FILES`` を読み出し
+    た後で ``request.upload_handlers`` を変更しようとすると、 Django はエラー
+    を送出します。
 
-    Thus, you should always modify uploading handlers as early in your view as
-    possible.
+    従って、アップロードハンドラチェインはビュー処理の出来るだけ早い段階で
+    変更しておくことになるでしょう。
 
 .. _Writing custom upload handlers:
 
 カスタムのアップロードハンドラを書く
 ---------------------------------------
 
-All file upload handlers should be subclasses of
-``django.core.files.uploadhandler.FileUploadHandler``. You can define upload
-handlers wherever you wish.
+ファイルアップロードハンドラは、全て
+``django.core.files.uploadhandler.FileUploadHandler`` のサブクラスでなけれ
+ばなりません。アップロードハンドラはどこに記述してもかまいません。
 
 .. _Required methods:
 
