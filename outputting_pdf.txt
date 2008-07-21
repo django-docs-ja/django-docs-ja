@@ -2,7 +2,7 @@
 Django で PDF を出力する
 ===========================
 
-:revision-up-to: 7710 (0.97pre SVN)
+:revision-up-to: 8001 (1.0pre SVN)
 
 このドキュメントでは， Django のビューを使って動的に PDF ファイルを生成する
 方法について説明します． PDF の生成は，優れたオープンソースの Python 用 PDF

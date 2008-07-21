@@ -2,7 +2,7 @@
 localflavor アドオン
 ==========================
 
-:revision-up-to: 7127 (0.97pre SVN)
+:revision-up-to: 8001 (1.0pre SVN)
 
 Python の「バッテリ入り (batteries included)」哲学に従って、 Django には様々
 な国や文化のための有用なコードが付属しています。こうしたコードは
@@ -52,6 +52,7 @@ localflavor でサポートされている国
     * ノルウェー (Norway_)
     * ペルー (Peru_)
     * ポーランド (Poland_)
+    * ルーマニア (Romania_)
     * スロバキア (Slovakia_)
     * 南アフリカ (`South Africa`_)
     * スペイン (Spain_)
@@ -89,6 +90,7 @@ localflavor でサポートされている国
 .. _Norway: `Norway (django.contrib.localflavor.no)`_
 .. _Peru: `Peru (django.contrib.localflavor.pe)`_
 .. _Poland: `Poland (django.contrib.localflavor.pl)`_
+.. _Romania: `Romania (django.contrib.localflavor.ro)`_
 .. _Slovakia: `Slovakia (django.contrib.localflavor.sk)`_
 .. _South Africa: `South Africa (django.contrib.localflavor.za)`_
 .. _Spain: `Spain (django.contrib.localflavor.es)`_
@@ -113,8 +115,8 @@ localflavor でサポートされている国
 
 .. _`Argentina (django.contrib.localflavor.ar)`:
 
-アルゼンチン (``django.contrib.localflavor.ar``)
-===================================================
+Argentina: アルゼンチン (``django.contrib.localflavor.ar``)
+=============================================================
 
 ARPostalCodeField
 -----------------
@@ -143,8 +145,8 @@ ARProvinceSelect
 
 .. _`Australia (django.contrib.localflavor.au)`:
 
-Australia (``django.contrib.localflavor.au``)
-=============================================
+Australia: オーストラリア (``django.contrib.localflavor.au``)
+================================================================
 				     
 AUPostCodeField
 ---------------
@@ -164,8 +166,8 @@ AUStateSelect
 
 .. _`Brazil (django.contrib.localflavor.br)`:
 
-Brazil (``django.contrib.localflavor.br``)
-==========================================
+Brazil: ブラジル (``django.contrib.localflavor.br``)
+=======================================================
 
 BRPhoneNumberField
 ------------------
@@ -187,8 +189,8 @@ BRStateSelect
 
 .. _`Canada (django.contrib.localflavor.ca)`:
 
-Canada (``django.contrib.localflavor.ca``)
-==========================================
+Canada: カナダ (``django.contrib.localflavor.ca``)
+======================================================
 
 CAPhoneNumberField
 ------------------
@@ -222,8 +224,8 @@ CAProvinceSelect
 
 .. _`Chile (django.contrib.localflavor.cl)`:
 
-Chile (``django.contrib.localflavor.cl``)
-=========================================
+Chile: チリ (``django.contrib.localflavor.cl``)
+==================================================
 
 CLRutField
 ----------
@@ -239,8 +241,8 @@ CLRegionSelect
 
 .. _`Finland (django.contrib.localflavor.fi)`:
 
-Finland (``django.contrib.localflavor.fi``)
-===========================================
+Finland: フィンランド (``django.contrib.localflavor.fi``)
+============================================================
 
 FISocialSecurityNumber
 ----------------------
@@ -260,8 +262,8 @@ FIMunicipalitySelect
 
 .. _`France (django.contrib.localflavor.fr)`:
 
-France (``django.contrib.localflavor.fr``)
-==========================================
+France: フランス (``django.contrib.localflavor.fr``)
+=========================================================
 
 FRPhoneNumberField
 ------------------
@@ -283,8 +285,8 @@ FRDepartmentSelect
 
 .. _`Germany (django.contrib.localflavor.de)`:
 
-Germany (``django.contrib.localflavor.de``)
-===========================================
+Germany: ドイツ (``django.contrib.localflavor.de``)
+=======================================================
 
 DEIdentityCardNumberField
 -------------------------
@@ -308,8 +310,8 @@ DEStateSelect
 
 .. _`Holland (django.contrib.localflavor.nl)`:
 
-Holland (``django.contrib.localflavor.nl``)
-===========================================
+Holland: オランダ (``django.contrib.localflavor.nl``)
+==========================================================
 
 NLPhoneNumberField
 ------------------
@@ -334,8 +336,8 @@ NLProvinceSelect
 
 .. _`Iceland (django.contrib.localflavor.is_)`:
 
-Iceland (``django.contrib.localflavor.is_``)
-============================================
+Iceland: アイスランド (``django.contrib.localflavor.is_``)
+=============================================================
 
 ISIdNumberField
 ---------------
@@ -356,8 +358,8 @@ ISPostalCodeSelect
 
 .. _`India (django.contrib.localflavor.in_)`:
 
-India (``django.contrib.localflavor.in_``)
-==========================================
+India: インド (``django.contrib.localflavor.in_``)
+=====================================================
 
 INStateField
 ------------
@@ -378,8 +380,8 @@ INStateSelect
 
 .. _`Italy (django.contrib.localflavor.it)`:
 
-Italy (``django.contrib.localflavor.it``)
-=========================================
+Italy: イタリア (``django.contrib.localflavor.it``)
+======================================================
 
 ITSocialSecurityNumberField
 ---------------------------
@@ -413,8 +415,8 @@ ITRegionSelect
 
 .. _`Japan (django.contrib.localflavor.jp)`:
 
-Japan (``django.contrib.localflavor.jp``)
-=========================================
+Japan: 日本 (``django.contrib.localflavor.jp``)
+===================================================
 
 JPPostalCodeField
 -----------------
@@ -429,8 +431,8 @@ JPPrefectureSelect
 
 .. _`Mexico (django.contrib.localflavor.mx)`:
 
-Mexico (``django.contrib.localflavor.mx``)
-==========================================
+Mexico: メキシコ (``django.contrib.localflavor.mx``)
+=========================================================
 
 MXStateSelect
 -------------
@@ -439,8 +441,8 @@ MXStateSelect
 
 .. _`Norway (django.contrib.localflavor.no)`:
 
-Norway (``django.contrib.localflavor.no``)
-==========================================
+Norway: ノルウェー (``django.contrib.localflavor.no``)
+==========================================================
 
 NOSocialSecurityNumber
 ----------------------
@@ -463,8 +465,8 @@ NOMunicipalitySelect
 
 .. _`Peru (django.contrib.localflavor.pe)`:
 
-Peru (``django.contrib.localflavor.pe``)
-========================================
+Peru: ペルー (``django.contrib.localflavor.pe``)
+====================================================
 
 PEDNIField
 ----------
@@ -484,8 +486,8 @@ PEDepartmentSelect
 
 .. _`Poland (django.contrib.localflavor.pl)`:
 
-Poland (``django.contrib.localflavor.pl``)
-==========================================
+Poland: ポーランド (``django.contrib.localflavor.pl``)
+========================================================
 
 PLNationalIdentificationNumberField
 -----------------------------------
@@ -528,6 +530,54 @@ PLVoivodeshipSelect
 -------------------
 
 ポーランドの郡 (voivodeship, 行政州) を選べる ``Select`` ウィジェットです。
+
+.. _Romania (django.contrib.localflavor.ro):
+
+Romania: ルーマニア (``django.contrib.localflavor.ro``)
+==============================================================
+
+ROCIFField
+----------
+
+入力が正しいルーマニア社会保障番号 (CIF) であるか検証するフォームフィールド
+です。入力の先頭に ``RO`` がついていた場合、戻り値からは除去します。
+
+ROCNPField
+----------
+
+入力が正しいルーマニア個人番号 (CNP) であるか検証するフォームフィールドです。
+
+ROCountyField
+-------------
+
+入力をルーマニアの地域 (judet) またはその略号として検証するフォームフィール
+ドです。このフィールドは、入力値の示す地域名を、標準の車両登録番号で使われ
+る略号に正規化して返します。このフィールドは、分音符号で書かれた名前しか解
+釈できません。正しい値を入力させるのが難しいときは、 ``ROCountySelect``
+の利用を検討してください。
+
+ROCountySelect
+--------------
+
+ルーマニアの地域 (judete) を選べる ``Select`` ウイジェットです。
+
+ROIBANField
+-----------
+
+入力がルーマニア国際銀行の正しい口座番号であるか検証するフォームフィールド
+です。正しい口座番号の形式は ROXX-XXXX-XXXX-XXXX-XXXX-XXXX で、
+ハイフンはあってもなくてもかまいません。
+
+ROPhoneNumberField
+------------------
+
+入力が正しいルーマニアの電話番号であるか検証するフォームフィールドです。
+このフィールドは、いくつかの特殊な番号を排除します。
+
+ROPostalCodeField
+-----------------
+
+入力が正しいルーマニアの郵便番号であるか検証するフォームフィールドです。
 
 .. _`Slovakia (django.contrib.localflavor.sk)`:
 

@@ -2,7 +2,7 @@
 Django の概要
 =============
 
-:revision-up-to: 5832 (0.97pre SVN)
+:revision-up-to: 8001 (1.0pre SVN)
 
 Django は変転の激しいニュースルーム環境で開発された経緯から、よくある
 Web 開発タスクを迅速かつ簡単化するように設計されました。ここでは Django に

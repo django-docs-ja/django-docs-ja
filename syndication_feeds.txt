@@ -2,7 +2,7 @@
 配信フィードフレームワーク
 ==========================
 
-:revision-up-to: 7392 (0.97pre SVN)
+:revision-up-to: 8001 (1.0pre SVN)
 
 Django には高水準の配信フィード (syndication feed) 生成フレームワークがつい
 てきます。このフレームワークを使えば、 RSS_ 形式や Atom_ 形式のフィードを簡

@@ -2,7 +2,7 @@
 newforms とモデルを組み合わせる
 ================================
 
-:revision-up-to: 7857 (0.97pre SVN)
+:revision-up-to: 8001 (1.0pre SVN)
 
 ``ModelForm``
 =============
@@ -408,3 +408,134 @@ Author モデルには ``'name'``, ``'title'``, ``'birth_date'`` の 3 つ
 
 これらの注意点は、サブクラスを作成する際に何かトリッキーなことをしない限り
 は当てはまらないはずです。
+
+
+.. _Model Formsets:
+
+モデルフォームセット
+=======================
+
+通常のフォームセットと同様、モデル由来のフォームをうまく扱えるように拡張さ
+れた特殊なフォームセットクラスがあります。上の ``Author`` モデルを使って説
+明しましょう::
+
+    >>> from django.newforms.models import modelformset_factory
+    >>> AuthorFormSet = modelformset_factory(Author)
+
+これで、 ``Author`` モデルに関連づけられたデータを扱えるフォームセットが生
+成されます。 ``AuthorFormSet`` は通常のフォームセットと同じように使えます::
+
+    >>> formset = AuthorFormSet()
+    >>> print formset
+    <input type="hidden" name="form-TOTAL_FORMS" value="1" id="id_form-TOTAL_FORMS" /><input type="hidden" name="form-INITIAL_FORMS" value="0" id="id_form-INITIAL_FORMS" />
+    <tr><th><label for="id_form-0-name">Name:</label></th><td><input id="id_form-0-name" type="text" name="form-0-name" maxlength="100" /></td></tr>
+    <tr><th><label for="id_form-0-title">Title:</label></th><td><select name="form-0-title" id="id_form-0-title">
+    <option value="" selected="selected">---------</option>
+    <option value="MR">Mr.</option>
+    <option value="MRS">Mrs.</option>
+    <option value="MS">Ms.</option>
+    </select></td></tr>
+    <tr><th><label for="id_form-0-birth_date">Birth date:</label></th><td><input type="text" name="form-0-birth_date" id="id_form-0-birth_date" /><input type="hidden" name="form-0-id" id="id_form-0-id" /></td></tr>
+
+.. note::
+    ちなみに、 ``modelformset_factory`` は ``formset_factory`` を使っていて、
+    デフォルトでは ``can_delete=True`` です。
+
+.. _Changing the queryset:
+
+クエリセットを変更する
+------------------------
+
+デフォルトでは、モデルからフォームセットを生成すると、そのクエリセットはモ
+デルの全てのオブジェクト、すなわち ``Author.objects.all()`` です。このクエ
+リセットは、以下のように変更できます::
+
+    >>> formset = AuthorFormSet(queryset=Author.objects.filter(name__startswith='O'))
+
+サブクラスを使ったアプローチでも指定できます::
+
+    from django.newforms.models import BaseModelFormSet
+    
+    class BaseAuthorFormSet(BaseModelFormSet):
+        def get_queryset(self):
+            return super(BaseAuthorFormSet, self).get_queryset().filter(name__startswith='O')
+
+ファクトリ関数を呼ぶときに、 ``BaseAuthorFormSet`` を渡してベースクラスにし
+てください::
+
+.. _Saving objects in the formset:
+
+フォームセット内のオブジェクトを保存する
+-------------------------------------------
+
+``ModelForm`` と同様、フォームセット内のデータからモデルへの保存を行えます。
+保存するには、フォームセットの ``save()`` メソッドを呼び出します::
+
+    # POST データからフォームセットインスタンスを生成します。
+    >>> formset = AuthorFormSet(request.POST)
+    
+    # フォームデータが有効なものと課程して、データを保存します。
+    >>> instances = formset.save()
+
+``save()`` メソッドはデータベースに保存されたインスタンスを返します。インス
+タンスがフォームセットに結びつけられたデータで変更されなかった場合、そのイ
+ンスタンスはデータベースに保存されず、戻り値 (上の例の ``instances``) にも
+含まれません。
+
+``save()`` に ``commit=False`` を渡せば、データベースは触らずに、モデルイン
+スタンスだけを返させられます::
+
+    # データベースに保存しません
+    >>> instances = formset.save(commit=False)
+    >>> for instance in instances:
+    ...     # インスタンスごとに必要な操作を行います。
+    ...     instance.save()
+
+この方法を使えば、データベースにインスタンスを保存する前に、各々のインスタ
+ンスにデータを付加できます。また、フォームセットに ``ManyToManyField`` が含
+まれている場合は、 ``formset.save_m2m()`` を使って多対多のリレーションを正
+しく保存させる必要があるでしょう。
+
+.. _Limiting the number of objects editable:
+
+編集可能なオブジェクトの数を制限する
+---------------------------------------
+
+通常のフォームセットど同様、 ``modelfomset_factory`` に ``max_num`` パラメ
+タを指定すれば、表示されるフォームの数を制限できます。モデルフォームセット
+の場合、クエリを制限して、表示に必要なオブジェクトの上限数を設定します::
+
+    >>> Author.objects.order_by('name')
+    [<Author: Charles Baudelaire>, <Author: Paul Verlaine>, <Author: Walt Whitman>]
+    
+    >>> AuthorFormSet = modelformset_factory(Author, max_num=2, extra=1)
+    >>> formset = AuthorFormSet(queryset=Author.objects.order_by('name'))
+    >>> formset.initial
+    [{'id': 1, 'name': u'Charles Baudelaire'}, {'id': 3, 'name': u'Paul Verlaine'}]
+
+クエリセットの返すモデルインスタンスの総数が ``max_num`` よりも大きければ、
+追加のフォームも取得したインスタンスのデータで埋まります::
+
+    >>> AuthorFormSet = modelformset_factory(Author, max_num=4, extra=1)
+    >>> formset = AuthorFormSet(queryset=Author.objects.order_by('name'))
+    >>> for form in formset.forms:
+    ...     print form.as_table()
+    <tr><th><label for="id_form-0-name">Name:</label></th><td><input id="id_form-0-name" type="text" name="form-0-name" value="Charles Baudelaire" maxlength="100" /><input type="hidden" name="form-0-id" value="1" id="id_form-0-id" /></td></tr>
+    <tr><th><label for="id_form-1-name">Name:</label></th><td><input id="id_form-1-name" type="text" name="form-1-name" value="Paul Verlaine" maxlength="100" /><input type="hidden" name="form-1-id" value="3" id="id_form-1-id" /></td></tr>
+    <tr><th><label for="id_form-2-name">Name:</label></th><td><input id="id_form-2-name" type="text" name="form-2-name" value="Walt Whitman" maxlength="100" /><input type="hidden" name="form-2-id" value="2" id="id_form-2-id" /></td></tr>
+    <tr><th><label for="id_form-3-name">Name:</label></th><td><input id="id_form-3-name" type="text" name="form-3-name" maxlength="100" /><input type="hidden" name="form-3-id" id="id_form-3-id" /></td></tr>
+
+.. _`Using inlineformset_factory`:
+
+``inlineformset_factory`` を使う
+----------------------------------
+
+``inlineformset_factory`` は外部キーのリレーション先オブジェクトを扱うとき
+によく使われるパターンを簡単に実行するためのヘルパです。
+``Author`` と ``Book`` という二つのモデルがあるとしましょう。特定の作者
+(author) の本を扱うフォームセットを生成したければ、以下のようにします::
+
+    >>> from django.newforms.models import inlineformset_factory
+    >>> BookFormSet = inlineformset_factory(Author, Book)
+    >>> author = Author.objects.get(name=u'Orson Scott Card')
+    >>> formset = BookFormSet(instance=author)

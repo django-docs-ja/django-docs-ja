@@ -2,7 +2,7 @@
 flatpages アプリケーション
 ===========================
 
-:revision-up-to: 7857 (0.97pre SVN)
+:revision-up-to: 8001 (1.0pre SVN)
 
 Django にはオプションのアプリケーション、 "flatpages" が付属しています。
 "flatpages" を使うと、データベースに素 ("flat") の HTML コンテンツを Django

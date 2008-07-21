@@ -2,7 +2,7 @@
 汎用ビュー
 ==========
 
-:revision-up-to: 7869 (0.97pre SVN)
+:revision-up-to: 8001 (1.0pre SVN)
 
 Web アプリケーションの作成は、同じパターンを何度も何度も繰り返し書くことに
 なるため、退屈なものです。 Django では、そんなパターンに共通する部分のほと
@@ -977,19 +977,33 @@ pagination に関する注意
 ``django.views.generic.create_update`` モジュールには、オブジェクトの作成
 (create)、編集 (edit, update)、削除 (delete) のための関数が入っています。
 
+**開発版の Django で変更された仕様:**
+
+``django.views.generic.create_update.create_object`` や
+``django.views.generic.create_update.update_object`` は、 `newforms`_ を使っ
+てフォームを生成・表示するようになりました。
+
+.. _newforms: ../newforms/
+
 ``django.views.generic.create_update.create_object``
 ----------------------------------------------------
 
 **解説:**
 
 オブジェクト作成のためのフォームを表示し、オブジェクトを保存するためのペー
-ジです。検証エラーが生じた場合にはフォームを再表示します。このビューは、
-Django モデルに付属の自動マニピュレータを使います。
+ジです。検証エラーが生じた場合にはフォームを再表示します。
 
 **必須の引数:**
 
-    * ``model``: フォームを使って作成するオブジェクトの Django モデルクラス
-      です。
+    * ``form_class`` または ``model`` のいずれかを指定せねばなりません。
+
+      ``form_class`` を指定する場合には、 ``django.newforms.ModelForm``
+      クラスのサブクラスを指定します。この引数は、モデルのフォームをカスタ
+      マイズしたいときに使います。詳しくは `ModelForm のドキュメント`_ を参
+      照してください。
+
+      ``model`` には Django のモデルクラスを指定します。この場合、フォーム
+      は ``model`` に対する標準の ``ModelForm`` で生成されます。
 
 **オプションの引数:**
 
@@ -1035,25 +1049,27 @@ Django モデルに付属の自動マニピュレータを使います。
 ります:
 
     * ``form``: オブジェクトを編集するためのフォームを表現する
-      ``django.oldforms.FormWrapper`` インスタンスです。 ``FormWrapper`` イン
-      スタンスを使うと、テンプレートシステム中でフォームフィールドを簡単に
-      参照できます。
+      ``django.newforms.ModelForm`` インスタンスです。この変数を使うと、テ
+      ンプレートシステム中でフォームフィールドを簡単に参照できます。
 
-      例えば、 ``model`` が  ``name`` と ``address`` という二つのフィールド
-      を持っている場合は以下のようになります:: 
+      例えば、モデルが  ``name`` と ``address`` という二つのフィールドを持っ
+      ている場合は、以下のように書けます::
 
           <form action="" method="post">
-          <p><label for="id_name">Name:</label> {{ form.name }}</p>
-          <p><label for="id_address">Address:</label> {{ form.address }}</p>
+          <p>{{ form.name.label_tag }} {{ form.name }}</p>
+          <p>{{ form.address.label_tag }} {{ form.address }}</p>
           </form>
 
-      ``FormWrapper`` オブジェクトをテンプレート内で使うための詳しい情報は、
-      `マニピュレータとフォームフィールドのドキュメント`_ を参照してください。
+      ``Form`` オブジェクトをテンプレート内で使う方法の詳しい説明は、 
+      `newforms のドキュメント`_ を参照してください。
 
-.. _`認証システム`: ../authentication/
+
 .. _authentication system: ../authentication/
-.. _`マニピュレータとフォームフィールドのドキュメント`: ../forms/
-.. _manipulator and formfield documentation: ../forms/
+.. _ModelForm docs: ../newforms/modelforms
+.. _newforms  documentation: ../newforms/
+.. _`認証システム`: `authentication system`_
+.. _`ModelForm のドキュメント`: `ModelForm docs`_
+.. _`newforms のドキュメント`: `newforms documentation`_
 
 ``django.views.generic.create_update.update_object``
 ----------------------------------------------------
@@ -1061,13 +1077,19 @@ Django モデルに付属の自動マニピュレータを使います。
 **解説:**
 
 既存のオブジェクトを編集するためのフォームを表示し、オブジェクトを保存する
-ためのページです。検証エラーが生じた場合にはフォームを再表示します。このビュー
-は、 Django モデルに付属の自動マニピュレータを使います。
+ためのページです。検証エラーが生じた場合にはフォームを再表示します。
 
 **必須の引数:**
 
-    * ``model``: フォームを使って作成するオブジェクトの Django モデルクラス
-      です。
+    * ``form_class`` または ``model`` のいずれかを指定せねばなりません。
+
+      ``form_class`` を指定する場合には、 ``django.newforms.ModelForm``
+      クラスのサブクラスを指定します。この引数は、モデルのフォームをカスタ
+      マイズしたいときに使います。詳しくは `ModelForm のドキュメント`_ を参
+      照してください。
+
+      ``model`` には Django のモデルクラスを指定します。この場合、フォーム
+      は ``model`` に対する標準の ``ModelForm`` で生成されます。
 
     * ``object_id`` または (``slug`` *と* ``slug_field``) が必要です。
 
@@ -1127,20 +1149,19 @@ Django モデルに付属の自動マニピュレータを使います。
 ります:
 
     * ``form``: オブジェクトを編集するためのフォームを表現する
-      ``django.oldforms.FormWrapper`` インスタンスです。 ``FormWrapper`` イン
-      スタンスを使うと、テンプレートシステム中でフォームフィールドを簡単に
-      参照できます。
+      ``django.oldforms.ModelForm`` インスタンスです。この変数を使うと、テ
+      ンプレートシステム中でフォームフィールドを簡単に参照できます。
 
-      例えば、 ``model`` が  ``name`` と ``address`` という二つのフィールド
-      を持っている場合は以下のようになります:: 
+      例えば、モデルが  ``name`` と ``address`` という二つのフィールドを持っ
+      ている場合は、以下のように書けます::
 
           <form action="" method="post">
-          <p><label for="id_name">Name:</label> {{ form.name }}</p>
-          <p><label for="id_address">Address:</label> {{ form.address }}</p>
+          <p>{{ form.name.label_tag }} {{ form.name }}</p>
+          <p>{{ form.address.label_tag }} {{ form.address }}</p>
           </form>
 
-      ``FormWrapper`` オブジェクトをテンプレート内で使うための詳しい情報は、
-      `マニピュレータとフォームフィールドのドキュメント`_ を参照してください。
+      ``Form`` オブジェクトをテンプレート内で使う方法の詳しい説明は、 
+      `newforms のドキュメント`_ を参照してください。
 
     * ``object``: オブジェクトです。この変数変の名前は
       ``template_object_name`` パラメタの値に依存し、そのデフォルト値は

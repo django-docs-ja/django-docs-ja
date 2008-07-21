@@ -2,7 +2,7 @@
 mod_python で Django を動かす
 =============================
 
-:revision-up-to: 7127 (0.97pre SVN)
+:revision-up-to: 8001 (1.0pre SVN)
 
 Django をプロダクションサーバ上で動かす設定として、現状では Apache_ と
 `mod_python`_ の組み合わせを推奨しています。

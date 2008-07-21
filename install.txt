@@ -2,7 +2,7 @@
 Django のインストール
 =====================
 
-:revision-up-to: 7392 (0.97pre SVN)
+:revision-up-to: 8001 (1.0pre SVN)
 
 このドキュメントを読めば Django を動かせるようになります。
 

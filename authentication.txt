@@ -2,7 +2,7 @@
 Django でのユーザ認証
 =====================
 
-:revision-up-to: 7710 (0.97pre SVN)
+:revision-up-to: 8001 (1.0pre SVN)
 
 Django にはユーザ認証システムがついてきます。 Django のユーザ認証システムは、
 ユーザアカウント、グループ、パーミッションとクッキーベースのユーザセッショ
@@ -583,8 +583,8 @@ Python 2.4 で登場したよりコンパクトなデコレータ構文を使っ
 フォームを提供せねばなりません。 Django はこのテンプレートに、以下の 3 つの
 テンプレートコンテキスト変数を渡します:
 
-    * ``form``: ログインフォームを表現する ``FormWrapper`` オブジェクトです。
-      ``FormWrapper`` オブジェクトの詳細は `forms のドキュメント`_ を参照し
+    * ``form``: ログインフォームを表現する ``Form`` オブジェクトです。
+      ``Form`` オブジェクトの詳細は `newforms のドキュメント`_ を参照し
       てください。
     * ``next``: ログイン成功後にリダイレクトされる先の URL です。 URL には
       クエリ文字列を含めてかまいません。
@@ -610,14 +610,14 @@ Python 2.4 で登場したよりコンパクトなデコレータ構文を使っ
 
     {% block content %}
 
-    {% if form.has_errors %}
+    {% if form.errors %}
     <p>Your username and password didn't match. Please try again.</p>
     {% endif %}
 
     <form method="post" action=".">
     <table>
-    <tr><td><label for="id_username">Username:</label></td><td>{{ form.username }}</td></tr>
-    <tr><td><label for="id_password">Password:</label></td><td>{{ form.password }}</td></tr>
+    <tr><td>{{ form.username.label_tag }}</td><td>{{ form.username }}</td></tr>
+    <tr><td>{{ form.password.label_tag }}</td><td>{{ form.password }}</td></tr>
     </table>
 
     <input type="submit" value="login" />
@@ -626,10 +626,10 @@ Python 2.4 で登場したよりコンパクトなデコレータ構文を使っ
 
     {% endblock %}
 
-.. _`forms のドキュメント`: ../forms/
-.. _`site フレームワークのドキュメント`: ../sites/
-.. _forms documentation: ../forms/
+.. _newforms documentation: ../newforms/
 .. _site framework docs: ../sites/
+.. _`newforms のドキュメント`: `newforms documentation`_
+.. _`site フレームワークのドキュメント`: `site framework docs`_
 
 .. _Other built-in views:
 
@@ -752,29 +752,30 @@ Python 2.4 で登場したよりコンパクトなデコレータ構文を使っ
       この引数を省略すると、デフォルト値の ``settings.LOGIN_URL`` を使いま
       す。
 
-.. _Built-in manipulators:
+.. _Built-in forms:
 
-組み込みマニピュレータ
+組み込みフォーム
 ----------------------
 
-組み込みビューを使いたくないけれども、マニピュレータを書かずに済ませたい場
-合のために、認証システムでは組み込みのマニピュレータをいくつか提供していま
-す:
+**開発版の Django で新たに追加された機能です。**
+
+組み込みビューを使いたくないけれども、フォームクラスを書かずに済ませたい場
+合のために、認証システムでは組み込みのフォームをいくつか提供しています:
 
     * ``django.contrib.auth.forms.AdminPasswordChangeForm``: Admin インタ
-      フェースでユーザのパスワード変更に使われているマニピュレータです。
+      フェースでユーザのパスワード変更に使われているフォームです。
 
     * ``django.contrib.auth.forms.AuthenticationForm``: ユーザをログインさ
-      せるためのマニピュレータです。
+      せるためのフォームです。
 
     * ``django.contrib.auth.forms.PasswordChangeForm``: ユーザにパスワード
-      変更させるためのマニピュレータです。
+      を変更させるためのフォームです。
 
     * ``django.contrib.auth.forms.PasswordResetForm``: パスワードをリセット
-      し、新たなパスワードを送信するためのマニピュレータです。
+      し、新たなパスワードを送信するためのフォームです。
 
     * ``django.contrib.auth.forms.UserCreationForm``: 新たなユーザを作成す
-      るためのマニピュレータです。
+      るためのフォームです。
 
 
 .. _Limiting access to logged-in users that pass a test:

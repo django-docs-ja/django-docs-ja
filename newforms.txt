@@ -2,7 +2,7 @@
 newforms ライブラリ
 ===================
 
-:revision-up-to: 7869 (0.97pre SVN)
+:revision-up-to: 8001 (1.0pre SVN)
 
 ``django.newforms`` は、 Django に新たに導入された画期的なフォーム処理ライ
 ブラリです。従来のフォーム／マニピュレータ／バリデータフレームワークである
@@ -83,6 +83,9 @@ import 文を使うように勧めます::
 
     * **フォーム (Form)** -- フィールドの集まりで、データの検証や HTML への
       表示方法が実装されたものです。
+
+    * **メディア (Media)** -- フォームをレンダするときに必要な CSS や
+      JavaScript リソースの定義です。
 
 このライブラリは、データベースレイヤやビュー、テンプレートといった他の
 Django コンポーネントに対してカップリングしていません。 newforms ライブラリ
@@ -519,7 +522,7 @@ Django コンポーネントに対してカップリングしていません。 
 
     {{ f }}
 
-.. _Configuring HTML ``<label>`` tags:
+.. _`Configuring HTML <label> tags`:
 
 ``<label>`` タグの出力設定
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1375,7 +1378,12 @@ Django の古いフォーム／検証フレームワークを使ったことが�
 
 追加の引数として、 ``choices`` 引数をとります。 ``choices`` 引数はイテレー
 ション可能オブジェクト (たとえばリストやタプルなど) で、各要素はフィールド
-の選択肢として使える 2 要素のタプルでなければなりません。
+の選択肢として使える 2 要素のタプルでなければなりません。この引数には、モデ
+ルフィールドの ``choices`` 引数と同じ形式で選択肢を指定できます。詳しくは
+`モデル API のドキュメント`_ を参照してください。
+
+.. _model API documentation on choices: ../model-api#choices
+.. _`モデル API のドキュメント`: `model API documentation on choices`_
 
 ``DateField``
 ~~~~~~~~~~~~~
@@ -1594,7 +1602,9 @@ ImageField を使いたい場合、 `Python Imaging Library`_ をインストー
 
 追加の引数として、 ``choices`` 引数をとります。 ``choices`` 引数はイテレー
 ション可能オブジェクト (たとえばリストやタプルなど) で、各要素はフィールド
-の選択肢として使える 2 要素のタプルでなければなりません。
+の選択肢として使える 2 要素のタプルでなければなりません。この引数には、モデ
+ルフィールドの ``choices`` 引数と同じ形式で選択肢を指定できます。詳しくは
+`モデル API のドキュメント`_ を参照してください。
 
 ``NullBooleanField``
 ~~~~~~~~~~~~~~~~~~~~
@@ -2038,6 +2048,686 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
 .. _`ModelForm のドキュメント`: `ModelForms documentation`_
 .. _`別のドキュメント`: `view the documentation`_
 
+
+.. _Media:
+
+メディアファイル
+==================
+
+魅力的で使いやすい Web フォームをレンダしたいなら、 HTML だけでは能力不足で
+しょう。CSS スタイルシートが必要でしょうし、ファンシーな "Web2.0" 的ウィジェッ
+トを使いたければ、各ページに JavaScript を仕込む必要もあるでしょう。あるペー
+ジでどのCSS と JavaScript の組み合わせが必要かは、そのページで使われている
+ウィジェットによって異なります。
+
+そこで、 Django のメディア定義が登場します。 Django は様々なメディアファイ
+ルをそのメディアファイルを必要とするフォームやウィジェットに関連付けられる
+ようにしています。例えば、カレンダーを使って DateField をレンダしたいので、
+カスタムの Calendar ウィジェットを定義したとします。このウィジェットには、
+カレンダーをレンダするときに必要な CSS や JavaScript を関連付けておけます。
+Calendar ウィジェットをフォーム上で使うときに、 Django は必要な CSS や
+JavaScript ファイルを特定して、それらのファイル名のリストを Web ページに簡
+単に組み込める形式で提供します。
+
+.. admonition:: Django admin とメディアファイル
+
+    Django の admin アプリケーションは、カレンダーやフィルタ機能つきのセレ
+    クタといった、様々なカスタムウィジェットを定義しています。これらのウィ
+    ジェットは、それぞれが必要なメディアを定義していて、 Django は admin サ
+    イトを表示するときに、デフォルトのウィジェットの代りにカスタムウィジェッ
+    トを表示しています。 admin のテンプレートは、ページごとに必要なメディア
+    ファイルだけを取り込み、ウィジェットをレンダするようになっています。
+    
+    Django の admin アプリケーションのウィジェットを使いたいのなら、どうぞ
+    ご自由に！ウィジェットは、全て ``django.contrib.admin.widgets`` で定義
+    されています。
+
+.. admonition:: どの JavaScript ツールキットを使えばいいの ?
+
+    JavaScript ツールキットは世の中に沢山あり、そのほとんどが（カレンダーの
+    ような）アプリケーションの操作性を向上させられるウィジェットを定義して
+    います。 Django は特定の JavaScript ツールキットを贔屓にしないよう慎重
+    に設計されています。どのツールキットにも、お互いに長所や短所があります。
+    自分にとって使いやすいツールキットを使ってください。 Django はどんな
+    JavaScript ツールキットでも組み込めます。
+
+.. _Media as a static definition:
+
+メディア定義を静的に行う
+---------------------------
+
+メディア定義の簡単な方法は、クラスで静的に行うというものです。この方法では、
+メディア定義を内部クラスとして宣言します。必要なメディアファイルの情報は、
+内部クラスのプロパティとして定義します。
+
+簡単な例を示しましょう::
+
+    class CalendarWidget(forms.TextInput):
+        class Media:
+            css = {
+                'all': ('pretty.css',)
+            }
+            js = ('animations.js', 'actions.js')
+
+このコードでは、 ``TextInput`` をベースにして ``CalendarWidget`` を定義して
+います。 ``CalendarWidget`` をフォーム内で使うと、フォームは CSS ファイル
+``pretty.css`` と JavaScript ファイル ``animations.js`` および
+``actions.js`` を組み込むよう指示を受けます。
+
+このような静的なメディア定義は、実行時に ``media`` というウィジェットのプロ
+パティに変換されます。 ``CalendarWidget`` インスタンスのメディア情報は、プ
+ロパティを介して以下のように取り出せます::
+
+    >>> w = CalendarWidget()
+    >>> print w.media
+    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://media.example.com/actions.js"></script>
+
+``Media`` には、以下のようなオプションがあります。必須のものはありません。
+
+``css``
+~~~~~~~
+
+出力媒体ごとの CSS ファイル要件を定義した辞書です。
+
+この辞書の値はメディアファイル名を列挙したタプルまたはリストです。メディア
+ファイルのパスを指定する方法は `メディアパスの節`_ を参照してください。
+
+.. _the section on media paths: `Paths in media definitions`_
+.. _`メディアパスの節`: `the section on media paths`_
+
+キーは出力媒体の名前です。このキーは、 CSS ファイルのメディアタイプ宣言で使
+われるのと同じ、すなわち  'all', 'aural', 'braille', 'embossed',
+'handheld', 'print', 'projection', 'screen', 'tty' そして 'tv' です。
+メディアタイプごとに別々のスタイルシートを使いたければ、各メディアごとに
+CSS ファイルのリストを指定してください。以下の例では、スクリーン (screen)
+と印刷 (print) 用の CSS オプションを定義しています::
+
+    class Media:
+        css = {
+            'screen': ('pretty.css',),
+            'print': ('newspaper.css',)
+        }
+
+一つの CSS ファイルグループが複数のメディアタイプをカバーできる場合、辞書の
+キーにメディアタイプをカンマ区切りのリストにして指定してください。以下の例
+では、テレビ (tv) およびプロジェクタ (projector) に同じメディアファイル要件
+を指定しています::
+
+    class Media:
+        css = {
+            'screen': ('pretty.css',),
+            'tv,projector': ('lo_res.css',),
+            'print': ('newspaper.css',)
+        }
+
+'print' の CSS 定義を使ってレンダリングを実行すると、以下のような HTML を出
+力します::
+
+    <link href="http://media.example.com/pretty.css" type="text/css" media="screen" rel="stylesheet" />
+    <link href="http://media.example.com/lo_res.css" type="text/css" media="tv,projector" rel="stylesheet" />
+    <link href="http://media.example.com/newspaper.css" type="text/css" media="print" rel="stylesheet" />
+                 
+``js``
+~~~~~~
+
+必要な JavaScript ファイルを列挙したタプルです。メディアファイルのパスを指
+定する方法は `メディアパスの節`_ を参照してください。
+
+``extend``   
+~~~~~~~~~~
+
+メディア宣言を親クラスから継承するかどうかを決めるブール値です。
+
+デフォルトの設定では、静的メディア宣言を使うオブジェクトは全て、親クラスの
+ウィジェットで定義されているメディアを継承します。この継承は、親クラスでど
+んなメディアファイル要件を宣言したかに関係なく行われます。例えば、上の例の
+カレンダーウィジェットを、以下のように拡張したとします::
+
+    class FancyCalendarWidget(CalendarWidget):
+        class Media:
+            css = {
+                'all': ('fancy.css',)
+            }
+            js = ('whizbang.js',)
+
+    >>> w = FancyCalendarWidget()
+    >>> print w.media
+    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <link href="http://media.example.com/fancy.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://media.example.com/actions.js"></script>
+    <script type="text/javascript" src="http://media.example.com/whizbang.js"></script>
+
+``FancyCalendarWidget`` は、親ウィジェットの全てのメディアを継承します。こ
+のやり方で親モデルのメディア宣言を継承したくないのなら、 ``extend=False``
+を ``Media`` クラスの宣言に追加します::
+
+    class FancyCalendar(Calendar):
+        class Media:
+            extend = False 
+            css = {
+                'all': ('fancy.css',)
+            }
+            js = ('whizbang.js',)
+
+    >>> w = FancyCalendarWidget()
+    >>> print w.media
+    <link href="http://media.example.com/fancy.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://media.example.com/whizbang.js"></script>
+
+メディア宣言の継承をより細かく制御したければ、 `動的なプロパティ`_ を使って
+メディア宣言を定義してください。動的プロパティを使えば、どのメディアファイ
+ルを継承し、どのファイルを継承しないかを完全に制御できます。
+
+.. _dynamic property: `Media as a dynamic property`_
+.. _`動的なプロパティ`: `dynamic property`_
+    
+.. _`Media as a dynamic property`:
+
+動的プロパティでのメディア定義
+----------------------------------
+
+``media`` プロパティを直接定義すれば、メディアファイル要件をより洗練された
+やり方で制御できます。この方法では、 ``forms.Media`` のインスタンスを
+返すようなプロパティを定義します。 ``forms.Media`` のコンストラクタは
+``css`` や ``js`` といったキーワード引数をとり、それぞれ静的なメディア定義
+で使われているのと同じ形式の値を指定できます。
+
+例えば、先の ``CalendarWidget`` の静的メディア定義を動的なやり方で実現する
+と、以下のようになります::
+
+    class CalendarWidget(forms.TextInput):
+        def _media(self):
+            return forms.Media(css={'all': ('pretty.css',)},
+                               js=('animations.js', 'actions.js'))
+        media = property(_media)
+
+動的なメディアプロパティの戻り値を構築するための詳しい方法は、 
+`Media オブジェクト`_ の節を参照してください。
+
+.. _Paths in media definitions:
+
+メディア定義のパス
+--------------------------
+
+メディアファイルの場所を指定するためのパスは、相対でも絶対でもかまいません。
+パスが ``'/'``, ``'http://'``, ``'https://'`` のいずれかで開始していれば、
+絶対パス指定として、値をそのまま使います。それ以外のパスの前には
+``settings.MEDIA_URL`` の値を付加します。例えば、 ``MEDIA_URL`` が
+``http://media.example.com/`` の場合は、以下のウィジェット::
+
+    class CalendarWidget(forms.TextInput):
+        class Media:
+            css = {
+                'all': ('/css/pretty.css',),
+            }
+            js = ('animations.js', 'http://othersite.com/actions.js')
+
+は、以下のような HTML を出力します。
+
+    >>> w = CalendarWidget()
+    >>> print w.media
+    <link href="/css/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://othersite.com/actions.js"></script>
+
+.. _Media objects:
+
+``Media`` オブジェクト
+---------------------------
+
+ウィジェットやフォームの media 属性を調べると、 ``forms.Media`` オブジェク
+トが返されます。すでに解説した通り、 ``Media`` オブジェクトの文字列表現は、
+HTML ページの ``<head>`` ブロックでメディアファイルを取り込むときに必要な
+HTML コードです。
+
+とはいえ、 ``Media`` オブジェクトには他にもいくつか興味深いプロパティがあり
+ます。
+
+.. _Media subsets:
+
+``Media`` サブセット
+~~~~~~~~~~~~~~~~~~~~~~
+
+特定のタイプのメディアファイル情報だけを出力したければ、添え字表記を使って
+以下のように欲しいメディアだけを指定できます::
+
+    >>> w = CalendarWidget()
+    >>> print w.media
+    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://media.example.com/actions.js"></script>
+
+    >>> print w.media['css']
+    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+
+添え字表記を使ってアクセスすると、新たな ``Media`` オブジェクトが返されます。
+ただし、このオブジェクトには指定したメディアしか入っていません。
+
+.. _Combining media objects:
+
+``Media`` オブジェクトを組み合わせる
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``Media`` オブジェクトは加算できます。二つの ``Media`` オブジェクトを加算す
+ると、結果の ``Media`` オブジェクトには両方のメディアファイル情報が入ります::
+
+    class CalendarWidget(forms.TextInput):
+        class Media:
+            css = {
+                'all': ('pretty.css',)
+            }
+            js = ('animations.js', 'actions.js')
+
+    class OtherWidget(forms.TextInput):
+        class Media:
+            js = ('whizbang.js',)
+
+    >>> w1 = CalendarWidget()
+    >>> w2 = OtherWidget()
+    >>> print w1+w2
+    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://media.example.com/actions.js"></script>
+    <script type="text/javascript" src="http://media.example.com/whizbang.js"></script>
+    
+.. _Media on Forms:
+
+フォームのメディア
+---------------------
+
+メディアファイル定義を持てるのはウィジェットだけではありません。フォームに
+もまた、メディアを定義できます。フォームのメディアファイル定義には、ウィジェ
+ットと同じ規則が適用されます。すなわち、静的・動的な宣言ができ、宣言内容に
+は絶対・相対パスの解釈や継承といった規則がウィジェット同様に当てはまります。
+
+どちらにメディア情報を定義したかに関係なく、フォームオブジェクトには
+*必ず*  ``media`` プロパティがあります。このプロパティのデフォルト値は、
+フォームを構成する全てのウィジェットのメディアファイル定義を加算したもので
+す::
+
+    class ContactForm(forms.Form):
+        date = DateField(widget=CalendarWidget)
+        name = CharField(max_length=40, widget=OtherWidget)
+
+    >>> f = ContactForm()
+    >>> f.media
+    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://media.example.com/actions.js"></script>
+    <script type="text/javascript" src="http://media.example.com/whizbang.js"></script>
+
+フォーム固有のメディア宣言を付加したい場合、例えば、フォームのレイアウトを
+決める CSS を指定したい場合には、以下のようにメディア定義を追加します::
+
+    class ContactForm(forms.Form):
+        date = DateField(widget=CalendarWidget)
+        name = CharField(max_length=40, widget=OtherWidget)
+
+        class Media:
+            css = {
+                'all': ('layout.css',)
+            }
+            
+    >>> f = ContactForm()
+    >>> f.media
+    <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <link href="http://media.example.com/layout.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://media.example.com/actions.js"></script>
+    <script type="text/javascript" src="http://media.example.com/whizbang.js"></script>
+
+.. _Formsets:
+
+フォームセット (formsets)
+=============================
+
+フォームセットとは、同じページで複数のフォームを扱うための抽象化レイヤで、
+いわばデータグリッドのようなものです。フォームセットを説明するために、まず
+以下のようなフォームを考えましょう::
+
+    >>> from django import newforms as forms
+    >>> class ArticleForm(forms.Form):
+    ...     title = forms.CharField()
+    ...     pub_date = forms.DateField()
+
+このフォームを使って、ユーザが一度に複数の記事を作成できるようにしたい場合
+があったとします。そのために、 ``ArticleForm`` からフォームセットを生成しま
+す::
+
+    >>> from django.newforms.formsets import formset_factory
+    >>> ArticleFormSet = formset_factory(ArticleForm)
+
+``ArticleFormSet`` という名前のフォームセットクラスができました。このフォー
+ムセットには、フォームセットに入っているフォームを一つ一つ取り出して、それ
+ぞれを普通のフォームとして表示する機能があります::
+
+    >>> formset = ArticleFormSet()
+    >>> for form in formset.forms:
+    ...     print form.as_table()
+    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title" /></td></tr>
+    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></td></tr>
+
+出力を見て分かる通り、フォームは一つだけ表示されています。これは、
+``formset_factory`` のデフォルトの設定で、「追加のフォーム表示数 (extra)」
+を 1 に設定しているからです。表示数は ``extra`` パラメタで制御できます::
+
+    >>> ArticleFormSet = formset_factory(ArticleForm, extra=2)
+
+.. _Using initial data with a formset:
+
+フォームセットに初期データを指定する
+-------------------------------------
+
+初期データは、フォームセットのユーザビリティに影響する大きな要素です。上に
+示したように、 ``formset_factory`` には追加のフォーム表示数を指定できます。
+この「追加」とは、初期データを渡したときに表示されるフォームの中で、追加で
+表示されている空のフォーム数という意味です。以下の例をよく見てください::
+
+    >>> ArticleFormSet = formset_factory(ArticleForm, extra=2)
+    >>> formset = ArticleFormSet(initial=[
+    ...     {'title': u'Django is now open source',
+    ...      'pub_date': datetime.date.today()},
+    ... ])
+    
+    >>> for form in formset.forms:
+    ...     print form.as_table()
+    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" value="Django is now open source" id="id_form-0-title" /></td></tr>
+    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" value="2008-05-12" id="id_form-0-pub_date" /></td></tr>
+    <tr><th><label for="id_form-1-title">Title:</label></th><td><input type="text" name="form-1-title" id="id_form-1-title" /></td></tr>
+    <tr><th><label for="id_form-1-pub_date">Pub date:</label></th><td><input type="text" name="form-1-pub_date" id="id_form-1-pub_date" /></td></tr>
+    <tr><th><label for="id_form-2-title">Title:</label></th><td><input type="text" name="form-2-title" id="id_form-2-title" /></td></tr>
+    <tr><th><label for="id_form-2-pub_date">Pub date:</label></th><td><input type="text" name="form-2-pub_date" id="id_form-2-pub_date" /></td></tr>
+
+上の例では、今度は 3 つのフォームが表示されました。初期データとして渡した 1
+つと、 2 つの追加フォームです。初期データとして、辞書のリストを渡しているこ
+とにも注意してください。
+
+.. _Limiting the maximum number of forms:
+
+フォームの最大表示数を制限する
+------------------------------------
+
+``formset_factory`` に ``max_num`` パラメタを指定すると、フォームセット中に
+表示されるフォームの最大数を制御できます::
+
+    >>> ArticleFormSet = formset_factory(ArticleForm, extra=2, max_num=1)
+    >>> formset = ArticleFormset()
+    >>> for form in formset.forms:
+    ...     print form.as_table()
+    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title" /></td></tr>
+    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></td></tr>
+
+``max_num`` のデフォルト値は表示数に制限がないことを示す ``0`` に設定されて
+います。
+
+.. _Formset validation:
+
+フォームセットのバリデーション
+------------------------------------
+
+フォームセットのバリデーションは、普通の ``Form`` とほぼ同じです。フォーム
+セットにも ``is_valid`` メソッドがあり、フォームセット中の全てのフォームを
+簡単に検証できます::
+
+    >>> ArticleFormSet = formset_factory(ArticleForm)
+    >>> formset = ArticleFormSet({})
+    >>> formset.is_valid()
+    True
+
+この例では、フォームセットにデータを渡さなかったので、有効なフォームを返し
+ています。フォームセットは賢くて、データの変更されなかったフォームを無視し
+てくれます。あるフォーム上の記事を変更しようとして、失敗した場合の挙動を以
+下に示します::
+
+    >>> data = {
+    ...     'form-TOTAL_FORMS': u'1',
+    ...     'form-INITIAL_FORMS': u'1',
+    ...     'form-0-title': u'Test',
+    ...     'form-0-pub_date': u'',
+    ... }
+    >>> formset = ArticleFormSet(data)
+    >>> formset.is_valid()
+    False
+    >>> formset.errors
+    [{'pub_date': [u'This field is required.']}]
+
+このように、フォームセットはバリデーションを正しく実行して、期待通りのエラー
+を表示します。
+
+.. _Understanding the ManagementForm:
+
+``ManagementForm`` を理解する
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+上の例でフォームセットに与えた初期値には、追加のデータが入っていたことに気
+付いたでしょうか。これはフォームセットで内部的に処理されているフォーム、
+``ManagementForm`` で扱うためのデータです。追加のデータ抜きでフォームセット
+を使おうとすると、例外が送出されます::
+
+    >>> data = {
+    ...     'form-0-title': u'Test',
+    ...     'form-0-pub_date': u'',
+    ... }
+    >>> formset = ArticleFormSet(data)
+    Traceback (most recent call last):
+    ...
+    django.newforms.util.ValidationError: [u'ManagementForm data is missing or has been tampered with']
+
+``ManagementForm`` のデータは、表示するフォームインスタンスの数を追跡するた
+めに使われます。 JavaScript でフォームを動的に追加する場合、
+``ManagementForm`` データのカウントも増やさねばなりません。
+
+.. _Custom formset validation:
+
+カスタムのフォームセットバリデーション
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``Form`` クラスと同様、フォームセットには ``clean`` メソッドがあります。こ
+のメソッドには、フォームセットレベルで扱う独自のバリデーションはここに定義
+します::
+
+    >>> from django.newforms.formsets import BaseFormSet
+    
+    >>> class BaseArticleFormSet(BaseFormSet):
+    ...     def clean(self):
+    ...         raise forms.ValidationError, u'An error occured.'
+    
+    >>> ArticleFormSet = formset_factory(ArticleForm, formset=BaseArticleFormSet)
+    >>> formset = ArticleFormSet({})
+    >>> formset.is_valid()
+    False
+    >>> formset.non_form_errors()
+    [u'An error occured.']
+
+フォームセットの ``clean`` メソッドは、全てのフォームに対して
+``Form.clean`` メソッドが呼出された後に実行されます。フォームセットに関する
+エラーは、フォームセットの ``non_form_errors()`` メソッドで取り出せます。
+
+.. _Dealing with ordering and deletion of forms:
+
+フォームの並び順や削除の扱い
+------------------------------
+
+フォームセットを扱う上でよくあるユースケースは、フォームインスタンスの並び
+順や削除の処理です。フォームセットはこれらの処理を実行してくれます。
+``formset_factory`` には  ``can_order`` および ``can_delete`` という二つの
+パラメタがあり、指定するとフォームにフィールドを追加して、並び順や削除フラ
+グを操作する簡単な手段を提供します。
+
+``can_order``
+~~~~~~~~~~~~~
+
+デフォルト値: ``False``
+
+``True`` にすると、フォームセットは順番を指定できるフォームを生成します::
+
+    >>> ArticleFormSet = formset_factory(ArticleForm, can_order=True)
+    >>> formset = ArticleFormSet(initial=[
+    ...     {'title': u'Article #1', 'pub_date': datetime.date(2008, 5, 10)},
+    ...     {'title': u'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
+    ... ])
+    >>> for form in formset.forms:
+    ...     print form.as_table()
+    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" value="Article #1" id="id_form-0-title" /></td></tr>
+    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" value="2008-05-10" id="id_form-0-pub_date" /></td></tr>
+    <tr><th><label for="id_form-0-ORDER">Order:</label></th><td><input type="text" name="form-0-ORDER" value="1" id="id_form-0-ORDER" /></td></tr>
+    <tr><th><label for="id_form-1-title">Title:</label></th><td><input type="text" name="form-1-title" value="Article #2" id="id_form-1-title" /></td></tr>
+    <tr><th><label for="id_form-1-pub_date">Pub date:</label></th><td><input type="text" name="form-1-pub_date" value="2008-05-11" id="id_form-1-pub_date" /></td></tr>
+    <tr><th><label for="id_form-1-ORDER">Order:</label></th><td><input type="text" name="form-1-ORDER" value="2" id="id_form-1-ORDER" /></td></tr>
+    <tr><th><label for="id_form-2-title">Title:</label></th><td><input type="text" name="form-2-title" id="id_form-2-title" /></td></tr>
+    <tr><th><label for="id_form-2-pub_date">Pub date:</label></th><td><input type="text" name="form-2-pub_date" id="id_form-2-pub_date" /></td></tr>
+    <tr><th><label for="id_form-2-ORDER">Order:</label></th><td><input type="text" name="form-2-ORDER" id="id_form-2-ORDER" /></td></tr>
+
+このオプションを指定すると、各フォームにフィールドが追加されます。フィール
+ドの名前は ``ORDER`` で、型は ``forms.IntegerField`` です。初期データを使っ
+てフォームを生成した場合、 ``ORDER`` フィールドには自動的に数値が割り当てら
+れます。ユーザがこの値を変更するとどうなるか見てみましょう::
+
+    >>> data = {
+    ...     'form-TOTAL_FORMS': u'3',
+    ...     'form-INITIAL_FORMS': u'2',
+    ...     'form-0-title': u'Article #1',
+    ...     'form-0-pub_date': u'2008-05-10',
+    ...     'form-0-ORDER': u'2',
+    ...     'form-1-title': u'Article #2',
+    ...     'form-1-pub_date': u'2008-05-11',
+    ...     'form-1-ORDER': u'1',
+    ...     'form-2-title': u'Article #3',
+    ...     'form-2-pub_date': u'2008-05-01',
+    ...     'form-2-ORDER': u'0',
+    ... }
+    
+    >>> formset = ArticleFormSet(data, initial=[
+    ...     {'title': u'Article #1', 'pub_date': datetime.date(2008, 5, 10)},
+    ...     {'title': u'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
+    ... ])
+    >>> formset.is_valid()
+    True
+    >>> for form in formset.ordered_forms:
+    ...     print form.cleaned_data
+    {'pub_date': datetime.date(2008, 5, 1), 'ORDER': 0, 'title': u'Article #3'}
+    {'pub_date': datetime.date(2008, 5, 11), 'ORDER': 1, 'title': u'Article #2'}
+    {'pub_date': datetime.date(2008, 5, 10), 'ORDER': 2, 'title': u'Article #1'}
+
+``can_delete``
+~~~~~~~~~~~~~~
+
+デフォルト値: ``False``
+
+``True`` にすると、フォームセットは削除を実行できるフォームを生成します::
+
+    >>> ArticleFormSet = formset_factory(ArticleForm, can_delete=True)
+    >>> formset = ArticleFormSet(initial=[
+    ...     {'title': u'Article #1', 'pub_date': datetime.date(2008, 5, 10)},
+    ...     {'title': u'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
+    ... ])
+    >>> for form in formset.forms:
+    ....    print form.as_table()
+    <input type="hidden" name="form-TOTAL_FORMS" value="3" id="id_form-TOTAL_FORMS" /><input type="hidden" name="form-INITIAL_FORMS" value="2" id="id_form-INITIAL_FORMS" />
+    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" value="Article #1" id="id_form-0-title" /></td></tr>
+    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" value="2008-05-10" id="id_form-0-pub_date" /></td></tr>
+    <tr><th><label for="id_form-0-DELETE">Delete:</label></th><td><input type="checkbox" name="form-0-DELETE" id="id_form-0-DELETE" /></td></tr>
+    <tr><th><label for="id_form-1-title">Title:</label></th><td><input type="text" name="form-1-title" value="Article #2" id="id_form-1-title" /></td></tr>
+    <tr><th><label for="id_form-1-pub_date">Pub date:</label></th><td><input type="text" name="form-1-pub_date" value="2008-05-11" id="id_form-1-pub_date" /></td></tr>
+    <tr><th><label for="id_form-1-DELETE">Delete:</label></th><td><input type="checkbox" name="form-1-DELETE" id="id_form-1-DELETE" /></td></tr>
+    <tr><th><label for="id_form-2-title">Title:</label></th><td><input type="text" name="form-2-title" id="id_form-2-title" /></td></tr>
+    <tr><th><label for="id_form-2-pub_date">Pub date:</label></th><td><input type="text" name="form-2-pub_date" id="id_form-2-pub_date" /></td></tr>
+    <tr><th><label for="id_form-2-DELETE">Delete:</label></th><td><input type="checkbox" name="form-2-DELETE" id="id_form-2-DELETE" /></td></tr>
+
+``can_order`` と同様、 ``DELETE`` という名前のついたフィールドが追加されま
+す。このフィールドは ``forms.BooleanField`` です。削除フラグフィールドをマー
+クしたデータを投入すると、削除フラグの立っているフォームに
+``deleted_forms`` でアクセスできます::
+
+    >>> data = {
+    ...     'form-TOTAL_FORMS': u'3',
+    ...     'form-INITIAL_FORMS': u'2',
+    ...     'form-0-title': u'Article #1',
+    ...     'form-0-pub_date': u'2008-05-10',
+    ...     'form-0-DELETE': u'on',
+    ...     'form-1-title': u'Article #2',
+    ...     'form-1-pub_date': u'2008-05-11',
+    ...     'form-1-DELETE': u'',
+    ...     'form-2-title': u'',
+    ...     'form-2-pub_date': u'',
+    ...     'form-2-DELETE': u'',
+    ... }
+    
+    >>> formset = ArticleFormSet(data, initial=[
+    ...     {'title': u'Article #1', 'pub_date': datetime.date(2008, 5, 10)},
+    ...     {'title': u'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
+    ... ])
+    >>> [form.cleaned_data for form in formset.deleted_forms]
+    [{'DELETE': True, 'pub_date': datetime.date(2008, 5, 10), 'title': u'Article #1'}]
+
+.. _Adding additional fields to a formset:
+
+フォームセットにフィールドを追加する
+-------------------------------------
+
+フォームセットには、追加のフィールドを簡単に追加できます。フォームセットの
+ベースクラスは ``add_fields`` メソッドを提供しています。このメソッドをオー
+バライドして、独自にフィールドを追加したり、デフォルトのフィールドや属性を
+再定義したり、フィールドを削除したりできます::
+
+    >>> class BaseArticleFormSet(BaseFormSet):
+    ...     def add_fields(self, form, index):
+    ...         super(BaseArticleFormSet, self).add_fields(form, index)
+    ...         form.fields["my_field"] = forms.CharField()
+
+    >>> ArticleFormSet = formset_factory(ArticleForm, formset=BaseArticleFormSet)
+    >>> formset = ArticleFormSet()
+    >>> for form in formset.forms:
+    ...     print form.as_table()
+    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title" /></td></tr>
+    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></td></tr>
+    <tr><th><label for="id_form-0-my_field">My field:</label></th><td><input type="text" name="form-0-my_field" id="id_form-0-my_field" /></td></tr>
+
+.. _Using a formset in views and templates:
+
+ビューやテンプレートでフォームセットを使う
+--------------------------------------
+
+ビュー内でのフォームセットの扱いは簡単で、普通の ``Form`` クラスと同じよう
+に使うだけです。気をつけておかねばならないのは、テンプレート内で
+``management_form`` を使うという点です。ビューの例を以下に示します::
+
+    def manage_articles(request):
+        ArticleFormSet = formset_factory(ArticleForm)
+        if request.method == 'POST':
+            formset = ArticleFormSet(request.POST, request.FILES)
+            if formset.is_valid():
+                # formset.cleaned_data を使った処理をここに
+        else:
+            formset = ArticleFormSet()
+        return render_to_response('manage_articles.html', {'formset': formset})
+
+
+``manage_articles.html`` テンプレートは以下のようになります::
+
+    <form method="POST" action="">
+        {{ formset.management_form }}
+        <table>
+            {% for form in formset.forms %}
+            {{ form }}
+            {% endfor %}
+        </table>
+    </form>
+
+ただし、上のような構造は、下記のようなショートカットを使って、フォームセッ
+ト自体に管理フォームを扱わせられます::
+
+    <form method="POST" action="">
+        <table>
+            {{ formset }}
+        </table>
+    </form>
+
+このショートカットは、フォームセットの ``as_table`` を呼び出した時と同じ内
+容を出力します。
 
 .. _More coming soon:
 

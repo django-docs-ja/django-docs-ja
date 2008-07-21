@@ -2,7 +2,7 @@
 はじめての Django アプリ作成、その 2
 =====================================
 
-:revision-up-to: 7127 (0.97pre SVN)
+:revision-up-to: 8001 (1.0pre SVN)
 
 このチュートリアルは `チュートリアルその 1`_ の続きです。ここでは、引続き
 Web 投票アプリケーションの開発を例にして、Django が自動生成する管理サイト
@@ -92,21 +92,14 @@ Poll モデルを admin で編集できるようにする
 ところで、 polls アプリケーションはどこにあるんでしょう？ admin のインデク
 スページを見ても表示されていませんね。
 
-実は、まだ一つやるべきことが残っていました。 ``Poll`` モデルの中で、
-``Poll`` オブジェクトに admin インタフェースを持たせるよう指定する必要があ
-るのです。 ``mysite/polls/models.py`` ファイルを編集して、モデルの中に
-``Admin`` という名前のクラスを作ります。 クラスの定義には ``pass`` と書いて
-空にしておきます::
+実は、まだ一つやるべきことが残っていました。 admin に ``Poll`` モデルが
+admin インタフェースを持つことを教える必要があるのです。
+``mysite/polls/models.py`` ファイルを編集して、末尾に以下のような一文を加え
+ます::
 
-    class Poll(models.Model):
-        # ...
-        class Admin:
-            pass
-
-``class Admin`` の中には、このモデルが Django admin でどのように表示される
-かを制御するための設定をいれます。とはいえ、設定は全て省略可能なので、空の
-クラスをつくっておくだけで「デフォルトの設定でオブジェクトの admin インタ
-フェースを作成」できます。
+    from django.contrib import admin
+    
+    admin.site.register(Poll)
 
 Django admin ページをリロードして、どんな変化が起きたか見てみましょう。
 開発サーバはプロジェクトを自動的にリロードしてくれるので、コードに加えた変
@@ -117,8 +110,8 @@ Django admin ページをリロードして、どんな変化が起きたか見�
 admin の機能を探究してみる
 ==========================
 
-``Poll`` に内部クラス ``Admin`` を持たせたことで、 Django は ``Poll`` を
-admin ページに表示するようになります:
+admin に ``Poll`` モデルを登録したので、 Django は ``Poll`` を admin ページ
+に表示するようになります:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin03t.png
    :alt: Django admin index page, now with polls displayed
@@ -176,20 +169,27 @@ admin ページに表示するようになります:
 admin フォームのカスタマイズ
 ============================
 
-しばらく操作してみて、これだけの機能をコードを全然書かずに実現したことに驚
-嘆しましょう。
+しばらく操作してみましょう。これだけの機能をコードを全然書かずに実現したこ
+とに驚くはずです。 ``admin.site.register(Poll)`` の呼び出しによって、
+Django はオブジェクトの表示方法を「推測」し、 admin でモデルの編集を行える
+ようにします。 admin の表示や挙動を少し変えたい場合には、モデルを登録すると
+きにオプションを指定します。
 
-少しカスタマイズしてみましょう。 内部クラス ``Admin`` の ``fields`` という
-クラス属性を追加すると、フィールドの並び順を明示的に変更できます::
+試しに、編集フォームでのフィールドの並び順を並べ替えてみましょう。
+``admin.site.register(Poll)`` の行を以下のように置き換えてみてください::
 
-        # ...
-        class Admin:
-            fields = (
-                (None, {'fields': ('pub_date', 'question')}),
-            )
+    class PollAdmin(admin.ModelAdmin):
+        fields = ['pub_date', 'question']
+        
+    admin.site.register(Poll, PollAdmin)
 
-これで、「Publication date」フィールドの表示位置が、 2 番目から先頭になりま
-す:
+このように、 admin のオプションを変更したいときには、モデルの admin オブジェ
+クトを生成して、 ``admin.site.register()`` の 2 番目の引数に渡すというパター
+ンを使ってください。
+
+上の例では、「Publication date」フィールドの表示位置を「Question」フィール
+ドよりも前に変更しています。
+
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin07.png
    :alt: Fields have been reordered
@@ -201,14 +201,16 @@ admin フォームのカスタマイズ
 同じく何ダースもフィールドがある場合、フォームを複数のフィールドセットに分
 割したいこともあるでしょう::
 
-        class Admin:
-            fields = (
-                (None, {'fields': ('question',)}),
-                ('Date information', {'fields': ('pub_date',)}),
-            )
+    class PollAdmin(admin.ModelAdmin):
+        fieldsets = [
+            (None,               {'fields': ['question']}),
+            ('Date information', {'fields': ['pub_date']}),
+        ]
+        
+    admin.site.register(Poll, PollAdmin)
 
-``fields`` の各タプルの先頭の要素はフィールドセットのタイトルになります。
-フォームは以下のようになります:
+``fieldsets`` の各タプルの先頭の要素はフィールドセットのタイトルです。
+フォームは以下のように表示されます:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin08t.png
    :alt: Form has fieldsets now
@@ -219,12 +221,11 @@ admin フォームのカスタマイズ
 ルドセットは最初折り畳まれた状態で表示されます。これは普段は使わないフィー
 ルドがたくさんあるようなフォームを使っている場合に便利です::
 
-        class Admin:
-            fields = (
-                (None, {'fields': ('question',)}),
-                ('Date information', {'fields': ('pub_date',), 
-                                      'classes': 'collapse'}),
-            )
+        class PollAdmin(admin.ModelAdmin):
+            fieldsets = [
+                (None,               {'fields': ['question']}),
+                ('Date information', {'fields': ['pub_date'], 'classes': ['collapse']}),
+            ]
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin09.png
    :alt: Fieldset is initially collapsed
@@ -239,14 +240,10 @@ OK、 Poll の admin ページはできました。しかし ``Poll`` は複数�
 
 今のところは。
 
-この問題の解決法は二つあります。一つ目は、 ``Choice`` モデルに ``Poll`` と
-同じように ``Admin`` クラスを指定するという方法です。その場合、コードは以下
-のようになるでしょう::
+この問題の解決法は二つあります。一つ目は、 ``Poll`` と同様、以下のようにし
+ て ``Choice`` モデルを admin に登録するというものです::
 
-    class Choice(models.Model):
-        # ...
-        class Admin:
-            pass
+    admin.site.register(Choice)
 
 これで Django admin サイトで「Choice」 を選べるようになります。「Choice の
 追加」フォームは以下のようになります:
@@ -270,26 +267,25 @@ Poll)」というポップアップウィンドウを表示します。このウ
 りません。むしろ、 Poll オブジェクトを追加する時に Choice をひと揃い追加出
 来た方が便利ですよね。そうしてみましょう。
 
-Choice モデルから ``Admin`` を削除して、 ``ForeignKey(Poll)`` フィールドを
-以下のように編集してください::
+Choice モデルに対する ``register()`` を削除して、 ``Poll`` を登録する部分を
+以下のように書き換えてください::
 
-    poll = models.ForeignKey(Poll, edit_inline=models.STACKED, 
-                             num_in_admin=3)
+    class ChoiceInline(admin.StackedInline):
+        model = Choice
+        extra = 3
+        
+    class PollAdmin(admin.ModelAdmin):
+        fieldsets = [
+            (None,               {'fields': ['question']}),
+            ('Date information', {'fields': ['pub_date'], 'classes': ['collapse']}),
+        ]
+        inlines = [ChoiceInline]
+
+    admin.site.register(Poll, PollAdmin)
 
 この行は Django に対して、「Choice オブジェクトは Poll の admin ページから
 編集する。デフォルトでは、 3 つの Choice を表示するのに十分なフィールドを用
-意すること」と指示します。
-
-次に、 ``Choice`` の他のフィールドを変更して、 ``core=True`` を指定します::
-
-    choice = models.CharField(max_length=200, core=True)
-    votes = models.IntegerField(core=True)
-
-Django の受ける指示はこうなります: 「Choice を Poll の admin ページで編集す
-る時には、 'choice' フィールドと 'votes' フィールドの指定が必要。これらの
-フィールドのうちすくなくとも一つが指定されていれば、新たな Choice オブジェ
-クトを作成し、どちらのフィールドの値も削除したらその Choice オブジェクトを
-削除すること」
+意すること」と指示しています。
 
 「Poll を追加」ページをロードして、どんな表示になったか見てみましょう:
 
@@ -297,23 +293,22 @@ Django の受ける指示はこうなります: 「Choice を Poll の admin ペ
    :alt: Add poll page now has choices on it
    :target: http://media.djangoproject.com/img/doc/tutorial/admin11.png
 
-変わった点をみてみましょう: リレーション相手である Choice を表示するために
-3 つのスロットがあります (``num_in_admin`` に指定した数ですね)。ただし、す
-でに作成したオブジェクトを「変更する (Change)」ページを開いた場合には、
-Choice の数よりも一つ余分のスロットを表示します。 (つまり、追加できるリレー
-ション相手のオブジェクトの上限はハードコードされていません。) ちなみに、
-Poll を変更するときに、常に Choice フィールドを 3 つ余分に追加したい場合に
-は ``num_extra_on_change=3`` のようにします。
 
-ところで、これはちょっと問題になりそうです。 Choice オブジェクトを入力する
-ためのフィールドを全部表示しようとすると、相当な広さのスクリーンが必要です。
-というわけで、 Django にはインラインでリレーション相手のオブジェクトを表示
-する方法をもう一つ提供しています::
+変わった点をみてみましょう。リレーション相手である Choice を表示するために
+3 つのスロットがあります (``extra`` に指定した数ですね)。また、作成済みのオ
+ブジェクトを「編集する」ページに行けば、いつでも 3 つ余分のスロットが表示さ
+れるはずです。
 
-    poll = models.ForeignKey(Poll, edit_inline=models.TABULAR, 
-                             num_in_admin=3)
+さて、このコードにはちょっと問題があります。というのも、 Choice オブジェク
+トを入力するためのフィールドを全部表示しようとすると、相当な広さのスクリー
+ンが必要だからです。そこで、 Django にはテーブルを使ってインラインでリレー
+ション相手のオブジェクトを表示するもう一つの方法があります。以下のように、
+``ChoiceInline`` の宣言を変更してください::
 
-``edit_inline`` を ``models.STACKED`` から ``models.TABULAR`` に変更すると、
+    class ChoiceInline(admin.TabularInline):
+        #...
+
+``StackedInline`` に変わって ``TabularInline`` を使うと、
 リレーション相手のオブジェクトはよりコンパクトなテーブル形式で表示されます:
 
 .. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin12.png
@@ -339,16 +334,16 @@ admin の変更リストページをカスタマイズする
 プションを使います。 このオプションには、カラム表示したいフィールドの名前を
 タプルにして指定します::
 
-    class Poll(models.Model):
+    class PollAdmin(admin.ModelAdmin):
         # ...
-        class Admin:
-            # ...
-            list_display = ('question', 'pub_date')
+        list_display = ('question', 'pub_date')
 
 おまけとして、チュートリアル 1 で定義したカスタムメソッド
 ``was_published_today`` も追加してみましょう::
 
-    list_display = ('question', 'pub_date', 'was_published_today')
+    class PollAdmin(admin.ModelAdmin):
+        # ...
+        list_display = ('question', 'pub_date', 'was_published_today')
 
 これで、 Poll の変更リストのページは以下のようになります:
 
@@ -369,7 +364,7 @@ admin の変更リストページをカスタマイズする
 
 
 もう一点、 Poll の変更リストを改良して、フィルタをを加えましょう。 
-以下の行を ``Poll.Admin`` の中に入れます::
+以下の行を ``PollAdmin`` の中に入れます::
 
     list_filter = ['pub_date']
 

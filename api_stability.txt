@@ -2,7 +2,7 @@
 API の安定性
 ============
 
-:revision-up-to: 7127 (0.97pre SVN)
+:revision-up-to: 8001 (1.0pre SVN)
 
 Django はまだリリース 1.0 に到達していませんが、 Django の公開 API の大半は
 リリース 0.95 をもってほぼ安定したといえます。このドキュメントでは、1.0 の

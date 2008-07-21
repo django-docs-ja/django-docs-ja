@@ -2,7 +2,7 @@
 モデル API リファレンス
 =======================
 
-:revision-up-to: 7857 (0.97pre SVN)
+:revision-up-to: 8001 (1.0pre SVN)
 
 モデルとは、サイトを構成するデータの、ただ一つかつ最終的なデータソースを指
 します。モデルには、保存したいデータに不可欠なデータフィールドと、その振舞
@@ -16,8 +16,6 @@
     * モデルの各属性値は、データベース上のあるフィールドを表現します。
     * モデルのメタデータ (フィールドで表現されない情報) は ``Meta`` と呼ば
       れる内部クラスに配置します。
-    * Django の admin サイトで使われるメタデータは ``Admin`` と呼ばれる内部
-      クラスに配置します。
     * これらの情報をもとに、 Django はデータベース API を自動生成します。
       API については `データベース API リファレンス`_ で解説します。
 
@@ -447,18 +445,6 @@ admin では、「不明」 ("Unknown") 「はい」 ("Yes")、「いいえ」 (
 CharField と同様、 ``max_length`` を指定できます。指定しなかった場合、
 Django はデフォルト値の 50 を使います。 ``db_index=True`` になります。
 
-追加のオプションとして、 ``prepopulate_from`` をとります。このオプションは、
-admin フォームで JavaScript を介してスラグを自動生成する際に、元にするフィー
-ルドの名前からなるリストです::
-
-    models.SlugField(prepopulate_from=("pre_name", "name"))
-
-DateTimeField, ForeignKey, ManyToManyField は ``prepopulate_from`` に入れら
-れません。
-
-admin では、 ``SlugField`` は ``<input type="text">`` (一行の入力フィールド)
-で表現されます。
-
 ``SmallIntegerField``
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -597,6 +583,29 @@ admin では、 ``<input type="text">`` (一行の入力フィールド) で表�
     )
     class Foo(models.Model):
         gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+
+
+また、選択肢をグループごとに集めて、名前をつけられます::
+
+    MEDIA_CHOICES = (
+        ('Audio', (
+                ('vinyl', 'Vinyl'),
+                ('cd', 'CD'),
+            )
+        ),
+        ('Video', (
+                ('vhs', 'VHS Tape'),
+                ('dvd', 'DVD'),
+            )
+        ),
+        ('unknown', 'Unknown'),
+    )
+
+各タプルの最初の要素は、選択肢グループの名前です。二つ目の要素は、2 要素の
+タプルからなるイテレーション可能なオブジェクトです。各 2 要素タプルには、
+選択肢の値と、人間可読な名前を指定します。(上の例の ``unknown`` オプション
+のように) グループ化されたオプションとされていないオプションを混ぜても構い
+ません。
 
 ``choices`` セットを持つモデルフィールド各々について、 Django は特殊なメソッ
 ドを追加し、フィールドの現在値を人間可読な形式で取得できるようにします。デー

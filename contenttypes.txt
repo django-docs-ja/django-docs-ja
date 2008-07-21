@@ -2,7 +2,7 @@
 contenttypes フレームワーク
 ============================
 
-:revision-up-to: 7127 (0.97pre SVN)
+:revision-up-to: 8001 (1.0pre SVN)
 
 Django には、 ``contenttypes`` アプリケーションが付属しています。
 このアプリケーションを使うと、 Django で作成したプロジェクト中に存在する全
@@ -226,6 +226,11 @@ Django にバンドルされているアプリケーションには、後者の�
     2. リレーション先のモデルインスタンスの主キー値を保存するためのモデル
        フィールドを定義します (ほとんどのモデルでは、 ``IntegerField`` また
        は ``PositiveIntegerField`` です)。
+
+         このフィールドは、 GeneicRelation の対象モデルの主キーと同じ型でな
+         ければなりません。例えば、モデルフィールドに ``IntegerField`` を使っ
+         ているなら、対象モデルの主キーに ``CharField`` を使うことはできま
+         せん。
 
     3. ``GenericForeignKey`` を定義します。 ``GenericForeignKey`` の引数に、
        上で定義したフィールドの名前を指定します。フィールド名が

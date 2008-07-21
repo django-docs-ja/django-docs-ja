@@ -2,7 +2,7 @@
 Django の設定
 =============
 
-:revision-up-to: 7869 (0.97pre SVN)
+:revision-up-to: 8001 (1.0pre SVN)
 
 Django の設定ファイルには、インストールした Django の使う全ての設定が入って
 います。このドキュメントでは、各設定の役割と、どのような設定を利用できるか
@@ -285,7 +285,7 @@ AUTH_PROFILE_MODULE
 CACHE_BACKEND
 -------------
 
-デフォルト値: ``'simple://'``
+デフォルト値: ``'locmem://'``
 
 利用するキャッシュバックエンドを指定します。 `キャッシュのドキュメント`_ を
 参照してください。.
@@ -313,7 +313,7 @@ DATABASE_ENGINE
 
 どのデータベースバックエンドを使うかを指定します。組み込みのデータベースバッ
 クエンドは、 ``'postgresql_psycopg2'``, ``'postgresql'``, ``'mysql'``,
-``'mysql_old'``, ``'sqlite3'``, ``'oracle'`` です。
+``'sqlite3'``, ``'oracle'`` です。
 
 DATABASE_HOST
 -------------
@@ -1100,7 +1100,7 @@ TEST_DATABASE_CHARSET
 名前や書式はバックエンドごとに異なります。
 
 この設定をサポートしているバックエンドは、 PostgreSQL_ (``postgresql``,
-``postgresql_psycopg2``) と MySQL_ (``mysql``, ``mysql_old``) です。
+``postgresql_psycopg2``) と MySQL_ (``mysql``) です。
 
 
 .. _PostgreSQL: http://www.postgresql.org/docs/8.2/static/multibyte.html
@@ -1117,8 +1117,8 @@ TEST_DATABASE_COLLATION
 タベースバックエンドに直接渡されるので、値の書式はバックエンドごとに異なり
 ます。
 
-``mysql`` および ``mysql_old`` バックエンドだけでサポートされています
-(くわしくは、MySQLマニュアルの `section 10.3.2`_ を参照してください)
+``mysql`` バックエンドだけでサポートされています(くわしくは、MySQLマニュア
+ルの `section 10.3.2`_ を参照してください)
 
 .. _section 10.3.2: http://www.mysql.org/doc/refman/5.0/en/charset-database.html
 .. _`10.3.2節`: http://www.mysql.org/doc/refman/5.0/ja/charset-database.html

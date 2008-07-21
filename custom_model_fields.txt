@@ -2,7 +2,7 @@
 カスタムのモデルフィールド
 ===========================
 
-:revision-up-to: 7392 (0.97pre SVN)
+:revision-up-to: 8001 (1.0pre SVN)
 
 **開発版の Django で新たに追加された機能です**
 
@@ -217,7 +217,6 @@ Python オブジェクトが入っています。モデル内でフィールド�
     * ``unique_for_year``
     * ``validator_list``
     * ``choices``
-    * ``radio_admin``
     * ``help_text``
     * ``db_column``
     * ``db_tablespace``: 現状は Oracle バックエンドだけで使っています。

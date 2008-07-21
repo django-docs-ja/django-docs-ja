@@ -2,7 +2,7 @@
 Django での Unicode の扱い
 ==========================
 
-:revision-up-to: 7127 (0.97pre SVN)
+:revision-up-to: 8001 (1.0pre SVN)
 
 **開発版の Django で新たに追加された機能です**
 

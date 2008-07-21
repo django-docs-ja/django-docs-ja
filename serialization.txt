@@ -2,7 +2,7 @@
 Django オブジェクトのシリアライズ
 =================================
 
-:revision-up-to: 7710 (0.97pre SVN)
+:revision-up-to: 8001 (1.0pre SVN)
 
 .. note::
     

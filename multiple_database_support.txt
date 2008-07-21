@@ -2,7 +2,7 @@
 複数のデータベースを使う
 ========================
 
-:revision-up-to: 5613 (0.97pre SVN)
+:revision-up-to: 8001 (1.0pre SVN)
 
 .. warning:: このドキュメントは multi-db ブランチ
 
