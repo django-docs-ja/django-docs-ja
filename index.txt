@@ -42,6 +42,7 @@ Django ドキュメント
    templates_python
    newforms
    modelforms
+   admin
    testing
    sessions
    cache
@@ -115,6 +116,9 @@ Django ドキュメント
 
 ブランチの機能、または撤廃された機能
 -------------------------------------
+
+.. toctree::
+   :maxdepth: 1
 
    form_for_model
    forms

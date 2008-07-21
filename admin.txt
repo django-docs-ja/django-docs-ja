@@ -521,7 +521,7 @@ SQL と等価な検索を実行します::
             js = ("my_code.js",)
 
 これらのメディア名のパスには ``MEDIA_URL`` の内容が前置されます。また、
-`fomrs の通常のメディア定義`_ と同じ規則が当てはまります。
+`forms の通常のメディア定義`_ と同じ規則が当てはまります。
 
 .. _regular media definitions on forms: ../newforms/#media
 .. _`forms の通常のメディア定義`: `regular media definitions on forms`_
