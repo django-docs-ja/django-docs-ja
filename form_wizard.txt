@@ -91,7 +91,7 @@ Django には、`フォーム`_ を複数のページに分割する「フォー
 フィールドを使うため、最後のページに表示するフォーム以外では ``FileField``
 を使えません。
 
-.. _newforms documentation: ../newforms
+.. _newforms documentation: ../newforms/
 ..  _`newforms のドキュメント`: `newforms documentation`_
 
 .. _Creating a FormWizard class:
@@ -141,7 +141,7 @@ Django には、`フォーム`_ を複数のページに分割する「フォー
 フォームウィザードの提供しているフックを詳しく知りたければ、後の
 `フォームウィザードの特殊なメソッド`_ を参照してください。
 
-.. _HttpRequest: request_response/#httprequest-objects
+.. _HttpRequest: ../request_response/#httprequest-objects
 
 .. _Creating templates for the forms:
 

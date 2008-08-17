@@ -977,7 +977,7 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
 .. _abstract base class: `Abstract base classes`_
 .. _`抽象ベースクラス`: `abstract base class`_
 .. _extra notes: `Be careful with related_name`_
-.. _`補足`: `extra notes`
+.. _`補足`: `extra notes`_
 
 .. _Many-to-many relationships:
 
@@ -2231,7 +2231,7 @@ Python DB-API に詳しくないのなら、上の SQL 文の ``cursor.execute()
 
 .. _Python DB-API: http://www.python.org/peps/pep-0249.html
 .. _`extra() のドキュメント`: 
-    ../db-api/#extra-select-none-where-none-params-none-tables-none
+    ../db-api/#extra-select-none-where-none-params-none-tables-none-order-by-none-select-params-none
 .. _Other lookup options: ../db_api/#other-lookup-options
 .. _transaction handling: ../transactions/
 .. _`トランザクションの扱い`: `transaction handling`_
@@ -2324,7 +2324,7 @@ Django のモデルクラス継承は、 Python の通常のクラス継承と�
 
 ほとんどの用途で使えるのは、このタイプのモデル継承でしょう。抽象ベースクラ
 スは、子クラスで共通の情報を Python レベルに切り出しながらも、データベース
-レベルでは、各子クラに一つのデータベーステーブルを生成します。
+レベルでは、各子クラスに一つのデータベーステーブルを生成します。
 
 .. _`Meta inheritance`:
 

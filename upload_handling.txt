@@ -56,7 +56,7 @@ Django がアップロードされたファイルを扱うとき、ファイル�
             form = UploadFileForm()
         return render_to_response('upload.html', {'form': form})
 
-.. _binding uploaded files to a form: ../newforms/#binding-uploaded-files-to-a- form
+.. _binding uploaded files to a form: ../newforms/#binding-uploaded-files-to-a-form
 .. _`アップロードファイルデータをフォームに結びつける`: `binding uploaded files to a form`_
 
 ``request.FILES`` を明示的にフォームのコンストラクタに渡さねばならないので
@@ -83,7 +83,7 @@ Django がアップロードされたファイルを扱うとき、ファイル�
         
     ``UploadedFile.multiple_chunks()``
         ファイルが大きくて、複数のチャンクに分けて読み出すべきである場合に
-        ``True`` を返します。デフォルトの設定では、 2.5 Mbtes より大きなファ
+        ``True`` を返します。デフォルトの設定では、 2.5 Mbytes より大きなファ
         イルに対して ``True`` を返します。サイズの閾値は設定でき、後で説明
         します。
     

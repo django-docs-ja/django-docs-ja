@@ -286,8 +286,7 @@ Django の `QuerySet Refactor ブランチ`_ のマージにより、Django 1.0 
 .. _Queryset Refactor branch: http://code.djangoproject.com/wiki/QuerysetRefactorBranch
 .. _`QuerySet Refactor ブランチ`: `Queryset Refactor branch`_
 .. _Newforms Admin branch: http://code.djangoproject.com/wiki/NewformsAdminBranch
-.. _Newforms Admin branch: http://code.djangoproject.com/wiki/NewformsAdminBranch
-.. `Newforms Admin ブランチ`: `Newforms Admin branch`_
+.. _`Newforms Admin ブランチ`: `Newforms Admin branch`_
 .. _quite a few production sites: http://code.djangoproject.com/wiki/DjangoPoweredSites
 
 .. How can I download the Django documentation to read it offline?:

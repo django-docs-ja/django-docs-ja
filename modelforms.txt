@@ -205,7 +205,6 @@ newforms とモデルを組み合わせる
 
     # 既存の Article オブジェクトを編集するためのフォームを作成します。
     # ただし、 POST データを使ってフォームに値を設定します。
-    # POST data to populate the form.
     >>> a = Article.objects.get(pk=1)
     >>> f = ArticleForm(request.POST, instance=a)
     >>> f.save()

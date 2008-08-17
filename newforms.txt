@@ -1382,7 +1382,7 @@ Django の古いフォーム／検証フレームワークを使ったことが�
 ルフィールドの ``choices`` 引数と同じ形式で選択肢を指定できます。詳しくは
 `モデル API のドキュメント`_ を参照してください。
 
-.. _model API documentation on choices: ../model-api#choices
+.. _model API documentation on choices: ../model-api/#choices
 .. _`モデル API のドキュメント`: `model API documentation on choices`_
 
 ``DateField``

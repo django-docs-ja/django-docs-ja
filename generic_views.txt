@@ -1065,7 +1065,7 @@ pagination に関する注意
 
 
 .. _authentication system: ../authentication/
-.. _ModelForm docs: ../newforms/modelforms
+.. _ModelForm docs: ../modelforms/
 .. _newforms  documentation: ../newforms/
 .. _`認証システム`: `authentication system`_
 .. _`ModelForm のドキュメント`: `ModelForm docs`_
