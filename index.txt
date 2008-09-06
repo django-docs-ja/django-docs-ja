@@ -1,75 +1,84 @@
 .. _index:
 
 ====================
-Django documentation
+Django ドキュメント
 ====================
+
+:version: 1.0
 
 .. rubric:: Everything you need to know about Django (and then some).
 
-Getting help
-============
+助けを求める
+==============
 
-Having trouble? We'd like to help!
+困り事ですか？手を貸しましょう！
 
-* Try the :ref:`FAQ <faq-index>` -- it's got answers to many common questions.
+* よくある質問への答えは、 :ref:`FAQ <faq-index>` にあります。
 
-* Looking for specific information? Try the :ref:`genindex`, :ref:`modindex` or
-  the :ref:`detailed table of contents <contents>`.
+* 特定のトピックについて情報を探しているなら、 :ref:`genindex` や
+  :ref:`modindex` , :ref:`詳細目次 <contents>` を見てくだ
+  さい。
 
-* Search for information in the `archives of the django-users mailing list`_, or
-  `post a question`_
+* `django-users メーリングリスト`_ でアーカイブ を探したり、 
+  `質問をポスト`_ してみましょう。
   
-* Ask a question in the `#django IRC channel`_, or search the `IRC logs`_ to see
-  if its been asked before
+* `IRC の #django チャネル`_ で質問したり、 `IRC のログ`_ を探してみましょ
+  う。
 
-* Report bugs with Django in our `ticket tracker`_.
+* Django のバグを見つけたら、 `チケットトラッカ`_ で報告してください。
 
 .. _archives of the django-users mailing list: http://groups.google.com/group/django-users/
+.. _`django-users メーリングリスト`: `archives of the django-users mailing list`_
 .. _post a question: http://groups.google.com/group/django-users/
+.. _`質問をポスト`: `post a question`_
 .. _#django IRC channel: irc://irc.freenode.net/django
+.. _`IRC の #django チャネル`: `#django IRC channel`_
 .. _IRC logs: http://oebfare.com/logger/django/
+.. _`IRC のログ`: `IRC logs`_
 .. _ticket tracker: http://code.djangoproject.com/
+.. _`チケットトラッカ`: `ticket tracker`_
 
-First steps
-===========
+最初のステップ
+===================
 
-:ref:`Overview <intro-overview>`
-    See what writing a database-driven application with Django looks like.
+:ref:`概要 (Overview) <intro-overview>`
+    Django でのデータベース駆動アプリケーションの作り方を理解しましょう。
     
-:ref:`Installation <intro-install>`
-    Get Django installed on your computer.
+:ref:`インストール (Installation) <intro-install>`
+    Django をインストールしましょう。
     
-Tutorial: Writing your first Django application
+チュートリアル: Django アプリケーションを書く
 ===============================================
 
-:ref:`Part 1 <intro-tutorial01>`
-    Get set up, create models, and play with the database API.
+:ref:`その 1 <intro-tutorial01>`
+    プロジェクトをセットアップし、モデルを作成して、データベース API をいじっ
+    てみましょう。
     
-:ref:`Part 2 <intro-tutorial02>`
-    Explore the automatically-generated admin site.
+:ref:`その 2 <intro-tutorial02>`
+    Django が自動生成する admin サイトを使ってみましょう。
     
-:ref:`Part 3 <intro-tutorial03>`
-    Write the public interface views.
-    
-:ref:`Part 4 <intro-tutorial04>`
-    Learn how to process forms.
-        
-Using Django
-============
+:ref:`その 3 <intro-tutorial03>`
+    公開用のインタフェースビューを作成しましょう。
 
-:ref:`Models <topics-db-index>`
+:ref:`その 4 <intro-tutorial04>`
+    フォームの処理方法を学びましょう。
+        
+Django を使う
+===============
+
+:ref:`モデル (Models) <topics-db-index>`
     Design a single, definitive source of data about your data.
     
-:ref:`Handling web requests <topics-http-index>`
-    Handle web requests, map them to views, and return pages.
+:ref:`リクエストの処理 (Handling web requests) <topics-http-index>`
+    リクエストを処理して、ビューに結びつけ、ページを生成して返しましょう。
     
-:ref:`Forms <topics-forms-index>`
-    Build and handle HTML forms.
+:ref:`フォーム (Forms) <topics-forms-index>`
+    HTML フォームを作成して、操作しましょう。
     
-:ref:`Templates <topics-templates>`
-    Develop the visual design of your site.
+:ref:`テンプレート (Templates) <topics-templates>`
+    サイトの視覚的なデザインを開発しましょう。
     
-And more:
+他にも:
 ---------
 
     * :ref:`topics-auth`
@@ -85,22 +94,22 @@ And more:
     * :ref:`topics-testing`
     * :ref:`topics-http-sessions`
     
-Add-on ("contrib") applications
-===============================
+アドオン (contrib) アプリケーション
+========================================
 
-:ref:`Django's automatic admin site <ref-contrib-admin>`
-    Get a clean interface to your data with no effort at all.
+:ref:`管理サイト (Django's automatic admin site) <ref-contrib-admin>`
+    手間をかけずに、データを操作するためのインタフェースを構築しましょう。
     
-:ref:`Form tools <ref-contrib-formtools-index>`
-    Easily handle complex form workflows.
+:ref:`フォームツール (Form tools) <ref-contrib-formtools-index>`
+    複雑なフォームのワークフローを簡単に操作しましょう。
     
-:ref:`Syndication feeds <ref-contrib-syndication>`
-    Generate RSS and Atom feeds of your data.
+:ref:`配信フィード (Syndication feeds) <ref-contrib-syndication>`
+    データから RSS や Atom フィードを生成しましょう。
     
-:ref:`"Local flavor" <ref-contrib-localflavor>`
-    Give your site that special local touch.
+:ref:`ローカルフレーバ (Local flavor) <ref-contrib-localflavor>`
+    地域特有の機能をサイトに組み込みましょう。
     
-And more:
+他にも:
 ---------
 
     * :ref:`ref-contrib-comments-index`
@@ -114,23 +123,24 @@ And more:
     * :ref:`ref-contrib-sites`
     * :ref:`ref-contrib-webdesign`
 
-Solving specific problems
+特殊な問題を解決する
 =========================
 
-:ref:`Deployment <howto-deployment-index>`
-    Release your project to the world.
+:ref:`デプロイ (Deployment) <howto-deployment-index>`
+    プロジェクトをリリースしましょう。
     
-:ref:`Importing data from legacy databases <howto-legacy-databases>`
-    Use Django with an existing database or alongside other web development
-    toolkits.
+:ref:`既存のデータベースからデータを取り込む (Importing data from legacy databases) <howto-legacy-databases>`
+    Django を既存のデータベースや他の Web 開発ツールと組み合わせて使いましょ
+    う。
 
-:ref:`Custom template tags <howto-custom-template-tags>`
-    Add your own extensions to Django's template language.
+:ref:`テンプレートタグの自作 (Custom template tags) <howto-custom-template-tags>`
+    Django のテンプレート言語に独自の拡張を追加しましょう。
     
-:ref:`Generating CSV <howto-outputting-csv>` & :ref:`PDF <howto-outputting-pdf>`
-    Produce non-HTML content with Django.
+:ref:`CSV の生成 (Generating CSV) <howto-outputting-csv>` 
+& :ref:`PDF の生成 (Generating PDF) <howto-outputting-pdf>`
+    HTML 以外のコンテンツを Django で生成しましょう。
     
-And more:
+他にも:
 ---------
 
     * :ref:`Authenticating in Apache <howto-apache-auth>`
@@ -142,22 +152,23 @@ And more:
     * :ref:`howto-jython`
     * :ref:`howto-static-files`
 
-Reference
-=========
+リファレンス
+==================
 
-:ref:`Settings <ref-settings>`
-    See all of Django's settings and what they do.
+:ref:`設定 (Settings) <ref-settings>`
+    Django の全ての設定とその働きを理解しましょう。
     
-:ref:`Request & response objects <ref-request-response>`
-    Understand the classes Django uses to represent HTTP requests and responses.
+:ref:`リクエストオブジェクトとレスポンスオブジェクト (Request & response objects) <ref-request-response>`
+    Django が HTTP のリクエストとレスポンスの表現に使っているクラスを理解し
+    ましょう。
 
-:ref:`Model API reference <ref-models-index>`
-    Revel in the gory details of Django's model system.
+:ref:`モデル API リファレンス <ref-models-index>`
+    Django のモデルシステムを骨の髄まであじわい尽くしましょう。
         
-:ref:`Form API reference <ref-forms-index>`
-    Learn the details of forms, fields, and widgets.
+:ref:`フォーム API リファレンス <ref-forms-index>`
+    フォームやフィールド、ウィジェットの詳細について学びましょう。
     
-And more:
+他にも:
 ---------
 
     * :ref:`ref-databases`
@@ -168,16 +179,16 @@ And more:
     * :ref:`ref-templates-index`
     * :ref:`ref-unicode`
     
-And all the rest
-================
+その他
+========
 
-:ref:`Internals <internals-index>`
-    Learn how Django works under the hood, and how you can contribute to the
-    project.
+:ref:`仕組み (Internals) <internals-index>`
+    Django が背後でどのように動作しているかを学びましょう。また、プロジェク
+    トへの参加方法を学びましょう。
 
-:ref:`Release notes <releases-index>`
-    See what is and was new in each release of Django.
+:ref:`リリースノート (Release notes) <releases-index>`
+    それぞれのリリースで、何が新たに Django に登場したかを見ましょう。
 
-:ref:`Miscellany <misc-index>`
-    Stuff we can't find a more organized place for. Like that drawer in your
-    kitchen with the scissors, batteries, and duct tape.
+:ref:`雑多 (Miscellany) <misc-index>`
+    分類しようのないドキュメントの置き場です。はさみや電池やテープの入った
+    キッチンの引き出しのようなものです。
