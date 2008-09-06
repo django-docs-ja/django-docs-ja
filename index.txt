@@ -4,7 +4,7 @@
 Django ドキュメント
 ====================
 
-:version: 1.0
+:revision-up-to: 8961 (1.0)
 
 .. rubric:: Everything you need to know about Django (and then some).
 

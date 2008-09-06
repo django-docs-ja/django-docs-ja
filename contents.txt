@@ -4,7 +4,7 @@
 Django ドキュメント 目次
 =============================
 
-:version: 1.0
+:revision-up-to: 8961 (1.0)
 
 .. toctree::
    :maxdepth: 2
