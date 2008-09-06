@@ -2,7 +2,7 @@
 FastCGI, SCGI, AJP で Django を使う
 ===================================
 
-:revision-up-to: 8001 (1.0pre SVN)
+:revision-up-to: 8032 (1.0pre SVN)
 
 Django を動作させる構成として `現在推奨されている`_ のは， Apache_ と
 `mod_python`_ の組合せですが，多くの人々が共有ホスティングサービスを使って
@@ -238,6 +238,12 @@ URL を ``mysite.fcgi`` (または ``FastCGIExternalServer`` ディレクティ�
 
 .. _mod_rewrite: http://httpd.apache.org/docs/2.0/mod/mod_rewrite.html
 
+.. TBD::
+
+Django will automatically use the pre-rewrite version of the URL when
+constructing URLs with the ``{% url %}`` template tag (and similar methods).
+
+
 .. _lighttpd setup:
 
 lighttpd での FastCGI 構成
@@ -378,4 +384,34 @@ Admin メディアファイルの提供
 上記の構成でも使えるアドバイスがあります．
 
 .. _modpython: ../modpython/#serving-the-admin-files
+
+.. TBD::
+
+Forcing the URL prefix to a particular value
+============================================
+
+Because many of these fastcgi-based solutions require rewriting the URL at
+some point inside the webserver, the path information that Django sees may not
+resemble the original URL that was passed in. This is a problem if the Django
+application is being served from under a particular prefix and you want your
+URLs from the ``{% url %}`` tag to look like the prefix, rather than the
+rewritten version, which might contain, for example, ``mysite.fcgi``.
+
+Django makes a good attempt to work out what the real script name prefix
+should be. In particular, if the webserver sets the ``SCRIPT_URL`` (specific
+to Apache's mod_rewrite), or ``REDIRECT_URL`` (set by a few servers, including
+Apache + mod_rewrite in some situations), Django will work out the original
+prefix automatically.
+
+In the cases where Django cannot work out the prefix correctly and where you
+wan the original value to be used in URLs, you can set the
+``FORCE_SCRIPT_NAME`` setting in your main ``settings`` file. This sets the
+script name uniformly for every URL served via that settings file. Thus you'll
+need to use different settings files is you want different sets of URLs to
+have different script names in this case, but that is a rare situation.
+
+As an example of how to use it, if your Django configuration is serving all of
+the URLs under ``'/'`` and you wanted to use this setting, you would set
+``FORCE_SCRIPT_NAME = ''`` in your settings file.
+
 

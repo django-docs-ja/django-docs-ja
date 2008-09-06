@@ -523,7 +523,7 @@ SQL と等価な検索を実行します::
 これらのメディア名のパスには ``MEDIA_URL`` の内容が前置されます。また、
 `forms の通常のメディア定義`_ と同じ規則が当てはまります。
 
-.. _regular media definitions on forms: ../newforms/#media
+.. _regular media definitions on forms: ../forms/#media
 .. _`forms の通常のメディア定義`: `regular media definitions on forms`_
 
 .. _`InlineModelAdmin objects`:
@@ -593,7 +593,7 @@ Django は、 ``InlineModelAdmin`` のサブクラスとして、以下の二つ
 フォームセットが、初期のフォームに加えて表示する追加のフォーム数を制御しま
 す。詳しくは `formsets のドキュメント`_ を参照してください。
 
-.. _formsets documentation: ../newforms/#formsets
+.. _formsets documentation: ../forms/#formsets
 .. _`formsets のドキュメント`: `formsets documentation`_
 
 ``max_num``

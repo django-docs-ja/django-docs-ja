@@ -2,7 +2,7 @@
 フォームプレビュー
 ==================
 
-:revision-up-to: 8001 (1.0pre SVN)
+:revision-up-to: 8032 (1.0pre SVN)
 
 Django には、フォームプレビュー (form preview) アプリケーションが付属してい
 ます。フォームプレビューは「HTMLフォームを表示し、プレビューを行わせ、フォー
@@ -16,9 +16,8 @@ Django には、フォームプレビュー (form preview) アプリケーショ
 概要
 =====
 
-フォームプレビューフレームワークは、
-``django.contrib.formtools.preview.FormPreview`` のサブクラスを定義すること
-で、以下のワークフローを管理できるようにします:
+フォームプレビューフレームワークは、 ``django.forms.Form`` のサブクラスを定
+義するだけで、以下のワークフローを管理できるようにします:
 
     1. フォームを HTML 形式で Web ページ上に表示します。
     2. フォームデータが POST で提出されると、データを検証します。
@@ -69,7 +68,7 @@ Django には、フォームプレビュー (form preview) アプリケーショ
 
            from myapp.preview import SomeModelFormPreview
            from myapp.models import SomeModel
-           from django import newforms as forms
+           from django import forms
 
        そして、 URLconf に以下の行を追加します。モデルからフォームを生成す
        るなら、以下のようにするとよいでしょう::

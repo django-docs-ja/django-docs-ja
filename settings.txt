@@ -2,7 +2,7 @@
 Django の設定
 =============
 
-:revision-up-to: 8001 (1.0pre SVN)
+:revision-up-to: 8032 (1.0pre SVN)
 
 Django の設定ファイルには、インストールした Django の使う全ての設定が入って
 います。このドキュメントでは、各設定の役割と、どのような設定を利用できるか
@@ -613,6 +613,18 @@ FIXTURE_DIRS
 ん。 `Django アプリケーションのテスト <../testing/>`_ も参照してください。
 
 .. _Testing Django Applications: ../testing/
+
+.. TBD::
+
+FORCE_SCRIPT_NAME
+------------------
+
+デフォルト値: ``None``
+
+If not ``None``, this will be used as the value of the ``SCRIPT_NAME``
+environment variable in any HTTP request. This setting can be used to override
+the server-provided value of ``SCRIPT_NAME``, which may be a rewritten version
+of the preferred value or not supplied at all.
 
 
 IGNORABLE_404_ENDS

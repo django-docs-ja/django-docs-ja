@@ -2,7 +2,7 @@
 モデル API リファレンス
 =======================
 
-:revision-up-to: 8001 (1.0pre SVN)
+:revision-up-to: 8032 (1.0pre SVN)
 
 モデルとは、サイトを構成するデータの、ただ一つかつ最終的なデータソースを指
 します。モデルには、保存したいデータに不可欠なデータフィールドと、その振舞
@@ -769,7 +769,8 @@ HTML を含めてもかまいません::
 Django にはほんの少しだけバリデータがついてきます。バリデータは
 ``django.core.validators`` に収められています。
 
-.. _`バリデータのドキュメント`: ../forms/#validators
+.. _validator docs: ../oldforms/#validators
+.. _`バリデータのドキュメント`: `validator docs`_
 
 .. _Verbose field names:
 

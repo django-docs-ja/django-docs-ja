@@ -2,7 +2,7 @@
 フォームウィザード (Form wizard)
 =================================
 
-:revision-up-to: 8001 (1.0pre SVN)
+:revision-up-to: 8032 (1.0pre SVN)
 
 **開発版の Django で新たに登場した機能です。**
 
@@ -22,8 +22,8 @@ Django には、`フォーム`_ を複数のページに分割する「フォー
 
 .. _explained on Wikipedia: http://en.wikipedia.org/wiki/Wizard_%28software%29
 .. _`Wikipedia で解説されています`: http://ja.wikipedia.org/wiki/ウィザード_%28ソフトウェア%29
-.. _forms: ../newforms/
-.. _`フォーム`: ../newforms/
+.. _forms: ../forms/
+.. _`フォーム`: `forms`_
 
 .. _How it works:
 
@@ -51,7 +51,7 @@ Django には、`フォーム`_ を複数のページに分割する「フォー
 このアプリケーションは、可能な限り処理を自動化しています。基本的には、開発
 者側で行う必要があるのは以下の 4 つの作業だけです:
 
-    1. ``django.newforms`` のフォームクラスをウィザードの各ページごとに作成
+    1. ``django.forms`` のフォームクラスをウィザードの各ページごとに作成
        します。
     2. ``FormWizard`` クラスを作成して、全てのフォームが提出され、フォーム
        データが有効だった場合の処理を記述します。同時に、ウィザードの挙動も
@@ -67,8 +67,8 @@ Django には、`フォーム`_ を複数のページに分割する「フォー
 =========================
 
 フォームウィザード作成の最初のステップは、フォームクラスの作成です。
-フォームの作成には ``django.newforms`` の ``Form`` クラスを使わねばなりませ
-ん。 ``Form`` クラスの開設は `newforms のドキュメント`_ を参照してください。
+フォームの作成には ``django.forms`` の ``Form`` クラスを使わねばなりませ
+ん。 ``Form`` クラスの開設は `forms のドキュメント`_ を参照してください。
 
 フォームクラスはコードベースのどこに置いてもかまいませんが、慣習的には
 アプリケーションフォルダの ``forms.py`` に置くことになっています。
@@ -78,7 +78,7 @@ Django には、`フォーム`_ を複数のページに分割する「フォー
 ページでメッセージ本体を入力させます。 ``forms.py`` は以下のようになるでしょ
 う::
 
-    from django import newforms as forms
+    from django import forms
 
     class ContactForm1(forms.Form):
         subject = forms.CharField(max_length=100)
@@ -91,8 +91,8 @@ Django には、`フォーム`_ を複数のページに分割する「フォー
 フィールドを使うため、最後のページに表示するフォーム以外では ``FileField``
 を使えません。
 
-.. _newforms documentation: ../newforms/
-..  _`newforms のドキュメント`: `newforms documentation`_
+.. _forms documentation: ../forms
+..  _`forms のドキュメント`: `forms documentation`_
 
 .. _Creating a FormWizard class:
 
@@ -112,7 +112,7 @@ Django には、`フォーム`_ を複数のページに分割する「フォー
 の引数が渡されます:
 
     * ``request`` -- HttpRequest_ オブジェクトです。
-    * ``form_list`` -- ``django.newforms`` のフォームクラスからなるリストで
+    * ``form_list`` -- ``django.forms`` のフォームクラスからなるリストで
       す。
 
 以下の簡単な例では、データベースの操作を行わずに、単に検証済みのデータをテ
@@ -236,7 +236,7 @@ Django には、`フォーム`_ を複数のページに分割する「フォー
     def prefix_for_step(self, step):
         return str(step)
 
-.. _form prefix documentation: ../newforms/#prefixes-for-forms
+.. _form prefix documentation: ../forms/#prefixes-for-forms
 .. _`フォームプレフィクスのドキュメント`: `form prefix documentation`_
 
 ``render_hash_failure``

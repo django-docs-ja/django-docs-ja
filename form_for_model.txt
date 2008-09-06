@@ -2,7 +2,7 @@
 モデルに対応したフォームの生成
 ===============================
 
-:revision-up-to: 8001 (1.0pre SVN)
+:revision-up-to: 8032 (1.0pre SVN)
 
 .. admonition:: 注意
 
@@ -25,14 +25,14 @@
 ``form_for_model()``
 --------------------
 
-``django.newforms.form_for_model()`` メソッドは、引数に指定したモデルの定義
+``django.forms.form_for_model()`` メソッドは、引数に指定したモデルの定義
 に従ってフォームを生成します。このメソッドは、モデルクラスを渡すとフォーム
 クラスを返します。フォームクラスの中には、モデル中の各フィールドに対応した
 フォームフィールドが入っています。
 
 例を示します::
 
-    >>> from django.newforms import form_for_model
+    >>> from django.forms import form_for_model
 
     # Create the form class.
     >>> ArticleForm = form_for_model(Article)
@@ -103,10 +103,10 @@
 ``ForeignKey`` と ``ManyToManyField`` モデルフィールド型は特別なケースとし
 て扱われます:
 
-    * ``ForeignKey`` は ``django.newforms.ModelChoiceField`` になります。
+    * ``ForeignKey`` は ``django.forms.ModelChoiceField`` になります。
       これは選択肢が ``QuerySet`` の内容であるような ``ChoiceField`` です。
 
-    * ``ManyToManyField`` は ``django.newforms.ModelMultipleChoiceField``
+    * ``ManyToManyField`` は ``django.forms.ModelMultipleChoiceField``
       で表されます。これは選択肢が ``QuerySet`` の内容であるような
       ``MultipleChoiceField`` です。
 
@@ -250,7 +250,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``form_for_model()`` が生成するフォームにカスタムのメソッドを追加したい場合、
-``django.newfdorms.BaseForm`` を拡張して、その中にカスタムメソッドを入れま
+``django.forms.BaseForm`` を拡張して、その中にカスタムメソッドを入れま
 す。そして、 ``form_for_model()`` を呼び出す際に、 ``form`` パラメタに自作
 のフォームを指定してベースクラスにさせます::
 
@@ -445,8 +445,8 @@
 ドが ``POST`` でない場合のブロックでは、 ``message`` インスタンスの値がフォー
 ムフィールドの初期値に使われるということです。
 
-.. _contact form: ../newforms/#simple-view-example
-.. _`simple example view`: ../newforms/#simple-view-example
+.. _contact form: ../forms/#simple-view-example
+.. _`simple example view`: ../forms/#simple-view-example
 .. _`コンタクトフォーム`: `contact form`_
 
 

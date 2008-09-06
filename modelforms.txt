@@ -1,8 +1,8 @@
 ================================
-newforms とモデルを組み合わせる
+forms とモデルを組み合わせる
 ================================
 
-:revision-up-to: 8001 (1.0pre SVN)
+:revision-up-to: 8032 (1.0pre SVN)
 
 ``ModelForm``
 =============
@@ -18,7 +18,7 @@ newforms とモデルを組み合わせる
 
 以下に例を示します::
 
-    >>> from django.newforms import ModelForm
+    >>> from django.forms import ModelForm
 
     # フォームクラスを生成
     >>> class ArticleForm(ModelForm):
@@ -93,11 +93,11 @@ newforms とモデルを組み合わせる
 お気付きかもしれませんが、 ``ForeignKey`` や ``ManyToManyField`` といったモ
 デルフィールドは特別扱いされています:
 
-    * ``ForeignKey`` は ``django.newforms.ModelChoiceField`` で表現されてお
+    * ``ForeignKey`` は ``django.forms.ModelChoiceField`` で表現されてお
       います。 ``ModelChoiceField`` は、選択肢がモデルの ``QuerySet`` であ
       るような ``ChoiceField`` です。
 
-    * ``ManyToManyField`` は ``django.newforms.ModelMultipleChoiceField``
+    * ``ManyToManyField`` は ``django.forms.ModelMultipleChoiceField``
        で表現されています。 ``ModelMultipleChoiceField`` は、選択肢がモデル
        の ``QuerySet`` であるような ``MultipleChoiceField`` です。
 
@@ -136,7 +136,7 @@ newforms とモデルを組み合わせる
 以下のような一連のモデルを考えましょう::
 
     from django.db import models
-    from django.newforms import ModelForm
+    from django.forms import ModelForm
 
     TITLE_CHOICES = (
         ('MR', 'Mr.'),
@@ -260,14 +260,14 @@ newforms とモデルを組み合わせる
     >>> new_author = f.save()
 
 ``save()`` および ``save_m2m()`` メソッド以外は、 ``ModelForm``
-``newforms`` で作られたフォームと全く同じように動作します。例えば、
+``forms`` で作られたフォームと全く同じように動作します。例えば、
 データの検証は ``is_valid()`` で行えますし、 ``is_multipart()``
 メソッドを使えばフォームがマルチパートのファイルアップロードを要求している
 かどうか (そして ``request.FILES`` をフォームに渡さなければならないかどうか)判
-別できます。詳しくは、 `newforms のドキュメント`_ を参照してください。
+別できます。詳しくは、 `forms のドキュメント`_ を参照してください。
 
-.. _the standard newforms documentation: ../newforms/
-.. _`newforms のドキュメント`: `the standard newforms documentation`_
+.. _the standard forms documentation: ../forms/
+.. _`forms のドキュメント`: `the standard forms documentation`_
 
 .. _Using a subset of fields on the form:
 
@@ -418,7 +418,7 @@ Author モデルには ``'name'``, ``'title'``, ``'birth_date'`` の 3 つ
 れた特殊なフォームセットクラスがあります。上の ``Author`` モデルを使って説
 明しましょう::
 
-    >>> from django.newforms.models import modelformset_factory
+    >>> from django.forms.models import modelformset_factory
     >>> AuthorFormSet = modelformset_factory(Author)
 
 これで、 ``Author`` モデルに関連づけられたデータを扱えるフォームセットが生
@@ -453,7 +453,7 @@ Author モデルには ``'name'``, ``'title'``, ``'birth_date'`` の 3 つ
 
 サブクラスを使ったアプローチでも指定できます::
 
-    from django.newforms.models import BaseModelFormSet
+    from django.forms.models import BaseModelFormSet
     
     class BaseAuthorFormSet(BaseModelFormSet):
         def get_queryset(self):
@@ -534,7 +534,7 @@ Author モデルには ``'name'``, ``'title'``, ``'birth_date'`` の 3 つ
 ``Author`` と ``Book`` という二つのモデルがあるとしましょう。特定の作者
 (author) の本を扱うフォームセットを生成したければ、以下のようにします::
 
-    >>> from django.newforms.models import inlineformset_factory
+    >>> from django.forms.models import inlineformset_factory
     >>> BookFormSet = inlineformset_factory(Author, Book)
     >>> author = Author.objects.get(name=u'Orson Scott Card')
     >>> formset = BookFormSet(instance=author)

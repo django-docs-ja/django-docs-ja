@@ -2,7 +2,7 @@
 mod_python で Django を動かす
 =============================
 
-:revision-up-to: 8001 (1.0pre SVN)
+:revision-up-to: 8032 (1.0pre SVN)
 
 Django をプロダクションサーバ上で動かす設定として、現状では Apache_ と
 `mod_python`_ の組み合わせを推奨しています。
@@ -37,6 +37,7 @@ mod_python モジュールが有効になっていることを確かめます。
         SetHandler python-program
         PythonHandler django.core.handlers.modpython
         SetEnv DJANGO_SETTINGS_MODULE mysite.settings
+	PythonOption django.root /mysite
         PythonDebug On
     </Location>
 
@@ -47,6 +48,26 @@ import パスになるよう、自分の環境に合わせて置き換えて下�
 処理には Django mod_python ハンドラを使うように」命令します。また、
 ``DJANGO_SETTINGS_MODULE`` を渡して、 mod_python にどこに設定ファイルがある
 のか教えます。
+
+.. TBD::
+
+**New in Django development version:** Because mod_python does not know we are
+serving this site from underneath the ``/mysite/`` prefix, this value needs to
+be passed through to the mod_python handler in Django, via the ``PythonOption
+django.root ...`` line. The value set on that line (the last item) should
+match the string given in the ``<Location ...>`` directive. The effect of this
+is that Django will automatically strip the ``/mysite`` string from the front
+of any URLs before matching them against your ``URLConf`` patterns. If you
+later move your site to live under ``/mysite2``, you will not have to change
+anything except the ``django.root`` option in the config file.
+
+When using ``django.root`` you should make sure that what's left, after the
+prefix has been removed, begins with a slash. Your URLConf patterns that are
+expecting an initial slash will then work correctly. In the above example,
+since we want to send things like ``/mysite/admin/`` to ``/admin/``, we need
+to remove the string ``/mysite`` from the beginning, so that is the
+``django.root`` value. It would be an error to use ``/mysite/`` (with a
+trailing slash) in this case.
 
 上の例では ``<Directory>``  ではなく ``<Location>`` ディレクティブを使って
 います。前者はファイルシステム上の場所を指定するのに使い、後者はウェブサイ
@@ -62,6 +83,7 @@ import パスになるよう、自分の環境に合わせて置き換えて下�
         SetHandler python-program
         PythonHandler django.core.handlers.modpython
         SetEnv DJANGO_SETTINGS_MODULE mysite.settings
+        PythonOption django.root /mysite
         PythonDebug On
         **PythonPath "['/path/to/project'] + sys.path"**
     </Location>

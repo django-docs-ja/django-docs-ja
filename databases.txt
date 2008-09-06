@@ -2,7 +2,7 @@
 データベースのサポート状況
 ==========================
 
-:revision-up-to: 8001 (1.0pre SVN)
+:revision-up-to: 8032 (1.0pre SVN)
 
 Django は可能な限り全てのデータベースバックエンドをサポートしようとしていま
 すが，残念ながら全てのサーバが全く同じ仕様というわけではないので，どの機能
@@ -228,8 +228,8 @@ Oracle で ``python manage.py syncdb`` コマンドを動かすには、デー�
 
 Django のテストスイートを実行させるには、 *さらに* 以下の権限が必要です:
 
- 	* CREATE DATABASE
-	* DROP DATABASE
+ 	* CREATE USER
+	* DROP USER
 	* CREATE TABLESPACE
 	* DROP TABLESPACE
 

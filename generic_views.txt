@@ -2,7 +2,7 @@
 汎用ビュー
 ==========
 
-:revision-up-to: 8001 (1.0pre SVN)
+:revision-up-to: 8032 (1.0pre SVN)
 
 Web アプリケーションの作成は、同じパターンを何度も何度も繰り返し書くことに
 なるため、退屈なものです。 Django では、そんなパターンに共通する部分のほと
@@ -980,10 +980,12 @@ pagination に関する注意
 **開発版の Django で変更された仕様:**
 
 ``django.views.generic.create_update.create_object`` や
-``django.views.generic.create_update.update_object`` は、 `newforms`_ を使っ
-てフォームを生成・表示するようになりました。
+``django.views.generic.create_update.update_object`` は、 
+`forms ライブラリ`_ を使ってフォームを生成・表示するようになりました。
 
-.. _newforms: ../newforms/
+.. _forms library: ../forms/
+.. _`forms ライブラリ`: `forms library`_
+
 
 ``django.views.generic.create_update.create_object``
 ----------------------------------------------------
@@ -997,7 +999,7 @@ pagination に関する注意
 
     * ``form_class`` または ``model`` のいずれかを指定せねばなりません。
 
-      ``form_class`` を指定する場合には、 ``django.newforms.ModelForm``
+      ``form_class`` を指定する場合には、 ``django.forms.ModelForm``
       クラスのサブクラスを指定します。この引数は、モデルのフォームをカスタ
       マイズしたいときに使います。詳しくは `ModelForm のドキュメント`_ を参
       照してください。
@@ -1049,7 +1051,7 @@ pagination に関する注意
 ります:
 
     * ``form``: オブジェクトを編集するためのフォームを表現する
-      ``django.newforms.ModelForm`` インスタンスです。この変数を使うと、テ
+      ``django.forms.ModelForm`` インスタンスです。この変数を使うと、テ
       ンプレートシステム中でフォームフィールドを簡単に参照できます。
 
       例えば、モデルが  ``name`` と ``address`` という二つのフィールドを持っ
@@ -1061,15 +1063,15 @@ pagination に関する注意
           </form>
 
       ``Form`` オブジェクトをテンプレート内で使う方法の詳しい説明は、 
-      `newforms のドキュメント`_ を参照してください。
+      `forms のドキュメント`_ を参照してください。
 
 
 .. _authentication system: ../authentication/
-.. _ModelForm docs: ../modelforms/
-.. _newforms  documentation: ../newforms/
+.. _ModelForm docs: ../forms/modelforms
+.. _forms  documentation: ../forms/
 .. _`認証システム`: `authentication system`_
 .. _`ModelForm のドキュメント`: `ModelForm docs`_
-.. _`newforms のドキュメント`: `newforms documentation`_
+.. _`forms のドキュメント`: `forms documentation`_
 
 ``django.views.generic.create_update.update_object``
 ----------------------------------------------------
@@ -1083,7 +1085,7 @@ pagination に関する注意
 
     * ``form_class`` または ``model`` のいずれかを指定せねばなりません。
 
-      ``form_class`` を指定する場合には、 ``django.newforms.ModelForm``
+      ``form_class`` を指定する場合には、 ``django.forms.ModelForm``
       クラスのサブクラスを指定します。この引数は、モデルのフォームをカスタ
       マイズしたいときに使います。詳しくは `ModelForm のドキュメント`_ を参
       照してください。
@@ -1161,7 +1163,7 @@ pagination に関する注意
           </form>
 
       ``Form`` オブジェクトをテンプレート内で使う方法の詳しい説明は、 
-      `newforms のドキュメント`_ を参照してください。
+      `forms のドキュメント`_ を参照してください。
 
     * ``object``: オブジェクトです。この変数変の名前は
       ``template_object_name`` パラメタの値に依存し、そのデフォルト値は

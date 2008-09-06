@@ -2,7 +2,7 @@
 はじめての Django アプリ作成、その 2
 =====================================
 
-:revision-up-to: 8001 (1.0pre SVN)
+:revision-up-to: 8032 (1.0pre SVN)
 
 このチュートリアルは `チュートリアルその 1`_ の続きです。ここでは、引続き
 Web 投票アプリケーションの開発を例にして、Django が自動生成する管理サイト
@@ -37,13 +37,37 @@ admin サイトの有効化
 す:
 
     * ``INSTALLED_APPS`` 設定に ``"django.contrib.admin"`` を追加します。
+
     * ``python manage.py syncdb`` を実行します。新たなアプリケーションを
       ``INSTALLED_APPS`` に追加したので、データベースを更新せねばなりません。
+
     * ``mysite/urls.py`` ファイルを編集し、 "Uncomment this for admin:" と
       書かれた行の次の行のコメントアウトを解除します。このファイルは
       URLconf といいます。 URLconf についてはチュートリアルの次の部で解説し
       ます。今はただ、この設定が URL をアプリケーションに対応づけていること
-      だけを覚えておきましょう。
+      だけを覚えておきましょう。最終的に、 ``urls.py`` は以下のようになるは
+      ずです:
+      
+      .. parsed-literal::
+      
+          from django.conf.urls.defaults import *
+
+          # Uncomment the next two lines to enable the admin:
+          **from django.contrib import admin**
+          **admin.autodiscover()**
+
+          urlpatterns = patterns('',
+              # Example:
+              # (r'^{{ project_name }}/', include('{{ project_name }}.foo.urls')),
+
+              # Uncomment the next line to enable admin documentation:
+              # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
+
+              # Uncomment the next line for to enable the admin:
+              **(r'^admin/(.*)', admin.site.root),**
+          )
+          
+      (太字の行はコメントを外した部分です)
 
 開発サーバの起動
 ================

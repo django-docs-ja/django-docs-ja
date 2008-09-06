@@ -2,7 +2,7 @@
 "django.contrib" 下のアドオン
 =============================
 
-:revision-up-to: 8001 (1.0pre SVN)
+:revision-up-to: 8032 (1.0pre SVN)
 
 Django は Python の `"batteries included" 哲学`_ を目指しています。 Django
 には Web 開発における課題を解くための様々な外部オプションツールがついてきま
@@ -24,11 +24,14 @@ Django は Python の `"batteries included" 哲学`_ を目指しています。
 admin
 =====
 
-Django の自動化管理インタフェースです。詳しくは `チュートリアルその 2`_ を
+Django の自動化管理インタフェースです。詳しくは `チュートリアルその 2`_ と
+`admin のドキュメント`_ を
 参照してください。
 
-.. _`チュートリアルその 2`: ../tutorial02/
 .. _Tutorial 2: ../tutorial02/
+.. _admin documentation: ../admin/
+.. _`チュートリアルその 2`: `Tutorial 2`_
+.. _`admin のドキュメント`: `admin documentation`_
 
 auth_ および contenttypes_ パッケージをインストールしておく必要があります。
 
@@ -83,7 +86,7 @@ sites_ パッケージもインストールしておく必要があります。
 formtools
 =========
 
-Django の新しいフォーム (django.newforms) に対する高水準の抽象化インタフェー
+Django の新しいフォーム (django.forms) に対する高水準の抽象化インタフェー
 スです。
 
 django.contrib.formtools.preview

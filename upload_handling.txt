@@ -2,7 +2,7 @@
 ファイルアップロード
 ========================
 
-:revision-up-to: 8001 (1.0pre SVN)
+:revision-up-to: 8032 (1.0pre SVN)
 
 **開発版の Django で新たに追加された機能です**
 
@@ -24,7 +24,7 @@ Django がアップロードされたファイルを扱うとき、ファイル�
 
 ``FileField`` を含む以下のような簡単なフォームを考えてみましょう::
 
-    from django import newforms as forms
+    from django import forms
 
     class UploadFileForm(forms.Form):
         title = forms.CharField(max_length=50)
@@ -56,7 +56,7 @@ Django がアップロードされたファイルを扱うとき、ファイル�
             form = UploadFileForm()
         return render_to_response('upload.html', {'form': form})
 
-.. _binding uploaded files to a form: ../newforms/#binding-uploaded-files-to-a-form
+.. _binding uploaded files to a form: ../forms/#binding-uploaded-files-to-a-form
 .. _`アップロードファイルデータをフォームに結びつける`: `binding uploaded files to a form`_
 
 ``request.FILES`` を明示的にフォームのコンストラクタに渡さねばならないので

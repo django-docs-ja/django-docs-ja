@@ -2,7 +2,7 @@
 localflavor アドオン
 ==========================
 
-:revision-up-to: 8001 (1.0pre SVN)
+:revision-up-to: 8032 (1.0pre SVN)
 
 Python の「バッテリ入り (batteries included)」哲学に従って、 Django には様々
 な国や文化のための有用なコードが付属しています。こうしたコードは
@@ -12,7 +12,7 @@ Python の「バッテリ入り (batteries included)」哲学に従って、 Dja
 ``localflavor`` パッケージは、各国、各文化圏のコードを、それぞれ
 `ISO 3166 国別コード`_ に従って名付けたサブパッケージにまとめています。
 
-``localflavor`` アドオンの大部分は、 newforms_ フレームワークから導出された、
+``localflavor`` アドオンの大部分は、 forms_ フレームワークから導出された、
 ローカライズされたフォームコンポーネントで占められています。例えば、
 ``USStateField`` にはアメリカの州名略号を検証する方法が組み込まれていますし、
 ``FISocialSecurityNumber`` は、フィンランドの社会保障番号の検証方法が組み
@@ -22,7 +22,7 @@ Python の「バッテリ入り (batteries included)」哲学に従って、 Dja
 例えば、フランスの電話番号を入力するためのフィールドを生成したければ、以下
 のようにします::
 
-    from django import newforms as forms
+    from django import forms
     from django.contrib.localflavor import fr
 
     class MyForm(forms.Form):
@@ -62,10 +62,10 @@ localflavor でサポートされている国
 
 ``localfravor`` パッケージ内には、 ``generic`` というサブパッケージもありま
 す。このパッケージは、複数の国や文化で便利なコードをまとめています。現状
-では、このモジュールには、アメリカの標準をデフォルトとしない、 newforms_ に
+では、このモジュールには、アメリカの標準をデフォルトとしない、 forms_ に
 基づいた日付や時刻の入力フィールドが入っています。使い方を以下に示します::
 
-    from django import newforms as forms
+    from django import forms
     from django.contrib.localflavor import generic
 
     class MyForm(forms.Form):
@@ -97,7 +97,7 @@ localflavor でサポートされている国
 .. _Switzerland: `Switzerland (django.contrib.localflavor.ch)`_
 .. _United Kingdom: `United Kingdom (django.contrib.localflavor.uk)`_
 .. _United States of America: `United States of America (django.contrib.localflavor.us)`_
-.. _newforms: ../newforms/
+.. _forms: ../forms/
 
 .. _`Adding flavors`:
 

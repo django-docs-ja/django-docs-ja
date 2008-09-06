@@ -2,7 +2,7 @@
 カスタムのモデルフィールド
 ===========================
 
-:revision-up-to: 8001 (1.0pre SVN)
+:revision-up-to: 8032 (1.0pre SVN)
 
 **開発版の Django で新たに追加された機能です**
 
@@ -121,7 +121,7 @@ Django のフィールド型 (このドキュメントで *フィールド* と�
 すが、さしあたっては、全ては ``Field`` から継承していて、その中からクラスの
 挙動の鍵になる部分をカスタマイズするのだと考えておけば十分です。
 
-.. _form fields: ../newforms/#fields
+.. _form fields: ../forms/#fields
 .. _`フォームフィールド`: `form fields`_
 
 Django のフィールドクラスは、モデルの属性値を保存するためのオブジェクトでは
@@ -516,8 +516,8 @@ Django からこの型を使うには、以下のように ``Field`` をサブ�
 (そして、 ``MyFormField`` でデフォルトのウィジェットを定義しています)。カス
 タムのフォームフィールドの定義方法は、このドキュメントでは扱いません。
 
-.. _helper functions: ../newforms/#generating-forms-for-models
-.. _forms documentation: ../newforms/
+.. _helper functions: ../forms/#generating-forms-for-models
+.. _forms documentation: ../forms/
 .. _`ヘルパ関数`: `helper functions`_
 .. _`forms のドキュメント`: `forms documentation`_
 

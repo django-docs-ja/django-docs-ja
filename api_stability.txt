@@ -2,7 +2,7 @@
 API の安定性
 ============
 
-:revision-up-to: 8001 (1.0pre SVN)
+:revision-up-to: 8032 (1.0pre SVN)
 
 Django はまだリリース 1.0 に到達していませんが、 Django の公開 API の大半は
 リリース 0.95 をもってほぼ安定したといえます。このドキュメントでは、1.0 の
@@ -123,7 +123,7 @@ APIの安定性とは
 .. _template language: ../templates/
 .. _transactions: ../transactions/
 .. _url dispatch: ../url_dispatch/
-.. _forms and validation: ../forms/
+.. _forms and validation: ../oldforms/
 .. _serialization: ../serialization/
 .. _authentication: ../authentication/
 
