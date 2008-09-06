@@ -1,191 +1,181 @@
 .TH "django-admin.py" "1" "March 2008" "Django Project" ""
 .SH "NAME"
-django\-admin.py \- Django web フレームワークのためのユーティリティスクリプト
-.SH "文法"
+django\-admin.py \- Utility script for the Django web framework
+.SH "SYNOPSIS"
 .B django\-admin.py
-.I <操作>
-.B [オプション]
+.I <action>
+.B [options]
 .sp
-.SH "説明"
-このユーティリティスクリプトを使うと， Django のプロジェクトや
-アプリケーションの生成やメンテナンスのためのコマンドを実行できます．
+.SH "DESCRIPTION"
+This utility script provides commands for creation and maintenance of Django
+projects and apps.
 .sp
-以下に示すコマンドは，
-.BI startproject
-を除いて， Django のプロジェクトディレクトリ直下にある
+With the exception of
+.BI startproject,
+all commands listed below can also be performed with the
 .BI manage.py
-スクリプトを使っても実行できます．
+script found at the top level of each Django project directory.
 .sp
-.SH "操作"
-.TP
-.BI "adminindex [" "appname ..." "]"
-指定したアプリケーション向けに admin のインデクスページのテンプレートを
-出力します．
+.SH "ACTIONS"
 .TP
 .BI cleanup
-データベースから古いデータ (現状では期限切れのセッションデータのみ) を
-除去します。
+Cleans out old data from the database (only expired sessions at the moment).
 .TP
 .BI "compilemessages [" "\-\-locale=LOCALE" "]"
-組み込みの gettext で使うために、 .po ファイルを .mo ファイルにコン
-パイルします。
+Compiles .po files to .mo files for use with builtin gettext support.
 .TP
 .BI "createcachetable [" "tablename" "]"
-SQL キャッシュバックエンドが使うキャッシュテーブルを生成します．
+Creates the table needed to use the SQL cache backend
 .TP
 .B dbshell
-現在 DATABASE_ENGINE に指定しているデータベースのコマンドラインクライアント
-を起動します．
+Runs the command\-line client for the current
 .BI DATABASE_ENGINE.
 .TP
 .B diffsettings
-現在の
+Displays differences between the current
 .B settings.py
-と， Django のデフォルトの設定との差分を出力します．
-デフォルトの設定にない変数の行頭には "###" が出力されます．
+and Django's default settings. Settings that don't appear in the defaults are
+followed by "###".
 .TP
 .B inspectdb
-settings.py で指定したデータベーステーブルに対してイントロスペクションを行い，
-その結果を Django モデルモジュールにして出力します．
+Introspects the database tables in the database specified in settings.py and outputs a Django
+model module.
 .TP
 .BI "install [" "appname ..." "]"
-指定したアプリケーションに対して
+Executes
 .B sqlall
-の内容を実行します．
+for the given app(s) in the current database.
 .TP
-.BI "makemessages [" "\-\-locale=LOCALE" "] [" "\-\-domain=DOMAIN" "] [" "\-\-all" "]"
-カレントディレクトリ以下のソースツリー全体を走査して、翻訳対象としてマー
-クされている文字列を抽出します。Django のソースツリーなら conf/locale
-以下、プロジェクトまたはアプリケーションなら locale ディレクトリ以下に、
-作成あるいは更新されたメッセージファイルを保存します。
+.BI "makemessages [" "\-\-locale=LOCALE" "] [" "\-\-domain=DOMAIN" "] [" "\-\-extension=EXTENSION" "] [" "\-\-all" "]"
+Runs over the entire source tree of the current directory and pulls out all
+strings marked for translation. It creates (or updates) a message file in the
+conf/locale (in the django tree) or locale (for project and application) directory.
 .TP
 .BI "reset [" "appname ..." "]"
-指定したアプリケーションに対して
+Executes
 .B sqlreset
-の内容を実行します．
+for the given app(s) in the current database.
 .TP
 .BI "runfcgi [" "KEY=val" "] [" "KEY=val" "] " "..."
-プロジェクトを FastCGI のアプリケーションとして実行します．
-flup モジュールのインストールが必要です．
+Runs this project as a FastCGI application. Requires flup. Use
 .B runfcgi help
-を実行すると， KEY=val 対の説明を表示します．
+for help on the KEY=val pairs.
 .TP
 .BI "runserver [" "\-\-noreload" "] [" "\-\-adminmedia=ADMIN_MEDIA_PATH" "] [" "port|ipaddr:port" "]"
-開発用の軽量 Web サーバを起動します．
+Starts a lightweight Web server for development.
 .TP
 .BI "shell [" "\-\-plain" "]"
-Python 対話シェルを起動します． IPython がインストールされていれば，
-IPython を使います．
+Runs a Python interactive interpreter. Tries to use IPython, if it's available.
+The
 .BI \-\-plain
-オプションを指定すると，
-IPython がインストールされていても標準の Python 対話シェルを使います．
+option forces the use of the standard Python interpreter even when IPython is
+installed.
 .TP
 .BI "sql [" "appname ..." "]"
-指定したアプリケーション向けに CREATE TABLE を行うための SQL 文を生成します．
+Prints the CREATE TABLE SQL statements for the given app name(s).
 .TP
 .BI "sqlall [" "appname ..." "]"
-指定したアプリケーション向けに CREATE TABLE と初期データの投入，および
-CREATE INDEX を行うための SQL 文を生成します．
+Prints the CREATE TABLE, initial\-data and CREATE INDEX SQL statements for the
+given model module name(s).
 .TP
 .BI "sqlclear [" "appname ..." "]"
-指定したアプリケーション向けに DROP TABLE を行うための SQL 文を生成します．
+Prints the DROP TABLE SQL statements for the given app name(s).
 .TP
 .BI "sqlindexes [" "appname ..." "]"
-指定したアプリケーション向けに CREATE INDEX を行うための SQL 文を生成します．
+Prints the CREATE INDEX SQL statements for the given model module name(s).
 .TP
 .BI "sqlinitialdata [" "appname ..." "]"
-指定したアプリケーション向けに初期データの INSERT を行うための
-SQL 文を生成します．
+Prints the initial INSERT SQL statements for the given app name(s).
 .TP
 .BI "sqlreset [" "appname ..." "]"
-指定したアプリケーション向けに DROP TABLE および CREATE TABLE を行うための
-SQL 文を生成します．
+Prints the DROP TABLE SQL, then the CREATE TABLE SQL, for the given app
+name(s).
 .TP
 .BI "sqlsequencereset [" "appname ..." "]"
-指定したアプリケーション向けに PostgreSQL
-シークエンスをリセットするための SQL 文を出力します．
+Prints the SQL statements for resetting PostgreSQL sequences for the
+given app name(s).
 .TP
 .BI "startapp [" "appname" "]"
-現在のディレクトリの直下に， 指定した名前の Django アプリケーション
-のディレクトリ構造を作成します．
+Creates a Django app directory structure for the given app name in
+the current directory.
 .TP
 .BI "startproject [" "projectname" "]"
-現在のディレクトリ下に，指定したディレクトリ名で
-Django のプロジェクトディレクトリ構造を作成します．
+Creates a Django project directory structure for the given project name
+in the current directory.
 .TP
 .BI syncdb
-INSTALLED_APPS に登録されている全てのアプリケーションの
-データベーステーブルを生成し，初期データを投入します．
+Creates the database tables for all apps in INSTALLED_APPS whose tables
+haven't already been created.
 .TP
 .BI "test [" "\-\-verbosity" "] [" "appname ..." "]"
-指定したアプリケーション内の全てのテストを実行します．
-アプリケーションを指定しない場合，プロジェクト全体のテストを実行します．
+Runs the test suite for the specified applications, or the entire project if
+no apps are specified
 .TP
 .BI validate
-インストール済みの全てのモデルを検証します．
-.SH "オプション"
+Validates all installed models.
+.SH "OPTIONS"
 .TP
 .I \-\-version
-プログラムのバージョン番号を出力して終了します．
+Show program's version number and exit.
 .TP
 .I \-h, \-\-help
-ヘルプメッセージを出力して終了します．
+Show this help message and exit.
 .TP
 .I \-\-settings=SETTINGS
-設定モジュールのある場所への Python パスです．この変数を指定しない
-場合，環境変数 DJANGO_SETTINGS_MODULE を使います．
+Python path to settings module, e.g. "myproject.settings.main". If
+this isn't provided, the DJANGO_SETTINGS_MODULE environment variable
+will be used.
 .TP
 .I \-\-pythonpath=PYTHONPATH
-Python パスに加えたいディレクトリを指定します．
-"/home/djangoprojects/myproject" のように指定します．
+Lets you manually add a directory the Python path,
+e.g. "/home/djangoprojects/myproject".
 .TP
 .I \-\-plain
-IPython がインストールされている場合， "shell" コマンドで IPython が起動
-されるのを抑制し，通常の Python 対話シェルを使います．
+Use plain Python, not IPython, for the "shell" command.
 .TP
 .I \-\-noinput
-ユーザに入力プロンプトを表示しません．
+Do not prompt the user for input.
 .TP
 .I \-\-noreload
-開発サーバの自動リロード機能を無効化します．
+Disable the development server's auto\-reloader.
 .TP
 .I \-\-verbosity=VERBOSITY
-メッセージの出力レベルです: 0 は最小限， 1 は通常， 2 は全ての
-メッセージを出力します．
+Verbosity level: 0=minimal output, 1=normal output, 2=all output.
 .TP
 .I \-\-adminmedia=ADMIN_MEDIA_PATH
-開発サーバを起動する際に， admin メディアファイルの置場所として使う
-ディレクトリを指定します．
+Specifies the directory from which to serve admin media when using the development server.
 .TP
 .I \-l, \-\-locale=LOCALE
-ロケールです。makemessages や compilemessages で使われます。
+The locale to process when using makemessages or compilemessages.
 .TP
 .I \-d, \-\-domain=DOMAIN
-メッセージファイルのドメイン (デフォルトは "django") です。
-makemessages で使われます。
+The domain of the message files (default: "django") when using makemessages.
+.TP
+.I \-e, \-\-extension=EXTENSION
+The file extension(s) to examine (default: ".html", separate multiple
+extensions with commas, or use -e multiple times).
 .TP
 .I \-a, \-\-all
-makemessages にこのオプションを指定すると、全てのロケールを処理します。
-.SH "環境変数"
+Process all available locales when using makemessages..SH "ENVIRONMENT"
 .TP
 .I DJANGO_SETTINGS_MODULE
+In the absence of the
 .BI \-\-settings
-オプションを指定しない場合，この環境変数で指定された
-設定ファイルモジュールを読み込みます． "myproject.settings" のように，
-Python の import パス表記で設定せねばなりません．
-.SH "参考"
-各オプションの詳しい説明と用例，および Django フレームワーク全般の
-解説は，Django 開発サイト:
+option, this environment variable defines the settings module to be read.
+It should be in Python-import form, e.g. "myproject.settings".
+
+.SH "SEE ALSO"
+Full descriptions of all these options, with examples, as well as documentation
+for the rest of the Django framework, can be found on the Django site:
 .sp
-.I http://www.djangoproject.com/documentation/
+.I http://docs.djangoproject.com/en/dev/
 .sp
-か，配布物中のドキュメントを参照してください．
-.SH "作者/クレジット"
-オリジナルのバージョンは米国カンザス州ローレンスの World Online
-によって開発されました．貢献者一覧は Django 配布物の AUTHORS ファイルを
-参照してください．
+or in the distributed documentation.
+.SH "AUTHORS/CREDITS"
+Originally developed at World Online in Lawrence, Kansas, USA. Refer to the
+AUTHORS file in the Django distribution for contributors.
 .sp
-.SH "ライセンス"
-新 BSD ライセンスです．ライセンス全文は， Django 配布物の LICENSE
-ファイルを参照してください．
+.SH "LICENSE"
+New BSD license. For the full license text refer to the LICENSE file in the
+Django distribution.
 

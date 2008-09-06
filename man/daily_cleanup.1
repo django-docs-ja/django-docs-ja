@@ -1,36 +1,34 @@
 .TH "daily_cleanup.py" "1" "August 2007" "Django Project" ""
 .SH "NAME"
-daily_cleanup.py \- Django ウェブフレームワークのためのデータベース整
-理ユーティリティ
+daily_cleanup.py \- Database clean-up for the Django web framework
 .SH "SYNOPSIS"
 .B daily_cleanup.py
 
 .SH "DESCRIPTION"
-Django データベースから、無効なセッションデータを除去します。すなわち、
-このスクリプトの実行時刻より前に有効期限の切れているセッションデータを
-全て削除します。
+Removes stale session data from a Django database. This means, any session data
+which has an expiry date prior to the date the script is run.
 .sp
-このスクリプトは手動でも実行できますし、
+The script can be run manually or can be scheduled to run at regular
+intervals as a
 .BI cron
-ジョブの形で定期実行させてもかまいません。
+job.
 
 .SH "ENVIRONMENT"
 .TP
 .I DJANGO_SETTINGS_MODULE
-スクリプトが読むべき設定モジュールを指定するための環境変数です。
-"myproject.settings" のように Python のモジュール import 形式で指定し
-ます。
+This environment variable defines the settings module to be read.
+It should be in Python-import form, e.g. "myproject.settings".
 
 .SH "SEE ALSO"
-セッションのドキュメント:
+The sessions documentation:
 .sp
-.I http://www.djangoproject.com/documentation/sessions/
+.I http://docs.djangoproject.com/en/dev/topics/http/sessions/
 
 .SH "AUTHORS/CREDITS"
-このプログラムの最初のバージョンは、米国カンザス州ローレンスの World
-Online 社で開発されました。プログラムに寄与した開発者たちのリストは
-Django 配布物中の AUTHORS ファイルを参照してください。
+Originally developed at World Online in Lawrence, Kansas, USA. Refer to the
+AUTHORS file in the Django distribution for contributors.
 
 .SH "LICENSE"
-新 BSD ライセンス (New BSD license) です。完全な形式のライセンステキストは、 Django 配布物中の LICENSE ファイルを参照してください。
+New BSD license. For the full license text refer to the LICENSE file in the
+Django distribution.
 

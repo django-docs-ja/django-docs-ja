@@ -1,147 +1,183 @@
+.. _index:
+
 ====================
-Django ドキュメント
+Django documentation
 ====================
 
-.. admonition:: 和訳ドキュメントについて
+.. rubric:: Everything you need to know about Django (and then some).
 
-   このドキュメントは、 Django ユーザ有志によって、
-   `Django <http://djangoproject.com/>`_ の標準ドキュメントを和訳したもので
-   す。
+Getting help
+============
 
-:底本: SVN trunk (0.97pre SVN)
-:翻訳: Yasushi Masuda (ymasuda at ethercube dot com), Takanao Endoh (takanao at endoh dot tk)
-:追従済みリビジョン: 8032 (2008/07/22)
+Having trouble? We'd like to help!
 
-必須のドキュメント
-=====================
+* Try the :ref:`FAQ <faq-index>` -- it's got answers to many common questions.
 
-.. toctree::
-   :maxdepth: 1
-   
-   overview
-   install
-   tutorial01
-   tutorial02
-   tutorial03
-   tutorial04
-   faq
-   documentation
-   
-リファレンス
-==============
+* Looking for specific information? Try the :ref:`genindex`, :ref:`modindex` or
+  the :ref:`detailed table of contents <contents>`.
 
-.. toctree::
-   :maxdepth: 1
-   
-   distributions
-   django-admin
-   model-api
-   db-api
-   transactions
-   templates
-   templates_python
-   forms
-   upload_handling
-   modelforms
-   admin
-   testing
-   sessions
-   cache
-   settings
-   url_dispatch
-   request_response
-   generic_views
-   authentication
-   shortcuts
-   unicode
-   pagination
-   serialization
-   i18n
-   middleware
-   custom_model_fields
-   databases
-   
-``django.contrib`` のアドオン
--------------------------------
+* Search for information in the `archives of the django-users mailing list`_, or
+  `post a question`_
+  
+* Ask a question in the `#django IRC channel`_, or search the `IRC logs`_ to see
+  if its been asked before
 
-.. toctree::
-   :maxdepth: 1
-   
-   add_ons
-   contenttypes
-   csrf
-   databrowse
-   flatpages
-   form_preview
-   form_wizard
-   localflavor
-   redirects
-   sites
-   sitemaps
-   syndication_feeds
-   webdesign
-   
-デプロイ
-----------
+* Report bugs with Django in our `ticket tracker`_.
 
-.. toctree::
-   :maxdepth: 1
+.. _archives of the django-users mailing list: http://groups.google.com/group/django-users/
+.. _post a question: http://groups.google.com/group/django-users/
+.. _#django IRC channel: irc://irc.freenode.net/django
+.. _IRC logs: http://oebfare.com/logger/django/
+.. _ticket tracker: http://code.djangoproject.com/
 
-   modpython
-   fastcgi
+First steps
+===========
+
+:ref:`Overview <intro-overview>`
+    See what writing a database-driven application with Django looks like.
     
-特殊な問題の解決法
-------------------
-
-.. toctree::
-   :maxdepth: 1
-
-   apache_auth
-   static_files
-   email
-   legacy_databases
-   outputting_pdf
-   outputting_csv
+:ref:`Installation <intro-install>`
+    Get Django installed on your computer.
     
-その他
--------
+Tutorial: Writing your first Django application
+===============================================
 
-.. toctree::
-   :maxdepth: 1
+:ref:`Part 1 <intro-tutorial01>`
+    Get set up, create models, and play with the database API.
+    
+:ref:`Part 2 <intro-tutorial02>`
+    Explore the automatically-generated admin site.
+    
+:ref:`Part 3 <intro-tutorial03>`
+    Write the public interface views.
+    
+:ref:`Part 4 <intro-tutorial04>`
+    Learn how to process forms.
+        
+Using Django
+============
 
-   design_philosophies
-   contributing
-   admin_css
-   api_stability
+:ref:`Models <topics-db-index>`
+    Design a single, definitive source of data about your data.
+    
+:ref:`Handling web requests <topics-http-index>`
+    Handle web requests, map them to views, and return pages.
+    
+:ref:`Forms <topics-forms-index>`
+    Build and handle HTML forms.
+    
+:ref:`Templates <topics-templates>`
+    Develop the visual design of your site.
+    
+And more:
+---------
 
-ブランチの機能、または撤廃された機能
--------------------------------------
+    * :ref:`topics-auth`
+    * :ref:`topics-cache`
+    * :ref:`topics-email`
+    * :ref:`topics-files`
+    * :ref:`topics-i18n`
+    * :ref:`topics-install`
+    * :ref:`topics-pagination`
+    * :ref:`topics-serialization`
+    * :ref:`topics-settings`
+    * :ref:`topics-signals`
+    * :ref:`topics-testing`
+    * :ref:`topics-http-sessions`
+    
+Add-on ("contrib") applications
+===============================
 
-.. toctree::
-   :maxdepth: 1
+:ref:`Django's automatic admin site <ref-contrib-admin>`
+    Get a clean interface to your data with no effort at all.
+    
+:ref:`Form tools <ref-contrib-formtools-index>`
+    Easily handle complex form workflows.
+    
+:ref:`Syndication feeds <ref-contrib-syndication>`
+    Generate RSS and Atom feeds of your data.
+    
+:ref:`"Local flavor" <ref-contrib-localflavor>`
+    Give your site that special local touch.
+    
+And more:
+---------
 
-   form_for_model
-   oldforms
-   multiple_database_support
+    * :ref:`ref-contrib-comments-index`
+    * :ref:`ref-contrib-contenttypes`
+    * :ref:`ref-contrib-csrf`
+    * :ref:`ref-contrib-databrowse`
+    * :ref:`ref-contrib-flatpages`
+    * :ref:`ref-contrib-humanize`
+    * :ref:`ref-contrib-redirects`
+    * :ref:`ref-contrib-sitemaps`
+    * :ref:`ref-contrib-sites`
+    * :ref:`ref-contrib-webdesign`
 
-リリースノート
-----------------
+Solving specific problems
+=========================
 
-.. toctree::
-   :maxdepth: 1
+:ref:`Deployment <howto-deployment-index>`
+    Release your project to the world.
+    
+:ref:`Importing data from legacy databases <howto-legacy-databases>`
+    Use Django with an existing database or alongside other web development
+    toolkits.
 
-   release_notes_0.96
-   release_notes_0.95
+:ref:`Custom template tags <howto-custom-template-tags>`
+    Add your own extensions to Django's template language.
+    
+:ref:`Generating CSV <howto-outputting-csv>` & :ref:`PDF <howto-outputting-pdf>`
+    Produce non-HTML content with Django.
+    
+And more:
+---------
 
-リリース間の違いは、 `互換性のない変更`_ を参照してください。
-.. _`互換性のない変更`: http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
+    * :ref:`Authenticating in Apache <howto-apache-auth>`
+    * :ref:`howto-custom-file-storage`
+    * :ref:`howto-custom-management-commands`
+    * :ref:`howto-custom-model-fields`
+    * :ref:`howto-error-reporting`
+    * :ref:`howto-initial-data`
+    * :ref:`howto-jython`
+    * :ref:`howto-static-files`
 
-インデクスとテーブル
-=======================
+Reference
+=========
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+:ref:`Settings <ref-settings>`
+    See all of Django's settings and what they do.
+    
+:ref:`Request & response objects <ref-request-response>`
+    Understand the classes Django uses to represent HTTP requests and responses.
 
+:ref:`Model API reference <ref-models-index>`
+    Revel in the gory details of Django's model system.
+        
+:ref:`Form API reference <ref-forms-index>`
+    Learn the details of forms, fields, and widgets.
+    
+And more:
+---------
 
+    * :ref:`ref-databases`
+    * :ref:`ref-django-admin`
+    * :ref:`ref-files-index`
+    * :ref:`ref-generic-views`
+    * :ref:`ref-middleware`
+    * :ref:`ref-templates-index`
+    * :ref:`ref-unicode`
+    
+And all the rest
+================
 
+:ref:`Internals <internals-index>`
+    Learn how Django works under the hood, and how you can contribute to the
+    project.
+
+:ref:`Release notes <releases-index>`
+    See what is and was new in each release of Django.
+
+:ref:`Miscellany <misc-index>`
+    Stuff we can't find a more organized place for. Like that drawer in your
+    kitchen with the scissors, batteries, and duct tape.
