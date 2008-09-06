@@ -1,29 +1,33 @@
 .. _intro-overview:
 
-==================
-Django at a glance
-==================
+=============
+Django の概要
+=============
 
-Because Django was developed in a fast-paced newsroom environment, it was
-designed to make common Web-development tasks fast and easy. Here's an informal
-overview of how to write a database-driven Web app with Django.
+:revision-up-to: 8961 (1.0)
 
-The goal of this document is to give you enough technical specifics to
-understand how Django works, but this isn't intended to be a tutorial or
-reference -- but we've got both! When you're ready to start a project, you can
-:ref:`start with the tutorial <intro-tutorial01>` or :ref:`dive right into more
-detailed documentation <topics-index>`.
+Django は変転の激しいニュースルーム環境で開発された経緯から、よくある
+Web 開発タスクを迅速かつ簡単化するように設計されました。ここでは Django に
+よるデータベース中心の Web アプリケーション開発をざっと見てみましょう。
 
-Design your model
-=================
+このドキュメントの目的は、 Django の技術的な仕様について述べ、どのように動
+作するかを理解してもらうことにあり、チュートリアルやリファレンス用ではあり
+ません。とはいえ、チュートリアルもリファレンスも用意していますよ！
+プロジェクトを作成する準備ができたら、
+:ref:`チュートリアルをはじめる <intro-tutorial01>` か、 
+:ref:`より詳細なドキュメントに読み進んで <topics-index>` みてください。
+.. _Design your model:
 
-Although you can use Django without a database, it comes with an
-object-relational mapper in which you describe your database layout in Python
-code.
+モデルの設計
+============
 
-The :ref:`data-model syntax <topics-db-models>` offers many rich ways of
-representing your models -- so far, it's been solving two years' worth of
-database-schema problems. Here's a quick example::
+Django はデータベースなしでも使えます。とはいえ、 Django にはオブジェクト-
+リレーショナルマッパが付属していて、 Python コードでデータベースのレイアウ
+ト記述できるようになっています。
+
+Django の :ref:`データ-モデルシンタクス <topics-db-models>` はモデルを表現
+するための色々な方法を提供しています。この API には、この 2 年データベース
+スキーマ問題を解決してきた実績があります。簡単な例を示しましょう::
 
     class Reporter(models.Model):
         full_name = models.CharField(max_length=70)
@@ -34,106 +38,118 @@ database-schema problems. Here's a quick example::
     class Article(models.Model):
         pub_date = models.DateTimeField()
         headline = models.CharField(max_length=200)
-        content = models.TextField()
+	content = models.TextField()
         reporter = models.ForeignKey(Reporter)
 
         def __unicode__(self):
             return self.headline
 
-Install it
-==========
 
-Next, run the Django command-line utility to create the database tables
-automatically:
+.. _Install it:
+
+モデルのインストール
+====================
+
+次に、Django コマンドラインユーティリティを実行し、データベース上にテーブル
+を自動的に生成します:
 
 .. code-block:: bash
 
-    manage.py syncdb
+    django-admin.py syncdb
 
-The :djadmin:`syncdb` command looks at all your available models and creates
-tables in your database for whichever tables don't already exist.
+:djadmin:`syncdb` コマンドは利用可能な全てのモデルを探し、まだ作成されてい
+ないテーブルがあれば作成します。
 
-Enjoy the free API
-==================
 
-With that, you've got a free, and rich, :ref:`Python API <topics-db-queries>` to
-access your data. The API is created on the fly, no code generation necessary::
+.. _Enjoy the free API:
+
+自動生成される API で楽しむ
+===========================
+
+これだけで、制約のない充実した :ref:`Python API <topics-db-queries>` を使っ
+て自分のデータにアクセスできます。API はオンザフライで生成され、コードを作
+成する必要はありません::
 
     >>> from mysite.models import Reporter, Article
 
-    # No reporters are in the system yet.
+    # まだシステム上に Reporter はひとつもありません。
     >>> Reporter.objects.all()
     []
 
-    # Create a new Reporter.
+    # 新しい Reporter を作成します。
     >>> r = Reporter(full_name='John Smith')
 
-    # Save the object into the database. You have to call save() explicitly.
+    # オブジェクトをデータベースに保存します。
+    # 明示的に save() を呼ばねばなりません。
     >>> r.save()
 
-    # Now it has an ID.
+    # オブジェクトに ID が割り当てられました。
     >>> r.id
     1
 
-    # Now the new reporter is in the database.
+    # 作成した Reporter はデータベース上にあります。
     >>> Reporter.objects.all()
     [<Reporter: John Smith>]
 
-    # Fields are represented as attributes on the Python object.
+    # 各フィールドは Python オブジェクトの属性として表現されています。
     >>> r.full_name
     'John Smith'
 
-    # Django provides a rich database lookup API.
+    # Django は充実したデータベース検索 API を提供しています。 
     >>> Reporter.objects.get(id=1)
     <Reporter: John Smith>
     >>> Reporter.objects.get(full_name__startswith='John')
     <Reporter: John Smith>
     >>> Reporter.objects.get(full_name__contains='mith')
-    <Reporter: John Smith>
+    John Smith
     >>> Reporter.objects.get(id=2)
     Traceback (most recent call last):
         ...
     DoesNotExist: Reporter matching query does not exist.
 
-    # Create an article.
+    # Article を作成します。
     >>> from datetime import datetime
-    >>> a = Article(pub_date=datetime.now(), headline='Django is cool',
-    ...     content='Yeah.', reporter=r)
+    >>> a = Article(pub_date=datetime.now(), headline='Django is cool', 
+    ...     content='Yeah.', reporter_id=1)
     >>> a.save()
 
-    # Now the article is in the database.
+    # これで Article はデータベースに入りました。
     >>> Article.objects.all()
     [<Article: Django is cool>]
 
-    # Article objects get API access to related Reporter objects.
+    # Article オブジェクトから、リレーションを張っている Reporter にアクセ
+    # スできる API を使えるようになります。
     >>> r = a.reporter
     >>> r.full_name
     'John Smith'
 
-    # And vice versa: Reporter objects get API access to Article objects.
+    # 逆も可能です: Reporter オブジェクトから Article オブジェクトにアクセスできます。
     >>> r.article_set.all()
     [<Article: Django is cool>]
 
-    # The API follows relationships as far as you need, performing efficient
-    # JOINs for you behind the scenes.
-    # This finds all articles by a reporter whose name starts with "John".
+    # API は必要に応じてリレーションを辿ります。背後では効率的に JOIN を
+    # 行います。
+    # "John" ではじまる Reporter の全ての Article を検索してみましょう。
     >>> Article.objects.filter(reporter__full_name__startswith="John")
     [<Article: Django is cool>]
 
-    # Change an object by altering its attributes and calling save().
+    # 属性値を変更して save() すればオブジェクトを変更できます。
     >>> r.full_name = 'Billy Goat'
     >>> r.save()
 
-    # Delete an object with delete().
+    # delete() でオブジェクトを削除できます。
     >>> r.delete()
 
-A dynamic admin interface: it's not just scaffolding -- it's the whole house
-============================================================================
+.. _`A dynamic admin interface: It's not just scaffolding -- it's the whole house`:
 
-Once your models are defined, Django can automatically create a professional,
-production ready :ref:`administrative interface <ref-contrib-admin>` -- a Web
-site that lets authenticated users add, change and delete objects. It's as easy
-as registering your model in the admin site::
+動的な管理インタフェース: 足場 (scaffold) ではなく完成品 (whole house) 
+=========================================================================
+
+モデルを定義したら、 Django は玄人向きの実運用に耐える
+:ref:`管理インタフェース <ref-contrib-admin>` (admin interface) を自動的に
+生成します。 管理インタフェースとは、認証をパスしたユーザがオブジェクトを追
+加、変更、削除できる Web サイトです。
+管理インタフェースの作成は簡単で、モデルクラスに一行書き加えるだけです::
 
     # In models.py...
 
@@ -153,28 +169,31 @@ as registering your model in the admin site::
 
     admin.site.register(models.Article)
 
-The philosophy here is that your site is edited by a staff, or a client, or
-maybe just you -- and you don't want to have to deal with creating backend
-interfaces just to manage content.
+サイトの編集はスタッフ、顧客、もしくはあなた自身の手で行われるものであり、
+コンテンツの管理だけのためにバックエンドインタフェースを作りたくはない、
+という思想がここにはあります。
 
-One typical workflow in creating Django apps is to create models and get the
-admin sites up and running as fast as possible, so your staff (or clients) can
-start populating data. Then, develop the way data is presented to the public.
+作者たちが Django アプリケーションを作成するときの典型的なワークフローは、
+モデルを作成し、 admin サイトを組み上げてできるだけ早期に立ち上げ、スタッフ
+(や顧客) がデータを投入できるようにしておいてから、データを公開するための方
+法を開発してゆくというものです。
 
-Design your URLs
-================
+.. _Design your URLs:
 
-A clean, elegant URL scheme is an important detail in a high-quality Web
-application. Django encourages beautiful URL design and doesn't put any cruft
-in URLs, like ``.php`` or ``.asp``.
+自由な URL 設計
+===============
 
-To design URLs for an app, you create a Python module called a :ref:`URLconf
-<topics-http-urls>`. A table of contents for your app, it contains a simple mapping
-between URL patterns and Python callback functions. URLconfs also serve to
-decouple URLs from Python code.
+すっきりとして洗練された URL スキームは、高品質な Web アプリケーションを実
+現する上で重要な要素です。 Django は美しい URL の設計を助け、 ``.php`` や
+``.asp`` のようなお粗末な制約を URL に課しません。
 
-Here's what a URLconf might look like for the ``Reporter``/``Article``
-example above::
+特定のアプリケーション用の URL を設計するには、 
+:ref:`URLconf <topics-http-urls>` と呼ばれる Python モジュールを一つ作成し
+ます。 URLconf はいわばアプリケーションの目次にあたり、 URL のパターンを
+Python のコールバック関数に対応づけています。 URLconf はまた、 URL を
+Python コードと脱カップリングする働きを持っています。
+
+``Reporter``/``Article`` の例では、 URLconf は以下のようになります::
 
     from django.conf.urls.defaults import *
 
@@ -184,54 +203,56 @@ example above::
         (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'mysite.views.article_detail'),
     )
 
-The code above maps URLs, as simple regular expressions, to the location of
-Python callback functions ("views"). The regular expressions use parenthesis to
-"capture" values from the URLs. When a user requests a page, Django runs
-through each pattern, in order, and stops at the first one that matches the
-requested URL. (If none of them matches, Django calls a special-case 404 view.)
-This is blazingly fast, because the regular expressions are compiled at load
-time.
+上のコードは簡単な正規表現で書かれた URL を Python コールバック関数 (ビュー:
+view) に対応づけています。正規表現の中で丸括弧を使い、 URL から値を「取り込
+み」ます。ユーザがあるページをリクエストすると、 Django は全ての正規表現に
+わたって順に調べてゆき、最初に URL にマッチするパターンで止まります。 (マッ
+チする正規表現がなければ Django は独自の 404 ビューを呼び出しします)。 正規
+表現をロード時にコンパイルしておくので、この処理は極めて高速です。 
 
-Once one of the regexes matches, Django imports and calls the given view, which
-is a simple Python function. Each view gets passed a request object --
-which contains request metadata -- and the values captured in the regex.
+正規表現が URL にマッチすると、 Django は指定されているビューを import して
+呼び出します。ビューは単純な Python の関数です。各ビューにはリクエストオブ
+ジェクトが渡されます。リクエストオブジェクトにはリクエストのメタデータと、
+正規表現で取り込んだ値が渡されます。
 
-For example, if a user requested the URL "/articles/2005/05/39323/", Django
-would call the function ``mysite.views.article_detail(request,
-'2005', '05', '39323')``.
+例えば、ユーザが "/articles/2005/05/39323/" という URL をリクエストすると、
+Django は ``mysite.news.views.article_detail(request, '2005', '05',
+'39323')`` のような関数呼び出しを行います。
 
-Write your views
-================
+ビューの自作
+============
 
-Each view is responsible for doing one of two things: Returning an
-:class:`~django.http.HttpResponse` object containing the content for the
-requested page, or raising an exception such as :class:`~django.http.Http404`.
-The rest is up to you.
+各ビュー (view) には二つの役割があります: 一つはリクエストされたページのコ
+ンテンツを含む  :class:`django.http.HttpResponse` オブジェクトを返すこと、
+もう一つは :class:`django.http.Http404` のような例外の送出です。それ以外の
+処理はユーザ次第です。
 
-Generally, a view retrieves data according to the parameters, loads a template
-and renders the template with the retrieved data. Here's an example view for
-``year_archive`` from above::
+一般的に、ビューはパラメタに従ってデータベースからデータを取り出し、テンプ
+レートをロードして、取り出したデータでテンプレートをレンダリングします。
+上の ``year_archive`` のビューを例に示しましょう::
 
     def year_archive(request, year):
         a_list = Article.objects.filter(pub_date__year=year)
-        return render_to_response('news/year_archive.html', {'year': year, 'article_list': a_list})
+        return render_to_response('news/year_archive.html', 
+                                  {'year': year, 'article_list': a_list})
 
-This example uses Django's :ref:`template system <topics-templates>`, which has
-several powerful features but strives to stay simple enough for non-programmers
-to use.
+この例では Django の :ref:`テンプレートシステム <topics-templates>` を使っ
+ています。テンプレートシステムは、強力な機能をいくつも備えながらも、非プロ
+グラマが使いこなせる程度に簡単な仕組みです。
 
-Design your templates
+テンプレートの設計
 =====================
 
-The code above loads the ``news/year_archive.html`` template.
+上のコードでは ``news/article_detail.html`` という名前のテンプレートをロー
+ドしています。
 
-Django has a template search path, which allows you to minimize redundancy among
-templates. In your Django settings, you specify a list of directories to check
-for templates. If a template doesn't exist in the first directory, it checks the
-second, and so on.
+Django にはテンプレート検索パスという概念があり、テンプレートが冗長になるの
+を防いでいます。 Django の設定で、テンプレートを探すディレクトリのリストを
+設定しておきます。あるディレクトリにテンプレートが見つからなければ、Django
+は次のディレクトリ、また次のディレクトリとテンプレートを探します。
 
-Let's say the ``news/article_detail.html`` template was found. Here's what that
-might look like:
+さて、 ``news/article_detail.html`` が見つかったとしましょう。テンプレート
+は以下のように書かれています:
 
 .. code-block:: html+django
 
@@ -246,31 +267,35 @@ might look like:
     <p>{{ article.headline }}</p>
     <p>By {{ article.reporter.full_name }}</p>
     <p>Published {{ article.pub_date|date:"F j, Y" }}</p>
+    {{ article.article }}
     {% endfor %}
     {% endblock %}
 
-Variables are surrounded by double-curly braces. ``{{ article.headline }}``
-means "Output the value of the article's headline attribute." But dots aren't
-used only for attribute lookup: They also can do dictionary-key lookup, index
-lookup and function calls.
 
-Note ``{{ article.pub_date|date:"F j, Y" }}`` uses a Unix-style "pipe" (the "|"
-character). This is called a template filter, and it's a way to filter the value
-of a variable. In this case, the date filter formats a Python datetime object in
-the given format (as found in PHP's date function; yes, there is one good idea
-in PHP).
+変数は二重の波括弧で囲まれています。 ``{{ article.headline }}`` は、
+「article の headline という属性の出力」を表しています。とはいえ、ドット表
+記は属性の検索に使われるだけではありません。辞書の検索や、インデクス指定、
+関数呼び出しも行えます。
 
-You can chain together as many filters as you'd like. You can write custom
-filters. You can write custom template tags, which run custom Python code behind
-the scenes.
+``{{ article.pub_date|date:"F j, Y" }}`` で、 Unix スタイルの「パイプ」
+(文字 "|") を使っていることに注意して下さい. これはテンプレートフィルタ
+と呼ばれ、変数の値にフィルタをかけるためのものです。この例では、フィルタに
+よって Python の datetime オブジェクトを指定の形式にフォーマットしています
+(PHP の date 関数に似ていますね。そう、これは PHP の便利なところです)。
 
-Finally, Django uses the concept of "template inheritance": That's what the
-``{% extends "base.html" %}`` does. It means "First load the template called
-'base', which has defined a bunch of blocks, and fill the blocks with the
-following blocks." In short, that lets you dramatically cut down on redundancy
-in templates: each template has to define only what's unique to that template.
+フィルタは好きなだけ連鎖させられます。カスタムのフィルタも実装できます。
+カスタムのテンプレートタグを設計でき、背後で自作の Python コードを実行でき
+ます。
 
-Here's what the "base.html" template might look like:
+最後に、Django にはテンプレートの継承という概念があります: 継承を宣言してい
+るのは ``{% extends "base.html" %}`` の部分です。このタグは「まず
+'base.html' というテンプレートをロードせよ。このテンプレートにはいくつかの
+ブロックが定義されているが、それらのブロックの中身を以下のブロック定義で埋
+めよ」という命令です。要するに、テンプレートを継承すると、各テンプレートご
+とに固有の定義だけを記述すればよくなり、テンプレート間の冗長性が劇的に減る
+のです。
+
+"base.html" テンプレートは以下のように書けます:
 
 .. code-block:: html+django
 
@@ -284,41 +309,45 @@ Here's what the "base.html" template might look like:
     </body>
     </html>
 
-Simplistically, it defines the look-and-feel of the site (with the site's logo),
-and provides "holes" for child templates to fill. This makes a site redesign as
-easy as changing a single file -- the base template.
+このテンプレートはサイトのルック & フィール (とサイトのロゴ) を定義するだけ
+の極度に単純化されています。また、子テンプレートで埋めるための「穴」を提供
+しています。これによって、ベーステンプレート一つを変更するだけでサイト全体
+のデザインを簡単に変更できるようになります。
 
-It also lets you create multiple versions of a site, with different base
-templates, while reusing child templates. Django's creators have used this
-technique to create strikingly different cell-phone editions of sites -- simply
-by creating a new base template.
+また、子テンプレートを変えずにベーステンプレートだけを変えた複数バージョン
+のサイトも作成できます。 Django の作者たちはこのテクニックを使い、新しい
+テンプレートを作成するだけで携帯電話向けのまったく見栄えの違うサイトを
+作成してきました。
 
-Note that you don't have to use Django's template system if you prefer another
-system. While Django's template system is particularly well-integrated with
-Django's model layer, nothing forces you to use it. For that matter, you don't
-have to use Django's database API, either. You can use another database
-abstraction layer, you can read XML files, you can read files off disk, or
-anything you want. Each piece of Django -- models, views, templates -- is
-decoupled from the next.
+他のシステムを使いたければ、必ずしも Django のテンプレートシステムを使う必
+要はないということに注意してください。 Django のテンプレートシステムは
+Django のモデルレイヤと部分的にしっかり組み合わさっていますが、絶対に使わね
+ばならないということではありません。さらに言えば、 Django のデータベース
+API を使う必然性もありません。別のデータベース抽象化レイヤを使っても構いま
+せんし、 XML ファイルやディスク上のファイルを読み込んでも構いません。何でも
+やりたいことをできるのです。Django の構成要素 -- モデル、ビュー、テンプレー
+ト -- は、互いに切り離して利用できるのです。
 
-This is just the surface
-========================
+.. _This is just the surface:
 
-This has been only a quick overview of Django's functionality. Some more useful
-features:
+これらはほんの一部にすぎません
+==============================
 
-    * A :ref:`caching framework <topics-cache>` that integrates with memcached
-      or other backends.
+以上、 Django の機能についてざっと紹介してきました。 Django は他にもまだま
+だ便利な機能を備えています:
 
-    * A :ref:`syndication framework <ref-contrib-syndication>` that makes
-      creating RSS and Atom feeds as easy as writing a small Python class.
+    * memcached などのバックエンドを組み込んだ
+      :ref:`キャッシュフレームワーク <topics-cache>` 。
+    * 小さな Python クラスを書くだけで簡単に RSS や Atom フィードを生成でき
+      る :ref:`配信フィードフレームワーク <ref-contrib-syndication>` 。
+    * 自動生成される admin のセクシーな機能の数々。ここで紹介したのはほんの
+      表層の一部でしかありません。 
 
-    * More sexy automatically-generated admin features -- this overview barely
-      scratched the surface.
-
-The next obvious steps are for you to `download Django`_, read :ref:`the
-tutorial <intro-tutorial01>` and join `the community`_. Thanks for your
-interest!
+次は、あなたが `Django をダウンロード`_ して、 
+:ref:`チュートリアル <intro-tutorial01>` を読み、 `コミュニティ`_ に参加す
+る番です。ご精読ありがとうございました!
 
 .. _download Django: http://www.djangoproject.com/download/
 .. _the community: http://www.djangoproject.com/community/
+.. _`Django をダウンロード`: `download Django`_
+.. _`コミュニティ`: `the community`_
