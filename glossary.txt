@@ -1,80 +1,108 @@
 .. _glossary:
 
 ========
-Glossary
+用語集
 ========
+
+:version: 1.0
 
 .. glossary::
 
     field
-        An attribute on a :term:`model`; a given field usually maps directly to
-        a single database column.
+        :term:`model` 内のアトリビュートです。通常、一つのフィールドが一つ
+        のデータベースカラムに対応しています。
         
-        See :ref:`topics-db-models`.
+        :ref:`topics-db-models` を参照してください。
 
     generic view
-        A higher-order :term:`view` function that abstracts common idioms and patterns
-        found in view development and abstracts them.
+        ビューを開発するときによくある言い回しやパターンを抽象化する
+        :term:`ビュー` 関数です。
         
-        See :ref:`ref-generic-views`.
+        :ref:`ref-generic-views` を参照してください。
 
     model
-        Models store your application's data.
+        アプリケーションのデータの保存に使われるクラスです。
         
-        See :ref:`topics-db-models`.
+        :ref:`topics-db-models` を参照してください。
 
     MTV
-        See :ref:`mtv`.
+        :ref:`mtv` を参照してください。
 
     MVC
-        `Model-view-controller`__; a software pattern. Django :ref:`follows MVC
-        to some extent <mtv>`.
+        ソフトウェアパターンの `Model-view-controller`__ です。
+	Django は :ref:`部分的に MVC です <mtv>` 。
 
         __ http://en.wikipedia.org/wiki/Model-view-controller
 
     project
-        A Python package -- i.e. a directory of code -- that contains all the
-        settings for an instance of Django. This would include database
-        configuration, Django-specific options and application-specific
-        settings.
+        Python のパッケージ、すなわちコードの入ったディレクトリです。プロジェ
+        クトには、一つの Django インスタンスを動かすために必要な全ての情報、
+	たとえばデータベースの設定、 Django 固有のオプション、アプリケーショ
+        ン固有の設定などが収められています。
 
     property
-        Also known as "managed attributes", and a feature of Python since
-        version 2.2. From `the property documentation`__:
+        Python バージョン 2.2 から導入された機能で、「マネージドアトリビュー
+        ト (managed attribute)」ともいいます。詳しくは
+	 `プロパティのドキュメント`__ を参照してください。
         
-            Properties are a neat way to implement attributes whose usage
-            resembles attribute access, but whose implementation uses method
-            calls. [...] You
-            could only do this by overriding ``__getattr__`` and
-            ``__setattr__``; but overriding ``__setattr__`` slows down all
-            attribute assignments considerably, and overriding ``__getattr__``
-            is always a bit tricky to get right. Properties let you do this
-            painlessly, without having to override ``__getattr__`` or
-            ``__setattr__``.
+            プロパティは、アトリビュートのアクセス時に実際にはメソッド呼び
+            出しを行いたいような場合に便利な手法です。同じようなことは
+            ``__getattr__`` と ``__setattr__`` のオーバライドでも実現できま
+            す。しかし、 ``__setattr__`` をオーバライドすると、全てのアトリ
+            ビュートのアクセスが遅くなりますし、 ``__getattr__`` をオーバラ
+            イドして正しい動作を実現するのはちょっと大変です。プロパティを
+            使えば、 ``__getattr__`` や ``__setattr__`` をオーバライドしな
+            くても、望みのことを実現できます。
 
         __ http://www.python.org/download/releases/2.2/descrintro/#property
 
     queryset
-        An object representing some set of rows to be fetched from the database.
+        データベースから取り出したレコード行を表現するオブジェクトです。
         
-        See :ref:`topics-db-queries`.
+        :ref:`topics-db-queries` を参照してください。
 
     slug
-        A short label for something, containing only letters, numbers,
-        underscores or hyphens. They're generally used in URLs. For
-        example, in a typical blog entry URL:
+        英文字と数字、アンダースコア、ハイフンだけからなる短いラベル文字列
+        です。 URL の中で使われます。例えば、以下の URL :
         
         .. parsed-literal::
         
             http://www.djangoproject.com/weblog/2008/apr/12/**spring**/
             
-        the last bit (``spring``) is the slug.
+        の中で、最後の部分 (``spring``) がスラグです。
 
     template
-        A chunk of text that separates the presentation of a document from its
-        data.
+        ドキュメントのデータと表現を分離するためのテキストです。
         
-        See :ref:`topics-templates`.
+        :ref:`topics-templates` を参照してください。
         
     view
-        A function responsible for rending a page.
+        ページのレンダリングを行う関数です。
+
+    クエリセット
+        :term:`queryset` を参照してください。
+
+    スラグ
+        :term:`slug` を参照してください。
+
+    テンプレート
+        :term:`template` を参照してください。
+
+    汎用ビュー
+        :term:`generic view` を参照してください。
+
+    ビュー
+        :term:`view` を参照してください。
+
+    フィールド
+        :term:`field` を参照してください。
+
+    プロジェクト
+        :term:`project` を参照してください。
+
+    プロパティ
+        :term:`property` を参照してください。
+
+    モデル
+        :term:`model` を参照してください。
+
