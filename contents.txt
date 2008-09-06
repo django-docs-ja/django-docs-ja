@@ -1,8 +1,10 @@
 .. _contents:
 
 =============================
-Django documentation contents
+Django ドキュメント 目次
 =============================
+
+:version: 1.0
 
 .. toctree::
    :maxdepth: 2
@@ -17,18 +19,18 @@ Django documentation contents
    releases/index
    internals/index
 
-Indices, glossary and tables
+索引、用語集、表一覧
 ============================
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`glossary`
 
-Deprecated/obsolete documentation
+撤廃されたもの・古いドキュメント
 =================================
 
-The following documentation covers features that have been deprecated or that
-have been replaced in newer versions of Django.
+以下は、撤廃されたり、現在の Django では他のものと置き換えられているドキュ
+メントです。
 
 .. toctree::
    :maxdepth: 2
