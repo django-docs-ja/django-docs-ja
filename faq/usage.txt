@@ -1,68 +1,85 @@
 .. _faq-usage:
 
-FAQ: Using Django
-=================
+.. _`FAQ: Using Django`:
 
-Why do I get an error about importing DJANGO_SETTINGS_MODULE?
--------------------------------------------------------------
+FAQ: Django を使う
+====================
 
-Make sure that:
+:revision-up-to: 8961 (1.0)
 
-    * The environment variable DJANGO_SETTINGS_MODULE is set to a fully-qualified
-      Python module (i.e. "mysite.settings").
+.. _Why do I get an error about importing DJANGO_SETTINGS_MODULE?:
 
-    * Said module is on ``sys.path`` (``import mysite.settings`` should work).
+なぜ、 DJANGO_SETTINGS_MODULE を import できないというエラーが出るのですか？
+----------------------------------------------------------------------------
 
-    * The module doesn't contain syntax errors (of course).
+以下の点を確認してください:
 
-    * If you're using mod_python but *not* using Django's request handler,
-      you'll need to work around a mod_python bug related to the use of
-      ``SetEnv``; before you import anything from Django you'll need to do
-      the following::
+    * 環境変数 DJANGO_SETTINGS_MODULE が完全指定の Python モジュール名になっ
+      ていますか (たとえば "mysite.settings")。
+
+    * 設定モジュールは ``sys.path`` の上にありますか (``import
+      mysite.settings`` はうまくいきますか)。
+
+    * (言うまでもなく) モジュールに構文エラーはありませんか。
+
+    * mod_python を使っていて、Django リクエストハンドラは *使っていない*
+      のなら、 ``SetEnv`` に関わる mod_python のバグを回避する必要がありま
+      す。 Django から何らかのモジュールを import する前に、以下のコードを
+      実行してください::
 
             os.environ.update(req.subprocess_env)
 
-      (where ``req`` is the mod_python request object).
+      (``req`` は mod_python のリクエストオブジェクトです)。
 
-I can't stand your template language. Do I have to use it?
-----------------------------------------------------------
+.. _I can't stand your template language. Do I have to use it?:
 
-We happen to think our template engine is the best thing since chunky bacon,
-but we recognize that choosing a template language runs close to religion.
-There's nothing about Django that requires using the template language, so
-if you're attached to ZPT, Cheetah, or whatever, feel free to use those.
+テンプレート言語を好きになれません。どうしても使わないとだめですか？
+--------------------------------------------------------------------
 
-Do I have to use your model/database layer?
--------------------------------------------
+私達はこのテンプレートエンジンを chunky bacon 以来の傑作だと思っているんで
+すが、テンプレート言語の選択というものは宗教に近いものがあるということは認
+識しています。 Django では、テンプレート言語に対する制限はなんらありません。
+ですから、 ZPT や Cheetah などを使いたいのなら、それは自由です。
 
-Nope. Just like the template system, the model/database layer is decoupled from
-the rest of the framework.
+.. _Do I have to use your model/database layer?:
 
-The one exception is: If you use a different database library, you won't get to
-use Django's automatically-generated admin site. That app is coupled to the
-Django database layer.
+付属のモデル／データベースレイヤを使わねばならないのですか？
+------------------------------------------------------------
 
-How do I use image and file fields?
------------------------------------
+いいえ、テンプレートシステムと同様、モデル／データベースレイヤはフレームワー
+クの他の部分と脱カップリングしています。
 
-Using a :class:`~django.db.models.FileField` or an 
-:class:`~django.db.models.ImageField` in a model takes a few steps:
+唯一の例外: 別のデータベースライブラリを使った場合には、 Django の自動生成
+admin サイトを利用できなくなります。 admin だけは Django のデータベースレイ
+ヤとカップリングしています。
 
-    #. In your settings file, you'll need to define :setting:`MEDIA_ROOT` as the
-       full path to a directory where you'd like Django to store uploaded files.
-       (For performance, these files are not stored in the database.) Define
-       :setting:`MEDIA_URL` as the base public URL of that directory. Make sure
-       that this directory is writable by the Web server's user account.
 
-    #. Add the :class:`~django.db.models.FileField` or 
-       :class:`~django.db.models.ImageField` to your model, making sure to 
-       define the :attr:`~django.db.models.FileField.upload_to` option to tell 
-       Django to which subdirectory of :setting:`MEDIA_ROOT` it should upload 
-       files.
+.. _How do I use image and file fields?:
 
-    #. All that will be stored in your database is a path to the file 
-       (relative to :setting:`MEDIA_ROOT`). You'll most likely want to use the
-       convenience :attr:`~django.core.files.File.url` attribute provided by
-       Django. For example, if your :class:`~django.db.models.ImageField` is
-       called ``mug_shot``, you can get the absolute URL to your image in a
-       template with ``{{ object.mug_shot.url }}``.
+画像やファイルのフィールドはどう使うのですか？
+-----------------------------------------------
+
+モデルで :class:`~django.db.models.FileField` や
+:class:`~django.db.models.ImageField` を使うには、いくつかのステップを踏む
+必要があります:
+
+    #. 設定ファイル内で :setting:`MEDIA_ROOT` を指定します。この値は、
+       Django がアップロードされたファイルを置く場所にします (パフォーマン
+       ス上の理由から、ファイルをデータベースに置くことはありません)。
+       :setting:`MEDIA_URL` をそのディレクトリの公開 URL にします。ディレク
+       トリは Web サーバのユーザアカウントに対して書き込み可能にしておかね
+       ばなりません。 
+
+    #. モデルに :class:`~django.db.models.FileField` や
+       :class:`~django.db.models.ImageField` を追加し、 
+       :attr:`~django.db.models.FileField.upload_to` オプションを定義して、
+       :setting:`MEDIA_ROOT` のどのサブディレクトリにファイルをアップロード
+       させるのかを Django に教えます。
+
+    #. データベースにい保存されるのは、ファイルの (:setting:`MEDIA_ROOT` か
+       らの相対で表した) パスだけです。 Django の提供している属性
+       :attr:`~django.core.files.File.url` を使うことになるでしょう。例えば、
+       ``mug_shot`` という名前の :class:`~django.db.models.ImageField` があ
+       るとすると、テンプレートで画像の URL を指定するには ``{{
+       object.mug_shot.url }}`` のようにします。
+

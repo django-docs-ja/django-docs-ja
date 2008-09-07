@@ -1,5 +1,7 @@
 .. _internals-committers:
 
+.. TBD::
+
 Django committers
 =================
 
@@ -10,24 +12,24 @@ Django originally started at World Online, the Web department of the `Lawrence
 Journal-World`_ of Lawrence, Kansas, USA.
 
 `Adrian Holovaty`_
-    Adrian is a Web developer with a background in journalism. He's known in
-    journalism circles as one of the pioneers of "journalism via computer
-    programming", and in technical circles as "the guy who invented Django."
-    
-    He was lead developer at World Online for 2.5 years, during which time
-    Django was developed and implemented on World Online's sites. He's now the
-    leader and founder of EveryBlock_, a "news feed for your block".
-    
-    Adrian lives in Chicago, USA.
+    Adrian はジャーナリズムのバックグラウンドを持った Web 開発者です。ジャー
+    ナリズムの世界では、「計算機ジャーナリズム」のパイオニアとして、テクノ
+    ロジーの世界では「Djangoを作った男」として知られています。
+
+    Adrian は 2 年半の間 World Online のリードプログラマを勤め、その間に
+    Django を開発して World Online サイトを実装しました。現在彼は「地域に根
+    ざしたフィードサイト」である EveryBlock_ のリーダー兼創立者です。
+
+    シカゴ在住です。
 
 `Simon Willison`_
-    Simon is a well-respected web developer from England. He had a one-year
-    internship at World Online, during which time he and Adrian developed Django
-    from scratch. The most enthusiastic Brit you'll ever meet, he's passionate
-    about best practices in web development has maintains a well-read
-    `web-development blog`_.
+    Simon はイングランドから来た尊敬すべき Web 開発者です。彼は World
+    Online で 1 年間のインターンシップを過ごし、その間に Adrian とともに
+    Djang をスクラッチから開発しました。彼はまれに見る情熱家の英国人で、
+    Web 開発の王道について確固たる信念を持っており、多くの読者を擁する
+    `Web 開発についての blog`_ を持っています。
     
-    Simon lives in Brighton, England.
+    イングランドのブライトン在住です。
 
 `Jacob Kaplan-Moss`_
     Jacob is a software architect at `Whiskey Media`_, one of those newfangled
@@ -39,17 +41,19 @@ Journal-World`_ of Lawrence, Kansas, USA.
     Jacob lives in Lawrence, Kansas, USA.
     
 `Wilson Miner`_
-    Wilson's design-fu is what makes Django look so nice. He designed the
-    website you're looking at right now, as well as Django's acclaimed admin
-    interface. Wilson is the designer for EveryBlock_.
+    Django をかっこよく見せているのは Wilson のデザインの力です。今あなたが
+    見ている Django サイトも、 Django の admin インタフェースも、 Wilson が
+    デザインしたものです。 Wilson は EveryBlock_ のデザイナとして働いていま
+    す。
     
-    Wilson lives in San Francisco, USA.
+    サンフランシスコ在住です。
 
 .. _lawrence journal-world: http://ljworld.com/
 .. _adrian holovaty: http://holovaty.com/
 .. _everyblock: http://everyblock.com/
 .. _simon willison: http://simonwillison.net/
 .. _web-development blog: `simon willison`_
+.. _`Web 開発についての blog`: `web-development blog`_
 .. _jacob kaplan-moss: http://jacobian.org/
 .. _whiskey media: http://whiskeymedia.com/
 .. _wilson miner: http://wilsonminer.com/

@@ -1,103 +1,131 @@
 .. _faq-admin:
 
-FAQ: The admin
+.. _`FAQ: The admin`:
+
+FAQ: admin
 ==============
 
-I can't log in. When I enter a valid username and password, it just brings up the login page again, with no error messages.
----------------------------------------------------------------------------------------------------------------------------
+:revision-up-to: 8961 (1.0)
 
-The login cookie isn't being set correctly, because the domain of the cookie
-sent out by Django doesn't match the domain in your browser. Try these two
-things:
+.. _`I can't log in. When I enter a valid username and password, it just brings up the login page again, with no error messages.`:
 
-    * Set the ``SESSION_COOKIE_DOMAIN`` setting in your admin config file
-      to match your domain. For example, if you're going to
-      "http://www.example.com/admin/" in your browser, in
-      "myproject.settings" you should set ``SESSION_COOKIE_DOMAIN = 'www.example.com'``.
+ログインできません。正しいユーザ名とパスワードを入力したのに、エラーメッセージも出ず再度ログインページが表示されるのです。
+--------------------------------------------------------------------------------------------------------------------------
 
-    * Some browsers (Firefox?) don't like to accept cookies from domains that
-      don't have dots in them. If you're running the admin site on "localhost"
-      or another domain that doesn't have a dot in it, try going to
-      "localhost.localdomain" or "127.0.0.1". And set
-      ``SESSION_COOKIE_DOMAIN`` accordingly.
+Django の発行するクッキーのドメインと、ブラウザに格納されたドメインが一致し
+ていないため、ログインクッキーが正しく設定されないからです。以下の二つの対
+策を試してみて下さい:
 
-I can't log in. When I enter a valid username and password, it brings up the login page again, with a "Please enter a correct username and password" error.
------------------------------------------------------------------------------------------------------------------------------------------------------------
+    * admin 設定ファイルの ``SESSION_COOKIE_DOMAIN`` とお使いのドメインが一
+      致するように設定してください。例えば、ブラウザで
+      "http://www.example.com/admin/" にアクセスするようになっているのなら、
+      "myproject.settings" には ``SESSION_COOKIE_DOMAIN = 'www.example.com'``
+      と設定せねばなりません。
 
-If you're sure your username and password are correct, make sure your user
-account has ``is_active`` and ``is_staff`` set to True. The admin site only
-allows access to users with those two fields both set to True.
+    * ブラウザによっては (Firefox?) ドットの入っていないドメインからのクッ
+      キーを受け取ろうとしないようです。admin を "localhost" などのようなドッ
+      トを含まないドメインで実行しているのなら、"localhost.localdomain" や
+      "127.0.0.1" のように指定してアクセスしてください。また、
+      ``SESSION_COOKIE_DOMAIN`` もそれに合わせて変更してください。
 
-How can I prevent the cache middleware from caching the admin site?
--------------------------------------------------------------------
+.. _`I can't log in. When I enter a valid username and password, it brings up the login page again, with a "Please enter a correct username and password" error.`:
 
-Set the :setting:``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting to ``True``. See the
-:ref:`cache documentation <topics-cache>` for more information.
+ログインできません。正しいユーザ名とパスワードを入力したところ、「正しいユーザ名とパスワードを入力してください」というエラーメッセージの表示されたログインページが表示されます。
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-How do I automatically set a field's value to the user who last edited the object in the admin?
------------------------------------------------------------------------------------------------
+ユーザネームとパスワードが本当に正しいのなら、ユーザアカウントが
+``is_active`` で、かつ ``is_staff`` が ``True`` になっているか確かめて下さ
+い。 admin サイトにアクセスできるのは、これら二つのフィールドが共に
+``True`` であるユーザだけです。
 
-At this point, Django doesn't have an official way to do this. But it's an oft-requested
-feature, so we're discussing how it can be implemented. The problem is we don't want to couple
-the model layer with the admin layer with the request layer (to get the current user). It's a
-tricky problem.
+.. _How can I prevent the cache middleware from caching the admin site?:
 
-One person hacked up a `solution that doesn't require patching Django`_, but note that it's an
-unofficial solution, and there's no guarantee it won't break at some point.
+キャッシュミドルウェアに admin サイトをキャッシュさせなくするにはどうすればよいですか？
+---------------------------------------------------------------------------------------
+
+:setting:`CACHE_MIDDLEWARE_ANONYMOUS_ONLY` 設定を ``True`` にしてください。
+詳しくは :ref:`キャッシュのドキュメント <topics-cache>` を参照してください。
+
+.. _How do I automatically set a field's value to the user who last edited the object in the admin?:
+
+admin 上でフィールドの値をオブジェクトを最後に編集したユーザの指定した値と同じにするにはどうすればよいですか？
+-----------------------------------------------------------------------------------------------------------------
+
+現時点では、 Django はこの操作を行う正規の方法を提供していません。しかしこ
+の要望はよく出ているので、どうやって実装するかを議論しているところです。問
+題は、(現在のユーザを判定するのに) モデルレイヤと admin レイヤとリクエスト
+レイヤをカップリングしたくないという点にあります。これは難しい問題です。
+
+`solution that doesn't require patching Django`_ というハックを提供している
+人もいますが、これは正規の方法ではなく、将来うまく働かなくなる可能性があり
+ます。
 
 .. _solution that doesn't require patching Django: http://lukeplant.me.uk/blog.php?id=1107301634
 
-How do I limit admin access so that objects can only be edited by the users who created them?
----------------------------------------------------------------------------------------------
+.. _How do I limit admin access so that objects can only be edited by the users who created them?:
 
-See the answer to the previous question.
+admin でオブジェクトを作成したユーザだけがオブジェクトを編集できるようにアクセス制限するにはどうすればよいですか？
+-------------------------------------------------------------------------------------------------------------------
 
-My admin-site CSS and images showed up fine using the development server, but they're not displaying when using mod_python.
----------------------------------------------------------------------------------------------------------------------------
+一つ前の質問の答えを見て下さい。
 
-See :ref:`serving the admin files <howto-deployment-modpython-serving-the-admin-files`
-in the "How to use Django with mod_python" documentation.
+.. _My admin-site CSS and images showed up fine using the development server, but they're not displaying when using mod_python.:
 
-My "list_filter" contains a ManyToManyField, but the filter doesn't display.
-----------------------------------------------------------------------------
+開発サーバでは admin サイトの CSS や画像がうまく表示されるのに、 mod_python を使うと表示されません。
+----------------------------------------------------------------------------------------------------
 
-Django won't bother displaying the filter for a ``ManyToManyField`` if there
-are fewer than two related objects.
+「mod_python で Django を使う」というドキュメントの 
+:ref:`admin ファイルの提供 <howto-deployment-modpython-serving-the-admin-files>`
+を参照してください
 
-For example, if your ``list_filter`` includes ``sites``, and there's only one
-site in your database, it won't display a "Site" filter. In that case,
-filtering by site would be meaningless.
+.. _My "list_filter" contains a ManyToManyField, but the filter doesn't display.:
 
-How can I customize the functionality of the admin interface?
--------------------------------------------------------------
+"list_filter" に ManyToManyField を入れたのに、フィルタが表示されません。
+-------------------------------------------------------------------------
 
-You've got several options. If you want to piggyback on top of an add/change
-form that Django automatically generates, you can attach arbitrary JavaScript
-modules to the page via the model's ``class Admin`` ``js`` parameter. That
-parameter is a list of URLs, as strings, pointing to JavaScript modules that
-will be included within the admin form via a ``<script>`` tag.
+Django が ``ManyToManyField`` に対してフィルタを表示するのはオブジェクトが
+二つ以上のときだけです。
 
-If you want more flexibility than simply tweaking the auto-generated forms,
-feel free to write custom views for the admin. The admin is powered by Django
-itself, and you can write custom views that hook into the authentication
-system, check permissions and do whatever else they need to do.
+例えば、 ``list_filter`` に ``sites`` が入っており、データベースにたった一
+つしかサイトが登録されていなければ、 "Site" フィルタは表示されません。
+この状況では、サイトによるフィルタは無意味だからです。
 
-If you want to customize the look-and-feel of the admin interface, read the
-next question.
+.. _How can I customize the functionality of the admin interface?:
 
-The dynamically-generated admin site is ugly! How can I change it?
-------------------------------------------------------------------
+admin インタフェースの機能をカスタマイズするにはどうすればよいですか？
+------------------------------------------------------------------------
 
-We like it, but if you don't agree, you can modify the admin site's
-presentation by editing the CSS stylesheet and/or associated image files. The
-site is built using semantic HTML and plenty of CSS hooks, so any changes you'd
-like to make should be possible by editing the stylesheet. We've got a
-:ref:`guide to the CSS used in the admin <obsolete-admin-css>` to get you started.
+方法はいくつかあります。Django が自動生成する add/change フォームを利用して
+楽をしたければ、モデルの ``class Admin`` の ``js`` パラメタを使ってページに
+任意の JavaScript モジュールを貼り付けてください。パラメタは文字列で表した
+URL からなるリストで、 admin フォームに <script> タグを使って取り込む
+JavaScript モジュールを指しています。
 
-How do I create users without having to edit password hashes?
--------------------------------------------------------------
+単に自動生成されるフォームをいじる以上の柔軟さが必要な場合には、 admin 用の
+カスタムビューを書いて下さい。 admin はそれ自体 Django で作られており、カス
+タムのビューを書いて認証システムやパーミッションのチェックにフックを掛け、
+必要な処理を行えます。
 
-If you'd like to use the admin site to create users, upgrade to the Django
-development version, where this problem was fixed on Aug. 4, 2006.
+admin のルック & フィールをカスタマイズしたいのなら、次の質問に進んで下さい。
 
-You can also use the Python API. See :ref:`creating users <topics-auth-creating-users>` for full info.
+.. _The dynamically-generated admin site is ugly! How can I change it?:
+
+動的に生成される admin サイトがみっともありません！どうすれば変更できますか？
+------------------------------------------------------------------------------
+
+私達は好きなんですが。そうは思わないのなら、 CSS スタイルシートや画像ファイ
+ルを編集して、 admin サイトのプレゼンテーションを変更できます。サイトはセマ
+ンティックな HTML を使って書かれているので、やりたい変更は全て CSS スタイル
+シートの編集で実現できます。てほどきに 
+:ref:`admin で使われているCSS のガイド <obsolete-admin-css>`
+を用意してあります。
+
+
+.. _How do I create users without having to edit password hashes?:
+
+パスワードハッシュを編集せずにユーザを作成するにはどうすればよいですか？
+-------------------------------------------------------------------------
+
+admin サイトでユーザを作成したいのなら、 Django の開発版を使ってください。
+この問題は 2006 年 8 月 4 日に修正されたので、それ以降のバージョンが必要で
+す。

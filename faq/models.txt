@@ -1,94 +1,112 @@
 .. _faq-models:
 
-FAQ: Databases and models
-=========================
+.. _`FAQ: Databases and models`:
 
-How can I see the raw SQL queries Django is running?
+FAQ: データベースとモデル
+==========================
+
+.. _How can I see the raw SQL queries Django is running?:
+
+Django が実行している生の SQL クエリを見られますか？
 ----------------------------------------------------
 
-Make sure your Django ``DEBUG`` setting is set to ``True``. Then, just do
-this::
+まず、 ``DEBUG`` 設定を ``True`` にして  Django を動かしているか確認してく
+ださい。次に、以下のコードを実行します::
 
     >>> from django.db import connection
     >>> connection.queries
     [{'sql': 'SELECT polls_polls.id,polls_polls.question,polls_polls.pub_date FROM polls_polls',
     'time': '0.002'}]
 
-``connection.queries`` is only available if ``DEBUG`` is ``True``. It's a list
-of dictionaries in order of query execution. Each dictionary has the following::
+``connection.queries`` を使えるのは ``DEBUG`` が ``True`` の時だけです。こ
+の値は、クエリの実行順に辞書を並べたものです。各辞書には以下の値が入ってい
+ます::
 
-    ``sql`` -- The raw SQL statement
-    ``time`` -- How long the statement took to execute, in seconds.
+    ``sql`` -- 生の SQL 文
+    ``time`` -- SQL 文の実行にかかった時間を秒で表したもの
 
-``connection.queries`` includes all SQL statements -- INSERTs, UPDATES,
-SELECTs, etc. Each time your app hits the database, the query will be recorded.
+``connection.queries`` には、 INSERT, UPDATE, SELECT といった全ての SQL 文
+が入ります。クエリはアプリケーションがデータベースを操作する度に記録され
+てゆきます。
 
-Can I use Django with a pre-existing database?
-----------------------------------------------
+.. _Can I use Django with a pre-existing database?:
 
-Yes. See :ref:`Integrating with a legacy database <howto-legacy-databases>`.
+既存のデータベースで Django を使えますか？
+------------------------------------------
 
-If I make changes to a model, how do I update the database?
------------------------------------------------------------
+使えます。 :ref:`古いデータベースの組み込み <howto-legacy-databases>` を参
+照してください。
 
-If you don't mind clearing data, your project's ``manage.py`` utility has an
-option to reset the SQL for a particular application::
+
+.. _If I make changes to a model, how do I update the database?:
+
+モデルを変更したとき、どうやってデータベースを更新すればよいですか？
+---------------------------------------------------------------------
+
+データが消えてもかまわないのなら、 ``manage.py`` ユーティリティを使って、特
+定のアプリケーションをリセットする SQL を発行できます::
 
     manage.py reset appname
 
-This drops any tables associated with ``appname`` and recreates them.
+この操作で、 ``appname`` に関係したテーブルが削除され、再度作成されます。
 
-If you do care about deleting data, you'll have to execute the ``ALTER TABLE``
-statements manually in your database. That's the way we've always done it,
-because dealing with data is a very sensitive operation that we've wanted to
-avoid automating. That said, there's some work being done to add partially
-automated database-upgrade functionality.
+データを削除したくないのなら、手作業で ``ALTER TABLE`` 文を実行せねばなりま
+せん。私達はいつもこの方法でやっています。というのも、データの扱いはとても
+慎重にせねばならないので、私達は自動化を避けたいのです。とはいえ、データベー
+スの更新を部分的に自動化する機能を追加すべく現在作業中です。
 
-Do Django models support multiple-column primary keys?
-------------------------------------------------------
+.. _Do Django models support multiple-column primary keys?:
 
-No. Only single-column primary keys are supported.
+Django のモデルは複数カラムにわたる主キーをサポートしていますか？
+-----------------------------------------------------------------
 
-But this isn't an issue in practice, because there's nothing stopping you from
-adding other constraints (using the ``unique_together`` model option or
-creating the constraint directly in your database), and enforcing the
-uniqueness at that level. Single-column primary keys are needed for things such
-as the admin interface to work; e.g., you need a simple way of being able to
-specify an object to edit or delete.
+いいえ。サポートしているのは単カラムの主キーだけです。
 
-How do I add database-specific options to my CREATE TABLE statements, such as specifying MyISAM as the table type?
-------------------------------------------------------------------------------------------------------------------
+しかし、実践的には問題にはなりません。というのは、(``unique_together`` モデ
+ルオプションを指定したり、直接データベースに制約を作ったりして) 他の制約を
+課し、モデルレベルで一意性を強制できるからです。単カラムの主キーは admin イ
+ンタフェースをうまく稼働させるため、例えば編集や削除対象のオブジェクトを指
+定する簡潔な手段として必要なのです。
 
-We try to avoid adding special cases in the Django code to accommodate all the
-database-specific options such as table type, etc. If you'd like to use any of
-these options, create an :ref:`SQL initial data file <initial-sql>` that
-contains ``ALTER TABLE`` statements that do what you want to do. The initial
-data files are executed in your database after the ``CREATE TABLE`` statements.
+.. _How do I add database-specific options to my CREATE TABLE statements, such as specifying MyISAM as the table type?:
 
-For example, if you're using MySQL and want your tables to use the MyISAM table
-type, create an initial data file and put something like this in it::
+テーブル形式を MyISAM に指定するなど、データベース固有のオプションを CREATE TABLE 文に追加したいのですが、どうすればよいですか？
+--------------------------------------------------------------------------------------------------------------------------------
+
+私達は、テーブルの形式のようなデータベース固有のオプションに対応するために
+Django のコードに特殊なケースを追加したくないと考えています。こうしたオプショ
+ンを使いたければ、 :ref:`SQL の初期データファイル <initial-sql>` を作成して、
+その中で ``ALTER TABLE`` 文を使って自分の目的を実現してください。初期データ
+ファイルはデータベースの中で ``CREATE TABLE`` 文の後に実行されます。
+
+例えば、 MySQL を使っていて、 MyISAM テーブルタイプを使いたい場合には、初期
+データファイルを作成して、以下のような行を挿入します::
 
     ALTER TABLE myapp_mytable ENGINE=MyISAM;
 
-As explained in the :ref:`SQL initial data file <initial-sql>` documentation,
-this SQL file can contain arbitrary SQL, so you can make any sorts of changes
-you need to make.
+`SQL の初期データファイル <initial-sql>` でも説明していますが、 SQL ファイ
+ルには任意の SQL コードを入れられるので、SQL で行なえる変更なら何でも実現で
+きます。
 
-Why is Django leaking memory?
------------------------------
 
-Django isn't known to leak memory. If you find your Django processes are
-allocating more and more memory, with no sign of releasing it, check to make
-sure your ``DEBUG`` setting is set to ``True``. If ``DEBUG`` is ``True``, then
-Django saves a copy of every SQL statement it has executed.
+.. _`Why is Django leaking memory?`:
 
-(The queries are saved in ``django.db.connection.queries``. See
-`How can I see the raw SQL queries Django is running?`_.)
+Django がメモリリークを起こしているのですが、なぜですか？
+---------------------------------------------------------
 
-To fix the problem, set ``DEBUG`` to ``False``.
+Django に既知のメモリリークはありません。 Django プロセスがメモリをどんどん
+消費して、いっこうに開放する気配がない場合、 ``DEBUG`` が ``True`` になって
+いないか調べてみてください。 ``DEBUG`` を ``True`` にすると、 Django は実行
+した SQL 文の全てのコピーを保存するようになるからです。
 
-If you need to clear the query list manually at any point in your functions,
-just call ``reset_queries()``, like this::
+(クエリは ``django.db.connection.queries`` で保存されます。
+`Django が実行している生の SQL クエリを見られますか？`_ を参照してください。)
+
+問題を解決するには、 ``DEBUG`` を ``False`` にしてください。
+
+クエリリストを手動で消去するには、以下のように ``reset_queries()`` を呼び出
+してください::
 
     from django import db
     db.reset_queries()
+

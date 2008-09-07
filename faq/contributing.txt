@@ -1,30 +1,40 @@
 .. _faq-contributing:
 
-FAQ: Contributing code
+.. _`FAQ: Contributing code`:
+
+FAQ: コードへの貢献
 ======================
 
-How can I get started contributing code to Django?
---------------------------------------------------
+:revision-up-to: 8961 (1.0)
 
-Thanks for asking! We've written an entire document devoted to this question.
-It's titled :ref:`Contributing to Django <internals-contributing>`.
+.. _How can I get started contributing code to Django?:
 
-I submitted a bug fix in the ticket system several weeks ago. Why are you ignoring my patch?
---------------------------------------------------------------------------------------------
+Django プロジェクトにコードを寄贈したいんですが、どうすればよいですか？
+-----------------------------------------------------------------------
 
-Don't worry: We're not ignoring you!
+よくぞ聞いてくれました！まさにこの質問に答えるためのドキュメントを用意して
+あります。 :ref:`Django プロジェクトへの貢献 <internals-contributing>` とい
+う文書です。
 
-It's important to understand there is a difference between "a ticket is being
-ignored" and "a ticket has not been attended to yet." Django's ticket system
-contains hundreds of open tickets, of various degrees of impact on end-user
-functionality, and Django's developers have to review and prioritize.
+.. _I submitted a bug fix in the ticket system several weeks ago. Why are you ignoring my patch?:
 
-On top of that: the people who work on Django are all volunteers. As a result,
-the amount of time that we have to work on the framework is limited and will
-vary from week to week depending on our spare time. If we're busy, we may not
-be able to spend as much time on Django as we might want.
+何週間も前にチケットシステムにバグフィクスを提出したんですが。何で私のパッチを無視するんですか？
+------------------------------------------------------------------------------------------------
 
-Besides, if your feature request stands no chance of inclusion in Django, we
-won't ignore it -- we'll just close the ticket. So if your ticket is still
-open, it doesn't mean we're ignoring you; it just means we haven't had time to
-look at it yet.
+心配しないでください。無視しているわけではないんですよ！
+
+まずは「チケットを無視する」ことと「まだチケットを検討していない」ことの違
+いを御理解ください。 Django のチケットシステムにはオープン状態のチケットが
+何百もあり、エンドユーザの使い勝手に与えるインパクトも様々です。そのため、
+Django の開発者達はチケットをレビューして、優先順位を決めねばならないのです。
+
+なにより、 Django プロジェクトに関わっている人たちは全てボランティアです。
+その結果、彼らがプロジェクトにかけられる労力には限界があるし、彼らがプロジェ
+クトに割ける時間もその時々で変化します。忙しいときには、十分な時間をかけら
+れず、なかなか要望に応えられない場合もあるのです。
+
+また、あなたのリクエストを Django に取り込まないとはっきりした場合、チケッ
+トを無視したりはせず、必ずクローズします。従って、チケットがまだオープンの
+状態なら、リクエストは無視されているのではなく、いま一時的にリクエストに目
+を通す時間を取れないということにすぎないのです。
+
