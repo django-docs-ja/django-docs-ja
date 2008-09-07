@@ -1,149 +1,168 @@
 .. _howto-outputting-pdf:
 
 ===========================
-Outputting PDFs with Django
+Django で PDF を出力する
 ===========================
 
-This document explains how to output PDF files dynamically using Django views.
-This is made possible by the excellent, open-source ReportLab_ Python PDF
-library.
+:revision-up-to: 8961 (1.0)
 
-The advantage of generating PDF files dynamically is that you can create
-customized PDFs for different purposes -- say, for different users or different
-pieces of content.
+このドキュメントでは， Django のビューを使って動的に PDF ファイルを生成する
+方法について説明します． PDF の生成は，優れたオープンソースの Python 用 PDF
+ライブラリである ReportLab_ を使うことで可能になります．
 
-For example, Django was used at kusports.com_ to generate customized,
-printer-friendly NCAA tournament brackets, as PDF files, for people
-participating in a March Madness contest.
+動的な PDF ファイル生成の利点は，様々な目的向けにカスタマイズされた PDF ，
+例えばユーザごとに違ったコンテンツの入った PDF を生成できることにあります．
+
+例えば， kusports.com_ では，March Madness contest の参加者向けに， Django
+を使ってカスタマイズ可能な印刷むきの NCAA トーナメント試合表を PDF で生成し
+ていました．
 
 .. _ReportLab: http://www.reportlab.org/rl_toolkit.html
 .. _kusports.com: http://www.kusports.com/
 
-Install ReportLab
-=================
+ReportLab のインストール
+========================
 
-Download and install the ReportLab library from http://www.reportlab.org/downloads.html.
-The `user guide`_ (not coincidentally, a PDF file) explains how to install it.
+ReportLab ライブラリは http://www.reportlab.org/downloads.html からダウンロー
+ドしてインストールします．
 
-Test your installation by importing it in the Python interactive interpreter::
+インストール方法は `ユーザガイド`_ (はからずも PDF ファイルですが) に書かれ
+ています．
+
+インストールがうまく行っているか， Python 対話シェルで import してみて確か
+めます::
 
     >>> import reportlab
 
-If that command doesn't raise any errors, the installation worked.
+エラーを送出しなければ，インストールはうまくいっています．
 
+.. _`ユーザガイド`: http://www.reportlab.com/docs/userguide.pdf
 .. _user guide: http://www.reportlab.com/docs/userguide.pdf
 
-Write your view
-===============
+ビューを書く
+============
 
-The key to generating PDFs dynamically with Django is that the ReportLab API
-acts on file-like objects, and Django's :class:`~django.http.HttpResponse`
-objects are file-like objects.
+Django を使った PDF 動的生成の鍵は，ファイル ReportLab の API がファイルラ
+イクオブジェクトのように動作し， Django の
+:class:`~django.http.HttpResponse` オブジェクトもまた、ファイルライクオブジェ
+クトのように振舞うところにあります．
 
-Here's a "Hello World" example::
+いわゆる "Hello World" サンプルを示します::
 
     from reportlab.pdfgen import canvas
     from django.http import HttpResponse
 
     def some_view(request):
-        # Create the HttpResponse object with the appropriate PDF headers.
+        # 適切な PDF 用応答ヘッダを持った HttpResponse オブジェクトを
+        # 作成します．
         response = HttpResponse(mimetype='application/pdf')
         response['Content-Disposition'] = 'attachment; filename=somefilename.pdf'
 
-        # Create the PDF object, using the response object as its "file."
+        # レスポンスオブジェクトを出力「ファイル」にして， PDF オブジェクト
+        # を作成します．
         p = canvas.Canvas(response)
 
-        # Draw things on the PDF. Here's where the PDF generation happens.
-        # See the ReportLab documentation for the full list of functionality.
+        # PDF に描画します． PDF 生成のキモの部分です．
+        # ReportLab の詳しい機能は ReportLab ドキュメントを参照してください．
         p.drawString(100, 100, "Hello world.")
 
-        # Close the PDF object cleanly, and we're done.
+        # PDF オブジェクトをきちんと閉じて終わり．
         p.showPage()
         p.save()
         return response
 
-The code and comments should be self-explanatory, but a few things deserve a
-mention:
+コードとコメントを読めば一目瞭然ですが，いくつか注意しておいたほうがよいで
+しょう:
 
-    * The response gets a special MIME type, ``application/pdf``. This tells
-      browsers that the document is a PDF file, rather than an HTML file. If
-      you leave this off, browsers will probably interpret the output as HTML,
-      which would result in ugly, scary gobbledygook in the browser window.
+    * レスポンスの MIME タイプは ``application/pdf`` にします．これにより，
+      ブラウザにドキュメントが PDF であると指示します． MIME タイプを指定し
+      ないと，出力を HTML として解釈するので，ブラウザウィンドウに見苦しい
+      ごみのような出力が表示されてしまいます．
 
-    * The response gets an additional ``Content-Disposition`` header, which
-      contains the name of the PDF file. This filename is arbitrary: Call it
-      whatever you want. It'll be used by browsers in the "Save as..."
-      dialogue, etc.
+    * さらに，レスポンスオブジェクトには ``Content-Disposition`` ヘッダを指
+      定しています．このヘッダは PDF ファイルの名前にします．ファイル名には
+      何を指定しても構いません．この名前は，ブラウザが「名前を付けて保存」
+      ダイアログなどで使います．
 
-    * The ``Content-Disposition`` header starts with ``'attachment; '`` in this
-      example. This forces Web browsers to pop-up a dialog box
-      prompting/confirming how to handle the document even if a default is set
-      on the machine. If you leave off ``'attachment;'``, browsers will handle
-      the PDF using whatever program/plugin they've been configured to use for
-      PDFs. Here's what that code would look like::
+    * 上の例では， ``Content-Disposition`` ヘッダは ``'attachment; '`` から
+      始まっています．ヘッダを ``'attachment; '`` で始めると，ウェブブラウ
+      ザは ``application/pdf`` に対するデフォルトの操作を指定していても，
+      ダイアログパネルを出して，ドキュメントの処理方法を選択するようユーザ
+      に促します．以下のように ``'attachment;'`` を入れない場合，ブラウザは
+      デフォルトの設定を使って PDF を処理します::
 
           response['Content-Disposition'] = 'filename=somefilename.pdf'
 
-    * Hooking into the ReportLab API is easy: Just pass ``response`` as the
-      first argument to ``canvas.Canvas``. The ``Canvas`` class expects a
-      file-like object, and :class:`~django.http.HttpResponse` objects fit the
-      bill.
+    * ReportLab API のフックは簡単です: ``response`` を ``canvas.Canvas``
+      の第一引数に指定します． ``Canvas`` クラスはファイルライクオブジェク
+      トを扱うようになっているので， :class:`django.http.HttpResponse` オブ
+      ジェクトを使えます．
 
-    * Note that all subsequent PDF-generation methods are called on the PDF
-      object (in this case, ``p``) -- not on ``response``.
+    * PDF オブジェクト (ここでは ``p``) を生成した後は， ``response`` では
+      なく ``p`` を使って PDF 生成メソッドを呼び出していることに注意して下
+      さい．
 
-    * Finally, it's important to call ``showPage()`` and ``save()`` on the PDF
-      file.
+    * 最後に必ず ``showPage()`` を呼び出し， PDF ファイルを ``save()`` して
+      ください．
 
-Complex PDFs
-============
+.. _Complex PDFs:
 
-If you're creating a complex PDF document with ReportLab, consider using the
-cStringIO_ library as a temporary holding place for your PDF file. The cStringIO
-library provides a file-like object interface that is particularly efficient.
-Here's the above "Hello World" example rewritten to use ``cStringIO``::
+複雑な PDF の生成
+=================
+
+ReportLab を使って複雑な PDF を作成したければ，一時的なファイルの保存に
+cStringIO_ ライブラリを使ってください． cStringIO ライブラリはこのような
+目的に対してとても効率的なファイルライクオブジェクトを提供します．
+``cStringIO`` で書き直した上の "Hello World" の例を示します::
 
     from cStringIO import StringIO
     from reportlab.pdfgen import canvas
     from django.http import HttpResponse
 
     def some_view(request):
-        # Create the HttpResponse object with the appropriate PDF headers.
+        # 適切な PDF 用応答ヘッダを持った HttpResponse オブジェクトを
+        # 作成します．
         response = HttpResponse(mimetype='application/pdf')
         response['Content-Disposition'] = 'attachment; filename=somefilename.pdf'
 
-        buffer = StringIO()
+        buffer = String()
 
-        # Create the PDF object, using the StringIO object as its "file."
+        # StringIO オブジェクトを出力「ファイル」にして， PDF オブジェクト
+        # を作成します．
         p = canvas.Canvas(buffer)
 
-        # Draw things on the PDF. Here's where the PDF generation happens.
-        # See the ReportLab documentation for the full list of functionality.
+        # PDF に描画します． PDF 生成のキモの部分です．
+        # ReportLab の詳しい機能は ReportLab ドキュメントを参照してください．
         p.drawString(100, 100, "Hello world.")
 
-        # Close the PDF object cleanly.
+        # PDF オブジェクトをきちんと閉じます．
         p.showPage()
         p.save()
 
-        # Get the value of the StringIO buffer and write it to the response.
+        # StringIO バッファの値を取り出して，レスポンスオブジェクトに
+        # 書き込みます．
         pdf = buffer.getvalue()
         buffer.close()
         response.write(pdf)
         return response
 
-.. _cStringIO: http://www.python.org/doc/current/lib/module-cStringIO.html
+.. _cStringIO: http://www.python.jp/doc/release/lib/module-cStringIO.html
+.. cStringIO: http://www.python.org/doc/current/lib/module-cStringIO.html
 
-Further resources
+.. _Further resources:
+
+その他のリソース
 =================
 
-    * PDFlib_ is another PDF-generation library that has Python bindings. To
-      use it with Django, just use the same concepts explained in this article.
-    * `Pisa HTML2PDF`_ is yet another PDF-generation library. Pisa ships with
-      an example of how to integrate Pisa with Django.      
-    * HTMLdoc_ is a command-line script that can convert HTML to PDF. It
-      doesn't have a Python interface, but you can escape out to the shell
-      using ``system`` or ``popen`` and retrieve the output in Python.
-    * `forge_fdf in Python`_ is a library that fills in PDF forms.
+    * Python バインディングを持つ別の PDF 生成ライブラリに PDFlib_ がありま
+      す． Django から使うには，このドキュメントで述べたのと同じ方法を使い
+      ます．
+    * `Pisa HTML2PDF`_ もまた、 PDF 生成のためのライブラリです。 Pisa には、
+      Django と Pisa を組み合わせ方の例が付属しています。
+    * HTMLdoc_ は HTML を PDF に変換できるコマンドラインスクリプトです．
+      HTMLdoc に Python インタフェースはありませんが， ``system`` や
+      ``popen`` のようなシェルを実行して，出力を Python から取り出せます．
+    * `forge_fdf in Python`_ はファイルを PDF 形式にするライブラリです．
 
 .. _PDFlib: http://www.pdflib.org/
 .. _`Pisa HTML2PDF`: http://www.htmltopdf.org/
@@ -152,6 +171,8 @@ Further resources
 
 Other formats
 =============
+
+.. TBD::
 
 Notice that there isn't a lot in these examples that's PDF-specific -- just the
 bits using ``reportlab``. You can use a similar technique to generate any

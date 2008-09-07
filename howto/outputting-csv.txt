@@ -1,29 +1,35 @@
 .. _howto-outputting-csv:
 
 ==========================
-Outputting CSV with Django
+Django で CSV を出力する
 ==========================
 
-This document explains how to output CSV (Comma Separated Values) dynamically
-using Django views. To do this, you can either use the `Python CSV library`_ or
-the Django template system.
+:revision-up-to: 8961 (1.0)
+
+このドキュメントでは， Django のビューを使って動的に CSV (Comma Separated
+Values: カンマ区切りのフィールドデータ) ファイルを生成する方法について説明
+します．  CSV の生成には `Python CSV ライブラリ`_ ， **または** Django テン
+プレートシステムが必要です．
+
+.. _`Python CSV ライブラリ`: http://www.python.jp/doc/release/lib/module-csv.html
 
 .. _Python CSV library: http://www.python.org/doc/current/lib/module-csv.html
 
-Using the Python CSV library
-============================
+CSV ライブラリを使う
+====================
 
-Python comes with a CSV library, ``csv``. The key to using it with Django is
-that the ``csv`` module's CSV-creation capability acts on file-like objects, and
-Django's :class:`~django.http.HttpResponse` objects are file-like objects.
+Python には CSV ライブラリモジュール ``csv`` がついてきます．Django で
+``csv`` を使う上での鍵は，モジュールの CSV 生成機能がファイルライクオ
+ブジェクトを扱えることと， Django の :class:`~django.http.HttpResponse` オ
+ブジェクトがファイルライクオブジェクトであることです．
 
-Here's an example::
+一例を示します::
 
     import csv
     from django.http import HttpResponse
 
     def some_view(request):
-        # Create the HttpResponse object with the appropriate CSV header.
+        # 適切な CSV 用ヘッダとともに HttpResponse オブジェクトを生成します．
         response = HttpResponse(mimetype='text/csv')
         response['Content-Disposition'] = 'attachment; filename=somefilename.csv'
 
@@ -33,83 +39,90 @@ Here's an example::
 
         return response
 
-The code and comments should be self-explanatory, but a few things deserve a
-mention:
+コードとコメントを読めば一目瞭然ですが，いくつか注意しておいたほうがよいで
+しょう:
 
-    * The response gets a special MIME type, ``text/csv``. This tells
-      browsers that the document is a CSV file, rather than an HTML file. If
-      you leave this off, browsers will probably interpret the output as HTML,
-      which will result in ugly, scary gobbledygook in the browser window.
+    * レスポンスの MIME タイプは ``text/csv`` にします．これにより，
+      ブラウザにドキュメントが CSV であると指示します． MIME タイプを指定し
+      ないと，出力を HTML として解釈するので，ブラウザウィンドウに見苦しい
+      ごみのような出力が表示されてしまいます．
 
-    * The response gets an additional ``Content-Disposition`` header, which
-      contains the name of the CSV file. This filename is arbitrary; call it
-      whatever you want. It'll be used by browsers in the "Save as..."
-      dialogue, etc.
+    * さらに，レスポンスオブジェクトには ``Content-Disposition`` ヘッダを指
+      定しています．このヘッダは CSV ファイルの名前にします．ファイル名には
+      何を指定しても構いません．この名前は，ブラウザが「名前を付けて保存」
+      ダイアログなどで使います．
 
-    * Hooking into the CSV-generation API is easy: Just pass ``response`` as the
-      first argument to ``csv.writer``. The ``csv.writer`` function expects a
-      file-like object, and :class:`~django.http.HttpResponse` objects fit the
-      bill.
+    * CSV 生成 API のフックは簡単です: ``response`` を ``csv.writer`` の第
+      一引数に指定します． ``csv.writer`` クラスはファイルライクオブジェク
+      トを扱うようになっているので， :class:`~django.http.HttpResponse` オ
+      ブジェクトを使えます．
 
-    * For each row in your CSV file, call ``writer.writerow``, passing it an
-      iterable object such as a list or tuple.
+    * CSV ファイルの各行ごとにリストやタプルのようなイテレーション可能オブ
+      ジェクトを渡して ``writer.writerow`` を呼び出します．
 
-    * The CSV module takes care of quoting for you, so you don't have to worry
-      about escaping strings with quotes or commas in them. Just pass
-      ``writerow()`` your raw strings, and it'll do the right thing.
+    * CSV モジュールはクオート処理を行ってくれるので，文字列中にクオートや
+      カンマがあっても心配することはありません．出力したい値を
+      ``writerow()`` に渡せば，モジュールが正しく処理してくれます．
 
-Using the template system
-=========================
+テンプレートシステムを使う
+==========================
 
-Alternatively, you can use the :ref:`Django template system <topics-templates>`
-to generate CSV. This is lower-level than using the convenient CSV, but the
-solution is presented here for completeness.
+``csv`` を使う代りに :ref:`Django テンプレートシステム <topics-templates>`
+を使っても CSV を生成できます．この方法よりも ``csv`` モジュールを使った方
+がより高水準で実現できますが，完全さのために紹介しておきます．
 
-The idea here is to pass a list of items to your template, and have the
-template output the commas in a :ttag:`for` loop.
+基本的な考え方は，テンプレートに要素リストを渡し，テンプレート上の
+:ttag:`for` ループの中でコンマとともに出力するというものです．
 
-Here's an example, which generates the same CSV file as above::
+上と同じ CSV ファイルを生成する例を示します::
 
     from django.http import HttpResponse
-    from django.template import loader, Context
+    from django.core.template import loader, Context
 
     def some_view(request):
-        # Create the HttpResponse object with the appropriate CSV header.
+        # 適切な CSV 用応答ヘッダを持った HttpResponse オブジェクトを
+        # 作成します．
         response = HttpResponse(mimetype='text/csv')
         response['Content-Disposition'] = 'attachment; filename=somefilename.csv'
 
-        # The data is hard-coded here, but you could load it from a database or
-        # some other source.
+        # ここではデータをハードコードしていますが，実際にはデータベースな
+	# のデータソースから取り出せます．
         csv_data = (
             ('First row', 'Foo', 'Bar', 'Baz'),
             ('Second row', 'A', 'B', 'C', '"Testing"', "Here's a quote"),
         )
 
-        t = loader.get_template('my_template_name.txt')
+        t = loader.get_template('my_template_name.html')
         c = Context({
             'data': csv_data,
         })
         response.write(t.render(c))
         return response
 
-The only difference between this example and the previous example is that this
-one uses template loading instead of the CSV module. The rest of the code --
-such as the ``mimetype='text/csv'`` -- is the same.
+前節の例との違いは， CSV モジュールの代りにテンプレートをロードしている点だ
+けです．それ以外のコード，例えば ``mimetype='text/csv'`` のような部分はまっ
+たく同じです．
 
-Then, create the template ``my_template_name.txt``, with this template code:
+次に， ``my_template_name.txt`` というテンプレートを以下のように書きます:
 
 .. code-block:: html+django
 
     {% for row in data %}"{{ row.0|addslashes }}", "{{ row.1|addslashes }}", "{{ row.2|addslashes }}", "{{ row.3|addslashes }}", "{{ row.4|addslashes }}"
     {% endfor %}
 
-This template is quite basic. It just iterates over the given data and displays
-a line of CSV for each row. It uses the :tfilter:`addslashes` template filter to
-ensure there aren't any problems with quotes.
+このテンプレートはきわめて基本的なものです．テンプレートは指定されたデータ
+に渡って繰り返し CSV の各行を表示してゆきます．クオートで問題が生じないよう，
+:tfilter:`addslashes`  テンプレートフィルタを使っています．データに引用符
+(一重と二重の両方) が入っていないと保証できる場合は :tfilter:`addslashes`
+フィルタを外してもかまいません．
 
-Other text-based formats
-========================
+.. _Other text-based formats:
 
+その他のテキストベース形式
+===========================
+
+.. TBD::
+ 
 Notice that there isn't very much specific to CSV here -- just the specific
 output format. You can use either of these techniques to output any text-based
 format you can dream of. You can also use a similar technique to generate
