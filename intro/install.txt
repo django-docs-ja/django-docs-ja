@@ -1,23 +1,31 @@
 .. _intro-install:
 
-Quick install guide
-===================
+インストールガイド
+=====================
 
-Before you can use Django, you'll need to get it installed. We have a
-:ref:`complete installation guide <topics-install>` that covers all the
-possibilities; this guide will guide you to a simple, minimal installation
-that'll work while you walk through the introduction.
+:revision-up-to: 8961 (1.0pre SVN)
 
-Install Python
---------------
+Django を動かすには、まずインストールせねばなりません。ここでは、 Django を
+学んでみるにあたって必要な、簡単で最小限のインストール方法を示します。
+色々なインストール方法をカバーしている
+:ref:`詳細なインストールガイド <topics-install>` も用意してあります。
 
-Being a Python Web framework, Django requires Python. It works with any Python
-version 2.3 and higher, but we recommend installing Python 2.5 or later. If you do so, you won't need to set up a database just yet: Python 2.5 or later includes a lightweight database called SQLite_.
+.. _Install Python:
+
+Python のインストール
+---------------------
+
+Django は Python の Web フレームワークなので Python が必要です。 Django は
+バージョン 2.3 以上の Python で動作しますが、 2.5 以降がお勧めです。という
+のも、 Python 2.5 からは、 SQLite_ という軽量なデータベースが付属するからで
+す。
 
 .. _sqlite: http://sqlite.org/
 
-Get Python at http://www.python.org. If you're running Linux or Mac OS X, you
-probably already have it installed.
+http://www.python.org から Python を取ってきましょう。 Linux や Mac OSX を
+動かしているのなら、おそらくインストール済みのはずです。
+
+.. TBD::
 
 .. admonition:: Django on Jython
 
@@ -32,7 +40,7 @@ You can verify that Python's installed py typing ``python`` from your shell; you
     [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
     Type "help", "copyright", "credits" or "license" for more information.
     >>>
-    
+     
 Set up a database
 -----------------
 
@@ -41,13 +49,17 @@ If you installed Python 2.5 or later, you can skip this step for now.
 If not, or if you'd like to work with a "large" database engine like PostgreSQL,
 MySQL, or Oracle, consult the :ref:`database installation information
 <database-installation>`.
+ 
+.. _Remove any old versions of Django:
 
-Remove any old versions of Django
----------------------------------
+旧バージョンの Django の除去
+============================
 
-If you are upgrading your installation of Django from a previous version, you
-will need to :ref:`uninstall the old Django version before installing the new
-version <removing-old-versions-of-django>`.
+以前のバージョンからアップグレードする形で Django をインストールする場合、
+:ref: `新しいバージョンをインストールする前に、まず旧バージョンをアンインス
+トールしておく <removing-old-versions-of-django>` 必要があります。
+
+.. TBD::
 
 Install Django
 --------------
@@ -77,6 +89,4 @@ That's it!
 ----------
 
 That's it -- you can now :ref:`move onto the tutorial <intro-tutorial01>`.
-
-
-
+ 

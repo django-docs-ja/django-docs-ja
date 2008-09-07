@@ -1,104 +1,112 @@
 .. _topics-install:
 
 =====================
-How to install Django
+Django のインストール
 =====================
 
-This document will get you up and running with Django.
+:revision-up-to: 8961 (1.0)
 
-Install Python
-==============
+このドキュメントを読めば Django を動かせるようになります。
 
-Being a Python Web framework, Django requires Python.
+.. _Install Python:
 
-It works with any Python version 2.3 and higher.
+Python のインストール
+=====================
 
-Get Python at http://www.python.org. If you're running Linux or Mac OS X, you
-probably already have it installed.
+Django は Python の Web フレームワークなので Python が必要です。
 
-.. admonition:: Django on Jython
+Django はバージョン 2.3 以上の Python で動作します。
 
-    If you use Jython_ (a Python implementation for the Java platform), you'll
-    need to follow a few additional steps. See :ref:`howto-jython` for details.
+http://www.python.org から Python を取ってきましょう。 Linux や Mac OSX を
+動かしているのなら、おそらくインストール済みのはずです。
+
+.. admonition:: Jython で Django を動かす
+
+    Jython_ (Java プラットフォームで動く Python 実装) を使っているなら、他
+    にもいくつかステップを踏む必要があります。詳しくは :ref:`howto-jython`
+    を参照してください。
 
 .. _jython: http://jython.org/
 
-Install Apache and mod_python
-=============================
 
-If you just want to experiment with Django, skip ahead to the next
-section; Django includes a lightweight web server you can use for
-testing, so you won't need to set up Apache until you're ready to
-deploy Django in production.
+.. _Install Apache and mod_python:
 
-If you want to use Django on a production site, use Apache with `mod_python`_.
-mod_python is similar to mod_perl -- it embeds Python within Apache and loads
-Python code into memory when the server starts. Code stays in memory throughout
-the life of an Apache process, which leads to significant performance gains
-over other server arrangements. Make sure you have Apache installed, with the
-mod_python module activated. Django requires Apache 2.x and mod_python 3.x.
+Apache と mod_python のインストール
+===================================
 
-See :ref:`How to use Django with mod_python <howto-deployment-modpython>` for
-information on how to configure mod_python once you have it installed.
+単に Django を試してみたいだけなら、この節は読み飛ばして次の節を読んでくだ
+さい。Djangoにはテスト用の軽量なWebサーバが付属しているので、運用環境での動
+作が必要になるまでApacheをセットアップする必要はないのです。
 
-If you can't use mod_python for some reason, fear not: Django follows the WSGI_
-spec, which allows it to run on a variety of server platforms. See the
-`server-arrangements wiki page`_ for specific installation instructions for
-each platform.
+Django を実運用のサイトで使いたい場合、 Apache と `mod_python`_ を使って下
+さい。 mod_python は mod_perl のようなもので、 Python を Apache の中に埋め
+込み、サーバの起動時に Python コードをメモリにロードします。コードは Apache
+プロセスが生きている間ずっとメモリ上に存在するので、他のサーバ構成よりも明
+らかに高いパフォーマンスを実現します。 Django の動作には Apache 2.x および
+mod_python 3.x が必要です。
+
+mod_python をインストールしたら、設定に関する情報は 
+:ref:`mod_python で Django を動かす <howto-deployment-modpython>` を参照し
+てください。
+
+何らかの理由で mod_python を使えない場合でも心配はいりません: Django は
+WSGI_ 仕様に従っているので、様々なサーバプラットフォームで動作させられます。
+個々のプラットフォームにおけるインストール方法の説明は 
+`サーバ構成に関する wiki ページ`_ を参照してください。
 
 .. _Apache: http://httpd.apache.org/
 .. _mod_python: http://www.modpython.org/
 .. _WSGI: http://www.python.org/peps/pep-0333.html
+.. _`サーバ構成に関する wiki ページ`: http://code.djangoproject.com/wiki/ServerArrangements
 .. _server-arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
 
-.. _database-installation:
+.. _Get your database running:
 
-Get your database running
-=========================
+データベースを動かす
+====================
 
-If you plan to use Django's database API functionality, you'll need to
-make sure a database server is running. Django works with PostgreSQL_,
-MySQL_, Oracle_ and SQLite_ (although SQLite doesn't require a separate server
-to be running).
+Django のデータベース API 機能を使うのなら、データベースサーバを動かす必要
+があります。 Django は PostgreSQL_, MySQL_, Oracle_ および SQLite_ で動作し
+ます (SQLite はサーバを動かさなくても使えます)。
 
-Additionally, you'll need to make sure your Python database bindings are
-installed.
+さらに、各データベースの Python バインディングをインストールしておく必要が
+あります。
 
-* If you're using PostgreSQL, you'll need the psycopg_ package. Django supports
-  both version 1 and 2. (When you configure Django's database layer, specify
-  either ``postgresql`` [for version 1] or ``postgresql_psycopg2`` [for version 2].)
+* PostgreSQL を使う場合、 psycopg_ パッケージが必要です。 Django はバージョ
+  ン 1 および 2 の psycopg をサポートしています (Django のデータベース設定
+  で、 ``postgresql`` [バージョン 1 の場合] か、 ``postgresql_psycopg2``
+  [バージョン 2 の場合] を選んでください。Windows 環境なら、 
+  非公式の `Windows むけコンパイル済みパッケージ`_ を使って下さい。
 
-  If you're on Windows, check out the unofficial `compiled Windows version`_.
+* MySQL を使う場合は、バージョン 1.2.1p2 以降の MySQLdb_ が必要です。
+  :ref:`MySQL バックエンド <ref-databases>` にまつわるデータベース固有の説
+  明も読んでおいたほうがよいでしょう。
 
-* If you're using MySQL, you'll need MySQLdb_, version 1.2.1p2 or higher. You
-  will also want to read the database-specific notes for the :ref:`MySQL
-  backend <ref-databases>`.
+* Python 2.3 または Python 2.4 で SQLite を使う場合、は pysqlite_ が必要で
+  す。バージョン 2.0.3 以上を使って下さい。 Python 2.5 は標準ライブラリに
+  SQLite のラッパモジュールが入っているので、特に追加でインストールするもの
+  はありません。
 
-* If you're using SQLite and either Python 2.3 or Python 2.4, you'll need
-  pysqlite_. Use version 2.0.3 or higher. Python 2.5 ships with an SQLite
-  wrapper in the standard library, so you don't need to install anything extra
-  in that case.
+* Oracle を使っているなら、 cx_Oracle_ が必要です。バージョン 4.3.1 以上を
+  使ってください。 :ref:`Oracle バックエンド <oracle-notes>` 固有の注意事項
+  も参照してください。
 
-* If you're using Oracle, you'll need cx_Oracle_, version 4.3.1 or higher. You
-  will also want to read the database-specific notes for the :ref:`Oracle
-  backend <oracle-notes>`.
+Django の ``manage.py syncdb`` を使って、モデルに対応するテーブルを自動生成
+するつもりなら、Django に対して、データベース上でテーブルの生成や ALTER を
+行える権限を付与せねばなりません。テーブルを手動で生成するのなら、Django に
+付与する権限は ``SELECT``, ``INSERT``, ``UPDATE`` および ``DELETE`` だけで
+かまいません。ただし、データベースによっては、 ``syncdb`` 時に 
+``ALTER TABLE`` 権限を付与しておく必要があります。 ``syncdb`` で一度テーブ
+ルを生成してしまえば、 ``syncdb`` は ``ALTER TABLE`` 文を発行しません。
 
-If you plan to use Django's ``manage.py syncdb`` command to
-automatically create database tables for your models, you'll need to
-ensure that Django has permission to create and alter tables in the
-database you're using; if you plan to manually create the tables, you
-can simply grant Django ``SELECT``, ``INSERT``, ``UPDATE`` and
-``DELETE`` permissions. On some databases, Django will need
-``ALTER TABLE`` privileges during ``syncdb`` but won't issue
-``ALTER TABLE`` statements on a table once ``syncdb`` has created it.
-
-If you're using Django's :ref:`testing framework<topics-testing>` to test database queries,
-Django will need permission to create a test database.
+:ref:`テストフレームワーク <topics-testing>` を使ってデータベースクエリのテ
+ストを行うのなら、データベースを生成する権限も必要です。
 
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
 .. _Django's ticket system: http://code.djangoproject.com/report/1
-.. _psycopg: http://initd.org/tracker/psycopg
+.. _psycopg: http://initd.org/projects/psycopg
+.. _`Windows むけコンパイル済みパッケージ`: http://stickpeople.com/projects/python/win-psycopg/
 .. _compiled Windows version: http://stickpeople.com/projects/python/win-psycopg/
 .. _MySQLdb: http://sourceforge.net/projects/mysql-python
 .. _SQLite: http://www.sqlite.org/
@@ -107,162 +115,176 @@ Django will need permission to create a test database.
 .. _Oracle: http://www.oracle.com/
 
 .. _removing-old-versions-of-django:
+.. _Remove any old versions of Django:
 
-Remove any old versions of Django
-=================================
+旧バージョンの Django の除去
+============================
 
-If you are upgrading your installation of Django from a previous version,
-you will need to uninstall the old Django version before installing the
-new version.
+以前のバージョンからアップグレードする形で Django をインストールする場合、
+新しいバージョンをインストールする前に、まず旧バージョンをアンインストール
+しておく必要があります。
 
-If you installed Django using ``setup.py install``, uninstalling
-is as simple as deleting the ``django`` directory from your Python
-``site-packages``.
+``setup.py install`` を使って Django をインストールした場合は簡単で、
+Python の ``site-packages`` ディレクトリから ``django`` ディレクトリを削除
+するだけです。
 
-If you installed Django from a Python egg, remove the Django ``.egg`` file,
-and remove the reference to the egg in the file named ``easy-install.pth``.
-This file should also be located in your ``site-packages`` directory.
+Python egg を使って Django をインストールした場合、Django の ``.egg`` ファ
+イルを削除するとともに、 ``easy-install.pth`` から Django の ``.egg`` ファ
+イルパスが書かれたエントリを削除します。 ``easy-install.pth`` や ``.egg``
+は、通常  ``site-packages`` ディレクトリ下にあります。
 
-.. admonition:: Where are my ``site-packages`` stored?
+.. admonition:: ``site-packages`` はどこにあるの？
 
-    The location of the ``site-packages`` directory depends on the operating
-    system, and the location in which Python was installed. To find out your
-    system's ``site-packages`` location, execute the following:
-    
+    ``site-packages`` の在処はオペレーティングシステムや Python のインストー
+    ル場所によって異なります。 ``site-pacakges`` の場所を調べるには、以下の
+    コマンドを実行してみてください:
+
     .. code-block:: bash
-
-        python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()"
-
-    (Note that this should be run from a shell prompt, not a Python interactive
-    prompt.)
     
+      python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()"
+ 
+    (このコマンドはPythonの対話プロンプトではなく、シェルプロンプトで実行し
+    てください。)
+
+
 .. _install-django-code:
+.. _Install the Django code:
 
-Install the Django code
-=======================
+Django コードのインストール
+===========================
 
-Installation instructions are slightly different depending on whether you're
-installing a distribution-specific package, downloading the latest official
-release, or fetching the latest development version.
+インストール方法の説明は、 OS ごとのインストールパッケージを入れる場合、公
+式リリース版を入れる場合、そして最新の開発バージョンを入れる場合で少し異な
+ります。
 
-It's easy, no matter which way you choose.
+どの方法を選ぶにしても、そんなに難しくはないので安心してください。
 
-Installing a distribution-specific package
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Check the :ref:`distribution specific notes <misc-distributions>` to see if your
-platform/distribution provides official Django packages/installers.
-Distribution-provided packages will typically allow for automatic installation
-of dependencies and easy upgrade paths.
+.. _Installing a distribution-specific package:
 
-.. _installing-official-release:
+OS ごとのインストールパッケージによるインストール
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 
+:ref:`ディストリビューション固有の注意 <misc-distributions>` を調べて、自分
+のプラットフォーム/ディストリビューションで公式の Django パッケージやインス
+トーラが提供されていないか調べます。ディストリビューション固有の配布パッケー
+ジは、たいてい依存関係のあるパッケージを自動的にインストールしてくれたり、パ
+スの更新を行ってくれたりします。
+ 
 
-Installing an official release
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _Installing an official release:
 
-    1. Download the latest release from our `download page`_.
+公式リリースのインストール
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    2. Untar the downloaded file (e.g. ``tar xzvf Django-NNN.tar.gz``,
-       where ``NNN`` is the version number of the latest release).
-       If you're using Windows, you can download the command-line tool
-       bsdtar_ to do this, or you can use a GUI-based tool such as 7-zip_.
+    1. `ダウンロードページ`_ から、最新版の Django をダウンロードします。
 
-    3. Change into the directory created in step 2 (e.g. ``cd Django-NNN``).
+    2. ダウンロードしたファイルを tar で展開します 
+       (例: ``tar xzvf Django-NNN.tar.gz``)。 Windows を使っているのなら、
+       コマンドラインツール bsdtar_ を使うか、 7-zip_ のような GUI ベースの
+       ツールを使います。
 
-    4. If you're using Linux, Mac OS X or some other flavor of Unix, enter
-       the command ``sudo python setup.py install`` at the shell prompt.
-       If you're using Windows, start up a command shell with administrator
-       privileges and run the command ``setup.py install``.
+    3. ステップ 2 で生成された展開先のディレクトリに移ります
+       (例: ``cd Django-NNN``)
 
-These commands will install Django in your Python installation's
-``site-packages`` directory.
+    4. Linux, Mac OS X, その他の Unix 系のオペレーティングシステムでは、
+       シェルプロンプトからコマンド ``sudo python setup.py install`` を入力
+       します。 Windows を使っているのなら、管理者権限でコマンドプロンプト
+       を起動して、コマンド ``setup.py install`` を実行します。
+       
+上のコマンドを実行すると、 Django は Python インストールディレクトリの
+``site-packages`` ディレクトリ下にインストールされます。
 
 .. _bsdtar: http://gnuwin32.sourceforge.net/packages/bsdtar.htm
 .. _7-zip: http://www.7-zip.org/
 
+
 .. _installing-development-version:
+.. _Installing the development version:
 
-Installing the development version
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+開発バージョンのインストール
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. admonition:: Tracking Django development
+.. admonition:: Django の開発版を追いかける
     
-    If you decide to use the latest development version of Django,
-    you'll want to pay close attention to `the development timeline`_,
-    and you'll want to keep an eye on `the list of
-    backwards-incompatible changes`_. This will help you stay on top
-    of any new features you might want to use, as well as any changes
-    you'll need to make to your code when updating your copy of Django.
-    (For stable releases, any necessary changes are documented in the
-    release notes.)
+    最新版の Django を使うと決めたのなら、 `開発の進行状況`_ によく注意して、
+    `以前のバージョンと互換性のない変更`_ がないか気をつけておく必要がある
+    でしょう。これらのリンク先のページに注意していれば、使ってみたい新たな
+    機能や、手元の Django をアップデートする際に、自分のコードのどこを修正
+    する必要があるか追いかけられます。 (安定版では、 Django のアップデート
+    時に必要な変更は全てドキュメントに記載されています。)
 
 .. _the development timeline: http://code.djangoproject.com/timeline
+.. _`開発の進行状況`: `the development timeline`_
 .. _the list of backwards-incompatible changes: http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
+.. _`以前のバージョンと互換性のない変更`: `the list of backwards-incompatible changes`_
 
-If you'd like to be able to update your Django code occasionally with the
-latest bug fixes and improvements, follow these instructions:
 
-1. Make sure that you have Subversion_ installed, and that you can run its
-   commands from a shell. (Enter ``svn help`` at a shell prompt to test
-   this.)
+Django のコードを更新して最新のバグフィクスや改良を適用したいのなら、以下の
+説明に従って開発バージョンをインストールしてください。
 
-2. Check out Django's main development branch (the 'trunk') like so:
+1. Subversion_ がインストールされていて、シェルからコマンドを実行できること
+   を確認してください。 (調べるには、シェルプロンプトで ``svn help`` を入力
+   します。)
+
+2. 以下のようにして、Django のメイン開発ブランチ ('trunk') をチェックアウト
+   します:
 
    .. code-block:: bash
 
-       svn co http://code.djangoproject.com/svn/django/trunk/ django-trunk
+     svn co http://code.djangoproject.com/svn/django/trunk/ django-trunk
 
-3. Next, make sure that the Python interpreter can load Django's code. There
-   are various ways of accomplishing this.  One of the most convenient, on
-   Linux, Mac OSX or other Unix-like systems, is to use a symbolic link:
+3. Python インタプリタが Django のコードをロードできるようにします。いくつ
+   か方法がありますが、 Linux や Mac OS X, Unix 系オペレーティングシステム
+   上では、以下のようにしてシンボリックリンクを張るのが最も便利な方法です:
+
+   .. code-block:: bash
+
+      ln -s `pwd`/django-trunk/django SITE-PACKAGES-DIR/django
+
+   (上の作業では、使っているプラットフォームの ``site-packages``  ディレク
+   トリに合わせて SITE-PACKAGES-DIR を書き換えてください。 
+   ``site-packages`` の場所の探し方は、「 ``site-packages`` はどこにあるの？」
+   を参照してください)
+
+   環境変数 ``PYTHONPATH`` に、 ``django-trunk`` ディレクトリを含めるよう設
+   定する方法もあります。 Windows システムではシンボリックリンクがサポート
+   されていないので、この方法が最も便利な方法です。 (Windows システムでは、
+   環境変数は、 `コントロールパネルから`_ 設定します)。
+
+   .. admonition:: Apache と mod_python の設定は？
+
+     ``PYTHONPATH`` を設定する方法をとる場合、同じ値を Apache の設定ファ
+     イルにも入れておくのを忘れないでください。 Apache で PYTHONPATH を設定
+     するには、 ``PythonPath`` ディレクティブを使います。
+
+     もちろん、 Apache と mod_python を使った運用に関する情報はこれだけでは
+     ありません。 
+     :ref:`mod_python で Django を動かす <howto-deployment-modpython>` も参
+     照してください。
+
+
+4. ``django_src/django/bin/django-admin.py`` を実行できるようにします。
+   Unix系のシステムでは、例えば以下のようにして、 ``/usr/local/bin`` のよう
+   なシステムパス上にシンボリックリンクを作成します::
+
+     ln -s `pwd`/django-trunk/django/bin/django-admin.py /usr/local/bin
+
+   これで、 ``django-admin.py`` とコマンド入力するだけで、どのディレクトリ
+   上でも ``django-admin.py`` を起動できるようになります。
+
+   Windows では、 ``django_src/django/bin/django-admin.py`` を、
+   ``C:\Python24\Scripts`` のようなシステムパス上にコピーします。
+
+ステップ 3 と 4 は ``python setup.py install`` と同じ作業を実行しているので、
+``python setup.py install`` を実行する必要は **ありません** 。
    
-   .. code-block:: bash
-
-       ln -s `pwd`/django-trunk/django SITE-PACKAGES-DIR/django
-
-   (In the above line, change ``SITE-PACKAGES-DIR`` to match the location of
-   your system's ``site-packages`` directory, as explained in the
-   "Where are my ``site-packages`` stored?" section above.)
-
-   Alternatively, you can define your ``PYTHONPATH`` environment variable
-   so that it includes the ``django-trunk`` directory. This is perhaps the
-   most convenient solution on Windows systems, which don't support symbolic
-   links. (Environment variables can be defined on Windows systems `from the
-   Control Panel`_.)
-
-   .. admonition:: What about Apache and mod_python?
-
-      If you take the approach of setting ``PYTHONPATH``, you'll need to
-      remember to do the same thing in your Apache configuration once you
-      deploy your production site. Do this by setting ``PythonPath`` in your
-      Apache configuration file.
-
-      More information about deployment is available, of course, in our
-      :ref:`How to use Django with mod_python <howto-deployment-modpython>`
-      documentation.
-
-4. On Unix-like systems, create a symbolic link to the file
-   ``django-trunk/django/bin/django-admin.py`` in a directory on your system
-   path, such as ``/usr/local/bin``. For example:
-   
-   .. code-block:: bash
-
-       ln -s `pwd`/django-trunk/django/bin/django-admin.py /usr/local/bin
-
-   This simply lets you type ``django-admin.py`` from within any directory,
-   rather than having to qualify the command with the full path to the file.
-
-   On Windows systems, the same result can be achieved by copying the file
-   ``django-trunk/django/bin/django-admin.py`` to somewhere on your system
-   path, for example ``C:\Python24\Scripts``.
-
-You *don't* have to run ``python setup.py install``, because you've already
-carried out the equivalent actions in steps 3 and 4.
-
-When you want to update your copy of the Django source code, just run the
-command ``svn update`` from within the ``django-trunk`` directory. When you do
-this, Subversion will automatically download any changes.
+Django のソースコードを更新する際には、 ``django-trunk`` ディレクトリで
+``svn update`` を実行してください。実行すると、 Subversion が更新部分を自動
+的にダウンロードします。
 
 .. _`download page`: http://www.djangoproject.com/download/
 .. _Subversion: http://subversion.tigris.org/
 .. _from the Control Panel: http://www.microsoft.com/resources/documentation/windows/xp/all/proddocs/en-us/sysdm_advancd_environmnt_addchange_variable.mspx
+.. _`ダウンロードページ`: `download page`_
+.. _`コントロールパネルから`: http://www.microsoft.com/resources/documentation/windows/xp/all/proddocs/ja/sysdm_advancd_environmnt_addchange_variable.mspx
