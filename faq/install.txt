@@ -1,40 +1,54 @@
 .. _faq-install:
 
-FAQ: Installation
+.. _`FAQ: Installation`:
+
+FAQ: インストール
 =================
 
 How do I get started?
 ---------------------
 
-    #. `Download the code`_.
-    #. Install Django (read the :ref:`installation guide <intro-install>`).
-    #. Walk through the :ref:`tutorial <intro-tutorial01>`.
-    #. Check out the rest of the :ref:`documentation <index>`, and `ask questions`_ if you
-       run into trouble.
+.. _How do I get started?:
+
+どこから始めたらいいですか？
+----------------------------
+
+    #. `コードをダウンロード`_ してください。
+    #. Django をインストールしてください (
+       :ref:`インストールガイド <intro-install>` を読んで下さい)。
+    #. :ref:`チュートリアル <intro-tutorial01>` をやってみてください。
+    #. 他の `ドキュメント <index>` にも目を通して下さい。何かトラブルに出会っ
+       たら、 `質問`_ してみましょう。
 
 .. _`Download the code`: http://www.djangoproject.com/download/
 .. _ask questions: http://www.djangoproject.com/community/
+.. _`コードをダウンロード`: `Download the code`_
+.. _`質問`: `ask questions`_
 
-How do I fix the "install a later version of setuptools" error?
----------------------------------------------------------------
+.. _How do I fix the "install a later version of setuptools" error?:
 
-Just run the ``ez_setup.py`` script in the Django distribution.
+"install a later version of setuptools" と表示されます。どうすればよいですか？
+------------------------------------------------------------------------------
 
-What are Django's prerequisites?
---------------------------------
+Django 配布物に入っている ``ez_setup.py`` を実行してください。
 
-Django requires Python_ 2.3 or later. No other Python libraries are required
-for basic Django usage.
+.. _What are Django's prerequisites?:
 
-For a development environment -- if you just want to experiment with Django --
-you don't need to have a separate Web server installed; Django comes with its
-own lightweight development server. For a production environment, we recommend
-`Apache 2`_ and mod_python_, although Django follows the WSGI_ spec, which
-means it can run on a variety of server platforms.
+Django を動かすには何が必要ですか？
+-------------------------------------
 
-If you want to use Django with a database, which is probably the case, you'll
-also need a database engine. PostgreSQL_ is recommended, because we're
-PostgreSQL fans, and MySQL_, `SQLite 3`_, and Oracle_ are also supported.
+Django を動かすには Python_ 2.3 以降が必要です。Django の初歩的な利用では、
+それ以外の Python ライブラリは不要です。
+
+開発環境を使う場合、つまり Django を試したいだけの場合は、 Web サーバを別に
+インストールしておく必要はありません。 Django には軽量な開発用サーバがつい
+てきます。
+運用環境には `Apache 2`_ と mod_python_ を勧めますが、 Django は WSGI_ 仕様
+に従っているので、様々なサーバフラットフォームで動作します。
+
+Django をデータベースと合わせて使うならデータベースエンジンも必要です。
+我々は PostgreSQL_ ファンなので PostgreSQL をお勧めしますが、 MySQL_ や
+`SQLite 3`_, Oracle_ もサポートしています。
 
 .. _Python: http://www.python.org/
 .. _Apache 2: http://httpd.apache.org/
@@ -45,64 +59,80 @@ PostgreSQL fans, and MySQL_, `SQLite 3`_, and Oracle_ are also supported.
 .. _`SQLite 3`: http://www.sqlite.org/
 .. _Oracle: http://www.oracle.com/
 
-Do I lose anything by using Python 2.3 versus newer Python versions, such as Python 2.5?
-----------------------------------------------------------------------------------------
+.. _Do I lose anything by using Python 2.3 versus newer Python versions, such as Python 2.5?:
 
-No. Django itself is guaranteed to work with any version of Python from 2.3
-and higher.
+Python 2.3 を使うのは、 2.5 のような新しいバージョンを使うよりも不利ですか？
+----------------------------------------------------------------------------
 
-If you use a Python version newer than 2.3, you will, of course, be able to
-take advantage of newer Python features in your own code, along with the speed
-improvements and other optimizations that have been made to the Python language
-itself. But the Django framework itself should work equally well on 2.3 as it
-does on 2.4 or 2.5.
+いいえ。 Django 自体は 2.3 以降全てのバージョンの Python で動作保証されてい
+ます。
 
-Do I have to use mod_python?
-----------------------------
+もちろん、 2.3 よりも新しい Python を使っていれば、自分のコードに新しい
+Python の機能を取り込めますし、Python 自体の改良によってもたらされた高速化
+や最適化の恩恵を受けられます。ただし、 Django フレームワーク自体は、 2.3 で
+も 2.4 や 2.5 でも同じように動作します。
 
-Although we recommend mod_python for production use, you don't have to use it,
-thanks to the fact that Django uses an arrangement called WSGI_. Django can
-talk to any WSGI-enabled server. Other non-mod_python deployment setups are
-FastCGI, SCGI or AJP. See
-:ref:`How to use Django with FastCGI, SCGI or AJP <howto-deployment-fastcgi>`
-for full information.
+.. _Do I have to use mod_python?:
 
-Also, see the `server arrangements wiki page`_ for other deployment strategies.
+mod_python を使わねばならないのでしょうか？
+-------------------------------------------
 
-If you just want to play around and develop things on your local computer, use
-the development Web server that comes with Django. Things should Just Work.
+実際に運用する上では mod_python を使うよう勧めていますが、 Django は WSGI_
+と呼ばれる構成を使っているため、必ずしも mod_python を使わねばならないわけ
+ではありません。 Django は WSGI を有効化したサーバと通信できます。
+他にも、 mod_python を使わない構成として、 FastCGI, SCGI, AJP があります。
+詳しい情報は 
+:ref:`FastCGI, SCGI, AJP で Django を使う <howto-deployment-fastcgi>` を参
+照してください。
+
+また、その他の運用方法については `サーバ構成に関する wikiページ`_ を参照し
+てください。
+
+Django を試してみたり、ローカルのコンピュータ上で開発するだけなら、 Django
+に付いてくる開発用 Web サーバを使ってください。
 
 .. _WSGI: http://www.python.org/peps/pep-0333.html
 .. _server arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
+.. _`サーバ構成に関する wikiページ`: `server arrangements wiki page`_
 
-How do I install mod_python on Windows?
----------------------------------------
+.. _How do I install mod_python on Windows?:
 
-    * For Python 2.4, grab mod_python from `win32 build of mod_python for
-      Python 2.4`_.
-    * For Python 2.4, check out this `Django on Windows howto`_.
-    * For Python 2.3, grab mod_python from http://www.modpython.org/ and read
-      `Running mod_python on Apache on Windows2000`_.
-    * Also, try this (not Windows-specific) `guide to getting mod_python
-      working`_.
+どうすれば Windows に mod_python をインストールできますか？
+-------------------------------------------------------------
+
+    * Python 2.4 を使っているなら
+      `Python 2.4 向け mod_python の win32 ビルド`_ を入手してください。
+    * Python 2.4 の場合、 `Windows での Django HOWTO`_ も参照してください。
+    * Python 2.3 なら、 http://www.modpython.org/ から mod_python を取って
+      来て、 `Running mod_python on Apache on Windows2000`_ を読んで下さい。
+    * また、 (Windows に限らず) `guide to getting mod_python
+      working`_ を読んで下さい。
 
 .. _`win32 build of mod_python for Python 2.4`: http://www.lehuen.com/nicolas/index.php/2005/02/21/39-win32-build-of-mod_python-314-for-python-24
 .. _`Django on Windows howto`: http://thinkhole.org/wp/django-on-windows/
+.. _`Python 2.4 向け mod_python の win32 ビルド`: `win32 build of mod_python for Python 2.4`_
+.. _`Windows での Django HOWTO`: `Django on Windows howto`_
+.. _`guide to mod_python & Python 2.3`: http://www.lehuen.com/nicolas/index.php/2005/02/21/39-win32-build-of-mod_python-314-for-python-24
 .. _`Running mod_python on Apache on Windows2000`: http://groups-beta.google.com/group/comp.lang.python/msg/139af8c83a5a9d4f
 .. _`guide to getting mod_python working`: http://www.dscpl.com.au/articles/modpython-001.html
 
-Will Django run under shared hosting (like TextDrive or Dreamhost)?
--------------------------------------------------------------------
+.. _Will Django run under shared hosting (like TextDrive or Dreamhost)?:
 
-See our `Django-friendly Web hosts`_ page.
+Django は共有ホスティングサービス (TextDrive や Dreamhost) で動きますか？
+-------------------------------------------------------------------------
 
+`Django を使える Web ホスト`_ のページをごらん下さい。
+
+.. _`Django を使える Web ホスト`: http://code.djangoproject.com/wiki/DjangoFriendlyWebHosts
 .. _`Django-friendly Web hosts`: http://code.djangoproject.com/wiki/DjangoFriendlyWebHosts
 
-Should I use the official version or development version?
----------------------------------------------------------
+.. _Should I use the official version or development version?:
 
-The Django developers improve Django every day and are pretty good about not
-checking in broken code. We use the development code (from the Subversion
-repository) directly on our servers, so we consider it stable. With that in
-mind, we recommend that you use the latest development code, because it
-generally contains more features and fewer bugs than the "official" releases.
+公式リリースと開発版のどちらを使うべきなのでしょうか？
+------------------------------------------------------
+
+Django の開発者達は毎日 Django 改良を重ねており、壊れたコードをチェックイン
+しないよう上手く計らっています。私達は自分のサーバに (Subversion レポジトリ
+上の) 開発中のコードを直接使っており、安定に運用できています。このことを考
+えると、一般論として。「公式の」リリースよりはより多くの機能と少ないバグを
+持つ最新の開発版を使うように勧めます。
