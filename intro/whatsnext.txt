@@ -4,6 +4,10 @@
 What to read next
 =================
 
+:revision-up-to: 8961 (1.0)
+
+.. TBD::
+
 So you've read all the :ref:`introductory material <intro-index>` and have
 decided you'd like to keep using Django. We've only just scratched the surface
 with this intro (in fact, if you've read every single word you've still read
@@ -76,86 +80,98 @@ different needs:
       elsewhere <misc-index>`.
       
 
-How documentation is updated
-============================
+.. _How documentation is updated:
 
-Just as the Django code base is developed and improved on a daily basis, our
-documentation is consistently improving. We improve documentation for several
-reasons:
+ドキュメント更新の方針
+======================
 
-    * To make content fixes, such as grammar/typo corrections.
+Django のコードベースが毎日のように開発と改良を重ねているように，ドキュメン
+トも常に改良を重ねています．ドキュメントの改良は以下のような理由に基づいて
+行われます:
 
-    * To add information and/or examples to existing sections that need to be
-      expanded.
+    * 文法やタイプミスなどの誤りを修正する場合．
 
-    * To document Django features that aren't yet documented. (The list of
-      such features is shrinking but exists nonetheless.)
+    * 既存の内容に対して，新たに情報や例題を追加する場合．
 
-    * To add documentation for new features as new features get added, or as
-      Django APIs or behaviors change.
+    * まだ解説されていない Django の機能をドキュメント化する場合 (未ドキュ
+      メントの機能は減りつつありますが，まだいくつか残っています)．
 
-Django's documentation is kept in the same source control system as its code. It
-lives in the `django/trunk/docs`_ directory of our Subversion repository. Each
-document online is a separate text file in the repository.
+    * 新たな機能が追加され，ドキュメントも追加する場合．あるいは， Django
+      の API や挙動が変更された場合．
+
+Django のドキュメントはコードと同じソースコード管理システム下にあり，
+Subversion リポジトリの `django/trunk/docs`_ ディレクトリ以下に置かれていま
+す．各ドキュメントは，例えば「汎用ビュー」フレームワークや，データベースモ
+デルの構築方法といった具合に，個別のトピックごとに別々のテキストファイルに
+なっています．
 
 .. _django/trunk/docs: http://code.djangoproject.com/browser/django/trunk/docs
 
-Where to get it
-===============
+.. _Where to get it:
 
-You can read Django documentation in several ways. They are, in order of
-preference:
+ドキュメントの入手
+==================
 
-On the Web
-----------
+Django のドキュメントを入手するにはいくつか方法があります．おすすめの順に以
+下に示します:
 
-The most recent version of the Django documentation lives at
-http://docs.djangoproject.com/en/dev/. These HTML pages are generated
-automatically from the text files in source control. That means they reflect the
-"latest and greatest" in Django -- they include the very latest corrections and
-additions, and they discuss the latest Django features, which may only be
-available to users of the Django development version. (See "Differences between
-versions" below.)
+.. _On the Web:
 
-We encourage you to help improve the docs by submitting changes, corrections and
-suggestions in the `ticket system`_. The Django developers actively monitor the
-ticket system and use your feedback to improve the documentation for everybody.
+Web から
+--------
 
-Note, however, that tickets should explicitly relate to the documentation,
-rather than asking broad tech-support questions. If you need help with your
-particular Django setup, try the `django-users mailing list`_ or the `#django
-IRC channel`_ instead.
+Django ドキュメントの最新版は http://docs.djangoproject.com/en/dev/
+にあります．ここにある HTML ページは，ソースコード管理システム上のテキスト
+ファイルから自動生成されているものです．従って，これらのファイルは「最新最
+良の」 Django に対応しています．つまり，最近の修正や追加事項を反映していて，
+まだ開発版でしか使えないような最新の機能についても部分的に解説しているわけ
+です (後述の「バージョン間の相違点」を参照してください)．
+
+ドキュメント改良のお手伝いは大歓迎です．変更すべき点，修正すべき点，改良す
+べき点などを `チケットシステム`_ に提出してください．Django の開発陣がチケッ
+トシステムを監視して，あなたのフィードバックが皆に恩恵をもたらすようにしま
+す．
+
+ただし，チケットは一般的なテクニカルサポートに関わる質問ではなく，ドキュメ
+ント自体に関する内容にしてください． Django のセットアップに関する個別の問
+題はドキュメントのコメント欄にではなく， `django-users メーリングリスト`_
+や `IRC の #django チャネル`_ にお願いします．
+
 
 .. _ticket system: http://code.djangoproject.com/simpleticket?component=Documentation
 .. _django-users mailing list: http://groups.google.com/group/django-users
 .. _#django IRC channel: irc://irc.freenode.net/django
+.. _`チケットシステム`: `ticket system`_
+.. _`django-users メーリングリスト`: `django-users mailing list`_
+.. _`IRC の #django チャネル`: `#django IRC channel`_
 
-In plain text
--------------
+.. _In plain text:
 
-For offline reading, or just for convenience, you can read the Django
-documentation in plain text.
+プレーンテキスト
+----------------
 
-If you're using an official release of Django, note that the zipped package
-(tarball) of the code includes a ``docs/`` directory, which contains all the
-documentation for that release.
+オフラインで読みたい人や手早く読みたい人のために、Django ドキュメントはプレー
+ンテキスト形式で読めます．
 
-If you're using the development version of Django (aka the Subversion "trunk"),
-note that the ``docs/`` directory contains all of the documentation. You can
-``svn update`` it, just as you ``svn update`` the Python code, in order to get
-the latest changes.
+Django の公式リリース版を使っているなら，ソースコードのアーカイブパッケージ
+(tarball) に ``docs/`` ディレクトリが入っています．このディレクトリには各リ
+リースの全てのドキュメントが入っています．
 
-You can check out the latest Django documentation from Subversion using this
-shell command:
+Django の開発版 (いわゆる Subversion "trunk") を使っている場合， ``docs/``
+ディレクトリに全てのドキュメントが入っています．最新版を取得したければ，
+Python コードの更新と同様， ``svn update`` を実行してください．
+
+最新の Django ドキュメントを Subversion から取り出すには，以下のようなシェ
+ルコマンドを使います:
 
 .. code-block:: bash
 
     $ svn co http://code.djangoproject.com/svn/django/trunk/docs/ django_docs
 
-One low-tech way of taking advantage of the text documentation is by using the
-Unix ``grep`` utility to search for a phrase in all of the documentation. For
-example, this will show you each mention of the phrase "max_length" in any
-Django document:
+
+テキストドキュメントの便利でローテクな使い方の一つに Unix の ``grep`` ユー
+ティリティを使った全ドキュメント検索があります．例えば，以下のようにすれば，
+"max_length" について触ている部分を表示できます::
 
 .. code-block:: bash
 
@@ -196,39 +212,40 @@ You can get a local copy of the HTML documentation following a few easy steps:
 __ http://sphinx.pocoo.org/
 __ http://www.gnu.org/software/make/
 
-Differences between versions
-============================
+.. _Differences between versions:
 
-As previously mentioned, the text documentation in our Subversion repository
-contains the "latest and greatest" changes and additions. These changes often
-include documentation of new features added in the Django development version
--- the Subversion ("trunk") version of Django. For that reason, it's worth
-pointing out our policy on keeping straight the documentation for various
-versions of the framework.
+バージョン間の相違点
+====================
 
-We follow this policy:
+前述したように， Subversion リポジトリに入っているテキストドキュメントは
+変更や追加によって「最新最良」の状態にあります．変更によって，開発版，すな
+わち Subverion ("trunk") 版の Django に新たに登場した機能がテキストに記載さ
+れることがよくあります．このため， Django の各バージョン間で一貫したドキュ
+メンテーションポリシをここで示しておきます．
 
-    * The primary documentation on djangoproject.com is an HTML version of the
-      latest docs in Subversion. These docs always correspond to the latest
-      official Django release, plus whatever features we've added/changed in
-      the framework *since* the latest release.
+我々は，以下のポリシに従っています:
 
-    * As we add features to Django's development version, we try to update the
-      documentation in the same Subversion commit transaction.
+    * djangoproject.com の第一のドキュメントは Subversion から生成される
+      HTML 形式のドキュメントです．これらのドキュメントは常に最新の Django
+      公式リリースと，最新のリリース *以後* に追加／変更された機能に対応し
+      ています．
 
-    * To distinguish feature changes/additions in the docs, we use the phrase:
-      "New in version X.Y", being X.Y the next release version (hence, the one
-      being developed).
+    * Django の開発版に機能を追加する場合，可能ならば同じ Subversion のコミッ
+      トトランザクションにおいてドキュメントの変更もチェックインします．
 
-    * Documentation for a particular Django release is frozen once the version
-      has been released officially. It remains a snapshot of the docs as of the
-      moment of the release. We will make exceptions to this rule in
-      the case of retroactive security updates or other such retroactive
-      changes. Once documentation is frozen, we add a note to the top of each
-      frozen document that says "These docs are frozen for Django version XXX"
-      and links to the current version of that document.
+    * 追加／変更された機能を区別するため，「バージョン X.Y で新たに追加され
+      た機能です (New in version X.Y) という文を使います．X.Y は次の (開発
+      中の) リリースバージョンです。
 
-    * The `main documentation Web page`_ includes links to documentation for
-      all previous versions.
+    * 特定のリリース版のドキュメントは，公式リリース時に一度フリーズされま
+      す．従って，ドキュメントはその時のスナップショットです．以前のバージョ
+      ンに遡ってセキュリティアップデートその他の変更を行った場合にのみ，例
+      外的にドキュメントを更新します．ドキュメントのフリーズ後は，各ドキュ
+      メントの冒頭に "These docs are frozen for Django version XXX" という
+      一文と，ドキュメントの最新版へのリンクを追加します．
+
+    * `Web のドキュメントメインページ`_ には，以前の全てのバージョンのドキュ
+      メントに対するリンクがあります．
 
 .. _main documentation Web page: http://docs.djangoproject.com/en/dev/
+.. _`Web のドキュメントメインページ`: `main documentation Web page`_
