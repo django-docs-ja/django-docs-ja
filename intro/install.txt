@@ -25,35 +25,39 @@ Django は Python の Web フレームワークなので Python が必要です�
 http://www.python.org から Python を取ってきましょう。 Linux や Mac OSX を
 動かしているのなら、おそらくインストール済みのはずです。
 
-.. TBD::
+.. admonition:: Jython で Django を動かす
 
-.. admonition:: Django on Jython
-
-    If you use Jython_ (a Python implementation for the Java platform), you'll
-    need to follow a few additional steps. See :ref:`howto-jython` for details.
+    Jython_ (Java プラットフォームで動く Python 実装) を使っているなら、他
+    にもいくつかステップを踏む必要があります。詳しくは :ref:`howto-jython`
+    を参照してください。
 
 .. _jython: http://jython.org/
 
-You can verify that Python's installed py typing ``python`` from your shell; you should see something like::
+インストールされている Python のバージョンを調べるには、シェル上で
+``python`` と入力します。出力は以下のようになるでしょう::
 
     Python 2.5.1 (r251:54863, Jan 17 2008, 19:35:17) 
     [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
     Type "help", "copyright", "credits" or "license" for more information.
     >>>
      
-Set up a database
------------------
+.. _Set up a database:
 
-If you installed Python 2.5 or later, you can skip this step for now.
+データベースをセットアップする
+----------------------------------
 
-If not, or if you'd like to work with a "large" database engine like PostgreSQL,
-MySQL, or Oracle, consult the :ref:`database installation information
-<database-installation>`.
+バージョン 2.5 以降の Python をインストールしていれば、この節は読み飛ばして
+もかまいません。
+
+バージョン 2.5 よりも前の Python を使っているか、 PostgreSQL や MySQL,
+Oracle といった、SQLite 以外の「大掛かりな」データベースエンジンを扱いたけ
+れば、 :ref:`データベースのインストールに関する情報 <database-installation>`
+を参照してください。
  
 .. _Remove any old versions of Django:
 
 旧バージョンの Django の除去
-============================
+-----------------------------
 
 以前のバージョンからアップグレードする形で Django をインストールする場合、
 :ref: `新しいバージョンをインストールする前に、まず旧バージョンをアンインス
@@ -61,32 +65,34 @@ MySQL, or Oracle, consult the :ref:`database installation information
 
 .. TBD::
 
-Install Django
---------------
+.. _Install Django:
 
-You've got three easy options to install Django:
+Django のインストール
+--------------------------------
 
-    * Install a version of Django :ref:`provided by your operating system
-      distribution <misc-distributions>`. This is the quickest option for those
-      who have operating systems that distribute Django.
+3 通りの簡単な方法で、Django をインストールできます:
 
-    * :ref:`Install an official release <installing-official-release>`. This
-      is the best approach for users who want a stable version number and aren't
-      concerned about running a slightly older version of Django.
+    * :ref:`オペレーティングシステムの提供している <misc-distributions>`
+      バージョンの Django をインストールする場合。お使いのオペレーティング
+      システム向けに Django が配布されている場合はもっとも簡単な選択肢です。
+
+    * :ref:`公式リリース版のインストール <installing-official-release>` 。
+      安定したバージョンの Django を使いたくて、少々古いものでも構わない場
+      合にはベストのアプローチです。
       
-    * :ref:`Install the latest development version
-      <installing-development-version>`. This is best for users who want the
-      latest-and-greatest features and aren't afraid of running brand-new code.
+    * :ref:`最新の開発版のインストール <installing-development-version>`
+      最新の素晴らしい機能を使ってみたい、書き立てのコードを実行することに
+      抵抗のない人のための選択肢です。
       
 .. warning::
 
-    If do either of the first two steps, keep an eye out for parts of the
-    documentation marked **new in development version**. That phrase flags
-    features that are only available in development versions of Django; if you
-    try to use them with an official release they won't work.
+    上に挙げた選択肢のうち、最初の二つを選んだ場合は、ドキュメントを読む際
+    に「 **開発版で登場した機能です** 」とマークされた部分に気をつけてくだ
+    さい。この文は、開発版の Django でのみ利用可能な機能をマークしています。
+    そうした機能を公式リリースなどで使おうとしても、動かないでしょう。
     
-That's it!
+以上です!
 ----------
 
-That's it -- you can now :ref:`move onto the tutorial <intro-tutorial01>`.
+これだけです。さあ、 :ref:`チュートリアルをやってみましょう <intro-tutorial01>`.
  

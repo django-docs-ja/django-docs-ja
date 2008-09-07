@@ -268,6 +268,8 @@ Django のコードを更新して最新のバグフィクスや改良を適用�
    Unix系のシステムでは、例えば以下のようにして、 ``/usr/local/bin`` のよう
    なシステムパス上にシンボリックリンクを作成します::
 
+   .. code-block:: bash
+
      ln -s `pwd`/django-trunk/django/bin/django-admin.py /usr/local/bin
 
    これで、 ``django-admin.py`` とコマンド入力するだけで、どのディレクトリ
