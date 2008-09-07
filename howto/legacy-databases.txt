@@ -1,25 +1,26 @@
 .. _howto-legacy-databases:
 
-=========================================
-Integrating Django with a legacy database
-=========================================
+=====================================
+古いデータベースを Django に組み込む
+=====================================
 
-While Django is best suited for developing new applications, it's quite
-possible to integrate it into legacy databases. Django includes a couple of
-utilities to automate as much of this process as possible.
+:revision-up-to: 8961 (1.0)
 
-This document assumes you know the Django basics, as covered in the
-:ref:`tutorial <intro-tutorial01>`.
+Django が最も得意とするのは新たなアプリケーションですが，古いデータベースの
+組み込みも可能です． Django には組み込み作業を可能な限り自動化するための二
+つのユーティリティが付属しています．
 
-Once you've got Django set up, you'll follow this general process to integrate
-with an existing database.
+このドキュメントでは，読者は :ref:`公式チュートリアル <intro-tutorial01>`
+のカバーしている Django の基礎を良く知っているものと仮定しています．
 
-Give Django your database parameters
-====================================
+.. _Give Django your database parameters:
 
-You'll need to tell Django what your database connection parameters are, and
-what the name of the database is. Do that by editing these settings in your
-:ref:`settings file <topics-settings>`:
+Django にデータベースパラメタを指定する
+=======================================
+
+まず，データベースへの接続パラメタとデータベース名を Django に指示する必要
+があります． :ref:`設定ファイル <topics-settings>` の以下の設定を編集してく
+ださい:
 
     * :setting:`DATABASE_NAME`
     * :setting:`DATABASE_ENGINE`
@@ -28,40 +29,55 @@ what the name of the database is. Do that by editing these settings in your
     * :setting:`DATABASE_HOST`
     * :setting:`DATABASE_PORT`
 
-Auto-generate the models
-========================
+.. _Auto-generate the models:
+
+モデルの自動生成
+================
+
+Django には，既存のデータベースにイントロスペクションを行ってモデルを生成で
+きるコマンド、 :djadmin:`inspectdb` が付属しています．出力を見るには以下の
+コマンドを実行します:
 
 .. highlight:: bash
 
-Django comes with a utility called :djadmin:`inspectdb` that can create models
-by introspecting an existing database. You can view the output by running this
-command::
-
     python manage.py inspectdb
 
-Save this as a file by using standard Unix output redirection::
+標準の Unix 出力リダイレクションを使って，この内容をファイルに保存しておき
+ます:
 
-    python manage.py inspectdb > models.py
+.. highlight:: bash
 
-This feature is meant as a shortcut, not as definitive model generation. See the
-:djadmin:`documentation of inspectdb <inspectdb>` for more information.
+    python manage.py inspectdb > appname.py
 
-Once you've cleaned up your models, name the file ``models.py`` and put it in
-the Python package that holds your app. Then add the app to your
-:setting:`INSTALLED_APPS` setting.
+この機能はショートカット目的で，正しいモデル生成を行うためのものではありま
+せん．詳しくは :ref:`django-admin.py のドキュメント <inspectdb>` を参照して
+ください．
 
-Install the core Django tables
-==============================
+モデルを削除し終えたら，モジュールをアプリケーションの ``models.py`` 
+に入れ，アプリケーションを収めているパッケージ内に配置し，
+:setting:`INSTALLED_APPS` 設定にアプリケーションを追加しておきます．
 
-Next, run the :djadmin:`syncdb` command to install any extra needed database
-records such as admin permissions and content types::
+.. _Install the core Django tables:
+
+Django のコアデータテーブルのインストール
+=========================================
+
+次に， :djadmin:`syncdb` コマンドを実行して， Django のコアデータテーブルを
+データベースにインストールします:
+
+.. highlight:: bash
 
     python manage.py syncdb
 
-Test and tweak
-==============
 
-Those are the basic steps -- from here you'll want to tweak the models Django
-generated until they work the way you'd like. Try accessing your data via the
-Django database API, and try editing objects via Django's admin site, and edit
-the models file accordingly.
+.. _Test and tweak:
+
+テストと確認
+=============
+
+ここまでで解説したのは基本です。この後は、生成したモデルが正しく動作するま
+で変更してゆく必要があるでしょう。 Django データベース API を使ってアプリケー
+ションのデータにアクセスしたり， Django admin サイトでオブジェクトを編集し
+てみたりしてください．
+
+
