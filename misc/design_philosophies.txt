@@ -1,8 +1,10 @@
+.. _misc-design-philosophies:
+
 ===================
 Django の設計思想
 ===================
 
-:revision-up-to: 8001 (1.0pre SVN)
+:revision-up-to: 8961 (1.0)
 
 このドキュメントでは， Django の開発者たちがフレームワークの構築に取り入れ
 ている根本的な設計思想についていくつか解説します．それによって， Django の
@@ -13,6 +15,7 @@ Django の設計思想
 全体的な設計思想
 ================
 
+.. _loose-coupling:
 .. _Loose coupling:
 
 ルースカップリング
@@ -35,6 +38,7 @@ Django のスタックが目指す基本的なゴールは
 .. _`loose coupling and tight cohesion`:
    http://c2.com/cgi/wiki?CouplingAndCohesion
 
+.. _less-code:
 .. _Less code:
 
 コード量の低減
@@ -44,6 +48,7 @@ Django アプリケーションのコードは可能なかぎり少なくし，�
 除します． Django では，イントロスペクションのような Python の動的な決定機
 能を積極的に活用します．
 
+.. _quick-development:
 .. _Quick development:
 
 迅速な開発
@@ -53,15 +58,28 @@ Django アプリケーションのコードは可能なかぎり少なくし，�
 高速化することにあります． Django は Web 開発を信じられないくらいに迅速化し
 ます．
 
+.. _dry:
 .. _Don't repeat yourself (DRY):
 
 DRY (Don't repeat yourself) 則
 -------------------------------
 
+.. index::
+   single: DRY
+   single: Don't repeat yourself
+
 個別のコンセプトやデータは，一つの，ただ一つの場所に置かねばなりません．冗
 長は悪，正規化は善です．
 
 こうした理由から，フレームワークは可能な限り小さくせねばなりません．
+
+.. seealso::
+
+    `Portland Pattern Repository の DRY に関する議論`__
+
+    __ http://c2.com/cgi/wiki?DontRepeatYourself
+    
+.. _explicit-is-better-than-implicit:
 
 .. _Explicit is better than implicit:
 
@@ -109,8 +127,12 @@ DRY (Don't repeat yourself) 則
 モデルは「オブジェクト」としての様々な側面をカプセル化し，いわゆる
 Martin Fowler の `アクティブレコード`_ デザインパターンに従わねばなりません．
 
-モデル固有の admin オプションをモデル自身に取り込んでいるのはこのためです．
-モデルに関係するデータはモデルの *中に* 保存すべきなのです．
+.. TBD
+
+This is why both the data represented by a model and information about
+it (its human-readable name, options like default ordering, etc.) are
+defined in the model class; all the information needed to understand a
+given model should be stored *in* the model.
 
 .. _`アクティブレコード`: http://www.martinfowler.com/eaaCatalog/activeRecord.html
 .. _`Active Record`: http://www.martinfowler.com/eaaCatalog/activeRecord.html
@@ -199,23 +221,27 @@ Web ページの URL にファイル拡張子を使うのは避けねばなり�
 
 URL にカンマを入れる Vignette スタイルは厳しく禁じねばなりません．
 
+.. _definitive-urls:
 .. _Definitive URLs:
 
 URL ははっきりと
 ----------------
+
+.. index:: urls; definitive
 
 技術的には， ``foo.com/bar`` と ``foo.com/bar/`` は別個の URL であり，検索
 エンジンロボット (や Web トラフィック解析ツール) はこれらのページを別々のも
 のとして扱わねばなりません． Django は URL を「正規化」して，検索エンジンロ
 ボットを混乱させないようにせねばなりません．
 
-これは ``APPEND_SLASH`` 設定の根底にある考えです．
+これは :setting:`APPEND_SLASH` 設定の根底にある考えです．
 
 .. _Template system:
 
 テンプレートシステム
 ====================
 
+.. _separation-of-logic-and-presentation:
 .. _Separate logic from presentation:
 
 プレゼンテーションとロジックの分離
@@ -238,10 +264,8 @@ URL ははっきりと
 こうしたサイトの構成要素を一箇所に保存しやすくし，コードの複製を無くさねば
 なりません．
 
-これは `テンプレートの継承`_ の根底にある考え方です．
-
-.. _`テンプレートの継承`: ../templates/#template-inheritance
-.. _template inheritance: ../templates/#template-inheritance
+これは :ref:`テンプレートの継承<template-inheritance>` の根底にある考え方で
+す．
 
 .. _Be decoupled from HTML:
 
@@ -256,6 +280,8 @@ HTML だけを出力するようにテンプレートシステムを設計すべ
 
 XML をテンプレート言語に使わない
 --------------------------------
+
+.. index:: xml; suckiness of
 
 テンプレートのパージングに XML エンジンを使うと，テンプレート編集における
 人為エラーという新たな問題に直面します．それに，テンプレート処理に受け入れ
