@@ -1,255 +1,284 @@
 .. _ref-unicode:
 
-======================
-Unicode data in Django
-======================
+==========================
+Django での Unicode の扱い
+==========================
+
+:revision-up-to: 8961 (1.0)
 
 .. versionadded:: 1.0
 
-Django natively supports Unicode data everywhere. Providing your database can
-somehow store the data, you can safely pass around Unicode strings to
-templates, models and the database.
+Django はネイティブで Unicode データをサポートしています．データベースの設
+定を正しく行っている限り，テンプレートやモデル，データベース間で Unicode 文
+字列を問題なく受渡しできます．
 
-This document tells you what you need to know if you're writing applications
-that use data or templates that are encoded in something other than ASCII.
+このドキュメントでは，非 ASCII の文字コードでエンコードされたデータやテンプ
+レートを扱うアプリケーションを作成するときに知っておくべきことを説明します．
 
-Creating the database
-=====================
+.. _Creating the database:
 
-Make sure your database is configured to be able to store arbitrary string
-data. Normally, this means giving it an encoding of UTF-8 or UTF-16. If you use
-a more restrictive encoding -- for example, latin1 (iso8859-1) -- you won't be
-able to store certain characters in the database, and information will be lost.
+データベースの作成
+==================
 
- * MySQL users, refer to the `MySQL manual`_ (section 10.3.2 for MySQL 5.1) for
-   details on how to set or alter the database character set encoding.
+まず，データベースが任意の文字列データを保存できるように設定してください．
+通常，これは UTF-8 または UTF-16 を使うことを意味します． latin1
+(iso8859-1) のような，より文字セットの制約が強いエンコーディングを使ってい
+ると，一部の文字をデータベースに保存できず，情報が失われるかもしれません．
 
- * PostgreSQL users, refer to the `PostgreSQL manual`_ (section 21.2.2 in
-   PostgreSQL 8) for details on creating databases with the correct encoding.
+ * MySQL ユーザは `MySQL 5.1 マニュアルの原文 10.3.2 節`_ ，または 
+   `和訳 9.3.2 節`_  を参考に，データベースの文字セットエンコーディングの設
+   定や変更を行ってください．
 
- * SQLite users, there is nothing you need to do. SQLite always uses UTF-8
-   for internal encoding.
+ * PostgreSQL ユーザは `PostgreSQL 8 マニュアルの原文 21.2.2 節`_ ，
+   または `和訳 20.2.2 節`_ を参考にして，正しいエンコーディングでデータベー
+   スを作成してください．
 
-.. _MySQL manual: http://www.mysql.org/doc/refman/5.1/en/charset-database.html
-.. _PostgreSQL manual: http://www.postgresql.org/docs/8.2/static/multibyte.html#AEN24104
+ * SQLite ユーザは何もする必要がありません． SQLite は常に内部のエンコーディ
+   ングに UTF-8 を使うからです．
 
-All of Django's database backends automatically convert Unicode strings into
-the appropriate encoding for talking to the database. They also automatically
-convert strings retrieved from the database into Python Unicode strings. You
-don't even need to tell Django what encoding your database uses: that is
-handled transparently.
+.. _MySQL manual: 
+  http://www.mysql.org/doc/refman/5.1/en/charset-database.html
+.. _PostgreSQL manual: 
+  http://www.postgresql.org/docs/8.2/static/multibyte.html#AEN24104
+.. _`MySQL 5.1 マニュアルの原文 10.3.2 節`: `MySQL manual`_
+.. _`PostgreSQL 8 マニュアルの原文 21.2.2 節`: `PostgreSQL manual`_
+.. _`和訳 9.3.2 節`: 
+  http://www.mysql.org/doc/refman/5.1/ja/charset-database.html
+.. _`和訳 20.2.2 節`: 
+  http://www.postgresql.jp/document/pg803doc/html/multibyte.html#AEN20640
 
-For more, see the section "The database API" below.
+Django のデータベースバックエンドは，データベースにクエリを発行する際に，
+Unicode 文字列を自動的に適切なエンコーディングに変換します．また，データベー
+スから文字列データを取り出す時にも，適切なエンコーディングで Python の
+Unicode 文字列に変換します．変換の際に，いちいち Django にデータベースの使っ
+ているエンコーディングを指定する必要はなく，透過的に操作できます．
 
-General string handling
-=======================
+詳しくは，後述の「データベース API」を参照してください．
 
-Whenever you use strings with Django -- e.g., in database lookups, template
-rendering or anywhere else -- you have two choices for encoding those strings.
-You can use Unicode strings, or you can use normal strings (sometimes called
-"bytestrings") that are encoded using UTF-8.
+.. _General string handling:
 
-.. admonition:: Warning
+一般的な文字列の操作
+====================
 
-    A bytestring does not carry any information with it about its encoding.
-    For that reason, we have to make an assumption, and Django assumes that all
-    bytestrings are in UTF-8.
+データベースの照合やテンプレートのレンダリングなど， Django 内で文字列を使
+う場面では， Unicode 文字列と UTF-8 でエンコードされた (string 型の) 文字列
+の 2 通りを選択できます．
 
-    If you pass a string to Django that has been encoded in some other format,
-    things will go wrong in interesting ways. Usually, Django will raise a
-    ``UnicodeDecodeError`` at some point.
+.. admonition:: 注意
+    バイト文字列 (string 型) 自体にはエンコーディングに関する情報は付随して
+    いません．そのため， Django は全てのバイト文字列を UTF-8 でエンコードさ
+    れているとみなします．
 
-If your code only uses ASCII data, it's safe to use your normal strings,
-passing them around at will, because ASCII is a subset of UTF-8.
+    UTF-8 以外の文字セットを使ってエンコードされた文字列を Django に渡すと，
+    内部のどこかでまずいことが起きるでしょう．その結果， Django はたいてい
+    ``UnicodeDecodeError`` をどこかで送出するはずです．
 
-Don't be fooled into thinking that if your :setting:`DEFAULT_CHARSET` setting is set
-to something other than ``'utf-8'`` you can use that other encoding in your
-bytestrings! :setting:`DEFAULT_CHARSET` only applies to the strings generated as
-the result of template rendering (and e-mail). Django will always assume UTF-8
-encoding for internal bytestrings. The reason for this is that the
-:setting:`DEFAULT_CHARSET` setting is not actually under your control (if you are the
-application developer). It's under the control of the person installing and
-using your application -- and if that person chooses a different setting, your
-code must still continue to work. Ergo, it cannot rely on that setting.
+ASCII は UTF-8 のサブセットに相当するので，コード内で ASCII のデータしか扱
+わないのなら，通常の文字列を使って，自由に受渡ししてかまいません．
 
-In most cases when Django is dealing with strings, it will convert them to
-Unicode strings before doing anything else. So, as a general rule, if you pass
-in a bytestring, be prepared to receive a Unicode string back in the result.
+:setting:`DEFAULT_CHARSET` 設定を ``'utf-8'`` にすれば，バイト文字列の変換
+に他の文字セットを使えるかも，なんて考えるのはやめましょう！
+:setting:`DEFAULT_CHARSET` は，テンプレートのレンダリング結果 (とメール送信)
+の文字列のエンコーディングにしか使われません． Django は常に内部のバイト文
+字列のエンコーディングにUTF-8 を使います．その理由は，
+:setting:`DEFAULT_CHARSET` というものは，アプリケーションの開発者が自由にい
+じってよいものではなく，アプリケーションをインストールして使うユーザが自由
+に設定して使うためのものだからです．ユーザが:setting:`DEFAULT_CHARSET` をど
+んな値に設定しても，あなたのコードは正しく動かねばなりません．そのため，
+:setting:`DEFAULT_CHARSET` に依存したコードを書いてはならないのです．
 
-Translated strings
-------------------
+ほとんどの場合， Django は文字列を扱う際に，まず Unicode 文字列に変換してか
+ら処理を行います．従って，一般的なルールとして，バイト文字列を渡すときには，
+戻り値が Unicode 文字列となって戻ってくると想定しておいてください．
 
-Aside from Unicode strings and bytestrings, there's a third type of string-like
-object you may encounter when using Django. The framework's
-internationalization features introduce the concept of a "lazy translation" --
-a string that has been marked as translated but whose actual translation result
-isn't determined until the object is used in a string. This feature is useful
-in cases where the translation locale is unknown until the string is used, even
-though the string might have originally been created when the code was first
-imported.
+.. _Translated strings:
 
-Normally, you won't have to worry about lazy translations. Just be aware that
-if you examine an object and it claims to be a
-``django.utils.functional.__proxy__`` object, it is a lazy translation.
-Calling ``unicode()`` with the lazy translation as the argument will generate a
-Unicode string in the current locale.
+翻訳された文字列
+----------------
 
-For more details about lazy translation objects, refer to the
-:ref:`internationalization <topics-i18n>` documentation.
+Django を使っていると， Unicode 文字列とバイト文字列の他に，文字列ライクな
+第三の型，すなわち「翻訳された文字列」を目にするはずです．Django フレームワー
+クの国際化機能には，文字列を翻訳用としてマークはするけれども，実際の翻訳結
+果はその文字列を使うときまで決定しないという，「遅延翻訳 (lazy translation)」
+の概念があります．この機能は，文字列を実際に使用するまでに翻訳ロケールがはっ
+きり決まらない一方で，コードを import する時にはもとの文字列を生成しておき
+たい場合に便利です．
 
-Useful utility functions
+通常は，遅延翻訳文字列について心配する必要はありません．ただ，このオブジェ
+クトを評価すると，遅延翻訳を表す ``django.utils.functional.__proxy__`` オブ
+ジェクトになっているということを覚えておいてください．また， ``unicode()``
+の引数に遅延翻訳オブジェクトを指定して呼び出すと，現在のロケールでの翻訳結
+果を Unicode 文字列で返すということも覚えておいてください．
+
+遅延翻訳オブジェクトの詳細は， :ref:`国際化のドキュメント <topics-i18n>` を
+参照してください．
+
+.. _Useful utility functions:
+
+便利なユーティリティ関数
 ------------------------
 
-Because some string operations come up again and again, Django ships with a few
-useful functions that should make working with Unicode and bytestring objects
-a bit easier.
+文字列の操作は何度も何度も必要になるので， Django では Unicode 文字列型やバ
+イト文字列型オブジェクトの操作を少しだけ簡単にするユーティリティ関数を提供
+しています．
 
-Conversion functions
-~~~~~~~~~~~~~~~~~~~~
+.. _Conversion functions:
 
-The ``django.utils.encoding`` module contains a few functions that are handy
-for converting back and forth between Unicode and bytestrings.
+変換用の関数
+~~~~~~~~~~~~
 
-    * ``smart_unicode(s, encoding='utf-8', strings_only=False, errors='strict')``
-      converts its input to a Unicode string. The ``encoding`` parameter
-      specifies the input encoding. (For example, Django uses this internally
-      when processing form input data, which might not be UTF-8 encoded.) The
-      ``strings_only`` parameter, if set to True, will result in Python
-      numbers, booleans and ``None`` not being converted to a string (they keep
-      their original types). The ``errors`` parameter takes any of the values
-      that are accepted by Python's ``unicode()`` function for its error
-      handling.
+``django.utils.encoding`` モジュールには， Unicode 文字列とバイト文字列との
+間で相互に変換を行うための関数が入っています．
 
-      If you pass ``smart_unicode()`` an object that has a ``__unicode__``
-      method, it will use that method to do the conversion.
+    * ``smart_unicode(s, encoding='utf-8', string_only=False, errors='strict')``
+      は，入力 ``s`` を Unicode 文字列に変換します． ``encoding`` パラメタ
+      には入力文字列のエンコーディングを指定します．(例えば， Django はフォー
+      ムから入力された UTF-8 でエンコードされていないデータを内部的に処理す
+      る際にこの関数を使っています．) ``strings_only`` パラメタが ``True``
+      の場合、数値型、ブール型、 ``None`` といった値を ``s`` に渡しても文字列
+      に変換しません (もとの型のままで値を返します) 。 ``errors`` はエラー
+      処理時の動作を指定するためのパラメタで，Python の ``unicode()`` 関数
+      で使われているのと同じ値を受け取ります．
 
-    * ``force_unicode(s, encoding='utf-8', strings_only=False,
-      errors='strict')`` is identical to ``smart_unicode()`` in almost all
-      cases. The difference is when the first argument is a :ref:`lazy
-      translation <lazy-translations>` instance. While ``smart_unicode()``
-      preserves lazy translations, ``force_unicode()`` forces those objects to a
-      Unicode string (causing the translation to occur). Normally, you'll want
-      to use ``smart_unicode()``. However, ``force_unicode()`` is useful in
-      template tags and filters that absolutely *must* have a string to work
-      with, not just something that can be converted to a string.
+      ``__unicode__`` メソッドを実装しているオブジェクトを
+      ``smart_unicode()`` に渡すと， ``__unicode__`` メソッドを使って変換を
+      行います．
+
+    * ``force_unicode(s, encoding='utf-8', string_only=False, errors='strict')``
+      は，ほとんどの場合 ``smart_unicode()`` と同じように動作します．ただし，
+      第一引数が :ref:`遅延翻訳オブジェクト <lazy-translation>` の場合には
+      動作が異なります．
+      ``smart_unicode()`` は遅延翻訳オブジェクトをそのままにしておきますが，
+      ``force_unicode()`` を使うと，(その場で翻訳を行って) Unicode 文字列を
+      返します．通常は ``smart_unicode()`` を使った方がよいでしょう．とはい
+      え，テンプレートタグやフィルタは，「後で文字列になる何か」ではなく，
+      *「文字列」を扱わねばならない* ので， ``force_unicode()`` を使った方
+      が有意義です．
 
     * ``smart_str(s, encoding='utf-8', strings_only=False, errors='strict')``
-      is essentially the opposite of ``smart_unicode()``. It forces the first
-      argument to a bytestring. The ``strings_only`` parameter has the same
-      behavior as for ``smart_unicode()`` and ``force_unicode()``. This is
-      slightly different semantics from Python's builtin ``str()`` function,
-      but the difference is needed in a few places within Django's internals.
+      は本質的に ``smart_unicode()`` の対極にあたるメソッドです．このメソッ
+      ドは，第一引数をバイト文字列に変換します． ``strings_only`` パラメタ
+      の意味は、 ``smart_unicode()`` および ``force_unicode()`` の同名のパ
+      ラメタと同じです。これは Python の組み込み関数 ``str()`` と少し違った
+      仕様ですが， Django 内部のいくつかの場所で必要な機能として実装されて
+      います．
 
-Normally, you'll only need to use ``smart_unicode()``. Call it as early as
-possible on any input data that might be either Unicode or a bytestring, and
-from then on, you can treat the result as always being Unicode.
+普段は， ``smart_unicode()`` しか必要ないでしょう．入力データが Unicode か
+バイト文字列であるような場合には，早い段階でこのメソッドを使って Unicode 化
+を行い，その後の操作ではつねに Unicode を扱うようにしてください．
 
-URI and IRI handling
-~~~~~~~~~~~~~~~~~~~~
+.. _URI and IRI handling:
 
-Web frameworks have to deal with URLs (which are a type of IRI_). One
-requirement of URLs is that they are encoded using only ASCII characters.
-However, in an international environment, you might need to construct a
-URL from an IRI_ -- very loosely speaking, a URI that can contain Unicode
-characters. Quoting and converting an IRI to URI can be a little tricky, so
-Django provides some assistance.
+URI および IRI の処理
+~~~~~~~~~~~~~~~~~~~~~
 
-    * The function ``django.utils.encoding.iri_to_uri()`` implements the
-      conversion from IRI to URI as required by the specification (`RFC
-      3987`_).
+Web フレームワークは (IRI_ の一形式である) URL を扱えねばなりません．
+URL の必要条件の一つとして， URL は全て ASCII 文字セットで構成せねばなりま
+せん．しかし，国際化環境では， URL を IRI_ で構築せねばならない，ざっくりと
+言えば，Unicode 文字を含んだ URI を構築せねばならない場合もあるでしょう．
+IRI から URI へのクオート処理や変換処理はやや厄介なので， Django は補助にな
+る機能をいくつか提供しています．
 
-    * The functions ``django.utils.http.urlquote()`` and
-      ``django.utils.http.urlquote_plus()`` are versions of Python's standard
-      ``urllib.quote()`` and ``urllib.quote_plus()`` that work with non-ASCII
-      characters. (The data is converted to UTF-8 prior to encoding.)
+    * ``django.utils.encoding.iri_to_uri()`` は (`RFC 3987`_ 準拠の) IRI
+      から URI への変換を実装しています．
 
-These two groups of functions have slightly different purposes, and it's
-important to keep them straight. Normally, you would use ``urlquote()`` on the
-individual portions of the IRI or URI path so that any reserved characters
-such as '&' or '%' are correctly encoded. Then, you apply ``iri_to_uri()`` to
-the full IRI and it converts any non-ASCII characters to the correct encoded
-values.
+    * ``django.utils.http.urlquote()`` および
+      ``django.utils.http.urlquote_plus()`` は， Python の標準ライブラリで
+      提供している ``urllib.quote()`` および ``urllib.quote_plus()`` に手を
+      加えて，(データをエンコーディング前に UTF-8 文字列に変換することで)非
+      ASCII 文字を扱えるようにしています．
+
+これらの関数は，それぞれのグループごとに少し違った目的があり，きちんとした
+使い分けが必要です．通常，IRI や URI パスを構成する個々の部分文字列には
+``urlquote()`` を使い， ``'&'`` や ``'%'`` といった予約文字が正しくエンコー
+ドされるようにします．その後， ``iri_to_uri`` を IRI 全体に適用して，非
+ASCII 文字が正しい値にエンコードされるようにしてください．
 
 .. note::
-    Technically, it isn't correct to say that ``iri_to_uri()`` implements the
-    full algorithm in the IRI specification. It doesn't (yet) perform the
-    international domain name encoding portion of the algorithm.
+    技術的には， ``iri_to_uri()`` は IRI 仕様に準拠した完全なアルゴリズムを
+    実装しているわけではありません．このメソッドは，(いまのところ) 国際化ド
+    メイン名のエンコーディングを行っていないからです．
 
-The ``iri_to_uri()`` function will not change ASCII characters that are
-otherwise permitted in a URL. So, for example, the character '%' is not
-further encoded when passed to ``iri_to_uri()``. This means you can pass a
-full URL to this function and it will not mess up the query string or anything
-like that.
+``iri_to_uri()`` は， URL 内での使用を許されている ASCII 文字を一切変換しま
+せん．従って，例えば ``'%'`` のような文字を ``iri_to_url()`` に渡してもエン
+コーディングは起こりません．つまり，この関数に完全な URL を渡しても，クエリ
+文字列部分などを壊してしまうことはありません．
 
-An example might clarify things here::
+以下の例を見ればわかりやすいでしょう::
 
     >>> urlquote(u'Paris & Orléans')
     u'Paris%20%26%20Orl%C3%A9ans'
     >>> iri_to_uri(u'/favorites/François/%s' % urlquote(u'Paris & Orléans'))
     '/favorites/Fran%C3%A7ois/Paris%20%26%20Orl%C3%A9ans'
 
-If you look carefully, you can see that the portion that was generated by
-``urlquote()`` in the second example was not double-quoted when passed to
-``iri_to_uri()``. This is a very important and useful feature. It means that
-you can construct your IRI without worrying about whether it contains
-non-ASCII characters and then, right at the end, call ``iri_to_uri()`` on the
-result.
+注意深く見れば，二つ目の例では， ``urlquote()`` が生成した URL を
+``iri_to_uri()`` が誤って二重クオートしていないことがわかるでしょう．これは
+非常に重要かつ有用な機能です．つまり，非 ASCII 文字列が入っているかどうかを
+気にせず IRI を構築してもかまわず，最後に ``iri_to_uri()`` を呼び出しさえす
+ればよいということなのです．
 
-The ``iri_to_uri()`` function is also idempotent, which means the following is
-always true::
+``iri_to_uri()`` は等冪性がある (何度適用しても同じ結果になる) ので，以下の
+ような関係が常に成立します::
 
     iri_to_uri(iri_to_uri(some_string)) = iri_to_uri(some_string)
 
-So you can safely call it multiple times on the same IRI without risking
-double-quoting problems.
+従って， ``iri_to_uri()`` は同じ IRI に対して二重クオート問題を気にせず何度
+でも呼び出せます．
 
 .. _URI: http://www.ietf.org/rfc/rfc2396.txt
 .. _IRI: http://www.ietf.org/rfc/rfc3987.txt
 .. _RFC 3987: IRI_
 
-Models
+.. _Models:
+
+モデル
 ======
 
-Because all strings are returned from the database as Unicode strings, model
-fields that are character based (CharField, TextField, URLField, etc) will
-contain Unicode values when Django retrieves data from the database. This
-is *always* the case, even if the data could fit into an ASCII bytestring.
+データベースから返される文字列は全て Unicode 文字列です。文字ベースのモデル
+フィールド (CharField, TextField, URLField など) の値をデータベースから取り
+出すと，データが ASCII バイト文字列の範疇に収まるかどうかに関わらず，常に
+Unicode 型の値になります．
 
-You can pass in bytestrings when creating a model or populating a field, and
-Django will convert it to Unicode when it needs to.
+バイト文字列を渡してモデルを作成したり，フィールドに値を入れたりしてもよく，
+その場合には Django が必要に応じてデータを Unicode 型に変換します．
 
-Choosing between ``__str__()`` and ``__unicode__()``
-----------------------------------------------------
+.. _Choosing between __str__() and __unicode__():
 
-One consequence of using Unicode by default is that you have to take some care
-when printing data from the model.
+``__str__()`` と ``__unicode__()`` のどちらを使うべきか
+-------------------------------------------------------
 
-In particular, rather than giving your model a ``__str__()`` method, we
-recommended you implement a ``__unicode__()`` method. In the ``__unicode__()``
-method, you can quite safely return the values of all your fields without
-having to worry about whether they fit into a bytestring or not. (The way
-Python works, the result of ``__str__()`` is *always* a bytestring, even if you
-accidentally try to return a Unicode object).
+デフォルトで Unicode を使うようにした結果，モデルのデータを出力するときに
+注意せねばならない点が一つ増えました．
 
-You can still create a ``__str__()`` method on your models if you want, of
-course, but you shouldn't need to do this unless you have a good reason.
-Django's ``Model`` base class automatically provides a ``__str__()``
-implementation that calls ``__unicode__()`` and encodes the result into UTF-8.
-This means you'll normally only need to implement a ``__unicode__()`` method
-and let Django handle the coercion to a bytestring when required.
+具体的には，モデルに ``__str__()`` メソッドを定義する代わりに
+``__unicode__()`` メソッドを実装するよう推奨します． ``__unicode__()`` メソッ
+ドの中では，モデルのフィールド値を使って好きな値を作成でき，その値がバイト
+文字列として適切に表現されるかを気にせず返してかまいません (たとえ
+``__str__()`` に Unicode オブジェクトを返させるように実装したとしても，
+Python の仕様によって， ``__str__()`` は *常に* バイト文字列を返します)．
 
-Taking care in ``get_absolute_url()``
--------------------------------------
+もちろん，必要であれば，モデルに ``__str__()`` メソッドを定義してもかまいま
+せんが，明確な理由がないかぎりそうするべきではありません． Django の
+モデルクラスのベースクラスでは，自動的にモデルに ``__str__()`` メソッドを追
+加するようになっていて，この ``__str__()`` 実装は内部で ``__unicode__()``
+を呼び出し，その結果を UTF-8 で返します．つまり， ``__unicode__()`` メソッ
+ドだけを定義しておけば， Django が自動的にバイト文字列への型強制を処理して
+くれるのです．
 
-URLs can only contain ASCII characters. If you're constructing a URL from
-pieces of data that might be non-ASCII, be careful to encode the results in a
-way that is suitable for a URL. The ``django.db.models.permalink()`` decorator
-handles this for you automatically.
+.. _Taking care in get_absolute_url():
 
-If you're constructing a URL manually (i.e., *not* using the ``permalink()``
-decorator), you'll need to take care of the encoding yourself. In this case,
-use the ``iri_to_uri()`` and ``urlquote()`` functions that were documented
-above_. For example::
+``get_absolute_url()`` に注意
+-----------------------------
+
+URL に含めてよい文字は ASCII 文字だけです．従って，非 ASCII 文字を含むよう
+なデータから URL を構築する場合， URL として適切な値になるようにエンコード
+する必要があります． ``django.db.models.permalink()`` デコレータはこの処理
+を自動的に行います．
+
+URL を手動で生成する場合 (``permalink()`` デコレータを *使わない* 場合)，
+作り手が自分でエンコーディングに気を配らねばなりません．この場合，
+`前述の`_  ``iri_to_uri()`` および ``urlquote()`` 関数を使っ
+てください．例えば::
 
     from django.utils.encoding import iri_to_uri
     from django.utils.http import urlquote
@@ -258,67 +287,79 @@ above_. For example::
         url = u'/person/%s/?x=0&y=0' % urlquote(self.location)
         return iri_to_uri(url)
 
-This function returns a correctly encoded URL even if ``self.location`` is
-something like "Jack visited Paris & Orléans". (In fact, the ``iri_to_uri()``
-call isn't strictly necessary in the above example, because all the
-non-ASCII characters would have been removed in quoting in the first line.)
+この関数は， ``self.location`` に "Jack visited Paris & Orléans" のような文
+字列が入っていてもただしくエンコードされた URL を返します． (実際，上の例で
+は，最初の行のクオート処理で非 ASCII 文字が落ちるので，厳密には
+``iri_to_uri()`` の呼び出しは不要です)
 
 .. _above: `URI and IRI handling`_
+.. _`前述の`: above_
 
-The database API
+.. _The database API:
+
+データベース API
 ================
 
-You can pass either Unicode strings or UTF-8 bytestrings as arguments to
-``filter()`` methods and the like in the database API. The following two
-querysets are identical::
+``filter()`` メソッドなどのデータベース API の引数には， Unicode 文字列と，
+UTF-8 でエンコードされたバイト文字列のどちらを渡してもかまいません．以下の
+二つのクエリセットは全く同じです::
 
     qs = People.objects.filter(name__contains=u'Å')
     qs = People.objects.filter(name__contains='\xc3\85') # UTF-8 encoding of Å
 
-Templates
-=========
+.. _Templates:
 
-You can use either Unicode or bytestrings when creating templates manually::
+テンプレート
+============
+
+テンプレートの手動生成には， Unicode とバイト文字列のどちらでも使えます::
 
 	from django.template import Template
-	t1 = Template('This is a bytestring template.')
-	t2 = Template(u'This is a Unicode template.')
+	t1 = Template('バイト文字列のテンプレートだよ．')
+	t2 = Template(u'Unicode のテンプレートだよ．')
 
-But the common case is to read templates from the filesystem, and this creates
-a slight complication: not all filesystems store their data encoded as UTF-8.
-If your template files are not stored with a UTF-8 encoding, set the :setting:`FILE_CHARSET`
-setting to the encoding of the files on disk. When Django reads in a template
-file, it will convert the data from this encoding to Unicode. (:setting:`FILE_CHARSET`
-is set to ``'utf-8'`` by default.)
+とはいえ，ほとんどのケースではファイルシステムからテンプレートを読み出して
+いることでしょう．そして，ここにはちょっと難しい問題があります．というのも，
+ファイルシステム上のファイルが常に UTF-8 でエンコードされているとは限らない
+からです．ファイルシステム上のテンプレートファイルが UTF-8 でエンコードされ
+ていない場合は， :setting:`FILE_CHARSET` を該当ファイルのエンコードに設定し
+てください． Django はテンプレートファイルを読み出すときに，設定値に基づい
+てテンプレートの内容をデコードして Unicode オブジェクトに変換します
+(:setting:`FILE_CHARSET` のデフォルト値は ``'utf-8'`` です．)
 
-The :setting:`DEFAULT_CHARSET` setting controls the encoding of rendered templates.
-This is set to UTF-8 by default.
+レンダリング済みのテンプレートのエンコーディングは
+:setting:`DEFAULT_CHARSET` 設定で制御されています．この設定のデフォルト値は
+UTF-8 です．
 
-Template tags and filters
--------------------------
 
-A couple of tips to remember when writing your own template tags and filters:
+.. _Template tags and filters:
 
-    * Always return Unicode strings from a template tag's ``render()`` method
-      and from template filters.
+テンプレートタグとフィルタ
+--------------------------
 
-    * Use ``force_unicode()`` in preference to ``smart_unicode()`` in these
-      places. Tag rendering and filter calls occur as the template is being
-      rendered, so there is no advantage to postponing the conversion of lazy
-      translation objects into strings. It's easier to work solely with Unicode
-      strings at that point.
+テンプレートタグやフィルタを定義する場合，以下の 2 点に注意してください:
 
-E-mail
+    * テンプレートタグの ``render()`` メソッドやテンプレートフィルタの戻
+      り値には，常に Unicode 文字列を使ってください．
+
+    * ``smart_unicode()`` よりも ``force_unicode()`` を使うようにしてくださ
+      い．タグのレンダリングやフィルタの呼び出しはテンプレートのレンダリン
+      グ中に行われるので，遅延翻訳オブジェクトから文字列への変換を遅らせる
+      意味がないからです．また，この時点では， Unicode 文字列だけを扱うよう
+      にした方が簡単です．
+
+.. _E-mail:
+
+メール
 ======
 
-Django's e-mail framework (in ``django.core.mail``) supports Unicode
-transparently. You can use Unicode data in the message bodies and any headers.
-However, you're still obligated to respect the requirements of the e-mail
-specifications, so, for example, e-mail addresses should use only ASCII
-characters.
+Django のメール送信フレームワーク (``django.core.mail``) は，透過的に
+Unicode をサポートしており，メッセージ本体やヘッダに Unicode データを指定で
+きます．ただし，メールアドレスには ASCII 文字しか使わないといったように，一
+般のメールの仕様は守るよう気を配るべきでしょう．
 
-The following code example demonstrates that everything except e-mail addresses
-can be non-ASCII::
+以下のコード例では，メールアドレス以外が非 ASCII 文字列であるようなメールを
+送信しています::
 
     from django.core.mail import EmailMessage
 
@@ -328,37 +369,41 @@ can be non-ASCII::
     body = u'...'
     EmailMessage(subject, body, sender, recipients).send()
 
-Form submission
-===============
+.. _Form submission:
 
-HTML form submission is a tricky area. There's no guarantee that the
-submission will include encoding information, which means the framework might
-have to guess at the encoding of submitted data.
+フォームから提出されたデータ
+============================
 
-Django adopts a "lazy" approach to decoding form data. The data in an
-``HttpRequest`` object is only decoded when you access it. In fact, most of
-the data is not decoded at all. Only the ``HttpRequest.GET`` and
-``HttpRequest.POST`` data structures have any decoding applied to them. Those
-two fields will return their members as Unicode data. All other attributes and
-methods of ``HttpRequest`` return data exactly as it was submitted by the
-client.
+HTML フォームから提出されたデータの扱いはいささか厄介な問題です．提出データ
+にエンコーディング情報が入っている保証がないため，結局フレームワーク側でデー
+タのエンコーディングを推定することになるからです．
 
-By default, the :setting:`DEFAULT_CHARSET` setting is used as the assumed encoding
-for form data. If you need to change this for a particular form, you can set
-the ``encoding`` attribute on an ``HttpRequest`` instance. For example::
+Django はフォームデータのデコードに「遅延的」アプローチを取っています．
+``HttpRequest`` オブジェクト内のデータは，データにアクセスする瞬間にのみデ
+コードされます．実際には，ほとんどのデータはまったくデコードされず，
+``HttpRequest.GET`` や ``HttpRequest.POST`` データ構造の一部がデコードされ
+ることになるでしょう．これら二つの辞書は，そのメンバを常に Unicode データと
+して返します．対して， ``HttpRequest`` の他の属性やメソッドの値はクライアン
+トから送信されたそのままの値になります．
+
+デフォルトでは，データのエンコーディングは :setting:`DEFAULT_CHARSET` 設定
+値であると想定しています．特定のフォームに対してエンコーディングを変えたけ
+れば，以下のように ``HttpRequest`` インスタンスの ``encoding`` 属性を変更し
+ます::
 
     def some_view(request):
-        # We know that the data must be encoded as KOI8-R (for some reason).
+        # (何かの理由で) データが必ず KOI8-R でエンコードされている場合
         request.encoding = 'koi8-r'
         ...
 
-You can even change the encoding after having accessed ``request.GET`` or
-``request.POST``, and all subsequent accesses will use the new encoding.
+``request.GET`` や ``request.POST`` にアクセスした後に ``encoding`` を変更
+してもかまいません．変更すると，それ以後のアクセス時に新しいエンコーディン
+グを使ってデータをデコードします．
 
-Most developers won't need to worry about changing form encoding, but this is
-a useful feature for applications that talk to legacy systems whose encoding
-you cannot control.
+ほとんどの開発者は，フォームのエンコーディングについて心配することはないで
+しょう．とはいえ，エンコーディングを制御できないような古いシステムを相手に
+するアプリケーションを開発する際には，この機能は有用なはずです．
 
-Django does not decode the data of file uploads, because that data is normally
-treated as collections of bytes, rather than strings. Any automatic decoding
-there would alter the meaning of the stream of bytes.
+Django はアップロードされたファイルの内容をデコードしません．通常，ファイル
+上のデータは文字列ではなく単なるバイト列とみなすべきだからです．自動的にデ
+コードを行って，バイトストリームの意味が変わってしまうのはまずいですよね．
