@@ -1,25 +1,32 @@
 .. _topics-pagination:
 
-==========
-Pagination
-==========
+=========================
+ペジネータ (paginator)
+=========================
+
+:revision-up-to: 8961 (1.0)
 
 .. module:: django.core.paginator
-   :synopsis: Classes to help you easily manage paginated data.
+   :synopsis: ページ分割されたデータを管理しやすくするためのクラスです。
 
 .. versionchanged:: 1.0
-   Pagination facilities have been almost fully reworked.
+   ペジネーション機能はバージョン 1.0 でほぼ完全に書き直されました。
 
-Django provides a few classes that help you manage paginated data -- that is,
-data that's split across several pages, with "Previous/Next" links. These
-classes live in :file:`django/core/paginator.py`.
+Django は、ページ分割された (paginated) データを扱うためのペジネータ
+(paginator) クラスを提供しています。ページ分割とは、データが複数のページに
+わたって表示され、それぞれのページに「前へ／次へ」といったリンクがある状態
+を指します。ペジネータのクラスは、 :file:`django/core/paginator.py` モジュー
+ルで定義されています。
 
-Example
+.. _Example:
+
+例
 =======
 
-Give :class:`Paginator` a list of objects, plus the number of items you'd like to
-have on each page, and it gives you methods for accessing the items for each
-page::
+ペジネータを使うには、まず :class:`Paginator` クラスにオブジェクトのリスト
+と、各ページに表示したい要素数を指定してインスタンスを生成します。生成され
+るインスタンスは、各ページの要素にアクセスするためのメソッドを提供していま
+す::
 
     >>> from django.core.paginator import Paginator
     >>> objects = ['john', 'paul', 'george', 'ringo']
@@ -66,161 +73,176 @@ page::
     EmptyPage: That page contains no results
 
 .. note::
+    ``Paginator`` にはリストやタプル、 Django の ``QuerySet`` の他に、
+    ``count()`` や ``__len__()`` をメソッドを備えた任意のオブジェクトを渡せ
+    ることに注意してください。 ``Paginator`` は、渡されたコンテナ内のオブジェ
+    クトの数を調べるのに、まず ``count()`` を呼び出そうとし、 ``count()``
+    がなければ ``len()`` にフォールバックします。これにより、 ``QuerySet``
+    のようなオブジェクトで、より効率的な ``count()`` を呼び出しています。 
 
-    Note that you can give ``Paginator`` a list/tuple, a Django ``QuerySet``, or
-    any other object with a ``count()`` or ``__len__()`` method. When
-    determining the number of objects contained in the passed object,
-    ``Paginator`` will first try calling ``count()``, then fallback to using
-    ``len()`` if the passed object has no ``count()`` method. This allows
-    objects such as Django's ``QuerySet`` to use a more efficient ``count()``
-    method when available.
+.. _Paginator objects:
 
-``Paginator`` objects
-=====================
+``Paginator`` オブジェクト
+===========================
 
-The :class:`Paginator` class has this constructor:
+:class:`Paginator` クラスは、以下のようなコンストラクタを持っています:
 
 .. class:: Paginator(object_list, per_page, orphans=0, allow_empty_first_page=True)
 
-Required arguments
+.. _Required arguments:
+
+必須の引数
 ------------------
 
 ``object_list``
-    A list, tuple, Django ``QuerySet``, or other sliceable object with a
-    ``count()`` or ``__len__()`` method.
+    リスト、タプル、Django の ``QuerySet``, または ``count()`` や
+    ``__len__()`` メソッドを備えたオブジェクトを指定します。
 
 ``per_page``
-    The maximum number of items to include on a page, not including orphans
-    (see the ``orphans`` optional argument below).
+    一ページに表示するオブジェクトの最大個数です (後述のオプション引数
+    ``orphans`` も参照してください)。
 
-Optional arguments
+.. _Optional arguments:
+
+オプションの引数
 ------------------
 
 ``orphans``
-    The minimum number of items allowed on the last page, defaults to zero.
-    Use this when you don't want to have a last page with very few items.
-    If the last page would normally have a number of items less than or equal
-    to ``orphans``, then those items will be added to the previous page (which
-    becomes the last page) instead of leaving the items on a page by
-    themselves. For example, with 23 items, ``per_page=10``, and
-    ``orphans=3``, there will be two pages; the first page with 10 items and
-    the  second (and last) page with 13 items.
+    最後のページに表示する要素の個数です。デフォルト値はゼロに設定されてい
+    ます。最後のページに表示するオブジェクトの個数を一定以上にしたい場合に
+    使ってください。 ``orphans`` を設定すると、ページ分割した要素の末尾のグ
+    ループの個数が ``orphans`` の設定値以下のときに、そのグループの要素だけ
+    のページを表示するのではなく、ひとつ前のページの要素に繰り入れて表示し
+    ます（すなわち、一つ手前のページが最終ページになります）。例えば、
+    ``per-page=10`` かつ ``orphans=3`` のペジネータで 23 個のオブジェクトを
+    表示すると、ページは二つに分割され、最初のページには 10 個、二つ目のペー
+    ジ（最終ページ）には 13 個の要素を表示します。
 
 ``allow_empty_first_page``
-    Whether or not the first page is allowed to be empty.  If ``False`` and
-    ``object_list`` is  empty, then an ``EmptyPage`` error will be raised.
+    先頭のページが空でもよいかどうかを決めるパラメタです。 ``False`` に設定
+    すると、 ``object_list`` が空のときに ``EmptyPage`` 例外を送出します。
 
-Methods
--------
+.. _Paginator Methods:
+
+メソッド
+---------
 
 .. method:: Paginator.page(number)
-    
-    Returns a :class:`Page` object with the given 1-based index. Raises
-    :exc:`InvalidPage` if the given page number doesn't exist.
 
-Attributes
+    指定ページの :class:``Page`` オブジェクトを返します。ページ番号は 1 か
+    ら始まる数です。存在しないページを指定すると :exc:`InvalidPage` を送出
+    します。
+
+.. _Paginator Attributes:
+
+属性
 ----------
 
 .. attribute:: Paginator.count
     
-    The total number of objects, across all pages.
+    全てのページにわたるオブジェクトの合計数です。
     
     .. note:: 
 
-        When determining the number of objects contained in ``object_list``,
-        ``Paginator`` will first try calling ``object_list.count()``. If
-        ``object_list`` has no ``count()`` method, then ``Paginator`` will
-        fallback to using ``object_list.__len__()``. This allows objects, such
-        as Django's ``QuerySet``, to use a more efficient ``count()`` method
-        when available.
+        ``object_list`` に入っているオブジェクトの個数を調べるときに、
+        ``Paginator`` はまず ``object_list.count()`` を呼びます。
+        ``object_list`` に ``count()`` メソッドがなければ、 ``Paginator`` 
+	は ``object_list.__len__()`` に切り替えます。これにより、
+        ``QuerySet`` のようなオブジェクトで、より効率的な ``count()`` を呼
+        び出しているのです。
         
 .. attribute:: Paginator.num_pages
     
-    The total number of pages.
+    総ページ数です。
     
 .. attribute:: Paginator.page_range
     
-    A 1-based range of page numbers, e.g., ``[1, 2, 3, 4]``.
+    ``[1, 2, 3, 4]`` のように、 1 から始まるページ番号です。
 
-``InvalidPage`` exceptions
+
+.. _`InvalidPage exceptions`:
+
+``InvalidPage`` 例外
 ==========================
 
-The ``page()`` method raises ``InvalidPage`` if the requested page is invalid
-(i.e., not an integer) or contains no objects. Generally, it's enough to trap
-the ``InvalidPage`` exception, but if you'd like more granularity, you can trap
-either of the following exceptions:
+リクエストされたページが無効なページ (整数でないページ番号) であったり、ペー
+ジにオブジェクトが含まれていない場合、 ``page()`` メソッドは
+``InvalidPage`` を送出します。通常はこの ``InvalidPage`` 例外をトラップする
+だけですみますが、より細かく例外処理するには、以下の例外をトラップしてくだ
+さい:
 
 ``PageNotAnInteger``
-    Raised when ``page()`` is given a value that isn't an integer.
+    ``page()`` に整数でない値を渡したときに送出されます。
 
-``EmptyPage``
-    Raised when ``page()`` is given a valid value but no objects exist on that
-    page.
+``EmptyPage`` 
+    ``page()`` には有効な値が渡されているが、ページにオブジェクトが含まれな
+    い場合に送出されます。
 
-Both of the exceptions are subclasses of ``InvalidPage``, so you can handle
-them both with a simple ``except InvalidPage``.
+どちらの例外も ``InvalidPage`` のサブクラスなので、単に
+``except InvalidPage`` としておけば両方の例外を捕捉できます。
 
+.. _Page objects:
 
-``Page`` objects
-================
+``Page`` オブジェクト
+=====================
 
-.. class:: Page(object_list, number, paginator):
+.. _Page Methods:
 
-You usually won't construct :class:`Pages <Page>` by hand -- you'll get them
-using :meth:`Paginator.page`.
-
-
-Methods
--------
+メソッド
+---------
 
 .. method:: Page.has_next()
     
-    Returns ``True`` if there's a next page.
+    次のページがある場合に ``True`` を返します。    
     
 .. method:: Page.has_previous()
     
-    Returns ``True`` if there's a previous page.
+    前のページがある場合に ``True`` を返します。
     
 .. method:: Page.has_other_pages()
     
-    Returns ``True`` if there's a next *or* previous page.
+    前後 *いずれか* のページがある場合に ``True`` を返します。
     
 .. method:: Page.next_page_number()
     
-    Returns the next page number. Note that this is "dumb" and will return the
-    next page number regardless of whether a subsequent page exists.
+    次のページが存在するかどうかに関係なく、「次のページ」のページ番号を返
+    します。
     
 .. method:: Page.previous_page_number()
     
-    Returns the previous page number. Note that this is "dumb" and will return
-    the previous page number regardless of whether a previous page exists.
+    前のページが存在するかどうかに関係なく、「前のページ」のページ番号を返
+    します。
     
 .. method:: Page.start_index()
     
-    Returns the 1-based index of the first object on the page, relative to all
-    of the objects in the paginator's list. For example, when paginating a list
-    of 5 objects with 2 objects per page, the second page's :meth:`~Page.start_index`
-    would return ``3``.
+    ページの先頭のオブジェクトの通番を、ペジネータ全体にわたるオブジェクト
+    のリストの通番で返します。通番は 1 から始まります。例えば、ページあたり
+    2 個のオブジェクトを表示するペジネータで 5 個のオブジェクトをページ分割
+    している場合、2 ページ目の
+    :meth:`~django.core.paginator.Paage.start_index` 
+    は ``3`` を返します。
     
 .. method:: Page.end_index()
     
-    Returns the 1-based index of the last object on the page, relative to all of
-    the objects in the paginator's list. For example, when paginating a list of
-    5 objects with 2 objects per page, the second page's :meth:`~Page.end_index`
-    would return ``4``.
+    ページの末尾のオブジェクトの通番を、ペジネータ全体にわたるオブジェクト
+    のリストの通番で返します。通番は 1 から始まります。例えば、ページあたり
+    2 個のオブジェクトを表示するペジネータで 5 個のオブジェクトをページ分割
+    している場合、2 ページ目の :meth:`~django.core.paginator.end_index()`
+    は ``4`` を返します。 
 
-Attributes
-----------
+.. _Page Attributes:
+
+属性
+------
 
 .. attribute:: Page.object_list
     
-    The list of objects on this page.
+    ページ上のオブジェクトのリストです。
     
 .. attribute:: Page.number
     
-    The 1-based page number for this page.
+    1 から数えたページ番号です。
     
 .. attribute:: Page.paginator
     
-    The associated :class:`Paginator` object.
-
+    ページの結びついている ``Paginator`` オブジェクトです。
