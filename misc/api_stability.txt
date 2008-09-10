@@ -1,0 +1,152 @@
+.. _misc-api-stability:
+
+============
+API の安定性
+============
+
+:revision-up-to: 8961 (1.0)
+
+:ref:`Django 1.0 のリリース <releases-1.0>` によって、 API の安定性と互換性
+に一定の保証が与えられました。これはつまり、 Django 1.0 用に書いたコードは
+何も変更せずに 1.1 でも動作し、以後の 1.X リリースではほんのわずかな変更し
+か必要ないということです。
+
+.. _What "stable" means:
+
+APIの安定性とは
+===============
+
+ここでいう「安定」とは、以下のような意味です:
+
+   - 公開 API -- リンクからたどれるドキュメント内で開設されていて、メソッド
+     名がアンダースコアで始まらないもの -- の配置や名前を変更する場合には、
+     以前のバージョンとの互換性のための別名のメソッドを提供します。
+     
+   - API に新たな機能を追加する場合 -- これはよくあることですが -- でも、
+     既存のメソッドの意味を無くしたり、変えたりすることはありません。換言す
+     れば、「安定」していても (必ずしも) 「完全」ではない、ということです。
+     
+   - すでに安定と宣言されている API を何らかの理由で削除したり移動したりせ
+     ねばならない場合、それらのメソッドは撤廃 (deprecated) とみなされ、少な
+     くとも二つのマイナーバージョン変更までは API 中に残します。撤廃された
+     メソッドを呼び出した場合には警告メッセージを表示します。
+
+     Django のバージョン番号の定義と、どの機能が撤廃されているかは、
+     :ref:`official-releases` を参照してください。
+     
+   - 深刻なバグやセキュリティホールによってやむを得ない場合に限り、これらの
+     API に対して互換性のない変更を行います。
+
+.. _Stable APIs:
+
+安定な API
+==========
+
+全般的に、 :ref:`内部仕様 <internals-index>` の中にあるドキュメントを除き、
+ドキュメント中でカバーされている機能は、 1.0 の時点で安定な API と考えてか
+まいません。安定な API を以下に示します:
+
+    - :ref:`認証 <topics-auth>`
+
+    - :ref:`キャッシュ <topics-cache>`.
+    
+    - :ref:`モデルの定義、マネジャ、クエリ、トランザクション <topics-db-index>`
+    
+    - :ref:`e-mail の送信 <topics-email>`.
+    
+    - :ref:`アップロードファイルの操作と保存 <topics-files>`
+    
+    - :ref:`フォーム <topics-forms-index>`
+    
+    - ファイルアップロード、ミドルウェア、セッション、 URL ディスパッチ、
+      ビュー、ショートカット API などを含む、
+      :ref:`HTTP リクエスト／レスポンスの操作 <topics-http-index>`
+    
+    - :ref:`汎用ビュー <topics-http-generic-views>`.
+
+    - :ref:`国際化 <topics-i18n>`.
+    
+    - :ref:`ペジネーション <topics-pagination>`
+    
+    - :ref:`シリアライゼーション <topics-serialization>`
+    
+    - :ref:`シグナル <topics-signals>`
+    
+    - :ref:`テンプレート <topics-templates>` 。テンプレート言語、 Python の
+      :ref:`テンプレート API <ref-templates-index>` 、
+      :ref:`カスタムテンプレートタグとライブラリ、 <howto-custom-template-tags>`
+      今後、新たなテンプレートタグが登場すると、ユーザが定義したタグと名前
+      が衝突する可能性があります。そのため、新たなタグを追加するときは、同
+      じ名前のタグを他のテンプレートライブラリからロードしようとした時点で
+      Django にエラーを送出させます。
+      
+    - :ref:`テストフレームワーク <topics-testing>`
+
+    - :ref:`django-admin ユーティリティ <ref-django-admin>`.
+    
+    - :ref:`組み込みミドルウェア <ref-middleware>`
+    
+    - :ref:`リクエスト／レスポンスオブジェクト <ref-request-response>`.
+    
+    - :ref:`設定ファイル <ref-settings>` 。ただし、現在の
+      :ref:`組み込みの設定 <ref-settings>` はほぼ完璧だとは考えていますが、
+      将来新たな設定を登場させるかもしれません。これはまさに「安定」だけれ
+      ども「完璧」ではない例ですね。
+      
+    - :ref:`組み込みシグナル <ref-signals>` 設定と同様、将来新たなシグナル
+      を登場させるかもしれませんが、既存のシグナルをなくすことはないでしょ
+      う。
+      
+    - :ref:`Unicode の操作 <ref-unicode>` 。
+        
+    - :ref:`HOWTO ガイド <howto-index>` に書かれている内容。
+
+.. _Exceptions:
+
+例外
+=====
+
+安定性や互換性の維持には、いくつか例外を設けています。
+
+.. _Security fixes:
+
+セキュリティ上の問題の修正
+----------------------------
+
+.. TBD
+
+If we become aware of a security problem -- hopefully by someone following our
+:ref:`security reporting policy <reporting-security-issues>` -- we'll do
+everything necessary to fix it. This might mean breaking backwards compatibility; security trumps the compatibility guarantee.
+
+コントリビュートアプリケーション (``django.contrib``)
+----------------------------------------------------------
+
+While we'll make every effort to keep these APIs stable -- and have no plans to
+break any contrib apps -- this is an area that will have more flux between
+releases. As the web evolves, Django must evolve with it.
+
+However, any changes to contrib apps will come with an important guarantee:
+we'll make sure it's always possible to use an older version of a contrib app if
+we need to make changes. Thus, if Django 1.5 ships with a backwards-incompatible
+``django.contrib.flatpages``, we'll make sure you can still use the Django 1.4
+version alongside Django 1.5. This will continue to allow for easy upgrades.
+
+Historically, apps in ``django.contrib`` have been more stable than the core, so
+in practice we probably won't have to ever make this exception. However, it's
+worth noting if you're building apps that depend on ``django.contrib``.
+
+.. _APIs marked as internal:
+
+内部 API
+----------
+
+Certain APIs are explicitly marked as "internal" in a couple of ways:
+
+    - Some documentation refers to internals and mentions them as such. If the
+      documentation says that something is internal, we reserve the right to
+      change it.
+      
+    - Functions, methods, and other objects prefixed by a leading underscore
+      (``_``). This is the standard Python way of indicating that something is
+      private; if any method starts with a single ``_``, it's an internal API.
