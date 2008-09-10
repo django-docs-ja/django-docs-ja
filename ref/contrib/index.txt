@@ -1,25 +1,27 @@
 .. _ref-contrib-index:
 
-============================
-The "django.contrib" add-ons
-============================
+=============================
+"django.contrib" 下のアドオン
+=============================
 
-Django aims to follow Python's `"batteries included" philosophy`_. It ships
-with a variety of extra, optional tools that solve common Web-development
-problems.
+:revision-up-to: 8961 (1.0)
 
-This code lives in ``django/contrib`` in the Django distribution. This document
-gives a rundown of the packages in ``contrib``, along with any dependencies
-those packages have.
+Django は Python の `"batteries included" 哲学`_ を目指しています。 Django
+には Web 開発における課題を解くための様々な外部オプションツールがついてきま
+す。
+
+これらのコードは Django 配布物中の ``django/contrib`` にあります。このドキュ
+メントでは、 ``contrib`` 下のパッケージをざっと解説し、パッケージを利用する
+ときに必要な依存関係について説明します。
 
 .. admonition:: Note
 
-    For most of these add-ons -- specifically, the add-ons that include either
-    models or template tags -- you'll need to add the package name (e.g.,
-    ``'django.contrib.admin'``) to your ``INSTALLED_APPS`` setting and re-run
-    ``manage.py syncdb``.
+    これらのアドオンの大半、特にモデルやテンプレートタグの定義が入っている
+    アドオンを使うには、パッケージ名 (例えば ``'django.contrib.admin'``) を
+    ``INSTALLED_APPS`` 設定に追加して、 ``manage.py syncdb`` を再度実行する
+    必要があります。
 
-.. _"batteries included" philosophy: http://docs.python.org/tut/node12.html#batteries-included
+.. _`"batteries included" 哲学`: http://python.jp/doc/release/tut/node12.html#batteries-included                                                
 
 .. toctree::
    :maxdepth: 1
@@ -43,108 +45,122 @@ those packages have.
 admin
 =====
 
-The automatic Django administrative interface. For more information, see
-:ref:`Tutorial 2 <intro-tutorial02>` and the
-:ref:`admin documentation <ref-contrib-admin>`.
+Django の自動化管理インタフェースです。詳しくは
+:ref:`チュートリアルその 2 <intro-tutorial02>` と
+:ref:`admin のドキュメント <ref-contrib-admin>` を参照してください。
 
-Requires the auth_ and contenttypes_ contrib packages to be installed.
+auth_ および contenttypes_ パッケージをインストールしておく必要があります。
 
 auth
 ====
 
-Django's authentication framework.
-
-See :ref:`topics-auth`.
+Django の認証フレームワークです。詳しくは :ref:`topics-auth` を参照して下さ
+い。
 
 comments
 ========
 
 .. versionchanged:: 1.0
-   The comments application has been rewriten. See :ref:`ref-contrib-comments-upgrade`
-   for information on howto upgrade.
+   comments アプリケーションは書き直されました。アップグレード方法は
+   :ref:`ref-contrib-comments-upgrade` を参照してください。
 
-A simple yet flexible comments system. See :ref:`ref-contrib-comments-index`.
+:ref:`ref-contrib-comments-index` を参照してください。
 
 contenttypes
 ============
 
-A light framework for hooking into "types" of content, where each installed
-Django model is a separate content type.
+コンテンツの「タイプ」をフックしするための軽量フレームワークです。
+コンテンツタイプは、インストールされている Django の個々のモデルを指します。
 
-See the :ref:`contenttypes documentation <ref-contrib-contenttypes>`.
+:ref:`contenttypes のドキュメント <ref-contrib-contenttypes>` を参照してください。
 
 csrf
 ====
 
-A middleware for preventing Cross Site Request Forgeries
+クロスサイトリクエストフォージェリ (Cross Site Request Forgeries) を阻止す
+るためのミドルウェアです。
 
-See the :ref:`csrf documentation <ref-contrib-csrf>`.
+:ref:`csrf のドキュメント <ref-contrib-csrf>` を参照してください。
+
 
 flatpages
 =========
 
-A framework for managing simple "flat" HTML content in a database.
+「フラット (flat) な」 HTML コンテンツをデータベースで扱うためのフレームワー
+クです。
 
-See the :ref:`flatpages documentation <ref-contrib-flatpages>`.
+:ref:`flatpages のドキュメント <ref-contrib-flatpages>` を参照してください。
 
-Requires the sites_ contrib package to be installed as well.
+sites_ パッケージもインストールしておく必要があります。
 
 formtools
 =========
 
-A set of high-level abstractions for Django forms (django.forms).
+Django の新しいフォーム (django.forms) に対する高水準の抽象化インタフェー
+スです。
 
 django.contrib.formtools.preview
 --------------------------------
 
-An abstraction of the following workflow:
+「 HTML フォームを表示し、必ずプレビューを行ってからフォームデータを提出す
+る」というワークフローを抽象化したものです。
 
-"Display an HTML form, force a preview, then do something with the submission."
-
-See the :ref:`form preview documentation <ref-contrib-formtools-form-preview>`.
+:ref:`フォームプレビューのドキュメント <ref-contrib-formtools-form-preview>`
+を参照してください。
 
 django.contrib.formtools.wizard
 --------------------------------
 
-Splits forms across multiple Web pages.
+フォームを複数の Web ページにわたるように分割します。
 
-See the :ref:`form wizard documentation <ref-contrib-formtools-form-wizard>`.
+:ref:`フォームウィザードのドキュメント <ref-contrib-formtools-form-wizard>`
+を参照してください。
 
 humanize
 ========
 
-A set of Django template filters useful for adding a "human touch" to data.
+データに「人間くささ (human touch)」を与えるための Django テンプレートフィ
+ルタです。
 
-See the :ref:`humanize documentation <ref-contrib-humanize>`.
+これらのフィルタを有効にするには、 :setting:`INSTALLED_APPS` 設定に
+``'django.contrib.humanize'`` を加えます。インストール後、テンプレート上で
+``{% load humanize %}`` を呼び出せば、以下のフィルタを利用できるようになり
+ます:
+
+:ref:`humanize のドキュメント <ref-contrib-humanize>` を参照してください。
 
 localflavor
 ===========
 
-A collection of various Django snippets that are useful only for a particular
-country or culture. For example, ``django.contrib.localflavor.us.forms``
-contains a ``USZipCodeField`` that you can use to validate U.S. zip codes.
+特定の国や文化でのみ有用な Django の短いコード (snippet) を集めたものです。
+例えば、 ``django.contrib.localflavor.us.forms`` には、米国の郵便番号
+(U.S. zip code) を検証するための ``USZipCodeField`` が入っています。
 
-See the :ref:`localflavor documentation <ref-contrib-localflavor>`.
+:ref:`localflavor のドキュメント <ref-contrib-localflavor>` を参照してくだ
+さい。
 
 .. _ref-contrib-markup:
 
 markup
 ======
 
-A collection of template filters that implement common markup languages:
+テンプレートフィルタのコレクションです。以下の 3 つのマークアップ言語に対す
+るフィルタを実装しています:
 
-    * ``textile`` -- implements `Textile`_
-    * ``markdown`` -- implements `Markdown`_
-    * ``restructuredtext`` -- implements `ReST (ReStructured Text)`_
+    * ``textile`` -- `Textile`_ 用の実装です
+    * ``markdown``  -- `Markdown`_ 用の実装です
+    * ``restructuredtext`` -- `ReST (ReStructured Text)`_ 用の実装です
 
-In each case, the filter expects formatted markup as a string and returns a
-string representing the marked-up text. For example, the ``textile`` filter
-converts text that is marked-up in Textile format to HTML.
+どのフィルタも、各マークアップ言語で書かれたテキストの入った文字列を引数に
+とり、マークアップ処理済みのテキストの入った文字列を返します。例えば、
+``textile`` フィルタは Textile フォーマットで書かれたテキストを HTML に変換
+します。
 
-To activate these filters, add ``'django.contrib.markup'`` to your
-:setting:`INSTALLED_APPS` setting. Once you've done that, use ``{% load markup %}`` in
-a template, and you'll have access to these filters. For more documentation,
-read the source code in django/contrib/markup/templatetags/markup.py.
+フィルタを有効にするには、 ``'django.contrib.markup'`` を
+:setting:`INSTALLED_APPS` 設定に追加します。その上で ``{% load markup %}``
+をテンプレートに追加すれば、フィルタを使えるようになります。詳細は
+``django/contrib/markup/templatetags/markup.py`` のソースコードを参
+照してください。
 
 .. _Textile: http://en.wikipedia.org/wiki/Textile_%28markup_language%29
 .. _Markdown: http://en.wikipedia.org/wiki/Markdown
@@ -153,52 +169,54 @@ read the source code in django/contrib/markup/templatetags/markup.py.
 redirects
 =========
 
-A framework for managing redirects.
+リダイレクトを管理するためのフレームワークです。
 
-See the :ref:`redirects documentation <ref-contrib-redirects>`.
+:ref:`redirects のドキュメント <ref-contrib-redirects>` を参照してください。
 
 sessions
 ========
 
-A framework for storing data in anonymous sessions.
+セッション管理のためのフレームワークです。
 
-See the :ref:`sessions documentation <topics-http-sessions>`.
+:ref:`セッションのドキュメント <topics-http-sessions>` を参照してください。
 
 sites
 =====
 
-A light framework that lets you operate multiple Web sites off of the same
-database and Django installation. It gives you hooks for associating objects to
-one or more sites.
+一つのデータベースと Django を使って複数のウェブサイトを操作できるようにす
+るための軽量フレームワークです。このフレームワークを使うと、オブジェクトを
+特定の (一つまたは複数の) サイトに関連づけできます。
 
-See the :ref:`sites documentation <ref-contrib-sites>`.
+:ref:``sites のドキュメント <ref-contrib-sites>` を参照してください。
 
 sitemaps
 ========
 
-A framework for generating Google sitemap XML files.
+Google サイトマップ XML ファイルを生成するためのフレームワークです。
 
-See the :ref:`sitemaps documentation <ref-contrib-sitemaps>`.
+:ref:`sitemaps のドキュメント <ref-contrib-sitemaps>` を参照してください。
 
 syndication
 ===========
 
-A framework for generating syndication feeds, in RSS and Atom, quite easily.
+RSS および Atom 形式の配信フィード (syndication feed) をごく簡単に生成する
+ためのフレームワークです。
 
-See the :ref:`syndication documentation <ref-contrib-syndication>`.
+:ref:`配信フィードフレームワークのドキュメント <ref-contrib-syndication>`
+を参照してください。
 
 webdesign
 =========
 
-Helpers and utilities targeted primarily at Web *designers* rather than
-Web *developers*.
+Web の *開発者* ではなく *デザイナ* のためのヘルパやユーティリティです。
 
-See the :ref:`Web design helpers documentation <ref-contrib-webdesign>`.
+:ref:`webdesign のドキュメント <ref-contrib-webdesign>` を参照してください。
 
-Other add-ons
-=============
 
-If you have an idea for functionality to include in ``contrib``, let us know!
-Code it up, and post it to the `django-users mailing list`_.
+その他のアドオン
+=================
+
+``contrib`` に入れたらよいと思う機能について何かアイデアがあるなら、是非教
+えて下さい! コードを書いて、 `django-users mailing list`_ に送って下さい。
 
 .. _django-users mailing list: http://groups.google.com/group/django-users
