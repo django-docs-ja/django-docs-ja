@@ -1,72 +1,85 @@
 .. _ref-contrib-redirects:
 
-=================
-The redirects app
-=================
+==========================
+redirects アプリケーション
+==========================
+
+:revision-up-to: 8961 (1.0)
 
 .. module:: django.contrib.redirects
-   :synopsis: A framework for managing redirects.
+   :synopsis: リダイレクションを管理するためのフレームワークです。
 
-Django comes with an optional redirects application. It lets you store simple
-redirects in a database and handles the redirecting for you.
+Django にはオプションとして redirects アプリケーションがついてきます．この
+アプリケーションを使うと，リダイレクト先をデータベースに保存し，適切なリダ
+イレクト処理をおこなってくれます．
 
-Installation
+.. _Installation:
+
+インストール
 ============
 
-To install the redirects app, follow these steps:
+redirects アプリケーションをインストールするには，以下の 3 ステップの操作を
+行います:
 
-    1. Add ``'django.contrib.redirects'`` to your :setting:`INSTALLED_APPS`
-       setting.
-    2. Add ``'django.contrib.redirects.middleware.RedirectFallbackMiddleware'``
-       to your :setting:`MIDDLEWARE_CLASSES` setting.
-    3. Run the command :djadmin:`manage.py syncdb <syncdb>`.
+    1. :setting:`INSTALLED_APPS` に ``"django.contrib.redirects"`` を追加し
+       ます．
+    2. :setting:`MIDDLEWARE_CLASSES` に
+       ``"django.contrib.redirects.middleware.RedirectFallbackMiddleware"``
+       を追加します．
+    3. :djadmin:`manage.py syncdb <syncdb>` を実行します．
 
-How it works
+.. _How it works:
+
+動作の仕組み
 ============
 
-``manage.py syncdb`` creates a ``django_redirect`` table in your database. This
-is a simple lookup table with ``site_id``, ``old_path`` and ``new_path`` fields.
+``manage.py syncdb`` を実行すると，データベースに ``django_redirects`` とい
+う名のテーブルを作成します．このテーブルは ``site_id``, ``old_path`` および
+``new_path`` というフィールドを持った検索テーブルです．
 
-The ``RedirectFallbackMiddleware`` does all of the work. Each time any Django
-application raises a 404 error, this middleware checks the redirects database
-for the requested URL as a last resort. Specifically, it checks for a redirect
-with the given ``old_path`` with a site ID that corresponds to the
-:setting:`SITE_ID` setting.
+全ての処理は ``RedirectFallbackMiddleware`` で行われます． Django アプリケー
+ション内で 404 エラーが送出されると，このミドルウェアは最後の手段として
+redirects データベースにリクエスト URL がないか調べます．特に，
+:setting:`SITE_ID` に対応するサイト ID を持った ``old_path`` を探します．
 
-    * If it finds a match, and ``new_path`` is not empty, it redirects to
-      ``new_path``.
-    * If it finds a match, and ``new_path`` is empty, it sends a 410 ("Gone")
-      HTTP header and empty (content-less) response.
-    * If it doesn't find a match, the request continues to be processed as
-      usual.
+    * 一致するエントリが見つかり，かつ ``new_path`` が空でなければ
+      ``new_path`` にリダイレクトします．
+    * 一致するエントリは見つかったが ``new_path`` が空の場合には， 410
+      ("Gone") HTTP ヘッダと空の (コンテンツのない) 応答を送信します．
+    * 一致するエントリがなければ，リクエストを通常通りに処理します．
 
-The middleware only gets activated for 404s -- not for 500s or responses of any
-other status code.
+ミドルウェアが起動されるのは 404 エラーに対してだけで， 500 やその他の状態
+コードでは起動されません．
 
-Note that the order of :setting:`MIDDLEWARE_CLASSES` matters. Generally, you
-can put ``RedirectFallbackMiddleware`` at the end of the list, because it's a
-last resort.
+:setting:`MIDDLEWARE_CLASSES` の設定順には注意が必要です．一般に，
+``RedirectFallbackMiddleware`` はリクエスト処理の最終手段なので，リストの末
+尾に指定します．
 
-For more on middleware, read the :ref:`middleware docs
-<topics-http-middleware>`.
+ミドルウェアについての詳しい情報は 
+`ミドルウェアのドキュメント <topics-http-middleware>` を参照してください．
 
-How to add, change and delete redirects
-=======================================
+.. _How to add, change and delete redirects:
 
-Via the admin interface
------------------------
+リダイレクトの追加，変更，削除
+==============================
 
-If you've activated the automatic Django admin interface, you should see a
-"Redirects" section on the admin index page. Edit redirects as you edit any
-other object in the system.
+.. _Via the admin interface:
 
-Via the Python API
-------------------
+admin インタフェースから
+------------------------
+
+Django の自動 admin インタフェースを有効にしていれば， "Redirects" という名
+前のセクションが admin のインデクスページに表示されているはずです．Django
+の他のオブジェクトと同じように編集してください．
+
+.. _Via the Python API:
+
+Python API から
+---------------
 
 .. class:: models.Redirect
 
-    Redirects are represented by a standard :ref:`Django model <topics-db-models>`,
-    which lives in `django/contrib/redirects/models.py`_. You can access redirect
-    objects via the :ref:`Django database API <topics-db-queries>`.
-
-.. _django/contrib/redirects/models.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/redirects/models.py
+    リダイレクトは `django/contrib/redirects/models.py`_ で定義されている標
+    準の :ref:`Django モデル <topics-db-models>` で表現されています。
+    :ref:`Django のデータベース API <topics-db-queries>` を使えば、リダイレ
+    クトオブジェクトにアクセスできます．
