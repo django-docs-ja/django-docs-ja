@@ -1,92 +1,98 @@
 .. _ref-contrib-databrowse:
 
 ==========
-Databrowse
+databrowse
 ==========
 
+:revision-up-to: 8961 (1.0)
+
 .. module:: django.contrib.databrowse
-   :synopsis: Databrowse is a Django application that lets you browse your data.
+   :synopsis: データのブラウジングを実現するための Django アプリケーション
+   です。
 
-Databrowse is a Django application that lets you browse your data.
-
-As the Django admin dynamically creates an admin interface by introspecting
-your models, Databrowse dynamically creates a rich, browsable Web site by
-introspecting your models.
+Django の Admin サイトはモデルに対するイントロスペクションによって、動的に
+管理サイトを構築しています。 databrowse も同様に、モデル定義からリッチなブ
+ラウジングウェブサイトを生成します。
 
 .. admonition:: Note
 
-    Databrowse is **very** new and is currently under active development. It
-    may change substantially before the next Django release.
+    databrowse は **非常に** 新しいアプリケーションで、まだ活発な開発下にあ
+    ります。次の Django のリリースまでには相当変更が加えられるでしょう。
 
-    With that said, it's easy to use, and it doesn't require writing any
-    code. So you can play around with it today, with very little investment in
-    time or coding.
+    そのことさえ念頭におけば、 databrowse 自体はとても簡単に利用でき、コー
+    ドを書く必要もありません。ですから、ごくごくわずかに時間を費してコード
+    を書くだけで試せます。
 
-How to use Databrowse
-=====================
 
-    1. Point Django at the default Databrowse templates. There are two ways to
-       do this:
+.. _How to use Databrowse:
 
-       * Add ``'django.contrib.databrowse'`` to your :setting:`INSTALLED_APPS`
-         setting. This will work if your :setting:`TEMPLATE_LOADERS` setting
-         includes the ``app_directories`` template loader (which is the case by
-         default). See the :ref:`template loader docs <template-loaders>` for
-         more.
+databrowse の使い方
+===================
 
-       * Otherwise, determine the full filesystem path to the
-         `:file:`django/contrib/databrowse/templates` directory, and add that
-         directory to your :setting:`TEMPLATE_DIRS` setting.
+1. Django に databrowse のデフォルトのテンプレートを教えます。やり方は
+   いくつかあります:
 
-    2. Register a number of models with the Databrowse site::
+   * ``'django.contrib.databrowse'`` を :setting:`INSTALLED_APPS` に追加し
+     ます。この方法は、 :setting:`TEMPLATE_LOADERS` 設定に
+     ``app_directories`` テンプレートローダが入っている場合に使えます (デフォ
+     ルトでは入っています) 。詳しくは 
+     :ref:`テンプレートローダのドキュメント <template-loaders>` を参照して
+     ください。
 
-           from django.contrib import databrowse
-           from myapp.models import SomeModel, SomeOtherModel
+   * あるいは、 :file:`django/contrib/databrowse/templates` ディレクトリへ
+     の完全なパスを調べ、 :setting:`TEMPLATE_DIRS` 設定に追加してください。
 
-           databrowse.site.register(SomeModel)
-           databrowse.site.register(SomeOtherModel)
+2. databrowse サイトにいくつかモデルを登録します::
 
-       Note that you should register the model *classes*, not instances.
+       from django.contrib import databrowse
+       from myapp.models import SomeModel, SomeOtherModel
 
-       It doesn't matter where you put this, as long as it gets executed at some
-       point. A good place for it is in your :ref:`URLconf file
-       <topics-http-urls>` (``urls.py``).
+       databrowse.site.register(SomeModel)
+       databrowse.site.register(SomeOtherModel)
 
-    3. Change your URLconf to import the :mod:`~django.contrib.databrowse` module::
+   モデルの *インスタンスではなくクラス* を登録してください。
 
-           from django.contrib import databrowse
+   このコードは、何らかのタイミングで実行される場所であればどこに書いて
+   もかまいません。例えば :ref:`URLconf <topics-http-urls>` (``urls.py``)
+   に書くのがよいでしょう。
 
-       ...and add the following line to your URLconf::
+3. URLconf を変更して、mod:`~django.contrib.databrowse` モジュールを
+   import します::
 
-           (r'^databrowse/(.*)', databrowse.site.root),
+       from django.contrib import databrowse
 
-       The prefix doesn't matter -- you can use ``databrowse/`` or ``db/`` or
-       whatever you'd like.
+   そして、以下の一行を追加します::
 
-    4. Run the Django server and visit ``/databrowse/`` in your browser.
+       (r'^databrowse/(.*)', databrowse.site.root),
 
-Requiring user login
-====================
+   プレフィクスはなんでも構いません -- ``databrowse/`` でも ``db/`` でも
+   なんでも好きなプレフィクスを使ってください。
 
-You can restrict access to logged-in users with only a few extra lines of
-code. Simply add the following import to your URLconf::
+4. Django サーバを起動して ``/databrowse/`` をブラウザで表示してください。
+
+.. _Requiring user login:
+
+ユーザにログインを要求する
+==========================
+
+たった数行追加するだけで、ビューへのアクセスをログインしているユーザに限定
+できます。まず、以下の import 行を URLconf に追加します::
 
     from django.contrib.auth.decorators import login_required
 
-Then modify the :ref:`URLconf <topics-http-urls>` so that the
-:func:`databrowse.site.root` view is decorated with
-:func:`django.contrib.auth.decorators.login_required`::
+次に、 :ref:`URLconf <topics-http-urls>` を変更して、
+:func:`databrowse.site.root` ビューを
+:func:`django.contrib.auth.decorators.login_required` で修飾 (decorate) し
+ます::
 
     (r'^databrowse/(.*)', login_required(databrowse.site.root)),
 
-If you haven't already added support for user logins to your :ref:`URLconf
-<topics-http-urls>`, as described in the :ref:`user authentication docs
-<ref-contrib-auth>`, then you will need to do so now with the following
-mapping::
+:ref:`ユーザ認証のドキュメント <ref-contrib-auth>` にあるような、ログインを
+サポートするための :ref:`URLconf <topics-http-urls>` を設定していないのなら、
+以下のようなマッピングも追加しておきます::
 
     (r'^accounts/login/$', 'django.contrib.auth.views.login'),
 
-The final step is to create the login form required by
-:func:`django.contrib.auth.views.login`. The
-:ref:`user authentication docs <ref-contrib-auth>` provide full details and a
-sample template that can be used for this purpose.
+最後のステップは、 :func:`django.contrib.auth.views.login` で必要なログイン
+フォームの作成です。 :ref:`ユーザ認証のドキュメント <ref-contrib-auth>` に
+は、テンプレートの詳細版と簡略版の両方を記載しています。
