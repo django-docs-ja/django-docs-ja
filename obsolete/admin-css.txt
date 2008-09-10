@@ -1,132 +1,157 @@
 .. _obsolete-admin-css:
 
-======================================
-Customizing the Django admin interface
-======================================
+=======================================
+Django 管理インタフェースのカスタマイズ
+=======================================
 
-.. warning::
+:revision-up-to: 8961 (1.0)
 
-    The design of the admin has changed somewhat since this document was
-    written, and parts may not apply any more. This document is no longer
-    maintained since an official API for customizing the Django admin interface
-    is in development.
+.. TBD
 
-Django's dynamic admin interface gives you a fully-functional admin for free
-with no hand-coding required. The dynamic admin is designed to be
-production-ready, not just a starting point, so you can use it as-is on a real
-site. While the underlying format of the admin pages is built in to Django, you
-can customize the look and feel by editing the admin stylesheet and images.
+ .. warning::
+ 
+     The design of the admin has changed somewhat since this document was
+     written, and parts may not apply any more. This document is no longer
+     maintained since an official API for customizing the Django admin interface
+     is in development.
+ 
+Django が動的に生成する admin インタフェースは、コードを書かずに使える完全
+な機能を備えた admin を提供しています。 admin は動的管理サイト構築の単なる
+足掛かりではなく、実運用の環境でそのまま使えるだけの機能を備えています。
+admin ページの根底にある形式は Django で構築されていますが、 admin のスタイ
+ルシートや画像を編集すればルック & フィールをカスタマイズできます。
 
-Here's a quick and dirty overview some of the main styles and classes used in
-the Django admin CSS.
+このドキュメントでは、 Django の admin の CSS で使われている主要なスタイル
+とクラスについてざっと紹介します。
 
-Modules
-=======
+.. _Modules:
 
-The ``.module`` class is a basic building block for grouping content in the
-admin. It's generally applied to a ``div`` or a ``fieldset``. It wraps the content
-group in a box and applies certain styles to the elements within. An ``h2``
-within a ``div.module`` will align to the top of the ``div`` as a header for the
-whole group.
+モジュール
+==========
+
+admin 上ではコンテンツをグループ化する基本の構成要素として ``.module`` クラ
+スを使っています。 ``.module`` は ``div`` や ``fieldset`` に適用されます。
+``.module`` はコンテンツのグループをボックス内にラップし。その中身に一定の
+スタイルを適用します。例えば、 ``div.module`` 内の ``h2`` タグは、グループ
+全体のヘッダになるよう、 ``div`` の上に配置されます。
 
 .. image:: _images/module.gif
    :alt: Example use of module class on admin homepage
 
-Column Types
+.. _Column Types:
+
+カラムタイプ
 ============
 
 .. note::
 
-    All admin pages (except the dashboard) are fluid-width. All fixed-width
-    classes from previous Django versions have been removed.
+    管理ページは (ダッシュボード部分を除いて) 全て可変幅 (fluid-width) になっ
+    ており、以前の Django にあった固定幅のクラスは全て除去されています。
 
-The base template for each admin page has a block that defines the column
-structure for the page. This sets a class on the page content area
-(``div#content``) so everything on the page knows how wide it should be. There
-are three column types available.
+admin ページのベーステンプレートには、ページのカラム構造を決めるブロックが
+あります。このブロックにはページのコンテンツ領域 (``div#content``) のクラス
+を定義し、コンテンツ領域の幅がわかるようにします。指定できるカラムタイプは
+3 種類あります。
 
 colM
-    This is the default column setting for all pages. The "M" stands for "main".
-    Assumes that all content on the page is in one main column
-    (``div#content-main``).
-colMS
-    This is for pages with one main column and a sidebar on the right. The "S"
-    stands for "sidebar". Assumes that main content is in ``div#content-main``
-    and sidebar content is in ``div#content-related``. This is used on the main
-    admin page.
-colSM
-    Same as above, with the sidebar on the left. The source order of the columns
-    doesn't matter.
+    全てのページのデフォルトのカラムの設定です。 "M" は "main" を表します。
+    全てのコンテンツは一つのメインカラム (``div#content-main``) に入るもの
+    と仮定しています。
 
-For instance, you could stick this in a template to make a two-column page with
-the sidebar on the right:
+colMS
+    一つのメインカラムと、その右側にサイドバーを持つようなページのカラム設
+    定です。 "S" は "sidebar" を表します。メインのコンテンツは
+    ``div#content-main`` に入り、サイドバーのコンテンツは
+    ``div#content-related`` に入るものと仮定しています。メインの admin ペー
+    ジで使われています。
+
+colSM
+    上と同じですが、サイドバーは左側に出ます。ソース中でどちらのカラムが先
+    にでてくるかは関係ありません。
+
+例えば、以下のようなコードをテンプレートに張り付ければ、右側のサイドバーを
+2 カラムのページにできるでしょう:
 
 .. code-block:: html+django
 
     {% block coltype %}colMS{% endblock %}
 
-Text Styles
-===========
 
-Font Sizes
-----------
+.. _Text Styles:
 
-Most HTML elements (headers, lists, etc.) have base font sizes in the stylesheet
-based on context. There are three classes are available for forcing text to a
-certain size in any context.
+テキストのスタイル
+==================
+
+.. _Font Sizes:
+
+フォントサイズ
+--------------
+
+スタイルシートには、ほとんどの HTML 要素 (ヘッダ、リストなど) に対して
+コンテキストに応じてベースフォントサイズを指定しています。テキストを
+特定のサイズに強制する 3 つのクラスがあります。
 
 small
     11px
+
 tiny
     10px
+
 mini
-    9px (use sparingly)
+    9px (控え目に使ってください)
 
-Font Styles and Alignment
--------------------------
+.. _Font Styles and Alignment:
 
-There are also a few styles for styling text.
+フォントスタイルと字揃え
+------------------------
+
+テキストのスタイルもいくつかあります。
 
 .quiet
-    Sets font color to light gray. Good for side notes in instructions. Combine
-    with ``.small`` or ``.tiny`` for sheer excitement.
+    フォント色をライトグレーにします。説明文の傍注意などに便利です。協調の
+    度合を変えるには ``.small`` や ``.tiny`` と組み合わせて下さい。
 .help
-    This is a custom class for blocks of inline help text explaining the
-    function of form elements. It makes text smaller and gray, and when applied
-    to ``p`` elements within ``.form-row`` elements (see Form Styles below),
-    it will offset the text to align with the form field. Use this for help
-    text, instead of ``small quiet``. It works on other elements, but try to
-    put the class on a ``p`` whenever you can.
+    フォーム要素の機能を説明するインラインヘルプテキストのブロック用に作ら
+    れたクラスです。テキストを小さいグレーで表示し、 ``.form-row`` 要素
+    (後述の「フォームのスタイル」参照) 内の ``p`` エレメントで使うと、フォー
+    ムフィールドと並ぶようにオフセットを決めます。ヘルプテキストには 
+    ``small quiet`` ではなくこのクラスを使ってください。他のエレメントで
+    も使えますが、できるだけ ``p`` に使うようにしてください。
 .align-left
-    It aligns the text left. Only works on block elements containing inline
-    elements.
+    テキストを左揃えにします。インラインエレメントの入ったブロックエレメン
+    トでしか使えません。
 .align-right
-    Are you paying attention?
+    テキストを右揃えにします。インラインエレメントの入ったブロックエレメン
+    トでしか使えません。
 .nowrap
-    Keeps text and inline objects from wrapping. Comes in handy for table
-    headers you want to stay on one line.
+    テキストとインラインオブジェクトがラップされないようにします。
+    テーブルヘッダなどを一行に収めたい場合に便利です。
 
-Floats and Clears
------------------
+.. _Floats and Clears:
+
+float 指定とクリア
+------------------
 
 float-left
-    floats left
+    左よせの float です。
 float-right
-    floats right
+    右よせの float です。
 clear
-    clears all
+    float 指定を全てクリアします。
 
-Object Tools
-============
+.. _Object Tools:
 
-Certain actions which apply directly to an object are used in form and
-changelist pages. These appear in a "toolbar" row above the form or changelist,
-to the right of the page. The tools are wrapped in a ``ul`` with the class
-``object-tools``. There are two custom tool types which can be defined with an
-additional class on the ``a`` for that tool. These are ``.addlink`` and
-``.viewsitelink``.
+オブジェクトツール
+==================
 
-Example from a changelist page:
+フォームやチェンジリストのページには、オブジェクトに直接適用される操作への
+リンクがあります。これらのリンクはチェンジリストの上にある「ツールバー」行
+の右側に表示されます。 ツールは ``object-tools`` クラスの ``ul`` でラップ
+されています。ツールには二つのカスタムのタイプがあり、ツール内で ``a`` タグ
+に指定して使うようになっています。 ``.addlink`` と ``.viewsitelink`` です。
+
+
+チェンジリストページではこのようになります:
 
 .. code-block:: html+django
 
@@ -137,7 +162,7 @@ Example from a changelist page:
 .. image:: _images/objecttools_01.gif
    :alt: Object tools on a changelist page
 
-and from a form page:
+フォームページでは以下のようになっています:
 
 .. code-block:: html+django
 
@@ -149,40 +174,48 @@ and from a form page:
 .. image:: _images/objecttools_02.gif
    :alt: Object tools on a form page
 
-Form Styles
-===========
+.. _Form Styles:
 
-Fieldsets
----------
+フォームのスタイル
+==================
 
-Admin forms are broken up into groups by ``fieldset`` elements. Each form fieldset
-should have a class ``.module``. Each fieldset should have a header ``h2`` within the
-fieldset at the top (except the first group in the form, and in some cases where the
-group of fields doesn't have a logical label).
+.. _Fieldsets:
 
-Each fieldset can also take extra classes in addition to ``.module`` to apply
-appropriate formatting to the group of fields.
+フィールドセット
+----------------
+
+admin のフォームは ``fieldset`` エレメントでグループごとに分けられています。
+各フィールドセットには ``.module`` クラスがなくてはなりません。また、
+各フィールドセットの先頭には ``h2`` タグによるヘッダがなくてはなりません
+(ただし、フォームの最初のグループや、フィールドグループに論理的なラベル
+を必要としない場合は除きます)。
+
+また、各フィールドセットに  ``.module`` 以外の追加のクラスを指定して、フィー
+ルドグループ全体が適当なフォーマットになるようにしてもかまいません。
 
 .aligned
-    This will align the labels and inputs side by side on the same line.
+    ラベルと input エレメントを同じ行に横並びに配置します。
 .wide
-    Used in combination with ``.aligned`` to widen the space available for the
-    labels.
+    ``.aligned`` と組み合わせて、ラベルの使えるスペースを広くします。
 
-Form Rows
----------
+.. _Form Rows:
 
-Each row of the form (within the ``fieldset``) should be enclosed in a ``div``
-with class ``form-row``. If the field in the row is required, a class of
-``required`` should also be added to the ``div.form-row``.
+フォーム行
+----------
 
-.. image:: _images/formrow.gif
+(``fieldset`` 内の) フォームの各行は ``form-row`` クラスの ``div`` で囲わね
+ばなりません。行内に収めるフィールドが必須のフィールドの場合、
+``div.form-row`` には ``required`` クラスを追加せねばなりません。
+
+.. image:: .. image:: _images/formrow.gif
    :alt: Example use of form-row class
 
-Labels
+.. _Labels:
+
+ラベル
 ------
 
-Form labels should always precede the field, except in the case
-of checkboxes and radio buttons, where the ``input`` should come first. Any
-explanation or help text should follow the ``label`` in a ``p`` with class
-``.help``.
+チェックボックスとラジオボタンを除き、フォームのラベルは常にフィールドの前
+にきます。チェックボックスやラジオボックスの場合には ``input`` タグが先にき
+ます。 ``label`` タグ以降の説明文やヘルプテキストは、 ``.help`` クラスの
+``p`` タグに入ります。
