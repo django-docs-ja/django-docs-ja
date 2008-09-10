@@ -4,55 +4,59 @@
 django.contrib.webdesign
 ========================
 
+:revision-up-to: 8961 (1.0)
+
 .. module:: django.contrib.webdesign
-   :synopsis: Helpers and utilities targeted primarily at Web *designers*
-              rather than Web *developers*.
+   :synopsis: Web *開発者* ではなく Web *デザイナ* のためのヘルパとユーティ
+              リティです。
 
-The ``django.contrib.webdesign`` package, part of the
-:ref:`"django.contrib" add-ons <ref-contrib-index>`, provides various Django
-helpers that are particularly useful to Web *designers* (as opposed to
-developers).
+``django.contrib.webdesign`` パッケージは 
+:ref:`"django.contrib" のアドオン <ref-contrib-index>` の一部で，Web 開発者
+ではなく *デザイナ* にとって便利なヘルパを提供しています．
 
-At present, the package contains only a single template tag. If you have ideas
-for Web-designer-friendly functionality in Django, please
-:ref:`suggest them <internals-contributing>`.
+現時点では，このパッケージにたテンプレートタグが一つ入っているだけです．
+Django に取り込みたい Web デザイナフレンドリな機能のアイデアがあるなら，
+ぜひ :ref:`開発チームに提案 <internals-contributing>` してください．
 
-Template tags
-=============
+.. _Template tags:
 
-To use these template tags, add ``'django.contrib.webdesign'`` to your
-:setting:`INSTALLED_APPS` setting. Once you've done that, use
-``{% load webdesign %}`` in a template to give your template access to the tags.
+テンプレートタグ
+================
+
+``django.contrib.webdesign`` のテンプレートタグを使うには，
+``'django.contrib.webdesign'`` を :setting:`INSTALLED_APPS` 設定に追加しま
+す．その上で，テンプレートに ``{% load webdesign %}`` を入れれば，テンプレー
+トタグを使えます．
 
 
 lorem
 =====
 
-Displays random "lorem ipsum" Latin text. This is useful for providing sample
-data in templates.
+ラテン語の "lorem ipsum" からランダムな文を生成して出力します．テンプレート
+内にサンプルデータを入れるときに便利です．
 
-Usage::
+使用法::
 
     {% lorem [count] [method] [random] %}
 
-The ``{% lorem %}`` tag can be used with zero, one, two or three arguments.
-The arguments are:
+``{% lorem %}`` 引数なしでも使えますが，3 つの省略可能な引数を指定できます:
 
     ===========  =============================================================
-    Argument     Description
+    引数         説明
     ===========  =============================================================
-    ``count``    A number (or variable) containing the number of paragraphs or
-                 words to generate (default is 1).
-    ``method``   Either ``w`` for words, ``p`` for HTML paragraphs or ``b``
-                 for plain-text paragraph blocks (default is ``b``).
-    ``random``   The word ``random``, which if given, does not use the common
-                 paragraph ("Lorem ipsum dolor sit amet...") when generating
-                 text.
+    ``count``    出力する文または単語の個数を表す数 (または変数) です．
+                 デフォルトは 1 です．
+    ``method``   ``w`` にすると単語を， ``p`` にすると HTML の ``<p>`` タグ
+                 を使った段落を， ``b`` にすると平文の段落ブロックを出力し
+                 ます． (デフォルトは ``b``) です．
+    ``random``   ``random`` を指定すると，テキストを生成するときにお決まり
+                 の文 ("Lorem ipsum dolor sit amet...") を使いません．
     ===========  =============================================================
 
-Examples:
+例:
 
-    * ``{% lorem %}`` will output the common "lorem ipsum" paragraph.
-    * ``{% lorem 3 p %}`` will output the common "lorem ipsum" paragraph
-      and two random paragraphs each wrapped in HTML ``<p>`` tags.
-    * ``{% lorem 2 w random %}`` will output two random Latin words.
+    * ``{% lorem %}`` とすると，おなじみの "lorem ipsum" 文を出力します．
+    * ``{% lorem 3 p %}`` とすると，おなじみの "lorem ipsum" 文と，ランダム
+      な文をそれぞれ HTML の ``<p>`` タグでラップしたものを出力します．
+    * ``{% lorem 2 w random %}`` とすると，ランダムな 2 単語のラテン語を出
+      力します．
