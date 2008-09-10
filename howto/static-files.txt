@@ -1,84 +1,102 @@
 .. _howto-static-files:
 
-=========================
-How to serve static files
-=========================
+========================
+静的なファイルの提供方法
+========================
+
+:revision-up-to: 8961 (1.0)
 
 .. module:: django.views.static
-   :synopsis: Serving of static files during development.
+   :synopsis: 開発時に静的なファイルを提供するためのモジュールです。
  
-Django itself doesn't serve static (media) files, such as images, style sheets,
-or video. It leaves that job to whichever Web server you choose.
+Django 自体では，画像やスタイルシート，ビデオといった静的な (メディア) ファ
+イルを提供しません．通常， Django はメディアファイルの提供を使っている Web
+サーバの仕事として残しておきます．なぜなら， Apache_ や lighttpd_ のような
+標準的な Web サーバは Web アプリケーションフレームワークよりもはるかに高
+性能な静的ファイル提供機能を備えているからです． 
 
-The reasoning here is that standard Web servers, such as Apache_ and lighttpd_,
-are much more fine-tuned at serving static files than a Web application
-framework.
-
-With that said, Django does support static files **during development**. You can
-use the :func:`django.views.static.serve` view to serve media files.
+というわけで， Django が静的ファイルをサポートするのは **開発中だけ** です．
+メディアファイルの提供には :func:`django.views.static.serve` ビューを使って
+下さい．
 
 .. _Apache: http://httpd.apache.org/
 .. _lighttpd: http://www.lighttpd.net/
 
-The big, fat disclaimer
-=======================
 
-Using this method is **inefficient** and **insecure**. Do not use this in a
-production setting. Use this only for development.
+.. _The big, fat disclaimer:
 
-For information on serving static files in an Apache production environment,
-see the :ref:`Django mod_python documentation <serving-media-files>`.
+大事な，大事な注意書き
+======================
 
-How to do it
-============
+この方法は **非効率的** かつ **安全ではありません** ．運用環境では使わず，
+開発環境だけで使って下さい．
 
-Here's the formal definition of the :func:`~django.views.static.serve` view:
+運用環境における静的ファイルの提供方法は， 
+:ref:`Django mod_python ドキュメント <serving-media-files>` を参照してくだ
+さい．
+
+.. _How to do it:
+
+方法
+====
+
+:func:`~django.views.static.serve` ビューの定義を以下に示します。
 
 .. function:: def serve(request, path, document_root, show_indexes=False):
 
-To use it, just put this in your :ref:`URLconf <topics-http-urls>`::
+このビューを使うには、 :ref:`URLconf <topics-http-urls>` に以下の設定を入れ
+ます::
 
-    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/path/to/media'}),
+    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', 
+     {'document_root': '/path/to/media'}),
 
-...where ``site_media`` is the URL where your media will be rooted, and
-``/path/to/media`` is the filesystem root for your media. This will call the
-:func:`~django.views.static.serve` view, passing in the path from the URLconf
-and the (required) ``document_root`` parameter.
+``site_media`` はメディアファイル置場のルートの URL にします．
+``/path/to/media`` はメディアファイル置場のルートのファイルシステム上の場所
+です．これで、 :func:`~django.views.static.serve` が呼び出されるときに必須
+のパラメタ ``document_root`` が渡されます。
 
-Given the above URLconf:
+ファイルシステムのルートを指定するため，必ず ``document_root`` パラメタを指
+定せねばなりません．
 
-    * The file ``/path/to/media/foo.jpg`` will be made available at the URL
-      ``/site_media/foo.jpg``.
+上の URLconf では:
 
-    * The file ``/path/to/media/css/mystyles.css`` will be made available
-      at the URL ``/site_media/css/mystyles.css``.
+    * ``/path/to/media/foo.jpg`` というファイルは ``/site_media/foo.jpg``
+      という URL でアクセスできるようになります．
 
-    * The file ``/path/bar.jpg`` will not be accessible, because it doesn't
-      fall under the document root.
+    * ``/path/to/media/css/mystyles.css`` というファイルの URL は
+      ``/site_media/css/mystyles.css`` になります．
 
+    * ``/path/bar.jpg`` というファイルはドキュメントルート下にないのでアク
+      セスできません．
 
-Directory listings
-==================
+.. _Directory listings:
 
-Optionally, you can pass the ``show_indexes`` parameter to the
-:func:`~django.views.static.serve` view. This is ``False`` by default. If it's
-``True``, Django will display file listings for directories.
+ディレクトリのリスト表示
+========================
 
-For example::
+オプションとして， ``show_indexes`` パラメタを 
+:ref:`~django.views.static.serve` ビューに渡せます．デフォルトの値は
+``False`` です． ``True`` にすると，Django はディレクトリに対して内容リスト
+を表示します．
 
-    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/path/to/media', 'show_indexes': True}),
+例::
 
-You can customize the index view by creating a template called
-``static/directory_index.html``. That template gets two objects in its context:
+    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', 
+     {'document_root': '/path/to/media', 'show_indexes': True}),
 
-    * ``directory`` -- the directory name (a string)
-    * ``file_list`` -- a list of file names (as strings) in the directory
+``static/directory_index.html`` テンプレートを変更すれば， index ビューをカ
+スタマイズできます．このテンプレートのコンテキストには二つのオブジェクトが
+入っています:
 
-Here's the default ``static/directory_index`` template:
+    * ``directory`` -- ディレクトリ名 (文字列) です．
+    * ``file_list`` -- ディレクトリ中のファイル名 (文字列) です．
+
+デフォルトの ``static/directory_index.html`` テンプレートを示します:
 
 .. code-block:: html+django
 
-    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
         <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
@@ -96,16 +114,18 @@ Here's the default ``static/directory_index`` template:
     </body>
     </html>
 
-Limiting use to DEBUG=True
-==========================
+.. _Limiting use to DEBUG=True:
 
-Because URLconfs are just plain Python modules, you can use Python logic to
-make the static-media view available only in development mode. This is a handy
-trick to make sure the static-serving view doesn't slip into a production
-setting by mistake.
+DEBUG=True の時だけに制限する
+=============================
 
-Do this by wrapping an ``if DEBUG`` statement around the
-:func:`django.views.static.serve` inclusion. Here's a full example URLconf::
+URLconf は単なる Python モジュールに過ぎないので，静的メディアビューを開発
+モードでしか使えないような Python ロジックを埋め込んでおけます．これは，うっ
+かり間違えて運用設定に静的ファイル提供ビューが紛れ込まないようにするのに便
+利です．
+
+以下のように ``if DEBUG`` 文でラップして 
+:func:`django.views.static.serve` を取り込みます． URLconf の例を示します::
 
     from django.conf.urls.defaults import *
     from django.conf import settings
@@ -113,19 +133,23 @@ Do this by wrapping an ``if DEBUG`` statement around the
     urlpatterns = patterns('',
         (r'^articles/2003/$', 'news.views.special_case_2003'),
         (r'^articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
-        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'news.views.month_archive'),
-        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'news.views.article_detail'),
+        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 
+         'news.views.month_archive'),
+        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 
+         'news.views.article_detail'),
     )
 
     if settings.DEBUG:
         urlpatterns += patterns('',
-            (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/path/to/media'}),
+            (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', 
+             {'document_root': '/path/to/media'}),
         )
 
-This code is straightforward. It imports the settings and checks the value of
-the :setting:`DEBUG` setting. If it evaluates to ``True``, then ``site_media``
-will be associated with the ``django.views.static.serve`` view. If not, then the
-view won't be made available.
+コードは一目瞭然で，設定を import して， :setting:`DEBUG` の値をチェックし
+ています．値が ``True`` なら， ``site_media`` は 
+:func:`django.views.static.serve` ビューに関連づけられます．そうでない
+(``DEBUG == False``) なら，ビューを使えなくなります．
 
-Of course, the catch here is that you'll have to remember to set ``DEBUG=False``
-in your production settings file. But you should be doing that anyway.
+もちろん，運用設定の設定ファイルでは忘れずに ``DEBUG=False`` を設定しておく
+という前提が必要ですが，何にせよ運用環境では ``DEBUG=False`` を設定すべきで
+す．
