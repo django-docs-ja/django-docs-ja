@@ -4,88 +4,96 @@
 django.contrib.humanize
 ========================
 
+:revision-up-to: 8961 (1.0)
+
 .. module:: django.contrib.humanize
    :synopsis: A set of Django template filters useful for adding a "human
               touch" to data.
 
-A set of Django template filters useful for adding a "human touch" to data.
+humanize は、データに「人間くささ (human touch)」を与えるための Django テン
+プレートフィルタです。
 
-To activate these filters, add ``'django.contrib.humanize'`` to your
-:setting:`INSTALLED_APPS` setting. Once you've done that, use
-``{% load humanize %}`` in a template, and you'll have access to these filters:
+これらのフィルタを有効にするには、 :setting:`INSTALLED_APPS` 設定に
+``'django.contrib.humanize'`` を加えます。インストール後、テンプレート上で
+``{% load humanize %}`` を呼び出せば、以下のフィルタを利用できるようになり
+ます:
 
 apnumber
 --------
 
-For numbers 1-9, returns the number spelled out. Otherwise, returns the
-number. This follows Associated Press style.
+1-9 の数字に対して、数をアルファベットで表します。それ以外の数はそのまま数
+字で返します。これは Associated Press の書式に従っています。
 
-Examples:
+例:
 
-    * ``1`` becomes ``'one'``.
-    * ``2`` becomes ``'two'``.
-    * ``10`` becomes ``10``.
+    * ``1`` は ``'one'`` になります
+    * ``2`` は ``'two'`` になります。
+    * ``10`` は ``10`` になります。
 
-You can pass in either an integer or a string representation of an integer.
+渡す値は整数でも、整数を文字列で表したものでもかまいません。
 
 intcomma
 --------
 
-Converts an integer to a string containing commas every three digits.
+整数を三桁ごとにカンマで区切った形式の文字列に変換します。
 
-Examples:
+例:
 
-    * ``4500`` becomes ``'4,500'``.
-    * ``45000`` becomes ``'45,000'``.
-    * ``450000`` becomes ``'450,000'``.
-    * ``4500000`` becomes ``'4,500,000'``.
+    * ``4500`` は ``'4,500'`` になります。
+    * ``45000`` は ``'45,000'`` になります。
+    * ``450000`` は ``'450,000'`` になります。
+    * ``4500000`` は ``'4,500,000'`` になります。
 
-You can pass in either an integer or a string representation of an integer.
+渡す値は整数でも、整数を文字列で表したものでもかまいません。
 
 intword
 -------
 
-Converts a large integer to a friendly text representation. Works best for
-numbers over 1 million.
+大きな整数を読みやすいテキスト表現に変換します。100 万を超えるような値を扱
+う場合に便利です。
 
-Examples:
+例:
 
-    * ``1000000`` becomes ``'1.0 million'``.
-    * ``1200000`` becomes ``'1.2 million'``.
-    * ``1200000000`` becomes ``'1.2 billion'``.
+    * ``1000000`` は ``'1.0 million'`` になります。
+    * ``1200000`` は ``'1.2 million'``  になります。
+    * ``1200000000`` は ``'1.2 billion'``  になります。
 
 Values up to 1000000000000000 (one quadrillion) are supported.
 
-You can pass in either an integer or a string representation of an integer.
+渡す値は整数でも、整数を文字列で表したものでもかまいません。
 
 ordinal
 -------
 
-Converts an integer to its ordinal as a string.
+整数を序数形式の文字列に変換します。
 
-Examples:
+例:
 
-    * ``1`` becomes ``'1st'``.
-    * ``2`` becomes ``'2nd'``.
-    * ``3`` becomes ``'3rd'``.
+    * ``1`` は ``'1st'`` になります。
+    * ``2`` は ``'2nd'`` になります。
+    * ``3`` は ``'3rd'`` になります。
 
-You can pass in either an integer or a string representation of an integer.
+渡す値は整数でも、整数を文字列で表したものでもかまいません。
 
 naturalday
 ----------
 
 .. versionadded:: 1.0
 
-For dates that are the current day or within one day, return "today",
-"tomorrow" or "yesterday", as appropriate. Otherwise, format the date using
-the passed in format string.
+naturalday
+----------
 
-**Argument:** Date formatting string as described in the :ttag:`now` tag.
+日付が今日、明日、昨日のいずれかに該当する場合、それぞれ「今日 ("today")」、
+「明日 ("tomorrow") 」、「昨日 ("yesterday")」を返します。それ以外の日付の
+場合は、引数に渡したフォーマット文字列を使って日付をレンダします。
 
-Examples (when 'today' is 17 Feb 2007):
+**引数:**  :ttag:`now` タグと同じ日付フォーマット形式です。
 
-    * ``16 Feb 2007`` becomes ``yesterday``.
-    * ``17 Feb 2007`` becomes ``today``.
-    * ``18 Feb 2007`` becomes ``tomorrow``.
-    * Any other day is formatted according to given argument or the
-      :setting:`DATE_FORMAT` setting if no argument is given.
+今日が 2007 年 2 月 17 日とすると、以下のように日付を表示します:
+
+    * ``16 Feb 2007`` は ``昨日`` に変わります。
+    * ``17 Feb 2007`` は ``今日`` に変わります。
+    * ``18 Feb 2007`` は ``明日`` に変わります。
+    * 引数を与えない場合、今日、昨日、明日以外の日付は 
+      :setting:`DATE_FORMAT` 設定に従ってフォーマットされます。
+
