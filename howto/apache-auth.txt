@@ -1,30 +1,35 @@
 .. _howto-apache-auth:
 
-=========================================================
-Authenticating against Django's user database from Apache
-=========================================================
+===================================================
+Apache での認証に Django のユーザデータベースを使う
+===================================================
 
-Since keeping multiple authentication databases in sync is a common problem when
-dealing with Apache, you can configuring Apache to authenticate against Django's
-:ref:`authentication system <topics-auth>` directly. For example, you
-could:
+:revision-up-to: 8961 (1.0)
 
-    * Serve static/media files directly from Apache only to authenticated users.
+Apache を使っていると，同期を保ちながら複数の認証データベースを維持するとい
+う問題によくぶつかります．そこで， Django の 
+:ref:`認証システム <topics-auth>` に対して直接 Apache から認証をかけるよう
+設定できます．例えば以下のような処理を実現できます:
 
-    * Authenticate access to a Subversion_ repository against Django users with
-      a certain permission.
+    * 認証ユーザだけを対象に，静的ファイル／メディアファイルを Apache から
+      直接提供できます．
 
-    * Allow certain users to connect to a WebDAV share created with mod_dav_.
+    * 特定のパーミッションを持つ Django ユーザだけに Subversion_ リポジト
+      リへのアクセスを許すよう認証をかけられます．
+
+    * mod_dav_ で作成した WebDAV 共有への接続を特定ユーザに許可できます．
 
 .. _Subversion: http://subversion.tigris.org/
 .. _mod_dav: http://httpd.apache.org/docs/2.0/mod/mod_dav.html
 
-Configuring Apache
-==================
+.. _Configuring Apache:
 
-To check against Django's authorization database from a Apache configuration
-file, you'll need to use mod_python's ``PythonAuthenHandler`` directive along
-with the standard ``Auth*`` and ``Require`` directives:
+Apache の設定
+=============
+
+Django の認証データベースを Apache 設定ファイルからチェックするには
+mod_python の標準の ``Auth*`` および ``Require`` ディレクティブと共に，
+``PythonAuthenHandler`` ディレクティブを使います:
 
 .. code-block:: apache
 
@@ -37,21 +42,20 @@ with the standard ``Auth*`` and ``Require`` directives:
         PythonAuthenHandler django.contrib.auth.handlers.modpython
     </Location>
 
-.. admonition:: Using the authentication handler with Apache 2.2
+.. admonition:: Apache 2.2 で認証ハンドラを使う場合
 
-    If you're using Apache 2.2, you'll need to take a couple extra steps.
+    Apache 2.2 を使っている場合には、あと 2 ステップほど作業が必要です。
 
-    You'll need to ensure that ``mod_auth_basic`` and ``mod_authz_user``
-    are loaded. These might be compiled statically into Apache, or you might
-    need to use ``LoadModule`` to load them dynamically (as shown in the
-    example at the bottom of this note).
+    まず、 ``mod_auth_basic`` と ``mod_authz_user`` をきちんとロードさせね
+    ばなりません。これらのモジュールは、 Apache のコンパイル時に静的に組み
+    込まれているか、 ``LoadModule`` を使って動的に組み込みます (この囲みの
+    末尾に例があります) 。
 
-    You'll also need to insert configuration directives that prevent Apache
-    from trying to use other authentication modules, as well as specifying
-    the ``AuthUserFile`` directive and pointing it to ``/dev/null``. Depending
-    on which other authentication modules you have loaded, you might need one
-    or more of the following directives::
-    
+    また、 Apache が他の認証用モジュールを使おうとしないように、設定のため
+    のディレクティブを挿入しておき、``AuthUserFile`` を ``/dev/null`` に指
+    定しておく必要があります。ロードした認証モジュールによって、以下のいず
+    れか、または複数のディレクティブが必要です:
+
     .. code-block:: apache
 
         AuthBasicAuthoritative Off
@@ -63,8 +67,7 @@ with the standard ``Auth*`` and ``Require`` directives:
         AuthzOwnerAuthoritative Off
         AuthzUserAuthoritative Off
 
-    A complete configuration, with differences between Apache 2.0 and
-    Apache 2.2 marked in bold, would look something like:
+    Apache 2.2 での設定全体を、2.0 との違いを太字にして示します:
 
     .. parsed-literal::
 
@@ -84,39 +87,41 @@ with the standard ``Auth*`` and ``Require`` directives:
             PythonAuthenHandler django.contrib.auth.handlers.modpython
         </Location>
 
-By default, the authentication handler will limit access to the ``/example/``
-location to users marked as staff members.  You can use a set of
-``PythonOption`` directives to modify this behavior:
+デフォルトでは，認証ハンドラは staff のマークのついたメンバだけに
+``/example/`` へのアクセスを制限します．この挙動を変更したければ，
+以下の ``PythonOption`` ディレクティブを使います:
 
     ================================  =========================================
-    ``PythonOption``                  Explanation
+    ``PythonOption``                  説明
     ================================  =========================================
-    ``DjangoRequireStaffStatus``      If set to ``on`` only "staff" users (i.e.
-                                      those with the ``is_staff`` flag set)
-                                      will be allowed.
+    ``DjangoRequireStaffStatus``      ``on`` に設定すると， "staff" ユーザ
+                                      (``is_staff`` フラグの立っているユーザ)
+                                      だけにアクセスを許可します．
 
-                                      Defaults to ``on``.
+                                      デフォルトは ``on`` です．
 
-    ``DjangoRequireSuperuserStatus``  If set to ``on`` only superusers (i.e.
-                                      those with the ``is_superuser`` flag set)
-                                      will be allowed.
+    ``DjangoRequireSuperuserStatus``  ``on`` に設定すると，スーパユーザ
+                                      (``is_superuser`` フラグの立っている
+                                      ユーザ) だけにアクセスを許可します．
 
-                                      Defaults to ``off``.
+                                      デフォルトは ``off`` です．
 
-    ``DjangoPermissionName``          The name of a permission to require for
-                                      access. See :ref:`custom permissions
-                                      <custom-permissions>` for more
-                                      information.
+    ``DjangoPermissionName``          アクセスに必要なパーミッションの名前
+                                      です．詳しくは 
+                                      :ref:`カスタムのパーミッション
+                                      <custom-permissions>` を参照
+                                      してください．
 
-                                      By default no specific permission will be
-                                      required.
+                                      デフォルトでは特定のパーミッションを
+                                      必要としません．
     ================================  =========================================
 
-Note that sometimes ``SetEnv`` doesn't play well in this mod_python
-configuration, for reasons unknown. If you're having problems getting
-mod_python to recognize your ``DJANGO_SETTINGS_MODULE``, you can set it using
-``PythonOption`` instead of ``SetEnv``. Therefore, these two Apache directives
-are equivalent::
+場合によって， ``SetEnv`` が mod_python の設定としてうまく働かない場合があ
+ります．この原因はよくわかっていません． mod_python が
+``DJANGO_SETTINGS_MODULE`` をうまく認識できない場合， ``SetEnv`` の代りに
+``PythonOption`` を使ってみて下さい．以下の二つのディレクティブは同じ意味で
+す::
 
     SetEnv DJANGO_SETTINGS_MODULE mysite.settings
     PythonOption DJANGO_SETTINGS_MODULE mysite.settings
+
