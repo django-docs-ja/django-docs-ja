@@ -1,128 +1,126 @@
 .. _misc-api-stability:
 
-=============
-API stability
-=============
+============
+API の安定性
+============
 
-:ref:`The release of Django 1.0 <releases-1.0>` comes with a promise of API
-stability and forwards-compatibility. In a nutshell, this means that code you
-develop against Django 1.0 will continue to work against 1.1 unchanged, and you
-should need to make only minor changes for any 1.X release.
+:revision-up-to: 8961 (1.0)
 
-What "stable" means
-===================
+:ref:`Django 1.0 のリリース <releases-1.0>` によって、 API の安定性と互換性
+に一定の保証が与えられました。これはつまり、 Django 1.0 用に書いたコードは
+何も変更せずに 1.1 でも動作し、以後の 1.X リリースではほんのわずかな変更し
+か必要ないということです。
 
-In this context, stable means:
+.. _What "stable" means:
 
-   - All the public APIs -- everything documented in the linked documents below,
-     and all methods that don't begin with an underscore -- will not be moved or
-     renamed without providing backwards-compatible aliases.
+APIの安定性とは
+===============
+
+ここでいう「安定」とは、以下のような意味です:
+
+   - 公開 API -- リンクからたどれるドキュメント内で開設されていて、メソッド
+     名がアンダースコアで始まらないもの -- の配置や名前を変更する場合には、
+     以前のバージョンとの互換性のための別名のメソッドを提供します。
      
-   - If new features are added to these APIs -- which is quite possible --
-     they will not break or change the meaning of existing methods. In other
-     words, "stable" does not (necessarily) mean "complete."
-          
-   - If, for some reason, an API declared stable must be removed or replaced, it
-     will be declared deprecated but will remain in the API for at least two
-     minor version releases. Warnings will be issued when the deprecated method
-     is called.
+   - API に新たな機能を追加する場合 -- これはよくあることですが -- でも、
+     既存のメソッドの意味を無くしたり、変えたりすることはありません。換言す
+     れば、「安定」していても (必ずしも) 「完全」ではない、ということです。
      
-     See :ref:`official-releases` for more details on how Django's version
-     numbering scheme works, and how features will be deprecated.
+   - すでに安定と宣言されている API を何らかの理由で削除したり移動したりせ
+     ねばならない場合、それらのメソッドは撤廃 (deprecated) とみなされ、少な
+     くとも二つのマイナーバージョン変更までは API 中に残します。撤廃された
+     メソッドを呼び出した場合には警告メッセージを表示します。
+
+     Django のバージョン番号の定義と、どの機能が撤廃されているかは、
+     :ref:`official-releases` を参照してください。
      
-   - We'll only break backwards compatibility of these APIs if a bug or
-     security hole makes it completely unavoidable.
+   - 深刻なバグやセキュリティホールによってやむを得ない場合に限り、これらの
+     API に対して互換性のない変更を行います。
 
-Stable APIs
-===========
+.. _Stable APIs:
 
-In general, everything covered in the documentation -- with the exception of
-anything in the :ref:`internals area <internals-index>` is considered stable as
-of 1.0. This includes these APIs:
-
-    - :ref:`Authorization <topics-auth>`
-
-    - :ref:`Caching <topics-cache>`.
-    
-    - :ref:`Model definition, managers, querying and transactions
-      <topics-db-index>`
-    
-    - :ref:`Sending e-mail <topics-email>`.
-    
-    - :ref:`File handling and storage <topics-files>`
-    
-    - :ref:`Forms <topics-forms-index>`
-    
-    - :ref:`HTTP request/response handling <topics-http-index>`, including file
-      uploads, middleware, sessions, URL resolution, view, and shortcut APIs.
-    
-    - :ref:`Generic views <topics-http-generic-views>`.
-
-    - :ref:`Internationalization <topics-i18n>`.
-    
-    - :ref:`Pagination <topics-pagination>`
-    
-    - :ref:`Serialization <topics-serialization>`
-    
-    - :ref:`Signals <topics-signals>`
-    
-    - :ref:`Templates <topics-templates>`, including the language, Python-level
-      :ref:`template APIs <ref-templates-index>`, and :ref:`custom template tags
-      and libraries <howto-custom-template-tags>`. We may add new template
-      tags in the future and the names may inadvertently clash with
-      external template tags. Before adding any such tags, we'll ensure that
-      Django raises an error if it tries to load tags with duplicate names.
-      
-    - :ref:`Testing <topics-testing>`
-
-    - :ref:`django-admin utility <ref-django-admin>`.
-    
-    - :ref:`Built-in middleware <ref-middleware>`
-    
-    - :ref:`Request/response objects <ref-request-response>`.
-    
-    - :ref:`Settings <ref-settings>`. Note, though that while the :ref:`list of
-      built-in settings <ref-settings>` can be considered complete we may -- and
-      probably will -- add new settings in future versions. This is one of those
-      places where "'stable' does not mean 'complete.'"
-      
-    - :ref:`Built-in signals <ref-signals>`. Like settings, we'll probably add
-      new signals in the future, but the existing ones won't break.
-      
-    - :ref:`Unicode handling <ref-unicode>`.
-        
-    - Everything covered by the :ref:`HOWTO guides <howto-index>`.
-    
-``django.utils``
-----------------
-
-Most of the modules in ``django.utils`` are designed for internal use. Only the following parts of ``django.utils`` can be considered stable:
-
-    - ``django.utils.cache``
-    - ``django.utils.datastructures.SortedDict`` -- only this single class; the
-      rest of the module is for internal use.
-    - ``django.utils.encoding``
-    - ``django.utils.feedgenerator``
-    - ``django.utils.http``
-    - ``django.utils.safestring``
-    - ``django.utils.translation``
-    - ``django.utils.tzinfo``
-    
-Exceptions
+安定な API
 ==========
 
-There are a few exceptions to this stability and backwards-compatibility
-promise.
+全般的に、 :ref:`内部仕様 <internals-index>` の中にあるドキュメントを除き、
+ドキュメント中でカバーされている機能は、 1.0 の時点で安定な API と考えてか
+まいません。安定な API を以下に示します:
 
-Security fixes
---------------
+    - :ref:`認証 <topics-auth>`
+
+    - :ref:`キャッシュ <topics-cache>`.
+    
+    - :ref:`モデルの定義、マネジャ、クエリ、トランザクション <topics-db-index>`
+    
+    - :ref:`e-mail の送信 <topics-email>`.
+    
+    - :ref:`アップロードファイルの操作と保存 <topics-files>`
+    
+    - :ref:`フォーム <topics-forms-index>`
+    
+    - ファイルアップロード、ミドルウェア、セッション、 URL ディスパッチ、
+      ビュー、ショートカット API などを含む、
+      :ref:`HTTP リクエスト／レスポンスの操作 <topics-http-index>`
+    
+    - :ref:`汎用ビュー <topics-http-generic-views>`.
+
+    - :ref:`国際化 <topics-i18n>`.
+    
+    - :ref:`ペジネーション <topics-pagination>`
+    
+    - :ref:`シリアライゼーション <topics-serialization>`
+    
+    - :ref:`シグナル <topics-signals>`
+    
+    - :ref:`テンプレート <topics-templates>` 。テンプレート言語、 Python の
+      :ref:`テンプレート API <ref-templates-index>` 、
+      :ref:`カスタムテンプレートタグとライブラリ、 <howto-custom-template-tags>`
+      今後、新たなテンプレートタグが登場すると、ユーザが定義したタグと名前
+      が衝突する可能性があります。そのため、新たなタグを追加するときは、同
+      じ名前のタグを他のテンプレートライブラリからロードしようとした時点で
+      Django にエラーを送出させます。
+      
+    - :ref:`テストフレームワーク <topics-testing>`
+
+    - :ref:`django-admin ユーティリティ <ref-django-admin>`.
+    
+    - :ref:`組み込みミドルウェア <ref-middleware>`
+    
+    - :ref:`リクエスト／レスポンスオブジェクト <ref-request-response>`.
+    
+    - :ref:`設定ファイル <ref-settings>` 。ただし、現在の
+      :ref:`組み込みの設定 <ref-settings>` はほぼ完璧だとは考えていますが、
+      将来新たな設定を登場させるかもしれません。これはまさに「安定」だけれ
+      ども「完璧」ではない例ですね。
+      
+    - :ref:`組み込みシグナル <ref-signals>` 設定と同様、将来新たなシグナル
+      を登場させるかもしれませんが、既存のシグナルをなくすことはないでしょ
+      う。
+      
+    - :ref:`Unicode の操作 <ref-unicode>` 。
+        
+    - :ref:`HOWTO ガイド <howto-index>` に書かれている内容。
+
+.. _Exceptions:
+
+例外
+=====
+
+安定性や互換性の維持には、いくつか例外を設けています。
+
+.. _Security fixes:
+
+セキュリティ上の問題の修正
+----------------------------
+
+.. TBD
 
 If we become aware of a security problem -- hopefully by someone following our
 :ref:`security reporting policy <reporting-security-issues>` -- we'll do
 everything necessary to fix it. This might mean breaking backwards compatibility; security trumps the compatibility guarantee.
 
-Contributed applications (``django.contrib``)
----------------------------------------------
+コントリビュートアプリケーション (``django.contrib``)
+----------------------------------------------------------
 
 While we'll make every effort to keep these APIs stable -- and have no plans to
 break any contrib apps -- this is an area that will have more flux between
@@ -138,8 +136,10 @@ Historically, apps in ``django.contrib`` have been more stable than the core, so
 in practice we probably won't have to ever make this exception. However, it's
 worth noting if you're building apps that depend on ``django.contrib``.
 
-APIs marked as internal
------------------------
+.. _APIs marked as internal:
+
+内部 API
+----------
 
 Certain APIs are explicitly marked as "internal" in a couple of ways:
 
@@ -150,4 +150,3 @@ Certain APIs are explicitly marked as "internal" in a couple of ways:
     - Functions, methods, and other objects prefixed by a leading underscore
       (``_``). This is the standard Python way of indicating that something is
       private; if any method starts with a single ``_``, it's an internal API.
-
