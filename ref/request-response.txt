@@ -1,46 +1,56 @@
 .. _ref-request-response:
 
-============================
-Request and response objects
-============================
+==============================================
+リクエストオブジェクトとレスポンスオブジェクト
+==============================================
+
+:revision-up-to: 8961 (1.0)
 
 .. module:: django.http
-   :synopsis: Classes dealing with HTTP requests and responses.
+   :synopsis: HTTP のリクエストとレスポンスを扱うためのクラスです。
 
-Quick overview
-==============
+.. _`Quick overview`:
 
-Django uses request and response objects to pass state through the system.
+簡単な概要
+==========
 
-When a page is requested, Django creates an :class:`HttpRequest` object that
-contains metadata about the request. Then Django loads the appropriate view,
-passing the :class:`HttpRequest` as the first argument to the view function. Each
-view is responsible for returning an :class:`HttpResponse` object.
+Django は、システム全体にわたって、リクエストとレスポンスオブジェクトを使っ
+て処理状態を受け渡します。
 
-This document explains the APIs for :class:`HttpRequest` and :class:`HttpResponse`
-objects.
+あるページへのリクエストを受け取ると、Django は
+:class:`~django.http.HttpRequest` オブジェクトを生成します。このオブジェク
+トにはリクエストのメタデータが入っています。次に Django は適切なビューをロー
+ドして、 :class:`~django.http.HttpRequest` をビュー関数の最初の引数に渡しま
+す。各ビューは :class:`~django.http.HttpResponse` オブジェクトを返さねばな
+りません。
 
-HttpRequest objects
-===================
+このドキュメントでは  :class:`~django.http.HttpRequest` および
+:class:`~django.http.HttpResponse` オブジェクトの API について説明します。
+
+.. _HttpRequest objects:
+
+HttpRequest オブジェクト
+========================
 
 .. class:: HttpRequest
 
-Attributes
-----------
+.. _Attributes:
 
-All attributes except ``session`` should be considered read-only.
+属性
+----
+
+``session`` 以外の属性は全て読み出し専用です。
 
 .. attribute:: HttpRequest.path
 
-   A string representing the full path to the requested page, not including
-   the domain.
+    リクエストしているページのフルパスを表す、ドメインを含まない文字列です。
 
-   Example: ``"/music/bands/the_beatles/"``
+    例: ``"/music/bands/the_beatles/"``
 
 .. attribute:: HttpRequest.method
 
-    A string representing the HTTP method used in the request. This is
-    guaranteed to be uppercase. Example::
+    リクエストに使われた HTTP メソッドを表す文字列です。必ず大文字になります。
+    例::
 
         if request.method == 'GET':
             do_something()
@@ -51,144 +61,157 @@ All attributes except ``session`` should be considered read-only.
 
     .. versionadded:: 1.0
 
-    A string representing the current encoding used to decode form submission
-    data (or ``None``, which means the ``DEFAULT_CHARSET`` setting is used).
-    You can write to this attribute to change the encoding used when accessing
-    the form data. Any subsequent attribute accesses (such as reading from
-    ``GET`` or ``POST``) will use the new ``encoding`` value.  Useful if you
-    know the form data is not in the ``DEFAULT_CHARSET`` encoding.
+    提出されたフォームデータのデコードに使われる、現在のエンコーディングを
+    表す文字列です (``None`` の場合もありますが、この場合は
+    :setting:`DEFAULT_CHARSET` を使います)。この属性を変更すれば、フォーム
+    データにアクセスする際に使われるエンコーディングを指定できます。一度エ
+    ンコーディングを変更すると、変更後に (``GET`` や ``POST`` の) 属性への
+    アクセスはすべて新しい ``encoding`` の値に従って行われます。フォームデー
+    タが :setting:`DEFAULT_CHARSET` 以外の特定のエンコーディングと分かって
+    いる場合に便利です。
 
 .. attribute:: HttpRequest.GET
 
-    A dictionary-like object containing all given HTTP GET parameters. See the
-    ``QueryDict`` documentation below.
+    全ての HTTP GET パラメタが入った辞書ライクなオブジェクトです。後述の
+    ``QueryDict`` も参照してください。
 
 .. attribute:: HttpRequest.POST
 
-    A dictionary-like object containing all given HTTP POST parameters. See the
-    ``QueryDict`` documentation below.
+    全ての HTTP POST パラメタが入った辞書ライクなオブジェクトです。後述の
+    ``QueryDict`` も参照してください。
 
-    It's possible that a request can come in via POST with an empty ``POST``
-    dictionary -- if, say, a form is requested via the POST HTTP method but
-    does not include form data. Therefore, you shouldn't use ``if request.POST``
-    to check for use of the POST method; instead, use ``if request.method ==
-    "POST"`` (see above).
+    フォームを POST HTTP メソッドで要求し、その際に何らフォームデータを伴わ
+    ないような場合には、リクエストが POST で送られていながらも ``POST`` 辞
+    書が空になることがあります。従って、リクエストが POST メソッドであるか
+    どうかを調べるために ``if request.POST`` を使うべきではありません。代わ
+    りに ``if request.method == "POST"`` を使ってください (上参照)。
 
-    Note: ``POST`` does *not* include file-upload information. See ``FILES``.
+    ``POST`` にはファイルアップロードに関する情報は *入っていない* ので注意
+    してください。 ``FILES`` を参照してください。
 
 .. attribute:: HttpRequest.REQUEST
 
-    For convenience, a dictionary-like object that searches ``POST`` first,
-    then ``GET``. Inspired by PHP's ``$_REQUEST``.
+    便宜的な辞書オブジェクトで、 ``POST`` パラメタをまず検索してから、次に
+    ``GET`` パラメタを検索します。 PHP の ``$_REQUEST`` にインスパイアされ
+    た機能です。
 
-    For example, if ``GET = {"name": "john"}`` and ``POST = {"age": '34'}``,
-    ``REQUEST["name"]`` would be ``"john"``, and ``REQUEST["age"]`` would be
-    ``"34"``.
+    例えば、 ``GET = {"name": "john"}`` で ``POST = {"age": '34'}`` の場合、
+    ``REQUEST["name"]`` は ``"john"`` になり、 ``REQUEST["age"]`` は
+    ``"34"`` になります。
 
-    It's strongly suggested that you use ``GET`` and ``POST`` instead of
-    ``REQUEST``, because the former are more explicit.
+    通常は ``GET`` および ``POST`` を使うように強く勧めます。その方が明示的
+    だからです。
 
 .. attribute:: HttpRequest.COOKIES
 
-    A standard Python dictionary containing all cookies. Keys and values are
-    strings.
+    全てのクッキーが入った標準の Python 辞書オブジェクトです。キーと値は文
+    字列です。
 
 .. attribute:: HttpRequest.FILES 
-
-    .. admonition:: Changed in Django development version
+    
+    .. admonition:: 開発版の Django で変更された仕様
         
-        In previous versions of Django, ``request.FILES`` contained
-        simple ``dict`` objects representing uploaded files. This is
-        no longer true -- files are represented by ``UploadedFile``
-        objects as described below.
+        以前のバージョンの Django では、 ``request.FILES`` に通常の辞書が入っ
+        ていて、その辞書がアップロードされたファイルを表していました。この
+        仕様は変更され、ファイルは後述の ``UploadedFile`` オブジェクトで表
+        現されるようになりました。
         
-        These ``UploadedFile`` objects will emulate the old-style ``dict``
-        interface, but this is deprecated and will be removed in the next
-        release of Django.
+        ``UploadedFile`` オブジェクトは、以前の辞書インタフェースをエミュレー
+        トしていますが、これは撤廃されたインタフェースであり、次の Django
+        のリリースでは除去される予定です。
+        
 
-    A dictionary-like object containing all uploaded files. Each key in
-    ``FILES`` is the ``name`` from the ``<input type="file" name="" />``. Each
-    value in ``FILES`` is an ``UploadedFile`` object containing the following
-    attributes:
+    アップロードされた全てのファイルが入っている辞書ライクオブジェクトです。
+    ``FILES`` の各キーは ``<input type="file" name="" />`` の ``name`` 
+    に対応しています。 ``FILES`` の各値は ``UploadedFile`` オブジェクトで、
+    以下の属性を持っています:
 
-        * ``read(num_bytes=None)`` -- Read a number of bytes from the file.
-        * ``name`` -- The name of the uploaded file.
-        * ``size`` -- The size, in bytes, of the uploaded file.
-        * ``chunks(chunk_size=None)`` -- A generator that yields sequential chunks of data.
+        * ``read(num_bytes=None)`` -- ファイルから最大 ``num_bytes`` 読み出
+          します。
+        * ``name`` -- アップロードされたファイルの名前です。
+        * ``size`` -- アップロードされたファイルのサイズ (単位はバイト)
+          です。
+        * ``chunks(chunk_size=None)`` -- ファイルから一定サイズのチャンクを
+          順に取り出して返すジェネレータです。
 
-    See :ref:`topics-files` for more information.
+    詳しくは :ref:`topics-files` を参照してください。
 
-    Note that ``FILES`` will only contain data if the request method was POST
-    and the ``<form>`` that posted to the request had
-    ``enctype="multipart/form-data"``. Otherwise, ``FILES`` will be a blank
-    dictionary-like object.
+    ``FILES`` にデータが入るのは、リクエストが ``POST`` であり、かつリクエ
+    ストをポストした ``<form>`` に ``enctype="multipart/form-data`` がある
+    場合だけです。それ以外の場合、 ``FILES`` は空の辞書ライクオブジェクトに
+    なります。
 
 .. attribute:: HttpRequest.META
 
-    A standard Python dictionary containing all available HTTP headers.
-    Available headers depend on the client and server, but here are some
-    examples:
+    標準の Python 辞書オブジェクトで、利用できる全ての HTTP ヘッダが入って
+    います。利用可能なヘッダはクライアントとサーバごとに違いますが、例えば
+    以下のようなヘッダを利用できます:
 
         * ``CONTENT_LENGTH``
         * ``CONTENT_TYPE``
         * ``HTTP_ACCEPT_ENCODING``
         * ``HTTP_ACCEPT_LANGUAGE``
-        * ``HTTP_HOST`` -- The HTTP Host header sent by the client.
-        * ``HTTP_REFERER`` -- The referring page, if any.
-        * ``HTTP_USER_AGENT`` -- The client's user-agent string.
-        * ``QUERY_STRING`` -- The query string, as a single (unparsed) string.
-        * ``REMOTE_ADDR`` -- The IP address of the client.
-        * ``REMOTE_HOST`` -- The hostname of the client.
-        * ``REQUEST_METHOD`` -- A string such as ``"GET"`` or ``"POST"``.
-        * ``SERVER_NAME`` -- The hostname of the server.
-        * ``SERVER_PORT`` -- The port of the server.
+        * ``HTTP_HOST`` -- クライアントから送信された HTTP Host ヘッダです。
+        * ``HTTP_REFERER`` -- リクエスト対象のページを参照しているページが
+          ある場合、そのページの URL です。
+        * ``HTTP_USER_AGENT`` -- クライアントのユーザエージェントを表す文字
+          列です。
+        * ``QUERY_STRING`` -- パース前の単一のクエリ文字列です。
+        * ``REMOTE_ADDR`` -- クライアントの IP アドレスです。
+        * ``REMOTE_HOST`` -- クライアントのホスト名です。
+        * ``REQUEST_METHOD`` -- ``"GET"`` や ``"POST"`` のような文字列です。
+        * ``SERVER_NAME`` -- サーバのホスト名です。
+        * ``SERVER_PORT`` -- サーバのポート番号です。
 
 .. attribute:: HttpRequest.user
 
-    A ``django.contrib.auth.models.User`` object representing the currently
-    logged-in user. If the user isn't currently logged in, ``user`` will be set
-    to an instance of ``django.contrib.auth.models.AnonymousUser``. You
-    can tell them apart with ``is_authenticated()``, like so::
+    現在ログインしているユーザを表す ``django.models.auth.models.User`` オブ
+    ジェクトです。ユーザが現在ログインしていない場合には、 ``user`` は 
+    ``django.contrib.auth.models.AnonymousUser`` のインスタンスになります。
+    ``is_authenticated()`` を使うと、これら二種類のユーザを区別できます::
 
         if request.user.is_authenticated():
             # Do something for logged-in users.
         else:
             # Do something for anonymous users.
 
-    ``user`` is only available if your Django installation has the
-    ``AuthenticationMiddleware`` activated. For more, see
-    :ref:`topics-auth`.
+    ``user`` を利用できるのは、 インストールした Django で
+    ``AuthenticationMiddleware`` を有効にした場合だけです。詳しくは
+    :ref:`topics-auth` を参照してください。
+
 
 .. attribute:: HttpRequest.session
 
-    A readable-and-writable, dictionary-like object that represents the current
-    session. This is only available if your Django installation has session
-    support activated. See the :ref:`session documentation
-    <topics-http-sessions>` for full details.
+    読み書き可能な辞書ライクオブジェクトで、現在のセッションを表現しています。
+    この辞書はインストールされている Django でセッションが有効な場合にのみ
+    利用できます。詳しくは 
+    :ref:`セッションのドキュメント <topics-http-sessions>` を参照してくださ
+    い。
 
 .. attribute:: HttpRequest.raw_post_data
 
-    The raw HTTP POST data. This is only useful for advanced processing. Use
-    ``POST`` instead.
+    HTTP POST データそのものです。高度な処理を行いたいときに便利です。普段
+    は ``POST`` を使ってください。
 
 .. attribute:: HttpRequest.urlconf
 
-    Not defined by Django itself, but will be read if other code (e.g., a custom
-    middleware class) sets it. When present, this will be used as the root
-    URLconf for the current request, overriding the ``ROOT_URLCONF`` setting.
-    See :ref:`how-django-processes-a-request` for details.
+    Django 自体はこの属性を設定しませんが、他のコード（自作のミドルウェアな
+    ど）でこの属性を設定した場合、Djangoはその値を ``ROOT_URLCONF`` の代わ
+    りにルート URLconf モジュール名として使います。
+    詳しくは 「 :ref:`how-django-processes-a-request` 」を参照してください。
 
-Methods
--------
+
+メソッド
+--------
 
 .. method:: HttpRequest.get_host()
 
    .. versionadded:: 1.0
 
-   Returns the originating host of the request using information from the
-   ``HTTP_X_FORWARDED_HOST`` and ``HTTP_HOST`` headers (in that order). If
-   they don't provide a value, the method uses a combination of
-   ``SERVER_NAME`` and ``SERVER_PORT`` as detailed in `PEP 333`_.
+   リクエストの送信元を ``HTTP_X_FORWARDED_HOST`` または ``HTTP_HOST`` ヘッ
+   ダを (順に) 調べて返します。クライアントがこれらの値を提供していない場合、
+   `PEP 333`_ に従って、 ``SERVER_NAME`` と ``SERVER_PORT`` の組み合わせを
+   返します。
 
    .. _PEP 333: http://www.python.org/dev/peps/pep-0333/
 
@@ -196,35 +219,36 @@ Methods
 
 .. method:: HttpRequest.get_full_path()
 
-   Returns the ``path``, plus an appended query string, if applicable.
+    ``path`` と、そのあとに続くクエリ文字列があれば返します。
 
-   Example: ``"/music/bands/the_beatles/?print=true"``
+    例: ``"/music/bands/the_beatles/?print=true"``
 
 .. method:: HttpRequest.build_absolute_uri(location)
 
    .. versionadded:: 1.0
 
-   Returns the absolute URI form of ``location``. If no location is provided,
-   the location will be set to ``request.get_full_path()``.
+   ``location`` の絶対 URI を計算して返します。引数 ``location`` を省略する
+   と、 ``location`` の値として ``request.get_full_path()`` を使います。
 
-   If the location is already an absolute URI, it will not be altered.
-   Otherwise the absolute URI is built using the server variables available in
-   this request.
+   ``location`` の値がすでに絶対 URI であれば、値を変更しません。そうでない
+   場合、リクエスト中のサーバに関する変数を使って URI を構築します。
 
-   Example: ``"http://example.com/music/bands/the_beatles/?print=true"``
+   例: ``"http://example.com/music/bands/the_beatles/?print=true"``
 
 .. method:: HttpRequest.is_secure()
 
-   Returns ``True`` if the request is secure; that is, if it was made with
-   HTTPS.
+    リクエストがセキュアである、すなわち HTTPS を介したリクエストのときに
+    ``True`` を返します。
 
 .. method:: HttpRequest.is_ajax()
 
    .. versionadded:: 1.0
 
-   Returns ``True`` if the request was made via an ``XMLHttpRequest``, by checking
-   the ``HTTP_X_REQUESTED_WITH`` header for the string ``'XMLHttpRequest'``. The
-   following major JavaScript libraries all send this header:
+   リクエストが ``XMLHttpRequest`` である場合には ``True`` に設定されます。
+   リクエストが ``XMLHttpRequest`` であるかどうかは、 
+   ``HTTP_X_REQUESTED_WITH`` ヘッダに文字列 ``XMLHttpRequest`` があるかどう
+   かで判別します。このヘッダは、以下のような主要 JavaScript ライブラリでサ
+   ポートされています:
 
        * jQuery
        * Dojo
@@ -233,66 +257,68 @@ Methods
        * Prototype
        * YUI
 
-   If you write your own XMLHttpRequest call (on the browser side), you'll
-   have to set this header manually if you want ``is_ajax()`` to work.
+   ブラウザ側で XMLHttpRequest を呼び出す独自のコードを書いている場合、
+   ``is_ajax()`` を正しく機能させたいなら、 ``HTTP_X_REQUESTED_WITH`` ヘッ
+   ダを適切に設定してください。
+
+.. _QueryDict objects:
+
+QueryDict オブジェクト
+----------------------
+
+:class:`~django.http.HttpRequest` オブジェクト内では、 ``GET`` と ``POST``
+属性は :class:`django.http.QueryDict` のインスタンスです。
+:class:`~django.http.QueryDict` は辞書ライクなクラスで、同じキーに対して複
+数の値を取り得るようにカスタマイズされています。これは、 HTML のフォーム要
+素には、例えば ``<select multiple="multiple">`` のように、同じキーに対して
+複数の値を渡すものがあるからです。
+
+:class:`~django.http.QueryDict` インスタンスは、 ``copy()`` を作らないかぎ
+り変更できません。これは、 ``request.POST`` や ``request.GET`` の属性を直接
+変更できないということです。
 
 
-QueryDict objects
------------------
+メソッド
+---------
 
-.. class:: QueryDict
-
-In an :class:`HttpRequest` object, the ``GET`` and ``POST`` attributes are instances
-of ``django.http.QueryDict``. :class:`QueryDict` is a dictionary-like
-class customized to deal with multiple values for the same key. This is
-necessary because some HTML form elements, notably
-``<select multiple="multiple">``, pass multiple values for the same key.
-
-``QueryDict`` instances are immutable, unless you create a ``copy()`` of them.
-That means you can't change attributes of ``request.POST`` and ``request.GET``
-directly.
-
-Methods
--------
-
-:class:`QueryDict` implements all the standard dictionary methods, because it's
-a subclass of dictionary. Exceptions are outlined here:
+:class:`~django.http.QueryDict` は辞書型のサブクラスなので、全ての標準的な
+辞書型のメソッドを実装しています。ただし、以下の点が異なります:
 
 .. method:: QueryDict.__getitem__(key)
 
-    Returns the value for the given key. If the key has more than one value,
-    ``__getitem__()`` returns the last value. Raises
-    ``django.utils.datastructure.MultiValueDictKeyError`` if the key does not
-    exist. (This is a subclass of Python's standard ``KeyError``, so you can
-    stick to catching ``KeyError``.)
+    指定のキーに対する値を返します。一つのキーに複数の値が存在する場合、
+    ``__getitem__()`` はリストの末尾の値を返します。キーに対応する値がなけ
+    れば、 :exc:`django.utils.datastructure.MultiValueDictKeyError` を送出
+    します。 (この例外は :exc:`KeyError` のサブクラスなので、
+    :exc:`KeyError`` を見張っていれば捕捉できます。)
 
 .. method:: QueryDict.__setitem__(key, value)
 
-    Sets the given key to ``[value]`` (a Python list whose single element is
-    ``value``). Note that this, as other dictionary functions that have side
-    effects, can only be called on a mutable ``QueryDict`` (one that was created
-    via ``copy()``).
+    指定のキーに対する値を ``[value]`` (``value`` という値が一つだけ入った
+    リスト) にします。副作用をともなう他の関数と同じく、このメソッドを呼び
+    出せるのは (``copy()`` を使って生成したオブジェクトのような) 変更可能な
+    :class:`~django.http.QueryDict` だけです。
 
 .. method:: QueryDict.__contains__(key)
 
-    Returns ``True`` if the given key is set. This lets you do, e.g., ``if "foo"
-    in request.GET``.
+    指定のキーが設定されている場合に ``True`` を返します。
+    ``if "foo" in request.GET`` のような書き方を実現します。
 
 .. method:: QueryDict.get(key, default)
 
-    Uses the same logic as ``__getitem__()`` above, with a hook for returning a
-    default value if the key doesn't exist.
+    上の ``__getitem__()`` と同じロジックですが、キーに対応する値がないとき
+    にデフォルト値を返すフックがあります。
 
 .. method:: QueryDict.setdefault(key, default)
 
-    Just like the standard dictionary ``setdefault()`` method, except it uses
-    ``__setitem__`` internally.
+    標準の辞書型の ``setdefault()`` と同じですが、内部的に ``__setitem__``
+    を使います。
 
 .. method:: QueryDict.update(other_dict) 
 
-    Takes either a ``QueryDict`` or standard dictionary. Just like the standard
-    dictionary ``update()`` method, except it *appends* to the current
-    dictionary items rather than replacing them. For example::
+    :class:`~django.http.QueryDict` または標準の辞書型を引数にとります。標
+    準の辞書型の ``update()`` メソッドと同じですが、現在の値を置き換えるの
+    ではなく、現在の値のリストに *追加* します。例えば::
 
           >>> q = QueryDict('a=1')
           >>> q = q.copy() # to make it mutable
@@ -304,8 +330,8 @@ a subclass of dictionary. Exceptions are outlined here:
 
 .. method:: QueryDict.items()
 
-    Just like the standard dictionary ``items()`` method, except this uses the
-    same last-value logic as ``__getitem()__``. For example::
+    標準の辞書型の ``items()`` メソッドと同じですが、 ``__getitem()__`` と
+    同じ、最後の値を返すロジックを使います。例えば::
 
            >>> q = QueryDict('a=1&a=2&a=3')
            >>> q.items()
@@ -313,86 +339,98 @@ a subclass of dictionary. Exceptions are outlined here:
 
 .. method:: QueryDict.values()
 
-    Just like the standard dictionary ``values()`` method, except this uses the
-    same last-value logic as ``__getitem()__``. For example::
+    ``values()`` -- 標準の辞書型の ``values()`` メソッドと同じですが、
+    ``__getitem()__`` と同じ、最後の値を返すロジックを使います。例えば::
 
            >>> q = QueryDict('a=1&a=2&a=3')
            >>> q.values()
            ['3']
 
-In addition, ``QueryDict`` has the following methods:
+加えて、 :class:`~django.http.QueryDict` には以下のメソッドがあります:
 
 .. method:: QueryDict.copy()
 
-    Returns a copy of the object, using ``copy.deepcopy()`` from the Python
-    standard library. The copy will be mutable -- that is, you can change its
-    values.
+    Python 標準ライブラリの ``copy.deepcopy()`` を使ってオブジェクトのコピー
+    を生成して返します。コピーは変更可能になり、値を変更できます。
 
+   
 .. method:: QueryDict.getlist(key)
 
-    Returns the data with the requested key, as a Python list. Returns an
-    empty list if the key doesn't exist. It's guaranteed to return a list of
-    some sort.
+    要求されたキーに対して、 Python のリスト型を返します。キーに対応する値
+    がなければ空のリストを返します。このメソッドは確実に何らかのリストを返
+    します。
 
 .. method:: QueryDict.setlist(key, list_)
 
-    Sets the given key to ``list_`` (unlike ``__setitem__()``).
+    キーに対して ``list_`` を対応づけます (``__setitem__()`` と違います)。
 
 .. method:: QueryDict.appendlist(key, item)
 
-    Appends an item to the internal list associated with key.
+    キーに関連づけられている内部的なリストに要素を追加します。
 
 .. method:: QueryDict.setlistdefault(key, default_list)
 
-    Just like ``setdefault``, except it takes a list of values instead of a
-    single value.
+    ``setdefault`` に似ていますが、単一の値ではなく値のリストを引数にとりま
+    す。
 
 .. method:: QueryDict.lists()
+    ``items()`` に似ていますが、全ての値をリストで返します。例えば::
 
-    Like :method:items(), except it includes all values, as a list, for each
-    member of the dictionary. For example::
-    
-         >>> q = QueryDict('a=1&a=2&a=3')
-         >>> q.lists()
-         [('a', ['1', '2', '3'])]
-    
+           >>> q = QueryDict('a=1&a=2&a=3')
+           >>> q.lists()
+           [('a', ['1', '2', '3'])]
+
 .. method:: QueryDict.urlencode()
 
-    Returns a string of the data in query-string format.
-    Example: ``"a=2&b=3&b=5"``.
+    データをクエリ文字列形式にフォーマットした文字列を返します。例えば:
+    ``"a=2&b=3&b=5"`` のようになります。
 
-HttpResponse objects
-====================
+
+
+実装に関する注意
+------------------
+
+``GET``, ``POST``, ``COOKIES``, ``FILES``, ``META``, ``REQUEST``,
+``raw_post_data`` および ``user`` といった属性はすべて遅延読み込み (lazily
+load) されます。すなわち、 Django はコード中で要求されるまで、これらの値を
+計算するためにリソースを消費しません。
+
+.. _HttpResponse objects:
+
+HttpResponse オブジェクト
+=========================
 
 .. class:: HttpResponse
 
-In contrast to :class:`HttpRequest` objects, which are created automatically by
-Django, :class:`HttpResponse` objects are your responsibility. Each view you
-write is responsible for instantiating, populating and returning an
-:class:`HttpResponse`.
+Django によって自動生成される :class:`~django.http.HttpRequest` オブジェク
+トとは対象的に、 :class:`~django.http.HttpResponse` オブジェクトは自分で生
+成せねばなりません。ビューを書くときにはいつでも、
+:class:`~django.http.HttpResponse` インスタンスを生成して、値を設定し、戻り
+値として返さねばなりません。
 
-The :class:`HttpResponse` class lives in the ``django.http`` module.
+:class:`~django.http.HttpResponse` クラスは ``django.http`` モジュールで定
+義されています。
 
-Usage
------
+使いかた
+--------
 
-Passing strings
-~~~~~~~~~~~~~~~
+文字列を渡す
+~~~~~~~~~~~~
 
-Typical usage is to pass the contents of the page, as a string, to the
-:class:`HttpResponse` constructor::
+:class:`~django.http.HttpResponse` の典型的な使い方は、ページの内容を文字列
+としてコンストラクタに渡すというものです::
 
     >>> response = HttpResponse("Here's the text of the Web page.")
     >>> response = HttpResponse("Text only, please.", mimetype="text/plain")
 
-But if you want to add content incrementally, you can use ``response`` as a
-file-like object::
+コンテンツを累積的に追加していきたい場合には、 ``response`` をファイルライ
+クオブジェクトのようにも使えます::
 
     >>> response = HttpResponse()
     >>> response.write("<p>Here's the text of the Web page.</p>")
     >>> response.write("<p>Here's another paragraph.</p>")
 
-You can add and delete headers using dictionary syntax::
+ヘッダの追加や削除は辞書とおなじ書法で書けます::
 
     >>> response = HttpResponse()
     >>> response['X-DJANGO'] = "It's the best."
@@ -400,178 +438,202 @@ You can add and delete headers using dictionary syntax::
     >>> response['X-DJANGO']
     "It's the best."
 
-Note that ``del`` doesn't raise ``KeyError`` if the header doesn't exist.
+該当するヘッダがなくても、 ``del`` は ``KeyError`` を送出しないので気をつけ
+てください。
 
-Passing iterators
-~~~~~~~~~~~~~~~~~
+イテレータを渡す
+~~~~~~~~~~~~~~~~
 
-Finally, you can pass ``HttpResponse`` an iterator rather than passing it
-hard-coded strings. If you use this technique, follow these guidelines:
+最後に、ハードコードされた文字列ではなくイテレータも
+:class:`~django.http.HttpResponse` に渡せます。このテクニックを使う場合は以
+下のガイドラインに従って下さい:
 
-    * The iterator should return strings.
-    * If an :class:`HttpResponse` has been initialized with an iterator as its
-      content, you can't use the class:`HttpResponse` instance as a file-like
-      object. Doing so will raise ``Exception``.
+    * イテレータは文字列を返さねばなりません。
+    * イテレータをコンテンツに指定して :class:`~django.http.HttpResponse`
+      を初期化した場合、 :class:`~django.http.HttpResponse` インスタンスは
+      ファイルライクオブジェクトとして扱えず、ファイルライクオブジェクトと
+      して操作すると ``Exception`` を送出します。
+      
+.. _Setting headers:
 
-Setting headers
-~~~~~~~~~~~~~~~
+ヘッダ情報をセットする
+~~~~~~~~~~~~~~~~~~~~~~~
 
-To set a header in your response, just treat it like a dictionary::
+レスポンスのヘッダをセットするには、レスポンスを辞書のように扱います::
 
     >>> response = HttpResponse()
     >>> response['Pragma'] = 'no-cache'
 
-Telling the browser to treat the response as a file attachment
+.. _Telling the browser to treat the response as a file attachment:
+
+レスポンスをブラウザにファイルアタッチメントとして扱わせる
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To tell the browser to treat the response as a file attachment, use the
-``mimetype`` argument and set the ``Content-Disposition`` header. For example,
-this is how you might return a Microsoft Excel spreadsheet::
+レスポンスをブラウザにファイルアタッチメントとして扱わせるには、
+``mimetype`` 引数を使い、 ``Content-Disposition`` ヘッダをセットしてくださ
+い。例えば、 Microsoft Excel のスプレッドシートを返すには、以下のようにしま
+す::
 
     >>> response = HttpResponse(my_data, mimetype='application/vnd.ms-excel')
     >>> response['Content-Disposition'] = 'attachment; filename=foo.xls'
 
-There's nothing Django-specific about the ``Content-Disposition`` header, but
-it's easy to forget the syntax, so we've included it here.
+``Content-Disposition`` ヘッダの利用は Django 固有の仕様ではありませんが、
+記法を忘れやすいのでここに示しておきます。
 
-Methods
--------
+メソッド
+--------
 
 .. method:: HttpResponse.__init__(content='', mimetype=None, status=200, content_type=DEFAULT_CONTENT_TYPE)
-    
-    Instantiates an ``HttpResponse`` object with the given page content (a
-    string) and MIME type. The ``DEFAULT_CONTENT_TYPE`` is ``'text/html'``.
 
-    ``content`` can be an iterator or a string. If it's an iterator, it should
-    return strings, and those strings will be joined together to form the
-    content of the response.
+    指定のページコンテンツ (文字列) と MIME タイプで
+    :class:`~django.http.HttpResponse` オブジェクトをインスタンス化します。
+    :setting:`DEFAULT_CONTENT_TYPE` は ``'text/html'`` です。
 
-    ``status`` is the `HTTP Status code`_ for the response.
+    ``content`` はイテレータまたは文字列にできます。イテレータにする場合、
+    イテレータは文字列を返さねばなりません。イテレータを指定した場合、レス
+    ポンスの内容はイテレータの返す文字列を結合して生成されます。
+
+    ``status`` はレスポンスの  `HTTP 状態コード`_ です。
 
     .. versionadded:: 1.0
 
-    ``content_type`` is an alias for ``mimetype``. Historically, this parameter
-    was only called ``mimetype``, but since this is actually the value included
-    in the HTTP ``Content-Type`` header, it can also include the character set
-    encoding, which makes it more than just a MIME type specification.
-    If ``mimetype`` is specified (not ``None``), that value is used.
-    Otherwise, ``content_type`` is used. If neither is given, the
-    ``DEFAULT_CONTENT_TYPE`` setting is used.
+    ``content_type`` は ``mimetype`` の別名にすぎません。以前、このパラメタ
+    には ``mimetype`` という名前しかありませんでしたが、実際のところ、この
+    パラメタに指定する値は HTTP の ``Content-Type`` ヘッダに入る内容であり、
+    MIME タイプ仕様にはない文字セットエンコーディングの指定を含んでいました。
+    そこで、 ``mimetype`` が指定されている (``None`` でない) 場合にはその値
+    を使い、それ以外の場合には ``content_type`` を使うように変更しました。
+    どちらのパラメタも省略すると、 :setting:`DEFAULT_CONTENT_TYPE` 設定を使
+    います。
 
 .. method:: HttpResponse.__setitem__(header, value)
 
-    Sets the given header name to the given value. Both ``header`` and
-    ``value`` should be strings.
+    ヘッダ名と値を設定します。 ``header`` と ``value`` は文字列にせねばなり
+    ません。
 
 .. method:: HttpResponse.__delitem__(header)
 
-    Deletes the header with the given name. Fails silently if the header
-    doesn't exist. Case-sensitive.
+    指定の名前のヘッダを削除します。ヘッダが存在しなければ、暗黙のうちに失
+    敗します。大小文字を区別します。
 
 .. method:: HttpResponse.__getitem__(header)
 
-    Returns the value for the given header name. Case-sensitive.
+    指定のヘッダ名に対応する値を返します。大小文字を区別します。
 
 .. method:: HttpResponse.has_header(header)
 
-    Returns ``True`` or ``False`` based on a case-insensitive check for a
-    header with the given name.
+    大小文字を区別せずに指定の名前のヘッダがあるか調べ、 ``True`` または
+    ``False`` を返します。
 
 .. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None)
 
-    Sets a cookie. The parameters are the same as in the `cookie Morsel`_
-    object in the Python standard library.
+    クッキーを設定します。パラメタは Python 標準ライブラリの
+    `Morsel オブジェクト`_ と同じ形式です。
 
-        * ``max_age`` should be a number of seconds, or ``None`` (default) if
-          the cookie should last only as long as the client's browser session.
-        * ``expires`` should be a string in the format
-          ``"Wdy, DD-Mon-YY HH:MM:SS GMT"``.
-        * Use ``domain`` if you want to set a cross-domain cookie. For example,
-          ``domain=".lawrence.com"`` will set a cookie that is readable by
-          the domains www.lawrence.com, blogs.lawrence.com and
-          calendars.lawrence.com. Otherwise, a cookie will only be readable by
-          the domain that set it.
+        * ``max_age`` には秒数または ``None`` (デフォルト値) を指定します。
+          デフォルト値では、クッキーはクライアントブラウザとのセッションの
+          間だけ持続します。
+        * ``expires`` は ``"Wdy, DD-Mon-YY HH:MM:SS GMT"`` の形式の文字列で
+          す。
+        * 別のドメインのクッキー (cross-domain cookie) を設定したい場合には、
+          ``domain`` を使います。例えば、 ``domain=".lawrence.com"`` にする
+          と、 www.lawrence.com, blogs.lawrence.com, calendars.lawrence.com
+          といったサイトでだけ読めるようになります。それ以外の場合、クッキー
+          はクッキーを設定したドメインでしか読めません。
 
+    .. _`Morsel オブジェクト`: http://www.python.jp/doc/current/lib/morsel-objects.html
     .. _`cookie Morsel`: http://www.python.org/doc/current/lib/morsel-objects.html
 
 .. method:: HttpResponse.delete_cookie(key, path='/', domain=None)
 
-    Deletes the cookie with the given key. Fails silently if the key doesn't
-    exist.
+    指定のキーに対するクッキーを削除します。キーが存在しなければ、暗黙のう
+    ちに失敗します。
 
-    Due to the way cookies work, ``path`` and ``domain`` should be the same
-    values you used in ``set_cookie()`` -- otherwise the cookie may not be
-    deleted.
+    cookie の動作原理上、 ``path`` と ``domain`` を ``set_cookie()`` に指定
+    した値と同じにしないと、クッキーを削除できなくなります。
 
 .. method:: HttpResponse.content()
 
-    Returns the content as a Python string, encoding it from a Unicode object
-    if necessary. Note this is a property, not a method, so use ``r.content``
-    instead of ``r.content()``.
+    Python 文字列の内容を返します。必要ならば Unicode オブジェクトにエンコー
+    ドします。メソッドではなくプロパティなので、 ``r.content()`` ではなく 
+    ``r.content`` になることに注意して下さい。
 
 .. method:: HttpResponse.write(content)
 
-    This method makes an :class:`HttpResponse` instance a file-like object.
+    :class:`~django.http.HttpResponse` インスタンスをファイルライクオブジェ
+    クトのように扱うためのメソッドです。
 
 .. method:: HttpResponse.flush()
 
-    This method makes an :class:`HttpResponse` instance a file-like object.
+    :class:`~django.http.HttpResponse` インスタンスをファイルライクオブジェ
+    クトのように扱うためのメソッドです。
 
 .. method:: HttpResponse.tell()
 
-    This method makes an :class:`HttpResponse` instance a file-like object.
+    :class:`~django.http.HttpResponse` インスタンスをファイルライクオブジェ
+    クトのように扱うためのメソッドです。
 
 .. _HTTP Status code: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10
+.. _`HTTP 状態コード`: `HTTP Status code`_
 
+.. _HttpResponse subclasses:
 
-HttpResponse subclasses
------------------------
+HttpResponse のサブクラス
+-------------------------
 
-Django includes a number of ``HttpResponse`` subclasses that handle different
-types of HTTP responses. Like ``HttpResponse``, these subclasses live in
-:mod:`django.http`.
+Django には、様々なタイプの HTTP レスポンスを扱うための
+:class:`~django.http.HttpResponse` のサブクラスがあります。これらのサブクラ
+スは :class:`~django.http.HttpResponse` と同じく :mod:`django.http` モジュー
+ルにあります。
+
 
 .. class:: HttpResponseRedirect
 
-    The constructor takes a single argument -- the path to redirect to. This
-    can be a fully qualified URL (e.g. ``'http://www.yahoo.com/search/'``) or an
-    absolute URL with no domain (e.g. ``'/search/'``). Note that this returns
-    an HTTP status code 302.
+    コンストラクタはリダイレクト先のパスを示す引数を一つだけ取ります。リダ
+    イレクト先は完全指定の URL (例えば ``"http://www.yahoo.com/search/"``) 
+    でも、ドメイン名のない絶対 URL ( ``"/search/"``) でもかまいません。この
+    レスポンスオブジェクトは HTTP 状態コード 302 を返します。
 
 .. class:: HttpResponsePermanentRedirect
 
-    Like :class:`HttpResponseRedirect`, but it returns a permanent redirect
-    (HTTP status code 301) instead of a "found" redirect (status code 302).
+    ``HttpResponseRedirect`` と同じですが、"found" リダイレクト (HTTP 状態
+    コード 302) ではなく永続リダイレクト (状態コード 301) を使います。
 
 .. class:: HttpResponseNotModified
 
-    The constructor doesn't take any arguments. Use this to designate that a
-    page hasn't been modified since the user's last request (status code 304).
+    コンストラクタは引数をとりません。ユーザが最後にリクエストしたときから
+    ページが変更されていないこと  (状態コード 304) を知らせるために使います。
 
 .. class:: HttpResponseBadRequest
 
     .. versionadded:: 1.0
 
-    Acts just like :class:`HttpResponse` but uses a 400 status code.
+    :class:`~django.http.HttpResponse` と同じように振舞いますが、状態コード
+    400 を使います。
 
 .. class:: HttpResponseNotFound
 
-    Acts just like :class:`HttpResponse` but uses a 404 status code.
+    :class:`~django.http.HttpResponse` と同じですが、状態コード 404 を使い
+    ます。
 
 .. class:: HttpResponseForbidden
 
-    Acts just like :class:`HttpResponse` but uses a 403 status code.
+    :class:`~django.http.HttpResponse` と同じですが、状態コード 403 を使い
+    ます。
 
 .. class:: HttpResponseNotAllowed
 
-    Like :class:`HttpResponse`, but uses a 405 status code. Takes a single,
-    required argument: a list of permitted methods (e.g. ``['GET', 'POST']``).
+    :class:`~django.http.HttpResponse` と同じですが、状態コード 405 を使い
+    ます。許可されている HTTP メソッドのリスト (例えば ``['GET', 'POST']``)
+    を必須の引数としてとります。
 
 .. class:: HttpResponseGone
 
-    Acts just like :class:`HttpResponse` but uses a 410 status code.
+    :class:`~django.http.HttpResponse` と同じですが、状態コード 410 を使い
+    ます。
 
 .. class:: HttpResponseServerError
 
-    Acts just like :class:`HttpResponse` but uses a 500 status code.
+    :class:`~django.http.HttpResponse` と同じですが、状態コード 500 を使います。
+
 
