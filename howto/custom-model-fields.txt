@@ -4,7 +4,7 @@
 カスタムのモデルフィールド
 ===========================
 
-:revision-up-to: 8032 (1.0pre SVN)
+:revision-up-to: 8961 (1.0)
 
 .. versionadded:: 1.0
 
