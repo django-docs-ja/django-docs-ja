@@ -1,197 +1,215 @@
 .. _ref-contrib-contenttypes:
 
-==========================
-The contenttypes framework
-==========================
+============================
+contenttypes フレームワーク
+============================
+
+:revision-up-to: 8961 (1.0)
 
 .. module:: django.contrib.contenttypes
-   :synopsis: Provides generic interface to installed models.
+   :synopsis: インストール済のモデルを扱うための汎用インタフェースを提供します。
+   
+Django には、 :mod:`contenttypes` アプリケーションが付属しています。
+このアプリケーションを使うと、 Django で作成したプロジェクト中に存在する全
+てのモデルを追跡できます。また、 ``contenttypes`` では、モデルを扱うための
+高水準かつ汎用的なインタフェースを提供しています。
 
-Django includes a :mod:`contenttypes` application that can track all of
-the models installed in your Django-powered project, providing a
-high-level, generic interface for working with your models.
+.. _Overview:
 
-Overview
-========
+概要
+=====
 
-At the heart of the contenttypes application is the
-:class:`~django.contrib.contenttypes.models.ContentType` model, which lives at
-``django.contrib.contenttypes.models.ContentType``. Instances of
-:class:`~django.contrib.contenttypes.models.ContentType` represent and store
-information about the models installed in your project, and new instances of
-:class:`~django.contrib.contenttypes.models.ContentType` are automatically
-created whenever new models are installed.
+``contenttypes``  アプリケーションの心臓部は、 
+``django.contrib.contenttypes.models.ContentType` で定義されている
+:class:`~django.contrib.contenttypes.models.ContentType` モデルです。
+:class:`django.contrib.contenttypes.models.ContentType` のインスタンスは、
+プロジェクト上にインストールされているモデルの情報を表現したり保存したりし
+ています。 :class:`~django.contrib.contenttypes.models.ContentType` のイン
+スタンスは、新たにモデルをインストールすると自動的に生成されます。
 
-Instances of :class:`~django.contrib.contenttypes.models.ContentType` have
-methods for returning the model classes they represent and for querying objects
-from those models. :class:`~django.contrib.contenttypes.models.ContentType`
-also has a :ref:`custom manager <custom-managers>` that adds methods for
-working with :class:`~django.contrib.contenttypes.models.ContentType` and for
-obtaining instances of :class:`~django.contrib.contenttypes.models.ContentType`
-for a particular model.
+:class:`~django.contrib.contenttypes.models.ContentType` のインスタンスは、
+インスタンスの表現するモデルクラスを返したり、そのモデルクラスに対してオブ
+ジェクトをクエリするためのメソッドを提供しています。また、
+:class:`~django.contrib.contenttypes.models.ContentType` モデルは
+:class:`~django.contrib.contenttypes.models.ContentType`  を扱ったり、特定
+のモデルの :class:`~django.contrib.contenttypes.models.ContentType`  を取り
+出すための :ref:`カスタムマネジャ <custom-managers>` を持っています。
 
-Relations between your models and
-:class:`~django.contrib.contenttypes.models.ContentType` can also be used to
-enable "generic" relationships between an instance of one of your
-models and instances of any model you have installed.
+あるモデルから :class:`~django.contrib.contenttypes.models.ContentType`  に
+リレーションを張れば、そのモデルからインストール済みの任意のモデルのインス
+タンスとの間に、「一般化リレーション(generic relation)」を張れます。
 
-Installing the contenttypes framework
-=====================================
+.. _Installing the contenttypes framework:
 
-The contenttypes framework is included in the default
-:setting:`INSTALLED_APPS` list created by ``django-admin.py startproject``,
-but if you've removed it or if you manually set up your
-:setting:`INSTALLED_APPS` list, you can enable it by adding
-``'django.contrib.contenttypes'`` to your :setting:`INSTALLED_APPS` setting.
+``contenttypes`` フレームワークのインストール
+================================================
 
-It's generally a good idea to have the contenttypes framework
-installed; several of Django's other bundled applications require it:
+``contenttypes`` フレームワークは、 ``django-admin.py startproject``
+の生成するデフォルトの ``settings.py`` の :setting:`INSTALLED_APPS` リスト
+に入っています。リストから除外してしまっている場合や、
+:setting:`INSTALLED_APPS` を自分で設定した場合には、
+:setting:`INSTALLED_APPS` に ``'django.contrib.contenttypes'`` を追加してフ
+レームワークをインストールしてください。
 
-    * The admin application uses it to log the history of each object
-      added or changed through the admin interface.
+通常は、 ``contenttypes`` フレームワークをインストールしておいた方がよいで
+しょう。 Django にバンドルされている以下のアプリケーションには、
+``contenttypes`` フレームワークが必要だからです:
 
-    * Django's :mod:`authentication framework <django.contrib.auth>` uses it
-      to tie user permissions to specific models.
+    * ``admin`` アプリケーションは、管理インタフェース上で追加変更したオブ
+      ジェクトの履歴を管理するために ``contenttypes`` を使います。
 
-    * Django's comments system (:mod:`django.contrib.comments`) uses it to
-      "attach" comments to any installed model.
+    * Django の :mod:`認証フレームワーク <django.contrib.auth>` は、ユーザ
+      パーミッションをモデルに結びつけるために ``contenttypes`` を使います。
 
-The ``ContentType`` model
+    * Django のコメントシステム (:mod:`django.contrib.comments`) は、インス
+      トールされている任意のモデルに対してコメントを付けられる機能を
+      ``contenttypes`` で実現しています。
+
+.. _The ContentType model:
+
+:class:`~django.contrib.contenttypes.models.ContentType`  モデル
 =========================
 
 .. class:: models.ContentType
 
-    Each instance of :class:`~django.contrib.contenttypes.models.ContentType`
-    has three fields which, taken together, uniquely describe an installed model:
+    :class:`~django.contrib.contenttypes.models.ContentType`  のインスタン
+    スには 3 つのフィールドがあり、 3 つを組み合わせると、インストールされ
+    ているモデルを一意に表現できます:
 
     .. attribute:: models.ContentType.app_label
 
-        The name of the application the model is part of. This is taken from
-        the :attr:`app_label` attribute of the model, and includes only the *last*
-        part of the application's Python import path;
-        "django.contrib.contenttypes", for example, becomes an :attr:`app_label`
-        of "contenttypes".
+        モデルの入っているアプリケーションの名前です。この名前はモデルの
+	:attr:`app_label` 属性から取り出され、通常は Python の import パス
+	の *末尾* の部分が入っています。例えば、アプリケーションが
+	``django.contrib.contenttypes`` なら、 :attr:`app_label` は
+	``contenttypes`` です。
 
     .. attribute:: models.ContentType.model
 
-        The name of the model class.
+        モデルクラスの名前です。
 
     .. attribute:: models.ContentType.name
-
-        The human-readable name of the model. This is taken from the
+        人間可読なモデル名です。この値は、モデルの 
         :attr:`verbose_name <django.db.models.fields.Field.verbose_name>`
-        attribute of the model.
+	から取り出されます。
 
-Let's look at an example to see how this works. If you already have
-the contenttypes application installed, and then add
-:mod:`the sites application <django.contrib.sites>` to your
-:setting:`INSTALLED_APPS` setting and run ``manage.py syncdb`` to install it,
-the model :class:`django.contrib.sites.models.Site` will be installed into
-your database. Along with it a new instance of
-:class:`~django.contrib.contenttypes.models.ContentType` will be
-created with the following values:
+例を挙げて、 ``contenttypes`` の仕組みを見てみましょう。 ``contenttypes``
+アプリケーションをインストールしておき、 :setting:`INSTALLED_APPS` 設定に
+:mod:`sites アプリケーション <django.contrib.sites>` を追加してから、
+``manage.py syncdb`` を実行してみてください。
+``django.contrib.sites.models.Site`` モデルがデータベースにインストールされ
+るはずです。それに伴って、以下の値がセットされた
+:class:`~django.contrib.contenttypes.models.ContentType`  の新たなインスタ
+ンスが生成されているはずです:
 
-    * :attr:`app_label` will be set to ``'sites'`` (the last part of the Python
-      path "django.contrib.sites").
+    * :attr:`app_label` は ``'sites'`` (``django.contrib.sites`` の末尾) に設定
+      されています。
 
-    * :attr:`model` will be set to ``'site'``.
+    * :attr:`model` は ``'site'`` に設定されています。
 
-    * :attr:`name` will be set to ``'site'``.
+    * :attr:`name` は ``'site'`` に設定されています。
 
-.. _the verbose_name attribute: ../model-api/#verbose_name
+.. _the verbose_name attribute: ../model-api/#verbose-name
+.. _`verbose_name 属性`: `the verbose_name attribute`_
 
-Methods on ``ContentType`` instances
-====================================
+.. _Methods on ContentType instances:
+
+``ContentType``  インスタンスのメソッド
+=======================================
 
 .. class:: models.ContentType
 
-    Each :class:`~django.contrib.contenttypes.models.ContentType` instance has
-    methods that allow you to get from a
-    :class:`~django.contrib.contenttypes.models.ContentType` instance to the model
-    it represents, or to retrieve objects from that model:
+    :class:`~django.contrib.contenttypes.models.ContentType`  インスタンス
+    には、インスタンスの表現しているモデルクラスを取得したり、モデルクラス
+    のインスタンスを取り出したりするためのメソッドがあります:
 
 .. method:: models.ContentType.get_object_for_this_type(**kwargs)
 
-    Takes a set of valid :ref:`lookup arguments <field-lookups-intro>` for the
-    model the :class:`~django.contrib.contenttypes.models.ContentType`
-    represents, and does :ref:`a get() lookup <get-kwargs>` on that model,
-    returning the corresponding object.
+    :class:`~django.contrib.contenttypes.models.ContentType`  インスタンス
+    の表現しているモデルでサポートされている 
+    `照合メソッドの引数 <field-lookups-intro>` を取り、モデルインスタンスの
+    `get() 照合 <get-kwargs>` を行って、対応するオブジェクトを返します。
 
 .. method:: models.ContentType.model_class()
 
-    Returns the model class represented by this
-    :class:`~django.contrib.contenttypes.models.ContentType` instance.
+    :class:`~django.contrib.contenttypes.models.ContentType`  インスタンス
+    の表現しているモデルクラスを返します。
 
-For example, we could look up the
-:class:`~django.contrib.contenttypes.models.ContentType` for the
-:class:`~django.contrib.auth.models.User` model::
+例を挙げましょう。まず、 :class:`~django.contrib.auth.models.User` モデル
+の :class:`~django.contrib.contenttypes.models.ContentType`  インスタンスを
+照合します::
 
     >>> from django.contrib.contenttypes.models import ContentType
     >>> user_type = ContentType.objects.get(app_label="auth", model="user")
     >>> user_type
     <ContentType: user>
 
-And then use it to query for a particular ``User``, or to get access
-to the ``User`` model class::
+取り出した ``User`` の
+:class:`~django.contrib.contenttypes.models.ContentType`  から、 ``User``
+モデルクラスを取り出したり、 ``User`` インスタンスを照合したりできます::
 
     >>> user_type.model_class()
     <class 'django.contrib.auth.models.User'>
     >>> user_type.get_object_for_this_type(username='Guido')
     <User: Guido>
 
-Together,
 :meth:`~django.contrib.contenttypes.models.ContentType.get_object_for_this_type`
-and :meth:`~django.contrib.contenttypes.models.ContentType.model_class`
-enable two extremely important use cases:
+と :meth:`~django.contrib.contenttypes.models.ContentType.model_class` を組
+み合わせると、非常に重要なユースケースを実現できます:
 
-    1. Using these methods, you can write high-level generic code that
-       performs queries on any installed model -- instead of importing and using
-       a single specific model class, you can pass an ``app_label`` and
-       ``model`` into a :class:`~django.contrib.contenttypes.models.ContentType`
-       lookup at runtime, and then work with the model class or retrieve objects
-       from it.
+    1. 二つのメソッドを使えば、特定のモデルクラスを import して使うのではな
+       く、インストールされている全てのモデルに対して操作を行えるような一般
+       化された高水準のコードを書けます。実行時に :attr:`app_label` と
+       ``model`` を指定して
+       :class:`~django.contrib.contenttypes.models.ContentType`  を照合し、
+       得られたモデルクラスからオブジェクトを取り出せるのです。
 
-    2. You can relate another model to
-       :class:`~django.contrib.contenttypes.models.ContentType` as a way of
-       tying instances of it to particular model classes, and use these methods
-       to get access to those model classes.
+    2. 別のモデルから
+       :class:`~django.contrib.contenttypes.models.ContentType`  にリレーショ
+       ンを張って、モデルのインスタンスと、
+       :class:`~django.contrib.contenttypes.models.ContentType`  の表すモデ
+       ルクラスを結び付け、モデルクラスのメソッドにアクセスできます。
 
-Several of Django's bundled applications make use of the latter technique.
-For example,
-:class:`the permissions system <django.contrib.auth.models.Permission` in
-Django's authentication framework uses a
-:class:`~django.contrib.auth.models.Permission` model with a foreign
-key to :class:`~django.contrib.contenttypes.models.ContentType`; this lets
-:class:`~django.contrib.auth.models.Permission` represent concepts like
-"can add blog entry" or "can delete news story".
+Django にバンドルされているアプリケーションには、後者のテクニックを使ってい
+るものがいくつかあります。例えば、 Django の認証フレームワークに入っている
+:class:`パーミッションのシステム <django.contrib.auth.models.Permission>`
+では、 :class:`~django.contrib.auth.models.Permission` モデルの中で、
+:class:`~django.contrib.contenttypes.models.ContentType`  への外部キー
+を張っています。そうすることで、
+:class:`~django.contrib.auth.models.Permission`  は「ブログにエントリを追加」
+や「ニュースストーリーを削除」といった権限を表現できます。
 
-The ``ContentTypeManager``
---------------------------
+.. _The ContentTypeManager:
+
+``ContentTypeManager`` カスタムマネジャ
+-----------------------------------------
 
 .. class:: models.ContentTypeManager
 
-    :class:`~django.contrib.contenttypes.models.ContentType` also has a custom
-    manager, :class:`~django.contrib.contenttypes.models.ContentTypeManager`,
-    which adds the following methods:
+    :class:`~django.contrib.contenttypes.models.ContentType`  には
+    :class:`~django.contrib.contenttypes.models.ContentTypeManager`` という
+    カスタムマネジャがあります。このカスタムマネジャには、以下のメソッドが
+    あります:
 
     .. method:: models.ContentTypeManager.clear_cache()
 
-        Clears an internal cache used by
-        :class:`~django.contrib.contenttypes.models.ContentType>` to keep track
-        of which models for which it has created
-        :class:`django.contrib.contenttypes.models.ContentType>` instances. You
-        probably won't ever need to call this method yourself; Django will call
-        it automatically when it's needed.
+        ロード済みの
+        :class:`~django.contrib.contenttypes.models.ContentType`  インスタ
+        ンスを保持しておくための内部キャッシュをクリアします。このメソッド
+        を自分で呼ぶことはほとんどないでしょう。 Django は必要に応じて自動
+        的にメソッドを呼び出します。
 
     .. method:: models.ContentTypeManager.get_for_model(model)
 
-        Takes either a model class or an instance of a model, and returns the
-        :class:`~django.contrib.contenttypes.models.ContentType` instance
-        representing that model.
+        モデルクラスやモデルのインスタンスを引数にとり、そのモデルを表す
+        :class:`~django.contrib.contenttypes.models.ContentType`  インスタ
+        ンスを返します。
 
-The :meth:`~models.ContentTypeManager.get_for_model()` method is especially useful when you know you
-need to work with a :class:`ContentType <django.contrib.contenttypes.models.ContentType>` but don't want to go to the
-trouble of obtaining the model's metadata to perform a manual lookup::
+:class:`~django.contrib.contenttypes.models.ContentType`  を扱いたいけれど
+も、わざわざモデルのメタデータを取り出して
+:class:`~django.contrib.contenttypes.models.ContentType`  を手動で照合する
+のが面倒な場合には :meth:`~models.ContentTypeManager.get_for_model()` メソッ
+ドが特に便利です::
 
     >>> from django.contrib.auth.models import User
     >>> user_type = ContentType.objects.get_for_model(User)
@@ -199,19 +217,19 @@ trouble of obtaining the model's metadata to perform a manual lookup::
     <ContentType: user>
 
 .. _generic-relations:
+.. _Generic relations:
 
-Generic relations
-=================
+一般化リレーション
+===================
 
-Adding a foreign key from one of your own models to
-:class:`~django.contrib.contenttypes.models.ContentType` allows your model to
-effectively tie itself to another model class, as in the example of the
-:class:`~django.contrib.auth.models.Permission` model above. But it's possible
-to go one step further and use
-:class:`~django.contrib.contenttypes.models.ContentType` to enable truly
-generic (sometimes called "polymorphic") relationships between models.
+上で述べた :class:`~django.contrib.auth.models.Permission` モデルの例のよう
+に、自作のモデルから
+:class:`~django.contrib.contenttypes.models.ContentType`  に外部キーを張れ
+ば、モデルを別のモデルクラスに結び付けられます。しかし、もう一歩踏み込めば、
+:class:`~django.contrib.contenttypes.models.ContentType`  を使って真の一般
+化リレーション (または多態性: polymorphic リレーション) を実現できます。
 
-A simple example is a tagging system, which might look like this::
+簡単な例として、以下のようなタグシステムを挙げましょう::
 
     from django.db import models
     from django.contrib.contenttypes.models import ContentType
@@ -223,46 +241,45 @@ A simple example is a tagging system, which might look like this::
         object_id = models.PositiveIntegerField()
         content_object = generic.GenericForeignKey('content_type', 'object_id')
 
-       def __unicode__(self):
-           return self.tag
+        def __unicode__(self):
+            return self.tag
 
-A normal :class:`~django.db.models.fields.related.ForeignKey` can only "point
-to" one other model, which means that if the ``TaggedItem`` model used a
-:class:`~django.db.models.fields.related.ForeignKey` it would have to
-choose one and only one model to store tags for. The contenttypes
-application provides a special field type --
-:class:`django.contrib.contenttypes.generic.GenericForeignKey` -- which
-works around this and allows the relationship to be with any
-model. There are three parts to setting up a
-:class:`~django.contrib.contenttypes.generic.GenericForeignKey`:
+通常の :class:`~django.db.models.fields.related.ForeignKey` は、他のモデル
+を「指し示す」だけに過ぎません。従って、 ``TaggedItem`` モデルで
+:class:`~django.db.models.fields.related.ForeignKey` を使う場合、ただ一つの
+モデルに対してしかタグを保存できません。この問題を解決し、任意のモデルにリ
+レーションを張れるようにするために、 ``contenttypes`` アプリケーションでは、
+特殊なフィールドタイプ、
+:class:`django.contrib.contenttypes.generic.GenericForeignKey` を提供してい
+ます。 :class:`~django.contrib.contenttypes.generic.GenericForeignKey` のセッ
+トアップは、以下の 3 つのパートに分かれています:
 
-    1. Give your model a :class:`~django.db.models.fields.related.ForeignKey`
-       to :class:`~django.contrib.contenttypes.models.ContentType`.
+    1. :class:`~django.contrib.contenttypes.models.ContentType`  への
+       :class:`~django.db.models.fields.related.ForeignKey` を定義します。 
 
-    2. Give your model a field that can store a primary-key value from the
-       models you'll be relating to. (For most models, this means an
-       :class:`~django.db.models.fields.IntegerField` or
-       :class:`~django.db.models.fields.PositiveIntegerField`.)
+    2. リレーション先のモデルインスタンスの主キー値を保存するためのモデル
+       フィールドを定義します (ほとんどのモデルでは、
+       :class:`~django.db.models.fields.IntegerField` または
+       :class:`~django.db.models.fields.PositiveIntegerField` です)。
 
-       This field must be of the same type as the primary key of the models
-       that will be involved in the generic relation. For example, if you use
-       :class:`~django.db.models.fields.IntegerField`, you won't be able to
-       form a generic relation with a model that uses a
-       :class:`~django.db.models.fields.CharField` as a primary key.
+         このフィールドは、 GeneicRelation の対象モデルの主キーと同じ型でな
+         ければなりません。例えば、モデルフィールドに
+         :class:`~django.db.models.fields.IntegerField` を使っ
+         ているなら、対象モデルの主キーに
+         :class:`~django.db.models.fields.CharField` を使うことはできません。
 
-    3. Give your model a
-       :class:`~django.contrib.contenttypes.generic.GenericForeignKey`, and
-       pass it the names of the two fields described above. If these fields
-       are named "content_type" and "object_id", you can omit this -- those
-       are the default field names
-       :class:`~django.contrib.contenttypes.generic.GenericForeignKey` will
-       look for.
+    3. :class:`~django.contrib.contenttypes.generic.GenericForeignKey` を定
+       義します。
+       :class:`~django.contrib.contenttypes.generic.GenericForeignKey` の引
+       数に、上で定義したフィールドの名前を指定します。フィールド名が
+       :class:`~django.contrib.contenttypes.generic.GenericForeignKey` の探
+       すデフォルトの名前である ``content_type`` や ``object_id`` の場合に
+       は、引数を省略してかまいません。
 
-This will enable an API similar to the one used for a normal
-:class:`~django.db.models.fields.related.ForeignKey`;
-each ``TaggedItem`` will have a ``content_object`` field that returns the
-object it's related to, and you can also assign to that field or use it when
-creating a ``TaggedItem``::
+これで、通常の :class:`~django.db.models.fields.related.ForeignKey` に似た
+API を実現できます。 ``TaggedItem`` はリレーションを張っている対象のモデル
+インスタンスを返す ``content_object`` フィールドを持つようになります。
+``content_object`` の値は、 ``TaggedItem`` を生成するときに指定できます::
 
     >>> from django.contrib.auth.models import User
     >>> guido = User.objects.get(username='Guido')
@@ -271,28 +288,22 @@ creating a ``TaggedItem``::
     >>> t.content_object
     <User: Guido>
 
-Due to the way :class:`~django.contrib.contenttypes.generic.GenericForeignKey`
-is implemented, you cannot use such fields directly with filters (``filter()``
-and ``exclude()``, for example) via the database API. They aren't normal field
-objects. These examples will *not* work::
+.. _Reverse generic relations:
 
-    # This will fail
-    >>> TaggedItem.objects.filter(content_object=guido)
-    # This will also fail
-    >>> TaggedItem.objects.get(content_object=guido)
+逆方向の一般化リレーション
+----------------------------
 
-Reverse generic relations
--------------------------
-
-If you know which models you'll be using most often, you can also add
-a "reverse" generic relationship to enable an additional API. For example::
+リレーション対象にどのモデルがよく使われるのかが分かっていれば、
+「逆方向の」一般化リレーションを張って、 API を追加できます。例を挙げましょ
+う::
 
     class Bookmark(models.Model):
         url = models.URLField()
         tags = generic.GenericRelation(TaggedItem)
 
-``Bookmark`` instances will each have a ``tags`` attribute, which can
-be used to retrieve their associated ``TaggedItems``::
+これで、 ``Bookmark`` インスタンスは ``tags`` 属性をそなえます。この属性を
+使うと、インスタンスにリレーションを張っている ``TaggedItems`` を取り出せま
+す::
 
     >>> b = Bookmark(url='http://www.djangoproject.com/')
     >>> b.save()
@@ -303,7 +314,7 @@ be used to retrieve their associated ``TaggedItems``::
     >>> b.tags.all()
     [<TaggedItem: django>, <TaggedItem: python>]
 
-If you don't add the reverse relationship, you can do the lookup manually::
+逆方向のリレーションを張らなければ、手動で照合する必要があります::
 
     >>> b = Bookmark.objects.get(url='http://www.djangoproject.com/)
     >>> bookmark_type = ContentType.objects.get_for_model(b)
@@ -311,37 +322,41 @@ If you don't add the reverse relationship, you can do the lookup manually::
     ...                           object_id=b.id)
     [<TaggedItem: django>, <TaggedItem: python>]
 
-Note that if you delete an object that has a
-:class:`~django.contrib.contenttypes.generic.GenericRelation`, any objects
-which have a :class:`~django.contrib.contenttypes.generic.GenericForeignKey`
-pointing at it will be deleted as well. In the example above, this means that
-if a ``Bookmark`` object were deleted, any ``TaggedItem`` objects pointing at
-it would be deleted at the same time.
+:class:`~django.contrib.contenttypes.generic.GenericRelation`` を持つオブジェ
+クトを削除すると、このオブジェクトに
+:class:`~django.contrib.contenttypes.generic.GenericForeignKey` でリレーショ
+ンを張っているオブジェクトも全て削除されるので注意してください。つまり、上
+の例では、 ``Bookmark`` オブジェクト ``b`` を削除すると、 ``b`` にリレーショ
+ンを張っている ``t1`` や ``t2`` といった ``TaggedItem``  も同時に削除される
+のです。
 
-Generic relations in forms and admin
-------------------------------------
+.. _Generic relations in forms and admin:
 
-:mod:`django.contrib.contenttypes.generic` provides both a 
-:class:`~django.contrib.contenttypes.generic.GenericInlineFormSet`
-and :class:`~django.contrib.contenttypes.generic.GenericInlineModelAdmin`.
-This enables the use of generic relations in forms and the admin. See the
-:ref:`model formset <topics-forms-modelforms>` and
-:ref:`admin <ref-contrib-admin>` documentation for more information.
+フォームや admin で一般化リレーションを扱う
+---------------------------------------------
+
+:mod:`django.contrib.contenttypes.generic` では、二つのクラス、
+:class:`~django.contrib.contenttypes.generic.GenericInlineFormSet` と
+:class:`~django.contrib.contenttypes.generic.GenericInlineModelAdmin` 
+を提供しています。これらのクラスを使うと、フォームや admin で一般化リレーショ
+ンを扱えます。詳しくは :ref:`モデルフォームセット <topics-forms-modelforms>`
+や :ref:`admin <ref-contrib-admin>` のドキュメントを参照してください。
 
 .. class:: generic.GenericInlineModelAdmin
 
-    The :class:`~django.contrib.contenttypes.generic.GenericInlineModelAdmin`
-    class inherits all properties from an
-    :class:`~django.contrib.admin.options.InlineModelAdmin` class. However,
-    it adds a couple of its own for working with the generic relation:
+    :class:`~django.contrib.contenttypes.generic.GenericInlineModelAdmin`
+    クラスは、 :class:`~django.contrib.admin.options.InlineModelAdmin` 
+    の全てのプロパティを継承していますが、一般化リレーションを扱うために、
+    以下の二つの属性を備えています:
 
     .. attribute:: generic.GenericInlineModelAdmin.ct_field
 
-        The name of the
-        :class:`~django.contrib.contenttypes.models.ContentType` foreign key
-        field on the model. Defaults to ``content_type``.
+        モデル内の :class:`~django.contrib.contenttypes.models.ContentType` 
+	の外部キーフィールド名です。デフォルトの値は ``content_type`` です。
     
     .. attribute:: generic.GenericInlineModelAdmin.ct_fk_field
     
-        The name of the integer field that represents the ID of the related
-        object. Defaults to ``object_id``.
+        リレーション先オブジェクトの ID を表す整数フィールドの名前です。
+        デフォルトの値は ``object_id`` です。
+
+
