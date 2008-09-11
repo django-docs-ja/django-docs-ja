@@ -1,31 +1,34 @@
 .. _ref-contrib-localflavor:
 
 ==========================
-The "local flavor" add-ons
+localflavor アドオン
 ==========================
 
+:revision-up-to: 8961 (1.0)
+
 .. module:: django.contrib.localflavor
-    :synopsis: A collection of various Django snippets that are useful only for
-               a particular country or culture.
+    :synopsis: 特定の国や文化で有用な Django コードのコレクションです。
 
-Following its "batteries included" philosophy, Django comes with assorted
-pieces of code that are useful for particular countries or cultures. These are
-called the "local flavor" add-ons and live in the
-:mod:`django.contrib.localflavor` package.
+Python の「バッテリ入り (batteries included)」哲学に従って、 Django には様々
+な国や文化のための有用なコードが付属しています。こうしたコードは
+「localflavor アドオン」と呼ばれ、 :mod:`django.contrib.localflavor` パッケー
+ジに収められています。
 
-Inside that package, country- or culture-specific code is organized into
-subpackages, named using `ISO 3166 country codes`_.
+:mod:`~django.contrib.localflavor` パッケージは、各国、各文化圏のコードを、
+それぞれ `ISO 3166 国別コード`_ に従って名付けたサブパッケージにまとめてい
+ます。
 
-Most of the ``localflavor`` add-ons are localized form components deriving
-from the :ref:`forms <topics-forms-index>` framework -- for example, a
-:class:`~django.contrib.localflavor.us.forms.USStateField` that knows how to
-validate U.S. state abbreviations, and a
-:class:`~django.contrib.localflavor.fi.forms.FISocialSecurityNumber` that
-knows how to validate Finnish social security numbers.
+:mod:`~django.contrib.localflavor` アドオンの大部分は、 
+:ref:`forms <topics-forms-index>` フレームワークから導出された、ローカライ
+ズされたフォームコンポーネントで占められています。例えば、 
+:class:`~django.contrib.localflavor.us.forms.USStateField` にはアメリカの州
+名略号を検証する方法が組み込まれていますし、
+:class:`~django.contrib.localflavor.fi.forms.FISocialSecurityNumber` は、フィ
+ンランドの社会保障番号の検証方法が組み込まれています。
 
-To use one of these localized components, just import the relevant subpackage.
-For example, here's how you can create a form with a field representing a
-French telephone number::
+ローカライズコンポーネントは、サブパッケージを import するだけで使えます。
+例えば、フランスの電話番号を入力するためのフィールドを生成したければ、以下
+のようにします::
 
     from django import forms
     from django.contrib.localflavor.fr.forms import FRPhoneNumberField
@@ -33,42 +36,46 @@ French telephone number::
     class MyForm(forms.Form):
         my_french_phone_no = FRPhoneNumberField()
 
-Supported countries
-===================
+.. _Supported countries:
 
-Countries currently supported by :mod:`~django.contrib.localflavor` are:
+localflavor でサポートされている国
+===================================
 
-    * Argentina_
-    * Australia_
-    * Austria_
-    * Brazil_
-    * Canada_
-    * Chile_
-    * Finland_
-    * France_
-    * Germany_
-    * Holland_
-    * Iceland_
-    * India_
-    * Italy_
-    * Japan_
-    * Mexico_
-    * Norway_
-    * Peru_
-    * Poland_
-    * Romania_
-    * Slovakia_
-    * `South Africa`_
-    * Spain_
-    * Switzerland_
-    * `United Kingdom`_
-    * `United States of America`_
+:mod:`~django.contrib.localflavor` がサポートしている国や文化圏は、以下の通
+りです:
 
-The ``django.contrib.localflavor`` package also includes a ``generic`` subpackage,
-containing useful code that is not specific to one particular country or
-culture. Currently, it defines date and datetime input fields based on those
-from :ref:`forms <topics-forms-index>`, but with non-US default formats.
-Here's an example of how to use them::
+
+    * アルゼンチン (Argentina_)
+    * オーストラリア (Australia_)
+    * オーストリア (Austria_)
+    * ブラジル (Brazil_)
+    * カナダ (Canada_)
+    * チリ (Chile_)
+    * フィンランド (Finland_)
+    * フランス (France_)
+    * ドイツ (Germany_)
+    * オランダ (Holland_)
+    * アイスランド (Iceland_)
+    * インド (India_)
+    * イタリア (Italy_)
+    * 日本 (Japan_)
+    * メキシコ (Mexico_)
+    * ノルウェー (Norway_)
+    * ペルー (Peru_)
+    * ポーランド (Poland_)
+    * ルーマニア (Romania_)
+    * スロバキア (Slovakia_)
+    * 南アフリカ (`South Africa`_)
+    * スペイン (Spain_)
+    * スイス (Switzerland_)
+    * イギリス (`United Kingdom`_)
+    * アメリカ (`United States of America`_)
+
+:mod:`django.contrib.localfravor` パッケージ内には、 ``generic`` というサブ
+パッケージもあります。このパッケージは、複数の国や文化で便利なコードをまと
+めています。現状では、このモジュールには、アメリカの標準をデフォルトとしな
+い、 :ref:`forms <topics-forms-index>` に基づいた日付や時刻の入力フィールド
+が入っています。使い方を以下に示します::
 
     from django import forms
     from django.contrib.localflavor import generic
@@ -77,6 +84,7 @@ Here's an example of how to use them::
         my_date_field = generic.forms.DateField()
 
 .. _ISO 3166 country codes: http://www.iso.org/iso/country_codes/iso_3166_code_lists/english_country_names_and_code_elements.htm
+.. _ISO 3166 国別コード: `ISO 3166 country codes`_
 .. _Argentina: `Argentina (ar)`_
 .. _Australia: `Australia (au)`_
 .. _Austria: `Austria (at)`_
@@ -103,559 +111,616 @@ Here's an example of how to use them::
 .. _United Kingdom: `United Kingdom (uk)`_
 .. _United States of America: `United States of America (us)`_
 
-Adding flavors
-==============
+.. _`Adding flavors`:
 
-We'd love to add more of these to Django, so please `create a ticket`_ with
-any code you'd like to contribute. One thing we ask is that you please use
-Unicode objects (``u'mystring'``) for strings, rather than setting the encoding
-in the file. See any of the existing flavors for examples.
+新たなローカルフレーバを追加する
+====================================
+
+私達は、これからもローカルフレーバを充実させていきたいと考えています。ロー
+カルフレーバに取り込みたいコードがあるなら、 `チケットを作成`_ してください。
+ローカルフレーバの作成でお願いしたいのは、文字列を Unicode リテラルで表現
+(``u'mystring'``) し、ファイルのエンコーディングに頼って指定しないで欲しい
+ということです。既にあるローカルフレーバのコードが参考になるでしょう。
 
 .. _create a ticket: http://code.djangoproject.com/simpleticket
+.. _`チケットを作成`: http://code.djangoproject.com/simpleticket
 
-Argentina (``ar``)
-=============================================
+.. _`Argentina (ar)`:
+
+Argentina: アルゼンチン (``ar``)
+=================================
 
 .. class:: ar.forms.ARPostalCodeField
 
-    A form field that validates input as either a classic four-digit Argentinian
-    postal code or a CPA_.
+    入力が正しい旧形式のアルゼンチン郵便番号または CPA_ であるか検証するフォー
+    ムフィールドです。
 
 .. _CPA: http://www.correoargentino.com.ar/consulta_cpa/home.php
 
 .. class:: ar.forms.ARDNIField
 
-    A form field that validates input as a Documento Nacional de Identidad (DNI)
-    number.
+    入力が正しい Documento Nacional de Identidad (DNI) であるか検証するフォー
+    ムフィールドです。
 
 .. class:: ar.forms.ARCUITField
 
-    A form field that validates input as a Codigo Unico de Identificacion
-    Tributaria (CUIT) number.
+    入力が正しい Código Único de Identificación Tributaria (CUIT) 番号であ
+    るかか検証するフォームフィールドです。
 
 .. class:: ar.forms.ARProvinceSelect
 
-    A ``Select`` widget that uses a list of Argentina's provinces and autonomous
-    cities as its choices.
+    アルゼンチンの州および自治領を選べる ``Select`` ウィジェットです。
 
-Australia (``au``)
-=============================================
+.. _`Australia (au)`:
 
+Australia: オーストラリア (``au``)
+====================================
+				     
 .. class:: au.forms.AUPostCodeField
 
-    A form field that validates input as an Australian postcode.
+    入力が正しいオーストラリアの郵便番号であるか検証するフォームフィールド
+    です。
 
 .. class:: au.forms.AUPhoneNumberField
 
-    A form field that validates input as an Australian phone number. Valid numbers
-    have ten digits.
+    入力がオーストラリアの電話番号であるか検証するフォームフィールドです。
+    有効な番号は 10 桁の数字からなります。
 
 .. class:: au.forms.AUStateSelect
 
-    A ``Select`` widget that uses a list of Australian states/territories as its
-    choices.
+    オーストラリアの州や領を選べる ``Select`` ウィジェットです。
 
-Austria (``at``)
-================
+.. _`Austria (at)`:
+
+
+Austria: オーストリア(``at``)
+=============================
 
 .. class:: at.forms.ATZipCodeField
 
-    A form field that validates its input as an Austrian zip code.
+    入力が正しいオーストリアの ZIP コードであるか検証するフォームフィールド
+    です。
 
 .. class:: at.forms.ATStateSelect
 
-    A ``Select`` widget that uses a list of Austrian states as its choices. 
+    選択肢のリストにオーストリアの州が設定された ``Select`` ウィジェット
+    です。
 
 .. class:: at.forms.ATSocialSecurityNumberField
 
-    A form field that validates its input as an Austrian social security number.
+    入力が正しいオーストリアの社会保障番号であるか検証するフォームフィール
+    ドです。
 
-Brazil (``br``)
-===============
+.. _`Brazil (br)`:
+
+Brazil: ブラジル (``br``)
+===========================
 
 .. class:: br.forms.BRPhoneNumberField
 
-    A form field that validates input as a Brazilian phone number, with the format
-    XX-XXXX-XXXX.
+    入力が正しいブラジルの電話番号であるか検証するフォームフィールドです。
+    正しい形式は XX-XXXX-XXXX です。
+
 
 .. class:: br.forms.BRZipCodeField
 
-    A form field that validates input as a Brazilian zip code, with the format
-    XXXXX-XXX.
+    入力が正しいブラジルのZIPコードであるか検証するフォームフィールドです。
+    正しい形式はXXXXX-XXXです。
 
 .. class:: br.forms.BRStateSelect
 
-    A ``Select`` widget that uses a list of Brazilian states/territories as its
-    choices.
+    ブラジルの州や領を選べる ``Select`` ウィジェットです。
 
-Canada (``ca``)
-===============
+.. _`Canada (ca)`:
+
+Canada: カナダ (``ca``)
+========================
 
 .. class:: ca.forms.CAPhoneNumberField
 
-    A form field that validates input as a Canadian phone number, with the format
-    XXX-XXX-XXXX.
+    入力が正しいカナダの電話番号であるか検証するフォームフィールドです。
+    正しい形式はXXX-XXX-XXXXです。
 
 .. class:: ca.forms.CAPostalCodeField
 
-    A form field that validates input as a Canadian postal code, with the format
-    XXX XXX.
+    入力が正しいカナダの郵便番号であるか検証するフォームフィールドです。
+    正しい形式はXXX XXXです。
 
 .. class:: ca.forms.CAProvinceField
 
-    A form field that validates input as a Canadian province name or abbreviation.
+    入力が正しいカナダの州名か、州名略号であるか検証するフォームフィールド
+    です。
 
 .. class:: ca.forms.CASocialInsuranceNumberField
 
-    A form field that validates input as a Canadian Social Insurance Number (SIN).
-    A valid number must have the format XXX-XXX-XXX and pass a `Luhn mod-10
-    checksum`_.
+    入力が正しいカナダ社会保障番号 (SIN) であるか検証するフォームフィールド
+    です。正しい SIN は、XXX-XXX-XXX の形式で、 `Luhn mod-10 checksum`_ 
+    検証をパスします。
 
 .. _Luhn mod-10 checksum: http://en.wikipedia.org/wiki/Luhn_algorithm
 
 .. class:: ca.forms.CAProvinceSelect
 
-    A ``Select`` widget that uses a list of Canadian provinces and territories as
-    its choices.
+    カナダの州や領を選べる ``Select`` ウィジェットです。
 
-Chile (``cl``)
-==============
+.. _`Chile (cl)`:
+
+Chile: チリ (``cl``)
+=====================
 
 .. class:: cl.forms.CLRutField
 
-    A form field that validates input as a Chilean national identification number
-    ('Rol Unico Tributario' or RUT). The valid format is XX.XXX.XXX-X.
+    入力が正しいチリ国民識別番号 ('Rol Unico Tributario' or RUT) であるか検
+    証するフォームフィールドです。正しい形式は XX.XXX.XXX-X です。
 
 .. class:: cl.forms.CLRegionSelect
 
-    A ``Select`` widget that uses a list of Chilean regions (Regiones) as its
-    choices.
+    チリの地域 (Regiones) を選べる ``Select`` ウィジェットです。
 
-Finland (``fi``)
-================
+.. _`Finland (fi)`:
+
+Finland: フィンランド (``fi``)
+===============================
 
 .. class:: fi.forms.FISocialSecurityNumber
 
-    A form field that validates input as a Finnish social security number.
+    入力が正しいフィンランド社会保障番号であるか検証するフォームフィールド
+    です。
 
 .. class:: fi.forms.FIZipCodeField
 
-    A form field that validates input as a Finnish zip code. Valid codes
-    consist of five digits.
+    入力が正しいフィンランドのZIPコードであるか検証するフォームフィールドで
+    す。正しいコードは 5 桁の数字からなります。
 
 .. class:: fi.forms.FIMunicipalitySelect
 
-    A ``Select`` widget that uses a list of Finnish municipalities as its
-    choices.
+    フィンランドの市名 (municipality) を選べる ``Select`` ウィジェットです。
 
-France (``fr``)
-===============
+.. _`France (fr)`:
+
+France: フランス (``fr``)
+===========================
 
 .. class:: fr.forms.FRPhoneNumberField
 
-    A form field that validates input as a French local phone number. The
-    correct format is 0X XX XX XX XX. 0X.XX.XX.XX.XX and 0XXXXXXXXX validate
-    but are corrected to 0X XX XX XX XX.
+    入力が正しいフランスの電話番号であるか検証するフォームフィールドです。
+    正しい形式は、 0X XX XX XX XX, 0X.XX.XX.XX.XX, または 0XXXXXXXXX です。
+    入力は 0X XX XX XX XX 形式に正規化されます。
 
 .. class:: fr.forms.FRZipCodeField
 
-    A form field that validates input as a French zip code. Valid codes
-    consist of five digits.
+    入力が正しいフランスのZIPコードであるか検証するフォームフィールドです。
+    正しいZIPコードは5桁の数字からなります。
 
 .. class:: fr.forms.FRDepartmentSelect
 
-    A ``Select`` widget that uses a list of French departments as its choices.
+    フランスの県名 (department) を選べる ``Select`` ウィジェットです。
 
-Germany (``de``)
-================
+.. _`Germany (de)`:
+
+Germany: ドイツ (``de``)
+==========================
 
 .. class:: de.forms.DEIdentityCardNumberField
 
-    A form field that validates input as a German identity card number
-    (Personalausweis_). Valid numbers have the format
-    XXXXXXXXXXX-XXXXXXX-XXXXXXX-X, with no group consisting entirely of zeroes.
+    入力が正しいドイツの身分保障番号 (Personalausweis_) であるか検証するフォー
+    ムフィールドです。正しい番号は XXXXXXXXXXX-XXXXXXX-XXXXXXX-X で、どの桁
+    グループもゼロだけで構成されていてはなりません。
 
 .. _Personalausweis: http://de.wikipedia.org/wiki/Personalausweis
 
 .. class:: de.forms.DEZipCodeField
 
-    A form field that validates input as a German zip code. Valid codes
-    consist of five digits.
+    入力が正しいドイツのZIPコードであるか検証するフォームフィールドです。正
+    しいコードは5桁の数字からなります。
 
 .. class:: de.forms.DEStateSelect
 
-    A ``Select`` widget that uses a list of German states as its choices.
+    ドイツの州を選べる ``Select`` ウィジェットです。
 
-Holland (``nl``)
-================
+.. _`Holland (nl)`:
+
+Holland: オランダ (``nl``)
+===========================
 
 .. class:: nl.forms.NLPhoneNumberField
 
-    A form field that validates input as a Dutch telephone number.
+    入力が正しいオランダの電話番号であるか検証するフォームフィールドです。
 
 .. class:: nl.forms.NLSofiNumberField
 
-    A form field that validates input as a Dutch social security number
-    (SoFI/BSN).
+    入力が正しいオランダ社会保障番号 (SoFI/BSN) であるか検証するフォームフィー
+    ルドです。
 
 .. class:: nl.forms.NLZipCodeField
 
-    A form field that validates input as a Dutch zip code.
+    入力が正しいオランダのZIPコードであるか検証するフォームフィールドです。
 
 .. class:: nl.forms.NLProvinceSelect
 
-    A ``Select`` widget that uses a list of Dutch provinces as its list of
-    choices.
+    オランダの県 (province) を選べる ``Select`` ウィジェットです。
 
-Iceland (``is_``)
-=================
+.. _`Iceland (is_)`:
+
+Iceland: アイスランド (``is_``)
+=================================
 
 .. class:: is_.forms.ISIdNumberField
 
-    A form field that validates input as an Icelandic identification number
-    (kennitala). The format is XXXXXX-XXXX.
+    入力が正しいアイスランドの身分証明番号 (kennitala) であるか検証するフォー
+    ムフィールドです。形式は XXXXXX-XXXX です。
 
 .. class:: is_.forms.ISPhoneNumberField
 
-    A form field that validates input as an Icelandtic phone number (seven
-    digits with an optional hyphen or space after the first three digits).
+    入力が正しいアイスランド電話番号 (7 桁の数字で、最初の3桁以後にハイフン
+    やスペースが入っていてもよい) であるか検証するフォームフィールドです。
 
 .. class:: is_.forms.ISPostalCodeSelect
 
-    A ``Select`` widget that uses a list of Icelandic postal codes as its
-    choices.
+    アイスランドの郵便番号を選べる ``Select`` ウィジェットです。
 
-India (``in_``)
-===============
+.. _`India (in_)`:
+
+India: インド (``in_``)
+========================
 
 .. class:: in.forms.INStateField
 
-    A form field that validates input as an Indian state/territory name or
-    abbreviation. Input is normalized to the standard two-letter vehicle
-    registration abbreviation for the given state or territory.
+    入力が正しいインドの州・領名または略号であるか検証するフォームフィール
+    ドです。入力は車両番号登録に使われる標準の 2 文字略号形式に正規化されま
+    す。
 
 .. class:: in.forms.INZipCodeField
 
-    A form field that validates input as an Indian zip code, with the
-    format XXXXXXX.
+    入力が正しいインドのZIPコードであるか検証するフォームフィールドです。形
+    式は XXXXXXX です。
 
 .. class:: in.forms.INStateSelect
 
-    A ``Select`` widget that uses a list of Indian states/territories as its
-    choices.
+    インドの州や領を選べる ``Select`` ウィジェットです。
 
-Italy (``it``)
-==============
+.. _`Italy (it)`:
+
+Italy: イタリア (``it``)
+=========================
 
 .. class:: it.forms.ITSocialSecurityNumberField
 
-    A form field that validates input as an Italian social security number
-    (`codice fiscale`_).
+    入力が正しいイタリア社会保障番号 (`codice fiscale`_) であるか検証する
+    フォームフィールドです。
 
 .. _codice fiscale: http://www.agenziaentrate.it/ilwwcm/connect/Nsi/Servizi/Codice+fiscale+-+tessera+sanitaria/Codice+fiscale/NSI+Informazioni+sulla+codificazione+delle+persone+fisiche
 
 .. class:: it.forms.ITVatNumberField
 
-    A form field that validates Italian VAT numbers (partita IVA).
+    入力が正しいイタリアの VAT 番号 (partita IVA) であるか検証するフォーム
+    フィールドです。
 
 .. class:: it.forms.ITZipCodeField
 
-    A form field that validates input as an Italian zip code. Valid codes
-    must have five digits.
+    入力が正しいイタリアのZIPコードであるか検証するフォームフィールドです。
+    正しいコードは 5 桁の数字です。
 
 .. class:: it.forms.ITProvinceSelect
 
-    A ``Select`` widget that uses a list of Italian provinces as its choices.
+    イタリアの県 (province) を選べる ``Select`` ウィジェットです。
 
 .. class:: it.forms.ITRegionSelect
 
-    A ``Select`` widget that uses a list of Italian regions as its choices.
+    イタリアの地域名 (region) を選べる ``Select`` ウィジェットです。
 
-Japan (``jp``)
-==============
+.. _`Japan (jp)`:
+
+Japan: 日本 (``jp``)
+======================
 
 .. class:: jp.forms.JPPostalCodeField
 
-    A form field that validates input as a Japanese postcode. It accepts seven
-    digits, with or without a hyphen.
+    入力が正しい日本の郵便番号であるか検証するフォームフィールドです。7 桁
+    の数字で、ハイフンはあってもなくても構いません。
 
 .. class:: jp.forms.JPPrefectureSelect
 
-    A ``Select`` widget that uses a list of Japanese prefectures as its choices.
+    日本の県を選べる ``Select`` ウィジェットです。
 
-Mexico (``mx``)
-===============
+.. _`Mexico (mx)`:
+
+Mexico: メキシコ (``mx``)
+===========================
 
 .. class:: mx.forms.MXStateSelect
 
-    A ``Select`` widget that uses a list of Mexican states as its choices.
+    メキシコの州を選べる ``Select`` ウィジェットです。
 
-Norway (``no``)
-===============
+.. _`Norway (no)`:
+
+Norway: ノルウェー (``no``)
+============================
 
 .. class:: no.forms.NOSocialSecurityNumber
 
-    A form field that validates input as a Norwegian social security number
-    (personnummer_).
+    入力が正しいノルウェー社会保証番号 (personnummer_) であるか検証するフォー
+    ムフィールドです。
 
 .. _personnummer: http://no.wikipedia.org/wiki/Personnummer
 
 .. class:: no.forms.NOZipCodeField
 
-    A form field that validates input as a Norwegian zip code. Valid codes
-    have four digits.
+    入力が正しいノルウェーのZIPコードであるか検証するフォームフィールドです。
+    正しいコードは 4 桁の数字です。
 
 .. class:: no.forms.NOMunicipalitySelect
 
-    A ``Select`` widget that uses a list of Norwegian municipalities (fylker) as
-    its choices.
+    ノルウェーの市名 (municipality, fylker) を選べる ``Select`` ウィジェッ
+    トです。
 
-Peru (``pe``)
-=============
+.. _`Peru (pe)`:
 
-.. class:: pt.forms.PEDNIField
+Peru: ペルー (``pe``)
+=======================
 
-    A form field that validates input as a DNI (Peruvian national identity)
-    number.
+.. class:: pe.forms.PEDNIField
 
-.. class:: pt.forms.PERUCField
+    入力が正しいペルー国民識別番号 (DNI) であるか検証するフォームフィールド
+    です。
 
-    A form field that validates input as an RUC (Registro Unico de
-    Contribuyentes) number. Valid RUC numbers have 11 digits.
+.. class:: pe.forms.PERUCField
 
-.. class:: pt.forms.PEDepartmentSelect
+    入力が正しい納税登録番号 (Registro Unico de Contribuyentes, RUC) である
+    か検証するフォームフィールドです。正しい RUC 番号は 11 桁の数字形式です。
 
-    A ``Select`` widget that uses a list of Peruvian Departments as its choices.
+.. class:: pe.forms.PEDepartmentSelect
 
-Poland (``pl``)
-===============
+    ペルーの県 (department) を選べる ``Select`` ウィジェットです。
+
+.. _`Poland (pl)`:
+
+Poland: ポーランド (``pl``)
+=============================
 
 .. class:: pl.forms.PLNationalIdentificationNumberField
 
-    A form field that validates input as a Polish national identification number
-    (PESEL_).
+    入力が正しいポーランド国民識別番号 (PESEL_) であるか検証するフォームフィー
+    ルドです。
 
 .. _PESEL: http://en.wikipedia.org/wiki/PESEL
 
 .. class:: pl.forms.PLNationalBusinessRegisterField
 
-    A form field that validates input as a Polish National Official Business
-    Register Number (REGON_), having either seven or nine digits. The checksum
-    algorithm used for REGONs is documented at
-    http://wipos.p.lodz.pl/zylla/ut/nip-rego.html.
+    入力が正しいポーランド法人登記番号 (REGON_) であるか検証するフォームフィー
+    ルドです。REGON は 7 桁または 9 桁の数字で、
+    http://wipos.p.lodz.pl/zylla/ut/nip-rego.html のチェックサムアルゴリズ
+    ムに従います。
 
 .. _REGON: http://www.stat.gov.pl/bip/regon_ENG_HTML.htm
 
 .. class:: pl.forms.PLPostalCodeField
 
-    A form field that validates input as a Polish postal code. The valid format
-    is XX-XXX, where X is a digit.
+    入力が正しいポーランドの郵便番号であるか検証するフォームフィールドです。
+    正しい郵便番号は XX-XXX 形式の数字です。
 
 .. class:: pl.forms.PLTaxNumberField
 
-    A form field that validates input as a Polish Tax Number (NIP). Valid
-    formats are XXX-XXX-XX-XX or XX-XX-XXX-XXX. The checksum algorithm used
-    for NIPs is documented at http://wipos.p.lodz.pl/zylla/ut/nip-rego.html.
+    入力が正しいポーランド納税者番号 (NIP) であるか検証するフォームフィール
+    ドです。正しい形式は XXX-XXX-XX-XX または XX-XX-XXX-XXX です。NIP に使
+    われるチェックサムアルゴリズムは
+    http://wipos.p.lodz.pl/zylla/ut/nip-rego.html で定義されています。
 
 .. class:: pl.forms.PLAdministrativeUnitSelect
 
-    A ``Select`` widget that uses a list of Polish administrative units as its
-    choices.
+    ポーランドの行政単位 (administrative unit) を選べる ``Select`` ウィジェッ
+    トです。
 
 .. class:: pl.forms.PLVoivodeshipSelect
 
-    A ``Select`` widget that uses a list of Polish voivodeships (administrative
-    provinces) as its choices.
+    ポーランドの郡 (voivodeship, 行政州) を選べる ``Select`` ウィジェットで
+    す。
 
-Romania (``ro``)
-================
+.. _Romania (ro):
+
+Romania: ルーマニア (``ro``)
+==============================
 
 .. class:: ro.forms.ROCIFField
 
-    A form field that validates Romanian fiscal identification codes (CIF). The
-    return value strips the leading RO, if given.
+    入力が正しいルーマニア社会保障番号 (CIF) であるか検証するフォームフィー
+    ルドです。入力の先頭に ``RO`` がついていた場合、戻り値からは除去します。
 
 .. class:: ro.forms.ROCNPField
 
-    A form field that validates Romanian personal numeric codes (CNP).
+    入力が正しいルーマニア個人番号 (CNP) であるか検証するフォームフィールド
+    です。
 
 .. class:: ro.forms.ROCountyField
 
-    A form field that validates its input as a Romanian county (judet) name or
-    abbreviation. It normalizes the input to the standard vehicle registration
-    abbreviation for the given county. This field will only accept names written
-    with diacritics; consider using ROCountySelect as an alternative.
+    入力をルーマニアの地域 (judet) またはその略号として検証するフォームフィー
+    ルドです。このフィールドは、入力値の示す地域名を、標準の車両登録番号で
+    使われる略号に正規化して返します。このフィールドは、分音符号で書かれた
+    名前しか解釈できません。正しい値を入力させるのが難しいときは、
+    ``ROCountySelect`` の利用を検討してください。
 
 .. class:: ro.forms.ROCountySelect
 
-    A ``Select`` widget that uses a list of Romanian counties (judete) as its
-    choices.
+    ルーマニアの地域 (judete) を選べる ``Select`` ウイジェットです。
 
 .. class:: ro.forms.ROIBANField
 
-    A form field that validates its input as a Romanian International Bank 
-    Account Number (IBAN). The valid format is ROXX-XXXX-XXXX-XXXX-XXXX-XXXX,
-    with or without hyphens.
+    入力がルーマニア国際銀行の正しい口座番号であるか検証するフォームフィー
+    ルドです。正しい口座番号の形式は ROXX-XXXX-XXXX-XXXX-XXXX-XXXX で、ハイ
+    フンはあってもなくてもかまいません。
 
 .. class:: ro.forms.ROPhoneNumberField
 
-    A form field that validates Romanian phone numbers, short special numbers
-    excluded.
+    入力が正しいルーマニアの電話番号であるか検証するフォームフィールドです。
+    このフィールドは、いくつかの特殊な番号を排除します。
 
 .. class:: ro.forms.ROPostalCodeField
 
-    A form field that validates Romanian postal codes.
+    入力が正しいルーマニアの郵便番号であるか検証するフォームフィールドです。
+
+.. _`Slovakia (sk)`:
 
 Slovakia (``sk``)
-=================
+==================
 
 .. class:: sk.forms.SKPostalCodeField
 
-    A form field that validates input as a Slovak postal code. Valid formats
-    are XXXXX or XXX XX, where X is a digit.
+    入力が正しいスロバキアの郵便番号であるか検証するフォームフィールドです。
+    正しい番号は、 XXXXX または XXX XX の形式をとります。
 
 .. class:: sk.forms.SKDistrictSelect
 
-    A ``Select`` widget that uses a list of Slovak districts as its choices.
+    スロバキアの州 (district) を選べる ``Select`` ウィジェットです。
 
 .. class:: sk.forms.SKRegionSelect
 
-    A ``Select`` widget that uses a list of Slovak regions as its choices.
+    スロバキアの地域 (region) を選べる ``Select`` ウィジェットです。
+
+.. _`South Africa (za)`:
 
 South Africa (``za``)
-=====================
+================================================
 
 .. class:: za.forms.ZAIDField
 
-    A form field that validates input as a South African ID number. Validation
-    uses the Luhn checksum and a simplistic (i.e., not entirely accurate) check
-    for birth date.
+    入力が正しい南アフリカ身分証明番号であるか検証するフォームフィールドで
+    す。検証では、 Luhn チェックサムと、簡単な (完全に厳密ではない) 誕生日
+    のチェックを行います。
 
 .. class:: za.forms.ZAPostCodeField
 
-    A form field that validates input as a South African postcode. Valid
-    postcodes must have four digits.
+    入力が正しい南アフリカの郵便番号であるか検証するフォームフィールドです。
+    正しい郵便番号は 4 桁からなります。
+
+.. _`Spain (es)`:
 
 Spain (``es``)
-==============
+================
 
 .. class:: es.forms.ESIdentityCardNumberField
 
-    A form field that validates input as a Spanish NIF/NIE/CIF (Fiscal
-    Identification Number) code.
+    入力が正しいスペインの NIF/NIE/CIF (納税者識別番号) であるか検証するフォー
+    ムフィールドです。
 
 .. class:: es.forms.ESCCCField
 
-    A form field that validates input as a Spanish bank account number (Codigo
-    Cuenta Cliente or CCC). A valid CCC number has the format
-    EEEE-OOOO-CC-AAAAAAAAAA, where the E, O, C and A digits denote the entity,
-    office, checksum and account, respectively. The first checksum digit
-    validates the entity and office. The second checksum digit validates the
-    account. It is also valid to use a space as a delimiter, or to use no
-    delimiter.
+    入力が正しいスペイン銀行口座番号 (Codigo Cuenta Cliente, CCC) であるか
+    検証するフォームフィールドです。正しい CCC 番号は、
+    EEEE-OOOO-CC-AAAAAAAAAA の形式であり、 E, O, C および A はそれぞれ組織、
+    支店、チェックサムおよび口座番号を示しています。チェックサムの上下の桁
+    は、それぞれ支店番号および口座番号のチェックサム値です。区切り文字にス
+    ペースを使ってもよく、区切り文字がなくてもかまいません。
 
 .. class:: es.forms.ESPhoneNumberField
 
-    A form field that validates input as a Spanish phone number. Valid numbers
-    have nine digits, the first of which is 6, 8 or 9.
+    入力が正しいスペインの電話番号であるか検証するフォームフィールドです。
+    正しい番号は、 9 桁からなり、先頭の番号は 6, 8, または 9 です。
 
 .. class:: es.forms.ESPostalCodeField
 
-    A form field that validates input as a Spanish postal code. Valid codes
-    have five digits, the first two being in the range 01 to 52, representing
-    the province.
+    入力が正しいスペインの郵便番号であるか検証するフォームフィールドです。
+    正しい番号は 5 桁の数字からなり、先頭の二桁が州を表す 01 から 52 の間の
+    値をとります。
 
 .. class:: es.forms.ESProvinceSelect
 
-    A ``Select`` widget that uses a list of Spanish provinces as its choices.
+    スペインの州名を選べる ``Select`` ウィジェットです。
 
 .. class:: es.forms.ESRegionSelect
 
-    A ``Select`` widget that uses a list of Spanish regions as its choices.
+    スペインの領名を選べる ``Select`` ウィジェットです。
+
+.. _`Switzerland (ch)`:
 
 Switzerland (``ch``)
-====================
+======================
 
 .. class:: ch.forms.CHIdentityCardNumberField
 
-    A form field that validates input as a Swiss identity card number.
-    A valid number must confirm to the X1234567<0 or 1234567890 format and
-    have the correct checksums -- see http://adi.kousz.ch/artikel/IDCHE.htm.
+    入力が正しいスイスの身分証明書番号であるか検証するフォームフィールドで
+    す。正しい番号は、 X1234567<0 または 1234567890 の形式であり、正しいチェッ
+    クサム値を持たねばなりません。 http://adi.kousz.ch/artikel/IDCHE.htm を
+    参照してください。
 
 .. class:: ch.forms.CHPhoneNumberField
 
-    A form field that validates input as a Swiss phone number. The correct
-    format is 0XX XXX XX XX. 0XX.XXX.XX.XX and 0XXXXXXXXX validate but are
-    corrected to 0XX XXX XX XX.
+    入力が正しいスイスの電話番号であるか検証するフォームフィールドです。正
+    しい電話番号の形式とは、 0XX XXX XX XX, 0XX.XXX.XX.XX, および
+    0XXXXXXXXX です。番号は 0XX XXX XX XX 形式に正規化されます。
 
 .. class:: ch.forms.CHZipCodeField
 
-    A form field that validates input as a Swiss zip code. Valid codes
-    consist of four digits.
+    入力が正しいスイスのZIPコードであるかフォームフィールドです。正しいコー
+    ドは 4 桁からなります。
 
 .. class:: ch.forms.CHStateSelect
 
-    A ``Select`` widget that uses a list of Swiss states as its choices.
+    スイスの州名を選べる ``Select`` ウィジェットです。
+
+.. _`United Kingdom (uk)`:
 
 United Kingdom (``uk``)
-=======================
+========================
 
 .. class:: uk.forms.UKPostcodeField
 
-    A form field that validates input as a UK postcode. The regular
-    expression used is sourced from the schema for British Standard BS7666
-    address types at http://www.govtalk.gov.uk/gdsc/schemas/bs7666-v2-0.xsd.
+    入力が正しいイギリスの郵便番号であるか検証するフォームフィールドです。
+    検証に使われている正規表現は、
+    http://www.govtalk.gov.uk/gdsc/schemas/bs7666-v2-0.xsd 
+    で定義されている British Standard BS7666 address types をもとにしていま
+    す。
 
 .. class:: uk.forms.UKCountySelect
 
-    A ``Select`` widget that uses a list of UK counties/regions as its choices.
+    イギリスの地域名を選べる ``Select`` ウィジェットです。
 
 .. class:: uk.forms.UKNationSelect
 
-    A ``Select`` widget that uses a list of UK nations as its choices.
+    イギリスの地方名を選べる ``Select`` ウィジェットです。
+
+.. _`United States of America (us)`:
 
 United States of America (``us``)
-=================================
+================================== 
 
 .. class:: us.forms.USPhoneNumberField
 
-    A form field that validates input as a U.S. phone number.
+    入力が正しいアメリカの電話番号であるか検証するフォームフィールドです。
 
 .. class:: us.forms.USSocialSecurityNumberField
 
-    A form field that validates input as a U.S. Social Security Number (SSN).
-    A valid SSN must obey the following rules:
+    入力がアメリカの社会保障番号 (SSN) であるか検証するフォームフィールドで
+    す。正しい SSN 番号は、以下の規則に従います: 
 
-        * Format of XXX-XX-XXXX
-        * No group of digits consisting entirely of zeroes
-        * Leading group of digits cannot be 666
-        * Number not in promotional block 987-65-4320 through 987-65-4329
-        * Number not one known to be invalid due to widespread promotional
-          use or distribution (e.g., the Woolworth's number or the 1962
-          promotional number)
+        * XXX-XX-XXXX 形式であること
+        * 0 ばかりでできた桁グループがないこと
+        * 先頭の桁グループが 666 でないこと
+        * 広報に使われるブロック (987-65-4320 から 987-65-4329) の範囲内で
+          ないこと
+        * 広報で使われているために、明らかに無効であると知られている番号
+          (Woolworth 番号、または 1962 promotional number) でないこと
 
 .. class:: us.forms.USStateField
 
-    A form field that validates input as a U.S. state name or abbreviation. It
-    normalizes the input to the standard two-letter postal service abbreviation
-    for the given state.
+    入力がアメリカの州名または州名略号であるか検証するフォームフィールドで
+    す。入力を郵便向けの標準 2 文字州名略号に正規化します。
 
 .. class:: us.forms.USZipCodeField
 
-    A form field that validates input as a U.S. ZIP code. Valid formats are
-    XXXXX or XXXXX-XXXX.
+    入力が正しいアメリカの郵便番号であるか検証するフォームフィールドです。
+    XXXXX または XXXXX-XXXX 形式の番号が有効です。
 
 .. class:: us.forms.USStateSelect
 
-    A form ``Select`` widget that uses a list of U.S. states/territories as its
-    choices.
+    アメリカの州や領を選べる ``Select`` ウィジェットです。
 
 .. class:: us.models.PhoneNumberField
 
-    A :class:`CharField` that checks that the value is a valid U.S.A.-style phone
-    number (in the format ``XXX-XXX-XXXX``).
+    入力がアメリカ合州国の電話番号形式 (``XXX-XXX-XXXX``) に従っているかを
+    チェックする :class:`CharField` です。
 
 .. class:: us.models.USStateField
 
-    A model field that forms represent as a ``forms.USStateField`` field and
-    stores the two-letter U.S. state abbreviation in the database.
+    アメリカ合州国の州名を二文字の略号でデータベースに保存するモデルフィー
+    ルドです。 ``forms.USStateField`` モデルフィールドとして表示されます。
+
