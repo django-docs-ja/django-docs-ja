@@ -1,96 +1,111 @@
 .. _topics-i18n:
 
+======
+国際化
+======
+
+:revision-up-to: 8961 (1.0)
+
+Django はコードとテンプレートの双方で国際化をフルサポートしています。このド
+キュメントでは国際化の仕組みについて説明します。
+
+.. _Overview:
+
+概要
+====
+
+国際化のゴールは、一つの Web アプリケーションが複数の言語でコンテンツや機能
+を提供できるようにすることにあります。
+
+Django 開発者は、最小限のフックを Python コードとテンプレートに埋め込むこと
+で国際化というゴールにたどり着けます。これらのフックは
+**翻訳文字列 (translation string)** と呼ばれています。翻訳文字列は Django
+に「このテキストについてエンドユーザの言語に合ったテキストがあるなら、テキ
+ストを翻訳して出力せよ」と指示します。　
+
+Django はこれらのフックに注意して、ユーザの言語設定に合わせて Web アプリケー
+ションをオンザフライで翻訳します。
+
+Django が行っているのは、本質的には以下の二つの作業です:
+
+    * 開発者やテンプレートの作者に、アプリケーションのどの部分を翻訳できるか
+      指定させます。
+    * 指定したフックを使って、特定のユーザの言語設定に従って Web アプリケー
+      ションを翻訳します。
+
+.. _If you don't need internationalization in your app:
+
+国際化が必要ない場合
 ====================
-Internationalization
-====================
 
-Django has full support for internationalization of text in code and templates.
-Here's how it works.
+Django の国際化フックはデフォルトで有効になっているので、フレームワークの一
+部で i18n がらみのわずかなオーバヘッドが生じています。国際化の機能を使いた
+くなければ、設定ファイルで :setting:`USE_I18N = False <USE_I18N>` を設定し
+てください。 :setting:`USE_I18N` を ``False`` に設定すると、 Django は国際
+化機構をロードしないよう最適化を行います。
 
-Overview
-========
+この場合、 :setting:`TEMPLATE_CONTEXT_PROCESSORS` からも
+``'django.core.context_processors.i18n'`` を外すことになるでしょう。
 
-The goal of internationalization is to allow a single Web application to offer
-its content and functionality in multiple languages.
+.. _`If you do need internationalization: three steps`:
 
-You, the Django developer, can accomplish this goal by adding a minimal amount
-of hooks to your Python code and templates. These hooks are called
-**translation strings**. They tell Django: "This text should be translated into
-the end user's language, if a translation for this text is available in that
-language."
+国際化が必要な場合: 3 つのステップ
+===================================
 
-Django takes care of using these hooks to translate Web apps, on the fly,
-according to users' language preferences.
+    1. 翻訳対象文字列を Python コードやテンプレートに埋め込みます。
+    2. サポートしたい言語について、翻訳対象文字列に対応する翻訳を行います。
+    3. Django の設定でロケールミドルウェアを有効化します。
 
-Essentially, Django does two things:
+.. admonition:: 舞台裏では
 
-    * It lets developers and template authors specify which parts of their apps
-      should be translatable.
-    * It uses these hooks to translate Web apps for particular users according
-      to their language preferences.
+    Django の翻訳機構は、 Python に付属の ``gettext`` モジュールを使ってい
+    ます。
 
-If you don't need internationalization in your app
-==================================================
 
-Django's internationalization hooks are on by default, and that means there's a
-bit of i18n-related overhead in certain places of the framework. If you don't
-use internationalization, you should take the two seconds to set
-:setting:`USE_I18N = False <USE_I18N>` in your settings file. If
-:setting:`USE_I18N` is set to ``False``, then Django will make some
-optimizations so as not to load the internationalization machinery.
+.. _`1. How to specify translation strings`:
 
-You'll probably also want to remove ``'django.core.context_processors.i18n'``
-from your ``TEMPLATE_CONTEXT_PROCESSORS`` setting.
+1. 翻訳文字列の指定方法
+========================
 
-If you do need internationalization: three steps
-================================================
+翻訳文字列 (translation string) は、「このテキストを翻訳対象にする」という
+指定を行います。翻訳文字列は Python コードにもテンプレートにも現れます。翻
+訳可能な文字列をマークしておくのは作者の役割であり、翻訳システムはマークさ
+れた文字列しか翻訳対象にしません。
 
-    1. Embed translation strings in your Python code and templates.
-    2. Get translations for those strings, in whichever languages you want to
-       support.
-    3. Activate the locale middleware in your Django settings.
+.. _In Python code:
 
-.. admonition:: Behind the scenes
+Python コード内での指定
+-----------------------
 
-    Django's translation machinery uses the standard ``gettext`` module that
-    comes with Python.
+.. _Standard translation:
 
-1. How to specify translation strings
-=====================================
+標準的な翻訳
+~~~~~~~~~~~~
 
-Translation strings specify "This text should be translated." These strings can
-appear in your Python code and templates. It's your responsibility to mark
-translatable strings; the system can only translate strings it knows about.
-
-In Python code
---------------
-
-Standard translation
-~~~~~~~~~~~~~~~~~~~~
-
-Specify a translation string by using the function ``ugettext()``. It's
-convention to import this as a shorter alias, ``_``, to save typing.
+翻訳対象文字列を関数 ``ugettext()`` で指定します。タイプ数を減らすため、
+``ugettext()`` を ``_`` という別名で import するのが慣習的なやり方です。
 
 .. note::
-    Python's standard library ``gettext`` module installs ``_()`` into the
-    global namespace, as an alias for ``gettext()``. In Django, we have chosen
-    not to follow this practice, for a couple of reasons:
+    Python の標準ライブラリ ``gettext`` は、グローバルの名前空間に ``_()``
+    という名前で ``gettext()`` をインストールします。 Django ではこの方法に
+    従っていませんが、それは以下の理由からです:
 
-      1. For international character set (Unicode) support, ``ugettext()`` is
-         more useful than ``gettext()``. Sometimes, you should be using
-         ``ugettext_lazy()`` as the default translation method for a particular
-         file. Without ``_()`` in the global namespace, the developer has to
-         think about which is the most appropriate translation function.
+      1. 国際化文字セット (Unicode) のサポート下では、 ``gettext()`` よりも
+         ``ugettext()`` の方が便利だからです。また、ファイルによっては
+         ``ugettext_lazy()`` をデフォルトの翻訳用メソッドに使った方がよい
+         場合もあります。グローバル名前空間に ``_()`` がなければ、開発者に
+         場合に応じて適切な翻訳用メソッドを選ぶ自由を与えられます。
 
-      2. The underscore character (``_``) is used to represent "the previous
-         result" in Python's interactive shell and doctest tests. Installing a
-         global ``_()`` function causes interference. Explicitly importing
-         ``ugettext()`` as ``_()`` avoids this problem.
+      2. アンダースコア文字は、 Python の対話シェルや doctest で書かれたテ
+         スト中では「直前の式の値」を表します。そのため、グローバル名前空間
+         に ``_()`` をインストールすると、干渉して問題を引き起こします。
+         ``ugettext()`` を ``_()`` という名前で明示的に  import すれば、こ
+         の問題を回避できます。
 
 .. highlightlang:: python
 
-In this example, the text ``"Welcome to my site."`` is marked as a translation
-string::
+下の例では、 ``"Welcome to my site."`` というテキストを翻訳文字列としてマー
+クします::
 
     from django.utils.translation import ugettext as _
 
@@ -98,96 +113,101 @@ string::
         output = _("Welcome to my site.")
         return HttpResponse(output)
 
-Obviously, you could code this without using the alias. This example is
-identical to the previous one::
+もちろん、 ``ugettext()`` に別名を付けなくても使えます。従って、下の例は上
+の例と全く同じになります::
 
     from django.utils.translation import ugettext
-
     def my_view(request):
         output = ugettext("Welcome to my site.")
         return HttpResponse(output)
 
-Translation works on computed values. This example is identical to the previous
-two::
+翻訳は計算済みの値に対して行われます。従って、下の例も上の 2 例と同じになり
+ます::
 
     def my_view(request):
         words = ['Welcome', 'to', 'my', 'site.']
         output = _(' '.join(words))
         return HttpResponse(output)
 
-Translation works on variables. Again, here's an identical example::
+翻訳は変数に対しても使えます。従って、下の例もまた、上の例と同じになります::
 
     def my_view(request):
         sentence = 'Welcome to my site.'
         output = _(sentence)
         return HttpResponse(output)
 
-(The caveat with using variables or computed values, as in the previous two
-examples, is that Django's translation-string-detecting utility,
-``django-admin.py makemessages``, won't be able to find these strings. More on
-``makemessages`` later.)
+(上の 2 つの例のように変数や計算済みの値を使う場合、 Django の翻訳文字列検
+出ユーティリティ ``django-admin.py makemessages`` はこれらの文字列を検出で
+きないので注意しておきましょう。詳しくは後の ``makemessages`` の節で説明し
+ます。)
 
-The strings you pass to ``_()`` or ``ugettext()`` can take placeholders,
-specified with Python's standard named-string interpolation syntax. Example::
+
+``_()`` や ``ugettext()`` に渡す文字列には、 Pyton の標準の名前付き補完構文
+によるプレースホルダを使えます。例えば::
 
     def my_view(request, m, d):
         output = _('Today is %(month)s, %s(day)s.') % {'month': m, 'day': d}
         return HttpResponse(output)
 
-This technique lets language-specific translations reorder the placeholder
-text. For example, an English translation may be ``"Today is November, 26."``,
-while a Spanish translation may be ``"Hoy es 26 de Noviembre."`` -- with the
-placeholders (the month and the day) with their positions swapped.
+このテクニックを使うと、言語ごとの翻訳でプレースホルダを並べ変えできるよう
+になり、例えば、英語の翻訳文が ``"Today is Nobember, 26."`` であるのに対し
+て、スペイン語では ``"Hoy es 26 de Noviembre."`` であるように、プレースホル
+ダの位置を翻訳文の前後で移動できます。
 
-For this reason, you should use named-string interpolation (e.g., ``%(day)s``)
-instead of positional interpolation (e.g., ``%s`` or ``%d``) whenever you
-have more than a single parameter. If you used positional interpolation,
-translations wouldn't be able to reorder placeholder text.
+この理由から、引数が複数ある場合には、固定引数を使った補完 (``%s`` や
+``%d``) ではなく、名前付きの補完 (``%(day)s``) を使ってください。固定引数
+による補完を使った場合、プレースホルダの順番によってうまく翻訳できない場合
+があります。
 
-Marking strings as no-op
-~~~~~~~~~~~~~~~~~~~~~~~~
 
-Use the function ``django.utils.translation.ugettext_noop()`` to mark a string
-as a translation string without translating it. The string is later translated
-from a variable.
+.. _Marking strings as no-op:
 
-Use this if you have constant strings that should be stored in the source
-language because they are exchanged over systems or users -- such as strings in
-a database -- but should be translated at the last possible point in time, such
-as when the string is presented to the user.
+すぐには翻訳しない文字列をマークする
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+すぐには翻訳しない文字列のマークには 
+``django.utils.translation.ugettext_noop()`` を使って下さい。マークした文字
+列は後で変数として使われるときに翻訳されます。
+
+この関数は、ソース言語の中に定数として文字列を置いておきたい場合に使います。
+というのも、定数は、例えばデータベース中の文字列のように、システムやユーザ
+間で共通な値である一方で、ユーザにメッセージとして提示する最後の段階で翻訳
+せねばならない場合があるからです。
 
 .. _lazy-translations:
+.. _Lazy translation:
 
-Lazy translation
+翻訳を遅延させる
 ~~~~~~~~~~~~~~~~
 
-Use the function ``django.utils.translation.ugettext_lazy()`` to translate
-strings lazily -- when the value is accessed rather than when the
-``ugettext_lazy()`` function is called.
+文字列の翻訳を遅延 (lazy) させるには、
+``django.utils.translation.ugettext_lazy()`` を使います。翻訳を遅延させると、
+``ugettext_lazy()`` を呼び出すまで翻訳文字列の値にアクセスしません。
 
-For example, to translate a model's ``help_text``, do the following::
+例えば、モデルの ``help_text`` を翻訳する場合に以下のようにします::
 
     from django.utils.translation import ugettext_lazy
 
     class MyThing(models.Model):
         name = models.CharField(help_text=ugettext_lazy('This is the help text'))
 
-In this example, ``ugettext_lazy()`` stores a lazy reference to the string --
-not the actual translation. The translation itself will be done when the string
-is used in a string context, such as template rendering on the Django admin site.
+この例では、  ``ugettext_lazy()`` は実際の翻訳文字列ではなく、文字列への遅延
+参照 (lazy reference) を保存します。翻訳自体は文字列をコンテキストで使った
+時、例えば admin サイトでテンプレートをレンダリングしたときに初めて実行され
+ます。
 
-If you don't like the verbose name ``ugettext_lazy``, you can just alias it as
-``_`` (underscore), like so::
+``ugettext_lazy`` という名前が冗長で嫌なら、以下のようにして ``_`` (アンダー
+スコア) にエイリアスできます::
 
     from django.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
         name = models.CharField(help_text=_('This is the help text'))
 
-Always use lazy translations in :ref:`Django models <topics-db-models>`. It's a
-good idea to add translations for the field names and table names, too. This
-means writing explicit ``verbose_name`` and ``verbose_name_plural`` options in
-the ``Meta`` class, though::
+:ref:`Django モデル <topics-db-models>` の中では、常に遅延翻訳を使うように
+してください。フィールド名やテーブル名に翻訳をつけておくのも良いアイデアで
+す。とはいえ、これは ``Meta`` クラスで明示的に ``verbose_name`` や
+``verbose_name_plural`` オプションを指定するという作業です::
 
     from django.utils.translation import ugettext_lazy as _
 
@@ -197,11 +217,13 @@ the ``Meta`` class, though::
             verbose_name = _('my thing')
             verbose_name_plural = _('mythings')
 
-Pluralization
+.. _Pluralization:
+
+複数形化
 ~~~~~~~~~~~~~
 
-Use the function ``django.utils.translation.ungettext()`` to specify pluralized
-messages. Example::
+複数形のメッセージを指定するには ``django.utils.translation.ungettext()`` を
+使います。例えば::
 
     from django.utils.translation import ungettext
     def hello_world(request, count):
@@ -210,55 +232,58 @@ messages. Example::
         }
         return HttpResponse(page)
 
-``ungettext`` takes three arguments: the singular translation string, the plural
-translation string and the number of objects (which is passed to the
-translation languages as the ``count`` variable).
+``ungettext`` は、単数形の翻訳文字列、複数形の翻訳文字列、そしてオブジェクト
+の数 (翻訳言語に ``count`` という変数で渡されます) という 3 つの引数をとり
+ます。
 
-In template code
-----------------
+.. _In template code:
+
+テンプレート内での翻訳
+----------------------
 
 .. highlightlang:: html+django
 
-Translations in :ref:`Django templates <topics-templates>` uses two template
-tags and a slightly different syntax than in Python code. To give your template
-access to these tags, put ``{% load i18n %}`` toward the top of your template.
+:ref:`Django テンプレート <topics-templates>` 中の翻訳は、二つのテンプレー
+トタグを使ってPython コードとは少し違った方法で行います。テンプレートで翻訳
+用のタグを使えるようにするには、テンプレートの上の方に ``{% load i18n %}``
+を入れておきます。
 
-The ``{% trans %}`` template tag translates either a constant string
-(enclosed in single or double quotes) or variable content::
+テンプレートタグ ``{% trans %}`` は定数の文字列 (シングルクオートまたはダブ
+ルクオートで囲まれた文字列) や変数を翻訳します::
 
     <title>{% trans "This is the title." %}</title>
     <title>{% trans myvar %}</title>
 
-If the ``noop`` option is present, variable lookup still takes place but the
-translation is skipped. This is useful when "stubbing out" content that will
-require translation in the future::
+``noop`` オプションを指定すると、値の参照は行われますが、翻訳はしません。
+``noop`` は、将来翻訳が必要なコンテンツを「スタブ」するのに便利です。
 
     <title>{% trans "myvar" noop %}</title>
 
-It's not possible to mix a template variable inside a string within ``{% trans
-%}``. If your translations require strings with variables (placeholders), use
-``{% blocktrans %}``::
+``{% trans %}`` の中では定数文字列とテンプレート変数を同時に扱えません。翻
+訳中で変数 (プレースホルダ) を使いたい場合には、以下の例のように 
+``{% blocktrans %}`` を使います::
 
     {% blocktrans %}This string will have {{ value }} inside.{% endblocktrans %}
 
-To translate a template expression -- say, using template filters -- you need
-to bind the expression to a local variable for use within the translation
-block::
+テンプレート式を翻訳したい場合、すなわちテンプレートフィルタの出力を翻訳し
+たい場合には、式をローカルな変数にバインドして、翻訳ブロック中で使えるよう
+にせねばなりません::
 
     {% blocktrans with value|filter as myvar %}
     This will have {{ myvar }} inside.
     {% endblocktrans %}
 
-If you need to bind more than one expression inside a ``blocktrans`` tag,
-separate the pieces with ``and``::
+
+``blocktrans`` タグの中で複数個の式を束縛したい場合には、 ``and`` を使って
+分割します::
 
     {% blocktrans with book|title as book_t and author|title as author_t %}
     This is {{ book_t }} by {{ author_t }}
     {% endblocktrans %}
 
-To pluralize, specify both the singular and plural forms with the
-``{% plural %}`` tag, which appears within ``{% blocktrans %}`` and
-``{% endblocktrans %}``. Example::
+
+複数形化するには、 ``{% blocktrans %}`` と ``{% endblocktrans %}`` の間に
+``{% plural %}`` タグで単数形と複数形の両方の形式を記述します::
 
     {% blocktrans count list|length as counter %}
     There is only one {{ name }} object.
@@ -266,71 +291,75 @@ To pluralize, specify both the singular and plural forms with the
     There are {{ counter }} {{ name }} objects.
     {% endblocktrans %}
 
-Internally, all block and inline translations use the appropriate
-``ugettext`` / ``ungettext`` call.
+内部的には、ブロックおよびインラインの翻訳は全て適切な ``ugettext`` /
+``ungettext`` 呼び出しを行います。
 
-Each ``RequestContext`` has access to three translation-specific variables:
+``RequestContext`` は 3 つの翻訳処理固有の変数にアクセスできます:
 
-    * ``LANGUAGES`` is a list of tuples in which the first element is the
-      language code and the second is the language name (translated into the
-      currently active locale).
+    * ``LANGUAGES`` は各言語の言語コードと (現在有効なロケールを使って翻訳
+      した) 言語名からなるタプルでできた言語のリストです。
 
-    * ``LANGUAGE_CODE`` is the current user's preferred language, as a string.
-      Example: ``en-us``. (See "How language preference is discovered", below.)
-      
-    * ``LANGUAGE_BIDI`` is the current locale's direction. If True, it's a
-      right-to-left language, e.g.: Hebrew, Arabic. If False it's a
-      left-to-right language, e.g.: English, French, German etc.
+    * ``LANGUAGE_CODE`` は現在のユーザ設定言語で、文字列です。例: ``en-us``
+      (後述の "言語設定の検出メカニズム" を参照してください)。
 
+    * ``LANGUAGE_BIDI`` は現在の言語の表記方向 (direction) です。 ``True``
+      ならば、ヘブライ語やアラビア語のように右から左に記述する言語を示し、
+      ``False`` なら英語、フランス語、ドイツ語のように左から右に記述する言
+      語を指します。
 
-If you don't use the ``RequestContext`` extension, you can get those values with
-three tags::
+``RequestContext`` 拡張を使わなければ、以下の 3 つのタグを使って値を取得でき
+ます::
 
     {% get_current_language as LANGUAGE_CODE %}
     {% get_available_languages as LANGUAGES %}
     {% get_current_language_bidi as LANGUAGE_BIDI %}
 
-These tags also require a ``{% load i18n %}``.
+これらのタグを使うには ``{% load i18n %}`` が必要です。
 
-Translation hooks are also available within any template block tag that accepts
-constant strings. In those cases, just use ``_()`` syntax to specify a
-translation string::
+翻訳フックは定数文字列を使うテンプレートブロック全てでも利用できます。
+``_()`` 構文を使って翻訳文字列を指定してください。例えば::
 
     {% some_special_tag _("Page not found") value|yesno:_("yes,no") %}
 
-In this case, both the tag and the filter will see the already-translated
-string, so they don't need to be aware of translations.
+このばあい、タグとフィルタの両方は翻訳済みの文字列を扱うことになるので、翻
+訳の有無について気を配る必要がなくなります。
 
 .. note::
-    In this example, the translation infrastructure will be passed the string
-    ``"yes,no"``, not the individual strings ``"yes"`` and ``"no"``. The
-    translated string will need to contain the comma so that the filter
-    parsing code knows how to split up the arguments. For example, a German
-    translator might translate the string ``"yes,no"`` as ``"ja,nein"``
-    (keeping the comma intact).
+    上の例では、翻訳インフラストラクチャには文字列 ``"yes,no"`` が渡されま
+    す。 ``"yes"`` と ``"no"`` の別々の文字列が渡されるわけではありません。
+    フィルタが引数の文字列を正しく分割できるように、翻訳済みの文字列にはカ
+    ンマが入っていなければなりません。例えば、ドイツ語の翻訳は、 (カンマを
+    そのまま残して) ``"yes,no"`` を ``"ja,nein"`` に翻訳せねばなりません。
 
+.. _`Django テンプレート`: ../templates_python/
 .. _Django templates: ../templates_python/
 
-Working with lazy translation objects
--------------------------------------
+
+.. _Working with lazy translation objects:
+
+遅延翻訳オブジェクトを操作する
+--------------------------------
 
 .. highlightlang:: python
 
-Using ``ugettext_lazy()`` and ``ungettext_lazy()`` to mark strings in models
-and utility functions is a common operation. When you're working with these
-objects elsewhere in your code, you should ensure that you don't accidentally
-convert them to strings, because they should be converted as late as possible
-(so that the correct locale is in effect). This necessitates the use of a
-couple of helper functions.
+モデルやユーティリティ関数では、 ``ugettext_lazy()`` や
+``ungettext_lazy()`` を使って文字列をマークすることがよくあります。こうして
+マークした文字列をコードの他の部分で扱うときには、マークしてできた遅延翻訳
+オブジェクトをうっかり文字列に変換してしまわないよう気を付けてください。遅
+延翻訳オブジェクトの変換は (ロケールの影響下に入るように) できるだけ遅くせ
+ねばならないからです。遅延翻訳オブジェクトの変換を遅らせるために、以下の二
+つのヘルパ関数があります。
 
-Joining strings: string_concat()
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _`Joining strings: string_concat()`:
 
-Standard Python string joins (``''.join([...])``) will not work on lists
-containing lazy translation objects. Instead, you can use
-``django.utils.translation.string_concat()``, which creates a lazy object that
-concatenates its contents *and* converts them to strings only when the result
-is included in a string. For example::
+文字列の結合: string_concat()
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+標準の Python 文字列型の join メソッド (``''.join([...])``) は、
+遅延翻訳オブジェクトの入ったリストをうまく扱えません。その代わり、 
+``django.utils.translation.string_concat()`` を使ってください。このメソッド
+は、全ての内容を結合し、 *かつ* 文字列中に値が取り込まれるまで実際に変換を
+行わないような遅延オブジェクトを生成して返します。例えば::
 
     from django.utils.translation import string_concat
     ...
@@ -338,29 +367,32 @@ is included in a string. For example::
     instrument = ugettext_lazy(u'guitar')
     result = string_concat([name, ': ', instrument])
 
-In this case, the lazy translations in ``result`` will only be converted to
-strings when ``result`` itself is used in a string (usually at template
-rendering time).
+上のケースでは、 ``result`` 中の遅延翻訳オブジェクトは、 ``result`` 自体を
+文字列中で使った場合 (テンプレートのレンダリング時など) にしか文字列に変換
+されません。
 
-The allow_lazy() decorator
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _The allow_lazy() decorator:
 
-Django offers many utility functions (particularly in ``django.utils``) that
-take a string as their first argument and do something to that string. These
-functions are used by template filters as well as directly in other code.
+allow_lazy() デコレータ
+~~~~~~~~~~~~~~~~~~~~~~~
 
-If you write your own similar functions and deal with translations, you'll
-face the problem of what to do when the first argument is a lazy translation
-object. You don't want to convert it to a string immediately, because you might
-be using this function outside of a view (and hence the current thread's locale
-setting will not be correct).
+Django はたくさんのユーティリティ関数を (とりわけ ``django.utils`` パッケー
+ジで) 提供しています。これらの関数の多くは文字列を第一引数にとり、文字列に
+対して何らかの処理を行います。関数はテンプレートフィルタ内で使われたり、他
+のコードで直接呼び出されたりしています。
 
-For cases like this, use the ``django.utils.functional.allow_lazy()``
-decorator. It modifies the function so that *if* it's called with a lazy
-translation as the first argument, the function evaluation is delayed until it
-needs to be converted to a string.
+同様の関数を自分で作成し、翻訳文字列を扱おうとした場合、第一引数が遅延翻訳
+オブジェクトの場合に問題に直面することでしょう。この関数はビューの外側 (つ
+まり、現在のスレッドのロケール設定が的確でないかもしれない場所) で使われる
+かもしれないので、関数内で遅延翻訳オブジェクトを文字列に変換したくないはず
+だからです。
 
-For example::
+こうした場合のために、 ``django.utils.functional.allow_lazy()`` デコレータ
+を使ってください。このデコレータで関数をラップすると、関数の第一引数に遅延
+翻訳オブジェクトを渡した場合、関数の評価を文字列に変換する瞬間まで遅延させ
+られます。
+
+例を示しましょう::
 
     from django.utils.functional import allow_lazy
 
@@ -369,213 +401,224 @@ For example::
         ...
     fancy_utility_function = allow_lazy(fancy_utility_function, unicode)
 
-The ``allow_lazy()`` decorator takes, in addition to the function to decorate,
-a number of extra arguments (``*args``) specifying the type(s) that the
-original function can return. Usually, it's enough to include ``unicode`` here
-and ensure that your function returns only Unicode strings.
+``allow_lazy()`` デコレータは関数名に加えて追加の引数 (``*args``) をとりま
+す。この引数には、デコレーション対象の関数の戻り値の型 (複数可) を指定しま
+す。通常は、 ``unicode`` だけを入れておき、関数が必ず Unicode 文字列を返す
+ようにしておけばよいでしょう。
 
-Using this decorator means you can write your function and assume that the
-input is a proper string, then add support for lazy translation objects at the
-end.
+このデコレータを使えば、適切な文字列を入力として受け取る関数を書いておき、
+後で遅延翻訳オブジェクトのサポートを追加できます。
+
 
 .. _how-to-create-language-files:
+.. _`2. How to create language files`:
 
-2. How to create language files
-===============================
+2. 言語ファイルの作成
+======================
 
-Once you've tagged your strings for later translation, you need to write (or
-obtain) the language translations themselves. Here's how that works.
+文字列に翻訳用のタグをつけたら、今度は翻訳文自体を書く (または手に入れる)
+必要があります。ここでは翻訳文を書く方法について示します。
 
-.. admonition:: Locale restrictions
+.. admonition:: ロケールの制約
 
-    Django does not support localizing your application into a locale for
-    which Django itself has not been translated. In this case, it will ignore
-    your translation files. If you were to try this and Django supported it,
-    you would inevitably see a mixture of translated strings (from your
-    application) and English strings (from Django itself). If you want to
-    support a locale for your application that is not already part of
-    Django, you'll need to make at least a minimal translation of the Django
-    core. See the relevant :ref:LocaleMiddleware note`<locale-middleware-notes>`
-    for more details.
+    Django は、 Django 本体に対する翻訳カタログのない言語への地域化をサポー
+    トしていません。ある言語向けの自作のカタログを提供しても、 Django 本体
+    にその言語のサポートがなければ、カタログは無視されます。自作のアプリケー
+    ションに特定の言語のロケールをサポートさせたいのなら、まずは Django の
+    コア部分に対する最小限の翻訳カタログを作成する必要があるでしょう。また、
+    その場合、翻訳されたメッセージ (自作のアプリケーション内のカタログ) と
+    英語のメッセージ (Django 自体の不完全なカタログ) が入り混じった表示になっ
+    てしまうでしょう。くわしくは 
+    :ref:`LocaleMiddleware の注意事項 <locale-middleware-notes>` を参照して
+    ください。
 
-Message files
--------------
+.. _Message files:
 
-The first step is to create a **message file** for a new language. A message
-file is a plain-text file, representing a single language, that contains all
-available translation strings and how they should be represented in the given
-language. Message files have a ``.po`` file extension.
+メッセージファイル
+------------------
 
-Django comes with a tool, ``django-admin.py makemessages``, that automates the
-creation and upkeep of these files.
+最初のステップは、新たに追加する言語用の **メッセージファイル** の作成です。
+メッセージファイルは平文テキストファイルで、言語ごとに作成され、翻訳文字列
+全てと、言語ごとの対応する表現が収められています。メッセージファイルの拡張
+子は ``.po`` です。
 
-.. admonition:: A note to Django veterans
+Django には ``django-admin.py makemessages`` というツールが付属しています。
+このツールはメッセージファイルの作成や維持を自動化します。
 
-    The old tool ``bin/make-messages.py`` has been moved to the command
-    ``django-admin.py makemessages`` to provide consistency throughout Django.
+.. admonition:: ベテラン Django ユーザへの注意
 
-To create or update a message file, run this command::
+    以前からある ``bin/make-messages.py`` ツールの機能は、 Django の操作に
+    一貫性をもたせるために、 ``django-admin.py makemessages`` に移動しまし
+    た。
+
+メッセージファイルの作成や更新を行うには、以下のようにコマンドを実行します::
 
     django-admin.py makemessages -l de
 
-...where ``de`` is the language code for the message file you want to create.
-The language code, in this case, is in locale format. For example, it's
-``pt_BR`` for Brazilian Portuguese and ``de_AT`` for Austrian German.
+ここで、 ``de`` は作成したいメッセージファイルの言語コードです。言語コード
+はロケール表示の形式にします。例えば、ブラジル系ポルトガル語の場合には
+``pt_BR`` で、オーストリアドイツは ``de_AT`` です。
 
-The script should be run from one of three places:
+スクリプトは以下の 3 種類の場所のいずれかで実行します:
 
-    * The root directory of your Django project.
-    * The root directory of your Django app.
-    * The root ``django`` directory (not a Subversion checkout, but the one
-      that is linked-to via ``$PYTHONPATH`` or is located somewhere on that
-      path). This is only relevant when you are creating a translation for
-      Django itself, see :ref:`contributing-translations`.
+    * Django プロジェクトのルートディレクトリ。
+    * Django アプリケーションのルートディレクトリ。
+    * ``django`` のルートディレクトリ (Subversion からチェックアウトしたと
+      きのルートではなく、 ``$PYTHONPATH`` にリンクされているか、
+      ``$PYTHONPATH`` 上のどこかにあるディレクトリです)。この場所で実行する
+      のは、 Django 自体の翻訳カタログを生成するときだけです。
+      :ref:`contributing-translations` を参照してください。
 
-Th script runs over your project source tree or your application source tree and
-pulls out all strings marked for translation. It creates (or updates) a message
-file in the directory ``locale/LANG/LC_MESSAGES``. In the ``de`` example, the
-file will be ``locale/de/LC_MESSAGES/django.po``.
+スクリプトはプロジェクトのソースツリーやアプリケーションのソースツリーを走
+査して、翻訳用にマークされた全ての文字列を取り出します。スクリプトは
+``/locale/LANG/LC_MESSAGES`` 下にメッセージファイルを作成 (もしくは更新) し
+ます。 ``de`` の例では、ファイルは ``/locale/de/LC_MESSAGES/django.po`` で
+す。
 
-By default ``django-admin.py makemessages`` examines every file that has the
-``.html`` file extension. In case you want to override that default, use the
-``--extension`` or ``-e`` option to specify the file extensions to examine::
+
+デフォルトの設定では、 ``django-admin.py makemessages`` は拡張子 ``.html``
+のファイルも検索します。デフォルトの設定をオーバライドしたければ、
+``--extension`` または ``-e`` オプションを使って、拡張子を指定してください::
 
     django-admin.py makemessages -l de -e txt
 
-Separate multiple extensions with commas and/or use ``-e`` or ``--extension``
-multiple times::
+複数の拡張子を扱いたいのなら、カンマで区切るか、 ``-e`` や ``--extension``
+を複数回指定します::
 
     django-admin.py makemessages -l=de -e=html,txt -e xml
 
-When `creating JavaScript translation catalogs`_ you need to use the special
-'djangojs' domain, **not** ``-e js``.
+`JavaScript の翻訳カタログ`_ を生成したいのなら、 ``-e js`` **ではなく**
+'djangojs' ドメインを使ってください。
 
 .. _create a JavaScript translation catalog: `Creating JavaScript translation catalogs`_
+.. _`JavaScript の翻訳カタログ: `create a JavaScript translation catalog`_
 
-.. admonition:: No gettext?
+.. admonition:: gettext がなかったら?
 
-    If you don't have the ``gettext`` utilities installed, ``django-admin.py
-    makemessages`` will create empty files. If that's the case, either install
-    the ``gettext`` utilities or just copy the English message file
-    (``locale/en/LC_MESSAGES/django.po``) if available and use it as a starting
-    point; it's just an empty translation file.
+    ``gettext`` ユーティリティをインストールしていない場合、
+    ``django-admin.py makemessages`` は空のファイルを作成します。その場合、
+    ``gettext`` ユーティリティをインストールするか、英語用の空のメッセージ
+    ファイル (``locale/en/LC_MESSAGES/django.po``) をコピーして使って下さい。
 
-.. admonition:: Working on Windows?
+.. admonition:: Windows で動かしたいのですが?
+ 
+   Windows を使っていて、 ``django-admin compilemessages`` を動作させるため
+   に GNU gettext ユーティリティをインストールたいのなら、
+   `gettext on Windows`_ を参照してください。
 
-   If you're using Windows and need to install the GNU gettext utilities so
-   ``django-admin makemessages`` works see `gettext on Windows`_ for more
-   information.
+``.po`` ファイルは素直な形式で書かれています。 ``.po`` ファイルには翻訳メン
+テナのコンタクト情報のようなわずかなメタデータが入っています。それ以外の大
+部分は **メッセージ** のリストです。メッセージは翻訳文字列と特定の言語用の
+実際の翻訳テキストです。
 
-The format of ``.po`` files is straightforward. Each ``.po`` file contains a
-small bit of metadata, such as the translation maintainer's contact
-information, but the bulk of the file is a list of **messages** -- simple
-mappings between translation strings and the actual translated text for the
-particular language.
-
-For example, if your Django app contained a translation string for the text
-``"Welcome to my site."``, like so::
+例えば、 Django アプリケーションに ``"Welcome to my site."`` というテキスト
+の翻訳文字列が以下のように入っていたとします::
 
     _("Welcome to my site.")
 
-...then ``django-admin.py makemessages`` will have created a ``.po`` file
-containing the following snippet -- a message::
+``django-admin.py makemessages`` を実行すると、以下のようなコード断片を含む
+``.po`` ファイルを作成するはずです::
 
     #: path/to/python/module.py:23
     msgid "Welcome to my site."
     msgstr ""
 
-A quick explanation:
+上の内容を簡単に説明しましょう:
 
-    * ``msgid`` is the translation string, which appears in the source. Don't
-      change it.
-    * ``msgstr`` is where you put the language-specific translation. It starts
-      out empty, so it's your responsibility to change it. Make sure you keep
-      the quotes around your translation.
-    * As a convenience, each message includes, in the form of a comment line
-      prefixed with ``#`` and locted above the ``msgid`` line, the filename and
-      line number from which the translation string was gleaned.
+    * ``msgid`` は翻訳文字列で、ソースコードに書かれていたものです。変更し
+      てはなりません。
+    * ``msgstr`` には各言語の翻訳を入れます。最初は空になっており、変更する
+      のはユーザの責任です。翻訳文字列の周りにクオートを忘れないように注意
+      してください。
+    * 便宜上、各メッセージには該当する翻訳文字列のあったファイル名と行番号
+      が ``msgid`` 行の上の ``#`` ではじまる行に入っています。
 
-Long messages are a special case. There, the first string directly after the
-``msgstr`` (or ``msgid``) is an empty string. Then the content itself will be
-written over the next few lines as one string per line. Those strings are
-directly concatenated. Don't forget trailing spaces within the strings;
-otherwise, they'll be tacked together without whitespace!
+長いメッセージは特別なケースとして扱います。 ``msgstr`` (または ``msgid``)
+の直後の文字列が空文字列の場合、コンテンツ自体はその次の複数行にわたって書
+かれているものとみなします。これらの文字列は直接結合されるので、文字列の中
+間では末尾にスペースを忘れないようにしましょう。さもないと、空白なしで文字
+列がくっついてしまいますよ!
 
-.. admonition:: Mind your charset
+.. admonition:: 文字コードセットに注意
 
-    When creating a PO file with your favorite text editor, first edit
-    the charset line (search for ``"CHARSET"``) and set it to the charset
-    you'll be using to edit the content. Due to the way the ``gettext`` tools
-    work internally and because we want to allow non-ASCII source strings in
-    Django's core and your applications, you **must** use UTF-8 as the encoding
-    for your PO file. This means that everybody will be using the same
-    encoding, which is important when Django processes the PO files.
+    PO ファイルをテキストエディタで作成するときには、文字コードセット
+    の行 (``"CHARSET"`` を探して下さい) をまず編集して、これから編集に使う
+    文字セットにしてください。 ``gettext`` ツールの内部動作の仕組み上、また、
+    Django のコア部分やアプリケーションで非 ASCII のソース文字列を扱えるよ
+    うにするために、 PO ファイルのエンコーディングは必ず UTF-8 にしてくださ
+    い。
 
-To reexamine all source code and templates for new translation strings and
-update all message files for **all** languages, run this::
+全てのソースコードとテンプレートを新たな翻訳文字列でためし、 **全ての** 言
+語用にメッセージファイルを更新するには、以下のようにします::
 
     django-admin.py makemessages -a
 
-Compiling message files
------------------------
+.. _Compiling message files:
 
-After you create your message file -- and each time you make changes to it --
-you'll need to compile it into a more efficient form, for use by ``gettext``.
-Do this with the ``django-admin.py compilemessages`` utility.
+メッセージファイルのコンパイル
+------------------------------
 
-This tool runs over all available ``.po`` files and creates ``.mo`` files, which
-are binary files optimized for use by ``gettext``. In the same directory from
-which you ran ``django-admin.py makemessages``, run ``django-admin.py
-compilemessages`` like this::
+メッセージファイルを作成して、変更し終えたら ``gettext`` を使ってメッセージ
+ファイルをより効率的な形式にコンパイルします。作業は
+``django-admin.py makemessages`` ユーティリティで行いましょう。
+
+このツールは全ての ``.po`` ファイルをコンパイルして ``.mo`` ファイルを作成
+します。 ``.mo`` ファイルはバイナリファイルで、 ``gettext`` で使うために最
+適化されています。 ``django-admin.py makemessages`` を実行したのと同じディ
+レクトリで、以下のように ``django-admin.py compilemessages`` を実行してくだ
+さい::
 
    django-admin.py compilemessages
 
-That's it. Your translations are ready for use.
+これで終わりです。もう翻訳を使えるようになっているはずです。
 
-.. admonition:: A note to Django veterans
+.. admonition:: ベテラン Django ユーザへの注意
 
-    The old tool ``bin/compile-messages.py`` has been moved to the command
-    ``django-admin.py compilemessages`` to provide consistency throughout
-    Django.
+    以前からある ``bin/compile-messages.py`` ツールの機能は、 Django の操作
+    に一貫性をもたせるために、 ``django-admin.py compilemessages`` に移動し
+    ました。
 
-.. admonition:: Working on Windows?
+.. admonition:: Windows で動かしたいのですが?
+ 
+   Windows を使っていて、 ``django-admin compilemessages`` を動作させるため
+   に GNU gettext ユーティリティをインストールたいのなら、
+   `gettext on Windows`_ を参照してください。
 
-   If you're using Windows and need to install the GNU gettext utilities so
-   ``django-admin compilemessages`` works see `gettext on Windows`_ for more
-   information.
+.. _`3. How Django discovers language preference`:
 
-3. How Django discovers language preference
-===========================================
+3. 言語設定の検出メカニズム
+============================
 
-Once you've prepared your translations -- or, if you just want to use the
-translations that come with Django -- you'll just need to activate translation
-for your app.
+翻訳の準備を完了した、あるいは Django 付属の翻訳を使いたいだけなら、あとは
+アプリケーションで翻訳を有効にするだけです。
 
-Behind the scenes, Django has a very flexible model of deciding which language
-should be used -- installation-wide, for a particular user, or both.
+背後では、 Django はユーザの使用言語を決めるモデルを備えています。このモデ
+ルは柔軟で、インストール全体、あるいは特定のユーザ、またはその両方に対して
+使用言語を決定できます。
 
-To set an installation-wide language preference, set :setting:`LANGUAGE_CODE`.
-Django uses this language as the default translation -- the final attempt if no
-other translator finds a translation.
+インストール全体での使用言語を設定するには、 :setting:`LANGUAGE_CODE` を設
+定します。 Django この設定をデフォルトの翻訳言語、すなわち他の適切な翻訳が
+ない場合に試みる言語に設定します。
 
-If all you want to do is run Django with your native language, and a language
-file is available for your language, all you need to do is set
-``LANGUAGE_CODE``.
+Django をネイティブの言語で動かしたいだけで、かつ自分の言語に対する言語ファ
+イルをすでに準備しているのなら、 ``LANGUAGE_CODE`` を設定するだけで済みます。
 
-If you want to let each individual user specify which language he or she
-prefers, use ``LocaleMiddleware``. ``LocaleMiddleware`` enables language
-selection based on data from the request. It customizes content for each user.
+個々のユーザが自分の使いたい言語を選択できるようにするには
+``LocaleMiddleware`` を使ってください。 ``LocaleMiddleware`` は、リクエスト
+に埋め込まれたデータに基づいた言語の選択を可能にし、ユーザごとにコンテンツ
+をカスタマイズします。
 
-To use ``LocaleMiddleware``, add ``'django.middleware.locale.LocaleMiddleware'``
-to your ``MIDDLEWARE_CLASSES`` setting. Because middleware order matters, you
-should follow these guidelines:
+``LocaleMiddleware`` を使うには、 ``MIDDLEWARE_CLASSES`` 設定に
+``'django.middleware.locale.LocaleMiddleware'`` を追加します。ミドルウェア
+の順番は重要で、以下のガイドラインに従って下さい:
 
-    * Make sure it's one of the first middlewares installed.
-    * It should come after ``SessionMiddleware``, because ``LocaleMiddleware``
-      makes use of session data.
-    * If you use ``CacheMiddleware``, put ``LocaleMiddleware`` after it.
+    * まず、インストール済みのミドルウェアの先頭にくるようにしてください。
+    * ``LocaleMiddleware`` はセッションを使うので、 ``SessionMiddleware``
+      の後ろに配置してください。
+    * ``CacheMiddleware`` を使っているなら、その後ろに ``LocaleMiddleware``
+      を配置してください。
 
-For example, your ``MIDDLEWARE_CLASSES`` might look like this::
+例えば、 ``MIDDLEWARE_CLASSES`` は以下のようになります::
 
     MIDDLEWARE_CLASSES = (
        'django.contrib.sessions.middleware.SessionMiddleware',
@@ -583,70 +626,69 @@ For example, your ``MIDDLEWARE_CLASSES`` might look like this::
        'django.middleware.common.CommonMiddleware',
     )
 
-(For more on middleware, see the :ref:`middleware documentation
-<topics-http-middleware>`.)
+(ミドルウェアの詳細は :ref:`ミドルウェアのドキュメント <topics-http-middleware>`
+を参照してください。)
 
-``LocaleMiddleware`` tries to determine the user's language preference by
-following this algorithm:
+``LocaleMiddleware`` はユーザの言語設定を以下のようなアルゴリズムで決定しよ
+うと試みます:
 
-    * First, it looks for a ``django_language`` key in the current user's
-      session.
-    
-    * Failing that, it looks for a cookie.
-    
+    * まず、現在のユーザのセッションに ``django_language`` キーがないか探し
+      ます。
+
+    * なければ、クッキーを探します。
+
       .. versionchanged:: 1.0
-    
-      In Django version 0.96 and before, the cookie's name is hard-coded to
-      ``django_language``. In Django 1,0, The cookie name is set by the
-      ``LANGUAGE_COOKIE_NAME`` setting. (The default name is
-      ``django_language``.)
-    
-    * Failing that, it looks at the ``Accept-Language`` HTTP header. This
-      header is sent by your browser and tells the server which language(s) you
-      prefer, in order by priority. Django tries each language in the header
-      until it finds one with available translations.
-    
-    * Failing that, it uses the global ``LANGUAGE_CODE`` setting.
+
+      バージョン 0.96 以前の Djangoでは、クッキーの名前は
+      ``django_language`` にハードコードされていました。 1.0 では、クッキー
+      の名前を :setting:`LANGUAGE_COOKIE` で設定します。(クッキーのデフォル
+      ト名は ``django_language`` です。)
+
+    * なければ、 ``Accept-Language`` HTTP ヘッダを探します。このヘッダはブ
+      ラウザから送信され、サーバに対して順位つきで言語設定を知らせてきます。
+      Djang はこの設定を順に調べ、利用可能な翻訳のある言語を探します。
+
+    * なければ、グローバルに設定された ``LANGUAGE_CODE`` の設定を使います。
 
 .. _locale-middleware-notes:
 
-Notes:
+注意:
 
-    * In each of these places, the language preference is expected to be in the
-      standard language format, as a string. For example, Brazilian Portuguese
-      is ``pt-br``.
-    
-    * If a base language is available but the sublanguage specified is not,
-      Django uses the base language. For example, if a user specifies ``de-at``
-      (Austrian German) but Django only has ``de`` available, Django uses
-      ``de``.
-    
-    * Only languages listed in the :setting:`LANGUAGES` setting can be selected.
-      If you want to restrict the language selection to a subset of provided
-      languages (because your application doesn't provide all those languages),
-      set ``LANGUAGES`` to a list of languages. For example::
+    * 上記のどのステップでも、言語設定は標準の言語名表記法に従った文字列で
+      書かれているものと想定しています。例えば、ブラジル系ポルトガル語は
+      ``pt-br`` です。
+
+    * 基本言語 (base language) が指定されていて、副言語 (sublanguage) が指
+      定されていない場合、 Django は基本言語の設定を優先します。例えば、ユー
+      ザが ``de-at`` (オーストリアドイツ語) を指定しているのに対して、
+      Django 側には ``de`` のしかない場合、 Django は ``de`` を使います。
+
+    * :setting:`LANGUAGES` 設定にリストアップした言語しか選択できません。
+      (全ての言語に対する翻訳を提供できないなどの理由で) 言語選択を指定の言
+      語のサブセットに制限したい場合には、 ``LANGUAGES`` を設定します。例え
+      ば::
 
           LANGUAGES = (
             ('de', _('German')),
             ('en', _('English')),
           )
 
-      This example restricts languages that are available for automatic
-      selection to German and English (and any sublanguage, like de-ch or
-      en-us).
+      この例では、自動生成されるメニューで利用可能な言語をドイツ語:de と
+      英語:en (および de-ch や en-us のような副言語) に制限しています。
 
-      .. _LANGUAGES setting: ../settings/#languages
+      .. _`LANGUAGES 設定`: ../settings/#languages
+      .. _LANGUAGES setting: 
+          ../settings/#languages
 
-    * If you define a custom ``LANGUAGES`` setting, as explained in the
-      previous bullet, it's OK to mark the languages as translation strings
-      -- but use a "dummy" ``ugettext()`` function, not the one in
-      ``django.utils.translation``. You should *never* import
-      ``django.utils.translation`` from within your settings file, because that
-      module in itself depends on the settings, and that would cause a circular
-      import.
+    * 上の項で説明したように、カスタムの ``LANGUAGES`` 設定を行った場合、そ
+      の言語を翻訳対象文字列に含めても構いません。ただし、
+      ``django.utils.translation`` の ``ugettext()`` ではなく、「ダミーの」
+      ``ugettext()`` でマークしてください。循環 import を防ぐため、 *決して*
+      設定ファイル中で ``django.utils.translation`` を import しないでくだ
+      さい。
 
-      The solution is to use a "dummy" ``ugettext()`` function. Here's a sample
-      settings file::
+      カスタム ``LANGUAGES`` のマークアップは「ダミーの」 ``ugettext()`` 関
+      数で解決します。以下に設定ファイルでの記述例を示します::
 
           ugettext = lambda s: s
 
@@ -655,34 +697,35 @@ Notes:
               ('en', ugettext('English')),
           )
 
-      With this arrangement, ``django-admin.py makemessages`` will still find
-      and mark these strings for translation, but the translation won't happen
-      at runtime -- so you'll have to remember to wrap the languages in the
-      *real* ``ugettext()`` in any code that uses ``LANGUAGES`` at runtime.
+      このように設定しておいても、 ``django-admin.py makemessages`` は翻訳
+      文字列を検出して翻訳対象としてマークします。ただし、実行時の翻訳はお
+      こなわれません。したがって、実行時には ``LANGUAGES`` を使うコードを 
+      *本当の* ``ugettext()`` でラップしておかねばなりません。
 
-    * The ``LocaleMiddleware`` can only select languages for which there is a
-      Django-provided base translation. If you want to provide translations
-      for your application that aren't already in the set of translations
-      in Django's source tree, you'll want to provide at least basic
-      translations for that language. For example, Django uses technical
-      message IDs to translate date formats and time formats -- so you will
-      need at least those translations for the system to work correctly.
+    * ``LocaleMiddleware`` で選択できるのは、 Django が基本的な部分の翻訳を
+      提供している言語だけです。 Django のソースツリーの翻訳セットに入って
+      いない言語の翻訳を提供したければ、まずその言語むけの基本部分の翻訳を
+      提供する必要があります。例えば、Django はテクニカルメッセージ ID
+      (technical message ID) を使って日付や時刻のフォーマットを解釈するので、
+      システムを正しく動作させるには少なくともこうした部分の翻訳が必要にな
+      ります。
 
-      A good starting point is to copy the English ``.po`` file and to
-      translate at least the technical messages -- maybe the validation
-      messages, too.
+      作業を始めるには、まず英語用の ``.po`` ファイルをコピーするとよいでしょ
+      う。少なくともテクニカルメッセージだけは翻訳します。バリデーション時
+      のメッセージもやっておくとよいでしょう。
 
-      Technical message IDs are easily recognized; they're all upper case. You
-      don't translate the message ID as with other messages, you provide the
-      correct local variant on the provided English value. For example, with
-      ``DATETIME_FORMAT`` (or ``DATE_FORMAT`` or ``TIME_FORMAT``), this would
-      be the format string that you want to use in your language. The format
-      is identical to the format strings used by the ``now`` template tag.
+      テクニカルメッセージ ID は簡単に区別できます。メッセージ ID は全て大
+      文字でできているからです。このメッセージ ID は他のメッセージと同じよ
+      うに翻訳してよいものではなく、ローカルの正しい形式を指定せねばなりま
+      せん。例えば、 ``DATETIME_FORMAT`` (あるいは ``DATE_FORMAT`` や
+      ``TIME_FORMAT``) の場合、自分の言語における正しいフォーマット文字列を
+      指定せねばなりません。フォーマットは ``now`` テンプレートタグで使われ
+      ているフォーマット文字列と同じ文法に従います。
 
-Once ``LocaleMiddleware`` determines the user's preference, it makes this
-preference available as ``request.LANGUAGE_CODE`` for each
-:class:`~django.http.HttpRequest`. Feel free to read this value in your view
-code. Here's a simple example::
+``LocaleMiddleware`` がユーザ設定を検出すると、その設定に
+:class:`~django.http.HttpRequest` の ``request.LANGUAGE_CODE`` でアクセスで
+きます。この値はビューコードで自由に読みだしてかまいません。以下に一例を挙
+げます::
 
     def hello_world(request, count):
         if request.LANGUAGE_CODE == 'de-at':
@@ -690,111 +733,125 @@ code. Here's a simple example::
         else:
             return HttpResponse("You prefer to read another language.")
 
-Note that, with static (middleware-less) translation, the language is in
-``settings.LANGUAGE_CODE``, while with dynamic (middleware) translation, it's
-in ``request.LANGUAGE_CODE``.
+静的な (ミドルウェアを使わない) 翻訳では、言語設定は
+``settings.LANGUAGE_CODE`` の値になり、動的な (ミドルウェアを使った) 翻訳で
+は、言語設定は ``request.LANGUAGE_CODE`` の値になるので注意してください。
 
 .. _settings file: ../settings/
+.. _`設定ファイル`: `settings file`_
 .. _middleware documentation: ../middleware/
+.. _`ミドルウェアのドキュメント`: `middleware documentation`_
 .. _session: ../sessions/
+.. _`セッション`: session_
 .. _request object: ../request_response/#httprequest-objects
+.. _`リクエストオブジェクト`: `request object`_
 
 .. _translations-in-your-own-projects:
+.. _Using translations in your own projects:
 
-Using translations in your own projects
-=======================================
+自作のプロジェクトで翻訳を使う
+==============================
 
-Django looks for translations by following this algorithm:
+Django は以下のアルゴリズムに従って翻訳を探します:
 
-    * First, it looks for a ``locale`` directory in the application directory
-      of the view that's being called. If it finds a translation for the
-      selected language, the translation will be installed.
-    * Next, it looks for a ``locale`` directory in the project directory. If it
-      finds a translation, the translation will be installed.
-    * Finally, it checks the Django-provided base translation in
-      ``django/conf/locale``.
+    * まず、現在呼び出されているビューの入っているアプリケーションディレク
+      トリ下に ``locale`` ディレクトリを探します。現在選択されている言語に
+      対応する翻訳があれば、その翻訳をインストールします。
+    * 次に、プロジェクトディレクトリ下に ``locale`` ディレクトリを探します。
+      翻訳があれば、その翻訳をインストールします。
+    * 最後に、 ``django/conf/locale`` にある Django 付属の翻訳をチェックし
+      ます。
 
-This way, you can write applications that include their own translations, and
-you can override base translations in your project path. Or, you can just build
-a big project out of several apps and put all translations into one big project
-message file. The choice is yours.
+こうすることで、独自の翻訳の入ったアプリケーションを書いたり、基本の翻訳の
+内容をプロジェクトパスに置いた翻訳でオーバライドしたりできます。また、複数
+の小さなアプリケーションで大きめのプロジェクトを構築するときに、全ての翻訳
+を一つのプロジェクト単位のメッセージファイルにまとめておけます。どういう方
+法をとるかはユーザ次第です。
 
 .. note::
 
-    If you're using manually configured settings, as described
-    :ref:`settings-without-django-settings-module`, the ``locale`` directory in
-    the project directory will not be examined, since Django loses the ability
-    to work out the location of the project directory. (Django normally uses the
-    location of the settings file to determine this, and a settings file doesn't
-    exist if you're manually configuring your settings.)
+    :ref:`settings-without-django-settings-module` に示したように、
+    :setting:`DJANGO_SETTINGS_MODULE` を使わずに手動で設定を行った場合、プ
+    ロジェクトディレクトリ内の ``locale`` ディレクトリはチェックされません。
+    これは Django がプロジェクトディレクトリの場所を調べる術を持たないから
+    です (Django は通常、設定ファイルのある場所を基準に ``locale`` ディレク
+    トリの場所を調べますが、手動で設定を行うと設定ファイルが存在しなくなっ
+    てしまうからです)。
 
-All message file repositories are structured the same way. They are:
+メッセージファイルリポジトリも同じような構成になっています:
 
     * ``$APPPATH/locale/<language>/LC_MESSAGES/django.(po|mo)``
     * ``$PROJECTPATH/locale/<language>/LC_MESSAGES/django.(po|mo)``
-    * All paths listed in ``LOCALE_PATHS`` in your settings file are
-      searched in that order for ``<language>/LC_MESSAGES/django.(po|mo)``
+    * 設定ファイルの ``LOCALE_PATHS`` に指定されている全てのパスを指定順に
+      検索して ``<language>/LC_MESSAGES/django.(po|mo)`` を探します。
     * ``$PYTHONPATH/django/conf/locale/<language>/LC_MESSAGES/django.(po|mo)``
 
-To create message files, you use the same ``django-admin.py makemessages``
-tool as with the Django message files. You only need to be in the right place
--- in the directory where either the ``conf/locale`` (in case of the source
-tree) or the ``locale/`` (in case of app messages or project messages)
-directory are located. And you use the same ``django-admin.py compilemessages``
-to produce the binary ``django.mo`` files that are used by ``gettext``.
+メッセージファイルの作成には、 Django メッセージファイルと同じ
+``django-admin.py makemessages`` ツールを使って下さい。ツールの実行は正しい
+場所、すなわち ``conf/locale`` (ソースツリーの場合) か、あるいは ``locale``
+(アプリケーションメッセージやプロジェクトメッセージの場合) ディレクトリのあ
+るディレクトリで行わねばなりません。また、 ``gettext`` の使うバイナリ形式の
+``django.mo`` ファイルを生成するには ``django-admin.py compilemessages`` を
+使います。
 
-You can also run ``django-admin.py compilemessages --settings=path.to.settings``
-to make the compiler process all the directories in your ``LOCALE_PATHS``
-setting.
+``django-admin.py compilemessages --settings=path.to.settings`` を実行すれ
+ば、コンパイラに ``LOCALE_PATHS`` に設定された全てのディレクトリを処理させ
+られます。
 
-Application message files are a bit complicated to discover -- they need the
-``LocaleMiddleware``. If you don't use the middleware, only the Django message
-files and project message files will be processed.
+アプリケーションメッセージファイルを発見するメカニズムはやや複雑で、
+``LocaleMiddleware`` が必要になります。従って、このミドルウェアを使わない場
+合、 Django メッセージファイルとプロジェクトメッセージファイルだけが処理さ
+れます。
 
-Finally, you should give some thought to the structure of your translation
-files. If your applications need to be delivered to other users and will
-be used in other projects, you might want to use app-specific translations.
-But using app-specific translations and project translations could produce
-weird problems with ``makemessages``: ``makemessages`` will traverse all
-directories below the current path and so might put message IDs into the
-project message file that are already in application message files.
+最後に、翻訳ファイルをどのように構成するかしっかりと考えておくように勧めま
+す。自分の作ったアプリケーションを他のユーザに配ったり、他のプロジェクトで
+利用したりするなら、アプリケーション固有の翻訳が必要になるでしょう。しかし、
+アプリケーション固有のメッセージやプロジェクトごとの翻訳は
+``makemessages`` にまつわる困った問題を引き起こすことがあります:
+``makemessages`` は現在のパス以下の全てのディレクトリを検索してしまうので、
+すでにアプリケーションメッセージファイルに入っているメッセージ ID が、プロ
+ジェクトのメッセージファイルに入ってしまうことがあるのです。
 
-The easiest way out is to store applications that are not part of the project
-(and so carry their own translations) outside the project tree. That way,
+この問題の最も簡単な解決法は、プロジェクトを直接的に構築しない (なおかつ独
+自の翻訳を備えている) アプリケーションをプロジェクトツリーの外に配置してお
+くというものです。こうすれば、プロジェクトレベルで
+``django-admin.py make-messages`` を実行しても、自分のプロジェクトに明に関
+係する部分の文字列だけを翻訳し、別個に配布されたアプリケーションの文字列を
+対象にしなくなります。
 
-``django-admin.py makemessages`` on the project level will only translate
-strings that are connected to your explicit project and not strings that are
-distributed independently.
+.. _The set_language redirect view:
 
-The ``set_language`` redirect view
-==================================
+``set_language`` リダイレクトビュー
+=====================================
 
-As a convenience, Django comes with a view, ``django.views.i18n.set_language``,
-that sets a user's language preference and redirects back to the previous page.
+利便性のために、 Django には ``django.views.i18n.set_language`` ビューが定
+義されています。このビューはユーザの言語プリファレンスを設定して、遷移前の
+ページにリダイレクトします。
 
-Activate this view by adding the following line to your URLconf::
+このビューを有効にするには、以下の行を URLconf に追加します::
 
     (r'^i18n/', include('django.conf.urls.i18n')),
 
-(Note that this example makes the view available at ``/i18n/setlang/``.)
+(この例では ``/i18n/setlang/`` でビューを使えるようにします)
 
-The view expects to be called via the ``POST`` method, with a ``language``
-parameter set in request. If session support is enabled, the view
-saves the language choice in the user's session. Otherwise, it saves the
-language choice in a cookie that is by default named ``django_language``.
-(The name can be changed through the ``LANGUAGE_COOKIE_NAME`` setting if you're
-using the Django development version.)
+ビューは、リクエストに ``language`` が設定された状態で、  ``POST`` メソッド
+で呼び出すようになっています。セッションのサポートが有効であれば、ビューは
+ユーザのセッションに選択した言語を保存します。セッションのサポートがなけれ
+ば、言語設定を ``django_language``` クッキーに保存します。
+(開発版の Django を使っているなら、クッキーの名前は ``LANGUAGE_COOKIE_NAME``
+設定で変更できます。)
 
-After setting the language choice, Django redirects the user, following this
-algorithm:
+選択された言語に設定した後、 Django は以下のアルゴリズムに従ってリダイレク
+トを行います:
 
-    * Django looks for a ``next`` parameter in the ``POST`` data.
-    * If that doesn't exist, or is empty, Django tries the URL in the
-      ``Referrer`` header.
-    * If that's empty -- say, if a user's browser suppresses that header --
-      then the user will be redirected to ``/`` (the site root) as a fallback.
+    * Django は ``POST`` データから ``next`` パラメタを探します。
+    * ``next`` がないか、空の値なら、 ``Referer`` ヘッダを使って遷移元を決
+      定しようとします。
+    * ``Referer`` の値も空の場合、例えばユーザのブラウザがリファラの送信を
+      抑制している場合には、フォールバックとして、ユーザは ``/`` (サイトの
+      ルート URL) にリダイレクトします。
 
-Here's example HTML template code:
+以下に HTML テンプレートのコード例を示します:
 
 .. code-block:: html+django
 
@@ -808,33 +865,36 @@ Here's example HTML template code:
     <input type="submit" value="Go" />
     </form>
 
-Translations and JavaScript
-===========================
+.. _`Translations and JavaScript`:
 
-Adding translations to JavaScript poses some problems:
+翻訳と JavaScript
+=================
 
-    * JavaScript code doesn't have access to a ``gettext`` implementation.
+JavaScript に翻訳を追加しようとすると、いくつかの問題に直面します:
 
-    * JavaScript code doesn't have access to .po or .mo files; they need to be
-      delivered by the server.
+    * JavaScript コードには ``gettext`` 実装へのアクセス手段がありません。
 
-    * The translation catalogs for JavaScript should be kept as small as
-      possible.
+    * JavaScript コードには .po や .mo ファイルへのアクセス手段がありません。
+      というのも、これらのファイルはサーバに置かれているからです。
 
-Django provides an integrated solution for these problems: It passes the
-translations into JavaScript, so you can call ``gettext``, etc., from within
-JavaScript.
+    * JavaScript の翻訳カタログはできるだけ小さくしておかねばなりません。
 
-The ``javascript_catalog`` view
+Django では、これらの問題に対する解決策を組み込みで提供しています。この解決
+策は翻訳を JavaScript に渡して、 ``gettext`` などを JavaScript コード内で呼
+び出せるようにします。
+
+.. _`The javascript_catalog view`:
+
+``javascript_catalog`` ビュー
 -------------------------------
 
-The main solution to these problems is the ``javascript_catalog`` view, which
-sends out a JavaScript code library with functions that mimic the ``gettext``
-interface, plus an array of translation strings. Those translation strings are
-taken from the application, project or Django core, according to what you
-specify in either the info_dict or the URL.
+前述の問題に対する解決策は、 ``javascript_catalog`` ビューにあります。この
+ビューは ``gettext`` インタフェースをまねた関数の入った JavaScript コードと、
+翻訳文字列のアレイを送信します。翻訳文字列のアレイは ``info_dict`` や URL
+の指定に従ってアプリケーションやプロジェクト、Django コア部分から取り出され
+ます。
 
-You hook it up like this::
+例えば以下のようにフックをかけたとしましょう::
 
     js_info_dict = {
         'packages': ('your.app.package',),
@@ -844,63 +904,71 @@ You hook it up like this::
         (r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict),
     )
 
-Each string in ``packages`` should be in Python dotted-package syntax (the
-same format as the strings in ``INSTALLED_APPS``) and should refer to a package
-that contains a ``locale`` directory. If you specify multiple packages, all
-those catalogs are merged into one catalog. This is useful if you have
-JavaScript that uses strings from different applications.
+``packages`` のタプルに入っている各文字列は Python のドット区切りのパッケー
+ジ表記 (``INSTALLED_APPS`` で使われている書式と同じ) で、 ``locale`` ディレ
+クトリの入っているパッケージにします。複数のパッケージを指定した場合、全て
+のカタログが一つのカタログに統合されます。この仕様は、複数のアプリケーショ
+ンの文字列を扱うような JavaScript で便利です。
 
-You can make the view dynamic by putting the packages into the URL pattern::
+URL パターンにパッケージ名を入れておけば、ビューを動的にできます::
 
     urlpatterns = patterns('',
         (r'^jsi18n/(?P<packages>\S+?)/$', 'django.views.i18n.javascript_catalog'),
     )
 
-With this, you specify the packages as a list of package names delimited by '+'
-signs in the URL. This is especially useful if your pages use code from
-different apps and this changes often and you don't want to pull in one big
-catalog file. As a security measure, these values can only be either
-``django.conf`` or any package from the ``INSTALLED_APPS`` setting.
+こうしておいて、パッケージ名を '+' で区切ったパッケージ名リストとして指定で
+きます。これは、複数のアプリケーションからのコードを使っていて、変更が頻繁
+に起きている場合、巨大なカタログファイルを毎回プルしなくてすむので便利です。
+セキュリティ上の理由から、パッケージ名リストに指定できるのは、
+``django.conf`` か ``INSTALLED_APPS`` 設定に入っているアプリケーションだけ
+です。
 
-Using the JavaScript translation catalog
-----------------------------------------
+.. _Using the JavaScript translation catalog:
 
-To use the catalog, just pull in the dynamically generated script like this::
+JavaScript 翻訳カタログを使う
+-----------------------------
+
+カタログを使うには、単に以下のようにして動的に生成されたスクリプトをプルし
+ます::
 
     <script type="text/javascript" src="/path/to/jsi18n/"></script>
 
-This is how the admin fetches the translation catalog from the server. When the
-catalog is loaded, your JavaScript code can use the standard ``gettext``
-interface to access it::
+これはまさに admin がサーバから翻訳を取り出しているのと同じ方法です。カタロ
+グをロードしたら、JavaScript から標準的な ``gettext`` インタフェースを使っ
+てアクセスできるようになります::
 
     document.write(gettext('this is to be translated'));
 
-There is also an ``ngettext`` interface::
+``ngettext`` インタフェースもあります::
 
     var object_cnt = 1 // or 0, or 2, or 3, ...
     s = ngettext('literal for the singular case',
             'literal for the plural case', object_cnt);
 
-and even a string interpolation function::
-
+文字列補完を行う関数もあります::
+ 
     function interpolate(fmt, obj, named);
 
-The interpolation syntax is borrowed from Python, so the ``interpolate``
-function supports both positional and named interpolation:
+``interpolate`` 関数は、固定引数による補完と名前付き補完の両方をサポートし
+ています。従って、上のコードは以下のようにも書けます::
 
-    * Positional interpolation: ``obj`` contains a JavaScript Array object
-      whose elements values are then sequentially interpolated in their
-      corresponding ``fmt`` placeholders in the same order they appear.
-      For example::
+    s = interpolate(ungettext('this is %s object', 'this are %s objects', 11), [11]);
+
+補完の構文は Python から借りたもので、固定引数と名前つきの文字列補完をサポー
+トしています:
+
+    * 固定引数型の補完: ``obj`` には JavaScript の Array オブジェクトが入り
+      ます。 ``interpolate`` は Array の各要素を使って、 ``fmt`` 内のプレー
+      スホルダを順番に置換してゆきます。例えば::
 
         fmts = ngettext('There is %s object. Remaining: %s',
                 'There are %s objects. Remaining: %s', 11);
         s = interpolate(fmts, [11, 20]);
         // s is 'There are 11 objects. Remaining: 20'
 
-    * Named interpolation: This mode is selected by passing the optional
-      boolean ``named`` parameter as true. ``obj`` contains a JavaScript
-      object or associative array. For example::
+    * 名前つき補完: このモードは、オプションの ``named`` パラメタに
+      ``true`` を指定して選択します。 ``obj`` には JavaScript のオブジェク
+      トか、連想配列が入ります。例えば::
 
         d = {
             count: 10
@@ -911,41 +979,48 @@ function supports both positional and named interpolation:
         'there are %(count)s of a total of %(total)s objects', d.count);
         s = interpolate(fmts, d, true);
 
-You shouldn't go over the top with string interpolation, though: this is still
-JavaScript, so the code has to make repeated regular-expression substitutions.
-This isn't as fast as string interpolation in Python, so keep it to those
-cases where you really need it (for example, in conjunction with ``ngettext``
-to produce proper pluralizations).
 
-Creating JavaScript translation catalogs
-----------------------------------------
+とはいえ、この文字列補完を派手に使わない方がよいでしょう: 補完機能は
+JavaScript で動いており、中では何度も正規表現置換を行っています。この処理は
+Python の文字列補完ほど高速ではないので、本当に必要な場合 (例えば
+``ngettext`` を使って適切な複数形表現を実現したい場合) だけにしてください。
 
-You create and update the translation catalogs the same way as the other
+.. _Creating JavaScript translation catalogs:
 
-Django translation catalogs -- with the django-admin.py makemessages tool. The
-only difference is you need to provide a ``-d djangojs`` parameter, like this::
+JavaScript の翻訳カタログを作成する
+-----------------------------------
+
+JavaScript の翻訳カタログの作成と更新方法、他の Django の翻訳カタログの場合
+と同じで、 ``django-admin.py makemessages`` ツールを使います。ただし、
+``-d djangojs`` パラメタを指定してください。例えば:: 
 
     django-admin.py makemessages -d djangojs -l de
 
-This would create or update the translation catalog for JavaScript for German.
-After updating translation catalogs, just run ``django-admin.py compilemessages``
-the same way as you do with normal Django translation catalogs.
+上の例では、ドイツ語向けの JavaScript の翻訳カタログを作成または更新してい
+ます。翻訳カタログを更新したら、通常の Django 翻訳カタログと同じように、
+``django-admin.py compilemessages`` を実行してください。
 
-Specialties of Django translation
-==================================
+.. _Specialties of Django translation:
 
-If you know ``gettext``, you might note these specialties in the way Django
-does translation:
+Django 翻訳の特徴
+=================
 
-    * The string domain is ``django`` or ``djangojs``. This string domain is
-      used to differentiate between different programs that store their data
-      in a common message-file library (usually ``/usr/share/locale/``). The
-      ``django`` domain is used for python and template translation strings
-      and is loaded into the global translation catalogs. The ``djangojs``
-      domain is only used for JavaScript translation catalogs to make sure
-      that those are as small as possible.
-    * Django doesn't use ``xgettext`` alone. It uses Python wrappers around
-      ``xgettext`` and ``msgfmt``. This is mostly for convenience.
+``gettext`` について詳しければ、 Django の翻訳機能には以下のような特徴があ
+ることに気づくでしょう:
+
+    * 文字列ドメインは ``django`` または ``djangojs`` です。この文字列ドメ
+      インは、共通のメッセージファイルライブラリ (通常は
+      ``/usr/share/locale/`` にあります) にデータを保存している他のプログラ
+      ムと Django のデータを区別するためです。 ``django`` ドメインは、
+      Python とテンプレート翻訳文字列に使われ、グローバルな翻訳カタログ上に
+      読み込まれます。 ``djangojs`` は JavaScript だけで使うために、可能な
+      かぎり小さくして分けてあります。
+    * Django は ``xgettext`` を単体では使いません。 Django では、
+      ``xgettext`` や ``msgfmt`` を Python ラッパ越しに使います。これは便宜
+      上の理由によります。
+
+
+.. TBD
 
 ``gettext`` on Windows
 ======================
