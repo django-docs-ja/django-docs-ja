@@ -1,24 +1,27 @@
 .. _howto-deployment-modpython:
 
-============================================
-How to use Django with Apache and mod_python
-============================================
+=========================================
+Apache と mod_python で Django を動かす
+=========================================
 
 .. highlight:: apache
 
-Apache_ with `mod_python`_ currently is the preferred setup for using Django
-on a production server.
+:revision-up-to: 8961 (1.0)
 
-mod_python is similar to (and inspired by) `mod_perl`_ : It embeds Python within
-Apache and loads Python code into memory when the server starts. Code stays in
-memory throughout the life of an Apache process, which leads to significant
-performance gains over other server arrangements.
+Django をプロダクションサーバ上で動かす設定として、現状では Apache_ と
+`mod_python`_ の組み合わせを推奨しています。
 
-Django requires Apache 2.x and mod_python 3.x, and you should use Apache's
-`prefork MPM`_, as opposed to the `worker MPM`_.
+mod_python は `mod_perl`_ とよく似ていて (影響を受けていて)、 Apache の中に
+Python を埋め込み、サーバ起動時に Python のコードをメモリ上に読み込みます。
+読み込まれたコードは Apache のプロセスが生きている間ずっと残るので、他のや
+りかたに比べて明確なパフォーマンスの向上につながります。
 
-You may also be interested in :ref:`How to use Django with FastCGI, SCGI or AJP
-<howto-deployment-fastcgi>` (which also covers SCGI and AJP).
+Django を mod_python で動かす場合、 Apache 2.x と mod_python 3.x が必要です。
+また、 Apache を使う場合、 `worker MPM`_ ではなく `prefork MPM`_ を使うよう
+勧めます。
+
+興味があれば `FastCGI, SCGI, AJP で Django を動かす <howto-deplyment-fastcgi>`
+もどうぞ (SCGI と AJP もカバーしています)。
 
 .. _Apache: http://httpd.apache.org/
 .. _mod_python: http://www.modpython.org/
@@ -26,57 +29,61 @@ You may also be interested in :ref:`How to use Django with FastCGI, SCGI or AJP
 .. _prefork MPM: http://httpd.apache.org/docs/2.2/mod/prefork.html
 .. _worker MPM: http://httpd.apache.org/docs/2.2/mod/worker.html
 
-Basic configuration
-===================
+.. _Basic configuration:
 
-To configure Django with mod_python, first make sure you have Apache installed,
-with the mod_python module activated.
+基本的な設定
+============
 
-Then edit your ``httpd.conf`` file and add the following::
+Django を mod_python で動かすようにするには、まず Apache がインストールされ、
+mod_python モジュールが有効になっていることを確かめます。
+
+次に、 ``httpd.conf`` ファイルを編集し、以下のような設定を追加します::
 
     <Location "/mysite/">
         SetHandler python-program
         PythonHandler django.core.handlers.modpython
         SetEnv DJANGO_SETTINGS_MODULE mysite.settings
-        PythonOption django.root /mysite        
+	PythonOption django.root /mysite
         PythonDebug On
     </Location>
 
-...and replace ``mysite.settings`` with the Python import path to your Django
-project's settings file.
+``mysite.settings`` は、 Django プロジェクトの設定ファイルを指す Python
+import パスになるよう、自分の環境に合わせて置き換えて下さい。
 
-This tells Apache: "Use mod_python for any URL at or under '/mysite/', using the
-Django mod_python handler." It passes the value of :ref:`DJANGO_SETTINGS_MODULE
-<django-settings-module>` so mod_python knows which settings to use.
+この設定は、 Apache に 「/mysite/ の下の全ての URL は mod_python で処理し、
+処理には Django mod_python ハンドラを使うように」命令します。また、
+:ref:`DJANGO_SETTINGS_MODULE <django-settings-module>` を渡して、
+mod_python にどこに設定ファイルがあるのか教えます。
+
+.. TBD::
 
 .. versionadded:: 1.0
-    The ``PythonOption django.root ...`` is new in this version.
+    ``PythonOption django.root ...`` が新たに登場しました。
 
-Because mod_python does not know we are
-serving this site from underneath the ``/mysite/`` prefix, this value needs to
-be passed through to the mod_python handler in Django, via the ``PythonOption
-django.root ...`` line. The value set on that line (the last item) should
-match the string given in the ``<Location ...>`` directive. The effect of this
-is that Django will automatically strip the ``/mysite`` string from the front
-of any URLs before matching them against your ``URLConf`` patterns. If you
-later move your site to live under ``/mysite2``, you will not have to change
-anything except the ``django.root`` option in the config file.
+mod_python は、サイトを ``/mysite/`` プレフィクスの下で提供していることを自
+動的に検出できないので、 ``PythonOption django.root ...`` を使ってハンドラ
+に通知してやる必要があります。この行に設定する値は、 ``<Location ...>``
+の引数と一致していなければなりません。 ``django.root`` を設定すると、
+Django はリクエストの URL から ``django.root`` に設定されたプレフィクスを除
+去した上で ``URLConf`` のパターンマッチングを行います。このため、後でサイト
+を ``/mysite2`` に動かした際に、 ``djnago.root`` だけを変更すればよくなりま
+す。
 
-When using ``django.root`` you should make sure that what's left, after the
-prefix has been removed, begins with a slash. Your URLConf patterns that are
-expecting an initial slash will then work correctly. In the above example,
-since we want to send things like ``/mysite/admin/`` to ``/admin/``, we need
-to remove the string ``/mysite`` from the beginning, so that is the
-``django.root`` value. It would be an error to use ``/mysite/`` (with a
-trailing slash) in this case.
+``django.root`` を使う場合、必ず、プレフィクスを除去した後の URL がスラッシュ
+で開始するようにしてください。 そうでないと、先頭にスラッシュの入る URLConf
+の設定があった場合、パターンマッチングがうまくいきません。上の例では、
+``/mysite/admin/`` を ``/admin/`` に変えたいので、先頭から除去すべきなのは
+``/mysite`` です。従って、 ``django.root`` の値を ``/mysite`` にしているの
+です。この場合、 ``/mysite/`` (末尾にスラッシュがついている) にしてしまうと、
+エラーをひき起こすでしょう。
 
-Note that we're using the ``<Location>`` directive, not the ``<Directory>``
-directive. The latter is used for pointing at places on your filesystem,
-whereas ``<Location>`` points at places in the URL structure of a Web site.
-``<Directory>`` would be meaningless here.
+上の例では ``<Directory>``  ではなく ``<Location>`` ディレクティブを使って
+います。前者はファイルシステム上の場所を指定するのに使い、後者はウェブサイ
+トのURL 構造上の場所を指定するのに使います。従って、 ``<Directory>`` を使っ
+た指定は意味をなさないのです。
 
-Also, if your Django project is not on the default ``PYTHONPATH`` for your
-computer, you'll have to tell mod_python where your project can be found:
+また、 Django プロジェクトがデフォルトの ``PYTHONPATH`` 上になければ、以下
+のような設定を mod_python に教えておく必要があります:
 
 .. parsed-literal::
 
@@ -84,67 +91,72 @@ computer, you'll have to tell mod_python where your project can be found:
         SetHandler python-program
         PythonHandler django.core.handlers.modpython
         SetEnv DJANGO_SETTINGS_MODULE mysite.settings
-        PythonOption django.root /mysite        
+        PythonOption django.root /mysite
         PythonDebug On
         **PythonPath "['/path/to/project'] + sys.path"**
     </Location>
 
-The value you use for ``PythonPath`` should include the parent directories of
-all the modules you are going to import in your application. It should also
-include the parent directory of the :ref:`DJANGO_SETTINGS_MODULE
-<django-settings-module>` location. This is exactly the same situation as
-setting the Python path for interactive usage. Whenever you try to import
-something, Python will run through all the directories in ``sys.path`` in turn,
-from first to last, and try to import from each directory until one succeeds.
 
-An example might make this clearer. Suppose you have some applications under
-``/usr/local/django-apps/`` (for example, ``/usr/local/django-apps/weblog/`` and
-so forth), your settings file is at ``/var/www/mysite/settings.py`` and you have
-specified :ref:`DJANGO_SETTINGS_MODULE <django-settings-module>` as in the above
-example. In this case, you would need to write your ``PythonPath`` directive
-as::
+    PythonPath "['/path/to/project'] + sys.path"
+
+``PythonPath`` には、アプリケーションから import したいモジュールの各々の
+親ディレクトリを入れなければなりません。また、 :ref:`DJANGO_SETTINGS_MODULE
+<django-settings-module>` の親ディレクトリも入れねばなりません。対話シェル
+を使う場合に Python パスを設定するのと同じです。何かモジュールを import す
+る際には、Python は必ず ``sys.path`` の各ディレクトリを順に調べ、その下から
+該当モジュールを import しようと試み、 import に成功するまで探索を続けます。
+
+分かりやすくするために例を挙げましょう。アプリケーションを
+``/usr/local/django-apps/`` の下に配置しているとします (例えば、
+``/usr/local/django-apps/weblog/`` のようにです) 。そして、 ``mysite`` プロ
+ジェクトが ``/var/www/`` 下にあるとしましょう。上の例のように
+:ref:`DJANGO_SETTINGS_MODULE <django-settings-module>` を設定している場合に
+は、 ``PythonPath`` を以下のように書かねばなりません::
 
     PythonPath "['/usr/local/django-apps/', '/var/www'] + sys.path"
 
-With this path, ``import weblog`` and ``import mysite.settings`` will both
-work. If you had ``import blogroll`` in your code somewhere and ``blogroll``
-lived under the ``weblog/`` directory, you would *also* need to add
-``/usr/local/django-apps/weblog/`` to your ``PythonPath``. Remember: the
-**parent directories** of anything you import directly must be on the Python
-path.
+これで、 ``import weblog`` や ``import mysite.settings`` が正しく動作します。
+コード中で ``import blogroll`` していて、 ``blogroll`` が ``weblog/`` ディ
+レクトリの下にあるようなら、 ``/usr/local/django-apps/weblog/`` も
+``PythonPath`` に加えねばなりません。 import したいモジュールの 
+**親ディレクトリ** を Python パスに入れねばならないことに注意してください。
 
 .. note::
 
-    If you're using Windows, we still recommended that you use forward
-    slashes in the pathnames, even though Windows normally uses the backslash
-    character as its native separator. Apache knows how to convert from the
-    forward slash format to the native format, so this approach is portable and
-    easier to read. (It avoids tricky problems with having to double-escape
-    backslashes.)
+    Windows を使っているなら、パスの表記に注意してください。 Windows は通常
+    バックスラッシュをネイティブのパス区切り文字に使いますが、それでもスラッ
+    シュを使ってパスを表記するよう進めます。 Apache はスラッシュをプラット
+    フォームネイティブのパス区切り文字に変換する方法を知っているので、スラッ
+    シュを使った方が、可搬性や視認性を持たせられるのです。 (それに、バックス
+    ラッシュの二重エスケープのようなトリッキーな問題を回避できます)。
 
-    This is valid even on a Windows system::
+    Windows システムでも、以下のパス表記を利用できます::
 
         PythonPath "['c:/path/to/project'] + sys.path"
 
-You can also add directives such as ``PythonAutoReload Off`` for performance.
-See the `mod_python documentation`_ for a full list of options.
+また、 ``PythonAutoReload Off`` のようなディレクティブを設定して、パフォー
+マンスを向上させられます。使えるオプションのリストは
+`mod_python のドキュメント`_ を参照してください。
 
-Note that you should set ``PythonDebug Off`` on a production server. If you
-leave ``PythonDebug On``, your users would see ugly (and revealing) Python
-tracebacks if something goes wrong within mod_python.
+注意しなければならないのは、プロダクションサーバでは、  ``PythonDebug Off``
+を設定すべきであるということです。 ``PythonDebug`` が ``On`` に設定されたま
+まだと、 mod_python に不具合が生じたときに、恰好の悪い (そして赤裸々な)
+Python トレースバックを表示してしまいます。
 
-Restart Apache, and any request to ``/mysite/`` or below will be served by
-Django. Note that Django's URLconfs won't trim the "/mysite/" -- they get passed
-the full URL.
+Apache を再起動しましょう。 ``/mysite/`` やその下の URL へのリクエストが
+Django によって提供されているはずです。 Django の URLconf は ``/mysite/``
+を切り取りらず、完全な URL を渡すことに注意して下さい。
 
-When deploying Django sites on mod_python, you'll need to restart Apache each
-time you make changes to your Python code.
+Django で作られたサイトを mod_python 上で運営している場合、 Python コードに
+対して変更を加える度に Apache を再起動する必要があります。
 
-Multiple Django installations on the same Apache
-================================================
+.. _Multiple Django installations on the same Apache:
 
-It's entirely possible to run multiple Django installations on the same Apache
-instance. Just use ``VirtualHost`` for that, like so::
+ひとつの Apache に複数の Django をインストールする
+==================================================
+
+ひとつの Apache に複数の Django をインストールするのは簡単です。
+``VirtualHost`` を使って、以下のようにするだけです::
 
     NameVirtualHost *
 
@@ -160,10 +172,10 @@ instance. Just use ``VirtualHost`` for that, like so::
         SetEnv DJANGO_SETTINGS_MODULE mysite.other_settings
     </VirtualHost>
 
-If you need to put two Django installations within the same ``VirtualHost``,
-you'll need to take a special precaution to ensure mod_python's cache doesn't
-mess things up. Use the ``PythonInterpreter`` directive to give different
-``<Location>`` directives separate interpreters::
+一つの ``VirtualHost`` 設定の中に複数の Django をインストールしたい場合、
+mod_python のキャッシュが Django の動作を台無しにしないように特に気を配る必
+要があります。 ``PythonInterpreter`` ディレクティブを使って、
+``<Location>`` ディレクティブごとに別のインタプリタを使うようにしてください::
 
     <VirtualHost *>
         ServerName www.example.com
@@ -179,58 +191,62 @@ mess things up. Use the ``PythonInterpreter`` directive to give different
         </Location>
     </VirtualHost>
 
-The values of ``PythonInterpreter`` don't really matter, as long as they're
-different between the two ``Location`` blocks.
+``PythonInterpreter`` の値は、二つの ``Location`` ブロックの間で違う値にさ
+えなっていれば何でもかまいません。
 
-Running a development server with mod_python
-============================================
+mod_python 上で開発用サーバを動かす
+===================================
 
-If you use mod_python for your development server, you can avoid the hassle of
-having to restart the server each time you make code changes. Just set
-``MaxRequestsPerChild 1`` in your ``httpd.conf`` file to force Apache to reload
-everything for each request. But don't do that on a production server, or we'll
-revoke your Django privileges.
+開発用サーバに mod_python を使う場合、コードを変更する度にサーバを再起動す
+るようなやんちゃは避けられます。 ``MaxRequestsPerChild 1`` をアパッチの
+``httpd.conf`` ファイルに指定し、Apache にリクエストごとに全てをリロードさ
+せてください。とはいえ、これをプロダクションサーバでやらないでください。さ
+もないと、 Django の恩恵が失われてしまいます。
 
-If you're the type of programmer who debugs using scattered ``print``
-statements, note that ``print`` statements have no effect in mod_python; they
-don't appear in the Apache log, as one might expect. If you have the need to
-print debugging information in a mod_python setup, either do this::
+あなたが ``print`` 文を散りばめてデバッグするタイプのプログラマなら、
+``print`` 文は mod_python では何の効果も及ぼさないということに注意しましょ
+う。 ``print`` 文を使っても、 Apache のログには何も出力されません。
+mod_python を使った設定でデバッグ情報を出力したいのなら::
 
     assert False, the_value_i_want_to_see
 
-Or add the debugging information to the template of your page.
+のようにするか、ページのテンプレートにデバッグ情報を追加してください。
 
+.. _mod_python のドキュメント: 
+    http://www.python.jp/doc/contrib/modpython/directives.html
 .. _mod_python documentation: http://modpython.org/live/current/doc-html/directives.html
 
 .. _serving-media-files:
+.. _Serving media files:
 
-Serving media files
-===================
+メディアファイルの提供
+========================
 
-Django doesn't serve media files itself; it leaves that job to whichever Web
-server you choose.
+Django は、自分ではメディアファイルの提供を行わず、ユーザの選んだ Web サー
+バにその仕事を任せます。
 
-We recommend using a separate Web server -- i.e., one that's not also running
-Django -- for serving media. Here are some good choices:
+メディアの提供には、別のウェブサーバ、すなわち Django を動かしていないサー
+バを使うよう勧めます。お勧めはいくつかあります:
 
     * lighttpd_
     * TUX_
-    * A stripped-down version of Apache_
+    * Apache_ の軽量化 (stripped-down) 版
 
-If, however, you have no option but to serve media files on the same Apache
-``VirtualHost`` as Django, here's how you can turn off mod_python for a
-particular part of the site::
+とはいえ、Django を動作させているのと同じ Apache の ``VirtualHost`` でメディ
+アファイルを提供せざるを得ない場合には、以下のようにして特定の場所でだけ
+mod_python を切ります::
 
     <Location "/media">
         SetHandler None
     </Location>
 
-Just change ``Location`` to the root URL of your media files. You can also use
-``<LocationMatch>`` to match a regular expression.
+``Location`` ディレクティブの引数を、メディアファイルを置いている場所のルー
+ト URL に置き換えて下さい。 ``<LocationMatch>`` を使って、正規表現に一致さ
+せるようにもできます。
 
-This example sets up Django at the site root but explicitly disables Django for
-the ``media`` subdirectory and any URL that ends with ``.jpg``, ``.gif`` or
-``.png``::
+以下の例では、 Django をサイトのルートで設定し、 ``media`` サブディレクトリ
+の下と、 ``.jpg`` 、 ``.gif`` 、および ``.png`` で終わる URL だけでは明示的
+に Django を無効にしています::
 
     <Location "/">
         SetHandler python-program
@@ -252,113 +268,116 @@ the ``media`` subdirectory and any URL that ends with ``.jpg``, ``.gif`` or
 .. _Apache: http://httpd.apache.org/
 
 .. _howto-deployment-modpython-serving-the-admin-files:
-
 .. _serving-the-admin-files:
+.. _Serving the admin files:
 
-Serving the admin files
-=======================
+admin ファイルの提供
+====================
 
-Note that the Django development server automagically serves admin media files,
-but this is not the case when you use any other server arrangement. You're
-responsible for setting up Apache, or whichever media server you're using, to
-serve the admin files.
+Django の開発サーバは自動的に admin メディアファイルを提供しますが、それ以
+外の設定ではこれはあてはまりません。admin ファイルを提供するには、 Apache
+なりその他のメディアサーバなりで設定を行う必要があります。
 
-The admin files live in (:file:`django/contrib/admin/media`) of the Django
-distribution.
+admin ファイルは Django 配布物の (:file:`django/contrib/admin/media`) ディ
+レクトリ下にあります。
 
-Here are two recommended approaches:
+お勧めのアプローチは二つあります:
 
-    1. Create a symbolic link to the admin media files from within your
-       document root. This way, all of your Django-related files -- code **and**
-       templates -- stay in one place, and you'll still be able to ``svn
-       update`` your code to get the latest admin templates, if they change.
-       
-    2. Or, copy the admin media files so that they live within your Apache
-       document root.
+    1. ドキュメントルートから admin メディアファイルへのシンボリックリンク
+       を作ります。そうすれば、リンクを張った Django 関係のファイル (コード
+       **と** テンプレート) を一箇所にまとめられるので、自分のコードを
+       ``svn update`` するだけで admin テンプレートを最新の状態に保てます。
 
-Using "eggs" with mod_python
-============================
+    2. または、 admin メディアファイルをコピーして Apache のドキュメントルー
+       トに入れます。
 
-If you installed Django from a Python egg_ or are using eggs in your Django
-project, some extra configuration is required. Create an extra file in your
-project (or somewhere else) that contains something like the following:
+.. Using eggs with mod_python
+
+mod_python 上で "egg" パッケージを使う
+=======================================
+
+Django を Python egg_ でインストールしたり、 Django から egg 化されたモジュー
+ルを使っている場合、いくつか追加の設定が必要です。プロジェクト中 (か、どこ
+か import できる場所) にファイルを作り、以下の内容を入れておきます::
 
 .. code-block:: python
 
     import os
     os.environ['PYTHON_EGG_CACHE'] = '/some/directory'
 
-Here, ``/some/directory`` is a directory that the Apache webserver process can
-write to. It will be used as the location for any unpacking of code the eggs
-need to do.
+``/some/directory`` は Apache httpd を動作させているプロセスが読み書き可能
+なディレクトリにします。このディレクトリは、 egg がコードの展開を必要とする
+場合に使われます。
 
-Then you have to tell mod_python to import this file before doing anything
-else. This is done using the PythonImport_ directive to mod_python. You need
-to ensure that you have specified the ``PythonInterpreter`` directive to
-mod_python as described above__ (you need to do this even if you aren't
-serving multiple installations in this case). Then add the ``PythonImport``
-line in the main server configuration (i.e., outside the ``Location`` or
-``VirtualHost`` sections). For example::
+次に、 mod_python の PythonImport_ ディレクティブを使って、 mod_python が一
+番最初にこのファイルを import するよう指定します。まず、前述の
+「 `ひとつの Apache で複数の Django を使う`_ 」の節で説明した
+``PythonInterpreter`` ディレクティブを設定しておきます (複数の Django をイ
+ンストールしない場合でも必要です)。
+次に、メインのサーバ設定 (``Location`` や ``VirtualHost`` セクションの外)
+に、以下のように ``PythonImport`` 行を追加します::
 
     PythonInterpreter my_django
     PythonImport /path/to/my/project/file.py my_django
 
-Note that you can use an absolute path here (or a normal dotted import path),
-as described in the `mod_python manual`_. We use an absolute path in the
-above example because if any Python path modifications are required to access
-your project, they will not have been done at the time the ``PythonImport``
-line is processed.
+`mod_python マニュアル`_ で定義されている通り、モジュールの指定は絶対パス
+(またはドット区切りの import パス表記) で行えます。ここでは絶対パスを使って
+いますが、これは、 ``PythonImport`` を処理する時点では、プロジェクトへの
+Python パスを変更する操作がまだ完了していないからです。
 
 .. _Egg: http://peak.telecommunity.com/DevCenter/PythonEggs
-.. _PythonImport: http://www.modpython.org/live/current/doc-html/dir-other-pimp.html
+.. PythonImport: http://www.modpython.org/live/current/doc-html/dir-other-pimp.html
+.. _PythonImport: http://www.python.jp/doc/contrib/modpython/dir-other-pimp.html
 .. _mod_python manual: PythonImport_
-__ `Multiple Django installations on the same Apache`_
+.. _`mod_python マニュアル`: `mod_python manual`_
+.. _`ひとつの Apache で複数の Django を使う`: `Multiple Django installations on the same Apache`_
 
-Error handling
-==============
+.. _Error handling:
 
-When you use Apache/mod_python, errors will be caught by Django -- in other
-words, they won't propagate to the Apache level and won't appear in the Apache
-``error_log``.
+エラー処理
+==========
 
-The exception for this is if something is really wonky in your Django setup. In
-that case, you'll see an "Internal Server Error" page in your browser and the
-full Python traceback in your Apache ``error_log`` file. The ``error_log``
-traceback is spread over multiple lines. (Yes, this is ugly and rather hard to
-read, but it's how mod_python does things.)
+Apache/mod_python を使っている場合、エラーは Django によって捕捉されます。
+別の言い方をすれば、 エラーは Apache レベルまで伝播せず、 Apache の
+``error_log`` には出力されないということです。
 
-If you get a segmentation fault
-===============================
+例外は Django のセットアップが全くうまくいっていない場合で、この場合には
+"Internal Server Error" がブラウザに表示され、 ``error_log`` ファイルには完
+全な Python のトレースバックが出力されます。 (``error_log`` トレースバック
+は複数のログエントリ行に展開されます (これは見苦しくて読みづらいのですが、
+mod_python のやり方なので仕方ありません)。
 
-If Apache causes a segmentation fault, there are two probable causes, neither
-of which has to do with Django itself.
+.. _If you get a segmentation fault:
 
-    1. It may be because your Python code is importing the "pyexpat" module,
-       which may conflict with the version embedded in Apache. For full
-       information, see `Expat Causing Apache Crash`_.
-       
-    2. It may be because you're running mod_python and mod_php in the same
-       Apache instance, with MySQL as your database backend. In some cases,
-       this causes a known mod_python issue due to version conflicts in PHP and
-       the Python MySQL backend. There's full information in the
-       `mod_python FAQ entry`_.
+セグメンテーション違反になる場合
+================================
 
-If you continue to have problems setting up mod_python, a good thing to do is
-get a barebones mod_python site working, without the Django framework. This is
-an easy way to isolate mod_python-specific problems. `Getting mod_python Working`_
-details this procedure.
+Apache がセグメンテーション違反 (segumentation fault) を引き起こす場合、 2
+種類の原因が考えられます。いずれも Django 自体とは関係のない原因です。
 
-The next step should be to edit your test code and add an import of any
-Django-specific code you're using -- your views, your models, your URLconf,
-your RSS configuration, etc. Put these imports in your test handler function
-and access your test URL in a browser. If this causes a crash, you've confirmed
-it's the importing of Django code that causes the problem. Gradually reduce the
-set of imports until it stops crashing, so as to find the specific module that
-causes the problem. Drop down further into modules and look into their imports,
-as necessary.
+    1. Python コードが "pyexpat" モジュールを import している場合。
+       "pyexpat" は Apache に埋め込まれているバージョンと衝突する場合があり
+       ます。詳しくは、 `Expat Causing Apache Crash`_ を参照してください。
+    2. mod_python と mod_php を同じ Apache のインスタンスで動作させ、バック
+       エンドに MySQL を使っている場合。PHP と Python MySQL バックエンドと
+       のバージョン衝突で引き起こされる既知の問題かもしれません。これについ
+       ては `mod_python FAQ entry`_ に詳しく書かれています。
+
+mod_python を使った設定で問題を解決できない場合、まずは Django フレームワー
+クなしの素の mod_python サイトを動かすようにしてみるとよいでしょう。そうす
+れば、mod_python 固有の問題を簡単に切り分けられます。この手順については
+`Getting mod_python Working`_ で詳しく説明しています。
+
+次のステップでは、テストコードを編集して、自分が使っている全ての Django 関
+係のコード -- ビュー、モデル、 URLconf, RSS の設定など -- を import してみ
+ます。これらのモジュールを import する文をテストハンドラ関数に入れ、ブラウ
+ザでテストハンドラの URL にアクセスしてください。クラッシュするようなら、
+Django コードの import が問題の原因だということになります。クラッシュしなく
+なるまで段階的に import するモジュールを減らしてゆき、原因のモジュールを特
+定してください。原因のモジュールを調べて、中で import しているモジュールを
+必要に応じて調べて下さい。
+
 
 .. _Expat Causing Apache Crash: http://www.dscpl.com.au/articles/modpython-006.html
 .. _mod_python FAQ entry: http://modpython.org/FAQ/faqw.py?req=show&file=faq02.013.htp
 .. _Getting mod_python Working: http://www.dscpl.com.au/articles/modpython-001.html
-
-
