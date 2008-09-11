@@ -1,53 +1,59 @@
 .. _topics-forms-modelforms:
 
-==========================
-Creating forms from models
-==========================
+================================
+モデルからフォームを生成する
+================================
+
+:revision-up-to: 8961 (1.0)
 
 ``ModelForm``
 =============
 
-If you're building a database-driven app, chances are you'll have forms that
-map closely to Django models. For instance, you might have a ``BlogComment``
-model, and you want to create a form that lets people submit comments. In this
-case, it would be redundant to define the field types in your form, because
-you've already defined the fields in your model.
+データベース駆動のアプリケーションを構築しているのなら、 Django のモデルに
+対応したフォームが必要な場合があるでしょう。例えば、 ``BlogComment`` モデル
+を作っていて、読者がコメントを入力できるようなフォームを作成したいような場
+合です。こうしたケースでは、すでにモデルにフィールドを定義しているので、新
+たにフォームクラス用にフィールドを定義するのは無駄な作業でしかありません。
 
-For this reason, Django provides a helper class that let you create a ``Form``
-class from a Django model.
+この理由から、 Django はモデルからフォームクラスを生成するためのヘルパクラ
+スを提供しています。
 
-For example::
+以下に例を示します::
 
     >>> from django.forms import ModelForm
 
-    # Create the form class.
+    # フォームクラスを生成
     >>> class ArticleForm(ModelForm):
     ...     class Meta:
     ...         model = Article
 
-    # Creating a form to add an article.
+    # 記事を追加するためのフォームを作成
     >>> form = ArticleForm()
 
-    # Creating a form to change an existing article.
+    # 既存の記事を変更するためのフォームを作成
     >>> article = Article.objects.get(pk=1)
     >>> form = ArticleForm(instance=article)
 
-Field types
------------
+.. _Field types:
 
-The generated ``Form`` class will have a form field for every model field. Each
-model field has a corresponding default form field. For example, a
-``CharField`` on a model is represented as a ``CharField`` on a form. A
-model ``ManyToManyField`` is represented as a ``MultipleChoiceField``. Here is
-the full list of conversions:
+フィールド型
+-------------
+
+モデルから生成されるフォームクラスは、モデルの各フィールドに対応したフォー
+ムフィールドを持ちます。モデルフィールドには、それぞれデフォルトのフォーム
+フィールド型が定義されています。例えば、モデルの ``CharField`` 型には、
+``CharField`` 型のフォームフィールドが対応しています。モデルの
+``ManyToManyField`` には、 ``MultipleChoiceField`` が対応しています。以下に
+対応の一覧表を示します:
 
     ===============================  ========================================
-    Model field                      Form field
+    モデルフィールド型               フォームフィールド型
     ===============================  ========================================
-    ``AutoField``                    Not represented in the form
+    ``AutoField``                    フォーム上では表現されていません
     ``BooleanField``                 ``BooleanField``
-    ``CharField``                    ``CharField`` with ``max_length`` set to
-                                     the model field's ``max_length``
+    ``CharField``                    ``CharField`` 。 ``max_length`` にはモ
+                                     デルフィールドの ``max_length`` 値が設
+                                     定されます。
     ``CommaSeparatedIntegerField``   ``CharField``
     ``DateField``                    ``DateField``
     ``DateTimeField``                ``DateTimeField``
@@ -56,67 +62,75 @@ the full list of conversions:
     ``FileField``                    ``FileField``
     ``FilePathField``                ``CharField``
     ``FloatField``                   ``FloatField``
-    ``ForeignKey``                   ``ModelChoiceField`` (see below)
+    ``ForeignKey``                   ``ModelChoiceField`` (下記参照)
     ``ImageField``                   ``ImageField``
     ``IntegerField``                 ``IntegerField``
     ``IPAddressField``               ``IPAddressField``
-    ``ManyToManyField``              ``ModelMultipleChoiceField`` (see
-                                     below)
+    ``ManyToManyField``              ``ModelMultipleChoiceField`` (下記参照)
     ``NullBooleanField``             ``CharField``
     ``PhoneNumberField``             ``USPhoneNumberField``
-                                     (from ``django.contrib.localflavor.us``)
+                                     (``django.contrib.localflavor.us``)
     ``PositiveIntegerField``         ``IntegerField``
     ``PositiveSmallIntegerField``    ``IntegerField``
     ``SlugField``                    ``SlugField``
     ``SmallIntegerField``            ``IntegerField``
-    ``TextField``                    ``CharField`` with ``widget=Textarea``
+    ``TextField``                    ``widget=Textarea`` の ``CharField``
     ``TimeField``                    ``TimeField``
-    ``URLField``                     ``URLField`` with ``verify_exists`` set
-                                     to the model field's ``verify_exists``
-    ``XMLField``                     ``CharField`` with ``widget=Textarea``
+    ``URLField``                     ``URLField`` 。 ``verify_exists`` には
+                                     モデルフィールドの ``verify_exists``
+                                     値が設定されます。
+    ``XMLField``                     ``widget=Textarea`` の ``CharField``
     ===============================  ========================================
 
 
 .. note::
-    The ``FloatField`` form field and ``DecimalField`` model and form fields
-    are new in the development version.
+    ``FloatField`` および ``DecimalField`` は、モデルフィールド、フォーム
+    フィールドともに開発版の Django で新たに定義されました。
 
-As you might expect, the ``ForeignKey`` and ``ManyToManyField`` model field
-types are special cases:
+お気付きかもしれませんが、 ``ForeignKey`` や ``ManyToManyField`` といったモ
+デルフィールドは特別扱いされています:
 
-    * ``ForeignKey`` is represented by ``django.forms.ModelChoiceField``,
-      which is a ``ChoiceField`` whose choices are a model ``QuerySet``.
+    * ``ForeignKey`` は ``django.forms.ModelChoiceField`` で表現されてお
+      います。 ``ModelChoiceField`` は、選択肢がモデルの ``QuerySet`` であ
+      るような ``ChoiceField`` です。
 
-    * ``ManyToManyField`` is represented by
-      ``django.forms.ModelMultipleChoiceField``, which is a
-      ``MultipleChoiceField`` whose choices are a model ``QuerySet``.
+    * ``ManyToManyField`` は ``django.forms.ModelMultipleChoiceField``
+       で表現されています。 ``ModelMultipleChoiceField`` は、選択肢がモデル
+       の ``QuerySet`` であるような ``MultipleChoiceField`` です。
 
-In addition, each generated form field has attributes set as follows:
+さらに、生成されるフォームフィールドには、以下の属性が付加されます:
 
-    * If the model field has ``blank=True``, then ``required`` is set to
-      ``False`` on the form field. Otherwise, ``required=True``.
+    * モデルフィールドに ``blank=True`` が設定されていると、フォームフィー
+      ルドの ``required`` は ``False`` に設定されます。それ以外の場合には、
+      ``required=True`` です。
 
-    * The form field's ``label`` is set to the ``verbose_name`` of the model
-      field, with the first character capitalized.
+    * フォームフィールドの ``label`` にはモデルフィールドの
+      ``verbose_name`` の値を使います。このとき先頭の文字は大文字に変換され
+      ます。
 
-    * The form field's ``help_text`` is set to the ``help_text`` of the model
-      field.
+    * フォームフィールドの ``help_text`` にはモデルフィールドの
+      ``help_text`` の値を使います。
 
-    * If the model field has ``choices`` set, then the form field's ``widget``
-      will be set to ``Select``, with choices coming from the model field's
-      ``choices``. The choices will normally include the blank choice which is
-      selected by default. If the field is required, this forces the user to
-      make a selection. The blank choice will not be included if the model
-      field has ``blank=False`` and an explicit ``default`` value (the
-      ``default`` value will be initially selected instead).
+    * モデルフィールドに ``choices`` が設定されている場合、フォームフィール
+      ドの ``widget`` は ``Select`` に設定されます。また、選択肢にはモデル
+      フィールドの ``choices`` の値を使います。通常、選択肢の中には、空の
+      選択肢が加えられ、フォームの表示時にデフォルトで選択されています。
+      フィールドが必須のフィールドである場合、ユーザは必ず空の選択肢以外か
+      ら選択せねばなりません。モデルフィールドが ``blank=False`` で、かつ
+      ``default`` 値が明に設定されている場合、空の選択肢は表示されません
+      (``default`` の値が選択された状態で表示されます)。
 
-Finally, note that you can override the form field used for a given model
-field. See `Overriding the default field types`_ below.
 
-A full example
---------------
+あるモデルからフォームを作成する場合、モデルのフォームフィールドに対応する
+フォームフィールドをオーバライドできます。後述の
+`デフォルトのフィールド型をオーバライドする`_ を参照してください。
 
-Consider this set of models::
+.. _A full example:
+
+詳細な例
+---------
+
+以下のような一連のモデルを考えましょう::
 
     from django.db import models
     from django.forms import ModelForm
@@ -147,9 +161,9 @@ Consider this set of models::
         class Meta:
             model = Book
 
-With these models, the ``ModelForm`` subclasses above would be roughly
-equivalent to this (the only difference being the ``save()`` method, which
-we'll discuss in a moment.)::
+上に挙げた例中の ``ModelForm`` サブクラスは、以下のフォームクラスとほぼ同じ
+になります (違いは ``save()`` メソッドの動作だけです。これについてはすぐ後
+で説明します)::
 
     class AuthorForm(forms.Form):
         name = forms.CharField(max_length=100)
@@ -161,136 +175,145 @@ we'll discuss in a moment.)::
         name = forms.CharField(max_length=100)
         authors = forms.ModelMultipleChoiceField(queryset=Author.objects.all())
 
-The ``save()`` method
+.. _The save() method:
+
+``save()`` メソッド
 ---------------------
 
-Every form produced by ``ModelForm`` also has a ``save()``
-method. This method creates and saves a database object from the data
-bound to the form. A subclass of ``ModelForm`` can accept an existing
-model instance as the keyword argument ``instance``; if this is
-supplied, ``save()`` will update that instance. If it's not supplied,
-``save()`` will create a new instance of the specified model::
+``ModelForm`` から生成されたフォームは ``save()`` メソッドを備えています。
+このメソッドは、フォームに結びつけられたデータから、モデルオブジェクトを生
+成してデータベースに保存します。 ``ModelForm`` のサブクラスは既存のモデルイ
+ンスタンスをキーワード引数 ``instance`` にしてインスタンス化できます。
+``instance`` を指定してモデルフォームを生成すると、モデルフォームの
+``save()`` はこのインスタンスを更新して保存します。 ``instance`` を指定しな
+ければ、 ``save()`` はモデルフォームで指定しているモデルの新たなインスタン
+スを生成します::
 
-    # Create a form instance from POST data.
+    # POST データから新たなフォームインスタンスを生成
     >>> f = ArticleForm(request.POST)
 
-    # Save a new Article object from the form's data.
+    # フォームデータから新たな Article オブジェクトを生成
     >>> new_article = f.save()
 
-    # Create a form to edit an existing Article.
+    # 既存の Article オブジェクトからフォームを生成
     >>> a = Article.objects.get(pk=1)
     >>> f = ArticleForm(instance=a)
     >>> f.save()
 
-    # Create a form to edit an existing Article, but use
-    # POST data to populate the form.
+    # 既存の Article オブジェクトを編集するためのフォームを作成します。
+    # ただし、 POST データを使ってフォームに値を設定します。
     >>> a = Article.objects.get(pk=1)
     >>> f = ArticleForm(request.POST, instance=a)
     >>> f.save()
 
-Note that ``save()`` will raise a ``ValueError`` if the data in the form
-doesn't validate -- i.e., ``if form.errors``.
+フォームの入力値の検証に失敗すると、 ``save()`` は ``ValueError`` を送出す
+るので注意してください。
 
-This ``save()`` method accepts an optional ``commit`` keyword argument, which
-accepts either ``True`` or ``False``. If you call ``save()`` with
-``commit=False``, then it will return an object that hasn't yet been saved to
-the database. In this case, it's up to you to call ``save()`` on the resulting
-model instance. This is useful if you want to do custom processing on the
-object before saving it. ``commit`` is ``True`` by default.
+``save()`` メソッドはオプション ``commit`` キーワード引数を持っています。こ
+の引数には ``True`` または ``False`` を指定します。 ``save()`` を
+``commit=False`` で呼び出すと、データベースに保存する前のモデルオブジェクト
+を返します。返されたオブジェクトに対して、最終的に ``save()`` を呼び出すか
+どうかは自由です。この機能は、オブジェクトを実際に保存する前に何らかの処理
+を行いたい場合に便利です。 ``commit`` はデフォルトでは  ``True`` に設定され
+ています。
 
-Another side effect of using ``commit=False`` is seen when your model has
-a many-to-many relation with another model. If your model has a many-to-many
-relation and you specify ``commit=False`` when you save a form, Django cannot
-immediately save the form data for the many-to-many relation. This is because
-it isn't possible to save many-to-many data for an instance until the instance
-exists in the database.
+モデルが他のモデルに対する多対多のリレーションをはっている場合、
+``commit=False`` を使うともう一つの副作用があります。多対多のリレーションを
+持つモデルから生成したフォームを保存する際、 Django は多対多のリレーション
+に対するデータをすぐに保存できません。なぜなら、 ``save(commit=False)`` の
+対象であるオブジェクトはまだデータベースに保存されていないため、オブジェク
+トに対する多対多の関係を保存するためのテーブルを更新できないからです。
 
-To work around this problem, every time you save a form using ``commit=False``,
-Django adds a ``save_m2m()`` method to your ``ModelForm`` subclass. After
-you've manually saved the instance produced by the form, you can invoke
-``save_m2m()`` to save the many-to-many form data. For example::
+この問題を回避するために、Django は ``commit=False`` でフォームを保存した直
+後に、モデルフォームクラス ``save_m2m()`` メソッドを追加します。フォームの
+から生成したインスタンスを手動で保存した後で ``save_m2m()`` を呼び出せば、
+多対多のフォームデータを保存できます。以下に例を示します::
 
-    # Create a form instance with POST data.
+    # POST データから新たなフォームインスタンスを生成
     >>> f = AuthorForm(request.POST)
 
-    # Create, but don't save the new author instance.
+    # インスタンスを生成、ただし保存はしない
     >>> new_author = f.save(commit=False)
 
-    # Modify the author in some way.
+    # new_author のフィールド値を変更
     >>> new_author.some_field = 'some_value'
 
-    # Save the new instance.
+    # 新たなインスタンスを保存
     >>> new_author.save()
 
-    # Now, save the many-to-many data for the form.
+    # 最後に、多対多のフォームデータを保存
     >>> f.save_m2m()
 
-Calling ``save_m2m()`` is only required if you use ``save(commit=False)``.
-When you use a simple ``save()`` on a form, all data -- including
-many-to-many data -- is saved without the need for any additional method calls.
-For example::
+``save_m2m()`` の呼び出しが必要なのは、 ``save(commit=False)`` を使った場合
+だけです。単に ``save()`` を呼び出すだけなら、多対多のデータを含む全てのデー
+タが保存され、他に何らかのメソッドを呼び出す必要はありません。以下に例を示
+します::
 
-    # Create a form instance with POST data.
+    # POST データから新たなフォームインスタンスを生成
     >>> a = Author()
     >>> f = AuthorForm(request.POST, instance=a)
 
-    # Create and save the new author instance. There's no need to do anything else.
+    # 新たな Author インスタンスを生成して保存。他にはなにもしなくてよい
     >>> new_author = f.save()
 
-Other than the ``save()`` and ``save_m2m()`` methods, a ``ModelForm`` works
-exactly the same way as any other ``forms`` form. For example, the
-``is_valid()`` method is used to check for validity, the ``is_multipart()``
-method is used to determine whether a form requires multipart file upload (and
-hence whether ``request.FILES`` must be passed to the form), etc. See
-:ref:`topics-forms-index` for more information.
+``save()`` および ``save_m2m()`` メソッド以外は、 ``ModelForm``
+``forms`` で作られたフォームと全く同じように動作します。例えば、
+データの検証は ``is_valid()`` で行えますし、 ``is_multipart()``
+メソッドを使えばフォームがマルチパートのファイルアップロードを要求している
+かどうか (そして ``request.FILES`` をフォームに渡さなければならないかどうか)判
+別できます。詳しくは、 :ref:`topics-forms-index` を参照してください。
 
-Using a subset of fields on the form
-------------------------------------
+.. _Using a subset of fields on the form:
 
-In some cases, you may not want all the model fields to appear on the generated
-form. There are three ways of telling ``ModelForm`` to use only a subset of the
-model fields:
+モデルの一部のフィールドだけからフォームを生成する
+---------------------------------------------------
 
-1. Set ``editable=False`` on the model field. As a result, *any* form
-   created from the model via ``ModelForm`` will not include that
-   field.
+場合によっては、フォームを生成するときに、モデルの一部のフィールドだけを表
+示したいことでしょう。モデルフィールドの一部だけを使って ``ModelForm`` を作
+るには、以下の 3 つの方法があります:
 
-2. Use the ``fields`` attribute of the ``ModelForm``'s inner ``Meta``
-   class.  This attribute, if given, should be a list of field names
-   to include in the form.
+1. モデルフィールドに ``editable=False`` を定義します。その結果、
+   モデルフォームを使って生成したフォームは *全て* このフィールドを含ま
+   なくなります。
 
-3. Use the ``exclude`` attribute of the ``ModelForm``'s inner ``Meta``
-   class.  This attribute, if given, should be a list of field names
-   to exclude from the form.
+2. ``ModelForm`` サブクラスで、内部クラス ``Meta`` の ``fields`` 属性を
+   設定します。この属性にはフィールド名からなるリストを設定します。設定
+   すると、指定されたフィールドだけを含むフォームを生成します。
 
-For example, if you want a form for the ``Author`` model (defined
-above) that includes only the ``name`` and ``title`` fields, you would
-specify ``fields`` or ``exclude`` like this::
+3. ``ModelForm`` サブクラスで、内部クラス ``Meta`` の ``exclude`` 属性を
+   設定します。この属性にはフィールド名からなるリストを設定します。設定
+   すると、指定されたフィールドを含まないフォームを生成します。
+
+例えば、 (上で定義した) ``Author`` モデルから、 ``name`` と
+``title`` フィールドだけを含むようなフォームを作成したければ、以下の
+ようにして ``fields`` または ``exclude`` を指定します::
 
     class PartialAuthorForm(ModelForm):
         class Meta:
             model = Author
             fields = ('name', 'title')
-    
+
     class PartialAuthorForm(ModelForm):
         class Meta:
             model = Author
             exclude = ('birth_date',)
 
-Since the Author model has only 3 fields, 'name', 'title', and
-'birth_date', the forms above will contain exactly the same fields.
+Author モデルには ``'name'``, ``'title'``, ``'birth_date'`` の 3 つ
+のフィールドしかないので、上のフォームは全く同じフォームフィールド
+を持ちます。
 
 .. note::
 
-    If you specify ``fields`` or ``exclude`` when creating a form with
-    ``ModelForm``, then the fields that are not in the resulting form will not
-    be set by the form's ``save()`` method. Django will prevent any attempt to
-    save an incomplete model, so if the model does not allow the missing fields
-    to be empty, and does not provide a default value for the missing fields,
-    any attempt to ``save()`` a ``ModelForm`` with missing fields will fail.
-    To avoid this failure, you must instantiate your model with initial values
-    for the missing, but required fields, or use ``save(commit=False)`` and
-    manually set any extra required fields::
+    ``ModelForm`` を使ってフォームを生成するときに ``fields`` や
+    ``exclude`` を指定すると、生成されたフォームの ``save()`` を呼び出した
+    ときに、フォームに含まれていないフィールドのデータは設定されません。
+    このため、フォームに含まれていないフィールドに対応するモデルフィールド
+    が、空の値を許さないように定義されていて、かつデフォルトの値が指定され
+    ていない場合、モデルインスタンスが不完全なために Django がオブジェクト
+    の保存を抑止し、 ``save()`` は失敗します。これを避けるには、フォームの
+    インスタンスを生成するときに、不足しているフィールドでかつ必須のフィー
+    ルドに対する初期値を指定してやるか、 ``save(commit=False)`` を使って、
+    必須のフィールドの値を手動で設定してください::
 
         instance = Instance(required_field='value')
         form = InstanceForm(request.POST, instance=instance)
@@ -300,24 +323,29 @@ Since the Author model has only 3 fields, 'name', 'title', and
         instance.required_field = 'new value'
         new_instance = instance.save()
 
-    See the `section on saving forms`_ for more details on using
-    ``save(commit=False)``.
+    ``save(commit=False)`` については、 `「フォームの保存」`_ も参照してく
+    ださい。
+
 
 .. _section on saving forms: `The save() method`_
+.. _`「フォームの保存」`: `section on saving forms`_
 
-Overriding the default field types
-----------------------------------
+.. _Overriding the default field types:
 
-The default field types, as described in the `Field types`_ table above, are
-sensible defaults. If you have a ``DateField`` in your model, chances are you'd
-want that to be represented as a ``DateField`` in your form. But
-``ModelForm`` gives you the flexibility of changing the form field type
-for a given model field. You do this by declaratively specifying fields like
-you would in a regular ``Form``. Declared fields will override the default
-ones generated by using the ``model`` attribute.
+デフォルトのフィールド型をオーバライドする
+--------------------------------------------
 
-For example, if you wanted to use ``MyDateFormField`` for the ``pub_date``
-field, you could do the following::
+上の `フィールド型`_ で説明したデフォルトのフィールド型は、いわゆる気の利い
+たデフォルト値にすぎません。モデル上で ``DateField`` として定義されている
+フィールドは、フォーム上でも ``DateField`` として表現されてほしいというのが
+普通でしょう。とはいえ、 ``ModelForm`` は、あるモデルフィールドのフォーム
+フィールド型を変更できるという柔軟性を備えています。フォームフィールドの型
+を変更するには、通常のフォームクラスでしているように、クラス属性としてフォー
+ムフィールドを宣言します。宣言されたフィールドは、 ``model`` 属性から生成さ
+れたデフォルトのフィールドをオーバライドします。
+
+例えば、 ``pub_date`` フィールドに ``MyDateFormField`` を使いたければ、
+以下のようにして実現できます::
 
     >>> class ArticleForm(ModelForm):
     ...     pub_date = MyDateFormField()
@@ -325,14 +353,16 @@ field, you could do the following::
     ...     class Meta:
     ...         model = Article
 
-If you want to override a field's default widget, then specify the ``widget``
-parameter when declaring the form field::
+フィールドのデフォルトウィジェットをオーバライドしたければ、フォームフィー
+ルドを宣言するときに ``widget`` パラメタを指定します::
 
    >>> class ArticleForm(ModelForm):
    ...     pub_date = DateField(widget=MyDateWidget())
    ...
    ...     class Meta:
    ...         model = Article
+
+.. TBD
 
 Overriding the clean() method
 -----------------------------
@@ -344,59 +374,63 @@ or unique_together on the model. Therefore, if you would like to override
 the ``clean()`` method and maintain the default validation, you must call the
 parent class's ``clean()`` method.
 
-Form inheritance
-----------------
+.. _Form inheritance:
 
-As with basic forms, you can extend and reuse ``ModelForms`` by inheriting
-them. This is useful if you need to declare extra fields or extra methods on a
-parent class for use in a number of forms derived from models. For example,
-using the previous ``ArticleForm`` class::
+フォームクラスの継承
+---------------------
+
+フォームクラスと同様、 ``ModelForm`` も継承によって再利用できます。フォーム
+クラスの継承は、一つのモデルからいくつもフォームを導出して、フォーム毎にフィー
+ルドを追加したり、メソッドを追加したりする際に便利です::
 
     >>> class EnhancedArticleForm(ArticleForm):
     ...     def clean_pub_date(self):
     ...         ...
 
-This creates a form that behaves identically to ``ArticleForm``, except there's
-some extra validation and cleaning for the ``pub_date`` field.
+上記のコードは、独自に ``pub_date`` フィールドの検証とクリーニングを行うほ
+かは、 ``ArticleForm`` と全く同じフォームを生成します。
 
-You can also subclass the parent's ``Meta`` inner class if you want to change
-the ``Meta.fields`` or ``Meta.excludes`` lists::
+親クラスの内部クラス ``Meta`` をサブクラス化すれば、親クラスの
+``Meta.fields`` や ``Meta.excludes`` リストを変更できます::
 
     >>> class RestrictedArticleForm(EnhancedArticleForm):
     ...     class Meta(ArticleForm.Meta):
     ...         exclude = ['body']
 
-This adds the extra method from the ``EnhancedArticleForm`` and modifies
-the original ``ArticleForm.Meta`` to remove one field.
+上記のコードは、 ``EnhancedArticleForm`` を追加して、 ``ArticleForm.Meta``
+フィールドを変更することで、 ``body`` フィールドを除去しています。
 
-There are a couple of things to note, however.
+ただし、フォームクラスの継承にはいくつか注意すべき点もあります。
 
- * Normal Python name resolution rules apply. If you have multiple base
-   classes that declare a ``Meta`` inner class, only the first one will be
-   used. This means the child's ``Meta``, if it exists, otherwise the
-   ``Meta`` of the first parent, etc.
+ * 属性の名前解決には、通常の Python の名前解決規則が適用されます。すなわち、
+   内部クラス ``Meta`` を持つ複数の基底クラスを持つようなサブクラスを定義す
+   ると、最初のクラスの ``Meta`` だけを使います。従って、 ``Meta`` の解決は
+   まずサブクラスの ``Meta`` 、そして最初の親クラスの ``Meta`` の順に行われ
+   ます。
 
- * For technical reasons, a subclass cannot inherit from both a ``ModelForm``
-   and a ``Form`` simultaneously.
+ * 技術的な理由から、サブクラスは ``ModelForm`` と  ``Form`` を同時に継承で
+   きません。
 
-Chances are these notes won't affect you unless you're trying to do something
-tricky with subclassing.
+これらの注意点は、サブクラスを作成する際に何かトリッキーなことをしない限り
+は当てはまらないはずです。
+
 
 .. _model-formsets:
+.. _Model Formsets:
 
-Model Formsets
-==============
+モデルフォームセット
+=======================
 
-Similar to :ref:`regular formsets <topics-forms-formsets>` there are a couple
-enhanced formset classes that provide all the right things to work with your
-models. Lets reuse the ``Author`` model from above::
+:ref:`通常のフォームセット <topics-form-formsets>` と同様、モデル由来のフォー
+ムをうまく扱えるように拡張された特殊なフォームセットクラスがあります。上の
+``Author`` モデルを使って説明しましょう::
 
     >>> from django.forms.models import modelformset_factory
     >>> AuthorFormSet = modelformset_factory(Author)
 
-This will create a formset that is capable of working with the data associated
-to the ``Author`` model. It works just like a regular formset just that we are
-working with ``ModelForm`` instances instead of ``Form`` instances::
+これで、 ``Author`` モデルに関連づけられたデータを扱えるフォームセットが生
+成されます。 ``AuthorFormSet`` は、個々のフォームが ``Form`` ではなく
+``ModelForm`` なだけで、通常のフォームセットと同じように使えます::
 
     >>> formset = AuthorFormSet()
     >>> print formset
@@ -411,19 +445,21 @@ working with ``ModelForm`` instances instead of ``Form`` instances::
     <tr><th><label for="id_form-0-birth_date">Birth date:</label></th><td><input type="text" name="form-0-birth_date" id="id_form-0-birth_date" /><input type="hidden" name="form-0-id" id="id_form-0-id" /></td></tr>
 
 .. note::
-    One thing to note is that ``modelformset_factory`` uses ``formset_factory``
-    and by default uses ``can_delete=True``.
+    ちなみに、 ``modelformset_factory`` は ``formset_factory`` を使っていて、
+    デフォルトでは ``can_delete=True`` です。
 
-Changing the queryset
----------------------
+.. _Changing the queryset:
 
-By default when you create a formset from a model the queryset will be all
-objects in the model. This is best shown as ``Author.objects.all()``. This is
-configurable::
+クエリセットを変更する
+------------------------
+
+デフォルトでは、モデルからフォームセットを生成すると、そのクエリセットはモ
+デルの全てのオブジェクト、すなわち ``Author.objects.all()`` です。このクエ
+リセットは、以下のように変更できます::
 
     >>> formset = AuthorFormSet(queryset=Author.objects.filter(name__startswith='O'))
 
-Alternatively, you can use a subclassing based approach::
+サブクラスを使ったアプローチでも指定できます::
 
     from django.forms.models import BaseModelFormSet
     
@@ -431,10 +467,12 @@ Alternatively, you can use a subclassing based approach::
         def get_queryset(self):
             return super(BaseAuthorFormSet, self).get_queryset().filter(name__startswith='O')
 
-Then your ``BaseAuthorFormSet`` would be passed into the factory function to
-be used as a base::
+ファクトリ関数を呼ぶときに、 ``BaseAuthorFormSet`` を渡してベースクラスにし
+てください::
 
     >>> AuthorFormSet = modelformset_factory(Author, formset=BaseAuthorFormSet)
+
+.. TBD
 
 Controlling which fields are used with ``fields`` and ``exclude``
 -----------------------------------------------------------------
@@ -452,46 +490,48 @@ you need to go the other way::
 Using ``exclude`` will prevent the given fields from being used in the formset.
 
 .. _saving-objects-in-the-formset:
+.. _Saving objects in the formset:
 
-Saving objects in the formset
------------------------------
+フォームセット内のオブジェクトを保存する
+-------------------------------------------
 
-Similar to a ``ModelForm`` you can save the data into the model. This is done
-with the ``save()`` method on the formset::
+``ModelForm`` と同様、フォームセット内のデータからモデルへの保存を行えます。
+保存するには、フォームセットの ``save()`` メソッドを呼び出します::
 
-    # create a formset instance with POST data.
+    # POST データからフォームセットインスタンスを生成します。
     >>> formset = AuthorFormSet(request.POST)
     
-    # assuming all is valid, save the data
+    # フォームデータが有効なものと課程して、データを保存します。
     >>> instances = formset.save()
 
-The ``save()`` method will return the instances that have been saved to the
-database. If an instance did not change in the bound data it will not be
-saved to the database and not found in ``instances`` in the above example.
+``save()`` メソッドはデータベースに保存されたインスタンスを返します。インス
+タンスがフォームセットに結びつけられたデータで変更されなかった場合、そのイ
+ンスタンスはデータベースに保存されず、戻り値 (上の例の ``instances``) にも
+含まれません。
 
-You can optionally pass in ``commit=False`` to ``save()`` to only return the
-model instances without any database interaction::
+``save()`` に ``commit=False`` を渡せば、データベースは触らずに、モデルイン
+スタンスだけを返させられます::
 
-    # don't save to the database
+    # データベースに保存しません
     >>> instances = formset.save(commit=False)
     >>> for instance in instances:
-    ...     # do something with instance
+    ...     # インスタンスごとに必要な操作を行います。
     ...     instance.save()
 
-This gives you the ability to attach data to the instances before saving them
-to the database. If your formset contains a ``ManyToManyField`` you will also
-need to make a call to ``formset.save_m2m()`` to ensure the many-to-many
-relationships are saved properly.
+この方法を使えば、データベースにインスタンスを保存する前に、各々のインスタ
+ンスにデータを付加できます。また、フォームセットに ``ManyToManyField`` が含
+まれている場合は、 ``formset.save_m2m()`` を使って多対多のリレーションを正
+しく保存させる必要があるでしょう。
 
 .. _model-formsets-max-num:
+.. _Limiting the number of objects editable:
 
-Limiting the number of objects editable
+編集可能なオブジェクトの数を制限する
 ---------------------------------------
 
-Similar to regular formsets you can use the ``max_num`` parameter to
-``modelformset_factory`` to limit the number of forms displayed. With
-model formsets this will properly limit the query to only select the maximum
-number of objects needed::
+通常のフォームセットど同様、 ``modelfomset_factory`` に ``max_num`` パラメ
+タを指定すれば、表示されるフォームの数を制限できます。モデルフォームセット
+の場合、クエリを制限して、表示に必要なオブジェクトの上限数を設定します::
 
     >>> Author.objects.order_by('name')
     [<Author: Charles Baudelaire>, <Author: Paul Verlaine>, <Author: Walt Whitman>]
@@ -501,8 +541,8 @@ number of objects needed::
     >>> formset.initial
     [{'id': 1, 'name': u'Charles Baudelaire'}, {'id': 3, 'name': u'Paul Verlaine'}]
 
-If the value of ``max_num`` is less than the total objects returned it will
-fill the rest with extra forms::
+クエリセットの返すモデルインスタンスの総数が ``max_num`` よりも大きければ、
+追加のフォームも取得したインスタンスのデータで埋まります::
 
     >>> AuthorFormSet = modelformset_factory(Author, max_num=4, extra=1)
     >>> formset = AuthorFormSet(queryset=Author.objects.order_by('name'))
@@ -512,6 +552,8 @@ fill the rest with extra forms::
     <tr><th><label for="id_form-1-name">Name:</label></th><td><input id="id_form-1-name" type="text" name="form-1-name" value="Paul Verlaine" maxlength="100" /><input type="hidden" name="form-1-id" value="3" id="id_form-1-id" /></td></tr>
     <tr><th><label for="id_form-2-name">Name:</label></th><td><input id="id_form-2-name" type="text" name="form-2-name" value="Walt Whitman" maxlength="100" /><input type="hidden" name="form-2-id" value="2" id="id_form-2-id" /></td></tr>
     <tr><th><label for="id_form-3-name">Name:</label></th><td><input id="id_form-3-name" type="text" name="form-3-name" maxlength="100" /><input type="hidden" name="form-3-id" id="id_form-3-id" /></td></tr>
+
+.. TBD
 
 Using a model formset in a view
 -------------------------------
@@ -537,12 +579,15 @@ in a view. The only difference is that we call ``formset.save()`` to save the
 data into the database. This is described above in
 :ref:`saving-objects-in-the-formset`.
 
-Using ``inlineformset_factory``
--------------------------------
+.. _`Using inlineformset_factory`:
 
-The ``inlineformset_factory`` is a helper to a common usage pattern of working
-with related objects through a foreign key. It takes all the same options as
-a ``modelformset_factory``. Suppose you have these two models::
+``inlineformset_factory`` を使う
+----------------------------------
+
+``inlineformset_factory`` は外部キーのリレーション先オブジェクトを扱うとき
+によく使われるパターンを簡単に実行するためのヘルパです。このヘルパは、
+``modelformset_factory`` と同じオプションをとります。例えば、以下のように
+``Author`` と ``Book`` という二つのモデルがあるとしましょう::
 
     class Author(models.Model):
         name = models.CharField(max_length=100)
@@ -551,13 +596,14 @@ a ``modelformset_factory``. Suppose you have these two models::
         author = models.ForeignKey(Author)
         title = models.CharField(max_length=100)
 
-If you want to create a formset that allows you to edit books belonging to
-some author you would do::
+特定の作者(author) の本を扱うフォームセットを生成したければ、以下のようにし
+ます::
 
     >>> from django.forms.models import inlineformset_factory
     >>> BookFormSet = inlineformset_factory(Author, Book)
     >>> author = Author.objects.get(name=u'Orson Scott Card')
     >>> formset = BookFormSet(instance=author)
+
 
 More than one foriegn key to the same model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
