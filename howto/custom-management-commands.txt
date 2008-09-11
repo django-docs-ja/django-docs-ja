@@ -1,17 +1,20 @@
 .. _howto-custom-management-commands:
+.. _Customized actions:
 
-Writing custom django-admin commands
-====================================
+アクションを自作する
+=====================
+
+:revision-up-to: 8961 (1.0)
 
 .. versionadded:: 1.0
 
-Applications can register their own actions with ``manage.py``. For example,
-you might want to add a ``manage.py`` action for a Django app that you're
-distributing.
+アプリケーションごとに独自のアクションを定義して、 ``manage.py`` で使える
+ようにできます。例えば、配布したいアプリケーションの中に、 ``manage.py`` ア
+クションを追加したい場合があるとします。
 
-To do this, just add a ``management/commands`` directory to your application.
-Each Python module in that directory will be auto-discovered and registered as
-a command that can be executed as an action when you run ``manage.py``::
+アクションを追加するには、アプリケーション内に ``management/commands`` ディ
+レクトリを作成します。このディレクトリ内のモジュールは、 ``manage.py`` の実
+行時に呼び出せるアクションとして自動的に検出されます::
 
     blog/
         __init__.py
@@ -23,11 +26,14 @@ a command that can be executed as an action when you run ``manage.py``::
                 explode.py
         views.py
 
-In this example, the ``explode`` command will be made available to any project
-that includes the ``blog`` application in ``settings.INSTALLED_APPS``.
+上の例では、 ``blog`` アプリケーションを ``settings.INSTALLED_APPS`` に登録
+してあるプロジェクトで ``explode`` というコマンドを使えるようになります。
 
-The ``explode.py`` module has only one requirement -- it must define a class
-called ``Command`` that extends ``django.core.management.base.BaseCommand``.
+コマンドモジュールの必須の条件として、 ``explode.py`` は
+``django.core.management.base.BaseCommand`` を拡張した ``Command`` という名
+前のクラスを定義していなければなりません。
 
-For more details on how to define your own commands, look at the code for the
-existing ``django-admin.py`` commands, in ``/django/core/management/commands``.
+自作のコマンドを定義する詳しい方法は、既存の ``django-admin.py`` コマンドの
+ソースコードを参照してください。ソースは
+``/django/core/management/commands`` にあります。
+
