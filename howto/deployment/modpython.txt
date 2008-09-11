@@ -358,6 +358,7 @@ Apache がセグメンテーション違反 (segumentation fault) を引き起�
     1. Python コードが "pyexpat" モジュールを import している場合。
        "pyexpat" は Apache に埋め込まれているバージョンと衝突する場合があり
        ます。詳しくは、 `Expat Causing Apache Crash`_ を参照してください。
+
     2. mod_python と mod_php を同じ Apache のインスタンスで動作させ、バック
        エンドに MySQL を使っている場合。PHP と Python MySQL バックエンドと
        のバージョン衝突で引き起こされる既知の問題かもしれません。これについ
