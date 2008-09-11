@@ -1,58 +1,69 @@
 .. _howto-custom-model-fields:
 
 ===========================
-Writing custom model fields
+カスタムのモデルフィールド
 ===========================
+
+:revision-up-to: 8032 (1.0pre SVN)
 
 .. versionadded:: 1.0
 
-Introduction
-============
+.. _Introduction:
 
-The :ref:`model reference <topics-db-models>` documentation explains how to use
-Django's standard field classes -- :class:`~django.db.models.CharField`,
-:class:`~django.db.models.DateField`, etc. For many purposes, those classes are
-all you'll need. Sometimes, though, the Django version won't meet your precise
-requirements, or you'll want to use a field that is entirely different from
-those shipped with Django.
+はじめに
+=========
 
-Django's built-in field types don't cover every possible database column type --
-only the common types, such as ``VARCHAR`` and ``INTEGER``. For more obscure
-column types, such as geographic polygons or even user-created types such as
-`PostgreSQL custom types`_, you can define your own Django ``Field`` subclasses.
+:ref:`モデルリファレンス <topics-db-models>` ドキュメントでは、  
+:class:`~django.db.models.CharField` や
+:class:`~django.db.models.DateField` といった Django の標準のフィールドクラ
+スの使用法について説明しています。ほとんどの用途には、これらの標準フィール
+ドクラスだけで十分でしょう。とはいえ、現行の Django が自分の要求をうまく満
+たしていない場合や、 Django が提供しているものと全く異なるフィールドを使い
+たい場合もあるでしょう。
+
+Django の組み込みフィールド型は、データベースのカラムとして利用できる全ての
+データ型をサポートしているわけではなく、 ``VARCHAR`` や ``INTEGER`` のよう
+な一般的な型しかサポートしていません。幾何多角形 (geographic polygon) 型や、
+`PostgreSQL カスタム型`_ のようなユーザ定義型といった特異な型を扱うには、
+``Field`` 型のサブクラスを定義する必要があります。
 
 .. _PostgreSQL custom types: http://www.postgresql.org/docs/8.2/interactive/sql-createtype.html
+.. _`PostgreSQL カスタム型`: `PostgreSQL custom types`_
 
-Alternatively, you may have a complex Python object that can somehow be
-serialized to fit into a standard database column type. This is another case
-where a ``Field`` subclass will help you use your object with your models.
+``Field`` 型のサブクラス定義には、別の用途もあります。複雑な Python オブジェ
+クトをシリアライズして、標準的なデータベースのカラム型に変換して保存したい
+場合です。こうした場合にも、 ``Field`` のサブクラスを定義しておき、モデルで
+使うと便利です。
+
+.. _Our example object:
 
 Our example object
 ------------------
 
-Creating custom fields requires a bit of attention to detail. To make things
-easier to follow, we'll use a consistent example throughout this document.
-Suppose you have a Python object representing the deal of cards in a hand of
-Bridge_. (Don't worry, you don't know how to play Bridge to follow this
-example. You only need to know that 52 cards are dealt out equally to four
-players, who are traditionally called *north*, *east*, *south* and *west*.)
-Our class looks something like this::
+カスタムフィールドを作成するには、ちょっと注意が必要です。説明についていけ
+るように、このドキュメントでは一貫して一つの例題を扱うことにします。
+ここでは、まず `ブリッジ`_ の「手」を表す Python オブジェクトを考えましょう。
+(ブリッジの遊び方をしらなくても、心配することはありません。知っておくべきな
+のは、ブリッジは、 52 枚のカードを 4 人のプレイヤーで扱う遊びで、プレイヤー
+は伝統的に *north*, *east*, *south*, *west* と呼ばれることだけです。)
+``Hand`` クラスは以下のように定義されています::
 
     class Hand(object):
         def __init__(self, north, east, south, west):
-            # Input parameters are lists of cards ('Ah', '9s', etc)
+            # パラメタはカードのリスト ('Ah', '9s', など)
             self.north = north
             self.east = east
             self.south = south
             self.west = west
-        
-        # ... (other possibly useful methods omitted) ...
+
+        # ... (他のメソッドはここでは省略します) ...
 
 .. _Bridge: http://en.wikipedia.org/wiki/Contract_bridge
+.. _ブリッジ: http://ja.wikipedia.org/wiki/コントラクトブリッジ
 
-This is just an ordinary Python class, with nothing Django-specific about it.
-We'd like to be able to do things like this in our models (we assume the
-``hand`` attribute on the model is an instance of ``Hand``)::
+``Hand`` はただの普通の Python クラスで、 Django 固有の定義は一切していませ
+ん。このクラスを、モデルで扱えるようにしましょう (モデルの ``hand`` という
+属性に ``Hand`` のインスタンスが入るようにします)::
 
     example = MyModel.objects.get(pk=1)
     print example.hand.north
@@ -61,104 +72,109 @@ We'd like to be able to do things like this in our models (we assume the
     example.hand = new_hand
     example.save()
 
-We assign to and retrieve from the ``hand`` attribute in our model just like
-any other Python class. The trick is to tell Django how to handle saving and
-loading such an object.
+上の例では、 ``hand`` 属性を、他の Python クラスと同様に代入や値参照に使っ
+ています。このようなことができるトリックは、 Django に ``Hand`` オブジェク
+トの保存やロードの方法を教えることで実現できます。
 
-In order to use the ``Hand`` class in our models, we **do not** have to change
-this class at all. This is ideal, because it means you can easily write
-model support for existing classes where you cannot change the source code.
+モデルから ``Hand`` クラスを扱うために、 ``Hand`` に手を加える必要は 
+**全くありません** 。その方が、例えば既存のクラスでソースコードに手を加えら
+れないような場合にも、簡単にモデル上でサポートできるからです。
 
 .. note::
-    You might only be wanting to take advantage of custom database column
-    types and deal with the data as standard Python types in your models;
-    strings, or floats, for example. This case is similar to our ``Hand``
-    example and we'll note any differences as we go along.
+    単に、カスタムのデータベースカラム型を使って、文字列や浮動小数点型といっ
+    た標準の Python データを扱いたいという場合もあるでしょう。このケースも
+    ``Hand`` の例とほぼ同様で、違いは後で説明します。
 
-Background theory
+.. _model reference: ../model-api/
+.. _`モデルリファレンス`: `model reference`_
+
+.. _Background theory:
+
+基本的な考え方
 =================
 
-Database storage
-----------------
+.. _Database storage:
 
-The simplest way to think of a model field is that it provides a way to take a
-normal Python object -- string, boolean, ``datetime``, or something more
-complex like ``Hand`` -- and convert it to and from a format that is useful
-when dealing with the database (and serialization, but, as we'll see later,
-that falls out fairly naturally once you have the database side under control).
+データベースストレージ
+-----------------------
 
-Fields in a model must somehow be converted to fit into an existing database
-column type. Different databases provide different sets of valid column types,
-but the rule is still the same: those are the only types you have to work
-with. Anything you want to store in the database must fit into one of
-those types.
+モデルフィールドの役割とは、簡単に言えば、文字列、ブール型、 ``datetime``
+型、そして ``Hand`` のようなより複雑なデータ型の Python オブジェクトを
+受け取って、データベースを操作するときに便利な形式に変換することです。
+(シリアライザ用にも変換しますが、後で説明するように、一度データベース側の変
+換ができるようになれば、シリアライザ用の変換はかなり簡単です)。
 
-Normally, you're either writing a Django field to match a particular database
-column type, or there's a fairly straightforward way to convert your data to,
-say, a string.
+モデル内のフィールド値は、データベース上では何らかのカラムタイプに変換され
+ねばなりません。データベースはバックエンド毎に固有の異なったカラム型を提供
+しています。
 
-For our ``Hand`` example, we could convert the card data to a string of 104
-characters by concatenating all the cards together in a pre-determined order --
-say, all the *north* cards first, then the *east*, *south* and *west* cards. So
-``Hand`` objects can be saved to text or character columns in the database.
+``Hand`` の例の場合には、プレイヤーのカード情報を、予め決まった順番、
+*north*, *east*, *south*, *west* の順番にくっつけて、 104 文字の文字列に変
+換します。従って、 ``Hand`` オブジェクトはデータベースにテキスト型はキャラ
+クタ型で保存できます。
 
-What does a field class do?
----------------------------
+.. _What does a field class do?:
 
-All of Django's fields (and when we say *fields* in this document, we always
-mean model fields and not :ref:`form fields <ref-forms-fields>`) are subclasses
-of :class:`django.db.models.Field`. Most of the information that Django records
-about a field is common to all fields -- name, help text, uniqueness and so
-forth. Storing all that information is handled by ``Field``. We'll get into the
-precise details of what ``Field`` can do later on; for now, suffice it to say
-that everything descends from ``Field`` and then customizes key pieces of the
-class behavior.
+フィールドクラスの役割
+------------------------
 
-It's important to realize that a Django field class is not what is stored in
-your model attributes. The model attributes contain normal Python objects. The
-field classes you define in a model are actually stored in the ``Meta`` class
-when the model class is created (the precise details of how this is done are
-unimportant here). This is because the field classes aren't necessary when
-you're just creating and modifying attributes. Instead, they provide the
-machinery for converting between the attribute value and what is stored in the
-database or sent to the :ref:`serializer <topics-serialization>`.
+Django のフィールド型 (このドキュメントで *フィールド* という場合には、基本
+的に :ref:`フォームフィールド <ref-forms-fields>` ではなくモデルフィールド
+を指します) は、全て :class:`django.db.models.Field` のサブクラスです。
+Django がフィールドごとに記録する情報は、ほとんどのフィールドで共通で、名前、
+ヘルプテキスト、バリデータのリスト、ユニークキーにするか、といったものです。
+こうした情報の保存は``Field`` クラスで行います。 ``Field`` の動作については、
+後で詳細に説明しますが、さしあたっては、全ては ``Field`` から継承していて、
+その中からクラスの挙動の鍵になる部分をカスタマイズするのだと考えておけば十
+分です。
 
-Keep this in mind when creating your own custom fields. The Django ``Field``
-subclass you write provides the machinery for converting between your Python
-instances and the database/serializer values in various ways (there are
-differences between storing a value and using a value for lookups, for
-example). If this sounds a bit tricky, don't worry -- it will become clearer in
-the examples below. Just remember that you will often end up creating two
-classes when you want a custom field:
+Django のフィールドクラスは、モデルの属性値を保存するためのオブジェクトでは
+ない、ということをよく理解しておいてください。モデルの属性値には、通常の
+Python オブジェクトが入っています。モデル内でフィールドを定義すると、その
+フィールドクラスは、モデルクラスの生成時に内部クラス ``Meta`` の中に保存さ
+れます (詳しい動作の仕組みは、ここではあまり重要ではありません)。モデルイン
+スタンスの属性値を作成したり、変更する時には、フィールドクラスは必要ないの
+です。その代わり、フィールドクラスは、属性の値と、データベースに保存したり、
+:ref:`シリアライザ <topics-serialization>` に送信したりするための値との間の
+変換機構を提供しています。
 
-    * The first class is the Python object that your users will manipulate.
-      They will assign it to the model attribute, they will read from it for
-      displaying purposes, things like that. This is the ``Hand`` class in our
-      example.
+カスタムのフィールドクラスを定義する際には、上記のことを心に留めておいてく
+ださい。 Django の ``Field`` サブクラスは、 Python オブジェクトとデータベー
+スやシリアライザ向けの値との変換を色々な方法で実現するための機構を提供しま
+す (例えば、データを保存するための変換と、照合に使うための変換には違いがあ
+ります)。この仕組みがトリッキーに見えても、心配する必要はありません。以下の
+例を読み進めていくうちにはっきり分かるでしょう。ただ、たいていの場合、カス
+タムフィールドが必要な場面では、以下の二つのクラスを定義することになるとい
+うことを覚えておいてください:
 
-    * The second class is the ``Field`` subclass. This is the class that knows
-      how to convert your first class back and forth between its permanent
-      storage form and the Python form.
+    * 一つ目は、ユーザが操作する Python オブジェクトです。このオブジェクト
+      はモデルの属性値として代入され、表示時に読み出されます。例でいうと
+      ``Hand`` クラスです。
 
-Writing a field subclass
-========================
+    * もう一つは ``Field`` のサブクラスです。このクラスには、上のクラスと
+      永続ストレージとの間で相互変換を行うための処理が組み込まれています。
 
-When planning your :class:`~django.db.models.Field` subclass, first give some
-thought to which existing :class:`~django.db.models.Field` class your new field
-is most similar to. Can you subclass an existing Django field and save yourself
-some work? If not, you should subclass the :class:`~django.db.models.Field`
-class, from which everything is descended.
+.. _Writing a field subclass:
 
-Initializing your new field is a matter of separating out any arguments that are
-specific to your case from the common arguments and passing the latter to the
-:meth:`~django.db.models.Field.__init__` method of
-:class:`~django.db.models.Field` (or your parent class).
+フィールドのサブクラスを定義する
+==================================
 
-In our example, we'll call our field ``HandField``. (It's a good idea to call
-your :class:`~django.db.models.Field` subclass ``<Something>Field``, so it's
-easily identifiable as a :class:`~django.db.models.Field` subclass.) It doesn't
-behave like any existing field, so we'll subclass directly from
-:class:`~django.db.models.Field`::
+:class:`~django.db.models.Field` のサブクラスを定義するときには、まずは作り
+たいフィールドが既存のフィールドクラスのどれに一番近いかを考えましょう。
+
+既存の Django のフィールド型をサブクラス化すれば、作業が楽になるでしょうか？
+もしそうでなければ、 :class:`~django.db.models.Field`  クラスをサブクラス化
+します。
+
+フィールドの初期化時には、 :class:`~django.db.models.Field`  クラス (または
+親クラス) 共通の引数と、新たなフィールドクラス固有の引数を分離して、前者を
+親クラスの :meth:`~django.db.models.Field.__init__` に渡します。
+
+このドキュメントの例題では、定義するフィールドを ``HandField`` と呼ぶことに
+しましょう (フィールドを ``(何とか)Field`` と呼ぶようにしておけば、クラスが
+:class:`~django.db.models.Field`  のサブクラスであるとすぐ分かるからです)。
+``HandField`` は既存のフィールドと似た部分はあまりないので、
+:class:`~django.db.models.Field`  クラスから直接導出します::
 
     from django.db import models
 
@@ -167,28 +183,29 @@ behave like any existing field, so we'll subclass directly from
             kwargs['max_length'] = 104
             super(HandField, self).__init__(*args, **kwargs)
 
-Our ``HandField`` accept most of the standard field options (see the list
-below), but we ensure it has a fixed length, since it only needs to hold 52
-card values plus their suits; 104 characters in total.
+``HandField`` は標準的なフィールドオプションのほとんどを指定できます。ただ
+し、このフィールドは高々 52 枚のカードの値と種類だけを保存できればよいので、
+合計 104 文字分の固定長にしておきます。
 
 .. note::
-    Many of Django's model fields accept options that they don't do anything
-    with. For example, you can pass both
-    :attr:`~django.db.models.Field.editable` and
-    :attr:`~django.db.models.Field.auto_now` to a
-    :class:`django.db.models.DateField` and it will simply ignore the
-    :attr:`~django.db.models.Field.editable` parameter
-    (:attr:`~django.db.models.Field.auto_now` being set implies
-    ``editable=False``). No error is raised in this case.
+    多くの Django のモデルフィールドは、そのフィールドに関係のないオプショ
+    ンも引数に指定できます。例えば、 
+    :attr:`~django.db.models.Field.editable` と 
+    :attr:`~django.db.models.Field.auto_now` の両方を
+    :class:`~django.db.models.DateField` に指定してもよく、
+    :class:`~django.db.models.DateField` は
+    (:attr:`~django.db.models.Field.auto_now` を指定すると
+    ``editable=False`` なので) :attr:`~django.db.models.Field.editable` パ
+    ラメタを無視します。この場合、エラーは送出されません。
 
-    This behavior simplifies the field classes, because they don't need to
-    check for options that aren't necessary. They just pass all the options to
-    the parent class and then don't use them later on. It's up to you whether
-    you want your fields to be more strict about the options they select, or
-    to use the simpler, more permissive behavior of the current fields.
+    このような挙動にしておくと、不要なオプションをいちいちチェックしなくて
+    よいので、フィールドクラスの定義が簡単になります。サブクラスでは、単に
+    全てのオプションを親クラスに渡しておけばよく、それ以上何もしなくてよい
+    のです。選べるオプションを厳しく制限してもよいですし、簡単にしたければ、
+    何でも指定できるようにしておけばよいのです。
 
-The :meth:`~django.db.models.Field.__init__` method takes the following
-parameters:
+:meth:`~django.db.models.Field.__init__` メソッドは、以下のパラメタを (列挙
+順に) 取ります:
 
     * :attr:`~django.db.models.Field.verbose_name`
     * :attr:`~django.db.models.Field.name`
@@ -199,48 +216,49 @@ parameters:
     * :attr:`~django.db.models.Field.null`
     * :attr:`~django.db.models.Field.db_index`
     * :attr:`~django.db.models.Field.core`
-    * :attr:`~django.db.models.Field.rel`: Used for related fields (like
-      :class:`ForeignKey`). For advanced use only.
+    * :attr:`~django.db.models.Field.rel`: (:class:`ForeignKey` のような)
+      リレーションに関するフィールドで使います。高度な用途でしか必要ありま
+      せん。
     * :attr:`~django.db.models.Field.default`
     * :attr:`~django.db.models.Field.editable`
-    * :attr:`~django.db.models.Field.serialize`: If ``False``, the field will 
-      not be serialized when the model is passed to Django's :ref:`serializers
-      <topics-serialization>`. Defaults to ``True``.
+    * :attr:`~django.db.models.Field.serialize`: ``False`` の場合、モデルイ
+      ンスタンスを :ref:`シリアライザ <topics-serialization>` に渡しても、
+      フィールドをシリアライズしません。デフォルトの値は ``True`` です。
     * :attr:`~django.db.models.Field.prepopulate_from`
     * :attr:`~django.db.models.Field.unique_for_date`
     * :attr:`~django.db.models.Field.unique_for_month`
     * :attr:`~django.db.models.Field.unique_for_year`
+    * :attr:`~django.db.models.Field.validator_list`
     * :attr:`~django.db.models.Field.choices`
     * :attr:`~django.db.models.Field.help_text`
     * :attr:`~django.db.models.Field.db_column`
-    * :attr:`~django.db.models.Field.db_tablespace`: Currently only used with
-      the Oracle backend and only for index creation. You can usually ignore
-      this option.
+    * :attr:`~django.db.models.Field.db_tablespace`: 現状は Oracle バックエ
+      ンドだけで使っています。インデクス生成に使います。通常、このオプショ
+      ンは無視できます。
 
-All of the options without an explanation in the above list have the same
-meaning they do for normal Django fields. See the :ref:`field documentation
-<ref-models-fields>` for examples and details.
+上のリストで解説のないオプションは、通常の Django のフィールドと同じ意味を
+持っています。詳しくは :ref:`モデルのドキュメント <ref-models-fields>` を参
+照してください。
 
-The ``SubfieldBase`` metaclass
+.. _`The SubfieldBase metaclass`:
+
+``SubfieldBase`` メタクラス
 ------------------------------
 
-As we indicated in the introduction_, field subclasses are often needed for
-two reasons: either to take advantage of a custom database column type, or to
-handle complex Python types. Obviously, a combination of the two is also
-possible. If you're only working with custom database column types and your
-model fields appear in Python as standard Python types direct from the
-database backend, you don't need to worry about this section.
+`はじめに`_ でも説明したように、フィールド型のサブクラスが必要な理由は主に
+二つあります。一つはカスタムのデータベースカラム型を利用したい場合、もう一
+つは複雑な Python のデータ型を扱いたい場合です。もちろん、二つを合わせて実
+現するのも可能です。カスタムのデータベースカラム型を扱っているだけで、かつ
+Python からモデルフィールドを扱うときのデータ型が、データベースバックエンド
+から取り出したデータの型と一致している場合には、この節を気にする必要はあり
+ません。
 
-If you're handling custom Python types, such as our ``Hand`` class, we need to
-make sure that when Django initializes an instance of our model and assigns a
-database value to our custom field attribute, we convert that value into the
-appropriate Python object. The details of how this happens internally are a
-little complex, but the code you need to write in your ``Field`` class is
-simple: make sure your field subclass uses a special metaclass:
-
-.. class:: django.db.models.SubfieldBase
-
-For example::
+``Hand`` クラスのようにカスタムの Python 型を扱うフィールドを作成したい場合、
+Django がモデルのインスタンスを生成して、フィールドの属性値をデータベースに
+保存する時に、フィールドの値を適切な Python オブジェクトに変換する必要が
+あります。この処理のからくりはやや複雑ですが、フィールドクラスを定義すると
+きに書かねばならないコードはいたって単純で、特殊なメタクラスを使ってサブク
+ラスを作成するだけです::
 
     class HandField(models.Field):
         __metaclass__ = models.SubfieldBase
@@ -248,28 +266,33 @@ For example::
         def __init__(self, *args, **kwargs):
             # ...
 
-This ensures that the :meth:`to_python` method, documented below, will always be
-called when the attribute is initialized.
+こうしておけば、属性値を初期化する際に、自動的に :meth:`to_python` メソッド
+が呼び出されるようになります。 :meth:`to_python` メソッドについては後で解説
+します。
 
-Useful methods
---------------
+.. _Useful methods:
 
-Once you've created your :class:`~django.db.models.Field` subclass and set up up
-the ``__metaclass__``, you might consider overriding a few standard methods,
-depending on your field's behavior. The list of methods below is in
-approximately decreasing order of importance, so start from the top.
+便利なメソッド
+---------------
 
-Custom database types
-~~~~~~~~~~~~~~~~~~~~~
+:class:`~django.db.models.Field`  のサブクラスを作成して、
+``__metaclass__`` をセットアップしたら、次はフィールドの挙動に応じて標準メ
+ソッドをいくつかオーバライドします。以下のメソッドは上からよく使う順に挙げ
+ています。
+
+.. Custom database types
+
+データベース型のカスタマイズ
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. method:: db_type(self)
 
-Returns the database column data type for the :class:`~django.db.models.Field`,
-taking into account the current :setting:`DATABASE_ENGINE` setting.
+:setting:`DATABASE_ENGINE` 設定に指定されているデータベースで、フィールドの
+データを保存するために使うカラム型を返します。
 
-Say you've created a PostgreSQL custom type called ``mytype``. You can use this
-field with Django by subclassing ``Field`` and implementing the :meth:`db_type`
-method, like so::
+例えば、 PostgreSQL 固有のカスタム型 ``mytype`` を作成したとしましょう。
+Django からこの型を使うには、以下のように :class:`~django.db.models.Field`
+をサブクラス化して、 :meth:`db_type()` メソッドを実装します::
 
     from django.db import models
 
@@ -277,20 +300,20 @@ method, like so::
         def db_type(self):
             return 'mytype'
 
-Once you have ``MytypeField``, you can use it in any model, just like any other
-``Field`` type::
+``MytypeField`` を定義したら、他のフィールド型と同じようにモデルで利用でき
+ます::
 
     class Person(models.Model):
         name = models.CharField(max_length=80)
         gender = models.CharField(max_length=1)
         something_else = MytypeField()
 
-If you aim to build a database-agnostic application, you should account for
-differences in database column types. For example, the date/time column type
-in PostgreSQL is called ``timestamp``, while the same column in MySQL is called
-``datetime``. The simplest way to handle this in a ``db_type()`` method is to
-import the Django settings module and check the :setting:`DATABASE_ENGINE` setting.
-For example::
+データベースに依存しないアプリケーションを構築したいなら、データベース毎
+のカラム型の違いに注意しておかねばなりません。例えば、 PostgreSQL では日付
+や時間に関するカラム型は ``timestamp`` 型ですが、 MySQL では ``datetime``
+型です。この違いを :meth:`db_type` メソッドの中で吸収するには、Djangoの
+``settings`` モジュールを import しておいて、以下のように
+:setting:`DATABASE_ENGINE` 設定をチェックします::
 
     class MyDateField(models.Field):
         def db_type(self):
@@ -300,78 +323,79 @@ For example::
             else:
                 return 'timestamp'
 
-The :meth:`db_type` method is only called by Django when the framework
-constructs the ``CREATE TABLE`` statements for your application -- that is, when
-you first create your tables. It's not called at any other time, so it can
-afford to execute slightly complex code, such as the :setting:`DATABASE_ENGINE`
-check in the above example.
+:meth:`db_type` メソッドは、Django がアプリケーションのテーブルを生成する
+ための ``CREATE TABLE``` 文を構築する瞬間、すなわち最初にテーブルを生成する
+瞬間しか呼び出されません。それ以外の場合に呼び出されることはないので、上記
+の :setting:`DATABASE_ENGINE` をチェックする例のような多少ややこしいコード
+を書いてもさして問題ではありません。
 
-Some database column types accept parameters, such as ``CHAR(25)``, where the
-parameter ``25`` represents the maximum column length. In cases like these,
-it's more flexible if the parameter is specified in the model rather than being
-hard-coded in the ``db_type()`` method. For example, it wouldn't make much
-sense to have a ``CharMaxlength25Field``, shown here::
+カラムのデータ型にはパラメタを取るものがあります。例えば ``CHAR(25)`` は、
+``25`` がカラムの最大長を表しています。こうした場合には、 :meth:`db_type`
+メソッド内でハードコードしておくよりも、モデル内でパラメタを指定して使える
+方が柔軟性を高められます。例えば、以下に示すような ``CharMaxlength25Field``
+はあまり便利ではありません::
 
-    # This is a silly example of hard-coded parameters.
+    # パラメタをハードコードしているおバカな例
     class CharMaxlength25Field(models.Field):
         def db_type(self):
             return 'char(25)'
 
-    # In the model:
+    # モデル内での使い方
     class MyModel(models.Model):
         # ...
         my_field = CharMaxlength25Field()
 
-The better way of doing this would be to make the parameter specifiable at run
-time -- i.e., when the class is instantiated. To do that, just implement
-:meth:`django.db.models.Field.__init__`, like so::
+実行時、すなわちフィールドクラスをインスタンス化する時にパラメタを指定でき
+た方がよいでしょう。パラメタを指定できるようにするには、以下のように 
+:meth:`django.db.models.Field.__init__` を実装します::
 
-    # This is a much more flexible example.
+    # より柔軟性のある例
     class BetterCharField(models.Field):
-        def __init__(self, max_length, *args, **kwargs):
+        def __init__(self, maxlength, *args, **kwargs):
             self.max_length = max_length
             super(BetterCharField, self).__init__(*args, **kwargs)
 
         def db_type(self):
             return 'char(%s)' % self.max_length
 
-    # In the model:
+    # モデル内での使い方
     class MyModel(models.Model):
         # ...
         my_field = BetterCharField(25)
 
-Finally, if your column requires truly complex SQL setup, return ``None`` from
-:meth:`db_type`. This will cause Django's SQL creation code to skip over this
-field. You are then responsible for creating the column in the right table in
-some other way, of course, but this gives you a way to tell Django to get out of
-the way.
+最後に、カラムの操作に非常に複雑な SQL が必要な場合には、 :meth:`db_type`
+に ``None`` を返させましょう。そうすれば、 Django の SQL 生成コードはこの
+フィールドの処理をスキップします。もちろん、その場合には、何らかの方法で正
+しいテーブルに正しいカラムを生成する必要があります。
 
-Converting database values to Python objects
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _Converting database values to Python objects:
+
+データベース上の値を Python オブジェクトに変換する
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. method:: to_python(self, value)
 
-Converts a value as returned by your database (or a serializer) to a Python
-object.
+データベース (またはシリアライザ) の返す値を Python オブジェクトに変換しま
+す。
 
-The default implementation simply returns ``value``, for the common case in
-which the database backend already returns data in the correct format (as a
-Python string, for example).
+デフォルトの実装では、単に ``value`` を返します。通常は、データベースバック
+エンドは正しい形式 (Python 文字列型など) でデータを返すからです。
 
-If your custom :class:`~django.db.models.Field` class deals with data structures
-that are more complex than strings, dates, integers or floats, then you'll need
-to override this method. As a general rule, the method should deal gracefully
-with any of the following arguments:
+カスタムのフィールドクラスで、文字列や日時、整数や浮動小数点型といったデー
+タ型よりも複雑なデータ構造を扱いたい場合、このメソッドをオーバライドする必
+要があります。一般的な規則として、このメソッドは以下の引数をきちんと扱えね
+ばなりません:
 
-    * An instance of the correct type (e.g., ``Hand`` in our ongoing example).
+    * 正しい型のインスタンス (このドキュメントの例では ``Hand`` オブジェク
+      ト)
 
-    * A string (e.g., from a deserializer).
+    * 文字列 (デシリアライザなどが返す値)
 
-    * Whatever the database returns for the column type you're using.
+    * このフィールドのカラムタイプに対して、データベースバックエンドが返す
+      値
 
-In our ``HandField`` class, we're storing the data as a VARCHAR field in the
-database, so we need to be able to process strings and ``Hand`` instances in
-:meth:`to_python`::
+``HandField`` クラスでは、データを VARCHAR フィールドで保存しているので、
+:meth:`to_python` は文字列と ``Hand`` インスタンスの両方を扱えねばなりません::
 
     import re
 
@@ -388,25 +412,29 @@ database, so we need to be able to process strings and ``Hand`` instances in
             args = [p2.findall(x) for x in p1.findall(value)]
             return Hand(*args)
 
-Notice that we always return a ``Hand`` instance from this method. That's the
-Python object type we want to store in the model's attribute.
+このメソッドは常に ``Hand`` インスタンスを返していることに注意してください。
+:meth:`to_python` は、モデルの属性値として保存したい Python オブジェクト型を
+返します。
 
-**Remember:** If your custom field needs the :meth:`to_python` method to be
-called when it is created, you should be using `The SubfieldBase metaclass`_
-mentioned earlier. Otherwise :meth:`to_python` won't be called automatically.
+**忘れないで！:** カスタムフィールドに対して :meth:`to_python` を呼び出した
+  ければ、上で述べた `SubfieldBase メタクラス`_ を使わねばなりません。メタ
+  クラスを使わないと、 :meth:`to_python` は自動的に呼び出されません。
 
-Converting Python objects to database values
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _Converting Python objects to database values:
+
+Python オブジェクトをデータベース保存用の値に変換する
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. method:: get_db_prep_value(self, value)
 
-This is the reverse of :meth:`to_python` when working with the database backends
-(as opposed to serialization). The ``value`` parameter is the current value of
-the model's attribute (a field has no reference to its containing model, so it
-cannot retrieve the value itself), and the method should return data in a format
-that can be used as a parameter in a query for the database backend.
+:meth:`to_python` の逆のメソッドで、データベースバックエンドを扱うときに呼
+び出されます。 ``value`` パラメタは、モデルの現在の属性値です (このような設
+計になっているのは、個々のフィールドが、自身を組み込んでいるモデルに対する
+参照を持っていないため、フィールドが自分でモデルインスタンスから値を取り出
+せないからです)。 このメソッドは、データベースバックエンドのクエリパラメタ
+として使えるようにデータをフォーマットして返さねばなりません。
 
-For example::
+例を示します::
 
     class HandField(models.Field):
         # ...
@@ -417,76 +445,84 @@ For example::
 
 .. method:: get_db_prep_save(self, value)
 
+.. TBD
+
 Same as the above, but called when the Field value must be *saved* to the
 database. As the default implementation just calls ``get_db_prep_value``, you
 shouldn't need to implement this method unless your custom field need a special
 conversion when being saved that is not the same as the used for normal query
 parameters (which is implemented by ``get_db_prep_value``).
 
-Preprocessing values before saving
+.. _Preprocessing values before saving:
+
+保存前に値に前処理をほどこす
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. method:: pre_save(self, model_instance, add)
 
-This method is called just prior to :meth:`get_db_prep_save` and should return
-the value of the appropriate attribute from ``model_instance`` for this field.
-The attribute name is in ``self.attname`` (this is set up by
-:class:`~django.db.models.Field`). If the model is being saved to the database
-for the first time, the ``add`` parameter will be ``True``, otherwise it will be
-``False``.
+このメソッドは、 :meth:`get_db_prep_save` の直前に呼び出され、このフィール
+ドの ``model_instance`` での適切な値を生成して返さねばなりません。属性の名
+前は  ``self.attrname`` で参照できます (この値はフィールドのインスタンス化
+時に設定されます)。モデルインスタンスをデータベースに初めて保存しようとして
+いる場合、 ``add`` パラメタの値は ``True`` です。それ以外の値は ``False``
+です。
 
-You only need to override this method if you want to preprocess the value
-somehow, just before saving. For example, Django's
-`:class:`~django.db.models.DateTimeField` uses this method to set the attribute
-correctly in the case of :attr:`~django.db.models.Field.auto_now` or
-:attr:`~django.db.models.Field.auto_now_add`.
+このメソッドをオーバライドする必要があるのは、フィールドの値を、保存の直前
+に前処理したい場合だけです。例えば、 Django の
+:class:`~django.db.models.DateTimeField` は、
+:attr:`~django.db.models.Field.auto_now` や
+:attr:`~django.db.models.Field.auto_now_add` で生成された場合、このメソッド
+を使って正しい値をセットします。
 
-If you do override this method, you must return the value of the attribute at
-the end. You should also update the model's attribute if you make any changes
-to the value so that code holding references to the model will always see the
-correct value.
+このメソッドをオーバライドする場合、最後に属性の値を返さねばなりません。
+また、フィールドの値を変更した場合、モデル上の対応する値も更新して、モデル
+インスタンスを参照しているコードが正しい値を読み出せるようにせねばなりませ
+ん。
 
-Preparing values for use in database lookups
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _Preparing values for use in database lookups:
+
+データベース照合時のパラメタを SQL 用に変換する
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. method:: get_db_prep_lookup(self, lookup_type, value)
 
-Prepares the ``value`` for passing to the database when used in a lookup (a
-``WHERE`` constraint in SQL). The ``lookup_type`` will be one of the valid
-Django filter lookups: ``exact``, ``iexact``, ``contains``, ``icontains``,
-``gt``, ``gte``, ``lt``, ``lte``, ``in``, ``startswith``, ``istartswith``,
+データベース上で照合を行う時 (``WHERE`` 制約付きで SQL を発行する時) にデー
+タベースに渡す値を前処理します。 ``lookup_type`` は、 Django のフィルタ照合
+条件である ``exact``, ``iexact``, ``contains``, ``icontains``, ``gt``,
+``gte``, ``lt``, ``lte``, ``in``, ``startswith``, ``istartswith``,
 ``endswith``, ``iendswith``, ``range``, ``year``, ``month``, ``day``,
-``isnull``, ``search``, ``regex``, and ``iregex``.
+``isnull``, ``search``, ``regex``, ``iregex`` のいずれかの値を取ります。
 
-Your method must be prepared to handle all of these ``lookup_type`` values and
-should raise either a ``ValueError`` if the ``value`` is of the wrong sort (a
-list when you were expecting an object, for example) or a ``TypeError`` if
-your field does not support that type of lookup. For many fields, you can get
-by with handling the lookup types that need special handling for your field
-and pass the rest of the :meth:`get_db_prep_lookup` method of the parent class.
+このメソッドをオーバライドする場合、 ``lookup_type`` に指定される全ての照合
+条件に対応せねばなりません。また、 ``value`` が正しい値でない場合 (単一のオ
+ブジェクトが指定されるべきところにリストが指定された場合など) には
+``ValueError`` を、フィールドが指定した照合に対応していない場合には
+``TypeError`` を送出せねばなりません。たいていのフィールドでは、特別な扱い
+の必要な照合タイプだけを処理して、残りは親クラスの
+:meth:`get_db_prep_lookup` メソッドに委ねればよいでしょう。
 
-If you needed to implement ``get_db_prep_save()``, you will usually need to
-implement ``get_db_prep_lookup()``. If you don't, ``get_db_prep_value`` will be
-called by the default implementation, to manage ``exact``, ``gt``, ``gte``,
-``lt``, ``lte``, ``in`` and ``range`` lookups.
+:meth:`get_db_prep_save` を定義するようなケースでは、通常
+:meth:`get_db_prep_lookup` も定義する必要があります。定義しなければ、
+``exact``, ``gt``, ``gte``, ``lt``, ``lte``, ``in``, ``range`` の照合時には
+デフォルトの実装に従って、 :meth:`get_db_prep_value` が呼び出されます。
 
-You may also want to implement this method to limit the lookup types that could
-be used with your custom field type.
+また、カスタムのフィールド型でサポートする照合タイプを制限したい場合にも、
+このメソッドを定義する必要があるでしょう。
 
-Note that, for ``range`` and ``in`` lookups, ``get_db_prep_lookup`` will receive
-a list of objects (presumably of the right type) and will need to convert them
-to a list of things of the right type for passing to the database. Most of the
-time, you can reuse ``get_db_prep_value()``, or at least factor out some common
-pieces.
+``range`` や ``in`` を使った照合を行う場合、 :meth:`get_db_prep_lookup` は
+引数として (適切な型の) オブジェクトのリストを受け取り、データベースに渡せ
+るなにがしか適切な型のオブジェクトからなるリストに変換せねばなりません。
+大抵の場合は :meth:`get_db_prep_save` を使い回したり、別のメソッドに共通の
+処理を括り出しておけます。
 
-For example, the following code implements ``get_db_prep_lookup`` to limit the
-accepted lookup types to ``exact`` and ``in``::
+例えば、以下のコードでは :meth:`get_db_prep_lookup` を実装して、照合タイプ
+を ``exact`` と ``in`` に制限しています::
 
     class HandField(models.Field):
         # ...
 
         def get_db_prep_lookup(self, lookup_type, value):
-            # We only handle 'exact' and 'in'. All others are errors.
+            # 'exact' および 'in' だけを扱います。それ以外はエラーにします。
             if lookup_type == 'exact':
                 return [self.get_db_prep_value(value)]
             elif lookup_type == 'in':
@@ -494,56 +530,65 @@ accepted lookup types to ``exact`` and ``in``::
             else:
                 raise TypeError('Lookup type %r not supported.' % lookup_type)
 
-Specifying the form field for a model field
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _Specifying the form field for a model field:
 
+モデルフィールドに対応したフォームフィールドを指定する
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 
 .. method:: formfield(self, form_class=forms.CharField, **kwargs)
 
-Returns the default form field to use when this field is displayed in a model.
-This method is called by the :class:`~django.forms.ModelForm` helper.
+このフィールドをモデルに組み込んで、フォームで表示したときに使うデフォルト
+のフォームフィールドを返します。このメソッドは、
+:class:`~django.forms.ModelForm` ヘルパから呼び出されます。
 
-All of the ``kwargs`` dictionary is passed directly to the form field's
-:meth:`~django.forms.Field__init__` method. Normally, all you need to do is
-set up a good default for the ``form_class`` argument and then delegate further
-handling to the parent class. This might require you to write a custom form
-field (and even a form widget). See the :ref:`forms documentation
-<topics-forms-index>` for information about this, and take a look at the code in
-:mod:`django.contrib.localflavor` for some examples of custom widgets.
+``kwargs`` 辞書の内容は、全てフォームフィールドの 
+:meth:`~django.forms.Field__init__` メソッドに渡されます。通常、このメソッ
+ドの定義では、適切な ``form_class`` 引数のデフォルト値を設定して、それ以降
+の処理を親クラスに移譲しているだけです。フォームフィールドを定義する場合、
+カスタムのフォームフィールド (や、フォームウィジェット) を書く必要があるか
+もしれません。カスタムのフォームフィールドについては
+:ref:`forms のドキュメント<topics-forms-index>` を参照してください。また、
+カスタムウィジェットは :mod:`django.contrib.localflavor` のコードを参照する
+とよいでしょう。
 
-Continuing our ongoing example, we can write the :meth:`formfield` method as::
+これまでの例に合わせて書くと、 :meth:`formfield` メソッドは以下のように書け
+ます::
 
     class HandField(models.Field):
         # ...
 
         def formfield(self, **kwargs):
-            # This is a fairly standard way to set up some defaults
-            # while letting the caller override them.
+            # メソッドの呼び出し側がデフォルトをオーバライド
+            # できるようにするための標準的な書き方
             defaults = {'form_class': MyFormField}
             defaults.update(kwargs)
             return super(HandField, self).formfield(**defaults)
 
-This assumes we're imported a ``MyFormField`` field class (which has its own
-default widget). This document doesn't cover the details of writing custom form
-fields.
+上の例では、 ``MyFormField`` フィールドクラスを import しているのが前提です
+(そして、 ``MyFormField`` でデフォルトのウィジェットを定義しています)。カス
+タムのフォームフィールドの定義方法は、このドキュメントでは扱いません。
 
 .. _helper functions: ../forms/#generating-forms-for-models
-.. _forms documentation: ../forms/
+.. _`ヘルパ関数`: `helper functions`_
 
-Emulating built-in field types
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _Emulating built-in field types:
+
+組み込みのフィールド型をエミュレートする
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. method:: get_internal_type(self)
 
-Returns a string giving the name of the :class:`~django.db.models.Field`
-subclass we are emulating at the database level. This is used to determine the
-type of database column for simple cases.
+データベースレベルでエミュレーションしているフィールド型の名前を返すメソッ
+ドです。このメソッドは、簡単な方法でフィールド型を定義する際に、データベー
+スのカラム型を決定するために使われます。
 
-If you have created a :meth:`db_type` method, you don't need to worry about
-:meth:`get_internal_type` -- it won't be used much. Sometimes, though, your
-database storage is similar in type to some other field, so you can use that
-other field's logic to create the right column.
+:meth:`db_type` メソッドを定義していれば、 :meth:`get_internal_type` を気に
+する必要はありません。このメソッドは、ほとんど使われません。ただし、フィー
+ルド型のデータベースストレージが、他のフィールドと同じような型である場合、
+このメソッドを定義しておくと、他のフィールドのロジックを使ってカラムを生成
+させられます。
 
-For example::
+例を示します::
 
     class HandField(models.Field):
         # ...
@@ -551,20 +596,23 @@ For example::
         def get_internal_type(self):
             return 'CharField'
 
-No matter which database backend we are using, this will mean that ``syncdb``
-and other SQL commands create the right column type for storing a string.
+どのデータベースバックエンドを使っているかに関わらず、上のように定義してお
+くと、 ``syncdb`` などの SQL 関係のコマンドを実行した時に、文字列を保存す
+るための正しいカラム型を生成します。
 
-If :meth:`get_internal_type` returns a string that is not known to Django for
-the database backend you are using -- that is, it doesn't appear in
-``django.db.backends.<db_name>.creation.DATA_TYPES`` -- the string will still be
-used by the serializer, but the default :meth:`db_type` method will return
-``None``. See the documentation of :meth:`db_type` for reasons why this might be
-useful. Putting a descriptive string in as the type of the field for the
-serializer is a useful idea if you're ever going to be using the serializer
-output in some other place, outside of Django.
+:meth:`get_internal_type` が、 Django 上でもデータベースバックエンドでも対
+応しない型を示す文字列を返した場合、すなわち、
+``django.db.backends.<db_name>.creation.DATA_TYPES`` に存在しない文字列を返
+した場合、シリアライザはこの文字列を使いますが、デフォルトの
+:meth:`db_type` 実装は ``None`` を返します。なぜこのような挙動が有用なのか
+は、 :meth:`db_type` のドキュメントを読んでください。シリアライザに、フィー
+ルドの型名として文字列を指定しておくと、 Django の外の何らかの場面でシリア
+ライザの出力を扱うときに便利だからです。
 
-Converting field data for serialization
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _Converting field data for serialization:
+
+シリアライゼーション用にフィールドデータを変換する
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. method:: value_to_string(self, obj)
 
@@ -573,6 +621,12 @@ output. Calling :meth:``Field._get_val_from_obj(obj)`` is the best way to get th
 value to serialize. For example, since our ``HandField`` uses strings for its
 data storage anyway, we can reuse some existing conversion code::
 
+このメソッドは、シリアライザがフィールドの値を出力する際に文字列に変換する
+ために使います。シリアライズデータを生成するには、
+:meth:`Field._get_val_from_obj(obj)` を呼び出すとよいでしょう。例えば、例え
+ば、 ``HandField`` はデータストレージに文字列を使っているので、既存の変換コー
+ドを再利用できます::
+
     class HandField(models.Field):
         # ...
 
@@ -580,28 +634,33 @@ data storage anyway, we can reuse some existing conversion code::
             value = self._get_val_from_obj(obj)
             return self.get_db_prep_value(value)
 
-Some general advice
+.. _Some general advice:
+
+一般的なアドバイス
 --------------------
 
-Writing a custom field can be a tricky process, particularly if you're doing
-complex conversions between your Python types and your database and
-serialization formats. Here are a couple of tips to make things go more
-smoothly:
+カスタムフィールドの定義は、とりわけ Python 型とデータベース、そしてシリア
+ライゼーション形式との間で複雑な変換を行う場合には、トリッキーな処理になり
+がちです。よりスムーズにフィールドを定義するためのアドバイスを、以下に示し
+ます:
 
-    1. Look at the existing Django fields (in
-       :file:`django/db/models/fields/__init__.py`) for inspiration. Try to find
-       a field that's similar to what you want and extend it a little bit,
-       instead of creating an entirely new field from scratch.
+    1. 既存のフィールド型定義 (:file:`django/db/models/fields/__init__.py`
+       にあります) を見て、インスピレーションを得ましょう。全く何もない状態
+       からスクラッチでフィールドを定義するのではなく、自分の実現したいこと
+       に近い処理を行っているフィールド型を探して、それをちょっとだけ拡張す
+       るようにしましょう。
 
-    2. Put a :meth:`__str__` or :meth:`__unicode__` method on the class you're
-       wrapping up as a field. There are a lot of places where the default
-       behavior of the field code is to call
-       :func:`~django.utils.encoding.force_unicode` on the value. (In our
-       examples in this document, ``value`` would be a ``Hand`` instance, not a
-       ``HandField``). So if your :meth:`__unicode__` method automatically
-       converts to the string form of your Python object, you can save yourself
-       a lot of work.
+    2. フィールドとしてラップしたいクラスに、 :meth:`__str__` や
+       :meth:`__unicode__` メソッドを定義しましょう。フィールドの処理におけ
+       るデフォルトの動作として、ラップしているクラスのインスタンスに対して
+       :func:`~django.utils.encoding.force_unicode` を呼び出すような処理が
+       たくさんあります。 (このドキュメントの例では、 ``value`` は ``Hand``
+       のインスタンスであり、 ``HandField`` のインスタンスではないので)
+       :meth:`__unicode__` メソッドを定義しておき、 Python オブジェクトが自
+       動的に文字列形式に変換されるようにしておけば、作業を大幅に減らせます。
 
+
+.. TBD
 
 Writing a ``FileField`` subclass
 =================================
@@ -639,3 +698,5 @@ improve the efficiency and readability of the field's code.
        some data about its content, cache as much of that data as possible to
        reduce the number of times the file must be retrieved on subsequent
        calls for that information.
+
+
