@@ -1,105 +1,126 @@
 .. _topics-http-sessions:
 
 ===================
-How to use sessions
+セッションの使い方
 ===================
 
-Django provides full support for anonymous sessions. The session framework lets
-you store and retrieve arbitrary data on a per-site-visitor basis. It stores
-data on the server side and abstracts the sending and receiving of cookies.
-Cookies contain a session ID -- not the data itself.
+:revision-up-to: 8961 (1.0)
 
-Enabling sessions
-=================
+Django では匿名セッション (anonymous session) を完全にサポートしています。
+セッションフレームワークを使うと、任意のデータをサイト訪問者単位
+(per-site-visitor) で保存したり取得したりできます。セッションフレームワーク
+はサーバ側にデータを保存し、クッキーの送受信操作を抽象化します。クッキーに
+はセッション ID だけが保存され、データ自体は送受信されません。
 
-Sessions are implemented via a piece of :ref:`middleware <ref-middleware>`.
+.. _Enabling sessions:
 
-To enable session functionality, do the following:
+セッションを有効にする
+======================
 
-    * Edit the ``MIDDLEWARE_CLASSES`` setting and make sure
-      ``MIDDLEWARE_CLASSES`` contains ``'django.contrib.sessions.middleware.SessionMiddleware'``.
-      The default ``settings.py`` created by ``django-admin.py startproject`` has
-      ``SessionMiddleware`` activated.
+セッション機能は :ref:`ミドルウェア <ref-middleware>` として実装されていま
+す。
 
-    * Add ``'django.contrib.sessions'`` to your ``INSTALLED_APPS`` setting,
-      and run ``manage.py syncdb`` to install the single database table
-      that stores session data.
+セッションを有効にするには、以下の作業が必要です:
 
-.. versionchanged:: 1.0
-   This step is optional if you're not using the database session backend;
-   see `configuring the session engine`_.
+セッション機能をオンオフするには ``MIDDLEWARE_CLASSES`` 設定を編集します。
 
-If you don't want to use sessions, you might as well remove the
-``SessionMiddleware`` line from ``MIDDLEWARE_CLASSES`` and ``'django.contrib.sessions'``
-from your ``INSTALLED_APPS``. It'll save you a small bit of overhead.
+    * ``MIDDLEWARE_CLASSES`` を編集して、
+      ``'django.contrib.sessions.middleware.SessionMiddleware'`` 
+      を入れます。 ``django-admiin.py startproject`` の作成するデフォルトの
+      ``settings.py`` では ``SessionMiddleware`` が有効になっています。
 
-Configuring the session engine
-==============================
+    * ``INSTALLED_APPS`` 設定に ``'django.contrib.sessions'`` を入れ、
+      ``manage.py syncdb`` を実行して、セッションデータを保存するためのデー
+      タベーステーブルを作成します。
+
+      .. versionchanged:: 1.0
+
+      データベースによるセッションバックエンドを使っていない場合は、このス
+      テップは不要です。
+
+
+セッション機能を必要としないのなら、 ``MIDDLEWARE_CLASSES`` から
+``SessionMiddleware`` の行を削り、 ``INSTALLED_APPS`` からも
+``'django.contrib.sessions'`` を削って下さい。セッションを無効にすると、ほ
+んのわずかだけオーバヘッドを軽減できます。
+
+.. _Configuring the session engine:
+
+セッションエンジンの設定
+==========================
 
 .. versionadded:: 1.0.
 
-By default, Django stores sessions in your database (using the model
-``django.contrib.sessions.models.Session``). Though this is convenient, in
-some setups it's faster to store session data elsewhere, so Django can be
-configured to store session data on your filesystem or in your cache.
+デフォルトでは、 Django はセッションをデータベースに
+(``django.contrib.sessions.models.Session`` モデルを使って) 保存します。こ
+の仕様は便利ではありますが、場合によっては、データベース以外の場所、ファイ
+ルシステムやキャッシュ上にセッションデータを保存する方が高速です。
 
-Using file-based sessions
--------------------------
+.. _Using file-based sessions:
 
-To use file-based sessions, set the ``SESSION_ENGINE`` setting to
-``"django.contrib.sessions.backends.file"``.
+ファイルベースのセッション
+---------------------------
 
-You might also want to set the ``SESSION_FILE_PATH`` setting (which defaults
-to output from ``tempfile.gettempdir()``, most likely ``/tmp``) to control
-where Django stores session files. Be sure to check that your Web server has
-permissions to read and write to this location.
+ファイルベースのセッションを使うには、 ``SESSION_ENGINE`` 設定を
+``"django.contrib.sessions.backends.file"`` にします。
 
-Using cache-based sessions
---------------------------
+また、必要に応じて ``SESSION_FILE_PATH`` も設定してください (デフォルト値は
+``tempfile.gettempdir()`` の戻り値で、たいていは ``/tmp`` です)。 Web サー
+バが ``SESSION_FILE_PATH`` の場所にファイルの読書き権限を持っているか確かめ
+てください。
 
-To store session data using Django's cache system, set ``SESSION_ENGINE``
-to ``"django.contrib.sessions.backends.cache"``. You'll want to make sure
-you've configured your cache; see the :ref:`cache documentation <topics-cache>` for details.
+.. _Using cache-based sessions:
 
-.. _cache documentation: ../cache/
+キャッシュベースのセッション
+-----------------------------
+
+Django のキャッシュシステムにセッションデータを保存するには、
+``SESSION_ENGINE`` に ``"django.contrib.sessions.backends.cache"`` 
+を設定してください。キャッシュを設定済みか確かめてください。詳しくは
+:ref:`キャッシュのドキュメント <topics-cache>` を参照してください。
 
 .. note::
 
-    You should probably only use cache-based sessions if you're using the
-    Memcached cache backend. The local-memory cache backend doesn't retain data
-    long enough to be a good choice, and it'll be faster to use file or
-    database sessions directly instead of sending everything through the file
-    or database cache backends.
+    Memcached をキャッシュバックエンドとして使っているなら、キャッシュベー
+    スのセッションを使うべきです。ローカルメモリ型のキャッシュバックエンド
+    は十分な時間データを保持できないので、よい選択肢とはいえません。また、
+    ファイルやデータベースによるキャッシュバックエンドを使っている場合、何
+    もかもをキャッシュに放り込むより、直接ファイルやデータベースからデータ
+    を出力する方がはるかに高速です。
 
-Using sessions in views
-=======================
+.. _Using sessions in views:
 
-When ``SessionMiddleware`` is activated, each ``HttpRequest`` object -- the
-first argument to any Django view function -- will have a ``session``
-attribute, which is a dictionary-like object. You can read it and write to it.
+ビュー中でセッションを扱う
+==========================
 
-A session object has the following standard dictionary methods:
+``SessionMiddleware`` を有効にすると、各々の ``HttpRequest`` オブジェクト
+(Django ビュー関数の最初の引数) は辞書ライクオブジェクトの属性 ``session``
+を持つようになります。この属性は読み書き可能です。
+
+セッションオブジェクトは以下のような標準辞書オブジェクトのメソッドを実装し
+ています:
 
     * ``__getitem__(key)``
 
-      Example: ``fav_color = request.session['fav_color']``
+      例: ``fav_color = request.session['fav_color']``
 
     * ``__setitem__(key, value)``
 
-      Example: ``request.session['fav_color'] = 'blue'``
+      例: ``request.session['fav_color'] = 'blue'``
 
     * ``__delitem__(key)``
 
-      Example: ``del request.session['fav_color']``. This raises ``KeyError``
-      if the given ``key`` isn't already in the session.
+      例: ``del request.session['fav_color']``
+
+      ``key`` がない場合には ``KeyError`` を送出します。
 
     * ``__contains__(key)``
 
-      Example: ``'fav_color' in request.session``
+      例: ``'fav_color' in request.session``
 
     * ``get(key, default=None)``
 
-      Example: ``fav_color = request.session.get('fav_color', 'red')``
+      例: ``fav_color = request.session.get('fav_color', 'red')``
 
     * ``keys()``
 
@@ -110,9 +131,11 @@ A session object has the following standard dictionary methods:
     * ``clear()``
 
 .. versionadded:: 1.0
-   ``setdefault()`` and ``clear()`` are new in this version.
+   ``setdefault()`` と ``clear()`` が追加されました。
 
-It also has these methods:
+また、以下のメソッドを持ちます:
+
+.. TBD
 
     * ``flush()``
 
@@ -126,86 +149,92 @@ It also has these methods:
 
     * ``set_test_cookie()``
 
-      Sets a test cookie to determine whether the user's browser supports
-      cookies. Due to the way cookies work, you won't be able to test this
-      until the user's next page request. See `Setting test cookies`_ below for
-      more information.
+      テストクッキーを設定して、ユーザのブラウザがクッキーをサポートしてい
+      るかどうかを調べられるようにします。クッキーの動作仕様上、次にブラウ
+      ザがリクエストを送信してくるまでテストは行えません。詳しくは後述の
+      「 `テストクッキーを設定する`_ 」を参照してください。
+
 
     * ``test_cookie_worked()``
 
-      Returns either ``True`` or ``False``, depending on whether the user's
-      browser accepted the test cookie. Due to the way cookies work, you'll
-      have to call ``set_test_cookie()`` on a previous, separate page request.
-      See `Setting test cookies`_ below for more information.
+      ユーザのブラウザがテストクッキーを受け入れたかどうかに応じて ``True``
+      または ``False`` を返します。クッキーの動作仕様上、あらかじめ別のペー
+      ジリクエストで ``set_test_cookie()`` を呼び出しておかねばなりません。
+      後述の「 `テストクッキーを設定する`_ 」を参照してください。
 
     * ``delete_test_cookie()``
 
-      Deletes the test cookie. Use this to clean up after yourself.
+      テストクッキーを削除します。後始末に使って下さい。
 
     * ``set_expiry(value)``
 
       .. versionadded:: 1.0
 
-      Sets the expiration time for the session. You can pass a number of
-      different values:
+      セッションの有効期限をセットします。渡せる値には、以下のバリエーショ
+      ンがあります:
 
-            * If ``value`` is an integer, the session will expire after that
-              many seconds of inactivity. For example, calling
-              ``request.session.set_expiry(300)`` would make the session expire
-              in 5 minutes.
+            * ``value`` に整数を渡すと、セッションがアクティブでないまま
+              ``value`` 秒間経った時点で有効期限が切れます。例えば、
+              ``request.session.set_expiry(300)`` とすると、セッションの有
+              効期限は 5 分で切れます。
 
-            * If ``value`` is a ``datetime`` or ``timedelta`` object, the
-              session will expire at that specific date/time.
+            * ``value`` に ``datetime`` や ``timedelta`` オブジェクトを渡す
+              と、セッションの有効期限は指定日・時刻に切れます。
 
-            * If ``value`` is ``0``, the user's session cookie will expire
-              when the user's Web browser is closed.
+            * ``value`` に ``0`` を渡すと、ユーザセッションクッキーの有効期
+              限は、ブラウザを閉じた時点で切れます。
 
-            * If ``value`` is ``None``, the session reverts to using the global
-              session expiry policy.
+            * ``value`` に ``None`` を渡すと、セッションの有効期限はグロー
+              バルに設定されているセッションポリシーに戻されます。
 
     * ``get_expiry_age()``
 
       .. versionadded:: 1.0
 
-      Returns the number of seconds until this session expires. For sessions
-      with no custom expiration (or those set to expire at browser close), this
-      will equal ``settings.SESSION_COOKIE_AGE``.
+      セッションの有効期限が切れるまでの秒数を返します。セッションの有効期
+      限をカスタマイズしていない場合 (またはブラウザを閉じるまでを有効期限
+      としている場合) は、 ``settings.SESSION_COOKIE_AGE`` と等しい値です。
 
     * ``get_expiry_date()``
 
       .. versionadded:: 1.0
 
-      Returns the date this session will expire. For sessions with no custom
-      expiration (or those set to expire at browser close), this will equal the
-      date ``settings.SESSION_COOKIE_AGE`` seconds from now.
+      セッションの有効期限が切れるまでの日数を返します。セッションの有効期
+      限をカスタマイズしていない場合 (またはブラウザを閉じるまでを有効期限
+      としている場合) は、 ``settings.SESSION_COOKIE_AGE`` 秒に相当する日数
+      です。
 
     * ``get_expire_at_browser_close()``
 
       .. versionadded:: 1.0
 
-      Returns either ``True`` or ``False``, depending on whether the user's
-      session cookie will expire when the user's Web browser is closed.
+      ユーザのセッションクッキーの有効期限がブラウザを閉じるまでに設定され
+      ていれば ``True`` を、そうでなければ ``False`` を返します。
 
-You can edit ``request.session`` at any point in your view. You can edit it
-multiple times.
+``request.session`` はビューのどこで変更しても、何度変更してもかまいません。
 
-Session object guidelines
--------------------------
+.. _Session object guidelines:
 
-    * Use normal Python strings as dictionary keys on ``request.session``. This
-      is more of a convention than a hard-and-fast rule.
+セッションオブジェクト使用上のガイドライン
+------------------------------------------
 
-    * Session dictionary keys that begin with an underscore are reserved for
-      internal use by Django.
+    * ``request.session`` のキーには通常の Python 文字列を使って下さい。と
+      はいえ、これは厳格な掟 (hard-and-fast rule) ではなく単なる規約です。
 
-    * Don't override ``request.session`` with a new object, and don't access or
-      set its attributes. Use it like a Python dictionary.
+    * アンダースコアで始まるセッション辞書のキーは Django の内部使用のため
+      に予約されています。
 
-Examples
+    * ``request.session`` を新たなオブジェクトでオーバライドしたり、属性を
+      いじってはなりません。Python 辞書型のように扱って下さい。
+
+.. _Examples:
+
+使用例
 --------
 
-This simplistic view sets a ``has_commented`` variable to ``True`` after a user
-posts a comment. It doesn't let a user post a comment more than once::
+以下の簡単なビューの例では、ユーザがコメントをポストした後に
+``has_commented`` という変数を ``True`` に設定しています。これにより、一人
+のユーザに一つのコメントを何度もポストさせないようにします::
 
     def post_comment(request, new_comment):
         if request.session.get('has_commented', False):
@@ -215,17 +244,17 @@ posts a comment. It doesn't let a user post a comment more than once::
         request.session['has_commented'] = True
         return HttpResponse('Thanks for your comment!')
 
-This simplistic view logs in a "member" of the site::
+以下のビューでは、「メンバ」をサイトにログインさせます::
 
     def login(request):
-        m = Member.objects.get(username=request.POST['username'])
+        m = Member.objects.get(username__exact=request.POST['username'])
         if m.password == request.POST['password']:
             request.session['member_id'] = m.id
             return HttpResponse("You're logged in.")
         else:
             return HttpResponse("Your username and password didn't match.")
 
-...And this one logs a member out, according to ``login()`` above::
+そして下の例では、上で ``login()`` したメンバをログアウトさせます::
 
     def logout(request):
         try:
@@ -234,27 +263,35 @@ This simplistic view logs in a "member" of the site::
             pass
         return HttpResponse("You're logged out.")
 
+.. TBD
+
 The standard ``django.contrib.auth.logout()`` function actually does a bit
 more than this to prevent inadvertent data leakage. It calls
 ``request.session.flush()``. We are using this example as a demonstration of
 how to work with session objects, not as a full ``logout()`` implementation.
 
-Setting test cookies
-====================
+.. _Setting test cookies:
 
-As a convenience, Django provides an easy way to test whether the user's
-browser accepts cookies. Just call ``request.session.set_test_cookie()`` in a
-view, and call ``request.session.test_cookie_worked()`` in a subsequent view --
-not in the same view call.
+テストクッキーを設定する
+========================
 
-This awkward split between ``set_test_cookie()`` and ``test_cookie_worked()``
-is necessary due to the way cookies work. When you set a cookie, you can't
-actually tell whether a browser accepted it until the browser's next request.
+利便性のために、 Django ではユーザのブラウザがクッキーを受け入れるかどうか
+を調べるための簡単な方法を提供しています。ビュー内で
+``request.session.set_test_cookie()`` を呼び出しておき、それ以後のビュー、
+すなわち別のビュー呼び出しで
+``request.session.test_cookie_worked()`` を呼び出すようにしてください。
 
-It's good practice to use ``delete_test_cookie()`` to clean up after yourself.
-Do this after you've verified that the test cookie worked.
+``set_test_cookie()`` と ``test_cookie_worked()`` が別々のビュー呼び出しに
+分離されるのは不恰好ですが、これはクッキーの動作上仕方のないことです。ある
+ブラウザに対して一度クッキーを設定しても、そのブラウザが次にリクエストを送
+信するまではクッキーを受け入れたかどうかを確かめる術はないのです。
 
-Here's a typical usage example::
+テストが終わったら、 ``delete_test_cookie()`` を呼び出して後始末をしておく
+のがよいでしょう。
+
+クッキーの動作テストが終わった時点で、この関数を呼び出して下さい。
+
+典型的な使用例を以下に示します::
 
     def login(request):
         if request.method == 'POST':
@@ -266,12 +303,14 @@ Here's a typical usage example::
         request.session.set_test_cookie()
         return render_to_response('foo/login_form.html')
 
-Using sessions out of views
-===========================
+.. _Using sessions out of views:
+
+ビューの外でセッションを使う
+============================
 
 .. versionadded:: 1.0
 
-An API is available to manipulate session data outside of a view::
+API を使うと、ビューの外からセッションデータを操作できます::
 
     >>> from django.contrib.sessions.backends.db import SessionStore
     >>> s = SessionStore(session_key='2b1189a188b44ad18c35e113ac6ceead')
@@ -280,199 +319,225 @@ An API is available to manipulate session data outside of a view::
     datetime.datetime(2005, 8, 20, 13, 35, 0)
     >>> s.save()
 
-If you're using the ``django.contrib.sessions.backends.db`` backend, each
-session is just a normal Django model. The ``Session`` model is defined in
-``django/contrib/sessions/models.py``. Because it's a normal model, you can
-access sessions using the normal Django database API::
+``django.contrib.sessions.backends.db`` バックエンドを使っている場合、各セッ
+ションは Django のモデルインスタンスで表現されています。 ``Session`` モデル
+は ``django/contrib/session/models.py`` で定義されています。 ``Session`` は
+通常のモデルなので、通常の Django データベース API でアクセスできます::
 
     >>> from django.contrib.sessions.models import Session
     >>> s = Session.objects.get(pk='2b1189a188b44ad18c35e113ac6ceead')
     >>> s.expire_date
     datetime.datetime(2005, 8, 20, 13, 35, 12)
 
-Note that you'll need to call ``get_decoded()`` to get the session dictionary.
-This is necessary because the dictionary is stored in an encoded format::
+セッション情報の辞書を取得するには ``get_decoded()`` を呼び出す必要があるの
+で注意して下さい。というのも、セッション情報はエンコードされた形式で保存さ
+れているからです。
 
     >>> s.session_data
     'KGRwMQpTJ19hdXRoX3VzZXJfaWQnCnAyCkkxCnMuMTExY2ZjODI2Yj...'
     >>> s.get_decoded()
     {'user_id': 42}
 
-When sessions are saved
-=======================
+.. _When sessions are saved:
 
-By default, Django only saves to the session database when the session has been
-modified -- that is if any of its dictionary values have been assigned or
-deleted::
+セッションはいつ保存されるのか
+==============================
 
-    # Session is modified.
+デフォルトでは、 Django はセッション情報が変更された場合、すなわちセッショ
+ン情報の入った辞書に値を代入したり、値を削除した場合にのみ、セッションデー
+タベースを保存します::
+
+    # セッションデータは変更されたものとみなされます
     request.session['foo'] = 'bar'
 
-    # Session is modified.
+    # セッションデータは変更されたものとみなされます
     del request.session['foo']
 
-    # Session is modified.
+    # セッションデータは変更されたものとみなされます
     request.session['foo'] = {}
 
-    # Gotcha: Session is NOT modified, because this alters
-    # request.session['foo'] instead of request.session.
+    # 落とし穴: request.session ではなく request.session['foo'] の変更なの
+    # で、セッションデータは変更されたものとみなされません。
     request.session['foo']['bar'] = 'baz'
 
-In the last case of the above example, we can tell the session object
-explicitly that it has been modified by setting the ``modified`` attribute on
-the session object::
+上の例の最後のケースでは、セッションオブジェクトに内容が変更されたことを明
+示的に教えねばなりません。変更の通知は ``modified`` 属性で行います::
 
     request.session.modified = True
 
-To change this default behavior, set the ``SESSION_SAVE_EVERY_REQUEST`` setting
-to ``True``. If ``SESSION_SAVE_EVERY_REQUEST`` is ``True``, Django will save
-the session to the database on every single request.
+この振舞いを変更したければ、 ``SESSION_SAVE_EVERY_REQUEST`` 設定を ``True``
+に設定してください。 ``SESSION_SAVE_EVERY_REQUEST`` を ``True`` にすると、
+Django はリクエスト一つ一つに対してセッションを保存します。
 
-Note that the session cookie is only sent when a session has been created or
-modified. If ``SESSION_SAVE_EVERY_REQUEST`` is ``True``, the session cookie
-will be sent on every request.
+セッションクッキーはセッションが作成されたり変更されたりした場合にのみ送信
+されることに注意してください。 ``SESSION_SAVE_EVERY_REQUEST`` を ``True``
+にすると、リクエストごとに必ずセッションクッキーを送信するようになります。
 
-Similarly, the ``expires`` part of a session cookie is updated each time the
-session cookie is sent.
+同様に、セッションクッキーの ``expires`` 部分もセッションクッキーの送信ごと
+に更新されます。
 
-Browser-length sessions vs. persistent sessions
-===============================================
+.. _Browser-length sessions v persistent sessions:
 
-You can control whether the session framework uses browser-length sessions vs.
-persistent sessions with the ``SESSION_EXPIRE_AT_BROWSER_CLOSE`` setting.
+ブラウザアクセス単位のセッションと永続的セッション
+==================================================
 
-By default, ``SESSION_EXPIRE_AT_BROWSER_CLOSE`` is set to ``False``, which
-means session cookies will be stored in users' browsers for as long as
-``SESSION_COOKIE_AGE``. Use this if you don't want people to have to log in
-every time they open a browser.
+``SESSION_EXPIRE_AT_BROWSER_CLOSE`` 設定を使うと、セッションフレームワーク
+に、ブラウザアクセス単位のセッションと永続的セッションのどちらを使わせるか
+を指定できます。
 
-If ``SESSION_EXPIRE_AT_BROWSER_CLOSE`` is set to ``True``, Django will use
-browser-length cookies -- cookies that expire as soon as the user closes his or
-her browser. Use this if you want people to have to log in every time they open
-a browser.
+デフォルトでは、 ``SESSION_EXPIRE_AT_BROWSER_CLOSE`` は ``False`` に設定さ
+れています。これはセッションクッキーが ``SESSION_COOKIE_AGE`` の間だけブラ
+ウザに保存されることを示します。ユーザがブラウザを起動するたびにログインし
+なくてもすむようにしたければ、この設定を使ってください。
+
+``SESSION_EXPIRE_AT_BROWSER_CLOSE`` を ``True`` にすると、 Django はブラウ
+ザアクセス単位のクッキー、すなわちユーザがブラウザを閉じると有効期限が切れ
+るようなクッキーを使うようになります。ブラウザを起動するたびにユーザにログ
+イン操作を行わせたい場合、この設定を使ってください。
 
 .. versionadded:: 1.0
 
-This setting is a global default and can be overwritten at a per-session level
-by explicitly calling ``request.session.set_expiry()`` as described above in
-`using sessions in views`_.
+この設定は、グローバルに有効なデフォルト値です。
+「 `ビューの外でセッションを使う`_ 」の節で解説した、
+``request.session.set_expiry()`` を使えば、セッション単位で有効期限をオーバ
+ライドできます。
 
-Clearing the session table
-==========================
+.. _Clearing the session table:
 
-Note that session data can accumulate in the ``django_session`` database table
-and Django does *not* provide automatic purging. Therefore, it's your job to
-purge expired sessions on a regular basis.
+セッションテーブルの消去
+========================
 
-To understand this problem, consider what happens when a user uses a session.
-When a user logs in, Django adds a row to the ``django_session`` database
-table. Django updates this row each time the session data changes. If the user
-logs out manually, Django deletes the row. But if the user does *not* log out,
-the row never gets deleted.
+セッションデータは ``django_session`` データベーステーブル上に蓄積されます
+が、 Django はセッションテーブルを自動的に清掃 *しません。* つまり、期限切
+れの (expired) セッションデータを正しい判断基準の下に削除するのは、アプリケー
+ション開発者であるあなた自身の仕事なのです。
 
-Django provides a sample clean-up script in ``django-admin.py cleanup``.
-That script deletes any session in the session table whose ``expire_date`` is
-in the past -- but your application may have different requirements.
+この問題を理解するには、ユーザがセッションを使ったときに何が起きているかを
+考える必要があります。ユーザがログインすると、 Django は ``django_session``
+データベーステーブルにレコードを 1 行追加します。セッションデータが変更され
+る度に、このレコード行は更新されてゆきます。ユーザが手動でログアウトすれば、
+レコード行は削除されますが、ユーザがログアウト操作を *しなかった場合* には、
+レコード行は削除されません。
 
-Settings
+Django は、クリーンアップ用のアクション、 ``django-admin.py cleanup`` を提
+供しています。このスクリプトはセッションテーブルの全てのエントリの中から、
+``expire_date`` の値が過去を指しているものを除去します。もちろん、お使いの
+アプリケーションが要求する仕様が異なる場合には、別のスクリプトを用意する必
+要があるでしょう。
+
+.. _Settings:
+
+設定
 ========
 
-A few :ref:`Django settings <ref-settings>` give you control over session behavior:
+:ref:`Django 設定ファイル <ref-settings>` には、セッションの振舞いを操作す
+るための設定がいくつかあります:
 
 SESSION_ENGINE
 --------------
 
 .. versionadded:: 1.0
 
-Default: ``django.contrib.sessions.backends.db``
+デフォルト値: ``django.contrib.sessions.backends.db``
 
-Controls where Django stores session data. Valid values are:
+Django がセッションデータを保存する方法を指定します。利用できる値は以下の通
+りです:
 
     * ``'django.contrib.sessions.backends.db'``
     * ``'django.contrib.sessions.backends.file'``
     * ``'django.contrib.sessions.backends.cache'``
 
-See `configuring the session engine`_ for more details.
+詳しくは `セッションエンジンの設定`_ を参照してください。
 
 SESSION_FILE_PATH
 -----------------
 
 .. versionadded:: 1.0
 
-Default: ``/tmp/``
+デフォルト値: ``/tmp/``
 
-If you're using file-based session storage, this sets the directory in
-which Django will store session data.
+ファイルベースのセッションストレージを使っている場合、この値でセッションデー
+タの保存場所を指定します。
 
 SESSION_COOKIE_AGE
 ------------------
 
-Default: ``1209600`` (2 weeks, in seconds)
+デフォルト値: ``1209600`` (秒単位で 2 週間)
 
-The age of session cookies, in seconds.
+セッションクッキーの寿命を秒で表したものです。
 
 SESSION_COOKIE_DOMAIN
 ---------------------
 
-Default: ``None``
+デフォルト値: ``None``
 
-The domain to use for session cookies. Set this to a string such as
-``".lawrence.com"`` for cross-domain cookies, or use ``None`` for a standard
-domain cookie.
+セッションクッキーを使うドメインです。クロスドメインのクッキーを使う場合に
+は ``".lawrence.com"`` といった値に、通常のドメイン内クッキーの場合には
+``None`` を指定します。
 
 SESSION_COOKIE_NAME
 -------------------
 
 Default: ``'sessionid'``
 
-The name of the cookie to use for sessions. This can be whatever you want.
+セッションに使うクッキーの名前です。どんな名前にしてもかまいません。
 
 SESSION_COOKIE_SECURE
 ---------------------
 
-Default: ``False``
+デフォルト値: ``False``
 
-Whether to use a secure cookie for the session cookie. If this is set to
-``True``, the cookie will be marked as "secure," which means browsers may
-ensure that the cookie is only sent under an HTTPS connection.
+セッションクッキーにセキュアなクッキーを使うかどうかを決めます。この値を
+``True`` に設定すると、クッキーは "セキュア" にマークされます。クッキーがセ
+キュアにマークされると、ブラウザによっては HTTPS 接続でのみクッキーを転送す
+るようになります。
+
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE
 -------------------------------
 
 Default: ``False``
 
-Whether to expire the session when the user closes his or her browser. See
-"Browser-length sessions vs. persistent sessions" above.
+ブラウザを閉じたときにセッションを期限切れにするかどうかを決めます。
+
 
 SESSION_SAVE_EVERY_REQUEST
 --------------------------
 
-Default: ``False``
+デフォルト値: ``False``
 
-Whether to save the session data on every request. If this is ``False``
-(default), then the session data will only be saved if it has been modified --
-that is, if any of its dictionary values have been assigned or deleted.
+リクエストごとにセッションデータを保存するかどうかを決めます。この値が
+``False`` (デフォルト) の場合、セッションデータの保存は内容が変更された場合、
+すなわちセッションデータ辞書に値を設定したり、値を削除したりした場合だけに
+なります。
 
+.. _`Django 設定ファイル`: ../settings/
 .. _Django settings: ../settings/
 
-Technical details
-=================
+.. _Technical details:
 
-    * The session dictionary should accept any pickleable Python object. See
-      `the pickle module`_ for more information.
+技術的な詳細
+============
 
-    * Session data is stored in a database table named ``django_session`` .
+  * セッション辞書には pickle 化可能な全てのオブジェクトを使えます。詳し
+    くは `pickle モジュールのドキュメント`_ を参照してください。
 
-    * Django only sends a cookie if it needs to. If you don't set any session
-      data, it won't send a session cookie.
+  * セッション情報は ``django_session`` という名前のデータベーステーブルに
+    保存されます。
 
+  * Django は必要なときにしかクッキーを送信しません。従って、セッション情
+    報を設定しない限り、セッションクッキーの送信を行いません。
+
+.. _`pickle モジュールのドキュメント`: http://www.python.jp/doc/nightly/lib/module-pickle.html
 .. _`the pickle module`: http://www.python.org/doc/current/lib/module-pickle.html
 
-Session IDs in URLs
-===================
+.. _Session IDs in URLs:
 
-The Django sessions framework is entirely, and solely, cookie-based. It does
-not fall back to putting session IDs in URLs as a last resort, as PHP does.
-This is an intentional design decision. Not only does that behavior make URLs
-ugly, it makes your site vulnerable to session-ID theft via the "Referer"
-header.
+URL と Session ID
+=================
+
+Django のセッションフレームワークは完全なクッキーベースであり、クッキー以外
+の情報を扱いません。従って、 PHP のように URL にセッション ID を入れる方法
+を最後の手段に残したりはしていません。これは設計上の意図的な決定です。とい
+うのも、URL にセッション ID を含めると、みっともない URL になるだけでなく、
+"Referer" ヘッダを使ってセッション ID を盗まれるという脆弱性を招くからです。
