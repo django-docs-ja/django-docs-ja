@@ -1,452 +1,486 @@
 .. _internals-contributing:
 
-======================
-Contributing to Django
-======================
+===================================
+Django プロジェクトに協力するために
+===================================
 
-If you think working *with* Django is fun, wait until you start working *on* it.
-We're passionate about helping Django users make the jump to contributing members
-of the community, so there are many ways you can help Django's development:
+:revision-up-to: 8961 (1.0)
 
-    * Blog about Django.  We syndicate all the Django blogs we know about on
-      the `community page`_; contact jacob@jacobian.org if you've got a blog
-      you'd like to see on that page.
+Django を *使う* のを楽しいと思ってもらえたなら、 *使い続ける* 前にすこし待っ
+てください。私達は多大な情熱をかけて、ユーザがコミュニティのメンバに貢献で
+きるよう手助けしています。Django の開発を手伝うにはいくつもの方法があります:
 
-    * Report bugs and request features in our `ticket tracker`_.  Please read
-      `Reporting bugs`_, below, for the details on how we like our bug reports
-      served up.
+    * Django について blog を書きましょう。私達は知っている限りの全ての
+      Django 関係の blog を `コミュニティのページ`_ で配信しています。この
+      ページに登録したい blog があるなら jacob@jacobian.org に連絡してくだ
+      さい。
 
-    * Submit patches for new and/or fixed behavior.  Please read `Submitting
-      patches`_, below, for details on how to submit a patch.
+    * バグ報告や機能に関する要望を `チケットトラッカ`_ に提出しましょう。
+      私達が望んでいるバグ報告の提出方法の詳細は `バグの報告`_ を読んで下さい。
 
-    * Join the `django-developers`_ mailing list and share your ideas for how
-      to improve Django.  We're always open to suggestions, although we're
-      likely to be skeptical of large-scale suggestions without some code to
-      back it up.
+    * 新たな機能を追加したり従来の機能を修正するパッチを提出しましょう。
+      パッチの提出方法は `パッチの提出`_ を参照してください。
 
-    * Triage patches that have been submitted by other users. Please read
-      `Ticket triage`_ below, for details on the triage process.
+    * `django-developers`_ メーリングリストに参加して、 Django をよりよくす
+      るためのアイデアを皆で共有しましょう。どんな提案でも歓迎します。ただ
+      し私達は後ろだてになるコードがないスケールの大きな話には懐疑的です。
 
-That's all you need to know if you'd like to join the Django development
-community. The rest of this document describes the details of how our community
-works and how it handles bugs, mailing lists, and all the other minutiae of
-Django development.
+    * 他のユーザが提出したパッチのトリアージ (選別) を行います。トリアージ
+      の手順については、後述の  `チケットのトリアージ <#ticket-triage>`_ を
+      参照してください。
+
+Django 開発コミュニティに参加するのに必要な知識はこれだけです。このドキュメ
+ントの残りの部分では、開発コミュニティがどのようになっていて、どうやってバ
+グを処理しているかについて詳しく説明し、メーリングリストやその他こまごまと
+した注意点について記述しています。
 
 .. _reporting-bugs:
 
-Reporting bugs
+.. _Reporting bugs:
+
+バグの報告
 ==============
 
-Well-written bug reports are *incredibly* helpful. However, there's a certain
-amount of overhead involved in working with any bug tracking system, so your
-help in keeping our ticket tracker as useful as possible is appreciated.  In
-particular:
+上手に書かれたバグ報告は *信じられないくらい* 助けになります。とはいえ、バ
+グ追跡システムでの作業はかなりのオーバヘッドを要するので、チケットトラッカ
+をできるだけ有意義に使うよう協力していただけると助かります。特に:
 
-    * **Do** read the :ref:`FAQ <faq-index>` to see if your issue might be a well-known question.
+    * **必ず** :ref:`FAQ <faq-index>` を読んで、自分の抱えている問題が既知
+      のものでないか探して下さい。 
 
-    * **Do** `search the tracker`_ to see if your issue has already been filed.
+    * **必ず** `トラッカを検索`_ して、自分の抱えている問題がファイルされて
+      いないか探して下さい。 
 
-    * **Do** ask on `django-users`_ *first* if you're not sure if what you're
-      seeing is a bug.
+    * **必ず** *最初に* `django-users`_ で質問して、自分の考えていることが
+      バグだということを確認してください。 
 
-    * **Do** write complete, reproducible, specific bug reports. Include as
-      much information as you possibly can, complete with code snippets, test
-      cases, etc. This means including a clear, concise description of the
-      problem, and a clear set of instructions for replicating the problem.
-      A minimal example that illustrates the bug in a nice small test case
-      is the best possible bug report.
+    * **必ず** 完結した、再現可能な、的確なバグ報告を書いて下さい。完全なコー
+      ド断片やテストセットなど、可能な限り多くの情報を含めて下さい。問題に
+      対する詳細かつ明瞭な説明と、問題を再現するための手順を含めてください。
+      小さなテストケースでバグを再現できれば最良のバグ報告になります。
 
-    * **Don't** use the ticket system to ask support questions.  Use the
-      `django-users`_ list, or the `#django`_ IRC channel for that.
+    * **決して** サポート質問にチケットシステムを **使わないで下さい。** 質
+      問は `django-users`_ リストや `#django`_ IRC チャネルでお願いします。
 
-    * **Don't** use the ticket system to make large-scale feature requests.
-      We like to discuss any big changes to Django's core on the `django-developers`_
-      list before actually working on them.
+    * **決して** スケールの大きな機能の提案にチケットシステムを 
+      **使わないで下さい。** Django のコアに関わる大きな変更は、
+      取り掛かる前に必ず `django-developers`_ リストで議論します。
 
-    * **Don't** reopen issues that have been marked "wontfix". This mark means
-      that the decision has been made that we can't or won't fix this particular
-      issue.  If you're not sure why, please ask on `django-developers`_.
+    * **決して** "wontfix" にマークされた問題を
+      **開き直さないで下さい。** "wontfix" マークは決定事項であり、この問題
+      についてはこれ以上修正できないか、修正する予定はないのです。納得でき
+      なければ、 `django-developers`_ で質問してください。
 
-    * **Don't** use the ticket tracker for lengthy discussions, because they're
-      likely to get lost. If a particular ticket is controversial, please move
-      discussion to `django-developers`_.
+    * **決して** 長い議論をチケットシステムで **行わないで下さい。** チケッ
+      トシステムでは議論内容がじきに失われてしまうからです。チケットの内容
+      について議論になりそうなときは `django-developers`_ に場所を移して下
+      さい。
 
-    * **Don't** post to django-developers just to announce that you have filed
-      a bug report. All the tickets are mailed to another list
-      (`django-updates`_), which is tracked by developers and triagers, so we
-      see them as they are filed.
+    * バグ報告をチケットに登録したこと **だけ** を django-developers にポス
+      ト **しない** でください。チケットを登録すると、別のメーリングリスト
+      (`django-updates`_) にメールが送信されます。開発者やトリアージ担当者
+      はこのメーリングリストを監視しているので、登録したことがすぐ分かるか
+      らです。
 
 .. _django-updates: http://groups.google.com/group/django-updates
 
 .. _reporting-security-issues:
+.. _Reporting security issues:
 
-Reporting security issues
+セキュリティ問題の報告
 =========================
 
-Report security issues to security@djangoproject.com. This is a private list
-only open to long-time, highly trusted Django developers, and its archives are
-not publicly readable.
+セキュリティ問題の報告は security@djangoproject.com にお願いします。このメー
+リングリスト経験豊かで信頼できる Django 開発者だけが購読でき、アーカイブは
+非公開になっています。
 
-In the event of a confirmed vulnerability in Django itself, we will take the
-following actions:
+Django に脆弱性が発見された場合、私達は以下のように行動します:
 
-    * Acknowledge to the reporter that we've received the report and that a fix
-      is forthcoming. We'll give a rough timeline and ask the reporter to keep
-      the issue confidential until we announce it.
+    * 報告者に対して、報告を受けとったことと、脆弱性がまもなく修正されるこ
+      とを知らせます。修正までのおおまかなタイムラインを示し、報告者に対し
+      て、アナウンスを行うまでにどのくらいの間この問題を秘密にしておけるか
+      問い合わせます。
 
-    * Halt all other development as long as is needed to develop a fix, including
-      patches against the current and two previous releases.
+    * 現在のバージョンと、二つ前までのリリースに対するパッチを含む修正版の
+      開発に必要な期間、他の全ての開発を停止します。
 
-    * Determine a go-public date for announcing the vulnerability and the fix.
-      To try to mitigate a possible "arms race" between those applying the patch
-      and those trying to exploit the hole, we will not announce security
-      problems immediately.
+    * 脆弱性と修正版をアナウンスするする日取りを決めます。 パッチを適用する
+      側と脆弱性を不正利用する側の間の「軍拡競争」を抑えるため、私達はセキュ
+      リティ問題を即座にアナウンスしません。
 
-    * Pre-notify everyone we know to be running the affected version(s) of
-      Django. We will send these notifications through private e-mail which will
-      include documentation of the vulnerability, links to the relevant patch(es),
-      and a request to keep the vulnerability confidential until the official
-      go-public date.
+    * 影響を受けるバージョンの Django を使っているユーザのうち、私達が把握
+      している人全員に事前に通知します。この通知は個人宛の電子メールで行わ
+      れます。メールには脆弱性に関するドキュメントと該当パッチへのリンク、
+      そしてこの脆弱性を公式の公開日まで秘密にしておくよう要請する文が入っ
+      ています。
 
-    * Publicly announce the vulnerability and the fix on the pre-determined
-      go-public date. This will probably mean a new release of Django, but
-      in some cases it may simply be patches against current releases.
+    * あらかじめ決めておいた日取りに基づいて、脆弱性と修正版を公開し、アナ
+      ウンスします。通常は新たなバージョンの Django リリースを意味しますが、
+      場合によっては現在のリリースに対する単なるパッチになります。
 
-Submitting patches
+.. _Submitting patches:
+
+パッチの提出
 ==================
 
-We're always grateful for patches to Django's code. Indeed, bug reports with
-associated patches will get fixed *far* more quickly than those without patches.
+Django のコードに対するパッチはつねに大歓迎です。実際、パッチつきのバグ報告
+は、パッチのないものよりも *はるかに* 素早く修正されます。
 
-"Claiming" tickets
-------------------
+.. _"Claiming" tickets:
 
-In an open-source project with hundreds of contributors around the world, it's
-important to manage communication efficiently so that work doesn't get
-duplicated and contributors can be as effective as possible. Hence, our policy
-is for contributors to "claim" tickets in order to let other developers know
-that a particular bug or feature is being worked on.
+チケットをクレーム（審査請求）する
+-----------------------------------
 
-If you have identified a contribution you want to make and you're capable of
-fixing it (as measured by your coding ability, knowledge of Django internals
-and time availability), claim it by following these steps:
+世界中に何百人ものコントリビュータを擁するようなオープンソースプロジェクト
+では、コミュニケーションを効率的に進めることで、同じ作業が何度も繰り返され
+るのを防ぎ、コントリビュータができるだけ効果的に振る舞えるような配慮が重要
+です。そのため、コントリビュータがチケットをクレームし、他の開発者たちに、
+何らかのバグ報告や機能提案がなされていることを知らせるという方針をとります。
 
-    * `Create an account`_ to use in our ticket system.
-    * If a ticket for this issue doesn't exist yet, create one in our
-      `ticket tracker`_.
-    * If a ticket for this issue already exists, make sure nobody else has
-      claimed it. To do this, look at the "Assigned to" section of the ticket.
-      If it's assigned to "nobody," then it's available to be claimed.
-      Otherwise, somebody else is working on this ticket, and you either find
-      another bug/feature to work on, or contact the developer working on the
-      ticket to offer your help.
-    * Log into your account, if you haven't already, by clicking "Login" in the
-      upper right of the ticket page.
-    * Claim the ticket by clicking the radio button next to "Accept ticket"
-      near the bottom of the page, then clicking "Submit changes."
+Django プロジェクトに何らかの貢献をしたいと考えていて、 (コード作成能力や、
+Django の内部に関する知識、時間的な余裕から) 必要な修正を行えるのなら、以下
+のステップに従ってチケットをクレームしてください:
+
+    * チケットシステム上に `アカウントを作成`_ します。
+    * 自分の提起したい内容がまだ `チケットトラッカ`_ 上になければ、
+      新たに作成します。
+    * 自分の提起したい内容がすでにチケットトラッカ上にあるのなら、そのチケッ
+      トの "Assigned to" セクションを調べて、誰かによってクレーム済みでない
+      か確認してください。 "nobody" になっていれば、そのチケットはクレーム
+      できます。すでに誰かのアカウント名が入っているのなら、他のチケットを
+      探してクレームするか、その問題に関わっている開発者に連絡をとって、チ
+      ケット解決に手を貸してください。
+    * まだログインしていなければ、自分のアカウントでログインしてください。
+      ログインするには、チケットページの右上にある "Login" をクリックします。
+    * チケットをクレームするには、チケットページの下にある、"Accept ticket" 
+      の隣のラジオボタンをクリックしてから、 "Submit changes" をクリックします。
 
 .. _Create an account: http://www.djangoproject.com/accounts/register/
+.. _`アカウントを作成`: http://www.djangoproject.com/accounts/register/
 
-Ticket claimers' responsibility
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _`Ticket claimers' responsibility`:
 
-Once you've claimed a ticket, you have a responsibility to work on that ticket
-in a reasonably timely fashion. If you don't have time to work on it, either
-unclaim it or don't claim it in the first place!
+チケットをクレームしたら
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Ticket triagers go through the list of claimed tickets from time to
-time, checking whether any progress has been made. If there's no sign of
-progress on a particular claimed ticket for a week or two, a triager may ask
-you to relinquish the ticket claim so that it's no longer monopolized and
-somebody else can claim it.
+チケットをクレームした人は、そのチケットが時代おくれにならないよう作業せね
+ばなりません。チケットに時間を割けないのなら、クレームを解除するか、そもそ
+もクレームしないようにしてください！
 
-If you've claimed a ticket and it's taking a long time (days or weeks) to code,
-keep everybody updated by posting comments on the ticket. If you don't provide
-regular updates, and you don't respond to a request for a progress report,
-your claim on the ticket may be revoked. As always, more communication is
-better than less communication!
+チケットのトリアージ担当者たちは、クレーム済みのチケットを何度も調べて、各々
+のチケットに進捗があるかどうか調べます。クレーム状態にあるチケットが進捗し
+ないまま 1 週間以上過ぎた場合、チケットが独占されつづけないよう、クレームを
+解除してほしい旨問い合わせる場合があります。
 
-Which tickets should be claimed?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+チケットをクレームしてから、コードを書くまでにしばらく (数日から数週間) 
+かかる場合、何らかのコメントをポストして、その旨を通知してください。更新が
+なく、進捗レポートの要求に対する返事もない場合、チケットを無効にする場合も
+あります。まずは連絡第一です!
 
-Of course, going through the steps of claiming tickets is overkill in some
-cases. In the case of small changes, such as typos in the documentation or
-small bugs that will only take a few minutes to fix, you don't need to jump
-through the hoops of claiming tickets. Just submit your patch and be done with
-it.
+.. _`Which tickets should be claimed?`:
 
-Patch style
+どのチケットをクレームすべきか
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+もちろん、わざわざチケットをクレームするまでもない場合もあります。ドキュメ
+ントのタイプミスや、ほんの数分あれば修正できるような小さなバグの場合には、
+チケットのクレームまでする必要はありません。単にパッチを投稿して、そのまま
+にしておいてください。
+
+.. _Patch style:
+
+パッチ形式
 -----------
 
-    * Make sure your code matches our `coding style`_.
+    * Django の `コーディングスタイル`_ に従っているか確認してください。
 
-    * Submit patches in the format returned by the ``svn diff`` command.
-      An exception is for code changes that are described more clearly in plain
-      English than in code. Indentation is the most common example; it's hard to
-      read patches when the only difference in code is that it's indented.
+    * ``svn diff`` コマンドの返す書式のパッチを提出してください。ただし、コー
+      ドよりも英語で変更点を説明した方がはるかに分かりやすい場合は例外です。
+      例えばインデントはよくある例です。というのも、コードの違いがインデン
+      トでしかない場合、パッチを読むのはとても大変だからです。
 
-    * When creating patches, always run ``svn diff`` from the top-level
-      ``trunk`` directory -- i.e., the one that contains ``django``, ``docs``,
-      ``tests``, ``AUTHORS``, etc. This makes it easy for other people to apply
-      your patches.
+    * パッチを作るときには、 常に ``trunk`` ディレクトリの最上位の階層、
+      すなわち、 ``django``, ``docs``, ``tests``, ``AUTHORS`` などがある場
+      所で ``svn diff`` を実行してください。こうしてパッチを作ったほうが
+      他の人が適用しやすいからです。
 
-    * Attach patches to a ticket in the `ticket tracker`_, using the "attach file"
-      button. Please *don't* put the patch in the ticket description or comment
-      unless it's a single line patch.
+    * `チケットトラッカ`_ で、 "attach file" ボタンを使ってチケットにパッチ
+      を添付してください。一行のパッチでないかぎり、チケットの説明やコメン
+      トの中にパッチを *入れないで* 下さい。
 
-    * Name the patch file with a ``.diff`` extension; this will let the ticket
-      tracker apply correct syntax highlighting, which is quite helpful.
+    * パッチファイルの名前には ``.diff`` 拡張子をつけて下さい。そうすること
+      で、チケットトラッカは構文のハイライト強調を正しく行うので助かります。
 
-    * Check the "Has patch" box on the ticket details. This will make it
-      obvious that the ticket includes a patch, and it will add the ticket to
-      the `list of tickets with patches`_.
+    * チケットの詳細情報欄にある「パッチ付き」("Has patch") ボックスにチェッ
+      クを入れてください。チケットがパッチつきであることが分かりやすくなり、
+      チケットシステムがそのチケットを `パッチつきのチケットのリスト`_ に追
+      加してくれます。
 
-    * The code required to fix a problem or add a feature is an essential part
-      of a patch, but it is not the only part. A good patch should also include
-      a regression test to validate the behavior that has been fixed (and prevent
-      the problem from arising again).
+    * 問題を解決したり機能を追加するためのコードはパッチの重要な部分ですが、
+      それだけではいけません。よいパッチというものには必ず回帰テストが付属
+      していて、問題が解決されたことを検証できる (そして将来同様の問題が再
+      発しないようにできる) ものです。 
+      
+    * パッチ中のコードが新たな機能や既存の機能に対する変更をもたらす場合、
+      パッチにはドキュメントも含めてください。
 
-    * If the code associated with a patch adds a new feature, or modifies behavior
-      of an existing feature, the patch should also contain documentation.
+.. _Non-trivial patches:
 
-Non-trivial patches
--------------------
+重要パッチ
+----------
 
-A "non-trivial" patch is one that is more than a simple bug fix. It's a patch
-that introduces Django functionality and makes some sort of design decision.
+「重要 (non-trivial)」パッチとは、単なるバグフィクスに留まらず、Django に
+新たな機能をもたらし、何らかの設計上の判断を迫るようなパッチです。
 
-If you provide a non-trivial patch, include evidence that alternatives have
-been discussed on `django-developers`_. If you're not sure whether your patch
-should be considered non-trivial, just ask.
+重要パッチを提出する場合には、その問題について `django-developers`_ で議論
+済みであるという証明を含めてください。自分のパッチが重要パッチかどうか判断
+しかねる場合には問い合わせてください。
 
-Ticket triage
-=============
+.. _Ticket triage:
 
-Unfortunately, not all bug reports in the `ticket tracker`_ provide all
-the `required details`_. A number of tickets have patches, but those patches
-don't meet all the requirements of a `good patch`_.
+チケットのトリアージ
+====================
 
-One way to help out is to *triage* bugs that have been reported by other
-users. A couple of dedicated volunteers work on this regularly, but more help
-is always appreciated.
+残念ながら、 `チケットトラッカ`_ に届くバグ報告全てが、上に述べた
+`チケットの要件 <#reporting-bugs>`_ を満たしているわけではありません。
+パッチの添付されたチケットもたくさんありますが、それら全てが 
+`よいパッチ <#patch-style>`_ の要件を満たしているわけでもありません。
 
-Most of the workflow is based around the concept of a ticket's "triage stage".
-This stage describes where in its lifetime a given ticket is at any time.
-Along with a handful of flags, this field easily tells us what and who each
-ticket is waiting on.
+こうした状況の打開を手助けする一つの方法に、他のユーザが報告したバグのトリ
+アージ (選別) 作業があります。この作業には献身的なボランティア 2 名が常時携
+わっていますが、手助けをしてくれる人は常に歓迎です。
 
-Since a picture is worth a thousand words, let's start there:
+トリアージ作業のワークフローの大半は、チケットの「トリアージ段階 (triage
+stage)」というフィールドに関わる作業です。このステージとは、あるチケットが
+ライフサイクルのどの段階にあるかを示す指標です。ステージフラグやその他のフ
+ラグによって、誰のどんなチケットが処理待ちになっているかがわかります。
+
+百聞は一見にしかずですから、例を挙げて説明しましょう:
 
 .. image:: _images/djangotickets.png
    :height: 451
    :width: 590
-   :alt: Django's ticket workflow
+   :alt: Django のチケットワークフロー図
 
-We've got two official roles here:
+チケット処理の流れには、まず、 2 種類の公認の役割があります:
 
-    * Core developers: people with commit access who make the big decisions
-      and write the bulk of the code.
+    * コア開発者: コミット権限を持ち、コードに関する重大な決定や、大部分の
+      コード作成を行う人です。
 
-    * Ticket triagers: trusted community members with a proven history of
-      working with the Django community. As a result of this history, they
-      have been entrusted by the core developers to make some of the smaller
-      decisions about tickets.
+    * トリアージ担当者:  Django コミュニティでの長期にわたる実績を持った信
+      頼のおけるメンバです。その実績に基づいて、コア開発者はチケット単位の
+      より小規模な決定権を委譲しています。
 
-Second, note the five triage stages:
+次に、トリアージ作業には以下の 5 つのステージがあります:
 
-    1. A ticket starts as "Unreviewed", meaning that nobody has examined
-       the ticket.
+    1. チケットは「未レビュー(unreviewed)」の状態からスタートします。まだだ
+       れもチケットを調べていない状態です。
 
-    2. "Design decision needed" means "this concept requires a design
-       decision," which should be discussed either in the ticket comments or on
-       `django-developers`_. The "Design decision needed" step will generally
-       only be used for feature requests. It can also be used for issues
-       that *might* be bugs, depending on opinion or interpretation. Obvious
-       bugs (such as crashes, incorrect query results, or non-compliance with a
-       standard) skip this step and move straight to "Accepted".
+    2. 「設計判断待ち(design decision needed)」は、「このコンセプトには設計
+       上の判断が必要」であり、チケットのコメント欄か、
+       `django-developers`_ 上で議論すべきであることを示しています。
+       設計判断待ちのステップは、原則として機能追加リクエストのチケットにし
+       かありません。ただし、意見や解釈によってはバグと見なされ *得る* よう
+       な問題に対して使われる場合もあります。明らかなバグ (クラッシュする、
+       クエリ結果がおかしい、標準からかけ離れた動作) の場合、このステップは
+       飛ばして「承認」に進みます。
 
-    3. Once a ticket is ruled to be approved for fixing, it's moved into the
-       "Accepted" stage. This stage is where all the real work gets done.
+    3. チケットの内容に従った修正が受け入れられた場合、「承認 (accepted)」
+       ステージに移行します。このステージは全ての作業が終わった状態です。
 
-    4. In some cases, a ticket might get moved to the "Someday/Maybe" state.
-       This means the ticket is an enhancement request that we might consider
-       adding to the framework if an excellent patch is submitted. These
-       tickets are not a high priority.
+    4. チケットは "Someday/Maybe" 状態に移行させられる場合があります。これ
+       は、該当チケットに述べられている内容に対して、素晴らしいパッチが提供
+       された時点でフレームワークに追加しようと考えていることを示します。こ
+       の状態に移行したチケットの優先度は高くありません。
 
-    5. If a ticket has an associated patch (see below), a triager will review
-       the patch. If the patch is complete, it'll be marked as "ready for
-       checkin" so that a core developer knows to review and check in the
-       patches.
+    5. チケットにパッチが関連づけられている場合 (下記参照)、トリアージ作業
+       者はパッチをレビューします。パッチの内容が完璧なら、「チェックイン可
+       (ready for checkin)」にマークされ、コア開発者にパッチをレビューし
+       てチェックすべきであることを知らせます。
 
-The second part of this workflow involves a set of flags the describe what the
-ticket has or needs in order to be "ready for checkin":
+ワークフローにはもう 1 つ、一連のフラグがあります。フラグは各チケットを
+「チェックイン可」にするために必要な条件のうち、何が満たされていて何が必要
+かを示します:
 
-    "Has patch"
-        This means the ticket has an associated patch_. These will be
-        reviewed by the triage team to see if the patch is "good".
+    「パッチあり (has patch)」
+        チケットに `パッチ`_ が添付されていることを示します。
+        このフラグのついたパッチはトリアージ担当者によってレビューされ、条
+        件を満たした「よいパッチ」であるかどうか調べられます。
 
-    "Needs documentation"
-        This flag is used for tickets with patches that need associated
-        documentation. Complete documentation of features is a prerequisite
-        before we can check a fix into the codebase.
+    「ドキュメント不足 (needs documentation)」
+        パッチつきのチケットに対して、ドキュメントが必要であることを示しま
+        す。コードベースに修正をチェックインする条件として、完全なドキュメ
+        ントが必要です。
 
-    "Needs tests"
-        This flags the patch as needing associated unit tests. Again, this is a
-        required part of a valid patch.
+    「テスト不足 (needs tests)」
+        パッチに単位テストが必要であることを示します。上ど同様、条件として
+        有効なパッチが必要です。
 
-    "Patch needs improvement"
-        This flag means that although the ticket *has* a patch, it's not quite
-        ready for checkin. This could mean the patch no longer applies
-        cleanly, or that the code doesn't live up to our standards.
+    「パッチに改良の余地あり (patch needs improvement)」
+        チケットにパッチが *付属している* が、チェックインするには修正の余
+        地があることを示します。パッチが古くてきれいに当てられなくなってし
+        まっている場合や、コードがコーディング基準に従っていないことを示し
+        ます。
 
-A ticket can be resolved in a number of ways:
+チケットは色々な形で解決されます:
 
-    "fixed"
-        Used by one of the core developers once a patch has been rolled into
-        Django and the issue is fixed.
+    「修正済み (fixed)」
+        パッチが Django に取り込まれ、問題が解決されると、コア開発者はチケッ
+        トを fixed にマークします。
 
-    "invalid"
-        Used if the ticket is found to be incorrect. This means that the
-        issue in the ticket is actually the result of a user error, or
-        describes a problem with something other than Django, or isn't
-        a bug report or feature request at all (for example, some new users
-        submit support queries as tickets).
+    「無効 (invalid)」
+        チケットの内容が不正確であると判断された場合に使われます。無効扱い
+        は、チケットの報告している問題が何らかのユーザの手違いに起因してい
+        る、 Django に関係ない問題である、あるいは、バグ報告でも機能リクエ
+        ストでもない (例えば、初心者の中にはチケットにサポート質問を書く人
+        がいます) と判断されたことを示しています。
 
-    "wontfix"
-        Used when a core developer decides that this request is not
-        appropriate for consideration in Django. This is usually chosen after
-        discussion in the ``django-developers`` mailing list, and you should
-        feel free to join in when it's something you care about.
+    「修正の予定なし (wontfix)」
+        修正要求を Django に取り込むのは不適切であると判断した場合、コア開
+        発者はチケットを wondfix にマークします。 wontfix へのマークは、
+        通常は ``django-developer`` メーリングリストでの議論の末に選択され
+        ることなので、気になる議論があったらぜひ参加してください。
 
-    "duplicate"
-        Used when another ticket covers the same issue. By closing duplicate
-        tickets, we keep all the discussion in one place, which helps everyone.
+    「他のチケットと重複 (duplicate)」
+        他のチケットで同じ問題がカバーされている場合にはチケットを
+        duplicate にマークします。重複したチケットをクローズして問題解決の
+        ための議論を 1 箇所にまとめ、話を進めやすくするためです。 
 
-    "worksforme"
-        Used when the the ticket doesn't contain enough detail to replicate
-        the original bug.
+    「再現不能 (worksforme)」
+        チケットに十分な情報がなく、問題を再現できない場合に使われます。
 
-If you believe that the ticket was closed in error -- because you're
-still having the issue, or it's popped up somewhere else, or the triagers have
--- made a mistake, please reopen the ticket and tell us why. Please do not
-reopen tickets that have been marked as "wontfix" by core developers.
+あるチケットが明らかに誤ってクローズされた -- クローズされたチケットで提起
+されている問題が依然として生じている場合や、別の問題が生じた場合、あるいは
+トリアージ作業でミスが起きている -- 場合には、そのチケットを再度開いて
+(reopen)、その理由を記載してください。また、コア開発者が "wontfix" にマーク
+したチケットを reopen しないでください。
+
 
 .. _required details: `Reporting bugs`_
 .. _good patch: `Patch style`_
 .. _patch: `Submitting patches`_
+.. _パッチ: `Patch style`_
 
-Triage by the general community
--------------------------------
+.. _Triage by the general community:
 
-Although the core developers and ticket triagers make the big decisions in
-the ticket triage process, there's also a lot that general community
-members can do to help the triage process. In particular, you can help out by:
+一般コミュニティメンバによるトリアージ
+----------------------------------------
 
-    * Closing "Unreviewed" tickets as "invalid", "worksforme" or "duplicate."
+コア開発者やトリアージ担当者がチケットのトリアージ作業で重要な決定を行う一
+方で、一般コミュニティのメンバもまた、トリアージ作業に参加できます。
+具体的には、以下のようなトリアージ補助があります:
 
-    * Promoting "Unreviewed" tickets to "Design decision needed" if a design
-      decision needs to be made, or "Accepted" in case of obvious bugs.
+    * 「レビュー待ち」状態のチケットを、「無効」、「再現不能」、「重複」と
+      いった理由でクローズできます。
 
-    * Correcting the "Needs tests", "Needs documentation", or "Has patch" flags
-      for tickets where they are incorrectly set.
+    * 「レビュー待ち」状態のチケットを、設計判断が必要な場合には「設計判断
+      待ち」に、明らかなバグの場合には「承認」に昇格させられます。
 
-    * Checking that old tickets are still valid. If a ticket hasn't seen
-      any activity in a long time, it's possible that the problem has been
-      fixed but the ticket hasn't yet been closed.
+    * 「テスト不足」「ドキュメント不足」のチケットを修正したり、「パッチあ
+      り」フラグが正しくセットされていないチケットを修正できます。
+ 
+    * 古いチケットに何も変化がないまま長時間経過している場合、その問題が解
+      決されているにもかかわらずチケットがクローズされず放置されていないか
+      調べられます。
 
-    * Contacting the owners of tickets that have been claimed but have not seen
-      any recent activity. If the owner doesn't respond after a week or so,
-      remove the owner's claim on the ticket.
+    * チケットをクレームしたにもかかわらず、最近動きのないチケットオーナに
+      連絡して、返事が 1 週間以上ない場合にはチケットのクレームを失効させら
+      れます。
 
-    * Identifying trends and themes in the tickets. If there a lot of bug reports
-      about a particular part of Django, it may indicate we should consider
-      refactoring that part of the code. If a trend is emerging, you should
-      raise it for discussion (referencing the relevant tickets) on
-      `django-developers`_.
+    * チケットの傾向と本質的な問題を分析できます。 Django の特定の部分に対
+      するバグ報告が集中している場合、コードのリファクタを検討する必要があ
+      ることを示しています。何らかの傾向が見られるのなら、(問題のチケットを
+      引きあいに出して) `django-developers`_ に問題提起してください。
 
-However, we do ask the following of all general community members working in
-the ticket database:
+とはいえ、一般コミュニティのメンバがチケットデータベースを操作する際には、
+以下の点に気をつけてください:
 
-    * Please **don't** close tickets as "wontfix." The core developers will
-      make the final determination of the fate of a ticket, usually after
-      consultation with the community.
+    * チケットを「修正の予定なし」で閉じては **なりません** 。チケットの生
+      死を最終的に決めるのはコア開発者で、それも通常はコミュニティと相談し
+      た後だからです。
+    
+    * つづりの間違い修正やドキュメントのリンク修正といった *些細な* 変更で
+      ない限り、チケットを「チェックイン可」に昇格させては **なりません** 。
 
-    * Please **don't** promote tickets to "Ready for checkin" unless they are
-      *trivial* changes -- for example, spelling mistakes or broken links in
-      documentation.
+    * コア開発者が下した決定を差し戻しては **なりません** 。議論に納得でき
+      ないのなら、 `django-developers`_ にメッセージをポストしてください。
 
-    * Please **don't** reverse a decision that has been made by a core
-      developer. If you disagree with a discussion that has been made,
-      please post a message to `django-developers`_.
+    * 慎重に振る舞ってください。チケットの状態を変更すべきか迷うような場合
+      には、変更してはなりません。そんな場合には、チケットに自分のコメント
+      を残すか、 `django-developers`_ にメッセージをポストしてください。
 
-    * Please be conservative in your actions. If you're unsure if you should
-      be making a change, don't make the change -- leave a comment with your
-      concerns on the ticket, or post a message to `django-developers`_.
 
 .. _contributing-translations:
+.. _Submitting and maintaining translations:
 
-Submitting and maintaining translations
-=======================================
+翻訳の提出と維持
+================
 
-Various parts of Django, such as the admin site and validation error messages,
-are internationalized. This means they display different text depending on a
-user's language setting. For this, Django uses the same internationalization
-infrastructure that is available to Django applications that is described
-in the :ref:`i18n documentation<topics-i18n>`.
+admin サイトやバリデータのエラーメッセージなど、Django は様々な部分で国際化
+されており、ユーザの言語設定に従って様々なテキストを表示します。この機能を
+実現するために、Django は共通の国際化メカニズムを使っています。国際化メカニ
+ズムはどのアプリケーションからも利用できます。利用法は
+:ref:`i18n のドキュメント <topics-i18n>` で解説しています。
 
-These translations are contributed by Django users worldwide. If you find an
-incorrect translation, or if you'd like to add a language that isn't yet
-translated, here's what to do:
+翻訳カタログは世界中の Django ユーザによる貢献でできています。間違った翻訳
+や、まだ翻訳存在しない言語に新たな翻訳を追加したい場合は以下のようにします:
 
-    * Join the `Django i18n mailing list`_ and introduce yourself.
+    * `Django i18n メーリングリスト`_ に参加して自己紹介してください。
+    * :ref:`i18n のドキュメント <topics-i18n>` に従って翻訳を作成してくださ
+      い。カタログの生成には ``django-admin.py makemessages`` ツールを使い
+      ます。 Django 全体のカタログを生成する場合、 Django のソースツリーの
+      トップレベルにある ``django`` ディレクトリでコマンドを実行してくださ
+      い。
+
+      このツールは、 Django のソースツリー全体を走査して、翻訳対象としてマー
+      クされた文字列を取り出します。メッセージカタログファイルは 
+      ``conf/locale`` ディレクトリ以下に生成（または更新）されます。
+      （例えば、 ``pt-BR`` ロケールであれば、ファイルは
+      ``conf/locale/pt-br/LC_MESSAGES/django.po`` に書き出されます。）
+
+    * ``django-admin.py compilemessages -l <lang>`` を実行して、警告がでな
+      いのを確認してください。
+
+    * 上の二つのステップを、 ``djangojs`` ドメインに対しても実行してくださ
+      い。 (``django-admin.py`` のコマンドラインに  ``-d djangojs`` オプショ
+      ンを付加して実行します)
     
-    * Create translations using the methods described in the :ref:`i18n
-      documentation <topics-i18n>`. For this you will use the ``django-admin.py
-      makemessages`` tool. In this particular case it should be run from the
-      top-level``django`` directory of the Django source tree.
+    * 最新の Subversion trunk に対して、 ``.po`` ファイルの差分を作成してください。
+    
+    * Django のチケットシステムで新しいチケットを作成し、 ``Component`` フィー
+      ルドを ``Translations`` に設定して、パッチを添付して提出してください。
 
-      The script runs over the entire Django source tree and pulls out all
-      strings marked for translation. It creates (or updates) a message file in
-      the directory ``conf/locale`` (for example for ``pt-BR``, the file will be
-      ``conf/locale/pt-br/LC_MESSAGES/django.po``).
-      
-    * Make sure that ``django-admin.py compilemessages -l <lang>`` runs without
-      producing any warnings.
-    
-    * Repeat the last two steps for the ``djangojs`` domain (by appending the
-      ``-d djangojs`` command line option to the ``django-admin.py``
-      invocations.
-    
-    * Create a diff of the ``.po`` file(s) against the current Subversion trunk.
-    
-    * Open a ticket in Django's ticket system, set its ``Component`` field to
-      ``Translations``, and attach the patch to it.
 
 .. _Django i18n mailing list: http://groups.google.com/group/django-i18n/
+.. _`Django i18n メーリングリスト`: `Django i18n mailing list`_
 
-Coding style
-============
+.. _Coding style:
 
-Please follow these coding standards when writing code for inclusion in Django:
+コーディングスタイル
+====================
 
-    * Unless otherwise specified, follow :pep:`8`.
+コードを書いて Django に取り込みたいなら、以下のコーディング標準に従って下
+さい:
 
-      You could use a tool like `pep8.py`_ to check for some problems in this
-      area, but remember that PEP 8 is only a guide, so respect the style of
-      the surrounding code as a primary goal.
+    * 特に指定のない限り :pep:`8` に従って下さい。
 
-    * Use four spaces for indentation.
+      `pep8.py`_ のようなツールを使えば、コーディング標準に従っているかどう
+      かをチェックできます。とはいえ、 PEP 8 はガイドにすぎません。まずは、
+      周辺のコードのスタイルを尊重してください。
 
-    * Use underscores, not camelCase, for variable, function and method names
-      (i.e. ``poll.get_unique_voters()``, not ``poll.getUniqueVoters``).
+    * インデントにはスペース 4 つを使います。
 
-    * Use ``InitialCaps`` for class names (or for factory functions that
-      return classes).
+    * 変数名、関数名、メソッド名には camelCase ではなくアンダースコアを使っ
+      て下さい (たとえば ``poll.getUniqueVoters`` ではなく
+      ``poll.get_unique_voters()``)。
 
-    * Mark all strings for internationalization; see the :ref:`i18n
-      documentation <topics-i18n>` for details.
+    * クラス名 (やクラスを返すファクトリ関数) には ``InitialCaps`` を使って
+      ください。
 
-    * In docstrings, use "action words" such as::
+    * 国際化の必要な全ての文字列をマークしておいてください。詳しくは 
+      :ref:`i18n ドキュメント <topics-i18n>` を参照してください。
+
+    * docstring 内では、下記のような "action word" を使ってください::
 
           def foo():
               """
@@ -454,7 +488,7 @@ Please follow these coding standards when writing code for inclusion in Django:
               """
               pass
 
-      Here's an example of what not to do::
+      以下のような書き方をしてはなりません::
 
           def foo():
               """
@@ -462,68 +496,76 @@ Please follow these coding standards when writing code for inclusion in Django:
               """
               pass
 
-    * Please don't put your name in the code you contribute. Our policy is to
-      keep contributors' names in the ``AUTHORS`` file distributed with Django
-      -- not scattered throughout the codebase itself. Feel free to include a
-      change to the ``AUTHORS`` file in your patch if you make more than a
-      single trivial change.
+    * コード中に自分の名前を埋め込まないでください。Django プロジェクトでは、
+      コードの開発者や貢献者の名前がコード中に散逸しないようにするため、
+      ``AUTHORS`` ファイルにまとめて記載するというポリシを採用しています。
+      ほんのちょっとした変更でないかぎり、ご自分のパッチに ``AUTHORS`` への
+      変更を加えて頂いてもかまいません。
 
-Template style
---------------
+.. _Template style:
 
-    * In Django template code, put one (and only one) space between the curly
-      brackets and the tag contents.
+テンプレートのスタイル
+----------------------
 
-      Do this:
+    * Django テンプレートコード内では、波括弧とタグコンテンツの間に 1 個 (1
+      個だけ) スペースをいれて下さい。
+
+      [正]:
 
       .. code-block:: html+django
 
           {{ foo }}
 
-      Don't do this:
+      [誤]:
 
       .. code-block:: html+django
 
           {{foo}}
 
-View style
-----------
 
-    * In Django views, the first parameter in a view function should be called
-      ``request``.
+.. _View style:
 
-      Do this::
+ビューのスタイル
+----------------
+
+
+    * Django のビューを書くときには、最初のパラメタは必ず ``request`` とい
+      う名前にしてください。
+
+      [正]::
 
           def my_view(request, foo):
               # ...
 
-      Don't do this::
+      [誤]::
 
           def my_view(req, foo):
               # ...
 
-Model style
------------
+.. _Model style:
 
-    * Field names should be all lowercase, using underscores instead of
-      camelCase.
+モデルのスタイル
+----------------
 
-      Do this::
+    * フィールド名は全て小文字で、キャメルケース (camelCase のような書き方)
+      はせず、アンダースコアを使います。
+
+      以下のような書き方をします::
 
           class Person(models.Model):
               first_name = models.CharField(max_length=20)
               last_name = models.CharField(max_length=40)
 
-      Don't do this::
+      以下のような書き方をしてはなりません::
 
           class Person(models.Model):
               FirstName = models.CharField(max_length=20)
               Last_Name = models.CharField(max_length=40)
 
-    * The ``class Meta`` should appear *after* the fields are defined, with
-      a single blank line separating the fields and the class definition.
+    * ``class Meta`` はフィールドの定義を書いた *後* に書きます。また、フィー
+      ルド定義とクラス定義の間には一行空行を入れます。
 
-      Do this::
+      以下のように書きます::
 
           class Person(models.Model):
               first_name = models.CharField(max_length=20)
@@ -532,7 +574,7 @@ Model style
               class Meta:
                   verbose_name_plural = 'people'
 
-      Don't do this::
+      以下のような書き方をしてはなりません::
 
           class Person(models.Model):
               first_name = models.CharField(max_length=20)
@@ -540,7 +582,7 @@ Model style
               class Meta:
                   verbose_name_plural = 'people'
 
-      Don't do this, either::
+      以下のような書き方もよくありません::
 
           class Person(models.Model):
               class Meta:
@@ -549,221 +591,245 @@ Model style
               first_name = models.CharField(max_length=20)
               last_name = models.CharField(max_length=40)
 
-    * The order of model inner classes and standard methods should be as
-      follows (noting that these are not all required):
+    * モデルの内部クラスや標準メソッドの順番は以下のようにします (ただし、
+      どれも必須ではないので省略してもかまいません):
 
-        * All database fields
+        * 全てのデータベースフィールド
         * ``class Meta``
         * ``def __unicode__()``
         * ``def __str__()``
         * ``def save()``
         * ``def get_absolute_url()``
-        * Any custom methods
+        * カスタムのメソッド定義
 
-    * If ``choices`` is defined for a given model field, define the choices as
-      a tuple of tuples, with an all-uppercase name, either near the top of the
-      model module or just above the model class. Example::
+    * ``choices`` をモデルフィールドに定義する場合、選択肢は、各選択項目の
+      タプルからなるタプルで定義します。定義はモデルモジュールの冒頭か、各
+      モデルクラスのすぐ上に置き、全て大文字の変数名を付けます。例えば以下
+      のようにします::
 
           GENDER_CHOICES = (
               ('M', 'Male'),
               ('F', 'Female'),
           )
 
-Documentation style
+.. _Documentation style:
+
+ドキュメントの形式
 ===================
 
-We place a high importance on consistency and readability of documentation.
-(After all, Django was created in a journalism environment!)
+私達は、ドキュメントの一貫性と読みやすさをとても重視しています (なんといっ
+ても、 Django はジャーナリズムの中で生まれましたからね！)
 
-How to document new features
+_How to document new features:
+
+新たな機能のドキュメント化
 ----------------------------
 
-We treat our documentation like we treat our code: we aim to improve it as
-often as possible. This section explains how writers can craft their
-documentation changes in the most useful and least error-prone ways.
+私達は、ドキュメントをコードと同じように扱います。すなわち、可能な限り改善
+を重ねたいと思っているのです。この節では、ドキュメントの書き手に、有意義で
+エラーの少ないドキュメントの変更方法を説明します。
 
-Documentation changes come in two forms:
+ドキュメントの変更には、二つの形式があります:
 
-    * General improvements -- Typo corrections, error fixes and better
-      explanations through clearer writing and more examples.
+    * 一般的な改善 -- タイプミス、誤った内容の修正、明確な文章への修正や、
+      例題の追加です。
 
-    * New features -- Documentation of features that have been added to the
-      framework since the last release.
+    * 新たな機能説明 -- 前回のリリース以降に追加された機能のドキュメントで
+      す。
 
-Our policy is:
+私達はドキュメントを以下のポリシに従って作成しています:
 
-    **All documentation of new features should be written in a way that clearly
-    designates the features are only available in the Django development
-    version. Assume documentation readers are using the latest release, not the
-    development version.**
+    **新たな機能に関するドキュメントを追加する場合、必ず該当機能が開発版の
+    Django でのみ使用可能な旨を明記せねばなりません。ドキュメントの読み手は、
+    開発版ではなく、最新のリリースを使っていると想定してください。**
 
-Our prefered way for marking new features is by prefacing the features'
-documentation with: ".. versionadded:: X.Y", followed by an optional one line
-comment and a mandatory blank line.
+新しい機能を説明するときには、ドキュメントの先頭に ".. versionadded:: X.Y"
+を付加します。オプションで一行コメントを入れることもできます。
+".. versionadded:: X.Y" の後には必ず空行を入れてください。
 
-General improvements, or other changes to the APIs that should be emphasised
-should use the ".. versionchanged:: X.Y" directive (with the same format as the
-``versionadded`` mentioned above.
+一般的な改善や API の変更は、 ".. versionchanged:: X.Y" ディレクティブで強
+調します（フォーマットは ``versionadded`` と同じです）。
 
-Guidelines for ReST files
--------------------------
+.. _Guidelines for ReST files:
 
-These guidelines regulate the format of our ReST documentation:
+ReST ファイル作成のガイドライン
+-------------------------------
 
-    * In section titles, capitalize only initial words and proper nouns.
+私達は、 ReST ドキュメントを作成するときに、以下のガイドラインに従っていま
+す:
 
-    * Wrap the documentation at 80 characters wide, unless a code example
-      is significantly less readable when split over two lines, or for another
-      good reason.
+  * 章や節の題名では、最初の文字と適切な名前のみ大文字で書きます。
 
-Commonly used terms
--------------------
+  * ドキュメントは幅 80 文字以内で折り返します。ただし、コード例を示す際に
+    複数行に分けると著しく読みにくくなる場合や、その他妥当な理由がある場合
+    は例外です。
 
-Here are some style guidelines on commonly used terms throughout the
-documentation:
+.. _Commonly used terms:
 
-    * **Django** -- when referring to the framework, capitalize Django. It is
-      lowercase only in Python code and in the djangoproject.com logo.
+よく使う用語
+------------
 
-    * **e-mail** -- it has a hyphen.
+ドキュメント中でよく使われる用語の書き方を以下に示します:
 
-    * **MySQL**
+  * **Django** -- フレームワークそのものを指す場合には、頭文字を大文字にし
+    ます。 Python コード中や djangoproject.com のロゴでは小文字です。
 
-    * **PostgreSQL**
+  * **e-mail** -- ハイフンを入れます。(和訳では「メール」と書いています)
 
-    * **Python** -- when referring to the language, capitalize Python.
+  * **MySQL**
 
-    * **realize**, **customize**, **initialize**, etc. -- use the American
-      "ize" suffix, not "ise."
+  * **PostgreSQL**
 
-    * **SQLite**
+  * **Python** -- 言語そのものを指す場合には頭文字を大文字にします。
 
-    * **subclass** -- it's a single word without a hyphen, both as a verb
-      ("subclass that model") and as a noun ("create a subclass").
+  * **realize**, **customize**, **initialize**, etc. -- "-ise" ではなく、ア
+    メリカ語表記です。
 
-    * **Web**, **World Wide Web**, **the Web** -- note Web is always
-      capitalized when referring to the World Wide Web.
+  * **SQLite**
 
-    * **Web site** -- use two words, with Web capitalized.
+  * **subclass** -- 動詞、名詞を問わず、ハイフンを入れず一つの単語で表しま
+    す。
 
-Django-specific terminology
----------------------------
+  * **Web**, **World Wide Web**, **the Web** -- ワールドワイドウェブを指す
+    場合には、常に Web の W は大文字です。
 
-    * **model** -- it's not capitalized.
+    * **Web site** -- Web を大文字にして、二つの単語を繋げません。
 
-    * **template** -- it's not capitalized.
+.. _Django-specific terminology:
 
-    * **URLconf** -- use three capitalized letters, with no space before
-      "conf."
+Django 固有の用語
+-----------------
 
-    * **view** -- it's not capitalized.
+  * **model** -- 頭文字は小文字です。
 
-Committing code
+  * **template** -- 頭文字は小文字です。
+
+  * **URLconf** -- "URL" は大文字、 "conf" は小文字です。
+
+  * **view** -- 頭文字は小文字です。
+
+
+.. _Committing code:
+
+コードの commit
 ===============
 
-Please follow these guidelines when committing code to Django's Subversion
-repository:
+Django の Subversion リポジトリにコードをコミットする場合には以下のガイドラ
+インに従って下さい:
 
-    * For any medium-to-big changes, where "medium-to-big" is according to your
-      judgment, please bring things up on the `django-developers`_ mailing list
-      before making the change.
+    * 中規模から大規模な変更 (「中規模から大規模」の判断は各自に任せます)
+      の際には、変更前に `django-developers`_ メーリングリストに相談を持ち
+      込んで下さい。
 
-      If you bring something up on `django-developers`_ and nobody responds,
-      please don't take that to mean your idea is great and should be
-      implemented immediately because nobody contested it. Django's lead
-      developers don't have a lot of time to read mailing-list discussions
-      immediately, so you may have to wait a couple of days before getting a
-      response.
+      `django-developers`_ に持ち込んだ話題に対して返事がなかった場合、自分
+      のアイデアが素晴らしく、すぐにでも実装すべきだと皆が思ったため誰も何
+      も言わないのだと勘違いしないでください。 Django の開発指揮者はメーリ
+      ングリストの議論にすぐに割ける時間を持ち合わせていないので、返事には
+      数日待たねばならない場合もあるのです。
 
-    * Write detailed commit messages in the past tense, not present tense.
+    * 詳しいコミットメッセージを過去形で書いて下さい。現在形を使ってはなり
+      ません。
 
-          * Good: "Fixed Unicode bug in RSS API."
-          * Bad: "Fixes Unicode bug in RSS API."
-          * Bad: "Fixing Unicode bug in RSS API."
+          * 良い例: "Fixed Unicode bug in RSS API."
+          * 悪い例: "Fixes Unicode bug in RSS API."
+          * 悪い例: "Fixing Unicode bug in RSS API."
 
-    * For commits to a branch, prefix the commit message with the branch name.
-      For example: "magic-removal: Added support for mind reading."
+    * ブランチにコミットする場合、コミットメッセージの先頭にブランチ名を付
+      けて下さい。例えば "magic-removal: Added support for mind reading."
+      のようにします。
 
-    * Limit commits to the most granular change that makes sense. This means,
-      use frequent small commits rather than infrequent large commits. For
-      example, if implementing feature X requires a small change to library Y,
-      first commit the change to library Y, then commit feature X in a separate
-      commit. This goes a *long way* in helping all core Django developers
-      follow your changes.
+    * 意味のある変更のまとまりであるかぎり、できるだけ細かい変更に分けてコ
+      ミットしてください。つまり、たまに大きなコミットをするのではなく、小
+      さなコミットを頻繁に行うようにしてください。例えば、機能 X を実装して
+      いて、その機能の実現にライブラリ Y の修正が必要なら、まず Y の修正を
+      コミットして、次に X を別にコミットしてください。これだけで、 Django
+      のコア開発者全員が変更を追うための *大きな* 助けになります。
 
-    * If your commit closes a ticket in the Django `ticket tracker`_, begin
-      your commit message with the text "Fixed #abc", where "abc" is the number
-      of the ticket your commit fixes. Example: "Fixed #123 -- Added support
-      for foo". We've rigged Subversion and Trac so that any commit message
-      in that format will automatically close the referenced ticket and post a
-      comment to it with the full commit message.
+    * コミットによって Django `チケットトラッカ`_ の何らかのチケットをクロー
+      ズする場合、コミットメッセージの先頭に "Fixed #abc" というメッセージ
+      を入れて下さい。 "abc" はコミットによって修正されるチケットの番号です。
+      例えば "Fixed # 123 -- Added support for foo" のようにします。私達は
+      Subversion と Trac を結びつけているので、この形式のメッセージを使って
+      commit した場合、関連するチケットを自動的にクローズし、完全なコミット
+      メッセージをコメントとしてチケットに追加します。
 
-      If your commit closes a ticket and is in a branch, use the branch name
-      first, then the "Fixed #abc." For example:
-      "magic-removal: Fixed #123 -- Added whizbang feature."
+      コミットによってブランチのチケットをクローズする場合、ブランチ名を先
+      にもってきます。例えば
+      "magic-removal: Fixed #123 -- Added whizbang feature." のようにします。
 
-      For the curious: We're using a `Trac post-commit hook`_ for this.
-
+      ちなみに、この機能は `Trac の post-commit フック`_ で実現しています。
       .. _Trac post-commit hook: http://trac.edgewall.org/browser/trunk/contrib/trac-post-commit-hook
+      .. _`Trac の post-commit フック`: http://trac.edgewall.org/browser/trunk/contrib/trac-post-commit-hook
 
-    * If your commit references a ticket in the Django `ticket tracker`_ but
-      does *not* close the ticket, include the phrase "Refs #abc", where "abc"
-      is the number of the ticket your commit references. We've rigged
-      Subversion and Trac so that any commit message in that format will
-      automatically post a comment to the appropriate ticket.
 
-Unit tests
-==========
+    * コミットメッセージで Django `チケットトラッカ`_ の何らかのチケットを
+      参照し、かつチケットを *閉じない* 場合、 "Refs #abc" というフレーズを
+      入れて下さい。 "abc" はコミットで参照しているチケットの番号です。私達
+      は Subversion と Trac を結びつけているので、この形式のメッセージを使っ
+      て commit した場合、関連するチケットに完全なコミットメッセージをコメ
+      ントとして追加します。 
 
-Django comes with a test suite of its own, in the ``tests`` directory of the
-Django tarball. It's our policy to make sure all tests pass at all times.
+.. _Unit tests:
 
-The tests cover:
+単体テストの作成
+====================
 
-    * Models and the database API (``tests/modeltests/``).
-    * Everything else in core Django code (``tests/regressiontests``)
-    * Contrib apps (``django/contrib/<contribapp>/tests``, see below)
+Django には独自のテストスイートが付属しています。テストは tarball 内の
+``test`` ディレクトリ下にあります。ポリシとして、常に全てのテストがパスする
+ようにしています。
 
-We appreciate any and all contributions to the test suite!
+テストでは以下の項目をカバーしています:
 
-The Django tests all use the testing infrastructure that ships with Django for
-testing applications. See :ref:`Testing Django applications <topics-testing>`
-for an explanation of how to write new tests.
+    * モデル API とデータベース API (``tests/modeltests/``)。
+    * その他、Django のコア内にあるテスト (``tests/regressiontests``)
+    * contrib アプリケーション (``django/contrib/<contribapp>/tests``, 下記
+      参照)
 
-Running the unit tests
+テストスイートに対する協力は何でも歓迎します!
+
+Django のテストは全て、 Django に付属のアプリケーションテストインフラを使っ
+ています。テストの書き方の詳細は 
+:ref:`Django アプリケーションのテスト <topics-testing>` を参照してください。
+
+.. _Running the unit tests:
+
+単体テストの実行
 ----------------------
 
-To run the tests, ``cd`` to the ``tests/`` directory and type:
+テストを実行するには、 ``tests/`` ディレクトリ下に移って以下のように入力し
+ます:
 
 .. code-block:: bash
 
     ./runtests.py --settings=path.to.django.settings
 
-Yes, the unit tests need a settings module, but only for database connection
-info, with the ``DATABASE_ENGINE`` setting.
+そうです。テストには設定モジュールが必要です。とはいえ、必要なのは
+:setting:`DATABASE_ENGINE` を含むデータベース接続に関する情報です。また、全
+てのテストをパスするには、 :setting:`ROOT_URLCONF` 設定 (この値は単にあれば
+よいだけで、内容は無視されます) を指定しておかねばなりません。
 
-If you're using the ``sqlite3`` database backend, no further settings are
-needed. A temporary database will be created in memory when running the tests.
+``sqlite3`` バックエンドを使っているなら、設定はこれだけで十分です。一時デー
+タベースはテスト実行時にメモリ上に生成されます。
+ 
+``sqlite3`` 以外のバックエンドを使っている場合は、以下のような設定が必要で
+す:
 
-If you're using another backend:
+    * :setting:`DATABASE_USER` を、対象データベースに存在するユーザ名に設定
+      する必要があります。
 
-    * Your :setting:`DATABASE_USER` setting needs to specify an existing user account
-      for the database engine.
+    * :setting:`DATABASE_NAME` を、実際に存在して、かつユーザが接続可能なデー
+      タベースの名前に設定せねばなりません。ただし、ユニットテストはこのデー
+      タベースを操作しません。テストランナは、  :setting:`DATABASE_NAME` 
+      の前に ``test_`` を付けた新たなデータベースを作成し、テスト終了後にこ
+      のデータベースを削除します。従って、データベースユーザには、 
+      ``CREATE DATABASE`` を実行する権限がなければなりません。
 
-    * The :setting:`DATABASE_NAME` setting must be the name of an existing database to
-      which the given user has permission to connect. The unit tests will not
-      touch this database; the test runner creates a new database whose name is
-      :setting:`DATABASE_NAME` prefixed with ``test_``, and this test database is
-      deleted when the tests are finished. This means your user account needs
-      permission to execute ``CREATE DATABASE``.
-
-You will also need to ensure that your database uses UTF-8 as the default
-character set. If your database server doesn't use UTF-8 as a default charset,
-you will need to include a value for ``TEST_DATABASE_CHARSET`` in your settings
-file.
-
-If you want to run the full suite of tests, you'll need to install a number of
-dependencies:
+また、データベースのデフォルト文字セットを UTF-8 にしているか確認してくださ
+い。データベースサーバのデフォルト文字セットが UTF-8 に設定されていないのな
+ら、 :setting:`TEST_DATABASE_CHARSET` に文字セットを指定する必要があります。
+   
+テストを全て実行したければ、以下の依存モジュール全てをインストールしておく
+必要があります:
 
     *  PyYAML_
     *  Markdown_
@@ -771,8 +837,8 @@ dependencies:
     *  Docutils_
     *  setuptools_
 
-Each of these dependencies is optional. If you're missing any of them, the
-associated tests will be skipped.
+これらの依存モジュールはなくても構いませんが、インストールされていなければ、
+関連するテストは飛ばして実行されます。
 
 .. _PyYAML: http://pyyaml.org/wiki/PyYAML
 .. _Markdown: http://pypi.python.org/pypi/Markdown/1.7
@@ -780,284 +846,324 @@ associated tests will be skipped.
 .. _docutils: http://pypi.python.org/pypi/docutils/0.4
 .. _setuptools: http://pypi.python.org/pypi/setuptools/
 
-To run a subset of the unit tests, append the names of the test modules to the
-``runtests.py`` command line. See the list of directories in
-``tests/modeltests`` and ``tests/regressiontests`` for module names.
+ユニットテストの一部（サブセット）を実行したい場合は、 ``runtest.py`` コマ
+ンドラインの後にテストモジュールの名前を追加してください。モジュール名は、
+``tests/modeltests`` および ``tests/regressiontests`` 以下のディレクトリ名
+を参照してください。
 
-As an example, if Django is not in your ``PYTHONPATH``, you placed
-``settings.py`` in the ``tests/`` directory, and you'd like to only run tests
-for generic relations and internationalization, type:
+例えば、 Django が ``PYTHONPATH`` 上になく、 ``settings.py`` が ``tests/``
+ディレクトリにある場合で、汎用リレーション (generic relation) と国際化
+(internationalization) だけをテストしたければ、以下のようにタイプします:
 
 .. code-block:: bash
 
     PYTHONPATH=..
     ./runtests.py --settings=settings generic_relations i18n
 
-Contrib apps
-------------
+.. _Contrib apps:
 
-Tests for apps in ``django/contrib/`` go in their respective directories under
-``django/contrib/``, in a ``tests.py`` file. (You can split the tests over
-multiple modules by using a ``tests`` directory in the normal Python way.)
+contrib アプリケーション
+--------------------------
 
-For the tests to be found, a ``models.py`` file must exist (it doesn't
-have to have anything in it). If you have URLs that need to be
-mapped, put them in ``tests/urls.py``.
+``django/contrib`` 以下のアプリケーションのテストは、 ``django/contrib/``
+以下のそれぞれのディレクトリ下にある ``test.py`` に収められています。
+(テストを複数のモジュールに分割したければ、 ``tests`` ディレクトリを使って
+ください。)
 
-To run tests for just one contrib app (e.g. ``markup``), use the same
-method as above::
+アプリケーションのテストを見つけさせるには、アプリケーション内に
+``models.py`` を入れていなければなりません (ファイルは空でもかまいません)。
+URL をマップする必要があるのなら、 ``tests/urls.py`` を入れてください。
+
+特定の contrib アプリケーション (例えば ``markup``) だけをテストするには、
+上で述べたのと同じ方法を使います:
+
+.. code-block:: bash
 
     ./runtests.py --settings=settings markup
 
+.. _Requesting features:
 
-Requesting features
+機能に関する要望
 ===================
 
-We're always trying to make Django better, and your feature requests are a key
-part of that. Here are some tips on how to most effectively make a request:
+私達は常に Django を改良しようと努めています。その中で、皆さんから寄せられ
+る要望は一つの鍵になっています。効果的に要望を出すコツをいくつか紹介してお
+きます:
 
-    * Request the feature on `django-developers`_, not in the ticket tracker;
-      it'll get read more closely if it's on the mailing list.
+    * チケットトラッカではなく、 `django-developers`_ に要望を出して下さい。
+      メーリングリストの方が多くの人の目に触れやすいからです。
 
-    * Describe clearly and concisely what the missing feature is and how you'd
-      like to see it implemented. Include example code (non-functional is OK)
-      if possible.
+    * 不足している機能と、それをどのように実装すればよいと思っているかを、
+      すっきりと、かつ詳細に説明してください。可能ならサンプルコード (実際
+      に動かなくても構いません) をつけてください。
 
-    * Explain *why* you'd like the feature. In some cases this is obvious, but
-      since Django is designed to help real developers get real work done,
-      you'll need to explain it, if it isn't obvious why the feature would be
-      useful.
+    * *なぜ* その機能を取り入れたいのかを説明してください。自明な場合もあり
+      ますが、 Django は実際の開発者が実際の仕事に使うために設計されている
+      ので、ある機能がどのようにユーザの役に立つのかを説明する必要がありま
+      す。
 
-As with most open-source projects, code talks. If you are willing to write the
-code for the feature yourself or if (even better) you've already written it,
-it's much more likely to be accepted.  If it's a large feature that might need
-multiple developers we're always happy to give you an experimental branch in
-our repository; see below.
+ほとんどのオープンソースプロジェクトと同じく、コードは大きな説明力を持って
+います。追加したい機能のコードを書く意志があるか、(さらに望ましいのは) すで
+に書き上げているのなら、ずっと受け入れられやすくなるでしょう。大がかりな機
+能で、複数の開発者が必要になりそうなら、いつでも喜んで実験用ブランチをリポ
+ジトリに作成します。詳しくは次節を参照してください。
 
-Branch policy
-=============
+.. _Branch policy:
 
-In general, most development is confined to the trunk, and the trunk
-is kept stable. People should be able to run production sites against the
-trunk at any time.
+ブランチの管理ポリシ
+====================
 
-Thus, large architectural changes -- that is, changes too large to be
-encapsulated in a single patch, or changes that need multiple eyes on them --
-will have dedicated branches. See, for example, the `i18n branch`_. If you
-have a change of this nature that you'd like to work on, ask on
-`django-developers`_ for a branch to be created for you. We'll create a branch
-for pretty much any kind of experimenting you'd like to do.
+一般に、ほとんどの開発は trunk で行われており、 trunk は安定に保たれていま
+す。 trunk のコードは、いついかなるときでも実運用サイトを動作させられなけれ
+ばなりません。
 
-We will only branch entire copies of the Django tree, even if work is only
-happening on part of that tree. This makes it painless to switch to a branch.
+このため、大規模なアーキテクチャ上の変更、一つのパッチに収まらないくらい大
+きな変更を伴う場合や、多くの人が関わる必要のある変更の場合には、専用のブラ
+ンチを作成します。例えば `i18n ブランチ`_ を見てください。この手の変更を行
+いたいと考えていて、作業をしたい場合には、 `django-developers`_ でブランチ
+を作成してもらうよう問い合わせて下さい。変更を試すのに必要な文だけのブラン
+チを作成します。
 
-Developers working on a branch should periodically merge changes from the trunk
-into the branch. Please merge at least once a week. Every time you merge from
-the trunk, note the merge and revision numbers in the commit message.
+ツリーの一部にしか作業しない場合でも、常に Django ツリー全体のブランチを作
+成します。これはブランチへのスイッチ作業を苦痛なく行えるようにするためです。
 
-Once the branch is stable and ready to be merged into the trunk, alert
-`django-developers`_.
+ブランチで作業している開発者は、 trunk の変更を定期的にブランチにマージせね
+ばなりません。少なくとも週に一度はマージしてください。 trunk からマージを行
+う度に、マージとリビジョン番号を commit メッセージに記載してください。
 
-After a branch has been merged, it should be considered "dead"; write access to
-it will be disabled, and old branches will be periodically "trimmed." To keep
-our SVN wrangling to a minimum, we won't be merging from a given branch into the
-trunk more than once.
+ブランチが安定していて、 trunk へのマージ準備が完了したら、
+`django-developers`_ にアラートを投稿します。
 
-Using branches
+あるブランチがマージされると、そのブランチは「死んだ」ものとみなされます。
+死んだブランチには書き込めなくなり、古いブランチは定期的に「刈り取られ」
+ます。 SVN への世話焼きを最小限にするため、ブランチから trunk へのマージは
+一度しか行いません。
+
+.. _Using branches:
+
+ブランチを使う
 --------------
 
-To use a branch, you'll need to do two things:
+ブランチをテストするには、二つの作業が必要です:
 
-    * Get the branch's code through Subversion.
+    * 該当するブランチのコードを Subversion から取得します。
 
-    * Point your Python ``site-packages`` directory at the branch's version of
-      the ``django`` package rather than the version you already have
-      installed.
+    * Python の site-package ディレクトリが、該当ブランチの ``django``
+      を含むように設定します。
 
-Getting the code from Subversion
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To get the latest version of a branch's code, check it out using Subversion:
+.. _Getting the code from Subversion:
+
+Subversion からコードを取り出す
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ブランチコードの最新版を入手するには Subversion を使います:
 
 .. code-block:: bash
 
     svn co http://code.djangoproject.com/svn/django/branches/<branch>/
 
-...where ``<branch>`` is the branch's name. See the `list of branch names`_.
+``<branch>`` はブランチの名前です。ブランチの名前については
+`ブランチ名一覧 <http://code.djangoproject.com/browser/django/branches>`_ 
+を参照してください。
 
-Alternatively, you can automatically convert an existing directory of the
-Django source code as long as you've checked it out via Subversion. To do the
-conversion, execute this command from within your ``django`` directory:
+既存の Django を Subversion からソースコードをチェックアウトして使っている
+場合には、ディレクトリ全体を特定のバージョンに自動的に変換できます。
+``django`` ディレクトリの下で以下のコマンドを実行してください:
 
 .. code-block:: bash
 
     svn switch http://code.djangoproject.com/svn/django/branches/<branch>/
 
-The advantage of using ``svn switch`` instead of ``svn co`` is that the
-``switch`` command retains any changes you might have made to your local copy
-of the code. It attempts to merge those changes into the "switched" code. The
-disadvantage is that it may cause conflicts with your local changes if the
-"switched" code has altered the same lines of code.
+``svn co`` ではなく ``svn switch`` を使う利点は、 ``switch`` コマンドを使っ
+た場合、ローカルコピー上で既に変更済みの内容についてはファイルを変更しない
+点にあります。 ``switch`` はローカルコピー上の変更を "スイッチ先の" コード
+にマージします。 ``svn switch`` には欠点もあります。それは、ローカルコピー
+上でコードに変更を加えた場合、スイッチ先のコードにも同じ部分に変更があると
+衝突するという問題です。
 
-(Note that if you use ``svn switch``, you don't need to point Python at the new
-version, as explained in the next section.)
+(``svn switch`` を使う場合には、次の節で述べるような、Pythonのモジュール検
+索パスを変更する操作は必要ありません。)
 
 .. _list of branch names: http://code.djangoproject.com/browser/django/branches
 
-Pointing Python at the new Django version
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _Pointing Python at the new Django version:
 
-Once you've retrieved the branch's code, you'll need to change your Python
-``site-packages`` directory so that it points to the branch version of the
-``django`` directory. (The ``site-packages`` directory is somewhere such as
-``/usr/lib/python2.4/site-packages`` or
-``/usr/local/lib/python2.4/site-packages`` or ``C:\Python\site-packages``.)
+Python に別のバージョンの Django を使わせる
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The simplest way to do this is by renaming the old ``django`` directory to
-``django.OLD`` and moving the trunk version of the code into the directory
-and calling it ``django``.
+ブランチのコードを取り出したら、ブランチの ``site-packages`` ディレクトリ
+の構成を変更して、ブランチ版の ``django`` ディレクトリを使えるようにする必
+要があります。
+(``site-packages`` ディレクトリは ``/usr/lib/python2.4/site-packages`` や
+``/usr/local/lib/python2.4/site-packages``, ``C:\Python\site-packages``
+などにあります。)
 
-Alternatively, you can use a symlink called ``django`` that points to the
-location of the branch's ``django`` package. If you want to switch back, just
-change the symlink to point to the old code.
+もっとも簡単な方法は、元の ``django`` ディレクトリを ``django.OLD`` のよう
+な別の名前に変えて、 trunk などから取り出したバージョンのコードをコピーし、
+名前を ``django`` に変更します。
 
-A third option is to use a `path file`_ (``<something>.pth``) which should
-work on all systems (including Windows, which doesn't have symlinks
-available). First, make sure there are no files, directories or symlinks named
-``django`` in your ``site-packages`` directory. Then create a text file named
-``django.pth`` and save it to your ``site-packages`` directory. That file
-should contain a path to your copy of Django on a single line and optional
-comments. Here is an example that points to multiple branches. Just uncomment
-the line for the branch you want to use ('Trunk' in this example) and make
-sure all other lines are commented::
+別の方法として、 ``django`` と言う名前のシンボリックリンクを作成して、特定
+のブランチの ``django`` パッケージの場所を指すという方法もあります。元に戻
+したい場合には、シンボリックリンクが元のコードを指すように変更しなおすだけ
+です。
 
-    # Trunk is a svn checkout of:
+第三の方法は、 
+`パスファイル <http://python.jp/doc/release/lib/module-site.html>`_
+(``<something>.pth``) を使うというものです。この方法は、 (シンボリックリン
+クを使えない Windows を含む) 全てのシステムで利用できます。まず、 
+``site-packages`` ディレクトリに、 ``django`` という名前のファイルやディレ
+クトリ、シンボリックリンクがない状態にしてください。次に、 ``django.pth``
+という名前のテキストファイルを作成して、 ``site-packages`` ディレクトリの直
+下に保存します。このファイルには、使いたい Django の置かれているパスを一行
+で記述します。コメントを追加しても構いません。複数のブランチを指定できるよ
+うにしたパスファイルの例を以下似示します。特定のブランチ (例えば 'trunk')
+を使いたい場合、その行のコメントを解除して、他の行を全てコメント化します::
+
+    # トランク (trunk): svn リポジトリの
     #   http://code.djangoproject.com/svn/django/trunk/
+    # からチェックアウトしたもの
     #
     /path/to/trunk
-
-    # <branch> is a svn checkout of:
+    
+    # ブランチ (branch): ブランチ名 <branch> を svn リポジトリの
     #   http://code.djangoproject.com/svn/django/branches/<branch>/
+    # からチェックアウトしたもの
     #
     #/path/to/<branch>
-
-    # On windows a path may look like this:
+    
+    # Windows の場合は以下のような形式にします:
     # C:/path/to/<branch>
 
-If you're using Django 0.95 or earlier and installed it using
-``python setup.py install``, you'll have a directory called something like
-``Django-0.95-py2.4.egg`` instead of ``django``. In this case, edit the file
-``setuptools.pth`` and remove the line that references the Django ``.egg``
-file. Then copy the branch's version of the ``django`` directory into
-``site-packages``.
+Django 0.95 やそれ以前のバージョンをインストールしていて、インストールに
+``python setup.py install`` を使った場合、 ``django`` ではなく
+``Django-0.95-py2.4.egg`` といった名前のディレクトリになっているでしょう。
+この場合、 ``setuptools.pth`` を編集して、該当する Django の ``.egg``
+の書かれた行を削除してから、 ``django`` のブランチを ``site-packages`` にコ
+ピーします。
 
 .. _path file: http://docs.python.org/lib/module-site.html
 
 .. _official-releases:
+.. _Official releases:
 
-Official releases
-=================
+公式リリース
+============
 
-Django's release numbering works as follows:
+Django のリリース番号は以下のようにして付けられます:
 
-    * Versions are numbered in the form ``A.B`` or ``A.B.C``.
+    * バージョンは ``A.B`` または ``A.B.C`` という形式でつけられます。
 
-    * ``A`` is the major version number, which is only incremented for major
-      changes to Django, and these changes are not necessarily
-      backwards-compatible. That is, code you wrote for Django 6.0 may break
-      when we release Django 7.0.
+    * ``A`` はメジャーバージョン番号で、増えるのは Django に重大な変更が加
+      えられ、変更が必ずしも以前のバージョンと互換でない場合だけです。従っ
+      て、 Django 6.0 で動いたコードは Django 7.0 では動かなくなるかもしれ
+      ません。
 
-    * ``B`` is the minor version number, which is incremented for large yet
-      backwards compatible changes.  Code written for Django 6.4 will continue
-      to work under Django 6.5.
+    * ``B`` はマイナーバージョン番号で、比較的大きいながらも後方互換性を保っ
+      た変更の際に増えます。 Django 6.4 向けに書かれたコードは Django 6.5
+      でも動作するでしょう。
 
-      A minor release may deprecate certain features in previous releases. If a
-      feature in version ``A.B`` is deprecated, it will continue to work in
-      version ``A.B+1``. In version ``A.B+2``, use of the feature will raise a
-      ``PendingDeprecationWarning`` but will continue to work.  Version
-      ``A.B+3`` will remove the feature entirely. Major point releases will
-      always remove deprecated features immediately.
+      マイナーリリースでは、以前のリリースの特定の機能を撤廃することがあり
+      ます。バージョン ``A.B`` の機能が撤廃された場合、撤廃された機能は
+      ``A.B+1`` では動作します。 ``A.B+2`` では
+      ``PendingDeprecationWarning`` 警告を送出しますが動作します。
+      ``A.B+3`` では完全に機能を削除します。メジャーポイントリリースでは撤
+      廃済みの仕様を全て削除します。
 
-    * ``C`` is the micro version number which, is incremented for bug and
-      security fixes.  A new micro-release will always be 100%
-      backwards-compatible with the previous micro-release.
+    * ``C`` はマイクロバージョンで、バグやセキュリティ修正の度に増えます。
+      マイクロバージョンは以前のマイクロバージョンと 100% 後方互換性を保ち
+      ます。
 
-    * In some cases, we'll make release candidate releases. These are of the
-      form ``A.BrcN``, which means the ``Nth`` candidate release of version
-      ``A.B``.
+    * 場合によってはリリース候補 (release candidate) を作成します。リリース
+      候補のバージョン番号は  ``A.BrcN`` の形式で、 ``A.B`` の ``N`` 番目の
+      リリース候補であることを表します。
 
-An exception to this version numbering scheme is the pre-1.0 Django code.
-There's no guarantee of backwards-compatibility until the 1.0 release.
+以上のバージョン番号スキームの例外として、1.0 以前の Django のコード
+があります。 1.0 リリース以前のコードでは、後方互換性を全く保証していません。
 
-In Subversion, each Django release will be tagged under `tags/releases`_.  If
-it's necessary to release a bug fix release or a security release that doesn't
-come from the trunk, we'll copy that tag to ``branches/releases`` to make the
-bug fix release.
+Subversion 上では、 Django の各リリースは `tags/releases_` でタグづけされて
+います。trunk 由来ではないバグフィクスリリースやセキュリティ修正リリースを
+出す必要画ある場合、該当リリースは  ``branches/releases`` にコピーされ、
+バグフィクスリリースになります。
 
-Deciding on features
-====================
+.. _Deciding on features:
 
-Once a feature's been requested and discussed, eventually we'll have a decision
-about whether to include the feature or drop it.
+仕様に関する決定
+================
 
-Whenever possible, we strive for a rough consensus. To that end, we'll often
-have informal votes on `django-developers`_ about a feature. In these votes we
-follow the voting style invented by Apache and used on Python itself, where
-votes are given as +1, +0, -0, or -1.  Roughly translated, these votes mean:
+ある仕様の要望が出て議論が始まると、そのうち仕様を取り入れるべきか棄却すべ
+きかという決定をせねばなりません。
 
-    * +1: "I love the idea and I'm strongly committed to it."
+私達は、可能な場合はいつでもまずおおまかな合意を形成しようと試みます。その
+後、たいていは `django-developers`_ において、その機能について正式でない投
+票を行います。投票では、 Apache や Python で使われている形式を採用しており、
+投票は +1, +0, -0, or -1 のいずれかを用いて行います。これらの票の大雑把な解
+釈は以下の通りです:
 
-    * +0: "Sounds OK to me."
+    * +1: "これはいい。強く同意します (I love the idea and I'm strongly
+      committed to it.)"
 
-    * -0: "I'm not thrilled, but I won't stand in the way."
+    * +0: "いいんじゃないかな (Sounds OK to me.)"
 
-    * -1: "I strongly disagree and would be very unhappy to see the idea turn
-      into reality."
+    * -0: "あまりわくわくしないが、反対もしない (I'm not thrilled, but I
+       won't stand in the way.)"
 
-Although these votes on django-developers are informal, they'll be taken very
-seriously. After a suitable voting period, if an obvious consensus arises
-we'll follow the votes.
+    * -1: "強く反対。このアイデアが実現したらとても嫌 (I strongly disagree
+       and would be very unhappy to see the idea turn into reality.)"
 
-However, consensus is not always possible.  Tough decisions will be discussed by
-all full committers and finally decided by the Benevolent Dictators for Life,
-Adrian and Jacob.
+django-developers での投票は正式なものではありませんが、その結果は真摯に受
+け止められます。適切な投票期間を経て、明らかな合意を形成できた場合には、投
+票の決定に従うでしょう。
 
-Commit access
+とはいえ、つねに合意を形成できるわけではありません。その場合、完全コミッタ
+全員の中で十分に議論を重ねた後、最終判断を慈悲深き終身独裁者 (Benevolent
+Dictators for Life) である Adrian と Jacob に委ねることとします。
+
+.. _Commit access:
+
+commit 権限
 =============
 
-Django has two types of committers:
+Django プロジェクトには二種類のコミッタがいます:
 
-Full committers
-    These are people who have a long history of contributions to Django's
-    codebase, a solid track record of being polite and helpful on the mailing
-    lists, and a proven desire to dedicate serious time to Django's development.
+完全コミッタ (full committers)
+    長期間にわたって Django のコードベースに貢献してきており、メーリングリ
+    ストにおいても礼儀正しく親切で、 Django の開発に十分な時間を割けること
+    が分かっている人達です。
 
-    The bar is very high for full commit access. It will only be granted by
-    unanimous approval of all existing full committers, and the decision will err
-    on the side of rejection.
+    完全な commit 権限者の敷居は極めて高いものです。全ての完全コミッタによ
+    る全会一致でのみ受け入れることとし、その決定は覆りません。
 
-Partial committers
-    These are people who are "domain experts." They have direct check-in access
-    to the subsystems that fall under their jurisdiction, and they're given a
-    formal vote in questions that involve their subsystems. This type of access
-    is likely to be given to someone who contributes a large subframework to
-    Django and wants to continue to maintain it.
+部分コミッタ (partial committers)
+    「個別領域のエキスパート」です。管轄下にあるサブシステムのコードに直接
+    チェックインする権限を持ち、サブシステムの懸案事項に対する正式な投票権
+    を持ちます。このタイプの権限は、 Django の大きなサブフレームワーク
+    に貢献し、継続してメンテナンスを続けたい人に与えられるものです。
 
-    Like full committers, partial commit access is by unanimous approval of all
-    full committers (and any other partial committers in the same area).
-    However, the bar is set lower; proven expertise in the area in question is
-    likely to be sufficient.
+    完全コミッタと同様、部分コミッタの受け入れも全ての完全コミッタ (と同じ
+    領域の部分コミッタ) による全会一致でのみ受け入れることとします。とはい
+    え、敷居はやや低く、個別領域で十分な専門性を示しているということで十分
+    です。
 
-To request commit access, please contact an existing committer privately. Public
-requests for commit access are potential flame-war starters, and will be ignored.
+コミット権限を得たければ、現在コミッタを勤めているだれかに個人的にコンタク
+トしてください。コミット権限を公の場でリクエストするのはフレームの元であり、
+一切無視します。
+
 
 .. _community page: http://www.djangoproject.com/community/
+.. _`コミュニティのページ`: `community page`_
 .. _ticket tracker: http://code.djangoproject.com/newticket
+.. _`チケットトラッカ`: `ticket tracker`_
 .. _django-developers: http://groups.google.com/group/django-developers
 .. _search the tracker: http://code.djangoproject.com/search
+.. _`トラッカを検索`: `search the tracker`_
 .. _django-users: http://groups.google.com/group/django-users
 .. _`#django`: irc://irc.freenode.net/django
 .. _list of tickets with patches: http://code.djangoproject.com/query?status=new&status=assigned&status=reopened&has_patch=1&order=priority
+.. _`パッチつきのチケットのリスト`: `list of tickets with patches`_
 .. _pep8.py: http://svn.browsershots.org/trunk/devtools/pep8/pep8.py
+.. _i18n documentation: ../i18n/
+.. _`i18n ドキュメント`: `i18n documentation`_
 .. _i18n branch: http://code.djangoproject.com/browser/django/branches/i18n
+.. _`i18n ブランチ`: `i18n branch`_
 .. _`tags/releases`: http://code.djangoproject.com/browser/django/tags/releases
