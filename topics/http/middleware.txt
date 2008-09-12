@@ -1,30 +1,38 @@
 .. _topics-http-middleware:
 
-==========
-Middleware
-==========
+=============
+ミドルウェア
+=============
 
-Middleware is a framework of hooks into Django's request/response processing.
-It's a light, low-level "plugin" system for globally altering Django's input
-and/or output.
+:revision-up-to: 8961 (1.0)
 
-Each middleware component is responsible for doing some specific function. For
-example, Django includes a middleware component, ``XViewMiddleware``, that adds
-an ``"X-View"`` HTTP header to every response to a ``HEAD`` request.
+ミドルウェア (Middleware) とは、 Django のリクエスト/レスポンス処理をフック
+するためのフレームワークです。ミドルウェアは軽量かつ低水準な「プラグイン」
+システムで、Django の入出力を操作します。
 
-This document explains how middleware works, how you activate middleware, and
-how to write your own middleware. Django ships with some built-in middleware you
+各ミドルウェアコンポーネントはそれぞれ特定の機能を担っています。例えば、
+Django には ``XViewMiddleware`` ミドルウェアコンポーネントがありますが、こ
+れは全ての ``HEAD`` リクエストに対して ``"X-View"`` HTTP ヘッダを追加します。
+
+このドキュメントでは、 Django についてくる全てのミドルウェアコンポーネント
+の使用法と、自分で新たにミドルウェアを作る方法を説明します。
+
+.. TBD 
+Django ships with some built-in middleware you
 can use right out of the box; they're documented in the :ref:`built-in
 middleware guide <ref-middleware>`.
 
-Activating middleware
-=====================
+.. _Activating middleware:
 
-To activate a middleware component, add it to the :setting:`MIDDLEWARE_CLASSES`
-list in your Django settings. In :setting:`MIDDLEWARE_CLASSES`, each middleware
-component is represented by a string: the full Python path to the middleware's
-class name. For example, here's the default :setting:`MIDDLEWARE_CLASSES`
-created by :djadmin:`django-admin.py startproject <startproject>`::
+ミドルウェアの有効化
+====================
+
+ミドルウェアコンポーネントを有効化するには、Django 設定ファイルの
+:setting:`MIDDLEWARE_CLASSES` リストにコンポーネントを追加します。コンポー
+ネント名は文字列で指定し、ミドルウェアのクラス名を完全な Python パスで表し
+ます。例えば、 :djadmin:`django-admin.py startproject <startproject>` が生
+成するデフォルトの設定ファイルにある :setting:`MIDDLEWARE_CLASSES` は以下の
+ようになっています::
 
     MIDDLEWARE_CLASSES = (
         'django.middleware.common.CommonMiddleware',
@@ -33,28 +41,29 @@ created by :djadmin:`django-admin.py startproject <startproject>`::
         'django.middleware.doc.XViewMiddleware',
     )
 
-During the request phases (:meth:`process_request` and :meth:`process_view`
-middleware), Django applies middleware in the order it's defined in
-:setting:`MIDDLEWARE_CLASSES`, top-down. During the response phases
-(:meth:`process_response` and :meth:`process_exception` middleware), the classes
-are applied in reverse order, from the bottom up. You can think of it like an
-onion: each middleware class is a "layer" that wraps the view:
+リクエストの処理フェーズでは、Django は :setting:`MIDDLEWARE_CLASSES`
+に指定された順番で (:meth:`process_request` および :meth:`process_view``)
+ミドルウェアを適用していきます。レスポンスの処理フェーズでは、
+(:meth:`process_response` および :meth:`process_exception` ) ミドルウェア
+が逆順に適用されます。この仕組みは、タマネギの構造になぞらえて、ミドルウェ
+アクラスを「層」だと考えるとよいでしょう:
 
 .. image:: _images/middleware.png
    :width: 502
    :height: 417
    :alt: Middleware application order.
 
-A Django installation doesn't require any middleware -- e.g.,
-:setting:`MIDDLEWARE_CLASSES` can be empty, if you'd like -- but it's strongly
-suggested that you at least use
-:class:`~django.middleware.common.CommonMiddleware`.
+Django はミドルウェアがなくても動作します -- 望むなら
+:setting:`MIDDLEWARE_CLASSES` は空でもよいのです。とはいえ、少なくとも
+:class:`~django.middleware.common.CommonMiddleware` は使うように強く勧めます。
 
-Writing your own middleware
-===========================
+.. _Writing your own middleware:
 
-Writing your own middleware is easy. Each middleware component is a single
-Python class that defines one or more of the following methods:
+ミドルウェアを自作する
+======================
+
+ミドルウェアの自作は簡単です。各ミドルウェアコンポーネントは、以下のメソッ
+ドを少なくとも一つ定義しているような単一の Python クラスです:
 
 .. _request-middleware:
 
@@ -63,16 +72,16 @@ Python class that defines one or more of the following methods:
 
 .. method:: process_request(self, request)
 
-``request`` is an :class:`~django.http.HttpRequest` object. This method is
-called on each request, before Django decides which view to execute.
+``request`` は :class:`~django.http.HttpRequest` オブジェクトです。このメソッ
+ドはリクエストごとに Django がどのビューを実行するか決定する前に呼び出されます。
 
-``process_request()`` should return either ``None`` or an
-:class:`~django.http.HttpResponse` object. If it returns ``None``, Django will
-continue processing this request, executing any other middleware and, then, the
-appropriate view. If it returns an :class:`~django.http.HttpResponse` object,
-Django won't bother calling ANY other request, view or exception middleware, or
-the appropriate view; it'll return that :class:`~django.http.HttpResponse`.
-Response middleware is always called on every response.
+``process_request()`` は ``None`` または :class:`~django.http.HttpResponse`
+オブジェクトのいずれかを返さねばなりません。 ``None`` を返した場合、 Django
+はリクエストの処理を継続し、他のミドルウェアや適切なビューを実行します。
+:class:`~django.http.HttpResponse` オブジェクトを返した場合、 Django は他の
+リクエストミドルウェア、ビューミドルウェア、例外ミドルウェア、あるいは
+URLconf で設定されたビューを呼び出さず、 :class:`~django.http.HttpResponse`
+オブジェクトをそのまま返します。レスポンスミドルウェアは必ず呼び出されます。
 
 .. _view-middleware:
 
@@ -81,21 +90,22 @@ Response middleware is always called on every response.
 
 .. method:: process_view(self, request, view_func, view_args, view_kwargs)
 
-``request`` is an :class:`~django.http.HttpRequest` object. ``view_func`` is the
-Python function that Django is about to use. (It's the actual function object,
-not the name of the function as a string.) ``view_args`` is a list of positional
-arguments that will be passed to the view, and ``view_kwargs`` is a dictionary
-of keyword arguments that will be passed to the view. Neither ``view_args`` nor
-``view_kwargs`` include the first view argument (``request``).
+``request`` は :class:`~django.http.HttpRequest` オブジェクトです。
+``view_func`` は Django がビュー関数としてこれから呼び出そうとしている
+Python の関数です、 (実際の関数オブジェクトで、関数名を表す文字列ではありま
+せん)。 ``view_args`` にはビューに渡されることになる固定引数が、
+``view_kwargs`` にはビューに渡されることになるキーワード引数の辞書が入って
+います。 ``view_args`` と``view_kwargs`` のいずれにも、ビューの第一引数
+(``request``) は入っていません。
 
-``process_view()`` is called just before Django calls the view. It should return
-either ``None`` or an :class:`~django.http. HttpResponse` object. If it returns
-``None``, Django will continue processing this request, executing any other
-``process_view()`` middleware and, then, the appropriate view. If it returns an
-:class:`~django.http. HttpResponse` object, Django won't bother calling ANY
-other request, view or exception middleware, or the appropriate view; it'll
-return that :class:`~django.http. HttpResponse`. Response middleware is always
-called on every response.
+``process_view()`` は Django がビュー関数を呼び出す直前に呼び出されます。こ
+の関数は ``None`` または :class:`~django.http.HttpResponse` オブジェクトを
+返さねばなりません。 ``None`` を返した場合、 Django は処理を継続し、他のミ
+ドルウェアの ``process_view()`` を試した後、適切なビュー関数を呼び出します。
+:class:`~django.http.HttpResponse` オブジェクトを返した場合、 Django は他の
+リクエストミドルウェア、ビューミドルウェア、例外ミドルウェア、あるいは
+URLconf で設定されたビューを呼び出さず、 :class:`~django.http.HttpResponse`
+オブジェクトをそのまま返します。レスポンスミドルウェアは必ず呼び出されます。
 
 .. _response-middleware:
 
@@ -104,12 +114,14 @@ called on every response.
 
 .. method:: process_response(self, request, response)
 
-``request`` is an :class:`~django.http.HttpRequest` object. ``response`` is the
-:class:`~django.http. HttpResponse` object returned by a Django view.
+``request`` は :class:`~django.http.HttpRequest` オブジェクトです。
+``response`` は Django のビュー関数の返す
+:class:`~django.http.HttpResponse` オブジェクトです。
 
-``process_response()`` should return an :class:`~django.http. HttpResponse`
-object. It could alter the given ``response``, or it could create and return a
-brand-new :class:`~django.http. HttpResponse`.
+``process_response()`` は :class:`~django.http.HttpResponse` オブジェクトを
+返さねばなりません。渡された ``response`` オブジェクトを変更して返しても、
+新たに :class:`~django.http.HttpResponse` オブジェクトを生成して返してもか
+まいません。
 
 .. _exception-middleware:
 
@@ -118,14 +130,17 @@ brand-new :class:`~django.http. HttpResponse`.
 
 .. method:: process_exception(self, request, exception)
 
-``request`` is an :class:`~django.http.HttpRequest` object. ``exception`` is an
-``Exception`` object raised by the view function.
+``request`` は :class:`~django.http.HttpRequest` オブジェクトです。
+``exception`` はビュー関数の送出した ``Exception`` オブジェクトです。
 
-Django calls ``process_exception()`` when a view raises an exception.
-``process_exception()`` should return either ``None`` or an
-:class:`~django.http. HttpResponse` object. If it returns an
-:class:`~django.http. HttpResponse` object, the response will be returned to the
-browser. Otherwise, default exception handling kicks in.
+Django はビューが例外を送出した際に ``process_exception()`` を呼び出します。
+``process_exception()`` は ``None`` または
+:class:`~django.http.HttpResponse` オブジェクトのいずれかを返さねばなりませ
+ん。 :class:`~django.http.HttpResponse` オブジェクトを返した場合、その応答
+をそのままブラウザに返します。それ以外の場合、デフォルトの例外処理を起動し
+ます。
+
+.. TBD
 
 ``__init__``
 ------------
@@ -149,21 +164,23 @@ should be used. In these cases, your middleware's ``__init__`` method may raise
 ``django.core.exceptions.MiddlewareNotUsed``. Django will then remove that piece
 of middleware from the middleware process.
 
-Guidelines
-----------
+.. _Guidelines:
 
-    * Middleware classes don't have to subclass anything.
+ガイドライン
+------------
 
-    * The middleware class can live anywhere on your Python path. All Django
-      cares about is that the :setting:`MIDDLEWARE_CLASSES` setting includes the
-      path
-      to it.
+    * ミドルウェアのクラスはサブクラスでなくてもかまいません。
 
-    * Feel free to look at :mod:`Django's available middleware for examples
-      <django.middleware>`. The core Django middleware classes are in
-      ``django/middleware/`` in the Django distribution. The session middleware
-      is in ``django/contrib/sessions``.
+    * ミドルウェアのクラスはPython のモジュールパス上のどこにでも置けます。
+      Django にとって必要なのは :setting:`MIDDLEWARE_CLASSES` にクラスへの
+      パスが指定されていることだけです。
 
-    * If you write a middleware component that you think would be useful to
-      other people, contribute to the community! :ref:`Let us know
-      <internals-contributing>`, and we'll consider adding it to Django.
+    * :mod:`Django で使えるミドルウェア <django.middleware>` を参考にしてく
+      ださい。Django ミドルウェアのデフォルトの置場は
+      ``django/middleware/`` です。ただし、セッションミドルウェアは
+      ``django/contrib/sessions`` にあります。
+
+    * 自分の書いたミドルウェアコンポーネントが他の人にとっても有用だと思っ
+      たなら、ぜひ :ref:`コミュニティにコントリビュート <internals-contributing>`
+      してください！知らせてくだされば、 Django に追加するか検討します。
+

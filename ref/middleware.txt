@@ -1,203 +1,244 @@
 .. _ref-middleware:
 
-=============================
-Built-in middleware reference
-=============================
+=====================================
+組み込みミドルウェアリファレンス
+=====================================
+
+:revision-up-to: 8961 (1.0)
 
 .. module:: django.middleware
-   :synopsis: Django's built-in middleware classes.
+   :synopsis: Django の組み込みミドルウェアクラスです。
+
+.. TBD
 
 This document explains all middleware components that come with Django. For
 information on how how to use them and how to write your own middleware, see the
 :ref:`middleware usage guide <topics-http-middleware>`.
 
-Available middleware
-====================
+利用できるミドルウェア
+======================
 
-Cache middleware
-----------------
+.. _Cache middleware:
+
+キャッシュミドルウェア
+------------------------
 
 .. module:: django.middleware.cache
-   :synopsis: Middleware for the site-wide cache
+   :synopsis: サイト単位のキャッシュを実現するミドルウェアです。
    
 .. class:: django.middleware.cache.UpdateCacheMiddleware
 
 .. class:: django.middleware.cache.FetchFromCacheMiddleware
 
-Enable the site-wide cache. If these are enabled, each Django-powered page will
-be cached for as long as the :setting:`CACHE_MIDDLEWARE_SECONDS` setting
-defines. See the :ref:`cache documentation <topics-cache>`.
+サイト全体にわたるキャッシュを有効にします。キャッシュを有効にすると、
+Django の管理下にあるページは :setting:`CACHE_MIDDLEWARE_SECONDS` 設定に定
+義した時間のキャッシュされます。
+:ref:`キャッシュのドキュメント <topics-cache>` を参照してください。
 
-"Common" middleware
+
+.. _"Common" middleware:
+
+コモンミドルウェア
 -------------------
 
 .. module:: django.middleware.common
-   :synopsis: Middleware adding "common" conveniences for perfectionists.
+   :synopsis: 完全主義者むけに、「一般的な」便宜機能を追加するミドルウェアです。
    
 .. class:: django.middleware.common.CommonMiddleware
 
-Adds a few conveniences for perfectionists:
+リクエスト処理に完全主義者むけの便宜機能を追加するミドルウェアです:
 
-    * Forbids access to user agents in the :setting:`DISALLOWED_USER_AGENTS`
-      setting, which should be a list of strings.
+    * :setting:`DISALLOWED_USER_AGENTS` に設定されたユーザエージェントから
+      のアクセスを禁止します。 :setting:`DISALLOWED_USER_AGENTS` には文字列
+      のリストを指定します。
 
-    * Performs URL rewriting based on the :setting:`APPEND_SLASH` and
-      :setting:`PREPEND_WWW` settings.
+    * :setting:`APPEND_SLASH` および :setting:`PREPEND_WWW` に基づいて URL
+      の書き換えを行います。 
 
-      If :setting:`APPEND_SLASH` is ``True`` and the initial URL doesn't end
-      with a slash, and it is not found in the URLconf, then a new URL is formed
-      by appending a slash at the end. If this new URL is found in the URLconf,
-      then Django redirects the request to this new URL. Otherwise, the initial
-      URL is processed as usual.
+      :setting:`APPEND_SLASH` が ``True`` の場合、リクエストの URL の末尾が
+      スラッシュで終わっておらず、 URLconf 上でもマッチしなければ、 スラッ
+      シュを付加した URL を作成して、 URLconf でマッチするか確かめます。マッ
+      チすれば、スラッシュつきの URL にリダイレクトします。そうでなければ、
+      URL を通常の手順に従って処理します。
 
-      For example, ``foo.com/bar`` will be redirected to ``foo.com/bar/`` if you
-      don't have a valid URL pattern for ``foo.com/bar`` but *do* have a valid
-      pattern for ``foo.com/bar/``.
+      例えば、 ``foo.com/bar`` に一致するパターンがなく、 ``foo.com/bar/``
+      に一致するパターンが *あれば* 、 ``foo.com/bar`` は ``foo.com/bar/``
+      にリダイレクトされます。
 
       .. versionchanged:: 1.0
-         The behavior of :setting:`APPEND_SLASH` has changed slightly in this
-         version. It didn't used to check whether the pattern was matched in
-         the URLconf.
+          開発版では、 :setting:`APPEND_SLASH` の挙動が若干変更されました。
+          以前のバージョンでは、リクエストの URL が URLconf とマッチするか
+          どうかに関係なくスラッシュを付加していました。
 
-      If :setting:`PREPEND_WWW` is ``True``, URLs that lack a leading "www."
-      will be redirected to the same URL with a leading "www."
+      :setting:`PREPEND_WWW` が ``True`` であれば、先頭に,  "www." のない
+      URL は先頭に"www." を付けた URL にリダイレクトします。
 
-      Both of these options are meant to normalize URLs. The philosophy is that
-      each URL should exist in one, and only one, place. Technically a URL
-      ``foo.com/bar`` is distinct from ``foo.com/bar/`` -- a search-engine
-      indexer would treat them as separate URLs -- so it's best practice to
-      normalize URLs.
+      それぞれのオプションは URL を正規化するためのものです。これは、 URL
+      (Uniform Resorce Location) がただひとつの、真にただひとつの場所
+      (Location) を表すべきであるという哲学に基づいています。技術的には、
+      ``foo.com/bar`` は ``foo.com/bar/`` とは別物です -- 例えば、検索エン
+      ジンはこの二つの URL を別々の URL として扱うかもしれません -- ですか
+      ら、 URL を正規化しておく方が得策なのです。
 
-    * Handles ETags based on the :setting:`USE_ETAGS` setting. If
-      :setting:`USE_ETAGS` is set to ``True``, Django will calculate an ETag for
-      each request by MD5-hashing the page content, and it'll take care of
-      sending ``Not Modified`` responses, if appropriate.
+    * :setting:`USE_ETAGS` 設定に基づいて ETag を処理します。
+      :setting:`USE_ETAGS` を ``True`` に設定すると、 Django は各リクエスト
+      ごとにページ内容の MD-5 ハッシュを計算して ETag にし、必要なら 
+      ``Not Modified`` 応答を返します。
 
-View metadata middleware
-------------------------
+.. _View metadata middleware:
+
+ビューメタデータミドルウェア
+--------------------------------
 
 .. module:: django.middleware.doc
-   :synopsis: Middleware to help your app self-document.
+   :synopsis: アプリケーションの自動ドキュメントを補助するミドルウェアです。
 
 .. class:: django.middleware.doc.XViewMiddleware
 
-Sends custom ``X-View`` HTTP headers to HEAD requests that come from IP
-addresses defined in the :setting:`INTERNAL_IPS` setting. This is used by
-Django's automatic documentation system.
+:setting:`INTERNAL_IPS` 設定に定義されている IP アドレスから来た HEAD リク
+エストに対してカスタムの ``X-View`` HTTP ヘッダを送信します。このミドルウェ
+アはDjango の自動ドキュメントシステムで使われています。
 
-GZIP middleware
----------------
+.. _GZIP middleware:
+
+GZIP ミドルウェア
+---------------------
 
 .. module:: django.middleware.gzip
-   :synopsis: Middleware to serve gziped content for performance.
+   :synopsis: コンテンツを gzip 圧縮してパフォーマンスを向上させるミドルウェ
+              アです。
    
 .. class:: django.middleware.gzip.GZipMiddleware
 
-Compresses content for browsers that understand gzip compression (all modern
-browsers).
+gzip 圧縮を受け付けるブラウザ (最近のほとんどのブラウザがそうです) 向けに、
+コンテンツを圧縮して送ります。
 
-It is suggested to place this first in the middleware list, so that the
-compression of the response content is the last thing that happens. Will not
-compress content bodies less than 200 bytes long, when the response code is
-something other than 200, JavaScript files (for IE compatibility), or
-responses that have the ``Content-Encoding`` header already specified.
+このミドルウェアは、ミドルウェアリストの先頭に置くよう勧めます。なぜなら、
+コンテンツの圧縮は最後に行うべきものだからです。このミドルウェアは、 200 バ
+イト未満のコンテンツを圧縮しません。また、状態コード 200 以外のレスポンス内
+のコンテンツ、Javascript ファイル (IE との互換性のため)、
+``Content-Encoding`` が指定されているレスポンスも圧縮しません。
 
-Conditional GET middleware
+.. _Conditional GET middleware:
+
+条件付き GET ミドルウェア
 --------------------------
 
 .. module:: django.middleware.http
-   :synopsis: Middleware handling advanced HTTP features.
+   :synopsis: 高度な HTTP 機能を扱うためのミドルウェアです。
 
 .. class:: django.middleware.http.ConditionalGetMiddleware
 
-Handles conditional GET operations. If the response has a ``ETag`` or
-``Last-Modified`` header, and the request has ``If-None-Match`` or
-``If-Modified-Since``, the response is replaced by an
-:class:`~django.http.HttpNotModified`.
+条件付き GET 操作を処理します。レスポンスに  ``ETag`` または
+``Last-Modified`` ヘッダがあり、リクエストに ``If-None-Match`` または
+``If-Modified-Since`` がある場合、レスポンスを 
+:class:`~django.http.HttpNotModified` に置き換えます。
 
-Also sets the ``Date`` and ``Content-Length`` response-headers.
+また、 ``Date`` および ``Content-Length`` ヘッダを設定します。
 
-Reverse proxy middleware
-------------------------
+.. _Reverse proxy middleware:
+
+リバースプロキシミドルウェア
+------------------------------
 
 .. class:: django.middleware.http.SetRemoteAddrFromForwardedFor
 
-Sets ``request.META['REMOTE_ADDR']`` based on
-``request.META['HTTP_X_FORWARDED_FOR']``, if the latter is set. This is useful
-if you're sitting behind a reverse proxy that causes each request's
-``REMOTE_ADDR`` to be set to ``127.0.0.1``.
+``request.META['HTTP_X_FORWARDED_FOR']`` が設定されていた場合、その値に基づ
+いて ``request.META['REMOTE_ADDR']`` をセットします。サーバがリバースプロキ
+シの向こうにあるためにリクエストの ``REMOTE_ADDR`` が ``127.0.0.1`` にセッ
+トされてしまう場合に便利です。
 
-**Important note:** This does NOT validate ``HTTP_X_FORWARDED_FOR``. If you're
-not behind a reverse proxy that sets ``HTTP_X_FORWARDED_FOR`` automatically, do
-not use this middleware. Anybody can spoof the value of
-``HTTP_X_FORWARDED_FOR``, and because this sets ``REMOTE_ADDR`` based on
-``HTTP_X_FORWARDED_FOR``, that means anybody can "fake" their IP address. Only
-use this when you can absolutely trust the value of ``HTTP_X_FORWARDED_FOR``.
+**注意事項:** このミドルウェアは ``HTTP_X_FORWARDED_FOR`` を検証 
+**しません** ``HTTP_X_FORWARDED_FOR`` を自動的に設定するリバースプロキシ
+を経由していない場合には、このミドルウェアを使ってはなりません。なぜなら、
+``HTTP_X_FORWARDED_FOR`` の値はだれでも簡単に偽装できるので、このミドルウェ
+アが ``REMOTE_ADDR`` に基づいて ``HTTP_X_FORWARDED_FOR`` を設定すると、誰も
+が "偽の" IP アドレスを名乗れてしまうからです。このミドルウェアを使ってよい
+のは、 ``HTTP_X_FORWARDED_FOR`` の値を完全に信用できる場合だけです。
 
-Locale middleware
------------------
+
+.. _Locale middleware:
+
+ロケールミドルウェア
+---------------------
 
 .. module:: django.middleware.locale
-   :synopsis: Middleware to enable language selection based on the request.
+   :synopsis: リクエストに基づいて言語設定を選択するミドルウェアです。
    
 .. class:: django.middleware.locale.LocaleMiddleware
 
-Enables language selection based on data from the request. It customizes content
-for each user. See the :ref:`internationalization documentation <topics-i18n>`.
+リクエストに基づいて言語の選択を行います。言語の選択によって、ユーザごとに
+提供するコンテンツをカスタマイズできます。 
+:ref:`国際化のドキュメント <topics-i18n>` を参照してください。
 
-Session middleware
-------------------
+.. _Session middleware:
+
+セッションミドルウェア
+-------------------------
 
 .. module:: django.contrib.sessions.middleware
-   :synopsis: Session middleware.
+   :synopsis: セッションミドルウェアです。
 
 .. class:: django.contrib.sessions.middleware.SessionMiddleware
 
-Enables session support. See the :ref:`session documentation
-<topics-http-sessions>`.
+セッションのサポートを有効にします。
+:ref:`セッションのドキュメント <topics-http-sessions>` も参照してください。
 
-Authentication middleware
+.. _Authentication middleware:
+
+認証ミドルウェア
 -------------------------
 
 .. module:: django.contrib.auth.middleware
-  :synopsis: Authentication middleware
+  :synopsis: 認証ミドルウェアです。
   
 .. class:: django.contrib.auth.middleware.AuthenticationMiddleware
 
-Adds the ``user`` attribute, representing the currently-logged-in user, to every
-incoming ``HttpRequest`` object. See :ref:` Authentication in Web requests
-<topics-http-auth>`.
+入力される ``HttpRequest`` オブジェクト全てに、現在ログインしているユーザを
+表す ``user`` 属性を追加します。 
+:ref:`Web リクエストの認証 <topics-http-auth>` を参照してください。
 
-CSRF protection middleware
+
+.. _CSRF protection middleware:
+
+CSRF 対策ミドルウェア
 --------------------------
 
 .. module:: django.contrib.csrf.middleware
-   :synopsis: Middleware adding protection against Cross Site Request Forgeries.
+   :synopsis: クロスサイトリクエストフォージェリ (Cross Site Request
+              Forgery) 対策のためのミドルウェアです。
 
 .. class:: django.contrib.csrf.middleware.CsrfMiddleware
 
 .. versionadded:: 1.0
 
-Adds protection against Cross Site Request Forgeries by adding hidden form
-fields to POST forms and checking requests for the correct value. See the
-:ref:`Cross Site Request Forgery protection documentation <ref-contrib-csrf>`.
+POST フォームに隠しフォームフィールドを追加し、リクエストデータに正しい値が
+設定されているかチェックすることによりクロスサイトリクエストフォージェリ
+(CSRF) を防ぎます。詳しくは
+:ref:`クロスサイトリクエストフォージェリからの保護 <ref-contrib-csrf>` を参
+照してください。
 
-Transaction middleware
-----------------------
+.. _Transaction middleware:
+
+トランザクションミドルウェア
+-----------------------------
 
 .. module:: django.middleware.transaction
-   :synopsis: Middleware binding a database transaction to each web request.
+   :synopsis: 各 Web リクエストにデータベーストランザクションを結びつけるミ
+             ドルウェアです。
 
 .. class:: django.middleware.transaction.TransactionMiddleware
 
-Binds commit and rollback to the request/response phase. If a view function runs
-successfully, a commit is done. If it fails with an exception, a rollback is
-done.
+リクエスト／レスポンス処理フェイズに commit と rollback をバインドします。
+あるビュー関数の実行に成功した場合に commit を、例外を送出して失敗した場合
+には rollback を行わせます。
 
-The order of this middleware in the stack is important: middleware modules
-running outside of it run with commit-on-save - the default Django behavior.
-Middleware modules running inside it (coming later in the stack) will be under
-the same transaction control as the view functions.
+このミドルウェアでは、スタック中の順番が重要になります。このミドルウェアの
+外で動作する他のミドルウェアモジュールは、Django のデフォルトの挙動、すなわ
+ち commit-on-save モードで動作します。このミドルウェアの内側にある (スタッ
+クの後ろに位置している) ミドルウェアは、ビュー関数と同じトランザクション制
+御下に置かれます。
 
-See the :ref:`transaction management documentation <topics-db-transactions>`.
+:ref:`トランザクション管理のドキュメント <topics-db-transactions>` を参照し
+てください。
 
