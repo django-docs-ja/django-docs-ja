@@ -1,45 +1,47 @@
 .. _topics-testing:
 
-===========================
-Testing Django applications
-===========================
+==============================
+Djangoアプリケーションのテスト
+==============================
+
+:revision-up-to: 8961 (1.0)
 
 .. module:: django.test
-   :synopsis: Testing tools for Django applications.
+   :synopsis: Django アプリケーション用のテストツールです。
 
-Automated testing is an extremely useful bug-killing tool for the modern
-Web developer. You can use a collection of tests -- a **test suite** -- to
-solve, or avoid, a number of problems:
+今日の Web 開発者にとって、自動化されたテストはバグ潰しの工程で極めて有用な
+ツールです。複数のテストを集めた **テストスイート** を使えば、Web開発におけ
+るいくつもの問題を解決したり回避したりできます:
 
-    * When you're writing new code, you can use tests to validate your code
-      works as expected.
+  * 新たなコードを書く際、コードが期待通りに動作するかテストできます。
 
-    * When you're refactoring or modifying old code, you can use tests to
-      ensure your changes haven't affected your application's behavior
-      unexpectedly.
+  * 以前のコードを修正したりリファクタする場合、テストによって、コードの変
+    更がアプリケーションに意図しない影響を及ぼさないか調べられます。
 
-Testing a Web application is a complex task, because a Web application is made
-of several layers of logic -- from HTTP-level request handling, to form
-validation and processing, to template rendering. With Django's test-execution
-framework and assorted utilities, you can simulate requests, insert test data,
-inspect your application's output and generally verify your code is doing what
-it should be doing.
+Web アプリケーションは、 HTTP レベルのリクエスト処理、フォームの検証と処理、
+そしてテンプレートレンダリングまで、複数のロジックレイヤから構成されていま
+す。そのため、Webアプリケーションのテストは複雑なタスクです。 Django のテス
+ト実行フレームワークと関連ユーティリティを使えば、仮想的なリクエストを発行
+したり、テストデータを挿入したり、アプリケーションの出力を調べて、コードが
+期待通りに動作しているか検証したりできます。
 
-The best part is, it's really easy.
+しかも素晴らしいことに、テストはとても簡単なのです。
 
-This document is split into two primary sections. First, we explain how to
-write tests with Django. Then, we explain how to run them.
+このドキュメントは前後半の 2 つの節に別れています。前半では Django における
+テストの書き方を、後半ではテストの実行方法を説明します。
 
-Writing tests
-=============
+.. _Writing tests:
 
-There are two primary ways to write tests with Django, corresponding to the
-two test frameworks that ship in the Python standard library. The two
-frameworks are:
+テストを書く
+============
 
-    * **Doctests** -- tests that are embedded in your functions' docstrings and
-      are written in a way that emulates a session of the Python interactive
-      interpreter. For example::
+Django でテストを書く方法は主に 2 つあり、それぞれ Python の標準ライブラリ
+についてくる二つのテストフレームワークに対応しています。フレームワークは以
+下の 2 つです:
+
+    * **doctest** -- 関数やクラスの docstring (ドキュメンテーション文字列)
+      に埋め込まれたテストで、例えば以下のように Python の対話インタプリタ
+      セッションを模した方法で書かれています::
 
           def my_func(a_list, idx):
               """
@@ -51,8 +53,8 @@ frameworks are:
               """
               return a_list[idx]
 
-    * **Unit tests** -- tests that are expressed as methods on a Python class
-      that subclasses ``unittest.TestCase``. For example::
+    * **ユニットテスト (unit test)** -- 以下の例のように、テストを
+      ``unittest.TestCase``` のサブクラスのメソッドとして表現したものです::
 
           import unittest
 
@@ -62,248 +64,296 @@ frameworks are:
                   self.assertEquals(my_func(a, 0), 'larry')
                   self.assertEquals(my_func(a, 1), 'curly')
 
-You can choose the test framework you like, depending on which syntax you
-prefer, or you can mix and match, using one framework for some of your code and
-the other framework for other code. You can also use any *other* Python test
-frameworks, as we'll explain in a bit.
+好みに応じて、どちらのテストを使ってもかまいませんし、両方のテストを組み合
+わせてもかまいません。また、後でほんの少しだけ説明しますが、他のテストフレー
+ムワークを使っても構いません。
 
-Writing doctests
-----------------
+.. _Writing doctests:
 
-Doctests use Python's standard doctest_ module, which searches your docstrings
-for statements that resemble a session of the Python interactive interpreter.
-A full explanation of how doctest works is out of the scope of this document;
-read Python's official documentation for the details.
+doctest を書く
+--------------
 
-.. admonition:: What's a **docstring**?
+doctest は、Python の標準モジュール、 doctest_ によるテストです。 doctest
+は docstring (ドキュメンテーション文字列) から、 Python の対話インタプリタ
+セッションの形式をとる部分を探し出して実行します。 doctest の詳しい構造につ
+いての解説はこのドキュメントの範囲を超えた話なので、公式ドキュメントを参照
+してください。
 
-    A good explanation of docstrings (and some guidelines for using them
-    effectively) can be found in :pep:`257`:
+.. admonition:: **docstring** とは?
 
-        A docstring is a string literal that occurs as the first statement in
-        a module, function, class, or method definition.  Such a docstring
-        becomes the ``__doc__`` special attribute of that object.
+    docstring の詳しい説明 (と、効果的な docstring の書き方) は、
+    :pep:`257` (訳注: PEP 257 の和訳は 
+    http://www.python.jp/doc/contrib/peps/pep-0257.txt にあります) に書かれ
+    ています:
+        
+        docstring とは、モジュールや関数、クラス、メソッド定義のブロック中
+        の先頭に置かれた文字列リテラルです。 docstring を定義すると、オブジェ
+        クトの ``__doc__`` という特殊な属性になります。
+        
 
-    For example, this function has a docstring that describes what it does::
+    例えば、下の関数には、関数の説明の入った docstring があります::
 
         def add_two(num):
-          "Return the result of adding two to the provided number."
-           return num + 2
+            "引数に指定した数に 2 を加えて返します。"
+            return num + 2
 
-    Because tests often make great documentation, putting tests directly in
-    your docstrings is an effective way to document *and* test your code.
+    テストはそれ自体素晴らしいドキュメントになることも多いので、テストをそ
+    のまま docstring に入れておけば、ドキュメント化とコードのテストの 
+    *両方を* 効率的に行えます。
 
-For a given Django application, the test runner looks for doctests in two
-places:
+テストランナは、 Django アプリケーションの中の以下のファイルから doctest を
+探して実行します:
 
-    * The ``models.py`` file. You can define module-level doctests and/or a
-      doctest for individual models. It's common practice to put
-      application-level doctests in the module docstring and model-level
-      doctests in the model docstrings.
+    * ``models.py`` ファイル。モジュールレベル、かつ/またはモデルレベルの
+      doctest を記述します。一般には、アプリケーションレベルの doctest はモ
+      ジュールの docstring として記述し、モデルレベルの docstring はモデル
+      クラスの docstring として記述します。
 
-    * A file called ``tests.py`` in the application directory -- i.e., the
-      directory that holds ``models.py``. This file is a hook for any and all
-      doctests you want to write that aren't necessarily related to models.
+    * アプリケーションディレクトリ、すなわち ``models.py`` の入ったディレク
+      トリ下に置かれた ``tests.py`` という名前のファイル。このファイルは、
+      モデルに関係しないような doctest を書きたい場合のフックとして使えます。
 
-Here is an example model doctest::
+doctest の文字列は ``models.py`` の全てのオブジェクトに対して記述できますが、
+慣習的には、アプリケーションレベルの doctest はモジュールの docstring に、
+モデルレベルの doctest は各モデルの docstring に配置します。
+
+モデル定義で doctest を使った例を示します::
 
     # models.py
 
     from django.db import models
-
+    
     class Animal(models.Model):
         """
-        An animal that knows how to make noise
-
-        # Create some animals
+        鳴き声から動物を調べるテスト
+        
+        # 動物インスタンスを生成する
         >>> lion = Animal.objects.create(name="lion", sound="roar")
         >>> cat = Animal.objects.create(name="cat", sound="meow")
-
-        # Make 'em speak
+        
+        # speak() を呼び出す
         >>> lion.speak()
         'The lion says "roar"'
         >>> cat.speak()
         'The cat says "meow"'
         """
+        
         name = models.CharField(max_length=20)
         sound = models.CharField(max_length=20)
-
+        
         def speak(self):
             return 'The %s says "%s"' % (self.name, self.sound)
 
-When you :ref:`run your tests <running-tests>`, the test runner will find this
-docstring, notice that portions of it look like an interactive Python session,
-and execute those lines while checking that the results match.
 
-In the case of model tests, note that the test runner takes care of creating
-its own test database. That is, any test that accesses a database -- by
-creating and saving model instances, for example -- will not affect your
-production database. Each doctest begins with a "blank slate" -- a fresh
-database containing an empty table for each model. (See the section on
-fixtures, below, for more on this.) Note that to use this feature, the database
-user Django is connecting as must have ``CREATE DATABASE`` rights.
+:ref:`テストを実行する <running-tests>` と、テストユーティリティは上の
+docstring を探し出して、Python の対話セッションに見える部分を検出し、そこに
+書かれた命令を実行して、docstring に書かれた結果と実際の実行結果が一致する
+かどうかを確かめます。
 
-For more details about how doctest works, see the `standard library
-documentation for doctest`_.
+モデルテストの場合、テストランナが独自にテストデータベースを作成します。す
+なわち、データベースに対してアクセスするテスト -- 例えば、モデルインスタン
+スを生成して保存するようなテスト -- が、実運用のためのデータベースに影響を
+及ぼすことはありません。 doctest はいずれも「白紙状態」、すなわち、各モデル
+のデータベーステーブルが空の状態で実行されます (詳しくは、後述のフィクスチャ
+の節を参照してください) 。この機能を使うには、 Django がデータベースに接続
+するときのユーザに ``CREATE DATABASE`` の権限を持たせておかねばならないので
+注意してください。
 
-.. _doctest: http://docs.python.org/lib/module-doctest.html
+doctest の詳しい動作原理は、 `標準ドキュメントの doctest の項`_
+を参照してください。
+
+.. doctest: http://python.jp/doc/release/lib/module-doctest.html
+.. _doctest: http://python.jp/doc/release/lib/module-doctest.html
 .. _standard library documentation for doctest: doctest_
+.. _`標準ドキュメントの doctest の項`: doctest_
 
-Writing unit tests
-------------------
+.. _Writing unit tests:
 
-Like doctests, Django's unit tests use a standard library module: unittest_.
-This module uses a different way of defining tests, taking a class-based
-approach.
+ユニットテストを書く
+--------------------
 
-As with doctests, for a given Django application, the test runner looks for
-unit tests in two places:
+Django の単体テストもまた、doctest と同様、標準ライブラリモジュールの
+unittest_ を使います。このモジュールは、 doctest_ とは違った、 クラスベース
+のやり方でテストを定義します。
 
-    * The ``models.py`` file. The test runner looks for any subclass of
-      ``unittest.TestCase`` in this module.
+doctest と同様、 Django のテストランナは、以下の二つの場所からユニットテス
+トを探します:
 
-    * A file called ``tests.py`` in the application directory -- i.e., the
-      directory that holds ``models.py``. Again, the test runner looks for any
-      subclass of ``unittest.TestCase`` in this module.
+    * ``models.py`` ファイル。テストランナはこのモジュールから
+      ``unittest.TestCase`` のサブクラスを探します。
 
-This example ``unittest.TestCase`` subclass is equivalent to the example given
-in the doctest section above::
+    * アプリケーションディレクトリ、すなわち ``models.py`` の入ったディレク
+      トリ下に置かれた ``tests.py`` という名前のファイル。上と同様に、テス
+      トランナはこのモジュールから ``unittest.TestCase`` のサブクラスを探し
+      ます。
+
+以下の ``unittest.TestCase`` のサブクラスは、前節の doctest と同じテストを
+実現しています::
 
     import unittest
     from myapp.models import Animal
-
+    
     class AnimalTestCase(unittest.TestCase):
+
         def setUp(self):
             self.lion = Animal.objects.create(name="lion", sound="roar")
             self.cat = Animal.objects.create(name="cat", sound="meow")
-
+        
         def testSpeaking(self):
             self.assertEquals(self.lion.speak(), 'The lion says "roar"')
             self.assertEquals(self.cat.speak(), 'The cat says "meow"')
+            
+:ref:`テストを実行する <running-tests>` と、テストユーティリティはデフォル
+トの動作として、 ``models.py`` と ``tests.py`` に入っている全てのテストケー
+ス (つまり ``unittest.TestCase`` のサブクラス) を捜し出し、そこからテストス
+イートを自動的に構築して、スイートを実行します。
 
-When you :ref:`run your tests <running-tests>`, the default behavior of the
-test utility is to find all the test cases (that is, subclasses of
-``unittest.TestCase``) in ``models.py`` and ``tests.py``, automatically build a
-test suite out of those test cases, and run that suite.
+開発バージョンの Django には、あるモジュールのテストスイートを定義する方法
+をもう一つ提供しています:  ``models.py`` や ``tests.py`` で ``suite()`` メ
+ソッドを定義している場合、 Django のテストランナはこのメソッドを使ってテス
+トスイートを構築します。この仕様は、ユニットテストにおいて 
+:ref:`おすすめのテストスイート構築方法 <>` に従っています。複雑なテストスイー
+トの構築方法についての詳細は Python のドキュメントを参照してください。
 
-In the Django development version, there is a second way to define the test
-suite for a module: if you define a function called ``suite()`` in either
-``models.py`` or ``tests.py``, the Django test runner will use that function
-to construct the test suite for that module. This follows the `suggested
-organization`_ for unit tests. See the Python documentation for more details on
-how to construct a complex test suite.
+``unittest`` の詳細は `標準ライブラリドキュメントの unittest の項`_ を参照
+してください。
 
-For more details about ``unittest``, see the `standard library unittest
-documentation`_.
-
-.. _unittest: http://docs.python.org/lib/module-unittest.html
+.. unittest: http://docs.python.org/lib/module-unittest.html
+.. _unittest: http://python.jp/doc/release/lib/module-unittest.html
 .. _standard library unittest documentation: unittest_
-.. _suggested organization: http://docs.python.org/lib/organizing-tests.html
+.. suggested organization: http://docs.python.org/lib/organizing-tests.html
+.. _suggested organization: http://python.jp/doc/release/lib/organizing-tests.html
+.. _`標準ライブラリドキュメントの unittest の項`: unittest_
+.. _`おすすめのテストスイート構築方法`: `suggested organization`_
 
-Which should I use?
--------------------
+.. _Which should I use?:
 
-Because Django supports both of the standard Python test frameworks, it's up to
-you and your tastes to decide which one to use. You can even decide to use
-*both*.
+どちらのテストを使うべきか
+--------------------------
 
-For developers new to testing, however, this choice can seem confusing. Here,
-then, are a few key differences to help you decide which approach is right for
-you:
+Django は標準的な Python テストフレームワークの両方をサポートしているので、
+どちらを選ぶかは、開発者個々人の好み次第です。もちろん、 *両方* を同時に使っ
+てもかまいません。
 
-    * If you've been using Python for a while, ``doctest`` will probably feel
-      more "pythonic". It's designed to make writing tests as easy as possible,
-      so it requires no overhead of writing classes or methods. You simply put
-      tests in docstrings. This has the added advantage of serving as
-      documentation (and correct documentation, at that!).
+とはいえ、テストを初めて書く開発者にとっては、この選択は混乱
+のもとになるでしょう。そこで、どちらのテストを使うべきかを決める手がかりに
+なるよう、 doctest と単体テストの主な違いについて示します:
 
-      If you're just getting started with testing, using doctests will probably
-      get you started faster.
+  * そこそこ Python に慣れているなら、 ``doctest`` の方がより「Python的
+    (pythonic)」に感じることでしょう。 doctest はテストをできるだけ楽に書け
+    るように設計されているので、クラスやメソッドを書くときのオーバヘッドが
+    ほとんどありません。単に docstring にテストを書くだけでよいのです。それ
+    に、モジュールに対してドキュメントを自動生成させられるという利点もあり
+    ます。つまり、 doctest を上手に書けば、ドキュメント作成とテストを同時に
+    片付けられて一石二鳥、というわけです。
 
-    * The ``unittest`` framework will probably feel very familiar to developers
-      coming from Java. ``unittest`` is inspired by Java's JUnit, so you'll
-      feel at home with this method if you've used JUnit or any test framework
-      inspired by JUnit.
+    また、テストにまだ慣れていない開発者は、 doctest を使った方が早くテスト
+    について学べることでしょう。
 
-    * If you need to write a bunch of tests that share similar code, then
-      you'll appreciate the ``unittest`` framework's organization around
-      classes and methods. This makes it easy to abstract common tasks into
-      common methods. The framework also supports explicit setup and/or cleanup
-      routines, which give you a high level of control over the environment
-      in which your test cases are run.
+  * Java での開発経験のある開発者なら、 ``unittest`` フレームワークはとても
+    理解しやすいはずです。 ``unittest`` は Java の JUnit に影響を受けている
+    ので、他の言語で JUnit から派生したテストフレームワークを使ったことがあ
+    るのなら、``unittest`` はかなりしっくりくるはずです。
 
-Again, remember that you can use both systems side-by-side (even in the same
-app). In the end, most projects will eventually end up using both. Each shines
-in different circumstances.
+  * 同じコードを含むような一連のテストを書くときには、 ``unittest`` フレー
+    ムワークのクラスとメソッドによる設計が気に入るでしょう。共通のタスクを
+    抽象化して、メソッド化できるからです。また、 ``unittest`` フレームワー
+    クは ``unittest`` はテストの初期化／終了処理のルーチンをサポートしてい
+    るので、テストケースを実行するときの環境を高い水準でコントロールできま
+    す。
+
+繰り返しになりますが、(一つのアプリケーションの中であっても) 両方のシステム
+を並べて使えることを忘れないでください。どちらのテストシステムにも、状況に
+応じて適した部分があるので、大抵のプロジェクトでは、最終的には両方のテスト
+システムを使うことになるものです。
 
 .. _running-tests:
+.. _Running tests:
 
-Running tests
-=============
+テストを実行する
+================
 
-Once you've written tests, run them using your project's ``manage.py``
-utility::
+テストを実行するには、プロジェクトの ``manage.py`` ユーティリティを使います::
 
     $ ./manage.py test
 
-By default, this will run every test in every application in
-:setting:`INSTALLED_APPS`. If you only want to run tests for a particular
-application, add the application name to the command line. For example, if your
-:setting:`INSTALLED_APPS` contains ``'myproject.polls'`` and
-``'myproject.animals'``, you can run the ``myproject.animals`` unit tests alone
-with this command::
-
+特定のアプリケーションに対してテストを実行したければ、コマンドラインにアプ
+リケーションの名前を追加します。例えば、 :setting:`INSTALLED_APPS` に
+``myproject.polls`` と ``myproject.animals`` というアプリケーションが入って
+おり、 animals の単体テストを実行したいだけなら、以下のようにします::
+ 
     $ ./manage.py test animals
 
-Note that we used ``animals``, not ``myproject.animals``.
+``animals`` ではなく、 ``myproject.animals`` なので注意してください。
 
 .. versionadded:: 1.0
-   You can now choose which test to run.
+   実行したいテストを選べるようになりました。
 
-If you use unit tests, as opposed to
-doctests, you can be even *more* specific in choosing which tests to execute.
-To run a single test case in an application (for example, the
-``AnimalTestCase`` described in the "Writing unit tests" section), add the
-name of the test case to the label on the command line::
+単体テストを実行する際、どのテストを実行するかを指定できます。あるアプリケー
+ション用のテストケースを実行する場合 (例えば、上で解説した AnimalTestCase
+の場合) は、コマンドラインにテストケースの名前を追加してください::
 
     $ ./manage.py test animals.AnimalTestCase
 
-And it gets even more granular than that! To run a *single* test method inside
-a test case, add the name of the test method to the label::
+**開発バージョンの Django で新たに追加された機能:**
+テストケース中の個別のテストメソッドを実行したければ、メソッド名を指定して
+ください::
 
     $ ./manage.py test animals.AnimalTestCase.testFluffyAnimals
 
-The test database
------------------
+.. _The test database:
 
-Tests that require a database (namely, model tests) will not use your "real"
-(production) database. A separate, blank database is created for the tests.
+テストデータベース
+-------------------
+ 
+データベースを必要とするテスト (モデルのテスト) に、「本番の (実運用環境の)」
+データベースは必要ありません。テストの際には、空の別のデータベースが作成さ
+れます。
 
-Regardless of whether the tests pass or fail, the test database is destroyed
-when all the tests have been executed.
+テストがパスするか失敗するかに関わらず、テストデータベースは全てのテストを
+実行し終えると消去されます。
 
-By default this test database gets its name by prepending ``test_`` to the
-value of the :setting:`DATABASE_NAME` setting. When using the SQLite database
-engine the tests will by default use an in-memory database (i.e., the database
-will be created in memory, bypassing the filesystem entirely!). If you want to
-use a different database name, specify the :setting:`TEST_DATABASE_NAME`
-setting.
+デフォルトでは、
+.. _Understanding the test output:
 
-Aside from using a separate database, the test runner will otherwise use all of
-the same database settings you have in your settings file:
-:setting:`DATABASE_ENGINE`, :setting:`DATABASE_USER`, :setting:`DATABASE_HOST`,
-etc. The test database is created by the user specified by
-:setting:`DATABASE_USER`, so you'll need to make sure that the given user
-account has sufficient privileges to create a new database on the system.
+テストの出力を理解する
+----------------------
+
+テストを実行すると、まずテストランナ自身の初期化メッセージが表示されます::
+
+    Creating test database...
+    Creating table myapp_animal
+    Creating table myapp_mineral
+    Loading 'initial_data' fixtures...
+    No fixtures found.
+
+このメッセージは、テストランナがテストデータベースを作成したことを示してい
+ます。テストデータベースは、空の、何もない状態から作成したデータベースで、
+(モデルテストのような) データベースの必要なテストで使われます。
+
+デフォルトでは、テストデータベースの名前は、 :setting:`DATABASE_NAME` に指
+定したデータベース名の前に ``test_`` を付けたものです。 SQLite データベース
+エンジンを使っている場合、デフォルトではテストをメモリ上のデータベースで行
+います(すなわち、データベースをメモリ上に生成し、ファイルシステムを全く経由
+しません！) 。テストデータベースの名前をデフォルト意外の値にしたければ、
+:setting:`TEST_DATABASE_NAME` 設定を使って指定します。
+ 
+テスト用に別のデータベースを使うことを除けば、テストランナは設定ファイルの
+データベースに関する他の設定、 :setting:`DATABASE_ENGINE`,
+:setting:`DATABASE_USER`, :setting:`DATABASE_HOST` などをそのまま使います。
+テストデータベースは :setting:`DATABASE_USER` の権限で作成されるので、この
+ユーザは新たに生成されたデータベースを操作する権限を備えていなければなりま
+せん。
 
 .. versionadded:: 1.0
 
-For fine-grained control over the
-character encoding of your test database, use the
-:setting:`TEST_DATABASE_CHARSET` setting. If you're using MySQL, you can also
-use the :setting:`TEST_DATABASE_COLLATION` setting to control the particular
-collation used by the test database. See the :ref:`settings documentation
-<ref-settings>` for details of these advanced settings.
+テスト用データベースの文字セットエンコーディング設定を細かく調整したいのな
+ら、 :setting:`TEST_DATABASE_CHARSET` 設定を使ってください。 MySQL を使って
+いるなら、 :setting:`TEST_DATABASE_COLLATION` でテストデータベースで使うコ
+レーション(collation) を指定できます。これらの設定については、 
+:ref:`settings ファイルのドキュメント<ref-settings>` を参照してください。
+
+.. TBD
 
 Other test conditions
 ---------------------
@@ -313,12 +363,14 @@ file, all Django tests run with :setting:`DEBUG=False`. This is to ensure that
 the observed output of your code matches what will be seen in a production
 setting.
 
-Understanding the test output
------------------------------
+.. _Understanding the test output:
 
-When you run your tests, you'll see a number of messages as the test runner
-prepares itself. You can control the level of detail of these messages with the
-``verbosity`` option on the command line::
+テストプログラムの出力を理解する
+---------------------------------
+
+テストを実行すると、テストランナ自体が大量に出力するメッセージに出くわすで
+しょう。コマンドラインの ``verbosity`` オプションを使えば、メッセージの詳細
+レベルを制御できます::
 
     Creating test database...
     Creating table myapp_animal
@@ -326,19 +378,18 @@ prepares itself. You can control the level of detail of these messages with the
     Loading 'initial_data' fixtures...
     No fixtures found.
 
-This tells you that the test runner is creating a test database, as described
-in the previous section.
+上のメッセージは、テストランナがデータベースをテストしたことを示します。
 
-Once the test database has been created, Django will run your tests.
-If everything goes well, you'll see something like this::
+テストデータベースが生成されると、 Django はテストを実行します。全てのテス
+トにパスすると、最後には以下のようなメッセージが表示されます::
 
     ----------------------------------------------------------------------
     Ran 22 tests in 0.221s
 
     OK
 
-If there are test failures, however, you'll see full details about which tests
-failed::
+一方、失敗したテストがあると、失敗したテストに関する詳しい情報が表示されま
+す::
 
     ======================================================================
     FAIL: Doctest: ellington.core.throttle.models
@@ -363,61 +414,68 @@ failed::
 
     FAILED (failures=1)
 
-A full explanation of this error output is beyond the scope of this document,
-but it's pretty intuitive. You can consult the documentation of Python's
-``unittest`` library for details.
+エラー出力の詳細はこのドキュメントの範囲を超えるので解説はしませんが、ほと
+んど直感的に理解できる内容のはずです。詳しくは、 Python の ``unittest`` ラ
+イブラリのドキュメントを参照してください。
 
-Note that the return code for the test-runner script is the total number of
-failed and erroneous tests. If all the tests pass, the return code is 0. This
-feature is useful if you're using the test-runner script in a shell script and
-need to test for success or failure at that level.
+スクリプトのリターンコードは失敗したテストや出力のおかしかったテストの総数で
+す。全てのテストにパスしていれば、リターンコードは 0 です。この仕様は、テス
+トランナをシェルスクリプト上で動かしたり、テストが成功したかどうかをテスト
+ランナのレベルで調べたい場合に便利です。
 
-Testing tools
-=============
+.. _Testing tools:
 
-Django provides a small set of tools that come in handy when writing tests.
+テスト用のツール
+================
 
-The test client
----------------
+Django は、テストを書くときに便利なツールをいくつか提供しています。
+
+.. _The test client:
+
+テストクライアント
+------------------
 
 .. module:: django.test.client
-   :synopsis: Django's test client.
+   :synopsis: Django のテストクライアントです。
 
-The test client is a Python class that acts as a dummy Web browser, allowing
-you to test your views and interact with your Django-powered application
-programmatically.
+テストクライアント (test client) は、簡単なダミーブラウザとして動作する
+Python のクラスです。テストクライアントを使うと、ビューをテストしたり、
+プログラムを使ってDjango で作られたアプリケーションとやりとりできます。
 
-Some of the things you can do with the test client are:
+テストクライアントを使ってできることをいくつか挙げましょう:
 
-    * Simulate GET and POST requests on a URL and observe the response --
-      everything from low-level HTTP (result headers and status codes) to
-      page content.
+  * ある URL に対する GET や POST をシミュレートでき、低水準の HTTP (レスポ
+    ンスヘッダや状態コード) 情報から、ページの内容まで、リクエストに対するレ
+    スポンスの全てを調べられます。
 
-    * Test that the correct view is executed for a given URL.
+  * 特定の URL に対して正しいビューが呼び出されるかどうかを調べられます。
 
-    * Test that a given request is rendered by a given Django template, with
-      a template context that contains certain values.
+  * 特定のリクエストに対して、特定のテンプレートを使ったレンダリングが行わ
+    れ、その際に特定の値が入ったコンテキストが使われているかどうかを調べら
+    れます。
 
-Note that the test client is not intended to be a replacement for Twill_,
-Selenium_, or other "in-browser" frameworks. Django's test client has
-a different focus. In short:
+テストクライアントは Twill_ や Selenium_ やその他のブラウザ自動化フレームワー
+クを置き換えようとするものではありません。 Django のテストクライアントはもっ
+と別の部分に焦点を当てているのです。すなわち:
 
-    * Use Django's test client to establish that the correct view is being
-      called and that the view is collecting the correct context data.
+  * 正しいビューが呼び出され、ビューが正しいコンテキストデータを生成してい
+    るかどうかは、 Django のテストクライアントを使って調べてください。
 
-    * Use in-browser frameworks such as Twill and Selenium to test *rendered*
-      HTML and the *behavior* of Web pages, namely JavaScript functionality.
-
-A comprehensive test suite should use a combination of both test types.
+  * Twill や Selenium は、 *レンダリング済みの* HTML や、 JavaScript の機能
+    のような Web ページの *ビヘイビア* のテストに使ってください。
+   
+網羅的なテストスイートでは、両方のタイプのテストを組み合わせて使うはずです。
 
 .. _Twill: http://twill.idyll.org/
 .. _Selenium: http://www.openqa.org/selenium/
 
-Overview and a quick example
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _Overview and a quick example:
 
-To use the test client, instantiate ``django.test.client.Client`` and retrieve
-Web pages::
+テストの概要と簡単な例
+~~~~~~~~~~~~~~~~~~~~~~
+
+テストクライアントを使うには、 ``django.test.client.Client`` をインスタンス
+化して、 Web ページを取得します::
 
     >>> from django.test.client import Client
     >>> c = Client()
@@ -428,322 +486,347 @@ Web pages::
     >>> response.content
     '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 ...'
 
-As this example suggests, you can instantiate ``Client`` from within a session
-of the Python interactive interpreter.
+上の例でわかるように、 ``Client`` は Python 対話インタプリタのセッション中
+でもインスタンス化できます。
 
-Note a few important things about how the test client works:
+テストクライアントの動作には重要な点がいくつかあります:
 
-    * The test client does *not* require the Web server to be running. In fact,
-      it will run just fine with no Web server running at all! That's because
-      it avoids the overhead of HTTP and deals directly with the Django
-      framework. This helps make the unit tests run quickly.
+    * テストクライアントを実行するために Web サーバを起動する必要は
+      *ありません* 。実際、 Web サーバがまったく動いていなくても、テストは
+      何の問題もなく実行できるのです。というのも、テストクライアントは HTTP
+      通信のオーバヘッドを回避して、 Django フレームワークに直接アクセスし
+      ているからです。このからくりによって、ユニットテストを高速に実行でき
+      ます。
 
-    * When retrieving pages, remember to specify the *path* of the URL, not the
-      whole domain. For example, this is correct::
+    * ページを取得するときには、ドメインを含まない *パス部分だけ* を指定す
+      るよう気をつけてください。例えば、以下の呼び出し::
 
           >>> c.get('/login/')
 
-      This is incorrect::
+      は正しいですが、次の呼び出し::
 
           >>> c.get('http://www.example.com/login/')
 
-      The test client is not capable of retrieving Web pages that are not
-      powered by your Django project. If you need to retrieve other Web pages,
-      use a Python standard library module such as urllib_ or urllib2_.
+      は正しくありません。
 
-    * To resolve URLs, the test client uses whatever URLconf is pointed-to by
-      your :setting:`ROOT_URLCONF` setting.
+      Django のプロジェクトから生成されていない Web ページは、テストクライ
+      アントで取得できません。Django 以外の Web ページを取得したければ、
+      urllib_ や urllib2_ のような Python 標準ライブラリを使ってください。
 
-    * Although the above example would work in the Python interactive
-      interpreter, some of the test client's functionality, notably the
-      template-related functionality, is only available *while tests are
-      running*.
+    * テストクライアントは URL の解決に :setting:`ROOT_URLCONF` に指定され
+      た URLconf を使います。
 
-      The reason for this is that Django's test runner performs a bit of black
-      magic in order to determine which template was loaded by a given view.
-      This black magic (essentially a patching of Django's template system in
-      memory) only happens during test running.
+    * 上の例は Python の対話インタプリタ中でも動作しますが、一部のテンプレー
+      ト関連の機能などは *テストの実行中だけ* でしか使えません。
+
+      というのも、 Django のテストランナは、あるビューでどのテンプレートが
+      ロードされるかを決定するためにちょっとした黒魔術的なコードを使ってい
+      るからです。この黒魔術 (実際には、メモリ上のテンプレートシステムに対
+      するパッチ) は、テスト実行時にしか適用されません。
 
 .. _urllib: http://docs.python.org/lib/module-urllib.html
 .. _urllib2: http://docs.python.org/lib/module-urllib2.html
 
-Making requests
-~~~~~~~~~~~~~~~
+.. _Making requests:
 
-Use the ``django.test.client.Client`` class to make requests. It requires no
-arguments at time of construction:
+リクエスト生成
+~~~~~~~~~~~~~~
+
+リクエストの生成には、 ``django.test.client.Client`` クラスを使います。
+``Client`` は引数なしで生成します。:
 
 .. class:: Client()
 
-    Once you have a ``Client`` instance, you can call any of the following
-    methods:
+    ``Client`` のインスタンスからは、以下のメソッドを呼び出せます:
 
     .. method:: Client.get(path, data={})
 
-        Makes a GET request on the provided ``path`` and returns a ``Response``
-        object, which is documented below.
+        ``path`` に対する GET リクエストを行い、 ``Response`` オブジェクト
+        を返します。 ``Response`` オブジェクトについては後で説明します。
 
-        The key-value pairs in the ``data`` dictionary are used to create a GET
-        data payload. For example::
+
+        引数 ``data`` は辞書オブジェクトで、キー／値のペアが GET データのペ
+        イロードの生成に使われます。例えば::
 
             >>> c = Client()
-            >>> c.get('/customers/details/', {'name': 'fred', 'age': 7})
+            >>> c.get('/customers/details/', {'name':'fred', 'age':7})
 
-        ...will result in the evaluation of a GET request equivalent to::
+        は、以下のような GET リクエストの送信と同じです::
 
             /customers/details/?name=fred&age=7
 
     .. method:: Client.post(path, data={}, content_type=MULTIPART_CONTENT)
 
-        Makes a POST request on the provided ``path`` and returns a
-        ``Response`` object, which is documented below.
+        ``path`` に対する POST リクエストを行い、 ``Response`` オブジェクト
+        を返します。
 
-        The key-value pairs in the ``data`` dictionary are used to submit POST
-        data. For example::
+        引数 ``data`` は辞書オブジェクトで、キー／値のペアが POST データの
+        ペイロード生成に使われます。例えば::
 
             >>> c = Client()
             >>> c.post('/login/', {'name': 'fred', 'passwd': 'secret'})
 
-        ...will result in the evaluation of a POST request to this URL::
+        は、以下のパス::
 
             /login/
 
-        ...with this POST data::
+        への POST リクエストで、以下の POST データ::
 
             name=fred&passwd=secret
 
-        If you provide ``content_type`` (e.g., ``text/xml`` for an XML
-        payload), the contents of ``data`` will be sent as-is in the POST
-        request, using ``content_type`` in the HTTP ``Content-Type`` header.
+        を伴います。
 
-        If you don't provide a value for ``content_type``, the values in
-        ``data`` will be transmitted with a content type of
-        ``multipart/form-data``. In this case, the key-value pairs in ``data``
-        will be encoded as a multipart message and used to create the POST data
-        payload.
+        ``content_type`` を指定した場合 (例えば XML ペイロードの場合には
+	``text/xml``)、引数 ``data`` の中身は POST リクエストそのままで送信
+	され、 ``Content-Type`` ヘッダに ``content_type`` の値を使います。
 
-        To submit multiple values for a given key -- for example, to specify
-        the selections for a ``<select multiple>`` -- provide the values as a
-        list or tuple for the required key. For example, this value of ``data``
-        would submit three selected values for the field named ``choices``::
+        ``content_type`` を指定しなければ、 ``data`` の中身は
+        ``multipart/form-data`` で送信されます。この場合、 ``data`` の中の
+        キー／値のペアは、マルチパートメッセージにエンコードされ、 POST デー
+        タのペイロード生成に使われます。
 
-            {'choices': ('a', 'b', 'd')}
+        あるキーに対して複数の値を提出 (submit) する場合 (例えば、
+	``<select multiple>`` の選択結果を指定する場合など) は、キーに対す
+	る値をリストやタプルにしてください。例えば、``choices`` という名前
+	のフィールドから 3 つの行を選択して提出したければ::
 
-        Submitting files is a special case. To POST a file, you need only
-        provide the file field name as a key, and a file handle to the file you
-        wish to upload as a value. For example::
+            ``{'choices': ('a', 'b', 'd')}``
+
+        のようにします。
+
+        ファイルの送信には特別な扱いが必要です。ファイルの POST を行う場合、
+        以下のように、ファイル名フィールドの名前をキーに、アップロードした
+        いファイルのファイルハンドルを値に設定します::
 
             >>> c = Client()
             >>> f = open('wishlist.doc')
-            >>> c.post('/customers/wishes/', {'name': 'fred', 'attachment': f})
+            >>> c.post('/customers/wishes/', {'name':'fred', 'attachment':f})
             >>> f.close()
 
-        (The name ``attachment`` here is not relevant; use whatever name your
-        file-processing code expects.)
+        (``attachment`` という名前には特に意味はありません。ファイルを処理
+        するコードで使いたい名前を指定してください)
 
-        Note that you should manually close the file after it has been provided
-        to ``post()``.
+        送信するファイルのハンドルは、 ``post()`` 後に手動で閉じねばならな
+        いので注意してください。
 
     .. method:: Client.login(**credentials)
 
         .. versionadded:: 1.0
 
-        If your site uses Django's :ref:`authentication system<topics-auth>`
-        and you deal with logging in users, you can use the test client's
-        ``login()`` method to simulate the effect of a user logging into the
-        site.
+        Django の :ref:`認証システム <topics-auth>` を使っていて、ログイン
+        済みのユーザを扱う必要がある場合、テストクライアントの ``login()``
+        メソッドを使えば、サイトへログインするユーザをシミュレートできます。
 
-        After you call this method, the test client will have all the cookies
-        and session data required to pass any login-based tests that may form
-        part of a view.
+        このメソッドを呼び出すと、テストクライアントはログインに必要なクッ
+        キーとセッションデータを持つようになり、テスト対象のビューのうち、
+        ログインの必要なテストをパスできるようになります。
 
-        The format of the ``credentials`` argument depends on which
-        :ref:`authentication backend <authentication-backends>` you're using
-        (which is configured by your :setting:`AUTHENTICATION_BACKENDS`
-        setting). If you're using the standard authentication backend provided
-        by Django (``ModelBackend``), ``credentials`` should be the user's
-        username and password, provided as keyword arguments::
+        ``credentials`` 引数の形式は、使っている 
+	:ref:`認証バックエンド <authentication-backends>` によって変わりま
+	す (認証バックエンドは :setting:`AUTHENTICATION_BACKENDS` で設定し
+	ます)。	Django が提供している標準の認証バックエンド
+	(``ModelBackend``) を使う場合、 ``credentials`` にはユーザのユーザ
+	名とパスワードをキーワー引数で指定します::
 
             >>> c = Client()
             >>> c.login(username='fred', password='secret')
+            # これでログイン保護されたビューに入れるようになりました。
 
-            # Now you can access a view that's only available to logged-in users.
 
-        If you're using a different authentication backend, this method may
-        require different credentials. It requires whichever credentials are
-        required by your backend's ``authenticate()`` method.
+        認証バックエンドを変えた場合、このメソッドは違った認証情報を要求す
+        るかもしれません。その場合、 ``login()`` は、認証バックエンドの
+        ``authenticate()`` メソッドが必要とする認証情報をそのまま要求します。
 
-        ``login()`` returns ``True`` if it the credentials were accepted and
-        login was successful.
+        ``login()`` は、指定した認証情報が承認され、ログインに成功した場合に
+        ``True`` を返します。
 
-        Finally, you'll need to remember to create user accounts before you can
-        use this method. As we explained above, the test runner is executed
-        using a test database, which contains no users by default. As a result,
-        user accounts that are valid on your production site will not work
-        under test conditions. You'll need to create users as part of the test
-        suite -- either manually (using the Django model API) or with a test
-        fixture.
+        このメソッドを使うには、事前にユーザを登録しておかねばなりません。上
+        で説明したように、テストランナはテストデータベースを使ってテストを実
+        行するので、デフォルトではユーザが登録されていません。そのため、運用
+        環境で使えるユーザはテスト環境では使えないのです。テストスイートの一
+        環として、手動で (Django のモデル API を使って) ユーザを作成するか、
+        フィクスチャでユーザを登録してください。
 
     .. method:: Client.logout()
 
-        .. versionadded:: 1.0
+        Django の :ref:`認証システム <topics-auth>` を使っている場合、
+        ``logout()`` メソッドで、サイトからユーザをログアウトさせる効果をシ
+        ミュレートできます。
 
-        If your site uses Django's :ref:`authentication system<topics-auth>`,
-        the ``logout()`` method can be used to simulate the effect of a user
-        logging out of your site.
+        このメソッドを呼び出すと、テストクライアントはクッキーとセッション
+        データを全て消去して、デフォルトの状態に戻します。それ以降のリクエ
+        ストは、ビューからは ``AnonymousUser`` から送信されたリクエストとみ
+        なされます。
 
-        After you call this method, the test client will have all the cookies
-        and session data cleared to defaults. Subsequent requests will appear
-        to come from an AnonymousUser.
+.. _Testing Responses:
 
-Testing responses
-~~~~~~~~~~~~~~~~~
+レスポンスのテスト
+~~~~~~~~~~~~~~~~~~
 
-The ``get()`` and ``post()`` methods both return a ``Response`` object. This
-``Response`` object is *not* the same as the ``HttpResponse`` object returned
-Django views; the test response object has some additional data useful for
-test code to verify.
+``get()`` および ``post()`` メソッドは、いずれも ``Response`` オブジェクト
+を返します。 ``Response`` オブジェクトは Django のビューが返す
+``HttpResponse`` オブジェクトと同じ *ではありません* 。このオブジェクトは
+検証用のテストコード作成に便利なデータをいくつか備えています。
 
-Specifically, a ``Response`` object has the following attributes:
+``Response`` オブジェクトには以下のようなプロパティがあります:
 
 .. class:: Response()
 
     .. attribute:: client
 
-        The test client that was used to make the request that resulted in the
-        response.
+        レスポンス要求の生成に使われたテストクライアントです。
 
     .. attribute:: content
 
-        The body of the response, as a string. This is the final page content as
-        rendered by the view, or any error message.
+        レスポンスの本体部分 (body) です。ビューがレンダリングによって生成
+        した最終的なページコンテンツか、エラーメッセージです。
 
     .. attribute:: context
 
-        The template ``Context`` instance that was used to render the template that
-        produced the response content.
+        レスポンスのページコンテンツのレンダに使われた ``Context`` オブジェ
+        クトです。
 
-        If the rendered page used multiple templates, then ``context`` will be a
-        list of ``Context`` objects, in the order in which they were rendered.
-
+        複数のテンプレートを使ってレンダリングを行った場合、 ``context`` は
+        ``Context`` オブジェクトをレンダリングで使った順に並べたリストです。
+ 
     .. attribute:: request
 
-        The request data that stimulated the response.
-
+        レスポンスを得るために使用したリクエストデータです。
+ 
     .. attribute:: status_code
 
-        The HTTP status of the response, as an integer. See RFC2616_ for a full
-        list of HTTP status codes.
+        レスポンスの HTTP 状態コードです。全ての HTTP 状態コードのリストは
+        RFC2616_ を参照してください。
 
     .. attribute:: template
 
-        The ``Template`` instance that was used to render the final content. Use
-        ``template.name`` to get the template's file name, if the template was
-        loaded from a file. (The name is a string such as ``'admin/index.html'``.)
+        最終的なページコンテンツのレンダリングに使われた ``Template`` のイ
+        ンスタンスです。テンプレートをファイルからロードした場合、テンプレー
+        トのファイル名を ``template.name`` で調べられます
+        (``'admin/index.html'`` のような形式の文字列です)。
 
-        If the rendered page used multiple templates -- e.g., using :ref:`template
-        inheritance<template-inheritance>` -- then ``template`` will be a list of
-        ``Template`` instances, in the order in which they were rendered.
+	複数のテンプレートをレンダリングしている場合 (例えば
+	:ref:`テンプレートの継承 <template-inheritance>`_ を使っている場合)、
+	``template`` はレンダリング順に並んだ  ``Template`` オブジェクトの
+	リストです。
 
-You can also use dictionary syntax on the response object to query the value
-of any settings in the HTTP headers. For example, you could determine the
-content type of a response using ``response['Content-Type']``.
+また、レスポンスオブジェクトを辞書のように扱っても、HTTPヘッダに設定された
+値にアクセスできます。例えば、レスポンスのコンテンツタイプは
+``response['Content-Type']`` でアクセスできます。
 
 .. _RFC2616: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 
-Exceptions
-~~~~~~~~~~
+.. _Exceptions:
 
-If you point the test client at a view that raises an exception, that exception
-will be visible in the test case. You can then use a standard ``try...catch``
-block or ``unittest.TestCase.assertRaises()`` to test for exceptions.
+例外
+~~~~
 
-The only exceptions that are not visible to the test client are ``Http404``,
-``PermissionDenied`` and ``SystemExit``. Django catches these exceptions
-internally and converts them into the appropriate HTTP response codes. In these
-cases, you can check ``response.status_code`` in your test.
+テストクライアントのアクセス先のビューが例外を送出するような場合、テストケー
+ス内で例外にアクセスできます。例外のテストを行うには、通常の
+``try...catch`` ブロックか、 ``unittest.TestCase.assertRaises()`` を使いま
+す。
 
-Persistent state
-~~~~~~~~~~~~~~~~
+ただし、 ``Http404`` や ``PermissionDenied``, ``SystemExit`` といった例外は
+テストケースからアクセスできません。 Django はこれらの例外を内部的に捕捉し
+て、対応する適切な HTTP 応答コードに変換してしまうからです。これらの例外に
+対しては、 ``response.status_code`` のチェックで対応してください。
 
-The test client is stateful. If a response returns a cookie, then that cookie
-will be stored in the test client and sent with all subsequent ``get()`` and
-``post()`` requests.
+.. _Persistent state:
 
-Expiration policies for these cookies are not followed. If you want a cookie
-to expire, either delete it manually or create a new ``Client`` instance (which
-will effectively delete all cookies).
+セッションの永続性
+~~~~~~~~~~~~~~~~~~
 
-A test client has two attributes that store persistent state information. You
-can access these properties as part of a test condition.
+テストクライアントの動作はステートフルです。あるレスポンスにクッキーが入っ
+ていると、クッキーはテストクライアント中に保存され、それ以降の ``get()`` や
+``post()`` リクエストで使われます。
+
+テストクライアントは、クッキーの有効期限ポリシを守りません。クッキーを期限
+切れにしたければ、該当クッキーを ``client.cookies`` から手動で削除するか、
+新たな ``Client`` インスタンスを生成してください (全てのクッキーを除去しま
+す)。
+
+テストクライアントには、永続セッション情報 (persistent state information)
+を保存するためのプロパティが二つあります。これらのプロパティは、必要に応じ
+てテスト条件の一部として検査できます。
 
 .. attribute:: Client.cookies
 
-    A Python ``SimpleCookie`` object, containing the current values of all the
-    client cookies. See the `Cookie module documentation`_ for more.
+    Python の ``SimpleCookie`` 型のオブジェクトで、全てのクライアントクッキー
+    の現在値が入っています。詳しくは `Cookie モジュールのドキュメント`_ を
+    参照してください。
 
 .. attribute:: Client.session
 
-    A dictionary-like object containing session information. See the
-    :ref:`session documentation<topics-http-sessions>` for full details.
+    セッション情報の入った辞書ライクなオブジェクトです。詳しくは 
+    :ref:`セッションのドキュメント <topics-http-sessions>` を参照してくださ
+    い。
 
 .. _Cookie module documentation: http://docs.python.org/lib/module-Cookie.html
+.. _`Cookie モジュールのドキュメント`: `Cookie module documentation`_
 
-Example
-~~~~~~~
+.. _Example:
+             
+ユニットテストの例
+~~~~~~~~~~~~~~~~~~
 
-The following is a simple unit test using the test client::
+テストクライアントを使った簡単なユニットテストを以下に示します::
 
     import unittest
     from django.test.client import Client
 
     class SimpleTest(unittest.TestCase):
         def setUp(self):
-            # Every test needs a client.
+            # unittest を使う場合、毎回 Client を生成する必要があります。
             self.client = Client()
 
         def test_details(self):
-            # Issue a GET request.
+            # GET リクエストを発行します。
             response = self.client.get('/customer/details/')
 
-            # Check that the response is 200 OK.
+            # レスポンスが 200 OK であるか調べます。
             self.failUnlessEqual(response.status_code, 200)
 
-            # Check that the rendered context contains 5 customers.
+            # レンダリングされるコンテキストの customers の長さが 5 である
+            # か確かます。
             self.failUnlessEqual(len(response.context['customers']), 5)
 
-TestCase
---------
+
+.. _TestCase:
+
+TestCaseクラス
+--------------
 
 .. currentmodule:: django.test
 
-Normal Python unit test classes extend a base class of ``unittest.TestCase``.
-Django provides an extension of this base class:
+Django は拡張用に以下のベースクラスを提供しています:
 
 .. class:: TestCase()
 
-This class provides some additional capabilities that can be useful for testing
-Web sites.
+を提供しています。このクラスは、Web サイトのテスト時に便利な機能をいくつか
+追加しています。
 
-Converting a normal ``unittest.TestCase`` to a Django ``TestCase`` is easy:
-just change the base class of your test from ``unittest.TestCase`` to
-``django.test.TestCase``. All of the standard Python unit test functionality
-will continue to be available, but it will be augmented with some useful
-additions.
+通常のユニットテストを ``unittest.TestCase`` から Django 独自の 
+``TestCase`` に移行するのは簡単で、単にベースクラスを ``unittest.TestCase``
+から ``django.test.TestCase`` に変更するだけです。 ``django.test.TestCase``
+は、標準の Python ユニットテスト機能はそのままに、さらに便利な機能を提供し
+ています。
 
-Default test client
-~~~~~~~~~~~~~~~~~~~
+.. _Default Test Client:
+
+デフォルトのテストクライアント
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. versionadded:: 1.0
 
 .. attribute:: TestCase.client
 
-Every test case in a ``django.test.TestCase`` instance has access to an
-instance of a Django test client. This client can be accessed as
-``self.client``. This client is recreated for each test, so you don't have to
-worry about state (such as cookies) carrying over from one test to another.
+``django.test.TestCase`` クラスのインスタンス内に入っているテストケースは全
+て、デフォルトの `テストクライアント`_ にアクセスできます。このテストクライ
+アントは ``self.client`` で参照できます。テストクライアントはテストごとに再
+生成されるので、テスト間でクッキーのような状態情報が継承される心配はありま
+せん。
 
-This means, instead of instantiating a ``Client`` in each test::
+例えば、以下のコード::
 
     import unittest
     from django.test.client import Client
@@ -759,7 +842,8 @@ This means, instead of instantiating a ``Client`` in each test::
             response = client.get('/customer/index/')
             self.failUnlessEqual(response.status_code, 200)
 
-...you can just refer to ``self.client``, like so::
+では、各テストで ``Client`` をインスタンス化していますが、実際は次のコード
+のように、 ``self.client`` を参照するだけでよいのです::
 
     from django.test import TestCase
 
@@ -773,37 +857,41 @@ This means, instead of instantiating a ``Client`` in each test::
             self.failUnlessEqual(response.status_code, 200)
 
 .. _topics-testing-fixtures:
+.. _Fixture loading:
 
-Fixture loading
-~~~~~~~~~~~~~~~
+フィクスチャの読み込み
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. attribute:: TestCase.fixtures
 
-A test case for a database-backed Web site isn't much use if there isn't any
-data in the database. To make it easy to put test data into the database,
-Django's custom ``TestCase`` class provides a way of loading **fixtures**.
+データベースがバックにあるウェブサイトのテストで、データベース上に何もデー
+タが入っていなければあまり意味はありません。データベースにテストデータを入
+れやすくするために、 Django の独自 ``TestCase`` クラスは 
+**フィクスチャ (fixture)** の読み込み機能を提供しています。
 
-A fixture is a collection of data that Django knows how to import into a
-database. For example, if your site has user accounts, you might set up a
-fixture of fake user accounts in order to populate your database during tests.
+フィクスチャとは、一群のデータを Django がデータベースに取り込める形式にし
+たものです。例えば、ユーザアカウントを持つようなサイトを作っている場合、テ
+スト中は仮のユーザアカウントの入ったフィクスチャを作り、データベースに入れ
+ておくと便利です。
 
-The most straightforward way of creating a fixture is to use the ``manage.py
-dumpdata`` command. This assumes you already have some data in your database.
-See the :djadmin:`dumpdata documentation<dumpdata>` for more details.
+最も素直なフィクスチャの作成方法は、 ``manage.py dumpdata`` コマンドを使う
+というものです。 ``dumpdata`` を使うにはデータベースに既に何らかのデータが
+入っていなければなりません。詳しくは :ref:`dumpdata のドキュメント <dumpdata>`
+を参照してください。
 
 .. note::
-    If you've ever run ``manage.py syncdb``, you've already used a fixture
-    without even knowing it! When you call ``syncdb`` in the database for
-    the first time, Django installs a fixture called ``initial_data``.
-    This gives you a way of populating a new database with any initial data,
-    such as a default set of categories.
+    ``manage.py syncdb`` を実行したことがあるなら、あなたの知らないうちにフィ
+    クスチャは使われています。最初に ``syncdb`` を実行したときに、 Django
+    は ``initial_data`` という名前のフィクスチャをインストールします。この
+    メカニズムを使えば、 (カテゴリのデフォルトセットのような) 新たなデータ
+    セットをデータベースに組み込めます。 
 
-    Fixtures with other names can always be installed manually using the
-    ``manage.py loaddata`` command.
-
-Once you've created a fixture and placed it somewhere in your Django project,
-you can use it in your unit tests by specifying a ``fixtures`` class attribute
-on your ``django.test.TestCase`` subclass::
+    ``initial_data`` 以外の名前のフィクスチャは、 
+    ``django-admin.py loaddata`` で手動で組み込めます。
+    
+単体テストでフィクスチャを使う場合、フィクスチャを作成して Django のプロジェ
+クトディレクトリ下に置き、 ``dhango.test.TestCase`` のサブクラスの
+``fixtures`` クラス属性を指定します::
 
     from django.test import TestCase
     from myapp.models import Animal
@@ -812,157 +900,168 @@ on your ``django.test.TestCase`` subclass::
         fixtures = ['mammals.json', 'birds']
 
         def setUp(self):
-            # Test definitions as before.
+            # 従来通りのテスト定義
 
         def testFluffyAnimals(self):
-            # A test that uses the fixtures.
+            # フィクスチャを使うテスト
 
-Here's specifically what will happen:
 
-    * At the start of each test case, before ``setUp()`` is run, Django will
-      flush the database, returning the database to the state it was in
-      directly after ``syncdb`` was called.
+ユニットテストは、以下のように動作します:
 
-    * Then, all the named fixtures are installed. In this example, Django will
-      install any JSON fixture named ``mammals``, followed by any fixture named
-      ``birds``. See the :djadmin:`loaddata documentation<loaddata>` for more
-      details on defining and installing fixtures.
+  * テストケースの開始時で、かつ ``setUp()`` の実行前に、 Django はデータベー
+    スを一掃して、データベースを ``syncdb`` 直後の状態に戻します。
 
-This flush/load procedure is repeated for each test in the test case, so you
-can be certain that the outcome of a test will not be affected by another test,
-or by the order of test execution.
+  * 次に、テストケースクラスに指定した全てのフィクスチャをインストールしま
+    す。上の例では、 ``mammals`` という名前の JSON フィクスチャと、
+    ``birds`` という名前のフィクスチャがインストールされます。フィクスチャ
+    の定義とインストールに関する詳細は :ref:`loaddata のドキュメント <loaddata>`
+    を参照してください。
 
-URLconf configuration
+このフラッシュ／ロードの作業はテストケースの実行毎に繰り返されるので、テス
+トの結果が他のテストや以前に実行したテストの影響を受けたり、テストの順番に
+左右されることはありません。
+
+.. _URLconf configuration:
+
+URLconf の設定
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. versionadded:: 1.0
 
 .. attribute:: TestCase.urls
 
-If your application provides views, you may want to include tests that use the
-test client to exercise those views. However, an end user is free to deploy the
-views in your application at any URL of their choosing. This means that your
-tests can't rely upon the fact that your views will be available at a
-particular URL.
+アプリケーションでビューを定義している場合、テストクライアントを使ってビュー
+を検査するテストを組み込みたいことがあるでしょう。しかし、エンドユーザはア
+プリケーションのビューを自分の好きな URL でデプロイできるので、テストを行う
+際には、ビューが特定の URL でアクセスできると期待してはなりません。
 
-In order to provide a reliable URL space for your test,
-``django.test.TestCase`` provides the ability to customize the URLconf
-configuration for the duration of the execution of a test suite. If your
-``TestCase`` instance defines an ``urls`` attribute, the ``TestCase`` will use
-the value of that attribute as the ``ROOT_URLCONF`` for the duration of that
-test.
+テスト用の URL 空間を指定するために、 ``django.test.TestCase`` はテストスイー
+ト実行中に使われる URLconf をカスタマイズできる仕組みを提供しています。
+``TestCase`` インスタンスに ``urls`` 属性を指定しておくと、 ``TestCase``
+はその値をテスト実行中だけ ``ROOT_URLCONF`` に使います。
 
-For example::
+使い方を示しましょう::
 
     from django.test import TestCase
-
+    
     class TestMyViews(TestCase):
         urls = 'myapp.test_urls'
 
         def testIndexPageView(self):
-            # Here you'd test your view using ``Client``.
+            #  ``Client`` を使ってビューをテストする
 
-This test case will use the contents of ``myapp.test_urls`` as the
-URLconf for the duration of the test case.
+このテストケースは、ケースの実行中だけ、 ``myapp.test_urls`` を URLconf と
+して使います。
 
 .. _emptying-test-outbox:
+.. _Emptying the test outbox:
 
-Emptying the test outbox
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.0
-
-If you use Django's custom ``TestCase`` class, the test runner will clear the
-contents of the test e-mail outbox at the start of each test case.
-
-For more detail on e-mail services during tests, see `E-mail services`_.
-
-Assertions
-~~~~~~~~~~
+メール送信箱の内容抹消
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. versionadded:: 1.0
 
-As Python's normal ``unittest.TestCase`` class implements assertion methods
-such as ``assertTrue`` and ``assertEquals``, Django's custom ``TestCase`` class
-provides a number of custom assertion methods that are useful for testing Web
-applications:
+Django 独自の ``TestCase`` クラスを使うと、テストランナは各テストケースの開
+始時にメールの送信箱に入っている内容を消去します。
+
+テスト中のメールサービスの詳細は `メールサービス`_ を参照してください。
+
+.. _Assertions:
+
+アサーション
+~~~~~~~~~~~~
+
+.. versionadded:: 1.0
+
+通常の Python ``unittest.TestCase`` クラスが備えている ``assertTrue`` や
+``assertEquals`` のようなアサーションメソッドと同様、 Django 独自の
+``TestCase`` クラスでも Web アプリケーションをテストする上で便利な様々な
+独自のアサーションメソッドを提供しています。
 
 .. method:: TestCase.assertContains(response, text, count=None, status_code=200)
 
-    Asserts that a ``Response`` instance produced the given ``status_code`` and
-    that ``text`` appears in the content of the response. If ``count`` is
-    provided, ``text`` must occur exactly ``count`` times in the response.
+    ``status_code`` に指定した状態コードで ``Response`` インスタンスが生成
+    され、レスポンスのコンテンツ内に ``text`` が入っているかどうか調べるア
+    サーションです。 ``count`` を指定すると、 ``text`` は正確に ``count``
+    回出現せねばなりません。
 
 .. method:: TestCase.assertNotContains(response, text, status_code=200)
 
-    Asserts that a ``Response`` instance produced the given ``status_code`` and
-    that ``text`` does not appears in the content of the response.
+    ``status_code`` に指定した状態コードで ``Response`` インスタンスが生成
+    され、レスポンスのコンテンツ内に ``text`` が入っていないことを確認する
+    アサーションです。
 
 .. method:: assertFormError(response, form, field, errors)
 
-    Asserts that a field on a form raises the provided list of errors when
-    rendered on the form.
+    ``form`` に指定したフォーム上のフィールド ``field`` で、 ``errors`` に
+    指定したエラーリストと同じエラーが送出されるかどうか調べるアサーション
+    です。
 
-    ``form`` is the name the ``Form`` instance was given in the template
-    context.
+    ``form`` はテンプレートコンテキスト上の ``Form`` インスタンスの名前です。
 
-    ``field`` is the name of the field on the form to check. If ``field``
-    has a value of ``None``, non-field errors (errors you can access via
-    ``form.non_field_errors()``) will be checked.
+    ``field`` はフォーム内のフィールドの名前です。 ``field`` の値が
+    ``None`` であれば、非フィールドエラー (特定のフィールドに関連付けられて
+    いない、 ``form.non_field_errors()`` でアクセスできるエラー) がチェック
+    されます。
 
-    ``errors`` is an error string, or a list of error strings, that are
-    expected as a result of form validation.
-
-.. method:: assertTemplateUsed(response, template_name)
-
-    Asserts that the template with the given name was used in rendering the
-    response.
-
-    The name is a string such as ``'admin/index.html'``.
-
-.. method:: assertTemplateNotUsed(response, template_name)
-
-    Asserts that the template with the given name was *not* used in rendering
-    the response.
+    ``errors`` はエラー文字列か、エラー文字列のリストです。フォームの検証結
+    果として返されるのと同じ形式です。
 
 .. method:: assertRedirects(response, expected_url, status_code=302, target_status_code=200)
 
-    Asserts that the response return a ``status_code`` redirect status, it
-    redirected to ``expected_url`` (including any GET data), and the subsequent
-    page was received with ``target_status_code``.
+    レスポンスが ``status_code`` に指定したリダイレクト状態コードを持ち、か
+    つ ``expected_url`` へのリダイレクトを指示しており、さらにリダイレクト
+    先の内容を HTTP 状態コード ``target_status_code`` で取得できるかどうか
+    調べるアサーションです。
 
-E-mail services
----------------
+.. method:: assertTemplateUsed(response, template_name)
+
+    ``template_name`` に指定したテンプレートがレスポンスのレンダリングに使
+    われていることを確認するアサーションです。
+
+    ``template_name`` は ``'admin/index.html'`` のような文字列です。
+
+.. method:: assertTemplateNotUsed(response, template_name)
+
+    ``template_name`` に指定したテンプレートがレスポンスのレンダリングに使
+    われて *いない* ことを確認するアサーションです。
+
+    ``template_name`` は ``'admin/index.html'`` のような文字列です。
+
+
+.. _E-mail services:
+
+メールサービス
+--------------
 
 .. versionadded:: 1.0
 
-If any of your Django views send e-mail using :ref:`Django's e-mail
-functionality <topics-email>`, you probably don't want to send e-mail each time
-you run a test using that view. For this reason, Django's test runner
-automatically redirects all Django-sent e-mail to a dummy outbox. This lets you
-test every aspect of sending e-mail -- from the number of messages sent to the
-contents of each message -- without actually sending the messages.
+ビューが :ref:`Django のメールサービス <topics-email>` を使っている場合、
+ビューをテストするたびにメールが送信されてほしくはないでしょう。 Django の
+テストランナは、テスト中に Django から送信されたすべてのメールをダミーの送
+信箱に振り分けます。これによって、送信したメールの数から、各メールのメッセー
+ジに至るまで、メール送信機能のすべてを (実際にメールを送らずに) テストでき
+ます。
 
-The test runner accomplishes this by transparently replacing the normal
-:class:`~django.core.mail.SMTPConnection` class with a different version.
-(Don't worry -- this has no effect on any other e-mail senders outside of
-Django, such as your machine's mail server, if you're running one.)
+Django は、テストフレームワークを初期化する際、通常の 
+:class:`~django.core.mail.SMTPConnection` クラスをダミーの SMTPConnection
+実装に切替えます (Django の外部のメール送信機構、例えば Django を動かしてい
+るホストで動いているメールサーバには一切影響を及ぼしません)。
 
 .. currentmodule:: django.core.mail
 
 .. data:: django.core.mail.output
 
-During test running, each outgoing e-mail is saved in
-``django.core.mail.outbox``. This is a simple list of all
-:class:`<~django.core.mail.EmailMessage>` instances that have been sent.
-It does not exist under normal execution conditions, i.e., when you're not
-running unit tests. The outbox is created during test setup, along with the
-dummy :class:`<~django.core.mail.SMTPConnection>`. When the test framework is
-torn down, the standard :class:`<~django.core.mail.SMTPConnection>` class is
-restored, and the test outbox is destroyed.
+テストの実行中、 Django から送信されたメールは ``djnago.core.mail.outbox``
+に保存されます。 ``djnago.core.mail.outbox`` はその時点で送信された全ての
+:class:`<~django.core.mail.EmailMessage>` インスタンスからなるリストで、テ
+スト時以外には存在しません。このダミー送信箱は、テストのセットアップ時に、
+ダミーの :class:`~django.core.mail.SMTPConnection` と組で初期化されます。テ
+ストが終了すると、通常の :class:`~django.core.mail.SMTPConnection` が復帰し、
+ダミー送信箱は削除されます。
 
-Here's an example test that examines ``django.core.mail.outbox`` for length
-and contents::
+``django.core.mail.outbox`` を調べて、メール送信数やメールの内容をチェック
+するコード例を以下に示します::
 
     from django.core import mail
     from django.test import TestCase
@@ -980,138 +1079,154 @@ and contents::
             # Verify that the subject of the first message is correct.
             self.assertEqual(mail.outbox[0].subject, 'Subject here')
 
-As noted :ref:`previously <emptying-test-outbox>`, the test outbox is emptied
-at the start of every test in a Django ``TestCase``. To empty the outbox
-manually, assign the empty list to ``mail.outbox``::
+
+:ref:`前節で <emptying-test-outbox>` 述べたように、テスト用の送信箱の内容は
+TestCase 内の各テストケースの開始時点で抹消されます。手動で送信箱の内容を空
+にしたければ、空のリストを ``mail.outbox`` に代入してください::
 
     from django.core import mail
 
     # Empty the test outbox
     mail.outbox = []
 
-Using different testing frameworks
-==================================
+.. _Using a different testing framework:
 
-Clearly, ``doctest`` and ``unittest`` are not the only Python testing
-frameworks. While Django doesn't provide explicit support for alternative
-frameworks, it does provide a way to invoke tests constructed for an
-alternative framework as if they were normal Django tests.
+他のテストフレームワークを使う
+==============================
 
-When you run ``./manage.py test``, Django looks at the :setting:`TEST_RUNNER`
-setting to determine what to do. By default, :setting:`TEST_RUNNER` points to
-``'django.test.simple.run_tests'``. This method defines the default Django
-testing behavior. This behavior involves:
+``doctest`` と ``unittest`` だけが Python のテストフレームワークではありま
+せん。Django は他のテストフレームワークを明にサポートしているわけではありま
+せんが、他のテストフレームワークで作成したテストを Django の通常のテストと
+同じように呼び出すためのメカニズムは提供しています。
 
-    #. Performing global pre-test setup.
+``./manage.py test`` を実行すると、 Django は :setting:`TEST_RUNNER` 設定を
+探して、実行すべきテストランナを決定します。デフォルトでは、
+:setting:`TEST_RUNNER` は ``django.test.simple.run_tests`` です。このメソッ
+ドは Django のデフォルトのテスト動作を実装しており、以下のように動作します:
 
-    #. Creating the test database.
+  #. テスト前の全体的な準備を行います。
 
-    #. Running ``syncdb`` to install models and initial data into the test
-       database.
+  #. テストデータベースを生成します。
 
-    #. Looking for unit tests and doctests in the ``models.py`` and
-       ``tests.py`` files in each installed application.
+  #. ``syncdb`` を実行して、モデルと初期データをデータベースにインストールし
+     ます。
 
-    #. Running the unit tests and doctests that are found.
+  #. インストールされている全てのアプリケーションの ``models.py`` や
+     ``tests.py`` から、単体テストと doctest を探します。
 
-    #. Destroying the test database.
+  #. 見つかった単体テストと doctest を実行します。
 
-    #. Performing global post-test teardown.
+  #. テストデータベースを破壊します。
 
-If you define your own test runner method and point :setting:`TEST_RUNNER` at
-that method, Django will execute your test runner whenever you run
-``./manage.py test``. In this way, it is possible to use any test framework
-that can be executed from Python code.
+  #. テスト後の全体的な後始末を行います。
 
-Defining a test runner
+テストランナメソッドを自作して、そのメソッド名を :setting:`TEST_RUNNER` に
+指定しておき、 ``./manage.py test`` を実行すると、 Django はそのテストラン
+ナメソッドを実行します。これによって、 Python コードから任意のテストフレー
+ムワークを実行できます。
+
+.. _Defining a test runner:
+
+テストランナを定義する
 ----------------------
 
 .. versionadded:: 1.0
 
 .. currentmodule:: django.test.simple
 
-By convention, a test runner should be called ``run_tests``. The only strict
-requirement is that it has the same arguments as the Django test runner:
+慣習的に、テストランナは ``run_tests`` と名付けます。テストランナは以下のよ
+うに Django テストランナと同じ引数をとらねばなりません:
 
 .. function:: run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[])
 
-    ``test_labels`` is a list of strings describing the tests to be run. A test
-    label can take one of three forms:
+    ``test_labels`` には、実行したいテストを表す文字列 (ラベル) のリストを
+    指定します。ラベルは以下の 3 つの形式で指定できます:
 
-        * ``app.TestCase.test_method`` -- Run a single test method in a test
-          case.
-        * ``app.TestCase`` -- Run all the test methods in a test case.
-        * ``app`` -- Search for and run all tests in the named application.
+        * ``app.TestCase.test_method`` - テストケース中の個別のテストメソッ
+          ドを実行します。
+        * ``app.TestCase`` - テストケース中の全てのテストメソッドを実行しま
+          す。
+        * ``app`` - アプリケーション中の全てのテストを探して実行します。
 
-    If ``test_labels`` has a value of ``None``, the test runner should run
-    search for tests in all the applications in :setting:`INSTALLED_APPS`.
+    ``test_labels`` が ``None`` の場合、テストランナは
+    :setting:`INSTALLED_APPS` に登録されている全てのアプリケーションからテ
+    ストを探して実行します。
 
-    ``verbosity`` determines the amount of notification and debug information
-    that will be printed to the console; ``0`` is no output, ``1`` is normal
-    output, and ``2`` is verbose output.
+    ``verbosity`` には、コンソールに出力される通知情報やデバッグ情報の量を
+    指定します。  ``0`` にすると何も出力しません。 ``1`` は通常の出力、
+    ``2`` は多めの出力です。
 
-    If ``interactive`` is ``True``, the test suite has permission to ask the
-    user for instructions when the test suite is executed. An example of this
-    behavior would be asking for permission to delete an existing test
-    database. If ``interactive`` is ``False``, the test suite must be able to
-    run without any manual intervention.
+    ``interactive`` を ``True`` にすると、テストスイートの実行時に、テスト
+    スイートからユーザに質問できるようになります。例えば、テストデータベー
+    スを削除してよいか尋ねるといった使い方です。 ``interactive`` を
+    ``False`` にする場合、テストスイートは手動操作なしで実行できねばなりま
+    せん。
+  
+  ``extra_tests`` には、このテストランナに追加で実行させたい ``TestCase``
+  インスタンスを指定します。 ``extra_tests`` を指定すると、 ``module_list``
+  から発見したテストに加えて、指定したテストを実行します。
+    
+  このメソッドは失敗したテストの数を返さねばなりません。
 
-    ``extra_tests`` is a list of extra ``TestCase`` instances to add to the
-    suite that is executed by the test runner. These extra tests are run
-    in addition to those discovered in the modules listed in ``module_list``.
 
-    This method should return the number of tests that failed.
+.. _Testing utilities:
 
-Testing utilities
------------------
+テスト用のユーティリティ
+------------------------
 
 .. module:: django.test.utils
-   :synopsis: Helpers to write custom test runners.
+   :synopsis: カスタムのテストランナを作成するためのヘルパです。
 
-To assist in the creation of your own test runner, Django provides a number of
-utility methods in the ``django.test.utils`` module.
+``django.test.utils`` モジュールには、テストランナの自作に役立つユーティリ
+ティメソッドが定義されています。
 
 .. function:: setup_test_environment()
 
-    Performs any global pre-test setup, such as the installing the
-    instrumentation of the template rendering system and setting up the dummy
-    ``SMTPConnection``.
+    テンプレートレンダリングシステム構成のインストールなど、テスト前の全
+    体的な準備を行い、ダミーの ``SMTPConnecton`` をセットアップします。
 
 .. function:: teardown_test_environment()
 
-    Performs any global post-test teardown, such as removing the black magic
-    hooks into the template system and restoring normal e-mail services.
+    テンプレートレンダリングシステムに組み込まれた黒魔術的なフックの除去な
+    ど、テスト後の全体的な後始末を行い、メールサービスを通常の状態に復帰し
+    ます。
+
+.. TBD
 
 The creation module of the database backend (``connection.creation``) also
 provides some utilities that can be useful during testing.
 
 .. function:: create_test_db(verbosity=1, autoclobber=False)
 
-    Creates a new test database and runs ``syncdb`` against it.
+    新たなテストデータベースを生成し、 ``syncdb`` を実行します。
 
-    ``verbosity`` has the same behavior as in ``run_tests()``.
+    ``verbosity`` は ``run_tests()`` の同名の引数と同じ意味です。
 
-    ``autoclobber`` describes the behavior that will occur if a database with
-    the same name as the test database is discovered:
+    ``autoclobber`` には、テストデータベースと同名のデータベースが見つかっ
+    た際の挙動を指定します:
 
-        * If ``autoclobber`` is ``False``, the user will be asked to approve
-          destroying the existing database. ``sys.exit`` is called if the user
-          does not approve.
+        * ``autoclobber`` が ``False`` なら、既存のデータベースを破壊しても
+          よいかユーザに尋ねます。ユーザが「いいえ」を選択すると、その時点
+          で ``sys.exit`` を呼び出して終了します。
 
-        * If autoclobber is ``True``, the database will be destroyed without
-          consulting the user.
+        * ``autoclobber`` が ``True`` なら、既存のデータベースを破壊すると
+          きにユーザに了解を求めません。
 
-    Returns the name of the test database that it created.
+    生成されたテストデータベースの名前を返します。
 
-    ``create_test_db()`` has the side effect of modifying
-    ``settings.DATABASE_NAME`` to match the name of the test database.
+    ``create_test_db()`` には ``settings.DATABASE_NAME`` を変更してテストデー
+    タベースの名前にするという副作用があります。
 
     .. versionchanged:: 1.0
-       ``create_test_db()`` now returns the name of the test database.
+       ``create_test_db()`` 生成されたテストデータベースの名前を返すように
+       なりました。
 
 .. function:: destroy_test_db(old_database_name, verbosity=1)
 
-    Destroys the database whose name is in the :setting:`DATABASE_NAME` setting
-    and restores the value of :setting:`DATABASE_NAME` to the provided name.
+    このメソッドを呼び出した時点で :setting:`DATABASE_NAME` に設定されてい
+    るデータベースを破壊し、 :setting:`DATABASE_NAME` の値を
+    ``old_database_name`` に指定したデータベース名に戻します。
 
-    ``verbosity`` has the same behavior as in ``run_tests()``.
+    ``verbosity`` は ``run_tests()`` の同名の引数と同じ意味です。
+
+
