@@ -1,100 +1,118 @@
 .. _ref-contrib-sitemaps:
 
-=====================
-The sitemap framework
-=====================
+=======================
+sitemaps フレームワーク
+=======================
+
+:revision-up-to: 8961 (1.0)
 
 .. module:: django.contrib.sitemaps
-   :synopsis: A framework for generating Google sitemap XML files.
+   :synopsis: Google サイトマップ XML ファイルを生成するためのフレームワー
+              クです。
 
-Django comes with a high-level sitemap-generating framework that makes
-creating sitemap_ XML files easy.
+Django には， `サイトマップ`_ XML ファイルを簡単に生成できる高水準
+のサイトマップ生成フレームワークが付属しています．
 
 .. _sitemap: http://www.sitemaps.org/
+.. _`サイトマップ`: `sitemap`_
 
-Overview
-========
+.. _Overview:
 
-A sitemap is an XML file on your Web site that tells search-engine indexers how
-frequently your pages change and how "important" certain pages are in relation
-to other pages on your site. This information helps search engines index your
-site.
+概要
+====
 
-The Django sitemap framework automates the creation of this XML file by letting
-you express this information in Python code.
+サイトマップ (sitemap) とは，自分のサイト上のページの更新頻度や特定のペー
+ジ間の「重要度」を検索エンジンのインデクサに対して知らせるために，Web サイ
+ト上に配置する XML ファイルです．この情報があると，検索エンジンがサイトのイ
+ンデクスを生成するときに役立ちます．
 
-It works much like Django's :ref:`syndication framework
-<ref-contrib-syndication>`. To create a sitemap, just write a
-:class:`~django.contrib.sitemaps.Sitemap` class and point to it in your
-:ref:`URLconf <topics-http-urls>`.
+Django のサイトマップフレームワークを使うと，この XML ファイルの情報を
+Python コードで表現でき，ファイルの生成を自動化できます．
 
-Installation
+sitemaps は Django の :ref:`配信フレームワーク <ref-contrib-syndication>`
+によく似ています．サイトマップの生成は簡単で，ただ ``Sitemap`` クラスを書い
+て， :ref:`URLconf <topics-http-urls>` に指定するだけです．
+
+.. _Installation:
+
+インストール
 ============
 
-To install the sitemap app, follow these steps:
+sitemaps アプリケーションは以下の手順でインストールします:
 
-    1. Add ``'django.contrib.sitemaps'`` to your :setting:`INSTALLED_APPS`
-       setting.
-       
-    2. Make sure ``'django.template.loaders.app_directories.load_template_source'``
-       is in your :setting:`TEMPLATE_LOADERS` setting. It's in there by default,
-       so you'll only need to change this if you've changed that setting.
+    1. :setting:`INSTALLED_APPS` 設定に ``'django.contrib.sitemaps'`` を加
+       えます．
+    2. :setting:`TEMPLATE_LOADERS` 設定に，
+       ``'django.template.loaders.app_directories.load_template_source'``
+       が入っているか確かめます．デフォルトの設定ファイルには入っているので，
+       注意が必要なのは設定を変更している時だけです．
+    3. :mod:`sites フレームワーク <django.contrib.sites>` をインストールし
+       ておいてください．
 
-    3. Make sure you've installed the 
-       :mod:`sites framework <django.contrib.sites>`.
+(注意: sitemaps アプリケーションは，データベースに何らテーブルをインストール
+しません． :setting:`INSTALLED_APPS` に ``sitemaps`` を入れておかねばならな
+いのは，
+:func:`~django.template.loaders.app_directories.load_template_source` テン
+プレートローダがデフォルトのテンプレートを捜し出せるようにするためです．)
 
-(Note: The sitemap application doesn't install any database tables. The only
-reason it needs to go into :setting:`INSTALLED_APPS` is so that the
-:func:`~django.template.loaders.app_directories.load_template_source` template
-loader can find the default templates.)
 
-Initialization
+.. _Initialization:
+
+初期化
+======
+
+自分の Django サイト上でサイトマップ生成を行わせるには， 
+:ref:`URLconf <topics-http-urls>` に以下の行を追加します::
+
+    (r'^sitemap.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
+
+これで， Django はクライアントが :file:`/sitemap.xml` にアクセスしたときに
+サイトマップを生成するようになります．
+
+サイトマップファイルの名前はさして重要ではありませんが，ファイルの場所は重
+要です．検索エンジンは，サイトマップ内のリンクをインデクス化する際，ファイ
+ルの置かれている URL レベルとその下のリンクしかたどりません．例えば，
+:file:`sitemap.xml` がルートディレクトリ下にあれば， Google はサイト上の全
+ての URL を参照します．一方，サイトマップの場所が 
+:file:`/content/sitemap.xml` であれば， :file:`/content/` で始まる URL しか
+参照しません．
+
+ビュー関数 ``sitemap()`` には，必須の引数 ``{'sitemaps': sitemaps}`` があり
+ます． ``sitemaps`` はセクションラベル (例えば ``blog`` や ``news``) を，
+:class:`~django.contrib.sitemaps.Sitemap` クラス (例えば ``BlogSitemap`` や
+``NewsSitemap``) に対応づける辞書にします．あるいは，
+:class:`~django.contrib.sitemaps.Sitemap` クラスの *インスタンス* (例えば
+``BlogSitemap(some_bar)``) でもかまいません．
+
+.. _Sitemap classes:
+
+Sitemap クラス
 ==============
 
-To activate sitemap generation on your Django site, add this line to your
-:ref:`URLconf <topics-http-urls>`::
+:class:`~django.contrib.sitemaps.Sitemap` クラスとは，サイトマップ上のエン
+トリの「セクション」を表現するための Python のクラスです．例えば，ある
+:class:`~django.contrib.sitemaps.Sitemap` クラスはブログ上の全てのエントリ
+を表し，別のクラスはイベントカレンダー上の全てのイベントを表現する，といっ
+た具合です．
 
-   (r'^sitemap.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
+最も単純化すれば，全てのセクションは :file:`sitemap.xml` という一つのファイ
+ルにまとめあげられることになります．とはいえ， sitemaps フレームワークを使
+えば，各セクションごとに個別のサイトマップファイルがあるようなサイトマップ
+インデクスを生成できます (後述の `サイトマップインデクスを生成する`_ を参照
+してください)．
 
-This tells Django to build a sitemap when a client accesses :file:`/sitemap.xml`.
+:class:`~django.contrib.sitemaps.Sitemap` クラスは
+``django.contrib.sitemaps.Sitemap`` のサブクラスでなければなりません．クラ
+スはコードベースのどこに置いてもかまいません．
 
-The name of the sitemap file is not important, but the location is. Search
-engines will only index links in your sitemap for the current URL level and
-below. For instance, if :file:`sitemap.xml` lives in your root directory, it may
-reference any URL in your site. However, if your sitemap lives at
-:file:`/content/sitemap.xml`, it may only reference URLs that begin with
-:file:`/content/`.
+.. _A simple example:
 
-The sitemap view takes an extra, required argument: ``{'sitemaps': sitemaps}``.
-``sitemaps`` should be a dictionary that maps a short section label (e.g.,
-``blog`` or ``news``) to its :class:`~django.contrib.sitemaps.Sitemap` class
-(e.g., ``BlogSitemap`` or ``NewsSitemap``). It may also map to an *instance* of
-a :class:`~django.contrib.sitemaps.Sitemap` class (e.g.,
-``BlogSitemap(some_var)``).
+簡単な例
+========
 
-Sitemap classes
-===============
-
-A :class:`~django.contrib.sitemaps.Sitemap` class is a simple Python
-class that represents a "section" of entries in your sitemap. For example,
-one :class:`~django.contrib.sitemaps.Sitemap` class could represent
-all the entries of your weblog, while another could represent all of the
-events in your events calendar.
-
-In the simplest case, all these sections get lumped together into one
-:file:`sitemap.xml`, but it's also possible to use the framework to generate a
-sitemap index that references individual sitemap files, one per section. (See
-`Creating a sitemap index`_ below.)
-
-:class:`~django.contrib.sitemaps.Sitemap` classes must subclass
-``django.contrib.sitemaps.Sitemap``. They can live anywhere in your codebase.
-
-A simple example
-================
-
-Let's assume you have a blog system, with an ``Entry`` model, and you want your
-sitemap to include all the links to your individual blog entries. Here's how
-your sitemap class might look::
+ブログシステムを使っていて， ``Entry`` というモデルがあるとしましょう．
+サイトマップに全てのブログエントリへのリンクを含めたければ，サイトマップク
+ラスは以下のようになります::
 
     from django.contrib.sitemaps import Sitemap
     from mysite.blog.models import Entry
@@ -109,82 +127,90 @@ your sitemap class might look::
         def lastmod(self, obj):
             return obj.pub_date
 
-Note:
+注意点:
 
-    * :attr:`~Sitemap.changefreq` and :attr:`~Sitemap.priority` are class
-      attributes corresponding to ``<changefreq>`` and ``<priority>`` elements,
-      respectively. They can be made callable as functions, as
-      :attr:`~Sitemap.lastmod` was in the example.
-    * :attr:`~Sitemap.items()` is simply a method that returns a list of
-      objects. The objects returned will get passed to any callable methods
-      corresponding to a sitemap property (:attr:`~Sitemap.location`,
-      :attr:`~Sitemap.lastmod`, :attr:`~Sitemap.changefreq`, and
-      :attr:`~Sitemap.priority`).
-    * :attr:`~Sitemap.lastmod` should return a Python ``datetime`` object.
-    * There is no :attr:`~Sitemap.location` method in this example, but you
-      can provide it in order to specify the URL for your object. By default,
-      :attr:`~Sitemap.location()` calls ``get_absolute_url()`` on each object
-      and returns the result.
+    * :attr:`~Sitemap.changefreq` と :attr:`~Sitemap.priority` はクラス属性
+      で，それぞれ ``<changefreq>`` および ``<priority>`` エレメントに対応
+      しています．これらの属性は，上の例の :attr:`~Sitemap.lastmod` のよう
+      に，メソッドとしても定義できます．
+    * :meth:`~Sitemap.items()` はオブジェクトのリストを返すだけのメソッドで
+      す．このメソッドの返すオブジェクトは，サイトマップの各プロパティ
+      (:attr:`~Sitemap.location`, :attr:`~Sitemap.lastmod`,
+      :attr:`~Sitemap.changefreq`, :attr:`~Sitemap.priority`) に対応するメ
+      ソッドに渡されます．
+    * :attr:`~Sitemap.lastmod` は Python の ``datetime`` オブジェクトを返さ
+      ねばなりません．
+    * この例には :attr:`~Sitemap.location` メソッドがありませんが，自分でメ
+      ソッドを定義して，オブジェクトの URL を指定してもかまいません．デフォ
+      ルトでは， :meth:`~Sitemap.location()` は各オブジェクトに対して
+      ``get_absolute_url()`` を呼び出し，その結果を返します．
 
-Sitemap class reference
-=======================
+.. _Sitemap class reference:
+
+Sitemap クラスリファレンス
+==========================
 
 .. class:: Sitemap
 
-    A ``Sitemap`` class can define the following methods/attributes:
+    ``Sitemap`` のサブクラスでは、以下のメソッドや属性を定義できます:
 
     .. attribute:: Sitemap.items
 
-        **Required.** A method that returns a list of objects. The framework
-        doesn't care what *type* of objects they are; all that matters is that
-        these objects get passed to the :attr:`~Sitemap.location()`,
-        :attr:`~Sitemap.lastmod()`, :attr:`~Sitemap.changefreq()` and
-        :attr:`~Sitemap.priority()` methods.
+        **必須です．** オブジェクトのリストを返すメソッドです．フレームワー
+        クはオブジェクトの *型* が何であるかを問いません．重要なのは，オブ
+        ジェクトが :meth:`~Sitemap.location()`, :meth:`~Sitemap.lastmod()`, 
+	:meth:`~Sitemap.changefreq()`, :meth:`~Sitemap.priority()` といった
+        メソッドに渡されるという点だけです．
 
     .. attribute:: Sitemap.location
 
-        **Optional.** Either a method or attribute.
+        **省略可能です．** メソッドまたは属性です．
 
-        If it's a method, it should return the absolute URL for a given object as
-        returned by :attr:`~Sitemap.items()`.
+	メソッドとして定義する場合， :meth:`~Sitemap.items()` の返すオブジェ
+	クトを引数にとり，オブジェクトに対する絶対 URLの文字列を計算して返
+	さねばなりません．
 
-        If it's an attribute, its value should be a string representing an absolute URL
-        to use for *every* object returned by :attr:`~Sitemap.items()`.
+	属性として定義する場合， :meth:`~Sitemap.items()` の返す 
+	*全てのオブジェクトに共通して* 使われる絶対 URL を表す文字列にしま
+	す．
 
-        In both cases, "absolute URL" means a URL that doesn't include the protocol or
-        domain. Examples:
+	いずれの場合も，「絶対 URL」とは，以下の例のようにプロトコルおよび
+	ドメイン部を含まない URLを指します:
 
-            * Good: :file:`'/foo/bar/'`
-            * Bad: :file:`'example.com/foo/bar/'`
-            * Bad: :file:`'http://example.com/foo/bar/'`
+            * 正しい: :file:`'/foo/bar/'`
+	    * 誤り: :file:`'example.com/foo/bar/'`
+	    * 誤り: :file:`'http://example.com/foo/bar/'`
 
-        If :attr:`~Sitemap.location` isn't provided, the framework will call the
-        ``get_absolute_url()`` method on each object as returned by
-        :attr:`~Sitemap.items()`.
+        :attr:`~Sitemap.location` を指定していない場合，フレームワークは
+        :meth:`~Sitemap.items()` の返す各オブジェクトに対して
+        ``get_absolute_url()`` メソッドを呼び出します．
 
     .. attribute:: Sitemap.lastmod
 
-        **Optional.** Either a method or attribute.
+        **省略可能です．** メソッドまたは属性です．
 
-        If it's a method, it should take one argument -- an object as returned by
-        :attr:`~Sitemap.items()` -- and return that object's last-modified date/time, as a Python
-        ``datetime.datetime`` object.
+	メソッドとして定義する場合， :meth:`~Sitemap.items()` の返すオブジェ
+	クトを引数にとり，オブジェクトの最終更新日時を Python の
+	``datetime.datetime`` オブジェクトで返さねばなりません．
 
-        If it's an attribute, its value should be a Python ``datetime.datetime`` object
-        representing the last-modified date/time for *every* object returned by
-        :attr:`~Sitemap.items()`.
+	属性として定義する場合， :meth:`~Sitemap.items()` の返す 
+	*全てのオブジェクトに共通して* 使われるオブジェクトの最終更新日時を
+	Python の ``datetime.datetime`` オブジェクトで返さねばなりません．
 
     .. attribute:: Sitemap.changefreq
 
-        **Optional.** Either a method or attribute.
+        **省略可能です．** メソッドまたは属性です．
 
-        If it's a method, it should take one argument -- an object as returned by
-        :attr:`~Sitemap.items()` -- and return that object's change frequency, as a Python string.
+        メソッドとして定義する場合， :meth:`~Sitemap.items()` の返すオブジェ
+        クトを引数にとり，オブジェクトの更新頻度を Python の文字列型で返さ
+        ねばなりません．
 
-        If it's an attribute, its value should be a string representing the change
-        frequency of *every* object returned by :attr:`~Sitemap.items()`.
+	属性として定義する場合， :meth:`~Sitemap.items()` の返す
+	*全てのオブジェクトに共通して* 使われるオブジェクトの更新頻度を
+	Python の文字列型で返さねばなりません．
 
-        Possible values for :attr:`~Sitemap.changefreq`, whether you use a method or attribute, are:
+	メソッド，属性を問わず， :attr:`~Sitemap.changefreq` の値は以下のい
+	ずれかにします:
 
             * ``'always'``
             * ``'hourly'``
@@ -196,33 +222,39 @@ Sitemap class reference
 
     .. method:: Sitemap.priority
 
-        **Optional.** Either a method or attribute.
+        **省略可能です．** メソッドまたは属性です．
 
-        If it's a method, it should take one argument -- an object as returned by
-        :attr:`~Sitemap.items()` -- and return that object's priority, as either a string or float.
+        メソッドとして定義する場合， :meth:`~Sitemap.items()` の返すオブジェ
+        クトを引数にとり，オブジェクトの重要度 (priority) を Python の文字
+        列型か浮動小数型で返さねばなりません．
 
-        If it's an attribute, its value should be either a string or float representing
-        the priority of *every* object returned by :attr:`~Sitemap.items()`.
+	属性として定義する場合， :meth:`~Sitemap.items()` の返す
+	*全てのオブジェクトに共通して* 使われるオブジェクトの重要度を
+	Python の文字列型か浮動小数型で返さねばなりません．
 
-        Example values for :attr:`~Sitemap.priority`: ``0.4``, ``1.0``. The default priority of a
-        page is ``0.5``. See the `sitemaps.org documentation`_ for more.
+	:attr:`~Sitemap.priority` の値は ``0.4`` や ``1.0`` のようにします．
+	デフォルトの重要度は ``0.5`` です．重要度の詳細は
+	`sitemaps.org のドキュメント`_ を参照してください．
 
-        .. _sitemaps.org documentation: http://www.sitemaps.org/protocol.html#prioritydef
+.. _sitemaps.org documentation: http://www.sitemaps.org/protocol.html#prioritydef
+.. _`sitemaps.org のドキュメント`: `sitemaps.org documentation`_
 
-Shortcuts
-=========
+.. _Shortcuts:
 
-The sitemap framework provides a couple convenience classes for common cases:
+ショートカット
+==============
+
+sitemaps フレームワークでは，よく使われる状況向けに，二つの便宜クラスを用意
+しています:
 
 .. class:: FlatPageSitemap
-
-    The :class:`django.contrib.sitemaps.FlatPageSitemap` class looks at all
-    :mod:`flatpages <django.contrib.flatpages>` defined for the current
-    :setting:`SITE_ID` (see the
-    :mod:`sites documentation <django.contrib.sites>`) and
-    creates an entry in the sitemap. These entries include only the
-    :attr:`~Sitemap.location` attribute -- not :attr:`~Sitemap.lastmod`,
-    :attr:`~Sitemap.changefreq` or :attr:`~Sitemap.priority`.
+    :class:`django.contrib.sitemaps.FlatPageSitemap` クラスは，現在の
+    :setting:`SITE_ID` (:ref:`sites のドキュメント <django.contrib.sites>`
+    参照) 向けの全ての :ref:`フラットページ <django.contrib.flatpages>` を
+    検索し，サイトマップのエントリを生成します．各エントリには
+    :attr:`~Sitemap.location` 属性だけが設定され，
+    :attr:`~Sitemap.lastmod`, :attr:`~Sitemap.changefreq`,
+    :attr:`~Sitemap.priority` は設定されません．
 
 .. class:: GenericSitemap
 
@@ -237,10 +269,28 @@ The sitemap framework provides a couple convenience classes for common cases:
     keyword arguments to the :class:`~django.contrib.sitemaps.GenericSitemap`
     constructor to specify these attributes for all URLs.
 
-Example
--------
+    :class:`django.contrib.sitemaps.GenericSitemap` クラスは任意の 
+    `汎用ビュー <ref-generic-views>` と組み合わせて使えます．
+    :class:`~django.contrib.sitemaps.GenericSitemap` を使うには，汎用ビュー
+    に渡すのと同じ :data:`info_dict` を
+    :class:`~django.contrib.sitemaps.GenericSitemap` に渡してインスタンスを
+    生成します． :data:`info_dict` には少なくとも :data:`queryset` がなけれ
+    ばなりません．また， :data:`info_dict` に :data:`queryset` で取り出され
+    るオブジェクトの日時のフィールドを指定する :data:`date_field` エントリ
+    がある場合，サイトマップ生成時にエントリの :attr:`~Sitemap.lastmod` 属
+    性に使われます． :class:`~django.contrib.sitemaps.GenericSitemap` のコ
+    ンストラクタには， :attr:`~Sitemap.priority` や
+    :attr:`~Sitemap.changefreq` といったキーワード引数も指定できます．
+    これらの引数の値は，全ての URL に共通の属性になります．
 
-Here's an example of a :ref:`URLconf <topics-http-urls>` using both::
+.. _Example:
+
+例
+----
+
+:class:`~django.contrib.sitemaps.FlatpageSitemap` と 
+:class:`~django.contrib.sitemaps.GenericSitemap` の両方を組み込んだ 
+:ref:`URLconf <topics-http-urls>` の例は以下のようになります::
 
     from django.conf.urls.defaults import *
     from django.contrib.sitemaps import FlatPageSitemap, GenericSitemap
@@ -257,69 +307,68 @@ Here's an example of a :ref:`URLconf <topics-http-urls>` using both::
     }
 
     urlpatterns = patterns('',
-        # some generic view using info_dict
+        # info_dict を使った汎用ビューの設定
         # ...
 
-        # the sitemap
-        (r'^sitemap.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
+        # サイトマップ
+        (r'^sitemap.xml$', 'django.contrib.sitemaps.views.sitemap', 
+            {'sitemaps': sitemaps})
     )
 
-.. _URLconf: ../url_dispatch/
+.. URLconf: ../url_dispatch/
 
-Creating a sitemap index
-========================
+.. _Creating a sitemap index:
 
-The sitemap framework also has the ability to create a sitemap index that
-references individual sitemap files, one per each section defined in your
-:data:`sitemaps` dictionary. The only differences in usage are:
+サイトマップインデクスを生成する
+================================
 
-    * You use two views in your URLconf: :func:`django.contrib.sitemaps.views.index`
-      and :func:`django.contrib.sitemaps.views.sitemap`.
-    * The :func:`django.contrib.sitemaps.views.sitemap` view should take a
-      :data:`section` keyword argument.
+sitemap フレームワークには，個々のサイトマップファイルを参照するサイトマッ
+プインデクスを生成する機能もあります．サイトマップインデクスからサイトマッ
+プファイルへの参照は， :data:`sitemaps` 辞書に定義されている各セクションご
+とにひとつづつ作成されます．サイトマップインデクスを使うには，少しだけやり
+方を変えます:
 
-Here is what the relevant URLconf lines would look like for the example above::
+    * URLconf に， :func:`django.contrib.sitemaps.views.index` と
+      :func:`django.contrib.sitemaps.views.sitemap` という二つのビューを使
+      います．
 
-   (r'^sitemap.xml$', 'django.contrib.sitemaps.views.index', {'sitemaps': sitemaps})
-   (r'^sitemap-(?P<section>.+)\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
+    * :func:`django.contrib.sitemaps.views.sitemap` にキーワード引数
+      :data:`section` を指定します．
 
-This will automatically generate a :file:`sitemap.xml` file that references both
-:file:`sitemap-flatpages.xml` and :file:`sitemap-blog.xml`. The
-:class:`~django.contrib.sitemaps.Sitemap` classes and the :data:`sitemaps` dict
-don't change at all.
+上の例にならうと，URLconf は以下のようになります::
 
-If one of your sitemaps is going to have more than 50,000 URLs you should 
-create an index file. Your sitemap will be paginated and the index will 
-reflect that.
+    (r'^sitemap.xml$', 'django.contrib.sitemaps.views.index', {'sitemaps': sitemaps})
+    (r'^sitemap-(?P<section>.+)\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
 
-Pinging Google
-==============
+この設定では， :file:`sitemap-flatpages.xml` と :file:`sitemap-blog.xml` へ
+の参照が入った :file:`sitemap.xml` が自動生成されます． 
+:class:`~django.contrib.sitemaps.Sitemap` クラスと :data:`sitemaps` 辞書に
+手を加える必要はありません．
 
-You may want to "ping" Google when your sitemap changes, to let it know to
-reindex your site. The sitemaps framework provides a function to do just 
-that: :func:`django.contrib.sitemaps.ping_google()`.
+.. _Pinging Google:
+
+Google に ping を打つ
+=====================
+
+サイトマップの変更時に，Google に「ping を打」って，サイトのインデクスを再
+構築させたい場合もあるでしょう． sitemap フレームワークで ping を打つには，
+:func:`django.contrib.sitemaps.ping_google()`` を呼び出します．
 
 .. function:: ping_google
 
-    :func:`ping_google` takes an optional argument, :data:`sitemap_url`,
-    which should be the absolute URL of your site's sitemap (e.g.,
-    :file:`'/sitemap.xml'`). If this argument isn't provided,
-    :func:`ping_google` will attempt to figure out your
-    sitemap by performing a reverse looking in your URLconf.
+    :func:`ping_google()` にはオプションの引数 :data:`sitemap_url` がありま
+    す．この引数にはサイトのサイトマップの絶対 URL (例えば
+    :file:`'/sitemap.xml'`)を指定します． :data:`sitemap_url` を指定しなかっ
+    た場合， :func:`ping_google()` は URLconf の逆引きを行って，サイトマップ
+    の在処を探します．
 
-    :func:`ping_google` raises the exception
-    :exc:`django.contrib.sitemaps.SitemapNotFound` if it cannot determine your
-    sitemap URL.
+    サイトマップの URL を捜し出せなかった場合， :func:`ping_google()`
+    は :exc:`django.contrib.sitemaps.SitemapNotFound` 例外を送出します．
 
-.. admonition:: Register with Google first!
+:func:`ping_google()` の用法として有用なのは，モデルの ``save()`` メソッド
+で呼び出すというものです::
 
-    The :func:`ping_google` command only works if you have registered your
-    site with `Google Webmaster Tools`_.
-        
-.. _`Google Webmaster Tools`: http://www.google.com/webmasters/tools/
-        
-One useful way to call :func:`ping_google` is from a model's ``save()``
-method::
+    from django.contrib.sitemaps import ping_google
 
    from django.contrib.sitemaps import ping_google
   
@@ -334,17 +383,22 @@ method::
                 # of HTTP-related exceptions.
                 pass
 
-A more efficient solution, however, would be to call :func:`ping_google` from a
-cron script, or some other scheduled task. The function makes an HTTP request
-to Google's servers, so you may not want to introduce that network overhead
-each time you call ``save()``.
+とはいえ， :func:`ping_google()` は Google のサーバに HTTP リクエストを送信
+するので， ``save()`` のたびにネットワークアクセスのオーバヘッドが生じます．
+もっと効率的にやりたければ， cron 化されたスクリプトなど，一定の時点で実行
+するようスケジュールしたタスクの中で :func:`ping_google()` を呼び出すとよい
+でしょう．
 
-Pinging Google via `manage.py`
-------------------------------
+.. _Pinging Google via manage.py:
+
+``manage.py`` で Google に Ping を送信する
+----------------------------------------------
 
 .. versionadded:: 1.0
 
-Once the sitemaps application is added to your project, you may also
-ping the Google server's through the command line manage.py interface::
+サイトマップアプリケーションをプロジェクトに追加したら、 ``manage.py`` コマ
+ンドラインインタフェースを使って、以下のように Google サーバに ping を送信
+できます::
 
     python manage.py ping_google [/sitemap.xml]
+
