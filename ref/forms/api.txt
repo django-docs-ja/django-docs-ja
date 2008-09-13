@@ -1,36 +1,47 @@
 .. _ref-forms-api:
 
+.. _The Forms API:
+
 =============
-The Forms API
+フォーム API
 =============
+
+:revision-up-to: 8961 (1.0)
 
 .. currentmodule:: django.forms
 
-.. admonition:: About this document
+.. admonition:: このドキュメントについて
 
-    This document covers the gritty details of Django's forms API. You should
-    read the :ref:`introduction to working with forms <topics-forms-index>`
-    first.
+    このドキュメントでは、 Django のフォーム API の細かい部分を解説していま
+    す。まずは :ref:`フォーム処理入門 <topics-forms-index>` を先に読んでく
+    ださい。
 
 .. _ref-forms-api-bound-unbound:
 
-Bound and unbound forms
------------------------
+.. _Bound and unbound forms:
 
-A :class:`Form` instance is either **bound** to a set of data, or **unbound**.
+束縛フォームと非束縛フォーム
+-------------------------------
 
-    * If it's **bound** to a set of data, it's capable of validating that data
-      and rendering the form as HTML with the data displayed in the HTML.
+フォームのインスタンスには、何らかのデータの集まりが結び付いた
+**束縛 (bound) フォーム** と、そうでない **非束縛 (unbound) フォーム** があ
+ります。
 
-    * If it's **unbound**, it cannot do validation (because there's no data to
-      validate!), but it can still render the blank form as HTML.
+    * データと **結び付いている** フォームは、データを検証機能する機能と、 
+      フォームを HTML にレンダリングするときにデータを HTML 形式で表示する
+      機能をあわせ持っています。
 
-To create an unbound :class:`Form` instance, simply instantiate the class::
+    * データと **結び付いていない** フォームには検証機能はありません (検証
+      すべきデータがないから当然ですね!) が、空のフォームを HTML としてレン
+      ダリングする機能は備えています。
+
+非束縛フォームのインスタンスを生成するには、単にフォームクラスのインスタン
+ス化を行います::
 
     >>> f = ContactForm()
 
-To bind data to a form, pass the data as a dictionary as the first parameter to
-your :class:`Form` class constructor::
+フォームにデータを結び付けるには、データの入った辞書をフォームクラスのコン
+ストラクタの第一引数に渡します::
 
     >>> data = {'subject': 'hello',
     ...         'message': 'Hi there',
@@ -38,16 +49,15 @@ your :class:`Form` class constructor::
     ...         'cc_myself': True}
     >>> f = ContactForm(data)
 
-In this dictionary, the keys are the field names, which correspond to the
-attributes in your :class:`Form` class. The values are the data you're trying to
-validate. These will usually be strings, but there's no requirement that they be
-strings; the type of data you pass depends on the :class:`Field`, as we'll see
-in a moment.
+この辞書の中では、キーは各フィールドの名前であり、フォームクラスの各属性に
+対応しています。値は検証すべきデータです。通常、値は文字列にしますが、必ず
+しも文字列でなくてかまいません。値にどんなデータ型を指定指定できるかは、フィー
+ルドの型に依存します。
 
 .. attribute:: Form.is_bound
 
-If you need to distinguish between bound and unbound form instances at runtime,
-check the value of the form's :attr:`~Form.is_bound` attribute::
+実行時に束縛フォームと非束縛フォームを区別したければ、フォームの
+:attr:`~Form.is_bound` 属性を調べてください::
 
     >>> f = ContactForm()
     >>> f.is_bound
@@ -56,26 +66,28 @@ check the value of the form's :attr:`~Form.is_bound` attribute::
     >>> f.is_bound
     True
 
-Note that passing an empty dictionary creates a *bound* form with empty data::
+空の辞書を渡すと、空のデータの入った *束縛フォーム* を返します::
 
     >>> f = ContactForm({})
     >>> f.is_bound
     True
 
-If you have a bound :class:`Form` instance and want to change the data somehow,
-or if you want to bind an unbound :class:`Form` instance to some data, create
-another :class:`Form` instance. There is no way to change data in a
-:class:`Form` instance. Once a :class:`Form` instance has been created, you
-should consider its data immutable, whether it has data or not.
+束縛フォームのインスタンスに入っているデータに何らかの変更を加えたい場合や、
+束縛フォームを変換して、何らかのデータの入った非束縛フォームにしたい場合に
+は、新たにフォームインスタンスを生成してください。フォームインスタンス内の
+データを変更する方法はありません。一度フォームインスタンスを生成したら、デー
+タの有無に関わらず、インスタンス内のデータは変更不能だと考えてください。
 
-Using forms to validate data
-----------------------------
+.. _Using forms to validate data:
+
+フォームを使ってデータを検証する
+--------------------------------
 
 .. method:: Form.is_valid()
 
-The primary task of a :class:`Form` object is to validate data. With a bound
-:class:`Form` instance, call the :meth:`~Form.is_valid` method to run validation
-and return a boolean designating whether the data was valid::
+フォームオブジェクトの主要な役割はデータの検証です。束縛フォームのインスタ
+ンスに対して :meth:`~Form.is_valid()` メソッドを呼び出すと、データの検証を
+行って、その結果をブール値で返します::
 
     >>> data = {'subject': 'hello',
     ...         'message': 'Hi there',
@@ -85,9 +97,9 @@ and return a boolean designating whether the data was valid::
     >>> f.is_valid()
     True
 
-Let's try with some invalid data. In this case, ``subject`` is blank (an error,
-because all fields are required by default) and ``sender`` is not a valid
-e-mail address::
+無効なデータを入れてみましょう。例えば、 ``subject`` を空にしてみます
+(フィールドは全てデフォルトで必須なためエラーになります)。また、
+``sender`` に不正なメールアドレス情報を入れてみます::
 
     >>> data = {'subject': '',
     ...         'message': 'Hi there',
@@ -99,29 +111,31 @@ e-mail address::
     
 .. attribute:: Form.errors
 
-Access the :attr:`~Form.errors` attribute to get a dictionary of error
-messages::
+:attr:`~Form.errors` という属性にアクセスすると、エラーメッセージの入った辞
+書を参照できます::
 
     >>> f.errors
     {'sender': [u'Enter a valid e-mail address.'], 'subject': [u'This field is required.']}
 
-In this dictionary, the keys are the field names, and the values are lists of
-Unicode strings representing the error messages. The error messages are stored
-in lists because a field can have multiple error messages.
+この辞書では、フィールド名がキーに、エラーメッセージを表す Unicode 文字列のリ
+ストが値になっています。エラーメッセージがリストになっているのは、一つのフィー
+ルドに対して複数のエラーが存在し得るからです。
 
-You can access :attr:`~Form.errors` without having to call
-:meth:`~Form.is_valid` first. The form's data will be validated the first time
-either you call :meth:`~Form.is_valid` or access :attr:`~Form.errors`.
+:meth:`~Form.is_valid()` を呼ばなくても :attr:`~Form.errors` にはアクセスで
+きます。 :meth:`~Form.is_valid()` を呼び出すか、 :attr:`~Form.errors` に最
+初にアクセスした時点で、フォームのデータが自動的に検証されます。
 
-The validation routines will only get called once, regardless of how many times
-you access :attr:`~Form.errors` or call :meth:`~Form.is_valid`. This means that
-if validation has side effects, those side effects will only be triggered once.
+:attr:`~Form.errors` や :meth:`~Form.is_valid()` に何度アクセスしても、検証
+のルーチンはたった一度しか呼ばれません。別の見方をすれば、検証の処理には副
+作用があり、その副作用はたった一度しか呼び出されないということです。
 
-Behavior of unbound forms
-~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _Behavior of unbound forms:
 
-It's meaningless to validate a form with no data, but, for the record, here's
-what happens with unbound forms::
+非束縛フォームの動作
+~~~~~~~~~~~~~~~~~~~~
+
+データを含まないフォームに対して "cleaned" を実行しても無意味でしかありませ
+んが、参考までに非束縛フォームに対して行ったときの動作を示しておきます::
 
     >>> f = ContactForm()
     >>> f.is_valid()
@@ -129,23 +143,26 @@ what happens with unbound forms::
     >>> f.errors
     {}
 
-Accessing "clean" data
-----------------------
+.. _Accessing "clean" data:
 
-Each ``Field`` in a ``Form`` class is responsible not only for validating data,
-but also for "cleaning" it -- normalizing it to a consistent format. This is a
-nice feature, because it allows data for a particular field to be input in
-a variety of ways, always resulting in consistent output.
+「クリーニング済み」のデータにアクセスする
+------------------------------------------
 
-For example, ``DateField`` normalizes input into a Python ``datetime.date``
-object. Regardless of whether you pass it a string in the format
-``'1994-07-15'``, a ``datetime.date`` object or a number of other formats,
-``DateField`` will always normalize it to a ``datetime.date`` object as long as
-it's valid.
+フォームクラスの各フィールドには、データの検証だけでなく、「クリーニング」
+を行う役割もあります。データのクリーニングとは、データを一貫性のある書式に
+正規化することです。データのクリーニングはとても素晴らしい機能で、クリーニ
+ングを行うと、ユーザがフィールドに色々な形式でデータを入力しても、常に一貫
+性を持った出力を得られます。
 
-Once you've created a ``Form`` instance with a set of data and validated it,
-you can access the clean data via the ``cleaned_data`` attribute of the ``Form``
-object::
+例えば、 ``DateField`` はデータを Python の ``datetime.date`` オブジェクト
+に正規化します。フィールドの値は、 ``'1994-07-15'`` のような形式の文字列で
+も、 ``datetime.date`` オブジェクトでも、その他の形式でも、 ``DateField``
+は有効なデータであるかぎり、常に出力を ``datetime.date`` オブジェクトで正規
+化します。
+
+データセットの入ったフォームインスタンスを生成して検証を行うと、 
+``cleaned_data`` 属性を介してクリーニング済みのデータにアクセスできるようにな
+ります::
 
     >>> data = {'subject': 'hello',
     ...         'message': 'Hi there',
@@ -158,14 +175,15 @@ object::
     {'cc_myself': True, 'message': u'Hi there', 'sender': u'foo@example.com', 'subject': u'hello'}
 
 .. versionchanged:: 1.0
-    The ``cleaned_data`` attribute was called ``clean_data`` in earlier releases.
+    ``cleaned_data`` 属性は、以前のリリースでは ``clean_data`` と呼ばれてい
+    ました。
 
-Note that any text-based field -- such as ``CharField`` or ``EmailField`` --
-always cleans the input into a Unicode string. We'll cover the encoding
-implications later in this document.
+``CharField`` や ``EmailField`` のようなテキストベースのフィールドは、常に
+入力を Unicode 文字列に変換します。エンコーディングに関する解説は、このドキュ
+メントの後の方でカバーする予定です。
 
-If your data does *not* validate, your ``Form`` instance will not have a
-``cleaned_data`` attribute::
+データが *まだ検証されていない* 場合、フォームインスタンスには
+``cleaned_data`` 属性がありません::
 
     >>> data = {'subject': '',
     ...         'message': 'Hi there',
@@ -179,10 +197,11 @@ If your data does *not* validate, your ``Form`` instance will not have a
     ...
     AttributeError: 'ContactForm' object has no attribute 'cleaned_data'
 
-``cleaned_data`` will always *only* contain a key for fields defined in the
-``Form``, even if you pass extra data when you define the ``Form``. In this
-example, we pass a bunch of extra fields to the ``ContactForm`` constructor,
-but ``cleaned_data`` contains only the form's fields::
+フォームを生成するときに追加の値を渡した場合でも、 ``cleaned_data`` の中に
+入るキーは、フォーム内で定義されているフィールド *だけ* です。以下の例でも、
+``ContactForm`` のコンストラクタに追加のフィールドデータを渡していますが、
+``cleaned_data`` が返すのは ``ContactForm`` で定義されているフィールドだけで
+す::
 
     >>> data = {'subject': 'hello',
     ...         'message': 'Hi there',
@@ -197,10 +216,10 @@ but ``cleaned_data`` contains only the form's fields::
     >>> f.cleaned_data # Doesn't contain extra_field_1, etc.
     {'cc_myself': True, 'message': u'Hi there', 'sender': u'foo@example.com', 'subject': u'hello'}
 
-``cleaned_data`` will include a key and value for *all* fields defined in the
-``Form``, even if the data didn't include a value for fields that are not
-required. In this example, the data dictionary doesn't include a value for the
-``nick_name`` field, but ``cleaned_data`` includes it, with an empty value::
+``cleaned_data`` には、 ``Form`` 内で定義されている *全ての* フィールドのキー
+と値が入ります。フォームに渡したデータに、必須でないフィールドの値が入って
+いない場合でもです。下の例では、データ辞書には ``nick_name`` フィールドの値
+が入っていませんが、 ``cleaned_data`` には空の値が入っています::
 
     >>> class OptionalPersonForm(Form):
     ...     first_name = CharField()
@@ -213,22 +232,26 @@ required. In this example, the data dictionary doesn't include a value for the
     >>> f.cleaned_data
     {'nick_name': u'', 'first_name': u'John', 'last_name': u'Lennon'}
 
-In this above example, the ``cleaned_data`` value for ``nick_name`` is set to an
-empty string, because ``nick_name`` is ``CharField``, and ``CharField``\s treat
-empty values as an empty string. Each field type knows what its "blank" value
-is -- e.g., for ``DateField``, it's ``None`` instead of the empty string. For
-full details on each field's behavior in this case, see the "Empty value" note
-for each field in the "Built-in ``Field`` classes" section below.
+この例で、 ``cleaned_data`` の中の ``nick_name`` は空文字列なのは、
+``nick_name`` が ``CharField`` であり、 ``CharField`` は空の値を空文字列と
+みなすからです。各フィールドタイプは「空の」値が設定されています。例えば、
+``DateField`` の場合、空の値は空文字列ではなく ``None`` になります。
+空の値を持ったフィールドの詳しい挙動は、「組み込みフィールドクラス」の節の
+各フィールドの説明中の「空のフォームデータに対する値」の項目を参照してくだ
+さい。
 
-You can write code to perform validation for particular form fields (based on
-their name) or for the form as a whole (considering combinations of various
-fields). More information about this is in :ref:`ref-forms-validation`.
+個別のフォームフィールド (フィールド名ごと) やフォーム全体 (複数フィールド
+の組み合わせ) に対してバリデーションを実現するコードを書けます。詳しくは、
+:ref:`ref-forms-validation` を参照してください。
 
-Outputting forms as HTML
-------------------------
+.. _Outputting forms as HTML:
 
-The second task of a ``Form`` object is to render itself as HTML. To do so,
-simply ``print`` it::
+フォームを HTML として出力する
+------------------------------
+
+フォームオブジェクトの二つ目の仕事は、フォームの HTML へのレンダリングです。
+フォームを HTML として出力するには、フォームをインスタンス化して、
+``print`` で出力します::
 
     >>> f = ContactForm()
     >>> print f
@@ -237,11 +260,10 @@ simply ``print`` it::
     <tr><th><label for="id_sender">Sender:</label></th><td><input type="text" name="sender" id="id_sender" /></td></tr>
     <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>
 
-If the form is bound to data, the HTML output will include that data
-appropriately. For example, if a field is represented by an
-``<input type="text">``, the data will be in the ``value`` attribute. If a
-field is represented by an ``<input type="checkbox">``, then that HTML will
-include ``checked="checked"`` if appropriate::
+束縛フォームの場合、フォームのデータは適切な形で HTML 出力されます。例えば、
+フィールドが ``<input type="text">`` で表される場合、データは ``value`` 属
+性の中に出力されます。フィールドが ``<input type="checkbox">`` であれば、
+必要に応じて ``checked="checked"`` が入ります::
 
     >>> data = {'subject': 'hello',
     ...         'message': 'Hi there',
@@ -254,42 +276,45 @@ include ``checked="checked"`` if appropriate::
     <tr><th><label for="id_sender">Sender:</label></th><td><input type="text" name="sender" id="id_sender" value="foo@example.com" /></td></tr>
     <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" checked="checked" /></td></tr>
 
-This default output is a two-column HTML table, with a ``<tr>`` for each field.
-Notice the following:
+デフォルトの出力は 2 カラムの HTML テーブルになり、各フィールドが一つの
+``<tr>`` タグの中に収まります。以下の点に注意してください:
 
-    * For flexibility, the output does *not* include the ``<table>`` and
-      ``</table>`` tags, nor does it include the ``<form>`` and ``</form>``
-      tags or an ``<input type="submit">`` tag. It's your job to do that.
+    * 柔軟性をもたせるために、出力中には ``<table>`` と ``</table>`` タグが
+      入っていません。また、 ``<form>`` と ``</form>`` や、 
+      ``<input type="submit">`` もありません。これらのタグは自分で入れる必
+      要があります。
 
-    * Each field type has a default HTML representation. ``CharField`` and
-      ``EmailField`` are represented by an ``<input type="text">``.
-      ``BooleanField`` is represented by an ``<input type="checkbox">``. Note
-      these are merely sensible defaults; you can specify which HTML to use for
-      a given field by using widgets, which we'll explain shortly.
+    * 各フィールドタイプには、それぞれデフォルトの HTML 表現があります。
+      ``CharField`` や ``EmailField`` は ``<input type="text">`` で表され、
+      ``BooleanField`` は ``<input type="checkbox">`` になります。とはいえ、
+      これらは便利なデフォルト値にすぎません。ウィジェット (widget) を使え
+      ば、フィールドの表現にどのような HTML を使うかを指定できます。これに
+      ついては後で説明する予定です。
 
-    * The HTML ``name`` for each tag is taken directly from its attribute name
-      in the ``ContactForm`` class.
+    * 各タグの ``name`` 属性は ``ContactForm`` クラスの属性名から直接取り出
+      して使われます。
 
-    * The text label for each field -- e.g. ``'Subject:'``, ``'Message:'`` and
-      ``'Cc myself:'`` is generated from the field name by converting all
-      underscores to spaces and upper-casing the first letter. Again, note
-      these are merely sensible defaults; you can also specify labels manually.
+    * ``'Subject:'``, ``'Message:'``, ``'Cc myself:'``  といった各フィール
+      ドのテキストラベルは、フィールド名のアンダースコアを全てスペースに変
+      換し、先頭の文字を大文字にして生成します。これもまたデフォルト値にす
+      ぎず、手動でもラベルを設定できるようになっています。
 
-    * Each text label is surrounded in an HTML ``<label>`` tag, which points
-      to the appropriate form field via its ``id``. Its ``id``, in turn, is
-      generated by prepending ``'id_'`` to the field name. The ``id``
-      attributes and ``<label>`` tags are included in the output by default, to
-      follow best practices, but you can change that behavior.
+    * 各テキストラベルは HTML の ``<label>`` タグで囲われています。このタグ
+      には ``for`` 属性が付いていて、対応するフォームフィールドの ``id`` 属
+      性に対応しています。属性の値はフィールド名の前に ``'id_'`` を付けたも
+      のになります。 ``id`` 属性や ``<label>`` タグはフォーム生成の定石に従っ
+      て組み込まれているものですが、この振舞は自分で変更できます。
 
-Although ``<table>`` output is the default output style when you ``print`` a
-form, other output styles are available. Each style is available as a method on
-a form object, and each rendering method returns a Unicode object.
+テーブル組みによる出力は ``print`` した時に出力されるデフォルトで、他にもい
+くつか出力スタイルがあります。各スタイルはフォームオブジェクトのメソッドと
+して利用でき、各々のレンダリングメソッドは Unicode オブジェクトを返すように
+なっています。
 
 ``as_p()``
 ~~~~~~~~~~
 
-``Form.as_p()`` renders the form as a series of ``<p>`` tags, with each ``<p>``
-containing one field::
+``Form.as_p()`` はフォームを一連の ``<p>`` タグの集まりで組みます。各
+``<p>`` タグの中に一つのフィールドが入ります::
 
     >>> f = ContactForm()
     >>> f.as_p()
@@ -303,9 +328,10 @@ containing one field::
 ``as_ul()``
 ~~~~~~~~~~~
 
-``Form.as_ul()`` renders the form as a series of ``<li>`` tags, with each
-``<li>`` containing one field. It does *not* include the ``<ul>`` or ``</ul>``,
-so that you can specify any HTML attributes on the ``<ul>`` for flexibility::
+``Form.as_ul()`` はフォームを一連の ``<li>`` タグで組みます。各 ``<li>`` タ
+グの中に一つのフィールドが入ります。 ``as_ul()`` は ``<ul>`` や ``</ul>``
+を出力に *含めません* 。これは、ユーザが ``<ul>`` タグの HTML 属性を好きに
+指定できるようにするためです::
 
     >>> f = ContactForm()
     >>> f.as_ul()
@@ -319,9 +345,10 @@ so that you can specify any HTML attributes on the ``<ul>`` for flexibility::
 ``as_table()``
 ~~~~~~~~~~~~~~
 
-Finally, ``Form.as_table()`` outputs the form as an HTML ``<table>``. This is
-exactly the same as ``print``. In fact, when you ``print`` a form object, it
-calls its ``as_table()`` method behind the scenes::
+最後に、 ``Form.as_table()`` はフォームを ``<table>`` で組みます。これは
+``print`` で出力したときに使われる形式と同じです。実際、フォームオブジェク
+トを ``print`` すると、背後では ``as_table()`` が呼び出されるようになってい
+ます::
 
     >>> f = ContactForm()
     >>> f.as_table()
@@ -333,25 +360,28 @@ calls its ``as_table()`` method behind the scenes::
     <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>
 
 .. _ref-forms-api-configuring-label:
+.. _`Configuring HTML <label> tags`:
 
-Configuring HTML ``<label>`` tags
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``<label>`` タグの出力設定
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-An HTML ``<label>`` tag designates which label text is associated with which
-form element. This small enhancement makes forms more usable and more accessible
-to assistive devices. It's always a good idea to use ``<label>`` tags.
+``<label>`` タグは、あるラベルテキストがどのフォーム要素に対応づけられてい
+るかを知らせるタグです。 ``<label>`` タグがあると、フォームの利便性が増し、
+入力補助デバイスで操作しやすくなります。 ``<label>`` タグは常に使うようにし
+ておくよう勧めます。
 
-By default, the form rendering methods include HTML ``id`` attributes on the
-form elements and corresponding ``<label>`` tags around the labels. The ``id``
-attribute values are generated by prepending ``id_`` to the form field names.
-This behavior is configurable, though, if you want to change the ``id``
-convention or remove HTML ``id`` attributes and ``<label>`` tags entirely.
+デフォルトでは、フォームのレンダリングメソッドを呼び出すと、各フォーム要素
+に ``id`` 属性が追加され、ラベルを ``<label>`` タグで囲って出力します。
+``id`` 属性の値はフォームのフィールド名の前に ``id_`` を付けたものになりま
+す。とはいえ、 ``id`` 属性の命名規則を変えたり、そもそも ``<label>`` を出力
+したくない人のために、この仕様は設定変更できるようになっています。
 
-Use the ``auto_id`` argument to the ``Form`` constructor to control the label
-and ``id`` behavior. This argument must be ``True``, ``False`` or a string.
+``<label>`` タグや ``id`` の挙動を変更するには、 ``Form`` コンストラクタの
+``auto_id`` 引数を使います。この引数は ``True`` 、 ``False`` 、文字列のいず
+れかで指定せねばなりません。
 
-If ``auto_id`` is ``False``, then the form output will not include ``<label>``
-tags nor ``id`` attributes::
+``auto_id`` を ``False`` にすると、フォーム出力に ``<label>`` タグや
+``id`` 属性が含まれなくなります::
 
     >>> f = ContactForm(auto_id=False)
     >>> print f.as_table()
@@ -370,9 +400,8 @@ tags nor ``id`` attributes::
     <p>Sender: <input type="text" name="sender" /></p>
     <p>Cc myself: <input type="checkbox" name="cc_myself" /></p>
 
-If ``auto_id`` is set to ``True``, then the form output *will* include
-``<label>`` tags and will simply use the field name as its ``id`` for each form
-field::
+``auto_id`` が ``True`` の場合、フォームの出力には ``<label>`` タグが入り、
+各フォームフィールドの ``id`` 属性の値にはフィールド名をそのまま使います::
 
     >>> f = ContactForm(auto_id=True)
     >>> print f.as_table()
@@ -391,11 +420,11 @@ field::
     <p><label for="sender">Sender:</label> <input type="text" name="sender" id="sender" /></p>
     <p><label for="cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="cc_myself" /></p>
 
-If ``auto_id`` is set to a string containing the format character ``'%s'``,
-then the form output will include ``<label>`` tags, and will generate ``id``
-attributes based on the format string. For example, for a format string
-``'field_%s'``, a field named ``subject`` will get the ``id`` value
-``'field_subject'``. Continuing our example::
+``auto_id`` がフォーマット文字 ``'%s'`` を含む文字列になっている場合、フォー
+ム出力は ``<label>`` タグを含むようになり、タグの ``id`` 属性はフォーマット
+文字列に従って生成されます。例えば、フォーマット文字列が ``field_%s`` の場
+合、 ``subject`` という名前のフィールドの ``id`` は ``'field_subject'`` に
+なります。出力例は以下のようになります::
 
     >>> f = ContactForm(auto_id='id_for_%s')
     >>> print f.as_table()
@@ -414,14 +443,14 @@ attributes based on the format string. For example, for a format string
     <p><label for="id_for_sender">Sender:</label> <input type="text" name="sender" id="id_for_sender" /></p>
     <p><label for="id_for_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_for_cc_myself" /></p>
 
-If ``auto_id`` is set to any other true value -- such as a string that doesn't
-include ``%s`` -- then the library will act as if ``auto_id`` is ``True``.
+``auto_id`` がこれ以外の偽でない値、つまり ``%s`` を含まない文字列のような
+値の場合、 ``auto_id`` は ``True`` に設定されたものとみなされます。
 
-By default, ``auto_id`` is set to the string ``'id_%s'``.
+デフォルトでは、 ``auto_id`` は ``'id_%s'`` に設定されています。
 
-Normally, a colon (``:``) will be appended after any label name when a form is
-rendered. It's possible to change the colon to another character, or omit it
-entirely, using the ``label_suffix`` parameter::
+通常、フォームのレンダ時には、ラベル名の直後にコロン (``:``) が付加されます。
+このコロンを他の文字に変更したり、文字を出力しないようにするには、
+``label_suffix`` パラメタを使います::
 
     >>> f = ContactForm(auto_id='id_for_%s', label_suffix='')
     >>> print f.as_ul()
@@ -436,26 +465,30 @@ entirely, using the ``label_suffix`` parameter::
     <li><label for="id_for_sender">Sender -></label> <input type="text" name="sender" id="id_for_sender" /></li>
     <li><label for="id_for_cc_myself">Cc myself -></label> <input type="checkbox" name="cc_myself" id="id_for_cc_myself" /></li>
 
-Note that the label suffix is added only if the last character of the
-label isn't a punctuation character (``.``, ``!``, ``?`` or ``:``)
+ラベルの付加は、ラベルの最後の文字が区切り文字 (``.``, ``!``, ``?``, ``:``
+のいずれか) でない場合にのみ行われます。
 
-Notes on field ordering
-~~~~~~~~~~~~~~~~~~~~~~~
+.. _Notes on field ordering:
 
-In the ``as_p()``, ``as_ul()`` and ``as_table()`` shortcuts, the fields are
-displayed in the order in which you define them in your form class. For
-example, in the ``ContactForm`` example, the fields are defined in the order
-``subject``, ``message``, ``sender``, ``cc_myself``. To reorder the HTML
-output, just change the order in which those fields are listed in the class.
+フィールドの並び順について
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-How errors are displayed
-~~~~~~~~~~~~~~~~~~~~~~~~
+``as_p()`` や ``as_ul()``, ``as_table()`` ショートカットを使うと、各フィー
+ルドは Form クラス内で定義された順に出力されます。例えば、上の
+``ContactForm`` の例では、フィールドの並び順は ``subject``, ``message``,
+``sender``, ``cc_myself`` です。 HTML 出力の中でフィールドの並び順を変更し
+たければ、クラス定義内でのフィールドの並び順を変更してください。
 
-If you render a bound ``Form`` object, the act of rendering will automatically
-run the form's validation if it hasn't already happened, and the HTML output
-will include the validation errors as a ``<ul class="errorlist">`` near the
-field. The particular positioning of the error messages depends on the output
-method you're using::
+.. _How errors are displayed:
+
+エラーの出力方法
+~~~~~~~~~~~~~~~~
+
+束縛フォームオブジェクトをレンダすると、フォームの検証がまだであればレンダ
+リング操作の中で自動的に検証が行われ、エラーがあれば HTML 出力中の該当フィー
+ルドの付近に ``<ul class=errorlist>`` でエラー内容が表示されます。エラーメッ
+セージ中の具体的なエラー表示位置は、どのメソッドでフォームをレンダしている
+かによります::
 
     >>> data = {'subject': '',
     ...         'message': 'Hi there',
@@ -480,12 +513,14 @@ method you're using::
     <p>Sender: <input type="text" name="sender" value="invalid e-mail address" /></p>
     <p>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></p>
 
-Customizing the error list format
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _Customizing the error list format:
 
-By default, forms use ``django.forms.util.ErrorList`` to format validation
-errors. If you'd like to use an alternate class for displaying errors, you can
-pass that in at construction time::
+エラーリストの出力形式をカスタマイズする
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+デフォルトでは、バリデーション時エラーの出力内容は、
+``django.forms.util.ErrorList`` を使ってフォーマットされます。エラーの表
+示に他のクラスを使いたければ、以下のようにフォームの生成時に指定します::
 
     >>> from django.forms.util import ErrorList
     >>> class DivErrorList(ErrorList):
@@ -503,14 +538,17 @@ pass that in at construction time::
     <p>Sender: <input type="text" name="sender" value="invalid e-mail address" /></p>
     <p>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></p>
 
-More granular output
-~~~~~~~~~~~~~~~~~~~~
+.. _More granular output:
 
-The ``as_p()``, ``as_ul()`` and ``as_table()`` methods are simply shortcuts for
-lazy developers -- they're not the only way a form object can be displayed.
+より細かな出力調整
+~~~~~~~~~~~~~~~~~~
 
-To display the HTML for a single field in your form, use dictionary lookup
-syntax using the field's name as the key, and print the resulting object::
+``as_p()`` や ``as_ul()``, ``as_table()`` といったメソッドは、単に面倒臭が
+りの開発者むけに用意されているショートカットでしかなく、他のやり方でもフォー
+ムを表示できます。
+
+フォーム中のあるフィールドの HTML を表示するには、フォームを辞書のように扱
+い、フィールドの名前をキーにして参照し、その値を出力します::
 
     >>> f = ContactForm()
     >>> print f['subject']
@@ -522,15 +560,16 @@ syntax using the field's name as the key, and print the resulting object::
     >>> print f['cc_myself']
     <input type="checkbox" name="cc_myself" id="id_cc_myself" />
 
-Call ``str()`` or ``unicode()`` on the field to get its rendered HTML as a
-string or Unicode object, respectively::
+フィールドを引数にして ``str()`` や ``unicode()`` を呼び出すと、レンダ結果
+の HTML をそれぞれ string 型や Unicode 型のオブジェクトで返します::
 
     >>> str(f['subject'])
     '<input id="id_subject" type="text" name="subject" maxlength="100" />'
     >>> unicode(f['subject'])
     u'<input id="id_subject" type="text" name="subject" maxlength="100" />'
 
-The field-specific output honors the form object's ``auto_id`` setting::
+フィールド固有の出力を行った場合でも、フォームオブジェクトの ``auto_id`` 設
+定は有効です::
 
     >>> f = ContactForm(auto_id=False)
     >>> print f['message']
@@ -539,9 +578,9 @@ The field-specific output honors the form object's ``auto_id`` setting::
     >>> print f['message']
     <input type="text" name="message" id="id_message" />
 
-For a field's list of errors, access the field's ``errors`` attribute. This
-is a list-like object that is displayed as an HTML ``<ul class="errorlist">``
-when printed::
+あるフィールドに関するエラーのリストを取得するには、フィールドの ``errors``
+属性にアクセスします。このフィールドはリストライクなオブジェクトで、 HTML
+として出力すると ``<ul class="errorlist">`` のリストになります::
 
     >>> data = {'subject': 'hi', 'message': '', 'sender': '', 'cc_myself': ''}
     >>> f = ContactForm(data, auto_id=False)
@@ -559,29 +598,30 @@ when printed::
     ''
 
 .. _binding-uploaded-files:
+.. _Binding uploaded files to a form:
 
-Binding uploaded files to a form
---------------------------------
+アップロードされたファイルをフォームに結びつける
+-------------------------------------------------
 
 .. versionadded:: 1.0
 
-Dealing with forms that have ``FileField`` and ``ImageField`` fields
-is a little more complicated than a normal form.
+``FileField`` や ``ImageField`` といったフィールドの入ったフォームの扱いは、
+通常のフォームより少しだけ複雑です。
 
-Firstly, in order to upload files, you'll need to make sure that your
-``<form>`` element correctly defines the ``enctype`` as
-``"multipart/form-data"``::
+まず、フォームからファイルをアップロードさせるには、 ``<form>`` エレメント
+で ``enctype`` が ``"multipart/form-data"`` に設定されていなければなりませ
+ん::
 
   <form enctype="multipart/form-data" method="post" action="/foo/">
 
-Secondly, when you use the form, you need to bind the file data. File
-data is handled separately to normal form data, so when your form
-contains a ``FileField`` and ``ImageField``, you will need to specify
-a second argument when you bind your form. So if we extend our
-ContactForm to include an ``ImageField`` called ``mugshot``, we
-need to bind the file data containing the mugshot image::
+次に、フォームを使う場合、ファイルデータをフォームに結びつけなければ
+なりません。ファイルデータは通常のフォームデータとは分けて扱われるので、
+フォームに ``FileField`` や ``ImageField`` が入っている場合、束縛フォームを
+作るには、第2引数にファイルデータを渡さねばなりません。ContactForm に
+``mugshot`` という名前の ``ImageField`` を組み込んだ場合、下記のようにして、
+顔写真 (mugshot) のファイルデータをフォームに結びつけます::
 
-    # Bound form with an image field
+    # 画像ファイルフィールドつきの束縛フォーム
     >>> from django.core.files.uploadedfile import SimpleUploadedFile
     >>> data = {'subject': 'hello',
     ...         'message': 'Hi there',
@@ -590,31 +630,33 @@ need to bind the file data containing the mugshot image::
     >>> file_data = {'mugshot': SimpleUploadedFile('face.jpg', <file data>)}
     >>> f = ContactFormWithMugshot(data, file_data)
 
-In practice, you will usually specify ``request.FILES`` as the source
-of file data (just like you use ``request.POST`` as the source of
-form data)::
+実践的には、 ``request.FILES`` をファイルデータのソースとして指定することに
+なるでしょう (``request.POST`` をフォームデータのソースにするのと同様です)::
 
-    # Bound form with an image field, data from the request
+    # 画像ファイルフィールドにリクエストからデータを渡す
     >>> f = ContactFormWithMugshot(request.POST, request.FILES)
 
-Constructing an unbound form is the same as always -- just omit both
-form data *and* file data::
+非束縛フォームの構築は通常通りで、フォームデータとファイルデータの *両方*
+を省略します::
 
     # Unbound form with a image field
     >>> f = ContactFormWithMugshot()
 
-Testing for multipart forms
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _Testing for multipart forms:
 
-If you're writing reusable views or templates, you may not know ahead of time
-whether your form is a multipart form or not. The ``is_multipart()`` method
-tells you whether the form requires multipart encoding for submission::
+マルチパート形式のフォームをテストする
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+再利用可能なビューやテンプレートを書いているのなら、フォームがマルチパー
+ト形式であるかどうか前もって分からない場合もあるでしょう。
+``is_multipart()`` メソッドを使うと、フォームがマルチパート形式でエンコード
+されたデータの提出を要求しているかどうかを調べられます::
 
     >>> f = ContactFormWithMugshot()
     >>> f.is_multipart()
     True
 
-Here's an example of how you might use this in a template::
+テンプレートの中では、以下のようにして使います::
 
     {% if form.is_multipart %}
         <form enctype="multipart/form-data" method="post" action="/foo/">
@@ -624,19 +666,21 @@ Here's an example of how you might use this in a template::
     {{ form }}
     </form>
 
-Subclassing forms
------------------
+.. _Subclassing forms:
 
-If you have multiple ``Form`` classes that share fields, you can use
-subclassing to remove redundancy.
+フォームのサブクラス化
+----------------------
 
-When you subclass a custom ``Form`` class, the resulting subclass will
-include all fields of the parent class(es), followed by the fields you define
-in the subclass.
+同じフィールドを持つようなフォームクラスをいくつも作りたい場合、サブクラス
+化を用いると冗長性を排除できます。
 
-In this example, ``ContactFormWithPriority`` contains all the fields from
-``ContactForm``, plus an additional field, ``priority``. The ``ContactForm``
-fields are ordered first::
+フォームクラスをサブクラス化すると、できたフォームクラスには親クラスの全て
+のフィールドが入っています。サブクラスで定義したフィールドは親クラスのフィー
+ルドの後に続きます。
+
+以下の例では、 ``ContactFormWithPriority`` には ``ContactForm`` の全てのフィー
+ルドと、 ``priority`` という追加のフィールドが入っています。
+``ContactForm`` のフィールドは先に表示されます::
 
     >>> class ContactFormWithPriority(ContactForm):
     ...     priority = forms.CharField()
@@ -648,10 +692,11 @@ fields are ordered first::
     <li>Cc myself: <input type="checkbox" name="cc_myself" /></li>
     <li>Priority: <input type="text" name="priority" /></li>
 
-It's possible to subclass multiple forms, treating forms as "mix-ins." In this
-example, ``BeatleForm`` subclasses both ``PersonForm`` and ``InstrumentForm``
-(in that order), and its field list includes the fields from the parent
-classes::
+複数のフォームを親クラスにしたサブクラス化も可能です。この場合、親クラスの
+フォームは「混ぜ込み (mix-in)」クラスのように扱われます。以下の例では、
+``BeatleForm`` が ``PersonForm`` と ``InstrumentForm`` を (この順番で)
+サブクラス化しています。フィールドのリストには、親クラスのフィールドが順番
+に表示されます::
 
     >>> class PersonForm(Form):
     ...     first_name = CharField()
@@ -668,14 +713,16 @@ classes::
     <li>Haircut type: <input type="text" name="haircut_type" /></li>
 
 .. _form-prefix:
+.. _Prefixes for forms:
 
-Prefixes for forms
-------------------
+フォームのプレフィクス
+-----------------------
 
 .. attribute:: Form.prefix
 
-You can put several Django forms inside one ``<form>`` tag. To give each
-``Form`` its own namespace, use the ``prefix`` keyword argument::
+Django のフォームは、一つの ``<form>`` タグの中に複数入れられます。各々の
+フォームに独自の名前空間を持たせるには、 ``prefix`` キーワード引数を使いま
+す::
 
     >>> mother = PersonForm(prefix="mother")
     >>> father = PersonForm(prefix="father")

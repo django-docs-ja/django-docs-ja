@@ -295,7 +295,6 @@ Django は標準的な Python テストフレームワークの両方をサポ�
 
     $ ./manage.py test animals.AnimalTestCase
 
-**開発バージョンの Django で新たに追加された機能:**
 テストケース中の個別のテストメソッドを実行したければ、メソッド名を指定して
 ください::
 

@@ -1,27 +1,30 @@
 .. _topics-forms-formsets:
 .. _formsets:
 
-Formsets
-========
+フォームセット (formsets)
+=============================
 
-A formset is a layer of abstraction to working with multiple forms on the same
-page. It can be best compared to a data grid. Let's say you have the following
-form::
+:revision-up-to: 8961 (1.0)
+
+フォームセットとは、同じページで複数のフォームを扱うための抽象化レイヤで、
+いわばデータグリッドのようなものです。フォームセットを説明するために、まず
+以下のようなフォームを考えましょう::
 
     >>> from django import forms
     >>> class ArticleForm(forms.Form):
     ...     title = forms.CharField()
     ...     pub_date = forms.DateField()
 
-You might want to allow the user to create several articles at once. To create
-a formset out of an ``ArticleForm`` you would do::
+このフォームを使って、ユーザが一度に複数の記事を作成できるようにしたい場合
+があったとします。そのために、 ``ArticleForm`` からフォームセットを生成しま
+す::
 
     >>> from django.forms.formsets import formset_factory
     >>> ArticleFormSet = formset_factory(ArticleForm)
 
-You now have created a formset named ``ArticleFormSet``. The formset gives you
-the ability to iterate over the forms in the formset and display them as you
-would with a regular form::
+``ArticleFormSet`` という名前のフォームセットクラスができました。このフォー
+ムセットには、フォームセットに入っているフォームを一つ一つ取り出して、それ
+ぞれを普通のフォームとして表示する機能があります::
 
     >>> formset = ArticleFormSet()
     >>> for form in formset.forms:
@@ -29,20 +32,21 @@ would with a regular form::
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title" /></td></tr>
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></td></tr>
 
-As you can see it only displayed one form. This is because by default the
-``formset_factory`` defines one extra form. This can be controlled with the
-``extra`` parameter::
+出力を見て分かる通り、フォームは一つだけ表示されています。これは、
+``formset_factory`` のデフォルトの設定で、「追加のフォーム表示数 (extra)」
+を 1 に設定しているからです。表示数は ``extra`` パラメタで制御できます::
 
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2)
 
-Using initial data with a formset
----------------------------------
+.. _Using initial data with a formset:
 
-Initial data is what drives the main usability of a formset. As shown above
-you can define the number of extra forms. What this means is that you are
-telling the formset how many additional forms to show in addition to the
-number of forms it generates from the initial data. Lets take a look at an
-example::
+フォームセットに初期データを指定する
+-------------------------------------
+
+初期データは、フォームセットのユーザビリティに影響する大きな要素です。上に
+示したように、 ``formset_factory`` には追加のフォーム表示数を指定できます。
+この「追加」とは、初期データを渡したときに表示されるフォームの中で、追加で
+表示されている空のフォーム数という意味です。以下の例をよく見てください::
 
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2)
     >>> formset = ArticleFormSet(initial=[
@@ -59,15 +63,17 @@ example::
     <tr><th><label for="id_form-2-title">Title:</label></th><td><input type="text" name="form-2-title" id="id_form-2-title" /></td></tr>
     <tr><th><label for="id_form-2-pub_date">Pub date:</label></th><td><input type="text" name="form-2-pub_date" id="id_form-2-pub_date" /></td></tr>
 
-There are now a total of three forms showing above. One for the initial data
-that was passed in and two extra forms. Also note that we are passing in a
-list of dictionaries as the initial data.
+上の例では、今度は 3 つのフォームが表示されました。初期データとして渡した 1
+つと、 2 つの追加フォームです。初期データとして、辞書のリストを渡しているこ
+とにも注意してください。
 
-Limiting the maximum number of forms
+.. _Limiting the maximum number of forms:
+
+フォームの最大表示数を制限する
 ------------------------------------
 
-The ``max_num`` parameter to ``formset_factory`` gives you the ability to
-force the maximum number of forms the formset will display::
+``formset_factory`` に ``max_num`` パラメタを指定すると、フォームセット中に
+表示されるフォームの最大数を制御できます::
 
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2, max_num=1)
     >>> formset = ArticleFormset()
@@ -76,24 +82,27 @@ force the maximum number of forms the formset will display::
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title" /></td></tr>
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></td></tr>
 
-The default value of ``max_num`` is ``0`` which is the same as saying put no
-limit on the number forms displayed.
+``max_num`` のデフォルト値は表示数に制限がないことを示す ``0`` に設定されて
+います。
 
-Formset validation
-------------------
+.. _Formset validation:
 
-Validation with a formset is about identical to a regular ``Form``. There is
-an ``is_valid`` method on the formset to provide a convenient way to validate
-each form in the formset::
+フォームセットのバリデーション
+------------------------------------
+
+フォームセットのバリデーションは、普通の ``Form`` とほぼ同じです。フォーム
+セットにも ``is_valid`` メソッドがあり、フォームセット中の全てのフォームを
+簡単に検証できます::
 
     >>> ArticleFormSet = formset_factory(ArticleForm)
     >>> formset = ArticleFormSet({})
     >>> formset.is_valid()
     True
 
-We passed in no data to the formset which is resulting in a valid form. The
-formset is smart enough to ignore extra forms that were not changed. If we
-attempt to provide an article, but fail to do so::
+この例では、フォームセットにデータを渡さなかったので、有効なフォームを返し
+ています。フォームセットは賢くて、データの変更されなかったフォームを無視し
+てくれます。あるフォーム上の記事を変更しようとして、失敗した場合の挙動を以
+下に示します::
 
     >>> data = {
     ...     'form-TOTAL_FORMS': u'1',
@@ -107,16 +116,18 @@ attempt to provide an article, but fail to do so::
     >>> formset.errors
     [{'pub_date': [u'This field is required.']}]
 
-As we can see the formset properly performed validation and gave us the
-expected errors.
+このように、フォームセットはバリデーションを正しく実行して、期待通りのエラー
+を表示します。
 
-Understanding the ManagementForm
+.. _Understanding the ManagementForm:
+
+``ManagementForm`` を理解する
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You may have noticed the additional data that was required in the formset's
-data above. This data is coming from the ``ManagementForm``. This form is
-dealt with internally to the formset. If you don't use it, it will result in
-an exception::
+上の例でフォームセットに与えた初期値には、追加のデータが入っていたことに気
+付いたでしょうか。これはフォームセットで内部的に処理されているフォーム、
+``ManagementForm`` で扱うためのデータです。追加のデータ抜きでフォームセット
+を使おうとすると、例外が送出されます::
 
     >>> data = {
     ...     'form-0-title': u'Test',
@@ -127,15 +138,17 @@ an exception::
     ...
     django.forms.util.ValidationError: [u'ManagementForm data is missing or has been tampered with']
 
-It is used to keep track of how many form instances are being displayed. If
-you are adding new forms via JavaScript, you should increment the count fields
-in this form as well.
+``ManagementForm`` のデータは、表示するフォームインスタンスの数を追跡するた
+めに使われます。 JavaScript でフォームを動的に追加する場合、
+``ManagementForm`` データのカウントも増やさねばなりません。
 
-Custom formset validation
-~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _Custom formset validation:
 
-A formset has a ``clean`` method similar to the one on a ``Form`` class. This
-is where you define your own validation that deals at the formset level::
+カスタムのフォームセットバリデーション
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``Form`` クラスと同様、フォームセットには ``clean`` メソッドがあります。こ
+のメソッドには、フォームセットレベルで扱う独自のバリデーションを定義します::
 
     >>> from django.forms.formsets import BaseFormSet
 
@@ -150,25 +163,27 @@ is where you define your own validation that deals at the formset level::
     >>> formset.non_form_errors()
     [u'An error occured.']
 
-The formset ``clean`` method is called after all the ``Form.clean`` methods
-have been called. The errors will be found using the ``non_form_errors()``
-method on the formset.
+フォームセットの ``clean`` メソッドは、全てのフォームに対して
+``Form.clean`` メソッドが呼出された後に実行されます。フォームセットに関する
+エラーは、フォームセットの ``non_form_errors()`` メソッドで取り出せます。
 
-Dealing with ordering and deletion of forms
--------------------------------------------
+.. _Dealing with ordering and deletion of forms:
 
-Common use cases with a formset is dealing with ordering and deletion of the
-form instances. This has been dealt with for you. The ``formset_factory``
-provides two optional parameters ``can_order`` and ``can_delete`` that will do
-the extra work of adding the extra fields and providing simpler ways of
-getting to that data.
+フォームの並び順や削除の扱い
+------------------------------
+
+フォームセットを扱う上でよくあるユースケースは、フォームインスタンスの並び
+順や削除の処理です。フォームセットはこれらの処理を実行してくれます。
+``formset_factory`` には  ``can_order`` および ``can_delete`` という二つの
+パラメタがあり、指定するとフォームにフィールドを追加して、並び順や削除フラ
+グを操作する簡単な手段を提供します。
 
 ``can_order``
 ~~~~~~~~~~~~~
 
-Default: ``False``
+デフォルト値: ``False``
 
-Lets create a formset with the ability to order::
+``True`` にすると、フォームセットは順番を指定できるフォームを生成します::
 
     >>> ArticleFormSet = formset_factory(ArticleForm, can_order=True)
     >>> formset = ArticleFormSet(initial=[
@@ -187,10 +202,10 @@ Lets create a formset with the ability to order::
     <tr><th><label for="id_form-2-pub_date">Pub date:</label></th><td><input type="text" name="form-2-pub_date" id="id_form-2-pub_date" /></td></tr>
     <tr><th><label for="id_form-2-ORDER">Order:</label></th><td><input type="text" name="form-2-ORDER" id="id_form-2-ORDER" /></td></tr>
 
-This adds an additional field to each form. This new field is named ``ORDER``
-and is an ``forms.IntegerField``. For the forms that came from the initial
-data it automatically assigned them a numeric value. Lets look at what will
-happen when the user changes these values::
+このオプションを指定すると、各フォームにフィールドが追加されます。フィール
+ドの名前は ``ORDER`` で、型は ``forms.IntegerField`` です。初期データを使っ
+てフォームを生成した場合、 ``ORDER`` フィールドには自動的に数値が割り当てら
+れます。ユーザがこの値を変更するとどうなるか見てみましょう::
 
     >>> data = {
     ...     'form-TOTAL_FORMS': u'3',
@@ -221,9 +236,9 @@ happen when the user changes these values::
 ``can_delete``
 ~~~~~~~~~~~~~~
 
-Default: ``False``
+デフォルト値: ``False``
 
-Lets create a formset with the ability to delete::
+``True`` にすると、フォームセットは削除を実行できるフォームを生成します::
 
     >>> ArticleFormSet = formset_factory(ArticleForm, can_delete=True)
     >>> formset = ArticleFormSet(initial=[
@@ -243,9 +258,10 @@ Lets create a formset with the ability to delete::
     <tr><th><label for="id_form-2-pub_date">Pub date:</label></th><td><input type="text" name="form-2-pub_date" id="id_form-2-pub_date" /></td></tr>
     <tr><th><label for="id_form-2-DELETE">Delete:</label></th><td><input type="checkbox" name="form-2-DELETE" id="id_form-2-DELETE" /></td></tr>
 
-Similar to ``can_order`` this adds a new field to each form named ``DELETE``
-and is a ``forms.BooleanField``. When data comes through marking any of the
-delete fields you can access them with ``deleted_forms``::
+``can_order`` と同様、 ``DELETE`` という名前のついたフィールドが追加されま
+す。このフィールドは ``forms.BooleanField`` です。削除フラグフィールドをマー
+クしたデータを投入すると、削除フラグの立っているフォームに
+``deleted_forms`` でアクセスできます::
 
     >>> data = {
     ...     'form-TOTAL_FORMS': u'3',
@@ -268,13 +284,15 @@ delete fields you can access them with ``deleted_forms``::
     >>> [form.cleaned_data for form in formset.deleted_forms]
     [{'DELETE': True, 'pub_date': datetime.date(2008, 5, 10), 'title': u'Article #1'}]
 
-Adding additional fields to a formset
+.. _Adding additional fields to a formset:
+
+フォームセットにフィールドを追加する
 -------------------------------------
 
-If you need to add additional fields to the formset this can be easily
-accomplished. The formset base class provides an ``add_fields`` method. You
-can simply override this method to add your own fields or even redefine the
-default fields/attributes of the order and deletion fields::
+フォームセットには、追加のフィールドを簡単に追加できます。フォームセットの
+ベースクラスは ``add_fields`` メソッドを提供しています。このメソッドをオー
+バライドして、独自にフィールドを追加したり、デフォルトのフィールドや属性を
+再定義したり、フィールドを削除したりできます::
 
     >>> class BaseArticleFormSet(BaseFormSet):
     ...     def add_fields(self, form, index):
@@ -289,24 +307,26 @@ default fields/attributes of the order and deletion fields::
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></td></tr>
     <tr><th><label for="id_form-0-my_field">My field:</label></th><td><input type="text" name="form-0-my_field" id="id_form-0-my_field" /></td></tr>
 
-Using a formset in views and templates
---------------------------------------
+.. _Using a formset in views and templates:
 
-Using a formset inside a view is as easy as using a regular ``Form`` class.
-The only thing you will want to be aware of is making sure to use the
-management form inside the template. Lets look at a sample view::
+ビューやテンプレートでフォームセットを使う
+----------------------------------------------
+
+ビュー内でのフォームセットの扱いは簡単で、普通の ``Form`` クラスと同じよう
+に使うだけです。気をつけておかねばならないのは、テンプレート内で
+``management_form`` を使うという点です。ビューの例を以下に示します::
 
     def manage_articles(request):
         ArticleFormSet = formset_factory(ArticleForm)
         if request.method == 'POST':
             formset = ArticleFormSet(request.POST, request.FILES)
             if formset.is_valid():
-                # do something with the formset.cleaned_data
+                # formset.cleaned_data を使った処理をここに
         else:
             formset = ArticleFormSet()
         return render_to_response('manage_articles.html', {'formset': formset})
 
-The ``manage_articles.html`` template might look like this::
+``manage_articles.html`` テンプレートは以下のようになります::
 
     <form method="POST" action="">
         {{ formset.management_form }}
@@ -317,8 +337,8 @@ The ``manage_articles.html`` template might look like this::
         </table>
     </form>
 
-However the above can be slightly shortcutted and let the formset itself deal
-with the management form::
+ただし、下記のようなショートカットを使えば、フォームセット自体に管理フォー
+ムを扱わせられます::
 
     <form method="POST" action="">
         <table>
@@ -326,7 +346,10 @@ with the management form::
         </table>
     </form>
 
-The above ends up calling the ``as_table`` method on the formset class.
+このショートカットは、フォームセットの ``as_table`` を呼び出した時と同じ内
+容を出力します。
+
+.. TBD
 
 Using more than one formset in a view
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

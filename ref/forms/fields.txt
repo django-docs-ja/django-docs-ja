@@ -1,27 +1,28 @@
 .. _ref-forms-fields:
+.. _Form fields:
 
-===========
-Form fields
-===========
+======================
+フォームフィールド
+======================
 
 .. module:: django.forms.fields
-   :synopsis: Django's built-in form fields.
+   :synopsis: Django の組み込みフォームフィールドです。
 
 .. currentmodule:: django.forms
 
 .. class:: Field(**kwargs)
 
-When you create a ``Form`` class, the most important part is defining the
-fields of the form. Each field has custom validation logic, along with a few
-other hooks.
+フォームクラスの作成で一番重要なのは、フォームの各フィールドの定義です。各
+フィールドには固有のデータ検証ロジックと、いくつかのフックが備わっています。
 
 .. method:: Field.clean(value)
 
-Although the primary way you'll use ``Field`` classes is in ``Form`` classes,
-you can also instantiate them and use them directly to get a better idea of
-how they work. Each ``Field`` instance has a ``clean()`` method, which takes
-a single argument and either raises a ``django.forms.ValidationError``
-exception or returns the clean value::
+フィールドクラスの主な用途はフォームクラスにおけるフィールド定義ですが、フィー
+ルドクラスは直接インスタンス化して使えるので、フィールドの動作を理解する役
+に立つはずです。各フィールドインスタンスは ``clean()`` メソッドを備えており、
+単一の引数を取って検証を行い、その結果に応じて
+``django.newforms.ValidationError`` を送出するか、クリーニング済みの値を返
+します::
 
     >>> f = forms.EmailField()
     >>> f.clean('foo@example.com')
@@ -33,21 +34,23 @@ exception or returns the clean value::
     ...
     ValidationError: [u'Enter a valid e-mail address.']
 
-Core field arguments
+.. _Core field arguments:
+
+フィールドの主な引数
 --------------------
 
-Each ``Field`` class constructor takes at least these arguments. Some
-``Field`` classes take additional, field-specific arguments, but the following
-should *always* be accepted:
+各フィールドクラスのコンストラクタは、少なくとも以下に示す引数を取ります。
+フィールドクラスによっては他にもフィールド固有の引数をとりますが。ここに示
+す引数はどのフィールドクラスでも *常に* 指定できる引数です:
 
 ``required``
 ~~~~~~~~~~~~
 
 .. attribute:: Field.required
 
-By default, each ``Field`` class assumes the value is required, so if you pass
-an empty value -- either ``None`` or the empty string (``""``) -- then
-``clean()`` will raise a ``ValidationError`` exception::
+デフォルトでは、フィールドクラスはフィールドが必須 (reqired) であると仮定し
+ています。従って、フィールドに空の値、すなわち ``None`` や空文字列 (``""``)
+を渡すと、 ``clean()`` は ``VaridationError`` 例外を送出します::
 
     >>> f = forms.CharField()
     >>> f.clean('foo')
@@ -69,8 +72,8 @@ an empty value -- either ``None`` or the empty string (``""``) -- then
     >>> f.clean(False)
     u'False'
 
-To specify that a field is *not* required, pass ``required=False`` to the
-``Field`` constructor::
+必須で *ない* フィールドにするには、フィールドのコンストラクタに
+``required=False`` を指定します::
 
     >>> f = forms.CharField(required=False)
     >>> f.clean('foo')
@@ -86,27 +89,26 @@ To specify that a field is *not* required, pass ``required=False`` to the
     >>> f.clean(False)
     u'False'
 
-If a ``Field`` has ``required=False`` and you pass ``clean()`` an empty value,
-then ``clean()`` will return a *normalized* empty value rather than raising
-``ValidationError``. For ``CharField``, this will be a Unicode empty string.
-For other ``Field`` classes, it might be ``None``. (This varies from field to
-field.)
+``required=False`` のフィールドの ``clean()`` に空の値を渡して呼び出すと、
+``clean()`` は ``VaridationError`` を送出する代わりに *正規化された* 空の値
+を返します。例えば ``CharField`` の場合なら、 Unicode の空文字列になります。
+その他のフィールドクラスでは ``None`` になるはずです (フィールドによって異
+なります)。
 
 ``label``
 ~~~~~~~~~
 
 .. attribute:: Field.label
 
-The ``label`` argument lets you specify the "human-friendly" label for this
-field. This is used when the ``Field`` is displayed in a ``Form``.
+``label`` 引数を使うと、フィールドに「人間に優しい」ラベルを指定できます。
+このラベルはフォーム内でフィールドを表示するときに使われます。
 
-As explained in "Outputting forms as HTML" above, the default label for a
-``Field`` is generated from the field name by converting all underscores to
-spaces and upper-casing the first letter. Specify ``label`` if that default
-behavior doesn't result in an adequate label.
+フィールドのデフォルトのラベルはフィールド名のアンダースコアを除去して、頭
+文字を大文字にしたものです。デフォルトのラベル命名規則で期待通りのラベルが
+出力されない場合には、この引数を指定してください。
 
-Here's a full example ``Form`` that implements ``label`` for two of its fields.
-We've specified ``auto_id=False`` to simplify the output::
+``label`` を指定したフォームの例を以下に示します。出力を短くするために
+``auto_id=False`` にしています::
 
     >>> class CommentForm(forms.Form):
     ...     name = forms.CharField(label='Your name')
@@ -123,11 +125,11 @@ We've specified ``auto_id=False`` to simplify the output::
 
 .. attribute:: Field.initial
 
-The ``initial`` argument lets you specify the initial value to use when
-rendering this ``Field`` in an unbound ``Form``.
+``initial`` 引数を使うと、非束縛フォーム内でフィールドをレンダするときの初
+期値を指定できます。
 
-The use-case for this is when you want to display an "empty" form in which a
-field is initialized to a particular value. For example::
+この引数を使うケースは、例えば以下のように、「空の」フォームの各フィールド
+を特定の値で初期化して表示したい場合です::
 
     >>> class CommentForm(forms.Form):
     ...     name = forms.CharField(initial='Your name')
@@ -139,9 +141,10 @@ field is initialized to a particular value. For example::
     <tr><th>Url:</th><td><input type="text" name="url" value="http://" /></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
-You may be thinking, why not just pass a dictionary of the initial values as
-data when displaying the form? Well, if you do that, you'll trigger validation,
-and the HTML output will include any validation errors::
+こんなことをしなくても、フォームに初期データの入った辞書を渡せばいいのにと
+思うかもしれませんね。しかし、フォームにデータを渡して束縛フォームにすると、
+データを表示する際に検証がトリガされてしまい、 HTML 出力にバリデーションエ
+ラーが入ってしまいます::
 
     >>> class CommentForm(forms.Form):
     ...     name = forms.CharField()
@@ -154,12 +157,12 @@ and the HTML output will include any validation errors::
     <tr><th>Url:</th><td><ul class="errorlist"><li>Enter a valid URL.</li></ul><input type="text" name="url" value="http://" /></td></tr>
     <tr><th>Comment:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="comment" /></td></tr>
 
-This is why ``initial`` values are only displayed for unbound forms. For bound
-forms, the HTML output will use the bound data.
+このため、非束縛フォームの場合に限って ``initial`` に指定した値が出力される
+ようになっているのです。束縛フォームの場合、出力は常に束縛済みのデータです。
 
-Also note that ``initial`` values are *not* used as "fallback" data in
-validation if a particular field's value is not given. ``initial`` values are
-*only* intended for initial form display::
+また、 ``initial`` の指定値は、フィールドの値が指定されなかった場合の「フォー
+ルバック用の」値には *ならない* ので注意が必要です。 ``initial`` の値は初期
+値の入ったフォームの表示 *だけ* に用いられます::
 
     >>> class CommentForm(forms.Form):
     ...     name = forms.CharField(initial='Your name')
@@ -169,7 +172,7 @@ validation if a particular field's value is not given. ``initial`` values are
     >>> f = CommentForm(data)
     >>> f.is_valid()
     False
-    # The form does *not* fall back to using the initial values.
+    # フォームの値は初期値にフォールバック *しません。*
     >>> f.errors
     {'url': [u'This field is required.'], 'name': [u'This field is required.']}
 
@@ -178,21 +181,21 @@ validation if a particular field's value is not given. ``initial`` values are
 
 .. attribute:: Field.widget
 
-The ``widget`` argument lets you specify a ``Widget`` class to use when
-rendering this ``Field``. See :ref:`ref-forms-widgets` for more information.
+``widget`` 引数を使うと、フィールドをレンダリングするときの ``Widget`` クラ
+スを指定できます。詳しくは :ref:`ref-forms-widgets` を参照してください。
 
 ``help_text``
 ~~~~~~~~~~~~~
 
 .. attribute:: Field.help_text
 
-The ``help_text`` argument lets you specify descriptive text for this
-``Field``. If you provide ``help_text``, it will be displayed next to the
-``Field`` when the ``Field`` is rendered by one of the convenience ``Form``
-methods (e.g., ``as_ul()``).
+``help_text`` 引数を使うと、フィールドに説明文をつけられます。
+``help_text`` を指定した場合、フォームを (``as_ul()`` のような) フォームメ
+ソッドでレンダした時に、該当フィールドの隣に表示されます。
 
-Here's a full example ``Form`` that implements ``help_text`` for two of its
-fields. We've specified ``auto_id=False`` to simplify the output::
+以下に、 ``help_text`` を使ったフォームの例を示します。この例では、フォーム
+の二つのフィールドに ``help_text`` を指定しています。出力を単純にするために、
+``auto_id=False`` を指定しています::
 
     >>> class HelpTextContactForm(forms.Form):
     ...     subject = forms.CharField(max_length=100, help_text='100 characters max.')
@@ -224,9 +227,10 @@ fields. We've specified ``auto_id=False`` to simplify the output::
 .. attribute:: Field.error_messages
 
 
-The ``error_messages`` argument lets you override the default messages that the
-field will raise. Pass in a dictionary with keys matching the error messages you
-want to override. For example, here is the default error message::
+``error_messages`` 引数を使うと、フィールドが送出するデフォルトのメッセージ
+をオーバライドできます。オーバライドしたいメッセージに対応する文字列をキー
+とし、メッセージを値に持つ辞書を渡してください。例えば、デフォルトのメッセー
+ジが以下のようだったとします::
 
     >>> generic = forms.CharField()
     >>> generic.clean('')
@@ -234,7 +238,7 @@ want to override. For example, here is the default error message::
       ...
     ValidationError: [u'This field is required.']
 
-And here is a custom error message::
+カスタムのエラーメッセージは以下のようにして設定します::
 
     >>> name = forms.CharField(error_messages={'required': 'Please enter your name'})
     >>> name.clean('')
@@ -242,21 +246,23 @@ And here is a custom error message::
       ...
     ValidationError: [u'Please enter your name']
 
-In the `built-in Field classes`_ section below, each ``Field`` defines the
-error message keys it uses.
+各フィールドで定義されているエラーメッセージのキーは、後述の
+`組み込みフォームフィールドクラス`_ の節で定義しています。
 
-Dynamic initial values
+.. _Dynamic initial values:
+
+初期値を動的に決定する
 ----------------------
 
-The ``initial`` argument to ``Field`` (explained above) lets you hard-code the
-initial value for a ``Field`` -- but what if you want to declare the initial
-value at runtime? For example, you might want to fill in a ``username`` field
-with the username of the current session.
+フィールドオブジェクトの ``initial`` 引数を使えばフィールドの初期値をハード
+コードできます。では、初期値を動的に決めたい場合はどうすればよいのでしょう。
+例えば、現在ログインしているユーザで ``username`` フィールドを埋めたいよう
+な場合です。
 
-To accomplish this, use the ``initial`` argument to a ``Form``. This argument,
-if given, should be a dictionary mapping field names to initial values. Only
-include the fields for which you're specifying an initial value; it's not
-necessary to include every field in your form. For example::
+動的に初期値を決めるには、フォームオブジェクトの ``initial`` 引数を使います。
+この引数はフィールド名と初期値を対応づけた辞書として指定します。全てのフィー
+ルドを含める必要はなく、初期値を設定したいフィールドだけでかまいません。例
+を示しましょう::
 
     >>> class CommentForm(forms.Form):
     ...     name = forms.CharField()
@@ -273,14 +279,14 @@ necessary to include every field in your form. For example::
     <tr><th>Url:</th><td><input type="text" name="url" /></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
-Just like the ``initial`` parameter to ``Field``, these values are only
-displayed for unbound forms, and they're not used as fallback values if a
-particular value isn't provided.
+フィールドの ``initial`` パラメタと同じく、フォームの初期値が表示されるのは
+非束縛フォームだけであり、ユーザが特定のフィールドに値を入力しなかったとき
+のフォールバックとしては使われません。
 
-Finally, note that if a ``Field`` defines ``initial`` *and* you include
-``initial`` when instantiating the ``Form``, then the latter ``initial`` will
-have precedence. In this example, ``initial`` is provided both at the field
-level and at the form instance level, and the latter gets precedence::
+最後に、フィールドに ``initial`` が定義されていて、 *かつ* フォームの初期化
+時にも ``initial`` を指定した場合、後者の ``initial`` が優先されるので気を
+付けてください。例えば、以下のように、フィールドとフォームの両方に
+``initial`` を指定した場合、フォームの値の方が使われます::
 
     >>> class CommentForm(forms.Form):
     ...     name = forms.CharField(initial='class')
@@ -293,124 +299,132 @@ level and at the form instance level, and the latter gets precedence::
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
 
-Built-in ``Field`` classes
---------------------------
+.. _Built-in Field classes:
 
-Naturally, the ``forms`` library comes with a set of ``Field`` classes that
-represent common validation needs. This section documents each built-in field.
+組み込みフォームフィールドクラス
+--------------------------------
 
-For each field, we describe the default widget used if you don't specify
-``widget``. We also specify the value returned when you provide an empty value
-(see the section on ``required`` above to understand what that means).
+通常、 ``forms`` ライブラリには、一般的なバリデーション機能を備えたフィー
+ルドクラスのセットがついてきます。この節では、そうした組み込みフィールドに
+ついて述べます。
+
+各フィールドについて、 ``widget`` パラメタを指定しなかったときのデフォルト
+のウィジェット型について説明しています。また、データが空の値だったとき
+(前述の ``requied`` の節を参照してください) に返される値についても定義して
+います。
+
 
 ``BooleanField``
 ~~~~~~~~~~~~~~~~
 
 .. class:: BooleanField(**kwargs)
 
-    * Default widget: ``CheckboxInput``
-    * Empty value: ``False``
-    * Normalizes to: A Python ``True`` or ``False`` value.
-    * Validates that the check box is checked (i.e. the value is ``True``) if
-      the field has ``required=True``.
-    * Error message keys: ``required``
+    * デフォルトのウィジェット: ``CheckboxInput``
+    * 空のフォームデータに対する値: ``False``
+    * Python データへの正規化: Python の ``True`` または ``False`` 値
+    * ``required=True`` の場合、チェックボックスがチェックされているか (値
+      が ``True`` であるか) 検証します。
+    * エラーメッセージのキー: ``required``
 
 .. versionchanged:: 1.0
-   The empty value for a ``CheckboxInput`` (and hence the standard ``BooleanField``)
-   has changed to return ``False`` instead of ``None`` in the development version.
+   ``CheckboxInput`` (および標準の ``BooleanField``) に空の値を指定した場合
+   のデフォルト値が ``None`` から ``False`` に変更されました。
 
 .. note::
 
-    Since all ``Field`` subclasses have ``required=True`` by default, the
-    validation condition here is important. If you want to include a checkbox
-    in your form that can be either checked or unchecked, you must remember to
-    pass in ``required=False`` when creating the ``BooleanField``.
+    全てのフィールドのサブクラスにデフォルトで ``required=True`` が設定され
+    るようになったので、バリデーション条件の設定は重要です。チェックされる
+    場合とされない場合のあるチェックボックスをフォームに含めたい場合は、
+    ``BooleanField`` を生成する際に ``required=False`` を忘れずに指定せねば
+    なりません。
+
 
 ``CharField``
 ~~~~~~~~~~~~~
 
 .. class:: CharField(**kwargs)
 
-    * Default widget: ``TextInput``
-    * Empty value: ``''`` (an empty string)
-    * Normalizes to: A Unicode object.
-    * Validates ``max_length`` or ``min_length``, if they are provided.
-      Otherwise, all inputs are valid.
-    * Error message keys: ``required``, ``max_length``, ``min_length``
+    * デフォルトのウィジェット: ``TextInput``
+    * 空のフォームデータに対する値: ``''`` (空文字列)
+    * Python データへの正規化: Unicode 文字列オブジェクト
+    * ``max_length`` または ``min_length`` が指定された場合、文字列長を検証
+      します。それ以外の場合、どのような入力も valid とみなします。
+    * エラーメッセージのキー: ``required``, ``max_length``, ``min_length``
 
-Has two optional arguments for validation:
+オプションの引数が 2 つあります:
 
 .. attribute:: CharField.max_length
 .. attribute:: CharField.min_length
 
-    If provided, these arguments ensure that the string is at most or at least
-    the given length.
+    これらの引数を指定すると、文字列長が最大、あるいは最小値の条件を満たし
+    ているか検証します。
 
 ``ChoiceField``
 ~~~~~~~~~~~~~~~
 
 .. class:: ChoiceField(**kwargs)
 
-    * Default widget: ``Select``
-    * Empty value: ``''`` (an empty string)
-    * Normalizes to: A Unicode object.
-    * Validates that the given value exists in the list of choices.
-    * Error message keys: ``required``, ``invalid_choice``
+    * デフォルトのウィジェット: ``Select``
+    * 空のフォームデータに対する値: ``''`` (空文字列)
+    * Python データへの正規化: Unicode 文字列オブジェクト
+    * 入力値が選択肢内にある値かどうか検証します。
+    * エラーメッセージのキー: ``required``, ``invalid_choice``
 
-Takes one extra required argument:
+必須の引数を一つとります:
 
 .. attribute:: ChoiceField.choices
 
-    An iterable (e.g., a list or tuple) of 2-tuples to use as choices for this
-    field.
+    イテレーション可能オブジェクト (たとえばリストやタプルなど) で、各要素
+    はフィールドの選択肢として使える 2 要素のタプルでなければなりません。
     
 ``TypedChoiceField``
 ~~~~~~~~~~~~~~~~~~~~
 
 .. class:: TypedChoiceField(**kwargs)
 
-Just like a :class:`ChoiceField`, except :class:`TypedChoiceField` takes an
-extra ``coerce`` argument.
+:class:`ChoiceField` に似ていますが、 :class:`TypedChoiceField` には
+``coerce`` 引数があります。
 
-    * Default widget: ``Select``
-    * Empty value: Whatever you've given as ``empty_value``
-    * Normalizes to: the value returned by the ``coerce`` argument.
-    * Validates that the given value exists in the list of choices.
-    * Error message keys: ``required``, ``invalid_choice``
+    * デフォルトのウィジェット: ``Select``
+    * 空のフォームデータに対する値: ``empty_value`` の指定値
+    * Python データへの正規化: ``coerce`` 引数の戻り値
+    * 入力値が選択肢内にある値かどうか検証します。
+    * エラーメッセージのキー: ``required``, ``invalid_choice``
 
-Takes extra arguments:
+以下の追加の引数をとります:
 
 .. attribute:: TypedChoiceField.coerce
 
-    A function that takes one argument and returns a coerced value. Examples
-    include the built-in ``int``, ``float``, ``bool`` and other types. Defaults
-    to an identity function.
+    引数を一つとり、型強制した値を返す関数を指定します。例えば、組み込みの
+    ``int``, ``float``, ``bool`` などです。等値関数がデフォルト値として設定
+    されています。
 
 .. attribute:: TypedChoiceField.empty_value
 
-    The value to use to represent "empty." Defaults to the empty string;
-    ``None`` is another common choice here.
+    「空の入力」を示すのに使う値です。デフォルト値は空文字列です。 ``None``
+    も良く使う値です。
 
 ``DateField``
 ~~~~~~~~~~~~~
 
 .. class:: DateField(**kwargs)
 
-    * Default widget: ``TextInput``
-    * Empty value: ``None``
-    * Normalizes to: A Python ``datetime.date`` object.
-    * Validates that the given value is either a ``datetime.date``,
-      ``datetime.datetime`` or string formatted in a particular date format.
-    * Error message keys: ``required``, ``invalid``
+    * デフォルトのウィジェット: ``TextInput``
+    * 空のフォームデータに対する値: ``None``
+    * Python データへの正規化: Python ``datetime.date`` オブジェクト
+    * 入力値が ``datetime.date`` や ``datetime.datetime`` オブジェクト、ま
+      たは特定の日付フォーマットの形式に従っているか検証します。
+    * エラーメッセージのキー: ``required``, ``invalid``
 
-Takes one optional argument:
+以下のオプションの引数をとります:
 
 .. attribute:: DateField.input_formats
 
-    A list of formats used to attempt to convert a string to a valid
-    ``datetime.date`` object.
+    文字列から有効な ``datetime.date`` オブジェクトへの変換を試みるために使
+    われるフォーマット文字列からなるリストです。
 
-If no ``input_formats`` argument is provided, the default input formats are::
+``input_formats`` を指定しない場合、デフォルトで以下の入力フォーマットをサ
+ポートします::
 
     '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y', # '2006-10-25', '10/25/2006', '10/25/06'
     '%b %d %Y', '%b %d, %Y',            # 'Oct 25 2006', 'Oct 25, 2006'
@@ -423,21 +437,22 @@ If no ``input_formats`` argument is provided, the default input formats are::
 
 .. class:: DateTimeField(**kwargs)
 
-    * Default widget: ``DateTimeInput``
-    * Empty value: ``None``
-    * Normalizes to: A Python ``datetime.datetime`` object.
-    * Validates that the given value is either a ``datetime.datetime``,
-      ``datetime.date`` or string formatted in a particular datetime format.
-    * Error message keys: ``required``, ``invalid``
+    * デフォルトのウィジェット: ``DateTimeInput``
+    * 空のフォームデータに対する値: ``None``
+    * Python データへの正規化: Python ``datetime.datetime`` オブジェクト
+    * 入力値が ``datetime.date`` や ``datetime.datetime`` オブジェクト、ま
+      たは特定の日付フォーマットの形式に従っているか検証します。
+    * エラーメッセージのキー: ``required``, ``invalid``
 
-Takes one optional argument:
+以下のオプションの引数をとります:
 
 .. attribute:: DateTimeField.input_formats
 
-    A list of formats used to attempt to convert a string to a valid
-    ``datetime.datetime`` object.
+    文字列から有効な ``datetime.datetime`` オブジェクトへの変換を試みるため
+    に使われるフォーマット文字列からなるリストです。
 
-If no ``input_formats`` argument is provided, the default input formats are::
+``input_formats`` を指定しない場合、デフォルトで以下の入力フォーマットをサ
+ポートします::
 
     '%Y-%m-%d %H:%M:%S',     # '2006-10-25 14:30:59'
     '%Y-%m-%d %H:%M',        # '2006-10-25 14:30'
@@ -450,7 +465,8 @@ If no ``input_formats`` argument is provided, the default input formats are::
     '%m/%d/%y',              # '10/25/06'
 
 .. versionchanged:: 1.0
-   The ``DateTimeField`` used to use a ``TextInput`` widget by default. This has now changed.
+   ``DateTimeField`` はデフォルトで ``TextInput`` を使っていましたが、変更
+   されました。
 
 ``DecimalField``
 ~~~~~~~~~~~~~~~~
@@ -459,47 +475,45 @@ If no ``input_formats`` argument is provided, the default input formats are::
 
 .. class:: DecimalField(**kwargs)
 
-    * Default widget: ``TextInput``
-    * Empty value: ``None``
-    * Normalizes to: A Python ``decimal``.
-    * Validates that the given value is a decimal. Leading and trailing
-      whitespace is ignored.
-    * Error message keys: ``required``, ``invalid``, ``max_value``,
+    * デフォルトのウィジェット: ``TextInput``
+    * 空のフォームデータに対する値: ``None``
+    * Python データへの正規化: Python の ``decimal`` オブジェクト
+    * 値が 10 進小数に変換可能か検証します。文字列の先頭および末尾の空白文
+      字は除去されます。
+    * エラーメッセージのキー: ``required``, ``invalid``, ``max_value``,
       ``min_value``, ``max_digits``, ``max_decimal_places``,
       ``max_whole_digits``
 
-Takes four optional arguments: 
+4 つのオプション引数を取ります:
 
 .. attribute:: DecimalField.max_value
 .. attribute:: DecimalField.min_value
 
-    These attributes define the limits for the fields value.
+    それぞれ、フィールドの値のとり得る最大／最小値です。
 
 .. attribute:: DecimalField.max_digits
 
-    The maximum number of digits (those before the decimal point plus those
-    after the decimal point, with leading zeros stripped) permitted in the
-    value.
+    最大の桁数 (先頭のゼロ詰め桁を除いた上での小数点前後の桁数の合計) です。
     
 .. attribute:: DecimalField.decimal_places
 
-    The maximum number of decimal places permitted.
+    ``decimal_places`` は小数部の最大桁数です。
 
 ``EmailField``
 ~~~~~~~~~~~~~~
 
 .. class:: EmailField(**kwargs)
 
-    * Default widget: ``TextInput``
-    * Empty value: ``''`` (an empty string)
-    * Normalizes to: A Unicode object.
-    * Validates that the given value is a valid e-mail address, using a
-      moderately complex regular expression.
-    * Error message keys: ``required``, ``invalid``
+    * デフォルトのウィジェット: ``TextInput``
+    * 空のフォームデータに対する値: ``''`` (空文字列)
+    * Python データへの正規化: Unicode 文字列オブジェクト
+    * やや複雑な正規表現を使って、入力値が有効なメールアドレスであるか検証
+      します。
+    * エラーメッセージのキー: ``required``, ``invalid``
 
-Has two optional arguments for validation, ``max_length`` and ``min_length``.
-If provided, these arguments ensure that the string is at most or at least the
-given length.
+オプションの引数として、 ``max_length`` と ``min_length`` の二つをとれます。
+これらの引数を指定すると、文字列長が最大、あるいは最小値の条件を満たしてい
+るか検証します。
 
 ``FileField``
 ~~~~~~~~~~~~~
@@ -508,18 +522,20 @@ given length.
 
 .. class:: FileField(**kwargs)
 
-    * Default widget: ``FileInput``
-    * Empty value: ``None``
-    * Normalizes to: An ``UploadedFile`` object that wraps the file content
-      and file name into a single object.
-    * Validates that non-empty file data has been bound to the form.
-    * Error message keys: ``required``, ``invalid``, ``missing``, ``empty``
+    * デフォルトのウィジェット: ``FileInput``
+    * 空のフォームデータに対する値: ``None``
+    * Python データへの正規化: ファイルコンテンツとファイル名を一つのオブジェ
+      クトとしてラップする ``UploadedFile`` オブジェクト。
+    * フォームに結びつけられているファイルデータが空でないか検証します。
+    * エラーメッセージのキー: ``required``, ``invalid``, ``missing``, ``empty``
 
-To learn more about the ``UploadedFile`` object, see the :ref:`file uploads
-documentation <topics-file-uploads>`.
+``UploadedFile`` オブジェクトの詳細は 
+:ref:`ファイルアップロードのドキュメント <topics-file-uploads>` を参照して
+ください。
 
-When you use a ``FileField`` in a form, you must also remember to
-:ref:`bind the file data to the form <topics-file-uploads>`.
+``FileField`` をフォームで使う場合、
+:ref:`フォームにファイルデータを束縛する <topics-file-uploads>`
+のを忘れないようにしてください。
 
 ``FilePathField``
 ~~~~~~~~~~~~~~~~~
@@ -528,44 +544,44 @@ When you use a ``FileField`` in a form, you must also remember to
 
 .. class:: FilePathField(**kwargs)
 
-    * Default widget: ``Select``
-    * Empty value: ``None``
-    * Normalizes to: A unicode object
-    * Validates that the selected choice exists in the list of choices.
-    * Error message keys: ``required``, ``invalid_choice``
+    * デフォルトのウィジェット: ``Select``
+    * 空のフォームデータに対する値: ``None``
+    * Python データへの正規化: unicode オブジェクト
+    * 入力値が選択肢内にある値かどうか検証します。
+    * エラーメッセージのキー: ``required``, ``invalid_choice``
 
-The field allows choosing from files inside a certain directory. It takes three
-extra arguments; only ``path`` is required:
+このフィールドを使うと、あるディレクトリの下にあるファイルを選択できます。
+フィールドは以下の 3 つの引数を追加で取り、 ``path`` のみ必須の引数です:
 
 .. attribute:: FilePathField.path
 
-    The absolute path to the directory whose contents you want listed. This
-    directory must exist.
+    ファイルの一覧を表示したいディレクトリの絶対パスです。実在するディレク
+    トリを指定せねばなりません。
 
 .. attribute:: FilePathField.recursive
 
-    If ``False`` (the default) only the direct contents of ``path`` will be
-    offered as choices. If ``True``, the directory will be descended into
-    recursively and all descendants will be listed as choices.
+    ``False`` (デフォルト値) の場合、 ``path`` の直下にあるファイルのみを選
+    択肢として表示します。 ``True`` にすると、 ``path`` 以下の全てのファイ
+    ルを再帰的に探索して選択肢にします。                                  
 
 .. attribute:: FilePathField.match
 
-    A regular expression pattern; only files with names matching this expression
-    will be allowed as choices.
+    正規表現です。この引数を指定すると、正規表現にマッチしたファイル名だけ
+    を選択肢として表示します。
 
 ``FloatField`` 
 ~~~~~~~~~~~~~~ 
 
-    * Default widget: ``TextInput`` 
-    * Empty value: ``None`` 
-    * Normalizes to: A Python float. 
-    * Validates that the given value is an float. Leading and trailing 
-      whitespace is allowed, as in Python's ``float()`` function. 
-    * Error message keys: ``required``, ``invalid``, ``max_value``, 
+    * デフォルトのウィジェット: ``TextInput`` 
+    * 空のフォームデータに対する値: ``None`` 
+    * Python データへの正規化: Python の float 型
+    * 指定された値が浮動小数点数を表すかどうか検証します。 Python の
+      ``float()`` 関数と同じく、前後に空白があってもかまいません。
+    * エラーメッセージのキー: ``required``, ``invalid``, ``max_value``, 
       ``min_value`` 
 	 
-Takes two optional arguments for validation, ``max_value`` and ``min_value``. 
-These control the range of values permitted in the field.
+オプションの引数として、 ``max_value`` および ``min_value`` をとります。こ
+れらの値は、入力値のとりえる値域の調整に使われます。
 
 ``ImageField``
 ~~~~~~~~~~~~~~
@@ -574,19 +590,21 @@ These control the range of values permitted in the field.
 
 .. class:: ImageField(**kwargs)
 
-    * Default widget: ``FileInput``
-    * Empty value: ``None``
-    * Normalizes to: An ``UploadedFile`` object that wraps the file content
-      and file name into a single object.
-    * Validates that file data has been bound to the form, and that the
-      file is of an image format understood by PIL.
-    * Error message keys: ``required``, ``invalid``, ``missing``, ``empty``,
+    * デフォルトのウィジェット: ``FileInput``
+    * 空のフォームデータに対する値: ``None``
+    * Python データへの正規化: ファイルコンテンツとファイル名を一つのオブジェ
+      クトとしてラップする ``UploadedFile`` オブジェクト。
+    * 空でないファイルデータがフォームに結びつけられていて、かつその内容が
+      PIL で扱えるファイル形式であるか検証します。
+    * エラーメッセージのキー: ``required``, ``invalid``, ``missing``, ``empty``,
       ``invalid_image``
 
-Using an ImageField requires that the `Python Imaging Library`_ is installed.
+ImageField を使いたい場合、 `Python Imaging Library`_ をインストールしてお
+かねばなりません。
 
-When you use an ``ImageField`` on a form, you must also remember to
-:ref:`bind the file data to the form <topics-file-uploads>`.
+``ImageField`` をフォームで使う場合、
+:ref:`フォームにファイルデータを束縛する <topics-file-uploads>`
+のを忘れないようにしてください。
 
 .. _Python Imaging Library: http://www.pythonware.com/products/pil/
 
@@ -595,104 +613,102 @@ When you use an ``ImageField`` on a form, you must also remember to
 
 .. class:: IntegerField(**kwargs)
 
-    * Default widget: ``TextInput``
-    * Empty value: ``None``
-    * Normalizes to: A Python integer or long integer.
-    * Validates that the given value is an integer. Leading and trailing
-      whitespace is allowed, as in Python's ``int()`` function.
-    * Error message keys: ``required``, ``invalid``, ``max_value``,
+    * デフォルトのウィジェット: ``TextInput``
+    * 空のフォームデータに対する値: ``None``
+    * Python データへの正規化: Python 整数型または長整数型
+    * 入力値が整数であるか検証します。 Python の ``int()`` 関数と同様、先頭
+      や末尾に空白があってもかまいません。
+    * エラーメッセージのキー: ``required``, ``invalid``, ``max_value``,
       ``min_value``
 
-Takes two optional arguments for validation:
+以下の二つの引数をとります:
 
 .. attribute:: IntegerField.max_value
 .. attribute:: IntegerField.min_value
 
-    These control the range of values permitted in the field.
+    フィールドのとり得る値の最大値および最小値です。
 
 ``IPAddressField``
 ~~~~~~~~~~~~~~~~~~
 
 .. class:: IPAddressField(**kwargs)
 
-    * Default widget: ``TextInput``
-    * Empty value: ``''`` (an empty string)
-    * Normalizes to: A Unicode object.
-    * Validates that the given value is a valid IPv4 address, using a regular
-      expression.
-    * Error message keys: ``required``, ``invalid``
+    * デフォルトのウィジェット: ``TextInput``
+    * 空のフォームデータに対する値: ``''`` (空の文字列)
+    * Python データへの正規化: Unicode オブジェクト
+    * 正規表現を使って、値が正しい IPv4 アドレス形式であるか検証します。
+    * エラーメッセージのキー: ``required``, ``invalid``
 
 ``MultipleChoiceField``
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 .. class:: MultipleChoiceField(**kwargs)
 
-    * Default widget: ``SelectMultiple``
-    * Empty value: ``[]`` (an empty list)
-    * Normalizes to: A list of Unicode objects.
-    * Validates that every value in the given list of values exists in the list
-      of choices.
-    * Error message keys: ``required``, ``invalid_choice``, ``invalid_list``
+    * デフォルトのウィジェット: ``SelectMultiple``
+    * 空のフォームデータに対する値: ``[]`` (空のリスト)
+    * Python データへの正規化: Unicode 文字列オブジェクトのリスト
+    * 入力値のリスト中の全ての値が選択肢内の値であるかどうか検証します。
+    * エラーメッセージのキー: ``required``, ``invalid_choice``, ``invalid_list``
 
-Takes one extra argument, ``choices``, as for ``ChoiceField``.
+追加の引数として ``choices`` をとります。 ``choices`` の意味は
+``ChoiceField`` の ``choices`` と同じです。
 
 ``NullBooleanField``
 ~~~~~~~~~~~~~~~~~~~~
 
 .. class:: NullBooleanField(**kwargs)
 
-    * Default widget: ``NullBooleanSelect``
-    * Empty value: ``None``
-    * Normalizes to: A Python ``True``, ``False`` or ``None`` value.
-    * Validates nothing (i.e., it never raises a ``ValidationError``).
+    * デフォルトのウィジェット: ``NullBooleanSelect``
+    * 空のフォームデータに対する値: ``None``
+    * Python データへの正規化: ``True``, ``False`` または ``None`` 。
+    * バリデーションを実行しません (``VaridationError`` を送出しません)。
 
 ``RegexField``
 ~~~~~~~~~~~~~~
 
 .. class:: RegexField(**kwargs)
 
-    * Default widget: ``TextInput``
-    * Empty value: ``''`` (an empty string)
-    * Normalizes to: A Unicode object.
-    * Validates that the given value matches against a certain regular
-      expression.
-    * Error message keys: ``required``, ``invalid``
+    * デフォルトのウィジェット: ``TextInput``
+    * 空のフォームデータに対する値: ``''`` (空文字列)
+    * Python データへの正規化: Unicode 文字列オブジェクト
+    * 入力値が特定の正規表現にマッチするかどうか検証します。
+    * エラーメッセージのキー: ``required``, ``invalid``
 
-Takes one required argument:
+追加の引数を一つ持っています:
 
 .. attribute:: RegexField.regex
 
-    A regular expression specified either as a string or a compiled regular
-    expression object.
+    ``regex`` は正規表現を表す文字列またはコンパイル済みの正規表現オブジェ
+    クトです。
 
-Also takes ``max_length`` and ``min_length``, which work just as they do for
-``CharField``.
+``CharField`` と同様、 ``max_length`` および ``min_length`` をとります。
 
-The optional argument ``error_message`` is also accepted for backwards
-compatibility. The preferred way to provide an error message is to use the
-``error_messages`` argument, passing a dictionary with ``'invalid'`` as a key
-and the error message as the value.
+以前のバージョンとの互換性のため、オプション引数 ``error_message`` も指定で
+きるようになっています。エラーメッセージを指定したければ、
+``error_messages`` を使って、 ``'invalid'`` をキーにしたメッセージを指定す
+るよう薦めます。
 
 ``TimeField``
 ~~~~~~~~~~~~~
 
 .. class:: TimeField(**kwargs)
 
-    * Default widget: ``TextInput``
-    * Empty value: ``None``
-    * Normalizes to: A Python ``datetime.time`` object.
-    * Validates that the given value is either a ``datetime.time`` or string
-      formatted in a particular time format.
-    * Error message keys: ``required``, ``invalid``
+    * デフォルトのウィジェット: ``TextInput``
+    * 空のフォームデータに対する値: ``None``
+    * Python データへの正規化: Python ``datetime.time`` オブジェクト
+    * 入力値が ``datetime.time`` オブジェクトまたは特定の日付フォーマットの
+      形式に従っているか検証します。
+    * エラーメッセージのキー: ``required``, ``invalid``
 
-Takes one optional argument:
+オプションの引数を一つ持っています:
 
 .. attribute:: TimeField.input_formats
 
-    A list of formats used to attempt to convert a string to a valid
-    ``datetime.time`` object.
+    文字列から有効な ``datetime.time`` オブジェクトへの変換を試みるために使
+    われるフォーマット文字列からなるリストです。
 
-If no ``input_formats`` argument is provided, the default input formats are::
+``input_formats`` を指定しない場合、デフォルトで以下の入力フォーマットをサ
+ポートします::
 
     '%H:%M:%S',     # '14:30:59'
     '%H:%M',        # '14:30'
@@ -702,34 +718,36 @@ If no ``input_formats`` argument is provided, the default input formats are::
 
 .. class:: URLField(**kwargs)
 
-    * Default widget: ``TextInput``
-    * Empty value: ``''`` (an empty string)
-    * Normalizes to: A Unicode object.
-    * Validates that the given value is a valid URL.
-    * Error message keys: ``required``, ``invalid``, ``invalid_link``
+    * デフォルトのウィジェット: ``TextInput``
+    * 空のフォームデータに対する値: ``''`` (空文字列)
+    * Python データへの正規化: Unicode 文字列オブジェクト
+    * 入力値が有効な URL であるかどうか検証します。
+    * エラーメッセージのキー: ``required``, ``invalid``, ``invalid_link``
 
-Takes the following optional arguments:
-
+以下のオプションの引数をとります:
 
 .. attribute:: URLField.max_length
 .. attribute:: URLField.min_length
 
-    Same as ``CharField.max_length`` and ``CharField.min_length``.
+    ``CharField.max_length`` や ``CharField.min_length`` と同じです。
 
 .. attribute:: URLField.verify_exists
 
-    If ``True``, the validator will attempt to load the given URL, raising
-    ``ValidationError`` if the page gives a 404. Defaults to ``False``.
+    ``True`` にすると、バリデータが指定された URLをロードできるか調べ、該当
+    ページの HTTP レスポンスが 404 のときに ``ValidationError`` を送出しま
+    す。デフォルト値は ``False`` です。
 
 .. attribute:: URLField.validator_user_agent
 
-    String used as the user-agent used when checking for a URL's existence.
-    Defaults to the value of the ``URL_VALIDATOR_USER_AGENT`` setting.
+    URL が存在するか確かめるときに使うユーザエージェントを表す文字列です。
+    デフォルト値は ``URL_VALIDATOR_USER_AGENT`` 設定の値です。
 
-Slightly complex built-in ``Field`` classes
--------------------------------------------
+.. _Slightly complex built-in Field classes:
 
-The following are not yet documented.
+やや複雑な組み込みフィールドクラス
+----------------------------------
+
+以下のフィールドはまだドキュメント化されていません。
 
 .. class:: ComboField(**kwargs)
 
@@ -737,37 +755,38 @@ The following are not yet documented.
 
 .. class:: SplitDateTimeField(**kwargs)
 
-Fields which handle relationships
+.. _Fields which handle relationships:
+
+リレーションを扱うフィールド
 ---------------------------------
 
-For representing relationships between models, two fields are
-provided which can derive their choices from a ``QuerySet``:
+モデル間のリレーションを表現するために、二つのフィールドが提供されています。
+これらのフィールドは、選択肢を ``QuerySet`` から取り出します:
 
 .. class:: ModelChoiceField(**kwargs)
 .. class:: ModelMultipleChoiceField(**kwargs)
 
-These fields place one or more model objects into the ``cleaned_data``
-dictionary of forms in which they're used. Both of these fields have an
-additional required argument:
+これらのフィールドは、入力に応じて、フォームの ``cleaned_data`` 辞書内にモ
+デルオブジェクトをいれます。どちらのフィールド型にも必須の引数が一つありま
+す:
 
 .. attribute:: ModelChoiceField.queryset
 
-    A ``QuerySet`` of model objects from which the choices for the
-    field will be derived, and which will be used to validate the
-    user's selection.
+    フィールドが選択肢として表示するモデルオブジェクトの ``QuerySet`` です。
+    また、フィールドはこの ``QuerySet`` を使って、ユーザの選択値が
+    ``QuerySet`` 内に含まれているかを検証します。
 
 ``ModelChoiceField``
 ~~~~~~~~~~~~~~~~~~~~
 
-Allows the selection of a single model object, suitable for
-representing a foreign key.
+モデルオブジェクト一つを選択できるフィールドです。外部キーを表現するのに適
+しています。
 
-The ``__unicode__`` method of the model will be called to generate
-string representations of the objects for use in the field's choices;
-to provide customized representations, subclass ``ModelChoiceField``
-and override ``label_from_instance``. This method will receive a model
-object, and should return a string suitable for representing it. For
-example::
+フィールドの選択肢として表示される文字列の取得には、モデルオブジェクトの
+``__unicode__`` メソッドを使います。表示をカスタマイズしたければ、
+``ModelChoicefield`` をサブクラス化して、 ``label_for_instance`` メソッドを
+オーバライドしてください。このメソッドはモデルオブジェクトを引数にとり、表
+示に適した文字列を返さねばなりません::
 
     class MyModelChoiceField(ModelChoiceField):
         def label_from_instance(self, obj):
@@ -776,17 +795,18 @@ example::
 ``ModelMultipleChoiceField``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Allows the selection of one or more model objects, suitable for
-representing a many-to-many relation. As with ``ModelChoiceField``,
-you can use ``label_from_instance`` to customize the object
-representations.
+複数のモデルオブジェクトを選択できるフィールドです。多対多のリレーションを
+表現するのに向いています。 ``ModelChoiceField`` と同様、オブジェクトの表示
+を変更するには ``label_from_instance`` メソッドをオーバライドしてください。
 
-Creating custom fields
-----------------------
+.. _Creating custom fields:
 
-If the built-in ``Field`` classes don't meet your needs, you can easily create
-custom ``Field`` classes. To do this, just create a subclass of
-``django.forms.Field``. Its only requirements are that it implement a
-``clean()`` method and that its ``__init__()`` method accept the core arguments
-mentioned above (``required``, ``label``, ``initial``, ``widget``,
-``help_text``).
+カスタムフィールドの作成
+------------------------
+
+組み込みのフィールドクラスが用途に合わなくても、カスタムのフィールドクラス
+は簡単に作成できるので大丈夫です。カスタムのフィールドクラスは
+``django.forms.Field`` をサブクラス化して作成します。
+フィールドクラスを定義する際の制約は、 ``clean()`` メソッドを実装すること、
+``__init__()`` メソッドにコアの引数 (``required``, ``label``, ``initial``,
+``widget``, ``help_text``) を持たせることだけです。

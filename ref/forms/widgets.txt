@@ -1,71 +1,75 @@
 .. _ref-forms-widgets:
+.. _Widgets:
 
-=======
-Widgets
-=======
+==============
+ウィジェット
+==============
+
+:revision-up-to: 8961 (1.0)
 
 .. module:: django.forms.widgets
-   :synopsis: Django's built-in form widgets.
+   :synopsis: Django の組み込みフォームウィジェットです。
    
 .. currentmodule:: django.forms
 
-A widget is Django's representation of a HTML input element. The widget
-handles the rendering of the HTML, and the extraction of data from a GET/POST
-dictionary that corresponds to the widget.
+ウィジェットとは、Django で HTML の入力エレメントを表現するためのオブジェク
+トです。ウィジェットは、 HTML のレンダリングや、個々のウィジェットに対応す
+るデータをGET/POST 辞書から抽出する処理を行います。
 
-Django provides a representation of all the basic HTML widgets, plus some
-commonly used groups of widgets:
+Django は、基本的な HTML ウィジェットすべてと、よく使われるウィジェットグルー
+プを提供しています:
 
 .. class:: TextInput
 
-    Text input: ``<input type='text' ...>``
+    テキスト入力: ``<input type='text' ...>`` です。
 
 .. class:: PasswordInput
 
-    Password input: ``<input type='password' ...>``
+    パスワードテキスト入力: ``<input type='password' ...>`` です。
 
 .. class:: HiddenInput
 
-    Hidden input: ``<input type='hidden' ...>``
+    hidden ウィジェット: ``<input type='hidden' ...>`` です。
 
 .. class:: MultipleHiddenInput
 
-    Multiple ``<input type='hidden' ...>`` widgets.
+    複数の hidden ウィジェット: ``<input type='hidden' ...>`` です。
 
 .. class:: FileInput
 
-    File upload input: ``<input type='file' ...>``
+    ファイルアップロード: ``<input type='file' ...>`` です。
 
 .. class:: DateTimeInput
 
     .. versionadded:: 1.0
 
-    Date/time input as a simple text box: ``<input type='text' ...>``
+    単純なテキストボックスで表現された、日付／時刻用の入力ウィジェット:
+    ``<input type='text' ...>`` です。
 
 .. class:: Textarea
 
-    Text area: ``<textarea>...</textarea>``
+    テキストエリア: ``<textarea>...</textarea>`` です。
 
 .. class:: CheckboxInput
 
-    Checkbox: ``<input type='checkbox' ...>``
+    チェックボックス: ``<input type='checkbox' ...>`` です。
 
 .. class:: Select
 
-    Select widget: ``<select><option ...>...</select>``
+    セレクタ: ``<select><option ...>...</select>`` です。
 
 .. class:: NullBooleanSelect
 
-    Select widget with options 'Unknown', 'Yes' and 'No'
+    「不明」, 「はい」, 「いいえ」 を選択肢とするセレクタです。
 
 .. class:: SelectMultiple
 
-    Select widget allowing multiple selection: ``<select
-    multiple='multiple'>...</select>``
+    複数選択の可能なセレクタ: ``<select multiple='multiple'>...</select>``
+    です。 
 
 .. class:: RadioSelect
 
-    A list of radio buttons:
+    ラジオボタンのリストです。以下のようにレンダされます:
     
     .. code-block:: html
     
@@ -76,7 +80,7 @@ commonly used groups of widgets:
 
 .. class:: CheckboxSelectMultiple
 
-    A list of checkboxes:
+    チェックボックスのリストです。以下のようにレンダされます:
     
     .. code-block:: html
     
@@ -87,57 +91,61 @@ commonly used groups of widgets:
 
 .. class:: MultiWidget
 
-    Wrapper around multiple other widgets
+    複数のウィジェットをラップするウィジェットです。
 
 .. class:: SplitDateTimeWidget
 
-    Wrapper around two ``TextInput`` widgets: one for the date, and one for the
-    time.
+    日付と時刻を表す二つの ``TextInput`` ウィジェットを組み合わせてラップし
+    たものです。
 
-Specifying widgets
+.. _Specifying widgets:
+
+ウィジェットの指定
 ------------------
 
 .. attribute:: Form.widget
 
-Whenever you specify a field on a form, Django will use a default widget
-that is appropriate to the type of data that is to be displayed. To find
-which widget is used on which field, see the documentation for the
-built-in Field classes.
+フォームに何らかのフィールドを作成する場合、 Django は表示するデータの型に
+応じて適切なデフォルトのウィジェットを使います。どのフィールドがどのウィ
+ジェットを使っているかは、組み込みフィールドクラスのドキュメントを参照して
+ください。
 
-However, if you want to use a different widget for a field, you can -
-just use the 'widget' argument on the field definition. For example::
+とはいえ、デフォルトとは違うウィジェットを使いたい場合もあるでしょう。その
+場合には、以下の例のように、フィールドを定義する際に ``widget`` 引数を指定
+します::
 
     class CommentForm(forms.Form):
         name = forms.CharField()
         url = forms.URLField()
         comment = forms.CharField(widget=forms.Textarea)
 
-This would specify a form with a comment that uses a larger Textarea widget,
-rather than the default TextInput widget.
+上のコードでは、 comment フィールドにデフォルトの ``TextInput`` ウィジェッ
+トではなく、より大きな ``TextArea`` ウィジェットを使うように指定しています。
 
-Customizing widget instances
-----------------------------
+.. _Customizing widget instances:
 
-When Django renders a widget as HTML, it only renders the bare minimum
-HTML - Django doesn't add a class definition, or any other widget-specific
-attributes. This means that all 'TextInput' widgets will appear the same
-on your web page.
+ウィジェットインスタンスのカスタマイズ
+--------------------------------------
 
-If you want to make one widget look different to another, you need to
-specify additional attributes for each widget. When you specify a
-widget, you can provide a list of attributes that will be added to the
-rendered HTML for the widget.
+ウィジェットを HTML としてレンダリングする際、 Django は最小限の HTML しか
+出力しません。すなわち、クラス定義やウィジェット固有の属性は一切付加しない
+のです。従って、例えばページ上にまったく同じ見栄えの 'TextInput' ウィジェッ
+トが並ぶわけです。
 
-For example, take the following simple form::
+ウィジェットごとに見栄えを変えたいのなら、各々のウィジェットに属性を指定し
+てやる必要があります。ウィジェットを指定するときに、レンダリング後の HTML
+に付加したい属性のリストを指定できます。
+
+例えば、以下のような簡単なフォームを考えましょう::
 
     class CommentForm(forms.Form):
         name = forms.CharField()
         url = forms.URLField()
         comment = forms.CharField()
 
-This form will include three default TextInput widgets, with default rendering -
-no CSS class, no extra attributes. This means that the input boxes provided for
-each widget will be rendered exactly the same::
+このフォームは 3 つの TextInput ウィジェットからなり、デフォルトのレンダリ
+ングでは CSS クラスや属性は指定されていません。従って、各ウィジェットは全く
+同じ入力ボックスとしてレンダリングされます::
 
     >>> f = CommentForm(auto_id=False)
     >>> f.as_table()
@@ -145,15 +153,16 @@ each widget will be rendered exactly the same::
     <tr><th>Url:</th><td><input type="text" name="url"/></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
-
-On a real web page, you probably don't want every widget to look the same. You
-might want a larger input element for the comment, and you might want the 'name'
-widget to have some special CSS class. To do this, you use the ``attrs``
-argument when creating the widget:
+現実の Web ページでは、全ウィジェットが同じに見えるような見栄えを期待しない
+でしょう。コメント欄をもうちょっと大きな入力ボックスにしたかったり、
+``'name'`` ウィジェットに特別な CSS クラスを指定したかったりするかもしれま
+せん。個々のウィジェットの属性こ細かく指定するには、フィールドにカスタムの
+ウィジェットを指定して、ウィジェットのレンダリング時に使われる属性を指定し
+ます。
 
 .. attribute:: Widget.attrs
 
-For example::
+例えば::
 
     class CommentForm(forms.Form):
         name = forms.CharField(
@@ -162,7 +171,7 @@ For example::
         comment = forms.CharField(
                    widget=forms.TextInput(attrs={'size':'40'}))
 
-Django will then include the extra attributes in the rendered output::
+これで、 Django はレンダリング結果に追加の属性を組み込むようになります::
 
     >>> f = CommentForm(auto_id=False)
     >>> f.as_table()

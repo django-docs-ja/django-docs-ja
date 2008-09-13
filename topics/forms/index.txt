@@ -4,6 +4,10 @@
 Working with forms
 ==================
 
+:revision-up-to: 8961 (1.0)
+
+.. TBD
+
 .. admonition:: About this document
 
     This document provides an introduction to Django's form handling features.
@@ -24,43 +28,45 @@ number of common form-related tasks. Using it, you can:
 Overview
 ========
 
-The library deals with these concepts:
+このライブラリでは、以下のような概念を扱います:
 
 .. glossary::
 
-    Widget
-        A class that corresponds to an HTML form widget, e.g.
-        ``<input type="text">`` or ``<textarea>``. This handles rendering of the
-        widget as HTML.
+    ウィジェット (Widget)
+        ``<input type="text">`` や ``<textarea>`` のような、 HTML フォーム
+        ウィジェットに対応するクラスです。ウィジェットから HTML へのレンダ
+        リングもこのクラスで行われます。
 
-    Field
-        A class that is responsible for doing validation, e.g.
-        an ``EmailField`` that makes sure its data is a valid e-mail address.
+    フィールド (Field)
+        データの検証を行うためのクラスです。例えば、 ``EmailField`` はデー
+        タが有効な電子メールアドレスかどうか検証します。
 
-    Form
-        A collection of fields that knows how to validate itself and
-        display itself as HTML.
+    フォーム (Form)
+        フィールドの集まりで、データの検証や HTML への表示方法が実装された
+        ものです。
 
-    Form Media
-        The CSS and JavaScript resources that are required to render a form.
-            
-The library is decoupled from the other Django components, such as the database
-layer, views and templates. It relies only on Django settings, a couple of
-``django.utils`` helper functions and Django's internationalization hooks (but
-you're not required to be using internationalization features to use this
-library).
+    フォームメディア (Form Media)
+        フォームをレンダするときに必要な CSS や JavaScript リソースの定義です。
 
-Form objects
-============
+このライブラリは、データベースレイヤやビュー、テンプレートといった他の
+Django コンポーネントに対してカップリングしていません。このライブラリが依存
+しているのは settings と ``django.utils`` の二つのヘルパ関数、そして国際化
+のためのフックだけです (ただし、このライブラリを使うために国際化の機能を使
+わねばならないわけではありません) 。
 
-A Form object encapsulates a sequence of form fields and a collection of
-validation rules that must be fulfilled in order for the form to be accepted.
-Form classes are created as subclasses of ``django.forms.Form`` and are
-make use of a declarative style that you'll be familiar with if you've used
-Django's database models.
+.. _Form objects:
 
-For example, consider a form used to implement "contact me" functionality on a
-personal Web site::
+フォームオブジェクト
+====================
+
+フォームオブジェクトは、フォームに含める一連のフィールドや、フォームに入力
+した値を受理するために充足しなければならないバリデーション規則をカプセル化
+します。フォームクラスは、 ``django.newforms.Form`` クラスをサブクラス化し、
+Django のデータベースモデルによく似た方法でフォームのフィールドを定義して作
+成します。
+
+一例として、個人のウェブサイトでコンタクトフォームの機能を実装するときに使
+うフォームを考えてみましょう::
 
     from django import forms
 
@@ -70,14 +76,15 @@ personal Web site::
         sender = forms.EmailField()
         cc_myself = forms.BooleanField(required=False)
 
-A form is composed of ``Field`` objects. In this case, our form has four
-fields: ``subject``, ``message``, ``sender`` and ``cc_myself``. ``CharField``,
-``EmailField`` and ``BooleanField`` are just three of the available field types;
-a full list can be found in :ref:`ref-forms-fields`.
+フォームは ``Field`` オブジェクトの組み合わせでできています。今回の例では、
+``subject`` (題名)、 ``message`` (メッセージ)、 ``sender`` (送信者)、そして
+``cc_myself`` (自分に CC する)、の 4 つのフィールドをフォームに持たせます。
+``CharField`` や ``EmailField``, ``BooleanField`` はフィールド型です。
+フィールド型の一覧は :ref:`ref-forms-fields` を参照してください。
 
-If your form is going to be used to directly add or edit a Django model, you can
-use a :ref:`ModelForm <topics-forms-modelforms>` to avoid duplicating your model
-description.
+:ref:`ModelForm <topics-forms-modelforms>` を使えば、フォームを使って
+Django のモデルを直接追加したり編集したりしたいときに、モデルと重複する記述
+をせずにすみます。
 
 Using a form in a view
 ----------------------

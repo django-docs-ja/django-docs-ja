@@ -1,23 +1,26 @@
 .. _ref-generic-views:
 
-=============
-Generic views
-=============
+==========
+汎用ビュー
+==========
 
-Writing Web applications can be monotonous, because we repeat certain patterns
-again and again. In Django, the most common of these patterns have been
-abstracted into "generic views" that let you quickly provide common views of
-an object without actually needing to write any Python code.
+:revision-up-to: 8961 (1.0)
 
-Django's generic views contain the following:
+Web アプリケーションの作成は、同じパターンを何度も何度も繰り返し書くことに
+なるため、退屈なものです。 Django では、そんなパターンに共通する部分のほと
+んどを「汎用ビュー (generic view) 」という形で抽象化し、オブジェクトに対し
+てよく定義されるビューを、 Python コードを一切書かずに作成できるようにして
+います。
 
-    * A set of views for doing list/detail interfaces.
+Django の汎用ビューには以下のようなものがあります:
 
-    * A set of views for year/month/day archive pages and associated
-      detail and "latest" pages (for example, the Django weblog's year_,
-      month_, day_, detail_, and latest_ pages).
+    * list/detail インタフェースを実現するビューのセット。
 
-    * A set of views for creating, editing, and deleting objects.
+    * アーカイブに入っているページ群に対する年/月/日のビューと、各ページの
+      詳細、そして「新着 (latest)」のページ (例えば Django weblog の year_,
+      month_, day_, detail_, latest_ といったページ)。
+
+    * オブジェクトの生成、編集、削除を行うためのビュー。
 
 .. _year: http://www.djangoproject.com/weblog/2005/
 .. _month: http://www.djangoproject.com/weblog/2005/jul/
@@ -25,1086 +28,1158 @@ Django's generic views contain the following:
 .. _detail: http://www.djangoproject.com/weblog/2005/jul/20/autoreload/
 .. _latest: http://www.djangoproject.com/weblog/
 
-All of these views are used by creating configuration dictionaries in
-your URLconf files and passing those dictionaries as the third member of the
-URLconf tuple for a given pattern. For example, here's the URLconf for the
-simple weblog app that drives the blog on djangoproject.com::
+これらのビューは全て、URLconf ファイルに設定の入った辞書を作成し、 URLconf
+で URL パターンを記述しているタプルの 3 つめのメンバにその辞書を渡すことで
+使えるようになります。例えば、djangoproject.com の blog を駆動している簡単
+な weblog アプリのための URLconf を以下に示しましょう::
 
     from django.conf.urls.defaults import *
     from django_website.apps.blog.models import Entry
 
-    info_dict = {
-        'queryset': Entry.objects.all(),
-        'date_field': 'pub_date',
-    }
+    info_dict = {'queryset': Entry.objects.all(),
+                 'date_field': 'pub_date'}
 
     urlpatterns = patterns('django.views.generic.date_based',
-       (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\w{1,2})/(?P<slug>[-\w]+)/$', 'object_detail', info_dict),
-       (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\w{1,2})/$',               'archive_day',   info_dict),
-       (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/$',                                'archive_month', info_dict),
-       (r'^(?P<year>\d{4})/$',                                                    'archive_year',  info_dict),
-       (r'^$',                                                                    'archive_index', info_dict),
+       (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\w{1,2})/(?P<slug>[-\w]+)/$', 
+       'object_detail', info_dict),
+       (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\w{1,2})/$',
+       'archive_day', info_dict),
+       (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/$',
+       'archive_month', info_dict),
+       (r'^(?P<year>\d{4})/$', 'archive_year',  info_dict),
+       (r'^$', 'archive_index', info_dict),
     )
 
-As you can see, this URLconf defines a few options in ``info_dict``.
-``'queryset'`` gives the generic view a ``QuerySet`` of objects to use (in this
-case, all of the ``Entry`` objects) and tells the generic view which model is
-being used.
+御覧のように、 URLconf では、 ``info_dict`` にいくつかのオプションを定義し
+ています。 ``queryset`` は汎用ビューに渡すオブジェクトに対する ``QuerySet``
+(上の場合には ``Entry`` オブジェクト全て) です。また、追加の情報 (どのモデ
+ルを使っているのかをビューに教えるための情報) も定義しています。
 
-Documentation of each generic view follows, along with a list of all keyword
-arguments that a generic view expects. Remember that as in the example above,
-arguments may either come from the URL pattern (as ``month``, ``day``,
-``year``, etc. do above) or from the additional-information dictionary (as for
-``queryset``, ``date_field``, etc.).
+以下では、各汎用ビューのドキュメントと、汎用ビューで使われる全てのキーワー
+ド引数について説明します。上の例では、引数は URL パターンの中にあるもの
+(``month``, ``day``, ``year``, など) も、辞書に入っているもの
+(``queryset``, ``date_field`` など) もあることに注意してください。
 
-Most generic views require the ``queryset`` key, which is a ``QuerySet``
-instance; see :ref:`topics-db-queries` for more information about ``QuerySet``
-objects.
+ほとんどの汎用ビューで ``queryset`` キーが必要です。この値は ``QuerySet``
+インスタンスです。 ``QuerySet`` オブジェクトの詳細は
+:ref:`topics-db-queries` を参照してください。
 
-Most views also take an optional ``extra_context`` dictionary that you can use
-to pass any auxiliary information you wish to the view. The values in the
-``extra_context`` dictionary can be either functions (or other callables) or
-other objects. Functions are evaluated just before they are passed to the
-template. However, note that QuerySets retrieve and cache their data when they
-are first evaluated, so if you want to pass in a QuerySet via
-``extra_context`` that is always fresh you need to wrap it in a function or
-lambda that returns the QuerySet.
+ほとんどのビューは、 ``extra_context`` というオプションの引数を取れます。こ
+の引数の値は辞書で、ビューに渡したい任意の外部の情報を渡すためのものです。
+``extra_context`` 辞書の値は関数 (や呼び出し可能オブジェクト) でも、それ以
+外のオブジェクトでもかまいません。関数はテンプレートに渡される直前に評価さ
+れます。ただし、 QuerySet は最初に評価した時点でデータを取得してキャッシュ
+に入れるので、 ``extra_context`` を使ってクエリセットを渡し、なおかつ
+QuerySet を常に最新の状態にしておきたい場合には、関数やラムダ表記を使って
+QuerySet を返させるようにせねばなりません。
 
-"Simple" generic views
-======================
+.. _"Simple" generic views:
 
-The ``django.views.generic.simple`` module contains simple views to handle a
-couple of common cases: rendering a template when no view logic is needed,
-and issuing a redirect.
+「簡単な」汎用ビュー
+====================
+
+``django.views.generic.simple`` モジュールには、簡単なビューが入っていて、
+ビューロジックの必要がないときのレンダリングと、リダイレクトの発行という
+よくある二つのケースを処理できるようになっています:
 
 ``django.views.generic.simple.direct_to_template``
 --------------------------------------------------
 
-**Description:**
+**解説:**
 
-Renders a given template, passing it a ``{{ params }}`` template variable,
-which is a dictionary of the parameters captured in the URL.
+指定のテンプレートにテンプレート変数 ``{{ params }}`` を指定してレンダリン
+グします。 ``{{ params }}`` は URL から取り出したパラメタの辞書になります。
 
-**Required arguments:**
+**必須の引数:**
 
-    * ``template``: The full name of a template to use.
+    * ``template``: 使用するテンプレートの完全な名前です。
 
-**Optional arguments:**
+**オプションの引数:**
 
-    * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary. If a value in the
-      dictionary is callable, the generic view will call it
-      just before rendering the template.
+    * ``extra_context``: テンプレートコンテキストに追加したい値を入れた辞書
+      です。辞書内の値が呼び出し可能オブジェクトの場合、ビューはテンプレー
+      トのレンダリング直前にオブジェクトを呼び出します。
 
-    * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
+    * ``mimetype``: 出力結果のドキュメントの MIME タイプです。
+      デフォルト値は ``DEFAULT_CONTENT_TYPE`` 設定の値です。
 
-**Example:**
+**例題:**
 
-Given the following URL patterns::
+例えば、以下のような URL パターンを指定したとしましょう::
 
     urlpatterns = patterns('django.views.generic.simple',
-        (r'^foo/$',             'direct_to_template', {'template': 'foo_index.html'}),
-        (r'^foo/(?P<id>\d+)/$', 'direct_to_template', {'template': 'foo_detail.html'}),
+        (r'^foo/$',
+	    'direct_to_template', {'template': 'foo_index'}),
+        (r'^foo/(?P<id>\d+)/$', 
+	    'direct_to_template', {'template': 'foo_detail'}),
     )
 
-... a request to ``/foo/`` would render the template ``foo_index.html``, and a
-request to ``/foo/15/`` would render the ``foo_detail.html`` with a context
-variable ``{{ params.id }}`` that is set to ``15``.
+``/foo/`` へのリクエストは、 ``foo_index.html`` テンプレートを使ったレンダ
+リングになります。一方、 ``/foo/15/`` へのリクエストは ``foo_detail.html``
+テンプレートを使ったレンダリングになりますが、このときのコンテキスト変数
+``{{ params.id }}`` は ``15`` になります。
 
 ``django.views.generic.simple.redirect_to``
 -------------------------------------------
+ 
+**解説:**
 
-**Description:**
+指定の URL へリダイレクトします。
 
-Redirects to a given URL.
+URL を指定する文字列には、辞書スタイルの文字列フォーマットを含めてもよく、
+その場合、 URL 中の該当パラメタで補完されます。
 
-The given URL may contain dictionary-style string formatting, which will be
-interpolated against the parameters captured in the URL.
+URL に ``None`` を指定すると、 ``HttpResponseGone`` (410) を発行します。
 
-If the given URL is ``None``, Django will return an ``HttpResponseGone`` (410).
+**必須の引数:**
 
-**Required arguments:**
+    * ``url``: リダイレクト先の URL を表す文字列です。 ``None`` にすると
+      HTTP 410 エラー (Gone) を送出します。
 
-    * ``url``: The URL to redirect to, as a string. Or ``None`` to raise a 410
-      (Gone) HTTP error.
+**例題:**
 
-**Example:**
-
-This example redirects from ``/foo/<id>/`` to ``/bar/<id>/``::
+以下の例では、 ``/foo/<id>/`` を ``/bar/<id>/`` にリダイレクトします::
 
     urlpatterns = patterns('django.views.generic.simple',
-        ('^foo/(?P<id>\d+)/$', 'redirect_to', {'url': '/bar/%(id)s/'}),
+        ('^foo/(?P<id>\d+)/$', 'redirect_to', {'url' : '/bar/%(id)s/'}),
     )
 
-This example returns a 410 HTTP error for requests to ``/bar/``::
+以下の例では、 ``/bar/`` へのリクエストに対して HTTP 410 エラーを返します::
 
     urlpatterns = patterns('django.views.generic.simple',
         ('^bar/$', 'redirect_to', {'url': None}),
     )
 
-Date-based generic views
-========================
 
-Date-based generic views (in the module ``django.views.generic.date_based``)
-are views for displaying drilldown pages for date-based data.
+.. _Date-based generic views:
+
+日付ベースの汎用ビュー
+======================
+
+日付ベースの汎用ビュー (date-based generic view,
+``django.views.generic.date_based`` モジュール) は、日付ベースのデータを絞
+り込めるページを表示するビューです。
 
 ``django.views.generic.date_based.archive_index``
 -------------------------------------------------
 
-**Description:**
+**解説:**
 
-A top-level index page showing the "latest" objects, by date. Objects with
-a date in the *future* are not included unless you set ``allow_future`` to
-``True``.
+「新着 ("latest")」オブジェクトを日付順で表示するトップレベルのインデクスペー
+ジです。 ``allow_future`` を ``True`` にしない限り、 *未来の* 日付のオブジェ
+クトは表示しません。
 
-**Required arguments:**
+**必須の引数:**
 
-    * ``queryset``: A ``QuerySet`` of objects for which the archive serves.
+    * ``queryset``: アーカイブを提供するオブジェクトの ``QuerySet`` です。
 
-    * ``date_field``: The name of the ``DateField`` or ``DateTimeField`` in
-      the ``QuerySet``'s model that the date-based archive should use to
-      determine the objects on the page.
+    * ``date_field``: ``QuerySet`` に指定したモデルの ``DateField`` または
+      ``DateTimeField`` 型のフィールド名です。日付ベースのアーカイブで、ペー
+      ジに掲載するオブジェクトを決定するために使います。
 
-**Optional arguments:**
+**オプションの引数:**
 
-    * ``num_latest``: The number of latest objects to send to the template
-      context. By default, it's 15.
+    * ``num_latest``: 最近のオブジェクトとしてテンプレートコンテキストに送
+      り込まれるオブジェクトの数です。デフォルトは 15 です。
 
-    * ``template_name``: The full name of a template to use in rendering the
-      page. This lets you override the default template name (see below).
+    * ``template_name``: ページのレンダリングに使うテンプレートの完全な名前
+      です。この変数を使うと、デフォルトのテンプレート名 (下記参照) をオー
+      バライドできます。
 
-    * ``template_loader``: The template loader to use when loading the
-      template. By default, it's ``django.template.loader``.
+    * ``template_loader``: テンプレートのロードに使うテンプレートローダです。
+      デフォルトでは ``django.template.loader`` になっています。
 
-    * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary. If a value in the
-      dictionary is callable, the generic view will call it
-      just before rendering the template.
+    * ``extra_context``: テンプレートコンテキストに追加する値からなる辞書で
+      す。デフォルトでは、この辞書は空になっています。辞書内の値が呼び出し
+      可能オブジェクトの場合、汎用ビューはテンプレートのレンダリング直前に
+      そのオブジェクトを呼び出します。
 
-    * ``allow_empty``: A boolean specifying whether to display the page if no
-      objects are available. If this is ``False`` and no objects are available,
-      the view will raise a 404 instead of displaying an empty page. By
-      default, this is ``True``.
+    * ``allow_empty``: オブジェクトがない場合にページを表示するかどうかを示
+      すブール値です。 ``False`` の場合、表示するべきオブジェクトが存在しな
+      ければ、空のインデクスページを表示する代わりに 404 エラーを送出します。
+      デフォルトは ``True`` です。
 
-    * ``context_processors``: A list of template-context processors to apply to
-      the view's template.
+    * ``context_processors``: ビューのテンプレートに適用するテンプレートコ
+      ンテキストプロセッサのリストです。
 
-    * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
+    * ``mimetype``: 出力結果のドキュメントに適用する MIME タイプです。
+      デフォルトの値は ``DEFAULT_CONTENT_TYPE`` の設定値になります。
 
-    * ``allow_future``: A boolean specifying whether to include "future"
-      objects on this page, where "future" means objects in which the field
-      specified in ``date_field`` is greater than the current date/time. By
-      default, this is ``False``.
+    * ``allow_future``: 「未来の」オブジェクトをページに表示するかどうかを
+      制御するブール値です。「未来の」オブジェクトとは、 ``date_field`` に
+      指定したフィールドの値が現在の日／時よりも大きいようなオブジェクトで
+      す。デフォルトでは ``False`` です。
 
     .. versionadded:: 1.0
+    * ``template_object_name``: テンプレートコンテキストをテンプレート変数
+      として渡すときの名前です。デフォルト値は ``'latest'`` です。
 
-    * ``template_object_name``: Designates the name of the template variable
-      to use in the template context. By default, this is ``'latest'``.
 
-**Template name:**
+**テンプレート名:**
 
-If ``template_name`` isn't specified, this view will use the template
-``<app_label>/<model_name>_archive.html`` by default, where:
+``template_name`` を指定しない場合、ビューはデフォルトのテンプレートである
+``<app_label>/<model_name>_archive.html`` を使います。ここで:
 
-    * ``<model_name>`` is your model's name in all lowercase. For a model
-      ``StaffMember``, that'd be ``staffmember``.
+    * ``<model_name>`` はモデル名を全て小文字にしたものです。例えば
+      ``StaffMember`` というモデルの場合は ``staffmember`` になります。
 
-    * ``<app_label>`` is the right-most part of the full Python path to
-      your model's app. For example, if your model lives in
-      ``apps/blog/models.py``, that'd be ``blog``.
+    * ``<app_label>`` はモデルアプリケーションへの Python パスの最も右側の
+      部分になります。例えば、モデルが ``apps/blog/models.py`` に入っていれ
+      ば ``blog`` になります。
 
-**Template context:**
+**テンプレートコンテキスト:**
 
-In addition to ``extra_context``, the template's context will be:
+``extra_context`` の値に加え、テンプレートのコンテキストには以下の変数が入
+ります:
 
-    * ``date_list``: A list of ``datetime.date`` objects representing all
-      years that have objects available according to ``queryset``. These are
-      ordered in reverse. This is equivalent to
-      ``queryset.dates(date_field, 'year')[::-1]``.
+    * ``date_list``: ``queryset`` を介してオブジェクトを取得できる年を表す
+      ``datetime.date`` オブジェクトのリストです。リストは逆順に並んでいま
+      す。 ``queryset.dates(date_field, 'year')[::-1]`` と等価です。
 
     .. versionchanged:: 1.0
-       The behaviour depending on ``template_object_name`` is new in this version.
+       ``template_object_name`` に応じて動作が変わるようになりました。
 
-    * ``latest``: The ``num_latest`` objects in the system, ordered descending
-      by ``date_field``. For example, if ``num_latest`` is ``10``, then
-      ``latest`` will be a list of the latest 10 objects in ``queryset``.
+    * ``latest``: ``date_field`` の順に並んだ ``num_latest`` 個のオブジェク
+      トです。例えば、 ``num_latest`` が ``10`` であれば、 ``latest`` は
+      ``queryset`` 内のオブジェクトのうち、最新の 10 個からなるリストです。
 
-      This variable's name depends on the ``template_object_name`` parameter,
-      which is ``'latest'`` by default. If ``template_object_name`` is
-      ``'foo'``, this variable's name will be ``foo``.
+      変数の名前は ``template_object_name`` パラメタで変更できます。デフォ
+      ルト値は ``'latest'`` です。例えば、 ``template_object_name`` を
+      ``'foo'`` にしたときの変数名は ``foo`` です。
+
 
 ``django.views.generic.date_based.archive_year``
 ------------------------------------------------
 
-**Description:**
+**解説:**
 
-A yearly archive page showing all available months in a given year. Objects
-with a date in the *future* are not displayed unless you set ``allow_future``
-to ``True``.
+指定年でオブジェクトのある月のリストを表示する、年ごとのアーカイブページで
+す。 ``allow_future`` を ``True`` にしない限り、  *未来の* 日付のオブジェク
+トは表示しません。
 
-**Required arguments:**
+**必須の引数:**
 
-    * ``year``: The four-digit year for which the archive serves.
+    * ``year``: アーカイブを提供する年の 4 桁の年号です。
 
-    * ``queryset``: A ``QuerySet`` of objects for which the archive serves.
+    * ``queryset``: アーカイブを提供するオブジェクトの ``QuerySet`` です。
 
-    * ``date_field``: The name of the ``DateField`` or ``DateTimeField`` in
-      the ``QuerySet``'s model that the date-based archive should use to
-      determine the objects on the page.
+    * ``date_field``: ``QuerySet`` に指定したモデルの ``DateField`` または
+      ``DateTimeField`` 型のフィールド名です。日付ベースのアーカイブで、ペー
+      ジに掲載するオブジェクトを決定するために使います。
 
-**Optional arguments:**
+**オプションの引数:**
 
-    * ``template_name``: The full name of a template to use in rendering the
-      page. This lets you override the default template name (see below).
+    * ``template_name``: ページのレンダリングに使うテンプレートの完全な名前
+      です。この変数を使うと、デフォルトのテンプレート名 (下記参照) をオー
+      バライドできます。
 
-    * ``template_loader``: The template loader to use when loading the
-      template. By default, it's ``django.template.loader``.
+    * ``template_loader``: テンプレートのロードに使うテンプレートローダです。
+      デフォルトでは ``django.template.loader`` になっています。
 
-    * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary. If a value in the
-      dictionary is callable, the generic view will call it
-      just before rendering the template.
+    * ``extra_context``: テンプレートコンテキストに追加する値からなる辞書で
+      す。デフォルトでは、この辞書は空になっています。辞書内の値が呼び出し
+      可能オブジェクトの場合、汎用ビューはテンプレートのレンダリング直前に
+      そのオブジェクトを呼び出します。
 
-    * ``allow_empty``: A boolean specifying whether to display the page if no
-      objects are available. If this is ``False`` and no objects are available,
-      the view will raise a 404 instead of displaying an empty page. By
-      default, this is ``False``.
+    * ``allow_empty``: オブジェクトがない場合にページを表示するかどうかを示
+      すブール値です。 ``False`` の場合、表示するべきオブジェクトが存在しな
+      ければ、空のインデクスページを表示する代わりに 404 エラーを送出します。
+      デフォルトは ``False`` です。
 
-    * ``context_processors``: A list of template-context processors to apply to
-      the view's template.
+    * ``context_processors``: ビューのテンプレートに適用するテンプレートコ
+      ンテキストプロセッサのリストです。 
 
-    * ``template_object_name``:  Designates the name of the template variable
-      to use in the template context. By default, this is ``'object'``. The
-      view will append ``'_list'`` to the value of this parameter in
-      determining the variable's name.
+    * ``template_object_name``: テンプレートコンテキスト中で使うテンプレー
+      ト変数の名前を指定します。デフォルトでは ``'object'`` です。ビューは
+      このパラメタに ``'_list'`` を追加した値を変数名に使います。
 
-    * ``make_object_list``: A boolean specifying whether to retrieve the full
-      list of objects for this year and pass those to the template. If ``True``,
-      this list of objects will be made available to the template as
-      ``object_list``. (The name ``object_list`` may be different; see the docs
-      for ``object_list`` in the "Template context" section below.) By default,
-      this is ``False``.
+    * ``make_object_list``: 指定年の全てのオブジェクトのリストを取得してテ
+      ンプレートに渡すかどうかを決めるブール値です。 ``True`` にすると、オ
+      ブジェクトのリストを ``object_list`` という変数で利用できます
+      (``object_list`` は別の名前になるかもしれません。後述の「テンプレート
+      コンテキスト」の節の ``object_list`` の説明を参照してください)。
+      デフォルトでは ``False`` になっています。
 
-    * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
+    * ``mimetype``: 出力結果のドキュメントに適用する MIME タイプです。
+      デフォルトの値は ``DEFAULT_CONTENT_TYPE`` の設定値になります。
 
-    * ``allow_future``: A boolean specifying whether to include "future"
-      objects on this page, where "future" means objects in which the field
-      specified in ``date_field`` is greater than the current date/time. By
-      default, this is ``False``.
+    * ``allow_future``: 「未来の」オブジェクトをページに表示するかどうかを
+      制御するブール値です。「未来の」オブジェクトとは、 ``date_field`` に
+      指定したフィールドの値が現在の日／時よりも大きいようなオブジェクトで
+      す。デフォルトでは ``False`` です。
 
-**Template name:**
+**テンプレート名:**
 
-If ``template_name`` isn't specified, this view will use the template
-``<app_label>/<model_name>_archive_year.html`` by default.
+``template_name`` を指定しない場合、ビューはデフォルトのテンプレートである
+``<app_label>/<model_name>_archive_year.html`` を使います。
 
-**Template context:**
+**テンプレートコンテキスト:**
 
-In addition to ``extra_context``, the template's context will be:
+``extra_context`` の値に加え、テンプレートのコンテキストには以下の変数が入
+ります:
 
-    * ``date_list``: A list of ``datetime.date`` objects representing all
-      months that have objects available in the given year, according to
-      ``queryset``, in ascending order.
+    * ``date_list``: 指定年内で ``queryset`` を介してオブジェクトを取得でき
+      る月を表す ``datetime.date`` オブジェクトのリストです。リストは昇順に
+      並んでいます。
 
-    * ``year``: The given year, as a four-character string.
+    * ``year``: 指定年の年号を表す 4 桁の文字列です。
 
-    * ``object_list``: If the ``make_object_list`` parameter is ``True``, this
-      will be set to a list of objects available for the given year, ordered by
-      the date field. This variable's name depends on the
-      ``template_object_name`` parameter, which is ``'object'`` by default. If
-      ``template_object_name`` is ``'foo'``, this variable's name will be
-      ``foo_list``.
+    * ``object_list``: ``make_object_list`` パラメタを ``True`` にした場合、
+      この値は指定年内のオブジェクトを日付フィールドで並べたリストになりま
+      す。この変数の名前は ``template_object_name`` パラメタの設定に依存し
+      ます。 ``template_object_name`` のデフォルト値は ``'object'`` で、例
+      えば ``template_object_name`` の値が ``'foo'`` であれば、変数名は
+      ``foo_list`` になります。
 
-      If ``make_object_list`` is ``False``, ``object_list`` will be passed to
-      the template as an empty list.
+      ``make_object_list`` が ``False`` の場合、 ``object_list`` は空のリス
+      トとしてテンプレートに渡されます。
 
 ``django.views.generic.date_based.archive_month``
 -------------------------------------------------
 
-**Description:**
+**解説:**
 
-A monthly archive page showing all objects in a given month. Objects with a
-date in the *future* are not displayed unless you set ``allow_future`` to
-``True``.
+指定月の全てのオブジェクトのリストを表示する、月ごとのアーカイブページです。
+``allow_future`` を ``True`` にしない限り、 *未来の* 日付のオブジェクトは表
+示しません。
 
-**Required arguments:**
+**必須の引数:**
 
-    * ``year``: The four-digit year for which the archive serves (a string).
+    * ``year``: アーカイブを提供する年の 4 桁の年号 (の文字列) です。
 
-    * ``month``: The month for which the archive serves, formatted according to
-      the ``month_format`` argument.
+    * ``month``: アーカイブを提供する月のです。 ``month_format`` 引数に従っ
+      てフォーマットされています。
 
-    * ``queryset``: A ``QuerySet`` of objects for which the archive serves.
+    * ``queryset``: アーカイブを提供するオブジェクトの ``QuerySet`` です。
 
-    * ``date_field``: The name of the ``DateField`` or ``DateTimeField`` in
-      the ``QuerySet``'s model that the date-based archive should use to
-      determine the objects on the page.
+    * ``date_field``: ``QuerySet`` に指定したモデルの ``DateField`` または
+      ``DateTimeField`` 型のフィールド名です。日付ベースのアーカイブで、ペー
+      ジに掲載するオブジェクトを決定するために使います。
 
-**Optional arguments:**
+**オプションの引数:**
 
-    * ``month_format``: A format string that regulates what format the
-      ``month`` parameter uses. This should be in the syntax accepted by
-      Python's ``time.strftime``. (See the `strftime docs`_.) It's set to
-      ``"%b"`` by default, which is a three-letter month abbreviation. To
-      change it to use numbers, use ``"%m"``.
+    * ``month_format``: ``month`` パラメタで使っているフォーマットを指定す
+      るためのフォーマット文字列です。この値は Python の ``time.strftime``
+      が受け取るのと同じ書法のフォーマット文字列を指定します。 
+      (`strftime のドキュメント`_  参照)。デフォルトでは ``"%b"`` に設定さ
+      れており、これは 3 文字で省略して表した月名です。数字を使うように変え
+      たければ ``"%m"`` を使って下さい。
 
-    * ``template_name``: The full name of a template to use in rendering the
-      page. This lets you override the default template name (see below).
+    * ``template_name``: ページのレンダリングに使うテンプレートの完全な名前
+      です。この変数を使うと、デフォルトのテンプレート名 (下記参照) をオー
+      バライドできます。
 
-    * ``template_loader``: The template loader to use when loading the
-      template. By default, it's ``django.template.loader``.
+    * ``template_loader``: テンプレートのロードに使うテンプレートローダです。
+      デフォルトでは ``django.template.loader`` になっています。
 
-    * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary. If a value in the
-      dictionary is callable, the generic view will call it
-      just before rendering the template.
+    * ``extra_context``: テンプレートコンテキストに追加する値からなる辞書で
+      す。デフォルトでは、この辞書は空になっています。辞書内の値が呼び出し
+      可能オブジェクトの場合、汎用ビューはテンプレートのレンダリング直前に
+      そのオブジェクトを呼び出します。
 
-    * ``allow_empty``: A boolean specifying whether to display the page if no
-      objects are available. If this is ``False`` and no objects are available,
-      the view will raise a 404 instead of displaying an empty page. By
-      default, this is ``False``.
+    * ``allow_empty``: オブジェクトがない場合にページを表示するかどうかを示
+      すブール値です。 ``False`` の場合、表示するべきオブジェクトが存在しな
+      ければ、空のインデクスページを表示する代わりに 404 エラーを送出します。
+      デフォルトは ``False`` です。
 
-    * ``context_processors``: A list of template-context processors to apply to
-      the view's template.
+    * ``context_processors``: ビューのテンプレートに適用するテンプレートコ
+      ンテキストプロセッサのリストです。 
 
-    * ``template_object_name``:  Designates the name of the template variable
-      to use in the template context. By default, this is ``'object'``. The
-      view will append ``'_list'`` to the value of this parameter in
-      determining the variable's name.
+    * ``template_object_name``: テンプレートコンテキスト内で使うテンプレー
+      ト変数名を示します。デフォルトでは ``'object'`` になっています。ビュー
+      はこの変数名に ``'_list'`` を追加して変数名を決定します。
 
-    * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
+    * ``mimetype``: 出力結果のドキュメントに適用する MIME タイプです。
+      デフォルトの値は ``DEFAULT_CONTENT_TYPE`` の設定値になります。
 
-    * ``allow_future``: A boolean specifying whether to include "future"
-      objects on this page, where "future" means objects in which the field
-      specified in ``date_field`` is greater than the current date/time. By
-      default, this is ``False``.
+    * ``allow_future``: 「未来の」オブジェクトをページに表示するかどうかを
+      制御するブール値です。「未来の」オブジェクトとは、 ``date_field`` に
+      指定したフィールドの値が現在の日／時よりも大きいようなオブジェクトで
+      す。デフォルトでは ``False`` です。
 
-**Template name:**
+**テンプレート名:**
 
-If ``template_name`` isn't specified, this view will use the template
-``<app_label>/<model_name>_archive_month.html`` by default.
+``template_name`` を指定しない場合、ビューはデフォルトのテンプレートである
+``<app_label>/<model_name>_archive_month.html`` を使います。
 
-**Template context:**
+**テンプレートコンテキスト:**
 
-In addition to ``extra_context``, the template's context will be:
+``extra_context`` の値に加え、テンプレートのコンテキストには以下の変数が入
+ります:
 
-    * ``month``: A ``datetime.date`` object representing the given month.
+    * ``month``: 指定月を表す ``datetime.date`` オブジェクトです。
 
-    * ``next_month``: A ``datetime.date`` object representing the first day of
-      the next month. If the next month is in the future, this will be
-      ``None``.
+    * ``next_month``: 次の月の最初の日を表す ``datetime.date`` オブジェクト
+      です。次の月が未来の日付の場合には ``None`` になります。
 
-    * ``previous_month``: A ``datetime.date`` object representing the first day
-      of the previous month. Unlike ``next_month``, this will never be
-      ``None``.
+    * ``previous_month``: 前の月の最初の日を表す ``datetime.date`` オブジェクト
+      です。 ``next_month`` と違い、決して ``None`` にはなりません。
 
-    * ``object_list``: A list of objects available for the given month. This
-      variable's name depends on the ``template_object_name`` parameter, which
-      is ``'object'`` by default. If ``template_object_name`` is ``'foo'``,
-      this variable's name will be ``foo_list``.
+    * ``object_list``: 指定月内のオブジェクトからなるリストです。この変数の
+      名前は ``template_object_name`` パラメタの設定に依存します。
+      ``template_object_name`` のデフォルト値は ``'object'`` で、例えば
+      ``template_object_name`` の値が ``'foo'`` であれば、変数名は
+      ``foo_list`` になります。
 
-.. _strftime docs: http://www.python.org/doc/current/lib/module-time.html#l2h-1941
+.. _`strftime のドキュメント`:
+    http://www.python.jp/doc/release/lib/module-time.html#l2h-1915
+.. _strftime docs: http://www.python.org/doc/current/lib/module-time.html#l2h-1915
 
 ``django.views.generic.date_based.archive_week``
 ------------------------------------------------
 
-**Description:**
+**解説:**
 
-A weekly archive page showing all objects in a given week. Objects with a date
-in the *future* are not displayed unless you set ``allow_future`` to ``True``.
+指定週の全てのオブジェクトのリストを表示する、週ごとのアーカイブページです。
+``allow_future`` を ``True`` にしない限り、 *未来の* 日付のオブジェクトは表
+示しません。
 
-**Required arguments:**
+**必須の引数:**
 
-    * ``year``: The four-digit year for which the archive serves (a string).
+    * ``year``: アーカイブを提供する年の 4 桁の年号 (の文字列) です。
 
-    * ``week``: The week of the year for which the archive serves (a string).
-      Weeks start with Sunday.
+    * ``week``: アーカイブを提供する週 (の文字列) です。週は日曜から始まり
+      ます。
 
-    * ``queryset``: A ``QuerySet`` of objects for which the archive serves.
+    * ``queryset``: アーカイブを提供するオブジェクトの ``QuerySet`` です。
 
-    * ``date_field``: The name of the ``DateField`` or ``DateTimeField`` in
-      the ``QuerySet``'s model that the date-based archive should use to
-      determine the objects on the page.
+    * ``date_field``: ``QuerySet`` に指定したモデルの ``DateField`` または
+      ``DateTimeField`` 型のフィールド名です。日付ベースのアーカイブで、ペー
+      ジに掲載するオブジェクトを決定するために使います。
 
-**Optional arguments:**
+**オプションの引数:**
 
-    * ``template_name``: The full name of a template to use in rendering the
-      page. This lets you override the default template name (see below).
+    * ``template_name``: ページのレンダリングに使うテンプレートの完全な名前
+      です。この変数を使うと、デフォルトのテンプレート名 (下記参照) をオー
+      バライドできます。
 
-    * ``template_loader``: The template loader to use when loading the
-      template. By default, it's ``django.template.loader``.
+    * ``template_loader``: テンプレートのロードに使うテンプレートローダです。
+      デフォルトでは ``django.template.loader`` になっています。
 
-    * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary. If a value in the
-      dictionary is callable, the generic view will call it
-      just before rendering the template.
+    * ``extra_context``: テンプレートコンテキストに追加する値からなる辞書で
+      す。デフォルトでは、この辞書は空になっています。辞書内の値が呼び出し
+      可能オブジェクトの場合、汎用ビューはテンプレートのレンダリング直前に
+      そのオブジェクトを呼び出します。
 
-    * ``allow_empty``: A boolean specifying whether to display the page if no
-      objects are available. If this is ``False`` and no objects are available,
-      the view will raise a 404 instead of displaying an empty page. By
-      default, this is ``True``.
+    * ``allow_empty``: オブジェクトがない場合にページを表示するかどうかを示
+      すブール値です。 ``False`` の場合、表示するべきオブジェクトが存在しな
+      ければ、空のインデクスページを表示する代わりに 404 エラーを送出します。
+      デフォルトは ``False`` です。
 
-    * ``context_processors``: A list of template-context processors to apply to
-      the view's template.
+    * ``context_processors``: ビューのテンプレートに適用するテンプレートコ
+      ンテキストプロセッサのリストです。 
 
-    * ``template_object_name``:  Designates the name of the template variable
-      to use in the template context. By default, this is ``'object'``. The
-      view will append ``'_list'`` to the value of this parameter in
-      determining the variable's name.
+    * ``template_object_name``: テンプレートコンテキスト内で使うテンプレー
+      ト変数名を示します。デフォルトでは ``'object'`` になっています。ビュー
+      はこの変数名に ``'_list'`` を追加して変数名を決定します。
 
-    * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
+    * ``mimetype``: 出力結果のドキュメントに適用する MIME タイプです。
+      デフォルトの値は ``DEFAULT_CONTENT_TYPE`` の設定値になります。
 
-    * ``allow_future``: A boolean specifying whether to include "future"
-      objects on this page, where "future" means objects in which the field
-      specified in ``date_field`` is greater than the current date/time. By
-      default, this is ``False``.
+    * ``allow_future``: 「未来の」オブジェクトをページに表示するかどうかを
+      制御するブール値です。「未来の」オブジェクトとは、 ``date_field`` に
+      指定したフィールドの値が現在の日／時よりも大きいようなオブジェクトで
+      す。デフォルトでは ``False`` です。
 
-**Template name:**
+**テンプレート名:**
 
-If ``template_name`` isn't specified, this view will use the template
-``<app_label>/<model_name>_archive_week.html`` by default.
+``template_name`` を指定しない場合、ビューはデフォルトのテンプレートである
+``<app_label>/<model_name>_archive_week.html`` を使います。
 
-**Template context:**
+**テンプレートコンテキスト:**
 
-In addition to ``extra_context``, the template's context will be:
+``extra_context`` の値に加え、テンプレートのコンテキストには以下の変数が入
+ります:
 
-    * ``week``: A ``datetime.date`` object representing the first day of the
-      given week.
+    * ``week``: 指定週を表す ``datetime.date`` オブジェクトです。
 
-    * ``object_list``: A list of objects available for the given week. This
-      variable's name depends on the ``template_object_name`` parameter, which
-      is ``'object'`` by default. If ``template_object_name`` is ``'foo'``,
-      this variable's name will be ``foo_list``.
+    * ``object_list``: 指定週内のオブジェクトからなるリストです。この変数の
+      名前は ``template_object_name`` パラメタの設定に依存します。
+      ``template_object_name`` のデフォルト値は ``'object'`` で、例えば
+      ``template_object_name`` の値が ``'foo'`` であれば、変数名は
+      ``foo_list`` になります。
+
 
 ``django.views.generic.date_based.archive_day``
 -----------------------------------------------
 
-**Description:**
+**解説:**
 
-A day archive page showing all objects in a given day. Days in the future throw
-a 404 error, regardless of whether any objects exist for future days, unless
-you set ``allow_future`` to ``True``.
+指定日の全てのオブジェクトのリストを表示する、日ごとのアーカイブページです。
+``allow_future`` を ``True`` にしない限り、 *未来の* 日付のオブジェクトを表
+示させようとすると、該当するオブジェクトの有無にかかわらず 404 エラーを送出
+します。
 
-**Required arguments:**
+**必須の引数:**
 
-    * ``year``: The four-digit year for which the archive serves (a string).
+    * ``year``: アーカイブを提供する年の 4 桁の年号 (の文字列) です。
 
-    * ``month``: The month for which the archive serves, formatted according to
-      the ``month_format`` argument.
+    * ``month``: アーカイブを提供する月です。 ``month_format`` 引数に従って
+      フォーマットされています。
 
-    * ``day``: The day for which the archive serves, formatted according to the
-      ``day_format`` argument.
+    * ``day``: アーカイブを提供する日です。 ``day_format`` 引数に従ってフォー
+      マットされています。
 
-    * ``queryset``: A ``QuerySet`` of objects for which the archive serves.
+    * ``queryset``: アーカイブを提供するオブジェクトの ``QuerySet`` です。
 
-    * ``date_field``: The name of the ``DateField`` or ``DateTimeField`` in
-      the ``QuerySet``'s model that the date-based archive should use to
-      determine the objects on the page.
+    * ``date_field``: ``QuerySet`` に指定したモデルの ``DateField`` または
+      ``DateTimeField`` 型のフィールド名です。日付ベースのアーカイブで、ペー
+      ジに掲載するオブジェクトを決定するために使います。
 
-**Optional arguments:**
 
-    * ``month_format``: A format string that regulates what format the
-      ``month`` parameter uses. This should be in the syntax accepted by
-      Python's ``time.strftime``. (See the `strftime docs`_.) It's set to
-      ``"%b"`` by default, which is a three-letter month abbreviation. To
-      change it to use numbers, use ``"%m"``.
+**オプションの引数:**
 
-    * ``day_format``: Like ``month_format``, but for the ``day`` parameter.
-      It defaults to ``"%d"`` (day of the month as a decimal number, 01-31).
+    * ``month_format``: ``month`` パラメタで使っているフォーマットを指定す
+      るためのフォーマット文字列です。この値は Python の ``time.strftime``
+      が受け取るのと同じ書法のフォーマット文字列を指定します。 
+      (`strftime のドキュメント`_  参照)。デフォルトでは ``"%b"`` に設定さ
+      れており、これは 3 文字で省略して表した月名です。数字を使うように変え
+      たければ ``"%m"`` を使って下さい。
 
-    * ``template_name``: The full name of a template to use in rendering the
-      page. This lets you override the default template name (see below).
+    * ``day_format``: ``month_format`` に似ていますが、 ``day`` パラメタ用
+      です。デフォルト値は ``"%d"`` (日付を 01-31 の 2 桁の 10 進数で表した
+      もの) です。
 
-    * ``template_loader``: The template loader to use when loading the
-      template. By default, it's ``django.template.loader``.
+    * ``template_name``: ページのレンダリングに使うテンプレートの完全な名前
+      です。この変数を使うと、デフォルトのテンプレート名 (下記参照) をオー
+      バライドできます。
 
-    * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary. If a value in the
-      dictionary is callable, the generic view will call it
-      just before rendering the template.
+    * ``template_loader``: テンプレートのロードに使うテンプレートローダです。
+      デフォルトでは ``django.template.loader`` になっています。
 
-    * ``allow_empty``: A boolean specifying whether to display the page if no
-      objects are available. If this is ``False`` and no objects are available,
-      the view will raise a 404 instead of displaying an empty page. By
-      default, this is ``False``.
+    * ``extra_context``: テンプレートコンテキストに追加する値からなる辞書で
+      す。デフォルトでは、この辞書は空になっています。辞書内の値が呼び出し
+      可能オブジェクトの場合、汎用ビューはテンプレートのレンダリング直前に
+      そのオブジェクトを呼び出します。
 
-    * ``context_processors``: A list of template-context processors to apply to
-      the view's template.
+    * ``allow_empty``: オブジェクトがない場合にページを表示するかどうかを示
+      すブール値です。 ``False`` の場合、表示するべきオブジェクトが存在しな
+      ければ、空のインデクスページを表示する代わりに 404 エラーを送出します。
+      デフォルトは ``False`` です。
 
-    * ``template_object_name``:  Designates the name of the template variable
-      to use in the template context. By default, this is ``'object'``. The
-      view will append ``'_list'`` to the value of this parameter in
-      determining the variable's name.
+    * ``context_processors``: ビューのテンプレートに適用するテンプレートコ
+      ンテキストプロセッサのリストです。 
 
-    * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
+    * ``template_object_name``: テンプレートコンテキスト内で使うテンプレー
+      ト変数名を示します。デフォルトでは ``'object'`` になっています。ビュー
+      はこの変数名に ``'_list'`` を追加して変数名を決定します。
 
-    * ``allow_future``: A boolean specifying whether to include "future"
-      objects on this page, where "future" means objects in which the field
-      specified in ``date_field`` is greater than the current date/time. By
-      default, this is ``False``.
+    * ``mimetype``: 出力結果のドキュメントに適用する MIME タイプです。
+      デフォルトの値は ``DEFAULT_CONTENT_TYPE`` の設定値になります。
 
-**Template name:**
+    * ``allow_future``: 「未来の」オブジェクトをページに表示するかどうかを
+      制御するブール値です。「未来の」オブジェクトとは、 ``date_field`` に
+      指定したフィールドの値が現在の日／時よりも大きいようなオブジェクトで
+      す。デフォルトでは ``False`` です。
 
-If ``template_name`` isn't specified, this view will use the template
-``<app_label>/<model_name>_archive_day.html`` by default.
+**テンプレート名:**
 
-**Template context:**
+``template_name`` を指定しない場合、ビューはデフォルトのテンプレートである
+``<app_label>/<model_name>_archive_day.html`` を使います。
 
-In addition to ``extra_context``, the template's context will be:
+**テンプレートコンテキスト:**
 
-    * ``day``: A ``datetime.date`` object representing the given day.
+``extra_context`` の値に加え、テンプレートのコンテキストには以下の変数が入
+ります:
 
-    * ``next_day``: A ``datetime.date`` object representing the next day. If
-      the next day is in the future, this will be ``None``.
+    * ``day``: 指定日を表す ``datetime.date`` オブジェクトです。
 
-    * ``previous_day``: A ``datetime.date`` object representing the given day.
-      Unlike ``next_day``, this will never be ``None``.
+    * ``next_day``: 次の日を表す ``datetime.date`` オブジェクトです。次の
+      日が未来の日付の場合には ``None`` になります。
 
-    * ``object_list``: A list of objects available for the given day. This
-      variable's name depends on the ``template_object_name`` parameter, which
-      is ``'object'`` by default. If ``template_object_name`` is ``'foo'``,
-      this variable's name will be ``foo_list``.
+    * ``previous_day``: 前の日を表す ``datetime.date`` オブジェクトです。
+      ``next_day`` と違い、決して ``None`` にはなりません。
+
+    * ``object_list``: 指定月内のオブジェクトからなるリストです。この変数の
+      名前は ``template_object_name`` パラメタの設定に依存します。
+      ``template_object_name`` のデフォルト値は ``'object'`` で、例えば
+      ``template_object_name`` の値が ``'foo'`` であれば、変数名は
+      ``foo_list`` になります。
 
 ``django.views.generic.date_based.archive_today``
 -------------------------------------------------
 
-**Description:**
+**解説:**
 
-A day archive page showing all objects for *today*. This is exactly the same as
-``archive_day``, except the ``year``/``month``/``day`` arguments are not used,
-and today's date is used instead.
+*今日* の全てのオブジェクトを表示する日ごとアーカイブページです。このページ
+は ``archive_day`` と全く同じで、 ``year``/``month``/``day`` といった引数を
+とらず、今日の日付を使う点だけが違います。
 
 ``django.views.generic.date_based.object_detail``
 -------------------------------------------------
 
-**Description:**
+**解説:**
 
-A page representing an individual object. If the object has a date value in the
-future, the view will throw a 404 error by default, unless you set
-``allow_future`` to ``True``.
+個々のオブジェクトを表現するページです。オブジェクトに設定された時刻が未来
+を表す値の場合、 ``allow_future`` を ``True`` にしない限り、このビューはデフォ
+ルトで 404 エラーを送出します。
 
-**Required arguments:**
+**必須の引数:**
 
-    * ``year``: The object's four-digit year (a string).
+    * ``year``: オブジェクトの日付の年部分で、 4 桁の年号 (の文字列) です。
 
-    * ``month``: The object's month , formatted according to the
-      ``month_format`` argument.
+    * ``month``: オブジェクトの日付の月部分で、 ``month_format`` 引数に従っ
+      てフォーマットされています。
 
-    * ``day``: The object's day , formatted according to the ``day_format``
-      argument.
+    * ``day``: オブジェクトの日付の日部分で、 ``day_format`` 引数に従って
+      フォーマットされています。
 
-    * ``queryset``: A ``QuerySet`` that contains the object.
+    * ``queryset``: オブジェクトの入っている ``QuerySet`` です。
 
-    * ``date_field``: The name of the ``DateField`` or ``DateTimeField`` in
-      the ``QuerySet``'s model that the generic view should use to look up the
-      object according to ``year``, ``month`` and ``day``.
+    * ``date_field``: ``QuerySet`` に指定したモデルの ``DateField`` または
+      ``DateTimeField`` 型のフィールド名です。汎用ビューが ``year``,
+      ``month``, ``day`` に応じてオブジェクトを照合するために使います。
 
-    * Either ``object_id`` or (``slug`` *and* ``slug_field``) is required.
+    * ``object_id`` または (``slug`` *と* ``slug_field``) が必要です。
 
-      If you provide ``object_id``, it should be the value of the primary-key
-      field for the object being displayed on this page.
+      ``object_id`` を使う場合、ページに表示するオブジェクトの主キーとなる
+      フィールドの値を指定せねばなりません。
 
-      Otherwise, ``slug`` should be the slug of the given object, and
-      ``slug_field`` should be the name of the slug field in the ``QuerySet``'s
-      model. By default, ``slug_field`` is ``'slug'``.
+      そうでない場合には、 ``slug`` にオブジェクトの slug を、
+      ``slug_field`` に ``QuerySet`` に指定したモデルの slug フィールド名を
+      指定せねばなりません。 ``slug_field`` のデフォルト値は ``'slug'`` で
+      す。
 
-**Optional arguments:**
+**オプションの引数:**
 
-    * ``month_format``: A format string that regulates what format the
-      ``month`` parameter uses. This should be in the syntax accepted by
-      Python's ``time.strftime``. (See the `strftime docs`_.) It's set to
-      ``"%b"`` by default, which is a three-letter month abbreviation. To
-      change it to use numbers, use ``"%m"``.
+    * ``month_format``: ``month`` パラメタで使っているフォーマットを指定す
+      るためのフォーマット文字列です。この値は Python の ``time.strftime``
+      が受け取るのと同じ書法のフォーマット文字列を指定します。 
+      (`strftime のドキュメント`_  参照)。デフォルトでは ``"%b"`` に設定さ
+      れており、これは 3 文字で省略して表した月名です。数字を使うように変え
+      たければ ``"%m"`` を使って下さい。
 
-    * ``day_format``: Like ``month_format``, but for the ``day`` parameter.
-      It defaults to ``"%d"`` (day of the month as a decimal number, 01-31).
+    * ``day_format``: ``month_format`` に似ていますが、 ``day`` パラメタ用
+      です。デフォルト値は ``"%d"`` (日付を 01-31 の 2 桁の 10 進数で表した
+      もの) です。
 
-    * ``template_name``: The full name of a template to use in rendering the
-      page. This lets you override the default template name (see below).
+    * ``template_name``: ページのレンダリングに使うテンプレートの完全な名前
+      です。この変数を使うと、デフォルトのテンプレート名 (下記参照) をオー
+      バライドできます。
 
-    * ``template_name_field``: The name of a field on the object whose value is
-      the template name to use. This lets you store template names in the data.
-      In other words, if your object has a field ``'the_template'`` that
-      contains a string ``'foo.html'``, and you set ``template_name_field`` to
-      ``'the_template'``, then the generic view for this object will use the
-      template ``'foo.html'``.
+    * ``template_name_field``: オブジェクトの表示に使うテンプレート名が入っ
+      たフィールドの名前です。このパラメタを使うと、データ中にテンプレート
+      名を保存しておけます。
+      例えば、オブジェクトに ``'the_template'`` という名前のフィールドがあ
+      り、その値が ``'foo.html'`` という文字列の場合、
+      ``template_name_field`` を ``'the_template'`` に指定しておくと、汎用
+      ビューはオブジェクトの表示に ``'foo.html'`` を使おうとするわけです。
 
-      It's a bit of a brain-bender, but it's useful in some cases.
+      ちょっと首を捻りたくなるような機能ですが、場合によってはとても便利な
+      機能です。
 
-    * ``template_loader``: The template loader to use when loading the
-      template. By default, it's ``django.template.loader``.
+    * ``template_loader``: テンプレートのロードに使うテンプレートローダです。
+      デフォルトでは ``django.template.loader`` になっています。
 
-    * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary. If a value in the
-      dictionary is callable, the generic view will call it
-      just before rendering the template.
+    * ``extra_context``: テンプレートコンテキストに追加する値からなる辞書で
+      す。デフォルトでは、この辞書は空になっています。辞書内の値が呼び出し
+      可能オブジェクトの場合、汎用ビューはテンプレートのレンダリング直前に
+      そのオブジェクトを呼び出します。
 
-    * ``context_processors``: A list of template-context processors to apply to
-      the view's template.
+    * ``allow_empty``: オブジェクトがない場合にページを表示するかどうかを示
+      すブール値です。 ``False`` の場合、表示するべきオブジェクトが存在しな
+      ければ、空のインデクスページを表示する代わりに 404 エラーを送出します。
+      デフォルトは ``False`` です。
 
-    * ``template_object_name``:  Designates the name of the template variable
-      to use in the template context. By default, this is ``'object'``.
+    * ``context_processors``: ビューのテンプレートに適用するテンプレートコ
+      ンテキストプロセッサのリストです。 
 
-    * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
+    * ``template_object_name``: テンプレートコンテキスト内で使うテンプレー
+      ト変数名を示します。デフォルトでは ``'object'`` になっています。ビュー
+      はこの変数名に ``'_list'`` を追加して変数名を決定します。
 
-    * ``allow_future``: A boolean specifying whether to include "future"
-      objects on this page, where "future" means objects in which the field
-      specified in ``date_field`` is greater than the current date/time. By
-      default, this is ``False``.
+    * ``mimetype``: 出力結果のドキュメントに適用する MIME タイプです。
+      デフォルトの値は ``DEFAULT_CONTENT_TYPE`` の設定値になります。
 
-**Template name:**
+    * ``allow_future``: 「未来の」オブジェクトをページに表示するかどうかを
+      制御するブール値です。「未来の」オブジェクトとは、 ``date_field`` に
+      指定したフィールドの値が現在の日／時よりも大きいようなオブジェクトで
+      す。デフォルトでは ``False`` です。
 
-If ``template_name`` isn't specified, this view will use the template
-``<app_label>/<model_name>_detail.html`` by default.
 
-**Template context:**
+**テンプレート名:**
 
-In addition to ``extra_context``, the template's context will be:
+``template_name`` を指定しない場合、ビューはデフォルトのテンプレートである
+``<app_label>/<model_name>_detail.html`` を使います。
 
-    * ``object``: The object. This variable's name depends on the
-      ``template_object_name`` parameter, which is ``'object'`` by default. If
-      ``template_object_name`` is ``'foo'``, this variable's name will be
-      ``foo``.
+**テンプレートコンテキスト:**
 
-List/detail generic views
-=========================
+``extra_context`` の値に加え、テンプレートのコンテキストには以下の変数が入
+ります:
 
-The list-detail generic-view framework (in the
-``django.views.generic.list_detail`` module) is similar to the date-based one,
-except the former simply has two views: a list of objects and an individual
-object page.
+    * ``object``: オブジェクトです。この変数変の名前は
+      ``template_object_name`` パラメタの値に依存し、そのデフォルト値は
+      ``'object'`` です。 ``template_object_name`` が ``'foo'`` の場合、変
+      数名は ``foo`` になります。
+
+.. _List/detail generic views:
+
+リスト／詳細形式の汎用ビュー
+============================
+
+リスト-詳細 (list/detail) 形式の汎用ビューフレームワーク
+(``django.views.generic.list_detail`` モジュール) は、日付ベースの汎用ビュー
+に似ていますが、オブジェクトのリストと個々のオブジェクトのページという二つ
+のビューしか持ちません。
 
 ``django.views.generic.list_detail.object_list``
 ------------------------------------------------
 
-**Description:**
+**解説:**
 
-A page representing a list of objects.
+オブジェクトのリストを表現するページです。
 
-**Required arguments:**
+**必須の引数:**
 
-    * ``queryset``: A ``QuerySet`` that represents the objects.
+    * ``queryset``: オブジェクトの入っている ``QuerySet`` です。
 
-**Optional arguments:**
+**オプションの引数:**
 
-    * ``paginate_by``: An integer specifying how many objects should be
-      displayed per page. If this is given, the view will paginate objects with
-      ``paginate_by`` objects per page. The view will expect either a ``page``
-      query string parameter (via ``GET``) or a ``page`` variable specified in
-      the URLconf. See `Notes on pagination`_ below.
+    * ``paginate_by``: ページあたり何個のオブジェクトを表示するかを指定する
+      整数です。この引数を指定すると、ビューはオブジェクトをページあたり
+      ``paginate_by`` 個のオブジェクトに分割します。ビューは (``GET`` を介
+      して渡される) クエリ文字列パラメタか、 URLconf で指定した変数
+      ``page`` を引数にとります。詳しくは下記の
+      「 `pagination に関する注意`_ 」を参照してください。
 
-    * ``page``: The current page number, as an integer, or the string
-      ``'last'``. This is 1-based. See `Notes on pagination`_ below.
+    * ``page``: 現在のページ番号を指定する 1 から始まる整数値か、文字列
+      ``'last'`` です。詳しくは下記の「 `pagination に関する注意`_ 」を参照
+      してください。
 
-    * ``template_name``: The full name of a template to use in rendering the
-      page. This lets you override the default template name (see below).
+    * ``template_name``: ページのレンダリングに使うテンプレートの完全な名前
+      です。この変数を使うと、デフォルトのテンプレート名 (下記参照) をオー
+      バライドできます。
 
-    * ``template_loader``: The template loader to use when loading the
-      template. By default, it's ``django.template.loader``.
+    * ``template_loader``: テンプレートのロードに使うテンプレートローダです。
+      デフォルトでは ``django.template.loader`` になっています。
 
-    * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary. If a value in the
-      dictionary is callable, the generic view will call it
-      just before rendering the template.
+    * ``extra_context``: テンプレートコンテキストに追加する値からなる辞書で
+      す。デフォルトでは、この辞書は空になっています。辞書内の値が呼び出し
+      可能オブジェクトの場合、汎用ビューはテンプレートのレンダリング直前に
+      そのオブジェクトを呼び出します。
 
-    * ``allow_empty``: A boolean specifying whether to display the page if no
-      objects are available. If this is ``False`` and no objects are available,
-      the view will raise a 404 instead of displaying an empty page. By
-      default, this is ``True``.
+    * ``allow_empty``: オブジェクトがない場合にページを表示するかどうかを示
+      すブール値です。 ``False`` の場合、表示するべきオブジェクトが存在しな
+      ければ、空のインデクスページを表示する代わりに 404 エラーを送出します。
+      デフォルトは ``True`` です。
 
-    * ``context_processors``: A list of template-context processors to apply to
-      the view's template.
+    * ``context_processors``: ビューのテンプレートに適用するテンプレートコ
+      ンテキストプロセッサのリストです。 
 
-    * ``template_object_name``:  Designates the name of the template variable
-      to use in the template context. By default, this is ``'object'``. The
-      view will append ``'_list'`` to the value of this parameter in
-      determining the variable's name.
+    * ``template_object_name``: テンプレートコンテキスト内で使うテンプレー
+      ト変数名を示します。デフォルトでは ``'object'`` になっています。ビュー
+      はこの変数名に ``'_list'`` を追加して変数名を決定します。
 
-    * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
+    * ``mimetype``: 出力結果のドキュメントに適用する MIME タイプです。
+      デフォルトの値は ``DEFAULT_CONTENT_TYPE`` の設定値になります。
 
-**Template name:**
+**テンプレート名:**
 
-If ``template_name`` isn't specified, this view will use the template
-``<app_label>/<model_name>_list.html`` by default.
+``template_name`` を指定しない場合、ビューはデフォルトのテンプレートである
+``<app_label>/<model_name>_list.html`` を使います。
 
-**Template context:**
+**テンプレートコンテキスト:**
 
 .. versionadded:: 1.0
-   The ``paginator`` and ``page_obj`` context variables are new.
+   ``paginator`` および ``page_obj`` が追加されました。
 
-In addition to ``extra_context``, the template's context will be:
+``extra_context`` の値に加え、テンプレートのコンテキストには以下の変数が入
+ります:
 
-    * ``object_list``: The list of objects. This variable's name depends on the
-      ``template_object_name`` parameter, which is ``'object'`` by default. If
-      ``template_object_name`` is ``'foo'``, this variable's name will be
-      ``foo_list``.
+    * ``object_list``: オブジェクトのリストです。この変数の名前は
+      ``template_object_name`` パラメタの設定に依存します。
+      ``template_object_name`` のデフォルト値は ``'object'`` で、例えば
+      ``template_object_name`` の値が ``'foo'`` であれば、変数名は
+      ``foo_list`` になります。
 
-    * ``is_paginated``: A boolean representing whether the results are
-      paginated. Specifically, this is set to ``False`` if the number of
-      available objects is less than or equal to ``paginate_by``.
+    * ``is_paginated``: 表示結果がページ分割されているかどうかを示すブール
+      値です。具体的には、オブジェクトの個数が ``paginate_by`` と等しいかそ
+      れ以下の場合には ``False`` にセットされます。
 
-If the results are paginated, the context will contain these extra variables:
+表示結果がページ分割されている場合、コンテキストには以下の追加の変数が入り
+ます:
 
-    * ``paginator``: An instance of ``django.core.paginator.Paginator``.
+    * ``paginator``: ``django.core.paginator.Paginator`` のインスタンスです。
+    * ``page_obj``: ``django.core.paginator.Page`` のインスタンスです。
 
-    * ``page_obj``: An instance of ``django.core.paginator.Page``.
 
-Notes on pagination
-~~~~~~~~~~~~~~~~~~~
+.. _Notes on pagination:
 
-If ``paginate_by`` is specified, Django will paginate the results. You can
-specify the page number in the URL in one of two ways:
+pagination に関する注意
+~~~~~~~~~~~~~~~~~~~~~~~
 
-    * Use the ``page`` parameter in the URLconf. For example, this is what
-      your URLconf might look like::
+``paginate_by`` を指定した場合、 Django は結果をページ分割 (peginate) しま
+す。 URL でページ番号を指定するには二つの方法があります:
+
+    * URLconf で ``page`` パラメタをキャプチャします。例えば、 URLconf は以
+      下のようになるでしょう::
 
         (r'^objects/page(?P<page>[0-9]+)/$', 'object_list', dict(info_dict))
 
-    * Pass the page number via the ``page`` query-string parameter. For
-      example, a URL would look like this::
+    * ページ番号をクエリ文字列パラメタ ``page`` に渡します。例えば URL は以
+      下のようになります::
 
         /objects/?page=3
 
-    * To loop over all the available page numbers, use the ``page_range`` 
-      variable. You can iterate over the list provided by ``page_range`` 
-      to create a link to every page of results.
+    * 全てのページ番号にわたるループを実施したい場合は、 ``page_range`` を
+      使ってください。例えば、``page_range`` にわたる反復処理を行って、
+      全てのページへのリンクを作成できます。
 
-These values and lists are 1-based, not 0-based, so the first page would be
-represented as page ``1``. 
+``page`` や ``page_range`` は 0 ではなく 1 から始まる数で指定します。従って
+最初のページのページ番号は ``1`` です。
 
-For more on pagination, read the :ref:`pagination documentation
-<topics-pagination>`.
+ペジネーションの詳細は、 
+:ref:`Pagination のドキュメント<topics-pagination>` を参照してください。
 
 .. versionadded:: 1.0
 
-As a special case, you are also permitted to use ``last`` as a value for
-``page``::
+特別なケースとして、 ``page`` の値に ``last`` を使えます::
 
     /objects/?page=last
 
-This allows you to access the final page of results without first having to 
-determine how many pages there are.
+このようにすると、いちいち総ページ数を数えなくても、最後のページにアクセス
+できます。
 
-Note that ``page`` *must* be either a valid page number or the value ``last``;
-any other value for ``page`` will result in a 404 error.
+``page`` の値は実在するページ番号か、 ``last`` でなければなりません。それ以
+外の値を ``page`` に指定すると 404 エラーを引き起こします。
+
 
 ``django.views.generic.list_detail.object_detail``
 --------------------------------------------------
 
-A page representing an individual object.
+個々のオブジェクトを表現するページです。
 
-**Description:**
+**解説:**
 
-A page representing an individual object.
+個々のオブジェクトを表現するページです。
 
-**Required arguments:**
+**必須の引数:**
 
-    * ``queryset``: A ``QuerySet`` that contains the object.
+    * ``queryset``: オブジェクトの入っている ``QuerySet`` です。
 
-    * Either ``object_id`` or (``slug`` *and* ``slug_field``) is required.
+    * ``object_id`` または (``slug`` *と* ``slug_field``) が必要です。
 
-      If you provide ``object_id``, it should be the value of the primary-key
-      field for the object being displayed on this page.
+      ``object_id`` を使う場合、ページに表示するオブジェクトの主キーとなる
+      フィールドの値を指定せねばなりません。
 
-      Otherwise, ``slug`` should be the slug of the given object, and
-      ``slug_field`` should be the name of the slug field in the ``QuerySet``'s
-      model. By default, ``slug_field`` is ``'slug'``.
+      そうでない場合には、 ``slug`` にオブジェクトの slug を、
+      ``slug_field`` に ``QuerySet`` に指定したモデルの slug フィールド名を
+      指定せねばなりません。 ``slug_field`` のデフォルト値は ``'slug'`` で
+      す。
 
-**Optional arguments:**
+**オプションの引数:**
 
-    * ``template_name``: The full name of a template to use in rendering the
-      page. This lets you override the default template name (see below).
+    * ``template_name``: ページのレンダリングに使うテンプレートの完全な名前
+      です。この変数を使うと、デフォルトのテンプレート名 (下記参照) をオー
+      バライドできます。
 
-    * ``template_name_field``: The name of a field on the object whose value is
-      the template name to use. This lets you store template names in the data.
-      In other words, if your object has a field ``'the_template'`` that
-      contains a string ``'foo.html'``, and you set ``template_name_field`` to
-      ``'the_template'``, then the generic view for this object will use the
-      template ``'foo.html'``.
+    * ``template_name_field``: オブジェクトの表示に使うテンプレート名が入っ
+      たフィールドの名前です。このパラメタを使うと、データ中にテンプレート
+      名を保存しておけます。
+      別の言い方をするなら、オブジェクトに ``'the_template'`` という名前の
+      フィールドがあり、その値が ``'foo.html'`` という文字列の場合、
+      ``template_name_field`` を ``'the_template'`` に指定しておくと、汎用
+      ビューはオブジェクトの表示に ``'foo.html'`` を使おうとします。
 
-      It's a bit of a brain-bender, but it's useful in some cases.
+      ちょっと首を捻りたくなるような機能ですが、場合によってはとても便利な
+      機能です。
 
-    * ``template_loader``: The template loader to use when loading the
-      template. By default, it's ``django.template.loader``.
+    * ``template_loader``: テンプレートのロードに使うテンプレートローダです。
+      デフォルトでは ``django.template.loader`` になっています。
 
-    * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary. If a value in the
-      dictionary is callable, the generic view will call it
-      just before rendering the template.
+    * ``extra_context``: テンプレートコンテキストに追加する値からなる辞書で
+      す。デフォルトでは、この辞書は空になっています。辞書内の値が呼び出し
+      可能オブジェクトの場合、汎用ビューはテンプレートのレンダリング直前に
+      そのオブジェクトを呼び出します。
 
-    * ``context_processors``: A list of template-context processors to apply to
-      the view's template.
+    * ``context_processors``: ビューのテンプレートに適用するテンプレートコ
+      ンテキストプロセッサのリストです。 
 
-    * ``template_object_name``:  Designates the name of the template variable
-      to use in the template context. By default, this is ``'object'``.
+    * ``template_object_name``: テンプレートコンテキスト内で使うテンプレー
+      ト変数名を示します。デフォルトでは ``'object'`` になっています。ビュー
+      はこの変数名に ``'_list'`` を追加して変数名を決定します。
 
-    * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
+    * ``mimetype``: 出力結果のドキュメントに適用する MIME タイプです。
+      デフォルトの値は ``DEFAULT_CONTENT_TYPE`` の設定値になります。
 
-**Template name:**
+**テンプレート名:**
 
-If ``template_name`` isn't specified, this view will use the template
-``<app_label>/<model_name>_detail.html`` by default.
+``template_name`` を指定しない場合、ビューはデフォルトのテンプレートである
+``<app_label>/<model_name>_detail.html`` を使います。
 
-**Template context:**
+**テンプレートコンテキスト:**
 
-In addition to ``extra_context``, the template's context will be:
+``extra_context`` の値に加え、テンプレートのコンテキストには以下の変数が入
+ります:
 
-    * ``object``: The object. This variable's name depends on the
-      ``template_object_name`` parameter, which is ``'object'`` by default. If
-      ``template_object_name`` is ``'foo'``, this variable's name will be
-      ``foo``.
+    * ``object``: オブジェクトです。この変数変の名前は
+      ``template_object_name`` パラメタの値に依存し、そのデフォルト値は
+      ``'object'`` です。 ``template_object_name`` が ``'foo'`` の場合、変
+      数名は ``foo`` になります。
 
-Create/update/delete generic views
-==================================
 
-The ``django.views.generic.create_update`` module contains a set of functions
-for creating, editing and deleting objects.
+.. _Create/update/delete generic views:
+
+作成/更新/削除の汎用ビュー
+==========================
+
+``django.views.generic.create_update`` モジュールには、オブジェクトの作成
+(create)、編集 (edit, update)、削除 (delete) のための関数が入っています。
 
 .. versionchanged:: 1.0
 
-``django.views.generic.create_update.create_object`` and
-``django.views.generic.create_update.update_object`` now use the new :ref:`forms
-library <topics-forms-index>` to build and display the form.
+``django.views.generic.create_update.create_object`` や
+``django.views.generic.create_update.update_object`` は、 
+:ref:`forms ライブラリ <topics-forms-index>` を使ってフォームを生成・表示す
+るようになりました。
+
 
 ``django.views.generic.create_update.create_object``
 ----------------------------------------------------
 
-**Description:**
+**解説:**
 
-A page that displays a form for creating an object, redisplaying the form with
-validation errors (if there are any) and saving the object. 
+オブジェクト作成のためのフォームを表示し、オブジェクトを保存するためのペー
+ジです。検証エラーが生じた場合にはフォームを再表示します。
 
-**Required arguments:**
+**必須の引数:**
 
-    * Either ``form_class`` or ``model`` is required.
+    * ``form_class`` または ``model`` のいずれかを指定せねばなりません。
 
-      If you provide ``form_class``, it should be a ``django.forms.ModelForm``
-      subclass. Use this argument when you need to customize the model's form.
-      See the :ref:`ModelForm docs <topics-forms-modelforms>` for more
-      information.
+      ``form_class`` を指定する場合には、 ``django.forms.ModelForm``
+      クラスのサブクラスを指定します。この引数は、モデルのフォームをカスタ
+      マイズしたいときに使います。詳しくは
+      :ref:`ModelForm のドキュメント <topics-forms-modelforms>` を参照して
+      ください。
 
-      Otherwise, ``model`` should be a Django model class and the form used
-      will be a standard ``ModelForm`` for ``model``.
+      ``model`` には Django のモデルクラスを指定します。この場合、フォーム
+      は ``model`` に対する標準の ``ModelForm`` で生成されます。
 
-**Optional arguments:**
+**オプションの引数:**
 
-    * ``post_save_redirect``: A URL to which the view will redirect after
-      saving the object. By default, it's ``object.get_absolute_url()``.
+    * ``post_save_redirect``: はオブジェクトを保存した後のビューのリダイレ
+      クト先 の URL です。デフォルト値は ``object.get_absolute_url()`` です。
 
-      ``post_save_redirect`` may contain dictionary string formatting, which
-      will be interpolated against the object's field attributes. For example,
-      you could use ``post_save_redirect="/polls/%(slug)s/"``.
+      ``post_save_redirect`` には、辞書を使う文字列フォーマット引数を含めら
+      れます。辞書のキーはオブジェクトのフィールド名に解釈されます。例えば、
+      ``post_save_redirect="/polls/%(slug)s/"`` のように指定できます。
 
-    * ``login_required``: A boolean that designates whether a user must be
-      logged in, in order to see the page and save changes. This hooks into the
-      Django :ref:`authentication system <topics-auth>`. By default, this is
-      ``False``.
+    * ``login_required``: オブジェクトを編集し、変更を保存するため編集にロ
+      グインが必要かどうかを指定するブール値です。 Django の
+      :ref:`認証システム <topics-auth>` にフックをかけます。デフォルト値は ``False`` です。
 
-      If this is ``True``, and a non-logged-in user attempts to visit this page
-      or save the form, Django will redirect the request to ``/accounts/login/``.
+      この値が ``True`` の場合、匿名ユーザがこのページを訪問したりフォーム
+      を保存しようとしたりすると、 Django はリクエストを
+      ``/accounts/login/`` にリダイレクトします。
 
-    * ``template_name``: The full name of a template to use in rendering the
-      page. This lets you override the default template name (see below).
+    * ``template_name``: ページのレンダリングに使うテンプレートの完全な名前
+      です。この変数を使うと、デフォルトのテンプレート名 (下記参照) をオー
+      バライドできます。
 
-    * ``template_loader``: The template loader to use when loading the
-      template. By default, it's ``django.template.loader``.
+    * ``template_loader``: テンプレートのロードに使うテンプレートローダです。
+      デフォルトでは ``django.template.loader`` になっています。
 
-    * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary. If a value in the
-      dictionary is callable, the generic view will call it
-      just before rendering the template.
+    * ``extra_context``: テンプレートコンテキストに追加する値からなる辞書で
+      す。デフォルトでは、この辞書は空になっています。辞書内の値が呼び出し
+      可能オブジェクトの場合、汎用ビューはテンプレートのレンダリング直前に
+      そのオブジェクトを呼び出します。
 
-    * ``context_processors``: A list of template-context processors to apply to
-      the view's template.
+    * ``context_processors``: ビューのテンプレートに適用するテンプレートコ
+      ンテキストプロセッサのリストです。 
 
-**Template name:**
+**テンプレート名:**
 
-If ``template_name`` isn't specified, this view will use the template
-``<app_label>/<model_name>_form.html`` by default.
+``template_name`` を指定しない場合、ビューはデフォルトのテンプレートである
+``<app_label>/<model_name>_form.html`` を使います。
 
-**Template context:**
+**テンプレートコンテキスト:**
 
-In addition to ``extra_context``, the template's context will be:
+``extra_context`` の値に加え、テンプレートのコンテキストには以下の変数が入
+ります:
 
-    * ``form``: A ``django.forms.ModelForm`` instance representing the form
-      for creating the object. This lets you refer to form fields easily in the
-      template system.
+    * ``form``: オブジェクトを編集するためのフォームを表現する
+      ``django.forms.ModelForm`` インスタンスです。この変数を使うと、テ
+      ンプレートシステム中でフォームフィールドを簡単に参照できます。
 
-      For example, if the model has two fields, ``name`` and ``address``::
+      例えば、モデルが  ``name`` と ``address`` という二つのフィールドを持っ
+      ている場合は、以下のように書けます::
 
           <form action="" method="post">
           <p>{{ form.name.label_tag }} {{ form.name }}</p>
           <p>{{ form.address.label_tag }} {{ form.address }}</p>
           </form>
 
-      See the :ref:`forms documentation <topics-forms-index>` for more
-      information about using ``Form`` objects in templates.
+      ``Form`` オブジェクトをテンプレート内で使う方法の詳しい説明は、 
+      :ref:`forms のドキュメント <topics-forms-index>` を参照してください。
 
 ``django.views.generic.create_update.update_object``
 ----------------------------------------------------
 
-**Description:**
+**解説:**
 
-A page that displays a form for editing an existing object, redisplaying the
-form with validation errors (if there are any) and saving changes to the
-object. This uses a form automatically generated from the object's
-model class.
+既存のオブジェクトを編集するためのフォームを表示し、オブジェクトを保存する
+ためのページです。検証エラーが生じた場合にはフォームを再表示します。
 
-**Required arguments:**
+**必須の引数:**
 
-    * Either ``form_class`` or ``model`` is required.
+    * ``form_class`` または ``model`` のいずれかを指定せねばなりません。
 
-      If you provide ``form_class``, it should be a ``django.forms.ModelForm``
-      subclass. Use this argument when you need to customize the model's form.
-      See the :ref:`ModelForm docs <topics-forms-modelforms>` for more
-      information.
+      ``form_class`` を指定する場合には、 ``django.forms.ModelForm``
+      クラスのサブクラスを指定します。この引数は、モデルのフォームをカスタ
+      マイズしたいときに使います。詳しくは 
+      :ref:`ModelForm のドキュメント <topics-forms-modelforms>` を参照して
+      ください。
 
-      Otherwise, ``model`` should be a Django model class and the form used
-      will be a standard ``ModelForm`` for ``model``.
+      ``model`` には Django のモデルクラスを指定します。この場合、フォーム
+      は ``model`` に対する標準の ``ModelForm`` で生成されます。
 
-    * Either ``object_id`` or (``slug`` *and* ``slug_field``) is required.
+    * ``object_id`` または (``slug`` *と* ``slug_field``) が必要です。
 
-      If you provide ``object_id``, it should be the value of the primary-key
-      field for the object being displayed on this page.
+      ``object_id`` を使う場合、ページに表示するオブジェクトの主キーとなる
+      フィールドの値を指定せねばなりません。
 
-      Otherwise, ``slug`` should be the slug of the given object, and
-      ``slug_field`` should be the name of the slug field in the ``QuerySet``'s
-      model. By default, ``slug_field`` is ``'slug'``.
+      そうでない場合には、 ``slug`` にオブジェクトの slug を、
+      ``slug_field`` に ``QuerySet`` に指定したモデルの slug フィールド名を
+      指定せねばなりません。 ``slug_field`` のデフォルト値は ``'slug'`` で
+      す。
 
-**Optional arguments:**
+**オプションの引数:**
 
-    * ``post_save_redirect``: A URL to which the view will redirect after
-      saving the object. By default, it's ``object.get_absolute_url()``.
+    * ``post_save_redirect``: オブジェクトを保存した後のビューのリダイレ
+      クト先 の URL です。デフォルト値は ``object.get_absolute_url()`` です。
 
-      ``post_save_redirect`` may contain dictionary string formatting, which
-      will be interpolated against the object's field attributes. For example,
-      you could use ``post_save_redirect="/polls/%(slug)s/"``.
+      ``post_save_redirect`` には辞書を使う文字列フォーマット引数が入ります。
+      辞書のキーはオブジェクトのフィールド名に解釈されます。例えば、
+      ``post_save_redirect="/polls/%(slug)s/"`` のように指定できます。
 
-    * ``login_required``: A boolean that designates whether a user must be
-      logged in, in order to see the page and save changes. This hooks into the
-      Django :ref:`authentication system <topics-auth>`. By default, this is
-      ``False``.
+    * ``login_required``: オブジェクトを編集し、変更を保存するため編集にロ
+      グインが必要かどうかを指定するブール値です。 Django の
+      :ref:`認証システム <topics-auth>` にフックをかけます。デフォルト値は ``False`` です。
 
-      If this is ``True``, and a non-logged-in user attempts to visit this page
-      or save the form, Django will redirect the request to ``/accounts/login/``.
+      この値が ``True`` の場合、匿名ユーザがこのページを訪問したりフォーム
+      を保存しようとしたりすると、 Django はリクエストを
+      ``/accounts/login/`` にリダイレクトします。
 
-    * ``template_name``: The full name of a template to use in rendering the
-      page. This lets you override the default template name (see below).
+    * ``template_name``: ページのレンダリングに使うテンプレートの完全な名前
+      です。この変数を使うと、デフォルトのテンプレート名 (下記参照) をオー
+      バライドできます。
 
-    * ``template_loader``: The template loader to use when loading the
-      template. By default, it's ``django.template.loader``.
+    * ``template_loader``: テンプレートのロードに使うテンプレートローダです。
+      デフォルトでは ``django.template.loader`` になっています。
 
-    * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary. If a value in the
-      dictionary is callable, the generic view will call it
-      just before rendering the template.
+    * ``extra_context``: テンプレートコンテキストに追加する値からなる辞書で
+      す。デフォルトでは、この辞書は空になっています。辞書内の値が呼び出し
+      可能オブジェクトの場合、汎用ビューはテンプレートのレンダリング直前に
+      そのオブジェクトを呼び出します。
 
-    * ``context_processors``: A list of template-context processors to apply to
-      the view's template.
+    * ``context_processors``: ビューのテンプレートに適用するテンプレートコ
+      ンテキストプロセッサのリストです。 
 
-    * ``template_object_name``:  Designates the name of the template variable
-      to use in the template context. By default, this is ``'object'``.
+    * ``template_object_name``: テンプレートコンテキスト内で使うテンプレー
+      ト変数名を示します。デフォルトでは ``'object'`` になっています。
 
-**Template name:**
 
-If ``template_name`` isn't specified, this view will use the template
-``<app_label>/<model_name>_form.html`` by default.
+**テンプレート名:**
 
-**Template context:**
+``template_name`` を指定しない場合、ビューはデフォルトのテンプレートである
+``<app_label>/<model_name>_form.html`` を使います。
 
-In addition to ``extra_context``, the template's context will be:
+**テンプレートコンテキスト:**
 
-    * ``form``: A ``django.forms.ModelForm`` instance representing the form
-      for editing the object. This lets you refer to form fields easily in the
-      template system.
+``extra_context`` の値に加え、テンプレートのコンテキストには以下の変数が入
+ります:
 
-      For example, if the model has two fields, ``name`` and ``address``::
+    * ``form``: オブジェクトを編集するためのフォームを表現する
+      ``django.oldforms.ModelForm`` インスタンスです。この変数を使うと、テ
+      ンプレートシステム中でフォームフィールドを簡単に参照できます。
+
+      例えば、モデルが  ``name`` と ``address`` という二つのフィールドを持っ
+      ている場合は、以下のように書けます::
 
           <form action="" method="post">
           <p>{{ form.name.label_tag }} {{ form.name }}</p>
           <p>{{ form.address.label_tag }} {{ form.address }}</p>
           </form>
 
-      See the :ref:`forms documentation <topics-forms-index>` for more
-      information about using ``Form`` objects in templates.
+      ``Form`` オブジェクトをテンプレート内で使う方法の詳しい説明は、 
+      :ref:`forms のドキュメント <topics-forms-index>` を参照してください。
 
-    * ``object``: The original object being edited. This variable's name
-      depends on the ``template_object_name`` parameter, which is ``'object'``
-      by default. If ``template_object_name`` is ``'foo'``, this variable's
-      name will be ``foo``.
+    * ``object``: オブジェクトです。この変数変の名前は
+      ``template_object_name`` パラメタの値に依存し、そのデフォルト値は
+      ``'object'`` です。 ``template_object_name`` が ``'foo'`` の場合、変
+      数名は ``foo`` になります。
+
 
 ``django.views.generic.create_update.delete_object``
 ----------------------------------------------------
 
-**Description:**
+**解説:**
 
-A view that displays a confirmation page and deletes an existing object. The
-given object will only be deleted if the request method is ``POST``. If this
-view is fetched via ``GET``, it will display a confirmation page that should
-contain a form that POSTs to the same URL.
+既存のオブジェクトを削除するための確認ページを表示し、オブジェクトを削除する
+ためのページです。オブジェクトを削除するのはリクエストメソッドが ``POST``
+であった場合だけです。このビューを ``GET`` で取得すると、同じ URL に対して
+POST を行うような確認ページを表示します。
 
-**Required arguments:**
+**必須の引数:**
 
-    * ``model``: The Django model class of the object that the form will
-      create.
+    * ``model``: フォームで削除するオブジェクトの Django モデルクラス
+      です。
 
-    * Either ``object_id`` or (``slug`` *and* ``slug_field``) is required.
+    * ``object_id`` または (``slug`` *と* ``slug_field``) が必要です。
 
-      If you provide ``object_id``, it should be the value of the primary-key
-      field for the object being displayed on this page.
+      ``object_id`` を使う場合、ページに表示するオブジェクトの主キーとなる
+      フィールドの値を指定せねばなりません。
 
-      Otherwise, ``slug`` should be the slug of the given object, and
-      ``slug_field`` should be the name of the slug field in the ``QuerySet``'s
-      model. By default, ``slug_field`` is ``'slug'``.
+      そうでない場合には、 ``slug`` にオブジェクトの slug を、
+      ``slug_field`` に ``QuerySet`` に指定したモデルの slug フィールド名を
+      指定せねばなりません。 ``slug_field`` のデフォルト値は ``'slug'`` で
+      す。
 
-    * ``post_delete_redirect``: A URL to which the view will redirect after
-      deleting the object.
+    * ``post_delete_redirect``: オブジェクトを削除した後のビューのリダイレ
+      クト先 の URL です。
 
-**Optional arguments:**
+**オプションの引数:**
 
-    * ``login_required``: A boolean that designates whether a user must be
-      logged in, in order to see the page and save changes. This hooks into the
-      Django :ref:`authentication system <topics-auth>`. By default, this is
-      ``False``.
+    * ``login_required``: ページを表示し、変更を保存するため編集にログイン
+      が必要かどうかを指定するブール値です。 Django の 
+      :ref:`認証システム <topics-auth>` にフックをかけます。デフォルト値は
+      ``False`` です。
 
-      If this is ``True``, and a non-logged-in user attempts to visit this page
-      or save the form, Django will redirect the request to ``/accounts/login/``.
+      この値が ``True`` の場合、匿名ユーザがこのページを訪問したりフォーム
+      を保存しようとしたりすると、 Django はリクエストを
+      ``/accounts/login/`` にリダイレクトします。
 
-    * ``template_name``: The full name of a template to use in rendering the
-      page. This lets you override the default template name (see below).
+    * ``template_name``: ページのレンダリングに使うテンプレートの完全な名前
+      です。この変数を使うと、デフォルトのテンプレート名 (下記参照) をオー
+      バライドできます。
 
-    * ``template_loader``: The template loader to use when loading the
-      template. By default, it's ``django.template.loader``.
+    * ``template_loader``: テンプレートのロードに使うテンプレートローダです。
+      デフォルトでは ``django.template.loader`` になっています。
 
-    * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary. If a value in the
-      dictionary is callable, the generic view will call it
-      just before rendering the template.
+    * ``extra_context``: テンプレートコンテキストに追加する値からなる辞書で
+      す。デフォルトでは、この辞書は空になっています。辞書内の値が呼び出し
+      可能オブジェクトの場合、汎用ビューはテンプレートのレンダリング直前に
+      そのオブジェクトを呼び出します。
 
-    * ``context_processors``: A list of template-context processors to apply to
-      the view's template.
+    * ``context_processors``: ビューのテンプレートに適用するテンプレートコ
+      ンテキストプロセッサのリストです。 
 
-    * ``template_object_name``:  Designates the name of the template variable
-      to use in the template context. By default, this is ``'object'``.
+    * ``template_object_name``: テンプレートコンテキスト内で使うテンプレー
+      ト変数名を示します。デフォルトでは ``'object'`` になっています。
 
-**Template name:**
 
-If ``template_name`` isn't specified, this view will use the template
-``<app_label>/<model_name>_confirm_delete.html`` by default.
+**テンプレート名:**
 
-**Template context:**
+``template_name`` を指定しない場合、ビューはデフォルトのテンプレートである
+``<app_label>/<model_name>_confirm_delete.html`` を使います。
 
-In addition to ``extra_context``, the template's context will be:
+**テンプレートコンテキスト:**
 
-    * ``object``: The original object that's about to be deleted. This
-      variable's name depends on the ``template_object_name`` parameter, which
-      is ``'object'`` by default. If ``template_object_name`` is ``'foo'``,
-      this variable's name will be ``foo``.
+``extra_context`` の値に加え、テンプレートのコンテキストには以下の変数が入
+ります:
+
+    * ``object``: オブジェクトです。この変数変の名前は
+      ``template_object_name`` パラメタの値に依存し、そのデフォルト値は
+      ``'object'`` です。 ``template_object_name`` が ``'foo'`` の場合、変
+      数名は ``foo`` になります。
+

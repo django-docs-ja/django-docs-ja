@@ -1,90 +1,96 @@
 .. _ref-forms-validation:
 
-Form and field validation
-=========================
+.. _Form and field validation:
 
-Form validation happens when the data is cleaned. If you want to customize
-this process, there are various places you can change, each one serving a
-different purpose. Three types of cleaning methods are run during form
-processing. These are normally executed when you call the ``is_valid()``
-method on a form. There are other things that can trigger cleaning and
-validation (accessing the ``errors`` attribute or calling ``full_clean()``
-directly), but normally they won't be needed.
+フォームやフィールドのバリデーション
+=====================================
 
-In general, any cleaning method can raise ``ValidationError`` if there is a
-problem with the data it is processing, passing the relevant error message to
-the ``ValidationError`` constructor. If no ``ValidationError`` is raised, the
-method should return the cleaned (normalized) data as a Python object.
+:revision-up-to: 8961 (1.0)
 
-If you detect multiple errors during a cleaning method and wish to signal all
-of them to the form submitter, it is possible to pass a list of errors to the
-``ValidationError`` constructor.
+フォームのバリデーションは、データのクリーニングを行ったときに実行されます。
+この挙動をカスタマイズしたければ、目的に応じていくつかの手法から選択するこ
+とになります。フォームの処理では、 3 つのデータクリーニング過程があります。
+これらの過程は通常、フォームの ``is_valid()`` メソッドを呼び出したときに実
+行されます。データのクリーニングとバリデーションをトリガする要素は他にもあ
+ります (``errors`` 属性へのアクセスや、 ``full_clean()`` の呼び出し) が、
+通常は直接用いることはありません。
 
-The three types of cleaning methods are:
+一般に、データクリーニングのメソッドは、処理中のデータに何らかの問題がある
+場合、 ``ValidationError`` 例外を送出し、その際 ``ValidationError`` のコン
+ストラクタにエラーメッセージを渡すことになっています。 ``ValidationError``
+を送出しない場合、クリーニングメソッドはクリーニング済み (正規化済み) のデー
+タを Python オブジェクトとして返さねばなりません。
 
-    * The ``clean()`` method on a Field subclass. This is responsible
-      for cleaning the data in a way that is generic for that type of field.
-      For example, a FloatField will turn the data into a Python ``float`` or
-      raise a ``ValidationError``.
+クリーニング処理中に複数のエラーを検出し、全てのエラーをフォームのユーザに
+提示したければ、 ``ValidationError`` のコンストラクタにエラーのリストを渡せ
+ます。
 
-    * The ``clean_<fieldname>()`` method in a form subclass -- where
-      ``<fieldname>`` is replaced with the name of the form field attribute.
-      This method does any cleaning that is specific to that particular
-      attribute, unrelated to the type of field that it is. This method is not
-      passed any parameters. You will need to look up the value of the field
-      in ``self.cleaned_data`` and remember that it will be a Python object
-      at this point, not the original string submitted in the form (it will be
-      in ``cleaned_data`` because the general field ``clean()`` method, above,
-      has already cleaned the data once).
+クリーニングメソッドとは、以下の 3 つです:
 
-      For example, if you wanted to validate that the contents of a
-      ``CharField`` called ``serialnumber`` was unique,
-      ``clean_serialnumber()`` would be the right place to do this. You don't
-      need a specific field (it's just a ``CharField``), but you want a
-      formfield-specific piece of validation and, possibly,
-      cleaning/normalizing the data.
+    * フィールドサブクラスの ``clean()`` メソッド。このメソッドは、該当フィー
+      ルドクラスのインスタンスに共通して必要なクリーニングを行う役割を担いま
+      す。例えば、 FloatField の ``clean()`` メソッドは、データを Python の
+      ``float`` オブジェクトに変換するか、 ``ValidationError`` を送出します。
 
-    * The Form subclass's ``clean()`` method. This method can perform
-      any validation that requires access to multiple fields from the form at
-      once. This is where you might put in things to check that if field ``A``
-      is supplied, field ``B`` must contain a valid e-mail address and the
-      like. The data that this method returns is the final ``cleaned_data``
-      attribute for the form, so don't forget to return the full list of
-      cleaned data if you override this method (by default, ``Form.clean()``
-      just returns ``self.cleaned_data``).
+    * フォームサブクラスの ``clean_<fieldname>()`` (``<fieldname>`` はフォー
+      ムフィールドを指す属性名) メソッド。このメソッドは特定の属性名のフィー
+      ルドに対するクリーニングを行います。フィールドの型は問いません。この
+      メソッドはパラメタ無しで呼び出されます。フィールドの値は
+      ``self.cleaned_data`` を介して参照せねばならず、値はこの段階ではフォー
+      ムとして提出された元の文字列ではなく、Python オブジェクトであることに
+      注意してください。(``cleaned_data`` に入るのは、上記の ``clean()`` メ
+      ソッドが既にデータを一度クリーニングしているからです。)
 
-      Note that any errors raised by your ``Form.clean()`` override will not
-      be associated with any field in particular. They go into a special
-      "field" (called ``__all__``), which you can access via the
-      ``non_field_errors()`` method if you need to.
+      例えば、 ``serialnumber`` という名前の ``CharField`` の中身が一意な値
+      になるようバリデーションを行いたければ、 ``clean_serialnumber()`` を
+      使うのが適切です。特定のフィールド (実際には ``CharField``) 向けでは
+      なく、フォーム上のフィールド固有のバリデーションや、データのクリーニ
+      ング、正規化はここで行いましょう。
 
-These methods are run in the order given above, one field at a time.  That is,
-for each field in the form (in the order they are declared in the form
-definition), the ``Field.clean()`` method (or its override) is run, then
-``clean_<fieldname>()``. Finally, once those two methods are run for every
-field, the ``Form.clean()`` method, or its override, is executed.
+    * フォームのサブクラスの ``clean()`` メソッド。このメソッドは、フォーム
+      上の複数のフィールドに一度にアクセスする必要があるようなバリデーショ
+      ンを実行できます。「フィールド ``A`` に値が入っている時に、フィールド
+      ``B`` には有効なメールアドレスが入っていなければならない」といったバ
+      リデーションにはこのメソッドを使います。このメソッドの返すデータは、
+      フォームの ``cleaned_data`` 属性の最終的な値になるので、このメソッド
+      をオーバライドする場合は必ず全てのクリーニング済みデータを返すように
+      してください (デフォルトでは、 ``Form.clean()`` は 
+      ``self.cleaned_data`` をそのまま返します)。
 
-As mentioned above, any of these methods can raise a ``ValidationError``. For
-any field, if the ``Field.clean()`` method raises a ``ValidationError``, any
-field-specific cleaning method is not called. However, the cleaning methods
-for all remaining fields are still executed.
+      オーバライドされた ``Form.clean()`` の送出するエラーは特定のフィー
+      ルドではなく、(``__all__`` という名の) 特殊な「フィールド」に関連づけ
+      られます。エラーは ``non_field_errors()`` でアクセスできます。
 
-The ``clean()`` method for the ``Form`` class or subclass is always run. If
-that method raises a ``ValidationError``, ``cleaned_data`` will be an empty
-dictionary.
+上に挙げたメソッドは、各フィールドごとに一度づつ、上に挙げた順に呼び出され
+ます。すなわち、フォームの各フィールドについて、 (フォーム定義で宣言した順
+に) まず ``Field.clean()`` メソッドを呼び出し、次いで 
+``cleaned_<fieldname>()`` 、を呼びます。最後に、 ``Form.clean()`` メソッド
+(オーバライドされていればそれを) を呼び出します。
 
-The previous paragraph means that if you are overriding ``Form.clean()``, you
-should iterate through ``self.cleaned_data.items()``, possibly considering the
-``_errors`` dictionary attribute on the form as well. In this way, you will
-already know which fields have passed their individual validation requirements.
+先程も書いた通り、上記のメソッドは ``VaridationError`` を送出することがあり
+ます。個々のフィールドで、 ``Field.clean()`` メソッドが ``ValidationError``
+を送出した場合、フォーム上のフィールドごとのクリーニングメソッドは呼び出さ
+れません。ただし、残りの全てのフィールドに対するクリーニング処理は最後まで
+行われます。
 
-A simple example
-~~~~~~~~~~~~~~~~
+フォームクラスやサブクラスに対する ``clean()`` メソッドは常に実行されます。
+このメソッドが ``VaridationError`` を送出する場合、 ``cleaned_data`` は空の
+辞書になります。
 
-Here's a simple example of a custom field that validates its input is a string
-containing comma-separated e-mail addresses, with at least one address. We'll
-keep it simple and assume e-mail validation is contained in a function called
-``is_valid_email()``. The full class::
+前の段落の意味するところは、 ``Form.clean()`` をオーバライドする場合、
+``self.cleaned_data.items()`` の各要素を調べ、さらにフォームの ``_errors`` 
+属性も考慮して、どのフィールドが個別のバリデーション用件を満たしているかを
+調べる必要があるということです。
+
+.. _A simple example:
+
+簡単な例
+~~~~~~~~
+
+入力値がカンマで区切られたメールアドレスになっていて、少なくとも一つアドレ
+スが入っているかどうか検証するカスタムフィールドの例を以下に示します。簡単
+のため、個々のメールアドレスの検証は ``is_valid_email()`` という関数で行っ
+ていることにします。クラスの全体像は以下のようになります::
 
     from django import forms
 
@@ -98,9 +104,9 @@ keep it simple and assume e-mail validation is contained in a function called
                     raise forms.ValidationError('%s is not a valid e-mail address.' % email)
             return emails
 
-Let's alter the ongoing ``ContactForm`` example to demonstrate how you'd use
-this in a form. Simply use ``MultiEmailField`` instead of ``forms.EmailField``,
-like so::
+件の ``ContactForm`` の例を使って、上のカスタムフィールドをフォームで使って
+みます。以下のように、 ``forms.EmailField`` を ``MultiEmailField`` に置き換
+えてください::
 
     class ContactForm(forms.Form):
         subject = forms.CharField(max_length=100)

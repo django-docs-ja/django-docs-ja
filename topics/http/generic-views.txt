@@ -1,7 +1,7 @@
 .. _topics-http-generic-views:
 
-=============
-Generic views
-=============
+============================
+汎用ビュー (Generic views)
+============================
 
-See :ref:`ref-generic-views`.
+:ref:`ref-generic-views` を参照してください。

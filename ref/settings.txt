@@ -3,157 +3,165 @@
 Available settings
 ==================
 
-Here's a full list of all available settings, in alphabetical order, and their
-default values.
+:revision-up-to: 8961 (1.0)
+
+このドキュメントでは、利用可能な全ての設定のリストを示します。リストはアル
+ファベット順で、デフォルト値も示します。
 
 .. setting:: ABSOLUTE_URL_OVERRIDES
 
 ABSOLUTE_URL_OVERRIDES
 ----------------------
 
-Default: ``{}`` (Empty dictionary)
+デフォルト値: ``{}`` (空の辞書)
 
-A dictionary mapping ``"app_label.model_name"`` strings to functions that take
-a model object and return its URL. This is a way of overriding
-``get_absolute_url()`` methods on a per-installation basis. Example::
+モデルオブジェクトのパスを表す文字列 ``"app_label.model_name"`` から、モデ
+ルオブジェクトを引数にとり URL を返すような関数への対応づけを行うための辞書
+です。 Django で作成したプロジェクトのインストール先ごとに
+``get_absolute_url()`` メソッドを上書きするのに役立ちます。例えば::
 
     ABSOLUTE_URL_OVERRIDES = {
         'blogs.weblog': lambda o: "/blogs/%s/" % o.slug,
         'news.story': lambda o: "/stories/%s/%s/" % (o.pub_year, o.slug),
     }
 
-Note that the model name used in this setting should be all lower-case, regardless
-of the case of the actual model class name.
+もとのモデルクラス名で使っている文字ケースに関係なく、モデル名は小文字にせ
+ねばならないので注意してください。
 
 .. setting:: ADMIN_FOR
 
 ADMIN_FOR
 ---------
 
-Default: ``()`` (Empty tuple)
+デフォルト値: ``()`` (空のタプル)
 
-Used for admin-site settings modules, this should be a tuple of settings
-modules (in the format ``'foo.bar.baz'``) for which this site is an admin.
+admin 用サイトの設定モジュールで設定します。このサイトの admin を他のサイト
+の admin にする場合、設定モジュールを (``'foo.bar.baz'`` の形式のタプルで) 
+指定します。
 
-The admin site uses this in its automatically-introspected documentation of
-models, views and template tags.
+admin サイトはこの変数を使って、モデルやビュー、テンプレートタグのドキュメ
+ントに対するイントロスペクションを自動的に行います。
 
 .. setting:: ADMIN_MEDIA_PREFIX
 
 ADMIN_MEDIA_PREFIX
 ------------------
 
-Default: ``'/media/'``
+デフォルト値: ``'/media/'``
 
-The URL prefix for admin media -- CSS, JavaScript and images used by
-the Django administrative interface. Make sure to use a trailing
-slash, and to have this be different from the ``MEDIA_URL`` setting
-(since the same URL cannot be mapped onto two different sets of
-files).
+Django の管理インタフェース上で使われている CSS, JavaScript, 画像といった、
+いわゆる admin メディアへの URL プレフィクスです。必ず末尾にスラッシュをつ
+けてください。また、この値は ``MEDIA_URL`` と同じにしないでください (さもな
+いと、二つのファイルに同じ URL がマップされてしまいます)。
 
 .. setting:: ADMINS
 
 ADMINS
 ------
 
-Default: ``()`` (Empty tuple)
+デフォルト値: ``()`` (空のタプル)
 
-A tuple that lists people who get code error notifications. When
-``DEBUG=False`` and a view raises an exception, Django will e-mail these people
-with the full exception information. Each member of the tuple should be a tuple
-of (Full name, e-mail address). Example::
+コード中で発生したエラーを報告する連絡先を列挙するタプルです。
+``DEBUG=False`` の設定で、ビューが例外を送出すると、 Django はこの設定値に
+列挙されている相手全てに全ての例外情報の入った通知メールを送ります。タプル
+に入れる各メンバは、 (Full name, e-mail address) の形式で指定します。例えば::
 
     (('John', 'john@example.com'), ('Mary', 'mary@example.com'))
 
-Note that Django will e-mail *all* of these people whenever an error happens.
-See :ref:`howto-error-reporting` for more information.
+Django はエラーが生じたときに、このリストに登録されている *全ての* 宛先にメー
+ルを送信します。詳しくは :ref:`howto-error-reporting` を参照してください。
 
 .. setting:: ALLOWED_INCLUDE_ROOTS
 
 ALLOWED_INCLUDE_ROOTS
 ---------------------
 
-Default: ``()`` (Empty tuple)
+デフォルト値: ``()`` (空のタプル)
 
-A tuple of strings representing allowed prefixes for the ``{% ssi %}`` template
-tag. This is a security measure, so that template authors can't access files
-that they shouldn't be accessing.
+``{% ssi %}`` テンプレートタグで取り込める URL のプレフィクスを表す文字列か
+らなるタプルです。この設定はセキュリティを高めるためのもので、テンプレート
+の作者に取り込みを禁じられているファイルにアクセスさせないようにします。
 
-For example, if ``ALLOWED_INCLUDE_ROOTS`` is ``('/home/html', '/var/www')``,
-then ``{% ssi /home/html/foo.txt %}`` would work, but ``{% ssi /etc/passwd %}``
-wouldn't.
+例えば、 ``ALLOWED_INCLUDE_ROOTS`` を ``('/home/html', '/var/www')`` にして
+おくと、 ``{% ssi /home/html/foo.txt %}`` は期待通りに動作しますが、 
+``{% ssi /etc/passwd %}`` はうまくいきません。
 
 .. setting:: APPEND_SLASH
 
 APPEND_SLASH
 ------------
 
-Default: ``True``
+デフォルト値: ``True``
 
-Whether to append trailing slashes to URLs. This is only used if
-``CommonMiddleware`` is installed (see :ref:`topics-http-middleware`). See also
-``PREPEND_WWW``.
+URL の末尾に常にスラッシュを追加するかどうかを決めます。
+``CommonMiddleware`` がインストールされている場合にしか使われません。
+(:ref:`topics-http-middleware` を参照してください。) ``PREPEND_WWW`` も参照
+してください。
 
 .. setting:: AUTHENTICATION_BACKENDS
 
 AUTHENTICATION_BACKENDS
 -----------------------
 
-Default: ``('django.contrib.auth.backends.ModelBackend',)``
+デフォルト値: ``('django.contrib.auth.backends.ModelBackend',)``
 
-A tuple of authentication backend classes (as strings) to use when attempting to
-authenticate a user. See the :ref:`authentication backends documentation
-<authentication-backends>` for details.
+認証バックエンドのクラス名を (文字列で) 列挙したタプルです。ユーザ認証を試
+みる際に使われます。詳しくは
+:ref:`認証バックエンドのドキュメント <authentication-backends>` を参照して
+ください。
 
 .. setting:: AUTH_PROFILE_MODULE
 
 AUTH_PROFILE_MODULE
 -------------------
 
-Default: Not defined
+デフォルト値: 定義されていません
 
-The site-specific user profile model used by this site. See
-:ref:`auth-profiles`.
+サイト固有のユーザプロファイルモデルです。詳しくは  :ref:`auth-profiles`
+を参照してください。
 
 .. setting:: CACHE_BACKEND
 
 CACHE_BACKEND
 -------------
 
-Default: ``'locmem://'``
+デフォルト値: ``'locmem://'``
 
-The cache backend to use. See :ref:`topics-cache`.
+利用するキャッシュバックエンドを指定します。 :ref:`topics-cache` を参照して
+ください。
 
 .. setting:: CACHE_MIDDLEWARE_KEY_PREFIX
 
 CACHE_MIDDLEWARE_KEY_PREFIX
 ---------------------------
 
-Default: ``''`` (Empty string)
+デフォルト値: ``''`` (空文字列)
 
-The cache key prefix that the cache middleware should use. See
-:ref:`topics-cache`.
+キャッシュミドルウェアが使うキャッシュキープレフィクスを指定します。
+:ref:`topics-cache` を参照してください。
 
 .. setting:: CACHE_MIDDLEWARE_SECONDS
 
 CACHE_MIDDLEWARE_SECONDS
 ------------------------
 
-Default: ``600``
+デフォルト値: ``600``
 
-The default number of seconds to cache a page when the caching middleware or
-``cache_page()`` decorator is used.
+キャッシュミドルウェアや ``cache_page()`` デコレータを使うときに、ページを
+キャッシュしておく秒数のデフォルト値です。
 
 .. setting:: DATABASE_ENGINE
 
 DATABASE_ENGINE
 ---------------
 
-Default: ``''`` (Empty string)
+デフォルト値: ``''`` (空文字列)
 
-The database backend to use. The build-in database backends are
-``'postgresql_psycopg2'``, ``'postgresql'``, ``'mysql'``, ``'sqlite3'``, and
-``'oracle'``.
+どのデータベースバックエンドを使うかを指定します。組み込みのデータベースバッ
+クエンドは、 ``'postgresql_psycopg2'``, ``'postgresql'``, ``'mysql'``,
+``'sqlite3'``, ``'oracle'`` です。
+
+.. TBD
 
 In the Django development version, you can use a database backend that doesn't
 ship with Django by setting ``DATABASE_ENGINE`` to a fully-qualified path (i.e.
@@ -166,163 +174,164 @@ examples.
 DATABASE_HOST
 -------------
 
-Default: ``''`` (Empty string)
+デフォルト値: ``''`` (空文字列)
 
-Which host to use when connecting to the database. An empty string means
-localhost. Not used with SQLite.
+データベース接続先のホストを指定します。空にしておくと localhost になります。
+SQLite では使いません。
 
-If this value starts with a forward slash (``'/'``) and you're using MySQL,
-MySQL will connect via a Unix socket to the specified socket. For example::
+この変数がスラッシュ (``'/'``) で始まっていて、 MySQL を使っている場合、
+MySQL は指定された Unix ソケットを介して接続します。例えば::
 
     DATABASE_HOST = '/var/run/mysql'
 
-If you're using MySQL and this value *doesn't* start with a forward slash, then
-this value is assumed to be the host.
+のように指定します。 MySQL を使っていて、この変数がスラッシュで始まっていな
+い場合には、この変数はホスト名として扱われます。
 
-If you're using PostgreSQL, an empty string means to use a Unix domain socket
-for the connection, rather than a network connection to localhost. If you
-explicitly need to use a TCP/IP connection on the local machine with
-PostgreSQL, specify ``localhost`` here.
+PostgreSQL を使っている場合、 ``DATABASE_HOST`` に空文字列を指定すると、
+Unix ドメインソケットを使った接続を意味します。ローカルホストに対する
+TCP/IP 接続を指定したければ ``localhost`` と指定してください。
 
 .. setting:: DATABASE_NAME
 
 DATABASE_NAME
 -------------
 
-Default: ``''`` (Empty string)
+デフォルト値: ``''`` (空文字列)
 
-The name of the database to use. For SQLite, it's the full path to the database
-file.
+データベースの名前です。 SQLite の場合は、データベースファイルへのフルパス
+です。
 
 .. setting:: DATABASE_OPTIONS
 
 DATABASE_OPTIONS
 ----------------
 
-Default: ``{}`` (Empty dictionary)
+デフォルト値: ``{}`` (空の辞書)
 
-Extra parameters to use when connecting to the database. Consult backend
-module's document for available keywords.
+データベースに接続するときの追加のパラメタです。利用できるキーワードは個々
+のバックエンドモジュールのドキュメントを参照してください。
 
 .. setting:: DATABASE_PASSWORD
 
 DATABASE_PASSWORD
 -----------------
 
-Default: ``''`` (Empty string)
+デフォルト値: ``''`` (空文字列)
 
-The password to use when connecting to the database. Not used with SQLite.
+データベースに接続するときのパスワードです。SQLite では使いません。
 
 .. setting:: DATABASE_PORT
 
 DATABASE_PORT
 -------------
 
-Default: ``''`` (Empty string)
+デフォルト値: ``''`` (空文字列)
 
-The port to use when connecting to the database. An empty string means the
-default port. Not used with SQLite.
+データベースに接続するときのポート番号です。空文字を指定するとデフォルトの
+ポートを使います。SQLite では使いません。
 
 .. setting:: DATABASE_USER
    
 DATABASE_USER
 -------------
 
-Default: ``''`` (Empty string)
+デフォルト値: ``''`` (空文字列)
 
-The username to use when connecting to the database. Not used with SQLite.
+データベースに接続するときのユーザ名です。SQLite では使いません。
 
 .. setting:: DATE_FORMAT
 
 DATE_FORMAT
 -----------
 
-Default: ``'N j, Y'`` (e.g. ``Feb. 4, 2003``)
+デフォルト値: ``'N j, Y'`` (e.g. ``Feb. 4, 2003``)
 
-The default formatting to use for date fields on Django admin change-list
-pages -- and, possibly, by other parts of the system. See
-:ttag:`allowed date format strings <now>`.
+Django の admin サイトの変更履歴ページ (や、システムの他の部分で) 日付フィー
+ルドの表示に使うデフォルトのフォーマットです。
+:ttag:`利用可能な日付フォーマット文字 <now>` を参照してください。
 
-See also ``DATETIME_FORMAT``, ``TIME_FORMAT``, ``YEAR_MONTH_FORMAT``
-and ``MONTH_DAY_FORMAT``.
+``DATETIME_FORMAT`` , ``TIME_FORMAT`` , ``YEAR_MONTH_FORMAT`` および
+``MONTH_DAY_FORMAT`` も参照してください。
 
 .. setting:: DATETIME_FORMAT
    
 DATETIME_FORMAT
 ---------------
 
-Default: ``'N j, Y, P'`` (e.g. ``Feb. 4, 2003, 4 p.m.``)
+デフォルト値: ``'N j, Y, P'`` (e.g. ``Feb. 4, 2003, 4 p.m.``)
 
-The default formatting to use for datetime fields on Django admin change-list
-pages -- and, possibly, by other parts of the system. See
-:ttag:`allowed date format strings <now>`.
+Django の admin サイトの変更履歴ページ (や、システムの他の部分で) 日時フィー
+ルドの表示に使うデフォルトのフォーマットです。
+:ttag:`利用可能な日付フォーマット文字 <now>` を参照してください。
 
-See also ``DATE_FORMAT``, ``DATETIME_FORMAT``, ``TIME_FORMAT``,
-``YEAR_MONTH_FORMAT`` and ``MONTH_DAY_FORMAT``.
+``DATE_FORMAT`` , ``TIME_FORMAT`` , ``YEAR_MONTH_FORMAT`` および
+``MONTH_DAY_FORMAT`` も参照してください。
 
 .. setting:: DEBUG
 
 DEBUG
 -----
 
-Default: ``False``
+デフォルト値: ``False``
 
-A boolean that turns on/off debug mode.
+デバッグモードのオンオフを切替えるブール値です。
 
-If you define custom settings, django/views/debug.py has a ``HIDDEN_SETTINGS``
-regular expression which will hide from the DEBUG view anything that contains
-``'SECRET'``, ``'PASSWORD'``, or ``'PROFANITIES'``. This allows untrusted users to
-be able to give backtraces without seeing sensitive (or offensive) settings.
+settings に自作の設定項目を追加する場合、django/views/debug.py の
+``HIDDEN_SETTINGS`` に注意してください。この変数は正規表現になっていて、デ
+フォルトでは ``'SECRET'``, ``'PASSWORD'``, ``'PROFANITIES'`` といった文字列
+を含む全ての設定の DEBUG ビューへの表示を抑制して、信頼されていないユーザが
+バックトレースから重要な (あるいは攻撃的な) 設定項目を見なくてすむようにし
+ているからです。
 
-Still, note that there are always going to be sections of your debug output that
-are inappropriate for public consumption. File paths, configuration options, and
-the like all give attackers extra information about your server.
+また、デバッグ出力の様々な情報は、いついかなる状況でも衆目に晒すべきもので
+はないということを心得ておきましょう。ファイルパス、各設定項目などは、攻撃
+者に対してサーバの様々な情報を与えてしまいます。
 
-It is also important to remember that when running with ``DEBUG`` turned on, Django
-will remember every SQL query it executes. This is useful when you are debugging,
-but on a production server, it will rapidly consume memory.
+また、 ``DEBUG`` をオンにして Django を起動すると、Django は実行した SQL ク
+エリを全て記憶してしまうことも忘れないでください。この機能はデバッグ時には
+便利ですが、運用時に使うとあっという間にメモリを消費してしまうでしょう。
 
-Never deploy a site into production with ``DEBUG`` turned on.
+決して ``DEBUG`` をオンにしたままサーバを運用しないでください。
 
 DEBUG_PROPAGATE_EXCEPTIONS
 --------------------------
 
 .. versionadded:: 1.0
 
-Default: ``False``
+デフォルト値: ``False``
 
-If set to True, Django's normal exception handling of view functions
-will be suppressed, and exceptions will propagate upwards.  This can
-be useful for some test setups, and should never be used on a live
-site.
-
+``True`` にすると、 Django が通常ビュー関数に対して行っている例外処理が抑制
+され、例外がそのまま送出されるようになります。テスト時に便利な機能ですが、
+実運用環境で使うべきではありません。
 
 .. setting:: DEFAULT_CHARSET
 
 DEFAULT_CHARSET
 ---------------
 
-Default: ``'utf-8'``
+デフォルト値: ``'utf-8'``
 
-Default charset to use for all ``HttpResponse`` objects, if a MIME type isn't
-manually specified. Used with ``DEFAULT_CONTENT_TYPE`` to construct the
-``Content-Type`` header.
+全ての ``HttpResponse`` オブジェクトで、MIME タイプを手動で指定しなかった場
+合に使われるデフォルトの文字セットです。 ``Content-Type`` ヘッダの生成時に
+``DEFAULT_CONTENT_TYPE`` とともに使われます。
 
 .. setting:: DEFAULT_CONTENT_TYPE
 
 DEFAULT_CONTENT_TYPE
 --------------------
 
-Default: ``'text/html'``
+デフォルト値: ``'text/html'``
 
-Default content type to use for all ``HttpResponse`` objects, if a MIME type
-isn't manually specified. Used with ``DEFAULT_CHARSET`` to construct the
-``Content-Type`` header.
+全ての ``HttpResponse`` オブジェクトで、MIME タイプを手動で指定しなかった場
+合に使われるデフォルトのコンテンツタイプです。 ``Content-Type`` ヘッダの生
+成時に ``DEFAULT_CHARSET`` とともに使われます。
 
 .. setting:: DEFAULT_FROM_EMAIL
 
 DEFAULT_FILE_STORAGE
 --------------------
+
+.. TBD
 
 Default: ``django.core.files.storage.FileSystemStorage``
 
@@ -332,10 +341,10 @@ specify a particular storage system. See :ref:`topics-files`.
 DEFAULT_FROM_EMAIL
 ------------------
 
-Default: ``'webmaster@localhost'``
+デフォルト値: ``'webmaster@localhost'``
 
-Default e-mail address to use for various automated correspondence from the
-site manager(s).
+サイト管理者からのさまざまな自動応答で使われるデフォルトの e-mail アドレス
+です。
 
 .. setting:: DEFAULT_TABLESPACE
 
@@ -344,10 +353,10 @@ DEFAULT_TABLESPACE
 
 .. versionadded:: 1.0
 
-Default: ``''`` (Empty string)
+デフォルト値: ``''`` (空文字列)
 
-Default tablespace to use for models that don't specify one, if the
-backend supports it.
+テーブルスペース名を明示していないモデルに使われるテーブルスペース
+名です。バックエンドがサポートしている場合に限って有効です。
 
 .. setting:: DEFAULT_INDEX_TABLESPACE
 
@@ -356,79 +365,80 @@ DEFAULT_INDEX_TABLESPACE
 
 .. versionadded:: 1.0
 
-Default: ``''`` (Empty string)
+デフォルト値: ``''`` (空文字列)
 
-Default tablespace to use for indexes on fields that don't specify
-one, if the backend supports it.
+テーブルスペース名を明示していないフィールドインデクスに使われるテーブルス
+ペース名です。バックエンドがサポートしている場合に限って有効です。
 
 .. setting:: DISALLOWED_USER_AGENTS
 
 DISALLOWED_USER_AGENTS
 ----------------------
 
-Default: ``()`` (Empty tuple)
+デフォルト値: ``()`` (空のタプル)
 
-List of compiled regular expression objects representing User-Agent strings that
-are not allowed to visit any page, systemwide. Use this for bad robots/crawlers.
-This is only used if ``CommonMiddleware`` is installed (see
-:ref:`topics-http-middleware`).
+システム全体にわたり、ページの閲覧を許さないクライアントの User-Agent を表
+すコンパイル済みの正規表現オブジェクトからなるリストです。相手にしたくない
+ロボットやクローラがいる場合に使って下さい。この設定は ``CommonMiddleware``
+がインストールされている場合にしか使われません。
+(:ref:`topics-http-middleware` を参照してください)。
 
 .. setting:: EMAIL_HOST
 
 EMAIL_HOST
 ----------
 
-Default: ``'localhost'``
+デフォルト値: ``'localhost'``
 
-The host to use for sending e-mail.
+e-mail の送信に使われるホスト名です。
 
-See also ``EMAIL_PORT``.
+``EMAIL_PORT`` も参照してください。
 
 .. setting:: EMAIL_HOST_PASSWORD
 
 EMAIL_HOST_PASSWORD
 -------------------
 
-Default: ``''`` (Empty string)
+デフォルト値: ``''`` (空文字列)
 
-Password to use for the SMTP server defined in ``EMAIL_HOST``. This setting is
-used in conjunction with ``EMAIL_HOST_USER`` when authenticating to the SMTP
-server. If either of these settings is empty, Django won't attempt
-authentication.
+``EMAIL_HOST`` に指定した SMTP サーバにアクセスする際のパスワードです。この
+設定は ``EMAIL_HOST_USER`` と組み合わせて、 SMTP サーバの認証に使われます。
+``EMAIL_HOST_USER`` と ``EMAIL_HOST_PASSWORD`` のどちらかが空文字列の場合、
+Django は SMTP への認証を試みません。
 
-See also ``EMAIL_HOST_USER``.
+``EMAIL_HOST_USER`` も参照してください。
 
 .. setting:: EMAIL_HOST_USER
 
 EMAIL_HOST_USER
 ---------------
 
-Default: ``''`` (Empty string)
+デフォルト値: ``''`` (空文字列)
 
-Username to use for the SMTP server defined in ``EMAIL_HOST``. If empty,
-Django won't attempt authentication.
+``EMAIL_HOST`` で定義されている SMTP サーバへのアクセスに使われるユーザ名で
+す。空文字列の場合、 Django は SMTP への認証を試みません。
 
-See also ``EMAIL_HOST_PASSWORD``.
+``EMAIL_HOST_PASSWORD`` も参照してください。
 
 .. setting:: EMAIL_PORT
 
 EMAIL_PORT
 ----------
 
-Default: ``25``
+デフォルト値: ``25``
 
-Port to use for the SMTP server defined in ``EMAIL_HOST``.
+``EMAIL_HOST`` で定義されている SMTP サーバのポート番号です。
 
 .. setting:: EMAIL_SUBJECT_PREFIX
 
 EMAIL_SUBJECT_PREFIX
 --------------------
 
-Default: ``'[Django] '``
+デフォルト値: ``'[Django] '``
 
-Subject-line prefix for e-mail messages sent with ``django.core.mail.mail_admins``
-or ``django.core.mail.mail_managers``. You'll probably want to include the
-trailing space.
+``django.core.mail.mail_admins`` や ``django.core.mail.mail_managers`` が送
+信するメールの題名に使われるプレフィクスです。末尾にはスペースを入れておいた
+方がよいでしょう。
 
 .. setting:: EMAIL_USE_TLS
 
@@ -437,9 +447,9 @@ EMAIL_USE_TLS
 
 .. versionadded:: 1.0
 
-Default: ``False``
+デフォルト値: ``False``
 
-Whether to use a TLS (secure) connection when talking to the SMTP server.
+SMTP サーバとの通信に TLS (安全な接続) を使うかどうかを指定します。
 
 .. setting:: FILE_CHARSET
 
@@ -448,10 +458,10 @@ FILE_CHARSET
 
 .. versionadded:: 1.0
 
-Default: ``'utf-8'``
+デフォルト値: ``'utf-8'``
 
-The character encoding used to decode any files read from disk. This includes
-template files and initial SQL data files.
+テンプレートファイルや SQL のデータファイルなどのファイルをファイルシステム
+から読み出すときに使う文字エンコーディングです。
 
 .. setting:: FILE_UPLOAD_HANDLERS
 
@@ -460,12 +470,13 @@ FILE_UPLOAD_HANDLERS
 
 .. versionadded:: 1.0
 
-Default::
+デフォルト値::
 
-    ("django.core.files.uploadhandler.MemoryFileUploadHandler",
-     "django.core.files.uploadhandler.TemporaryFileUploadHandler",)
+    ("django.core.files.fileuploadhandler.MemoryFileUploadHandler",
+     "django.core.files.fileuploadhandler.TemporaryFileUploadHandler",)
 
-A tuple of handlers to use for uploading. See :ref:`topics-files` for details.
+ファイルアップロード時に使うハンドラを指定するタプルです。詳しくは 
+:ref:`topics-files` を参照してください。
 
 .. setting:: FILE_UPLOAD_MAX_MEMORY_SIZE
 
@@ -474,10 +485,11 @@ FILE_UPLOAD_MAX_MEMORY_SIZE
 
 .. versionadded:: 1.0
 
-Default: ``2621440`` (i.e. 2.5 MB).
+デフォルト値: ``2621440`` (2.5 MB).
 
-The maximum size (in bytes) that an upload will be before it gets streamed to
-the file system. See :ref:`topics-files` for details.
+アップロード中のファイルをファイルシステム上にストリーム書き込み開始するま
+でに受け入れる最大サイズ (単位バイト) です。詳しくは :ref:`topics-files` を
+参照してください。
 
 .. setting:: FILE_UPLOAD_TEMP_DIR
 
@@ -486,13 +498,15 @@ FILE_UPLOAD_TEMP_DIR
 
 .. versionadded:: 1.0
 
-Default: ``None``
+デフォルト値: ``None``
 
-The directory to store data temporarily while uploading files. If ``None``,
-Django will use the standard temporary directory for the operating system. For
-example, this will default to '/tmp' on \*nix-style operating systems.
+アップロード中のファイルを一時的に保存するためのディレクトリです。 ``None``
+に指定すると、オペレーティングシステムごとに標準の一時ディレクトリを使いま
+す。例えば、 \*nix スタイルのオペレーティングシステムでは '/tmp' です。
 
-See :ref:`topics-files` for details.
+詳しくは :ref:`topics-files` を参照してください。
+
+.. TBD
 
 .. setting:: FILE_UPLOAD_PERMISSIONS
 
@@ -527,16 +541,18 @@ system's standard umask.
 FIXTURE_DIRS
 -------------
 
-Default: ``()`` (Empty tuple)
+デフォルト値: ``()`` (空のタプル)
 
-List of locations of the fixture data files, in search order. Note that
-these paths should use Unix-style forward slashes, even on Windows. See
-:ref:`topics-testing`.
+フィクスチャデータファイルの検索対象ディレクトリを順に挙げたリストです。
+パスの表記は (Windows 環境でも) Unix 形式の前向きスラッシュにせねばなりませ
+ん。 :ref:`topics-testing` も参照してください。
 
 FORCE_SCRIPT_NAME
 ------------------
 
-Default: ``None``
+デフォルト値: ``None``
+
+.. TBD
 
 If not ``None``, this will be used as the value of the ``SCRIPT_NAME``
 environment variable in any HTTP request. This setting can be used to override
@@ -548,67 +564,71 @@ of the preferred value or not supplied at all.
 IGNORABLE_404_ENDS
 ------------------
 
-Default: ``('mail.pl', 'mailform.pl', 'mail.cgi', 'mailform.cgi', 'favicon.ico', '.php')``
+デフォルト値: ``('mail.pl', 'mailform.pl', 'mail.cgi', 'mailform.cgi', 'favicon.ico', '.php')``
 
-See also ``IGNORABLE_404_STARTS`` and ``Error reporting via e-mail``.
+``IGNORABLE_404_STARTS`` と
+「 :ref:`電子メールによるエラー通知 <howto-error-reporting>` 」を参照してく
+ださい。
 
 .. setting:: IGNORABLE_404_STARTS
 
 IGNORABLE_404_STARTS
 --------------------
 
-Default: ``('/cgi-bin/', '/_vti_bin', '/_vti_inf')``
+デフォルト値: ``('/cgi-bin/', '/_vti_bin', '/_vti_inf')``
 
-A tuple of strings that specify beginnings of URLs that should be ignored by
-the 404 e-mailer. See ``SEND_BROKEN_LINK_EMAILS``, ``IGNORABLE_404_ENDS`` and
-the :ref:`howto-error-reporting`.
+404 通知 e-mail を使っている場合、このタプルに指定した文字列から始まる URL
+は無視されます。 ``SEND_BROKEN_LINK_EMAILS``, ``IGNORABLE_404_ENDS`` および
+:ref:`電子メールによるエラー通知 <howto-error-reporting>` も参照してくださ
+い。
 
 .. setting:: INSTALLED_APPS
 
 INSTALLED_APPS
 --------------
 
-Default: ``()`` (Empty tuple)
+デフォルト値: ``()`` (空のタプル)
 
-A tuple of strings designating all applications that are enabled in this Django
-installation. Each string should be a full Python path to a Python package that
-contains a Django application, as created by :djadmin:`django-admin.py startapp
-<startapp>`.
+現在の Django インストール下で有効にしたい全てのアプリケーションを表す文字
+列のタプルです。各文字列は、 :djadmin:`django-admin.py startapp <startapp>`
+で作成した Django アプリケーションの入った Python パッケージを示す完全な
+Python パスでなければなりません。
 
 .. setting:: INTERNAL_IPS
 
 INTERNAL_IPS
 ------------
 
-Default: ``()`` (Empty tuple)
+デフォルト値: ``()`` (空のタプル)
 
-A tuple of IP addresses, as strings, that:
+文字列で表した IP アドレスのタプルです。
 
-    * See debug comments, when ``DEBUG`` is ``True``
-    * Receive X headers if the ``XViewMiddleware`` is installed (see
-      :ref:`topics-http-middleware`)
+    * ``DEBUG`` が ``True`` の場合、デバッグコメント中に表示されます。
+    * ``XViewMiddleware`` がインストールされている場合、X ヘッダを受信しま
+      す。(:ref:`topics-http-middleware` も参照してください。)
 
 .. setting:: JING_PATH
 
 JING_PATH
 ---------
 
-Default: ``'/usr/bin/jing'``
+デフォルト値: ``'/usr/bin/jing'``
 
-Path to the "Jing" executable. Jing is a RELAX NG validator, and Django uses it
-to validate each ``XMLField`` in your models.
-See http://www.thaiopensource.com/relaxng/jing.html .
+"Jing" 実行形式へのパスです。 Jung は RELAX NG バリデータで、 Django はモデ
+ルの ``XMLField`` のバリデーションに "Jing" を使います。
+
+http://www.thaiopensource.com/relaxng/jing.html を参照してください。
 
 .. setting:: LANGUAGE_CODE
 
 LANGUAGE_CODE
 -------------
 
-Default: ``'en-us'``
+デフォルト値: ``'en-us'``
 
-A string representing the language code for this installation. This should be in
-standard language format. For example, U.S. English is ``"en-us"``. See
-:ref:`topics-i18n`.
+現在の Django インストールにおける言語コード文字列です。この値は標準の言語
+指定形式にせねばなりません。たとえば U.S. English は ``"en-us"`` にします。
+:ref:`topics-i18n` も参照してください。
 
 .. setting:: LANGUAGE_COOKIE_NAME
 
@@ -617,40 +637,42 @@ LANGUAGE_COOKIE_NAME
 
 .. versionadded:: 1.0
 
-Default: ``'django_language'``
+デフォルト値: ``'django_language'``
 
-The name of the cookie to use for the language cookie. This can be whatever you
-want (but should be different from ``SESSION_COOKIE_NAME``). See
-:ref:`topics-i18n`.
+言語情報を記憶するために使うクッキーの名前です。 ``SESSION_COOKIE_NAME``
+の設定値と同じでなければ、どんな名前にしてもかまいません。詳しくは
+:ref:`topics-i18n` を参照してください。
 
 .. setting:: LANGUAGES
 
 LANGUAGES
 ---------
 
-Default: A tuple of all available languages. This list is continually growing
-and including a copy here would inevitably become rapidly out of date. You can
-see the current list of translated languages by looking in
-``django/conf/global_settings.py`` (or view the `online source`_).
+デフォルト値: 利用可能な言語からなるタプルです。このリストには頻繁に新たな
+言語が登場しているので、そのコピーをここに記載していてもすぐに古い情報になっ
+てしまいます。現在サポートされている言語のリストは手元のソースコード中の
+``django/conf/global_settings.py`` (または `オンラインのソースコード`_) を
+参照してください。
 
 .. _online source: http://code.djangoproject.com/browser/django/trunk/django/conf/global_settings.py
+.. _`オンラインのソースコード`: `online source`_
 
-The list is a tuple of two-tuples in the format (language code, language
-name) -- for example, ``('ja', 'Japanese')``. This specifies which languages
-are available for language selection. See :ref:`topics-i18n`.
+このリストは、例えば ``('ja', 'Japanese')`` のように、 (言語コード, 言語名)
+の形式のタプルでできており、国際化機能で選択可能な言語を指定するために使い
+ます。詳しくは :ref:`topics-i18n` を参照してください。
 
-Generally, the default value should suffice. Only set this setting if you want
-to restrict language selection to a subset of the Django-provided languages.
+一般に、デフォルト値をいじる必要はありません。Django が提供している言語セッ
+トの選択肢を狭めたい場合のみ設定してください。
 
-If you define a custom ``LANGUAGES`` setting, it's OK to mark the languages as
-translation strings (as in the default value displayed above) -- but use a
-"dummy" ``gettext()`` function, not the one in ``django.utils.translation``.
-You should *never* import ``django.utils.translation`` from within your
-settings file, because that module in itself depends on the settings, and that
-would cause a circular import.
+カスタムの ``LANGUAGE`` 設定を定義する場合、(上の例に示したように) 各言語を
+翻訳文字列として定義してかまいませんが、 ``django.utils.translation`` の
+``gettext()`` 関数ではなく、「ダミーの」 ``gettext()`` を使うようにしてくだ
+さい。設定ファイル内では *決して* ``django.utils.translation`` を import し
+ないでください。このモジュールは settings の内容に依存しているため、循環
+import を引き起こしてしまうからです。
 
-The solution is to use a "dummy" ``gettext()`` function. Here's a sample
-settings file::
+解決方法は、上でも述べたように「ダミーの」 ``gettext()`` を使うというもので
+す。以下に設定ファイルの例を示します::
 
     gettext = lambda s: s
 
@@ -659,20 +681,21 @@ settings file::
         ('en', gettext('English')),
     )
 
-With this arrangement, ``django-admin.py makemessages`` will still find and
-mark these strings for translation, but the translation won't happen at
-runtime -- so you'll have to remember to wrap the languages in the *real*
-``gettext()`` in any code that uses ``LANGUAGES`` at runtime.
+このような書き方をした場合、 ``django-admin.py makemessage`` は翻訳対象文字
+列をきちんと取り出せます。しかし、実行時に翻訳は行われません。従って、実行
+時に ``LANGUAGES`` を使うようなコードでは、 *本当の* ``gettext()`` を使って
+言語名をラップするようにしてください。
 
 .. setting:: LOCALE_PATHS
 
 LOCALE_PATHS
 ------------
 
-Default: ``()`` (Empty tuple)
+デフォルト値: ``()`` (空のタプル)
 
-A tuple of directories where Django looks for translation files.
-See :ref:`translations-in-your-own-projects`.
+Django が翻訳ファイルを探しに行く場所を指定するためのタプルです。
+この変数の詳細とデフォルトの動作については、
+:ref:`translations-in-your-own-projects` を参照してください。
 
 .. setting:: LOGIN_REDIRECT_URL
 
@@ -681,13 +704,13 @@ LOGIN_REDIRECT_URL
 
 .. versionadded:: 1.0
 
-Default: ``'/accounts/profile/'``
+デフォルト値: ``'/accounts/profile/'``
 
-The URL where requests are redirected after login when the
-``contrib.auth.login`` view gets no ``next`` parameter.
+``controb.auth.login`` ビューに ``next`` パラメタが指定されていない場合の、
+デフォルトのリダイレクト先 URL です。
 
-This is used by the :func:`~django.contrib.auth.decorators.login_required`
-decorator, for example.
+:func:`~django.contrib.auth.decorators.login_required` デコレータを利用する
+ときなどに使う設定です。
 
 .. setting:: LOGIN_URL
 
@@ -696,10 +719,10 @@ LOGIN_URL
 
 .. versionadded:: 1.0
 
-Default: ``'/accounts/login/'``
+デフォルト値: ``'/accounts/login/'``
 
-The URL where requests are redirected for login, specially when using the
-:func:`~django.contrib.auth.decorators.login_required` decorator.
+:func:`~django.contrib.auth.decorators.login_required`  デコレータを利用す
+るときなどに、ログインページへのリダイレクト先として使う設定です。
 
 .. setting:: LOGOUT_URL
 
@@ -708,146 +731,159 @@ LOGOUT_URL
 
 .. versionadded:: 1.0
 
-Default: ``'/accounts/logout/'``
+デフォルト値: ``'/accounts/logout/'``
 
-LOGIN_URL counterpart.
+LOGIN_URL の対極にあたる、ログアウトページへのリダイレクト URL です。
 
 .. setting:: MANAGERS
 
 MANAGERS
 --------
 
-Default: ``()`` (Empty tuple)
+デフォルト値: ``()`` (空のタプル)
 
-A tuple in the same format as ``ADMINS`` that specifies who should get
-broken-link notifications when ``SEND_BROKEN_LINK_EMAILS=True``.
+``ADMINS`` と同じ形式のタプルで、 ``SEND_BROKEN_LINK_EMAILS=True`` の時に壊
+れたリンクの通知を受けるメンバを指定します。
 
 .. setting:: MEDIA_ROOT
 
 MEDIA_ROOT
 ----------
 
-Default: ``''`` (Empty string)
+デフォルト値: ``''`` (空文字列)
 
-Absolute path to the directory that holds media for this installation.
-Example: ``"/home/media/media.lawrence.com/"`` See also ``MEDIA_URL``.
+現在の Django インストールにおいて、メディアファイルを収めているディレクト
+リへの絶対パスです。例えば ``"/home/media/media.lawrence.com/"`` です。
+``MEDIA_URL`` も参照してください。
 
 .. setting:: MEDIA_URL
 
 MEDIA_URL
 ---------
 
-Default: ``''`` (Empty string)
+デフォルト値: ``''`` (空文字列)
 
-URL that handles the media served from ``MEDIA_ROOT``.
-Example: ``"http://media.lawrence.com"``
+``MEDIA_ROOT`` で提供されているメディアファイルを扱う URL です。例えば
+``"http://media.lawrence.com"`` です。
 
-Note that this should have a trailing slash if it has a path component.
+URL にパス部を含める場合、末尾はスラッシュにせねばなりません。
 
-Good: ``"http://www.example.com/static/"``
-Bad: ``"http://www.example.com/static"``
+良い例: ``"http://www.example.com/static/"``
+悪い例: ``"http://www.example.com/static"``
 
 .. setting:: MIDDLEWARE_CLASSES
 
 MIDDLEWARE_CLASSES
 ------------------
 
-Default::
+デフォルト値::
 
     ("django.contrib.sessions.middleware.SessionMiddleware",
      "django.contrib.auth.middleware.AuthenticationMiddleware",
      "django.middleware.common.CommonMiddleware",
      "django.middleware.doc.XViewMiddleware")
 
-A tuple of middleware classes to use. See :ref:`topics-http-middleware`.
+利用するミドルウェアクラスの Python パス名からなるタプルです。
+:ref:`topics-http-middleware` も参照してください。.
 
 .. setting:: MONTH_DAY_FORMAT
 
 MONTH_DAY_FORMAT
 ----------------
 
-Default: ``'F j'``
+デフォルト値: ``'F j'``
 
-The default formatting to use for date fields on Django admin change-list
-pages -- and, possibly, by other parts of the system -- in cases when only the
-month and day are displayed.
+Django の admin サイトにおける変更リストの日付フィールドの他、システムの各
+所で月と日だけを表示する際に使われるデフォルトのフォーマットです。
 
-For example, when a Django admin change-list page is being filtered by a date
-drilldown, the header for a given day displays the day and month. Different
-locales have different formats. For example, U.S. English would say
-"January 1," whereas Spanish might say "1 Enero."
+例えば、 Django の admin サイトにおける変更リストページを日付による絞り込み
+でフィルタする場合、指定日のヘッダには日と月が表示されます。ロケールによっ
+ては異なったフォーマットになります。例えば、 U.S. English での "January 1"
+は、スペイン語では "1 Enero." です。
 
-See :ttag:`allowed date format strings <now>`. See also ``DATE_FORMAT``,
-``DATETIME_FORMAT``, ``TIME_FORMAT`` and ``YEAR_MONTH_FORMAT``.
+:ttag:`利用可能な日付フォーマット文字 <now>` を参照してください。
+``DATE_FORMAT``, ``DATETIME_FORMAT`` , ``TIME_FORMAT`` ,
+``YEAR_MONTH_FORMAT`` も参照してください。
 
 .. setting:: PREPEND_WWW
 
 PREPEND_WWW
 -----------
 
-Default: ``False``
+デフォルト値: ``False``
 
-Whether to prepend the "www." subdomain to URLs that don't have it. This is only
-used if ``CommonMiddleware`` is installed (see :ref:`topics-http-middleware`).
-See also ``APPEND_SLASH``.
+URL にサブドメイン名 "www." が付いていない場合に付加するかどうかを決めます。
+``CommonMiddleware`` がインストールされている場合にのみ使われる設定です
+(:ref:`topics-http-middleware` を参照してください)。 ``APPEND_SLASH`` も参
+照してください。
 
 .. setting:: PROFANITIES_LIST
 
 PROFANITIES_LIST
 ----------------
 
-A tuple of profanities, as strings, that will trigger a validation error when
-the ``hasNoProfanities`` validator is called.
+非道徳的な言葉 (profanity) のタプルです。 ``hasNoProfanities`` バリデータが
+呼び出された際に、エラーを引き起こす単語のリストに使われます。
 
-We don't list the default values here, because that would be profane. To see
-the default values, see the file ``django/conf/global_settings.py``.
+デフォルト値はここでは示しません。不道徳な言葉が入っているからです。デフォ
+ルト値を見たければ、 ``django/conf/global_settings.py`` を参照してください。
 
 .. setting:: ROOT_URLCONF
 
 ROOT_URLCONF
 ------------
 
-Default: Not defined
+デフォルト値: 定義されていません
 
-A string representing the full Python import path to your root URLconf. For example:
-``"mydjangoapps.urls"``. Can be overridden on a per-request basis by
-setting the attribute ``urlconf`` on the incoming ``HttpRequest``
-object. See :ref:`how-django-processes-a-request` for details.
+ルート URLconf への完全な Python import パスを表す表す文字列です。例えば、
+``"mydjangoapps.urls"`` です。ルート URLconf は、 ``HttpRequest`` オブジェ
+クトに ``urlconf`` 属性を設定することで変更できます。
+詳しくは :ref:`how-django-processes-a-request` を参照してください。
 
 .. setting:: SECRET_KEY
 
 SECRET_KEY
 ----------
 
-Default: ``''`` (Empty string)
+デフォルト値: ``''`` (空文字列)
 
-A secret key for this particular Django installation. Used to provide a seed in
-secret-key hashing algorithms. Set this to a random string -- the longer, the
-better. ``django-admin.py startproject`` creates one automatically.
+Django インストール毎に固有の秘密の鍵です。秘密鍵を使ったハッシュアルゴリズ
+ムのシードを生成するために使います。この値はランダムな文字列に指定してくだ
+さい。長ければ長いほど好ましくなります。 ``django-admin.py startproject`` 
+を実行すると、自動的に値を生成します。
 
 .. setting:: SEND_BROKEN_LINK_EMAILS
 
 SEND_BROKEN_LINK_EMAILS
 -----------------------
 
-Default: ``False``
+デフォルト値: ``False``
+
+Django で作られたページに空でないリファラつきで訪問した人が 404 に遭遇した
+(すなわち、リンクが壊れていた) 場合に、 ``MANAGERS`` に e-mail を送信するか
+どうかを決めます。この設定は ``CommonMiddleware`` がインストールされている
+場合にしか使われません。(:ref:`topics-http-middleware` を参照してください。)
+``IGNORABLE_404_STARTS``, ``IGNORABLE_404_ENDS`` および
+:ref:`howto-error-reporting` も参照してください。
+
+.. TBD
 
 Whether to send an e-mail to the ``MANAGERS`` each time somebody visits a
 Django-powered page that is 404ed with a non-empty referer (i.e., a broken
 link). This is only used if ``CommonMiddleware`` is installed (see
-:ref:`topics-http-middleware`. See also ``IGNORABLE_404_STARTS``,
-``IGNORABLE_404_ENDS`` and :ref:`howto-error-reporting`.
+. See also ``IGNORABLE_404_STARTS``,
+``IGNORABLE_404_ENDS`` and .
 
 .. setting:: SERIALIZATION_MODULES
 
 SERIALIZATION_MODULES
 ---------------------
 
-Default: Not defined.
+デフォルト値: 定義されていません
 
-A dictionary of modules containing serializer definitions (provided as
-strings), keyed by a string identifier for that serialization type. For
-example, to define a YAML serializer, use::
+シリアライザのモジュールパスを (文字列) 指定した辞書です。辞書のキーはシリ
+アライザの識別名にします。例えば、 YAML のシリアライザを定義するには以下の
+ようにします::
 
     SERIALIZATION_MODULES = { 'yaml' : 'path.to.yaml_serializer' }
 
@@ -856,10 +892,10 @@ example, to define a YAML serializer, use::
 SERVER_EMAIL
 ------------
 
-Default: ``'root@localhost'``
+デフォルト値: ``'root@localhost'``
 
-The e-mail address that error messages come from, such as those sent to
-``ADMINS`` and ``MANAGERS``.
+``ADMINS`` や ``MANAGERS`` にエラーメッセージを送信するときの送信元の
+e-mail アドレスです。
 
 .. setting:: SESSION_ENGINE
 
@@ -868,45 +904,48 @@ SESSION_ENGINE
 
 .. versionadded:: 1.0
 
-Default: ``django.contrib.sessions.backends.db``
+デフォルト値: ``django.contrib.sessions.backends.db``
 
-Controls where Django stores session data. Valid values are:
+Django がセッションデータを保存する方法を指定します。利用できる値は以下の通
+りです:
 
     * ``'django.contrib.sessions.backends.db'``
     * ``'django.contrib.sessions.backends.file'``
     * ``'django.contrib.sessions.backends.cache'``
 
-See :ref:`topics-http-sessions`.
+詳しくは :ref:`topics-http-sessions` を参照してください。
 
 .. setting:: SESSION_COOKIE_AGE
 
 SESSION_COOKIE_AGE
 ------------------
 
-Default: ``1209600`` (2 weeks, in seconds)
+デフォルト値: ``1209600`` (秒単位で 2 週間)
 
-The age of session cookies, in seconds. See :ref:`topics-http-sessions`.
+セッションクッキーの寿命を秒で表したものです。 :ref:`topics-http-sessions`
+も参照してください。 
 
 .. setting:: SESSION_COOKIE_DOMAIN
 
 SESSION_COOKIE_DOMAIN
 ---------------------
 
-Default: ``None``
+デフォルト値: ``None``
 
-The domain to use for session cookies. Set this to a string such as
-``".lawrence.com"`` for cross-domain cookies, or use ``None`` for a standard
-domain cookie. See the :ref:`topics-http-sessions`.
+セッションクッキーを使うドメインです。クロスドメインのクッキーを使う場合に
+は ``".lawrence.com"`` といった値に、通常のドメイン内クッキーの場合には
+``None`` を指定します。 :ref:`topics-http-sessions`  も参照してください。
 
 .. setting:: SESSION_COOKIE_NAME
 
 SESSION_COOKIE_NAME
 -------------------
 
-Default: ``'sessionid'``
+デフォルト値: ``'sessionid'``
 
-The name of the cookie to use for sessions. This can be whatever you want (but
-should be different from ``LANGUAGE_COOKIE_NAME``). See the :ref:`topics-http-sessions`.
+セッションに使うクッキーの名前です。 ``LANGUAGE_COOKIE_NAME`` の値と同じで
+なければ、どんな名前にしてもかまいません。 :ref:`topics-http-sessions` も参
+照してください。
 
 .. setting:: SESSION_COOKIE_PATH
 
@@ -915,36 +954,36 @@ SESSION_COOKIE_PATH
 
 .. versionadded:: 1.0
 
-Default: ``'/'``
+デフォルト値: ``'/'``
 
-The path set on the session cookie. This should either match the URL path of your
-Django installation or be parent of that path.
+セッションクッキーをセットするパスです。 Django インスタンスの URL パスか、
+その上の階層の URL パスでなければなりません。
 
-This is useful if you have multiple Django instances running under the same
-hostname. They can use different cookie paths, and each instance will only see
-its own session cookie.
+この設定は、同じホスト名の下で、複数の Django インスタンスが稼働している場
+合に便利です。サイト毎に別々のクッキーパスを指定でき、その場合には各サイト
+のインスタンスが固有のセッションクッキーを参照するようになります。
 
 .. setting:: SESSION_COOKIE_SECURE
 
 SESSION_COOKIE_SECURE
 ---------------------
 
-Default: ``False``
+デフォルト値: ``False``
 
-Whether to use a secure cookie for the session cookie. If this is set to
-``True``, the cookie will be marked as "secure," which means browsers may
-ensure that the cookie is only sent under an HTTPS connection.
-See the :ref:`topics-http-sessions`.
+セッションクッキーにセキュアなクッキーを使うかどうかを決めます。この値を
+``True`` に設定すると、クッキーは "セキュア" にマークされます。クッキーがセ
+キュアにマークされると、ブラウザによっては HTTPS 接続でのみクッキーを転送す
+るようになります。詳しくは :ref:`topics-http-sessions` を参照してください。
 
 .. setting:: SESSION_EXPIRE_AT_BROWSER_CLOSE
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE
 -------------------------------
 
-Default: ``False``
+デフォルト値: ``False``
 
-Whether to expire the session when the user closes his or her browser.
-See the :ref:`topics-http-sessions`.
+ブラウザを閉じたときにセッションを期限切れにするかどうかを決めます。
+:ref:`topics-http-sessions` を参照してください。
 
 .. setting:: SESSION_FILE_PATH
 
@@ -953,105 +992,105 @@ SESSION_FILE_PATH
 
 .. versionadded:: 1.0
 
-Default: ``None``
+デフォルト値: ``None``
 
-If you're using file-based session storage, this sets the directory in
-which Django will store session data. See :ref:`topics-http-sessions`. When
-the default value (``None``) is used, Django will use the standard temporary
-directory for the system.
+ファイルベースのセッションストレージを使っている場合、この値でセッションデー
+タの保存場所を指定します。詳しくは :ref:`topics-http-sessions` を参照してく
+ださい。デフォルト値 (``None``) にすると、システム標準の一時ディレクトリを
+使います。
 
 .. setting:: SESSION_SAVE_EVERY_REQUEST
 
 SESSION_SAVE_EVERY_REQUEST
 --------------------------
 
-Default: ``False``
+デフォルト値: ``False``
 
-Whether to save the session data on every request. See
-:ref:`topics-http-sessions`.
+リクエストごとにセッションデータを保存するかどうかを決めます。
+:ref:`topics-http-sessions` も参照してください。
 
 .. setting:: SITE_ID
 
 SITE_ID
 -------
 
-Default: Not defined
+デフォルト値: 定義されていません
 
-The ID, as an integer, of the current site in the ``django_site`` database
-table. This is used so that application data can hook into specific site(s)
-and a single database can manage content for multiple sites.
+``django_sites`` データベース中で現在のサイトを示す ID の整数値です。この値
+は、アプリケーションデータが特定のサイトに対してフックできるようにし、一つ
+のデータベースで複数のサイトのコンテンツを管理できるようにするためのもので
+す。
 
-See :ref:`ref-contrib-sites`.
-
-.. _site framework docs: ../sites/
+:ref:`ref-contrib-sites` を参照してください。
 
 .. setting:: TEMPLATE_CONTEXT_PROCESSORS
 
 TEMPLATE_CONTEXT_PROCESSORS
 ---------------------------
 
-Default::
+デフォルト値::
 
     ("django.core.context_processors.auth",
     "django.core.context_processors.debug",
     "django.core.context_processors.i18n",
     "django.core.context_processors.media")
 
-A tuple of callables that are used to populate the context in ``RequestContext``.
-These callables take a request object as their argument and return a dictionary
-of items to be merged into the context.
+``RequestContext`` のコンテキストに値を入れてゆく際に使われる呼び出し可能オ
+ブジェクトからなるタプルです。これらの呼び出し可能オブジェクトはリクエスト
+オブジェクトを引数にとり、コンテキストに統合する項目からなる辞書を返します。
 
 .. setting:: TEMPLATE_DEBUG
 
 TEMPLATE_DEBUG
 --------------
 
-Default: ``False``
+デフォルト値: ``False``
 
-A boolean that turns on/off template debug mode. If this is ``True``, the fancy
-error page will display a detailed report for any ``TemplateSyntaxError``. This
-report contains the relevant snippet of the template, with the appropriate line
-highlighted.
+テンプレートのデバッグモードのオンオフを切替えるブール値です。この値を
+``True`` にすると、 ``TemplateSyntaxError`` を報告する際にファンシーなエラー
+ページを出力します。この報告にはエラーに関係するテンプレートの一部分が表示
+され、問題のある部分がハイライト表示されます。
 
-Note that Django only displays fancy error pages if ``DEBUG`` is ``True``, so
-you'll want to set that to take advantage of this setting.
+Django は ``DEBUG`` が ``True`` の場合にのみエラーページを表示するので、こ
+の設定の恩恵をうけたければ ``DEBUG`` を設定しておく必要があります。
 
-See also ``DEBUG``.
+``DEBUG`` も参照してください。
 
 .. setting:: TEMPLATE_DIRS
 
 TEMPLATE_DIRS
 -------------
 
-Default: ``()`` (Empty tuple)
+デフォルト値: ``()`` (空のタプル)
 
-List of locations of the template source files, in search order. Note that
-these paths should use Unix-style forward slashes, even on Windows.
+テンプレートソースファイルの入っている場所を検索順に並べたリストです。パス
+の区切りには Windows であっても Unix 形式のスラッシュを使って下さい。
 
-See :ref:`topics-templates`..
+:ref:`topics-templates` も参照してください。.
 
 .. setting:: TEMPLATE_LOADERS
 
 TEMPLATE_LOADERS
 ----------------
 
-Default::
+デフォルト値::
 
      ('django.template.loaders.filesystem.load_template_source',
       'django.template.loaders.app_directories.load_template_source')
 
-A tuple of callables (as strings) that know how to import templates from
-various sources. See :ref:`ref-templates-api`.
+様々なソースからのテンプレートの import を実装している、呼び出し可能オブジェ
+クト (を指す文字列) のタプルです。 :ref:`ref-templates-api` も参照してくだ
+さい。
 
 .. setting:: TEMPLATE_STRING_IF_INVALID
 
 TEMPLATE_STRING_IF_INVALID
 --------------------------
 
-Default: ``''`` (Empty string)
+デフォルト値: ``''`` (空文字列)
 
-Output, as a string, that the template system should use for invalid (e.g.
-misspelled) variables. See :ref:`invalid-template-variables`..
+誤った (スペルを間違えたなど) 変数名に対してテンプレートシステムが出力する
+文字列です。 :ref:`invalid-template-variables` を参照してください。
 
 .. setting:: TEST_DATABASE_CHARSET
 
@@ -1060,13 +1099,14 @@ TEST_DATABASE_CHARSET
 
 .. versionadded:: 1.0
 
-Default: ``None``
+デフォルト値: ``None``
 
-The character set encoding used to create the test database. The value of this
-string is passed directly through to the database, so its format is
-backend-specific.
+テストデータベースの作成に使われている文字セットエンコーディングです。この
+文字列の値はデータベースバックエンドに直接渡されるので、エンコーディングの
+名前や書式はバックエンドごとに異なります。
 
-Supported for the PostgreSQL_ (``postgresql``, ``postgresql_psycopg2``) and MySQL_ (``mysql``) backends.
+この設定をサポートしているバックエンドは、 PostgreSQL_ (``postgresql``,
+``postgresql_psycopg2``) と MySQL_ (``mysql``) です。
 
 .. _PostgreSQL: http://www.postgresql.org/docs/8.2/static/multibyte.html
 .. _MySQL: http://www.mysql.org/doc/refman/5.0/en/charset-database.html
@@ -1078,136 +1118,140 @@ TEST_DATABASE_COLLATION
 
 .. versionadded:: 1.0
 
-Default: ``None``
+デフォルト値: ``None``
 
-The collation order to use when creating the test database. This value is
-passed directly to the backend, so its format is backend-specific.
+テストデータベースを生成する際のコレーション (collation) です。この値はデー
+タベースバックエンドに直接渡されるので、値の書式はバックエンドごとに異なり
+ます。
 
-Only supported for the ``mysql`` backend (see `section 10.3.2`_ of the MySQL
-manual for details).
+``mysql`` バックエンドだけでサポートされています(くわしくは、MySQLマニュア
+ルの `10.3.2節` を参照してください)
 
 .. _section 10.3.2: http://www.mysql.org/doc/refman/5.0/en/charset-database.html
+.. _`10.3.2節`: http://www.mysql.org/doc/refman/5.0/ja/charset-database.html
 
 .. setting:: TEST_DATABASE_NAME
 
 TEST_DATABASE_NAME
 ------------------
 
-Default: ``None``
+デフォルト値: ``None``
 
-The name of database to use when running the test suite.
+テストスイートを実行するときに使うデータベースの名前です。
 
-If the default value (``None``) is used with the SQLite database engine, the
-tests will use a memory resident database. For all other database engines the
-test database will use the name ``'test_' + settings.DATABASE_NAME``.
+データベースエンジンが SQLite のときにデフォルト値 (``None``) を指定すると、
+テストのためのデータベースはメモリ上に展開されます。他のデータベースエンジ
+ンの場合、テストデータベースの名前として ``'test_'`` +
+``settings.DATABASE_NAME`` を使います。
 
-See :ref:`topics-testing`.
+:ref:`topics-testing` を参照してください。
 
 .. setting:: TEST_RUNNER
 
 TEST_RUNNER
 -----------
 
-Default: ``'django.test.simple.run_tests'``
+デフォルト値: ``'django.test.simple.run_tests'``
 
-The name of the method to use for starting the test suite. See
-:ref:`topics-testing`.
-
-.. _Testing Django Applications: ../testing/
+テストスイートを起動するためのメソッドの名前です。 :ref:`topics-testing` を
+参照してください。
 
 .. setting:: TIME_FORMAT
 
 TIME_FORMAT
 -----------
 
-Default: ``'P'`` (e.g. ``4 p.m.``)
+デフォルト値: ``'P'`` (e.g. ``4 p.m.``)
 
-The default formatting to use for time fields on Django admin change-list
-pages -- and, possibly, by other parts of the system. See
-:ttag:`allowed date format strings <now>`.
+Django の admin サイトの変更履歴ページ (や、システムの他の部分で) 時刻フィー
+ルドの表示に使うデフォルトのフォーマットです。 
 
-See also ``DATE_FORMAT``, ``DATETIME_FORMAT``, ``TIME_FORMAT``,
-``YEAR_MONTH_FORMAT`` and ``MONTH_DAY_FORMAT``.
+:ttag:`利用可能な日付フォーマット文字 <now>` を参照してください。
+
+``DATE_FORMAT`` , ``DATETIMETIME_FORMAT`` , ``YEAR_MONTH_FORMAT`` および
+``MONTH_DAY_FORMAT`` も参照してください。
 
 .. setting:: TIME_ZONE
 
 TIME_ZONE
 ---------
 
-Default: ``'America/Chicago'``
+デフォルト値: ``'America/Chicago'``
 
-A string representing the time zone for this installation. `See available choices`_.
-(Note that list of available choices lists more than one on the same line;
-you'll want to use just one of the choices for a given time zone. For instance,
-one line says ``'Europe/London GB GB-Eire'``, but you should use the first bit
-of that -- ``'Europe/London'`` -- as your ``TIME_ZONE`` setting.)
+現在の Django インストールが使うタイムゾーンを表す文字列です。
+`利用可能な選択肢`_ を参照してください。(利用可能な選択肢には、同じ行に複数
+の選択肢をリストしていることに注意してください。あるタイムゾーンを表すには
+いずれか一つを選ぶことになります。例えば、ある行に ``'Europe/London GB
+GB-Eire'`` と書かれている場合、 ``TIME_ZONE`` の設定には、最初の部分である
+``'Europe/London'`` だけを使います)この値は Django が全ての日付/時刻の変換
+に使うタイムゾーンであり、かならずしもサーバのタイムゾーンとは一致しないこ
+とに注意して下さい。例えば、一つのサーバで複数の Django サイトを運営し、個々
+に別々のタイムゾーン設定を持たせてもかまいません。
 
-Note that this is the time zone to which Django will convert all dates/times --
-not necessarily the timezone of the server. For example, one server may serve
-multiple Django-powered sites, each with a separate time-zone setting.
-
-Normally, Django sets the ``os.environ['TZ']`` variable to the time zone you
-specify in the ``TIME_ZONE`` setting. Thus, all your views and models will
-automatically operate in the correct time zone. However, if you're using the
-manual configuration option (see below), Django will *not* touch the ``TZ``
-environment variable, and it'll be up to you to ensure your processes are
-running in the correct environment.
+通常、 Django は ``TIME_ZONE`` の設定に従って ``os.environ['TZ']`` 変数を設
+定します。そのため、ビューやモデルは自動的に正しいタイムゾーンを扱えるよう
+になります。しかしながら、後述の手動設定オプションを使っている場合 (下参照)、
+Django は ``TZ`` 環境変数を *操作しない* ので、ユーザは自分の責任でプロセス
+を正しい環境の下で動作させねばなりません。
 
 .. note::
-    Django cannot reliably use alternate time zones in a Windows environment.
-    If you're running Django on Windows, this variable must be set to match the
-    system timezone.
+    Windows 環境では、 Django は信頼性のある方法でタイムゾーンを変更できま
+    せん。 Windows で Django を動作させる場合、この変数はシステムのタイムゾー
+    ンと一致させねばなりません。
     
 .. _See available choices: http://www.postgresql.org/docs/8.1/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
+.. _`利用可能な選択肢`: `See available choices`_
 
 .. setting:: URL_VALIDATOR_USER_AGENT
 
 URL_VALIDATOR_USER_AGENT
 ------------------------
 
-Default: ``Django/<version> (http://www.djangoproject.com/)``
+デフォルト値: ``Django/<version> (http://www.djangoproject.com/)``
 
-The string to use as the ``User-Agent`` header when checking to see if URLs
-exist (see the ``verify_exists`` option on :class:`~django.db.models.URLField`).
+特定の URL が実在するかを Django が調べにゆく際に使う ``User-Agent`` ヘッダ
+の値です。 (:class:`~django.db.models.URLField` の ``verify_exists`` を参照
+してください。)
 
 .. setting:: USE_ETAGS
 
 USE_ETAGS
 ---------
 
-Default: ``False``
+デフォルト値: ``False``
 
-A boolean that specifies whether to output the "Etag" header. This saves
-bandwidth but slows down performance. This is only used if ``CommonMiddleware``
-is installed (see :ref:`topics-http-middleware`).
+出力に "Etag" ヘッダを含めるかどうかを決めるブール値です。 "Etag" を含める
+と帯域の節約になりますが、パフォーマンスは低下します。この設定は
+``CommonMiddleware`` がインストールされている場合にしか使われません。
+(:ref:`topics-http-middleware` を参照してください。)
 
 .. setting:: USE_I18N
 
 USE_I18N
 --------
 
-Default: ``True``
+デフォルト値: ``True``
 
-A boolean that specifies whether Django's internationalization system should be
-enabled. This provides an easy way to turn it off, for performance. If this is
-set to ``False``, Django will make some optimizations so as not to load the
-internationalization machinery.
+国際化システムを有効にするかどうかを決めるブール値です。この設定を使うと、
+パフォーマンス向上のために簡単に国際化システムを無効化できます。この値を
+``False`` にすると、 Django は国際化機構をロードしないような最適化を行いま
+す。
 
 .. setting:: YEAR_MONTH_FORMAT
 
 YEAR_MONTH_FORMAT
 -----------------
 
-Default: ``'F Y'``
+デフォルト値: ``'F Y'`` 
 
-The default formatting to use for date fields on Django admin change-list
-pages -- and, possibly, by other parts of the system -- in cases when only the
-year and month are displayed.
+Django の admin サイトにおける変更リストの日付フィールドの他、システムの各
+所で年と月だけを表示する際に使われるデフォルトのフォーマットです。
 
-For example, when a Django admin change-list page is being filtered by a date
-drilldown, the header for a given month displays the month and the year.
-Different locales have different formats. For example, U.S. English would say
-"January 2006," whereas another locale might say "2006/January."
+例えば、 Django の admin サイトにおける変更リストページを日付による絞り込み
+でフィルタする場合、指定月のヘッダには月と年が表示されます。ロケールによっ
+ては異なったフォーマットになります。例えば、 U.S. English での 
+"January 2006" は、別のロケールでは "2006/January" になるかもしれません。
 
-See :ttag:`allowed date format strings <now>`. See also ``DATE_FORMAT``,
-``DATETIME_FORMAT``, ``TIME_FORMAT`` and ``MONTH_DAY_FORMAT``.
+:ttag:`利用可能な日付フォーマット文字 <now>` を参照してください。
+``DATE_FORMAT`` , ``DATETIME_FORMAT`` , ``TIME_FORMAT`` および
+``MONTH_DAY_FORMAT`` も参照してください。

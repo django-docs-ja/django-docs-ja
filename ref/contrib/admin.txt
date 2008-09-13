@@ -1,47 +1,56 @@
 .. _ref-contrib-admin:
 
-=====================
-The Django admin site
-=====================
+.. _The Django admin site:
 
-One of the most powerful parts of Django is the automatic admin interface. It
-reads metadata in your model to provide a powerful and production-ready
-interface that content producers can immediately use to start adding content to
-the site. In this document, we discuss how to activate, use and customize
-Django's admin interface.
+====================
+Django admin サイト
+====================
 
-.. admonition:: Note
+:revision-up-to: 8961 (1.0)
 
-    The admin site has been refactored significantly since Django 0.96. This
-    document describes the newest version of the admin site, which allows for
-    much richer customization. If you follow the development of Django itself,
-    you may have heard this described as "newforms-admin."
+Django の最も強力な機能の一つに、自動生成される admin インタフェースがあり
+ます。 admin はモデルのメタデータを読み込んで、強力で実運用に耐えるインタ
+フェースを生成し、コンテンツの製作者がすぐにサイトにコンテンツを投入できる
+ようにします。このドキュメントでは、 Django の admin インタフェースを有効に
+したり、カスタマイズしたりする方法を解説します。
 
-Overview
+.. admonition:: 注意
+
+    admin サイトは Django 0.96 から大幅にリファクタされました。このドキュメ
+    ントでは、よりカスタマイズ機能の充実した新しい admin サイトについて解説
+    しています。この admin サイトの仕様は、 Django の開発をよく追いかけてい
+    る人なら、一度は "newforms-admin" という名前で耳にしたことがあるはずで
+    す。
+
+.. _Overview:
+
+概要
 ========
 
-There are five steps in activating the Django admin site:
+Django admin サイトは、以下の 5 つのステップを通して有効化します:
 
-    1. Add ``django.contrib.admin`` to your ``INSTALLED_APPS`` setting.
+    1. ``django.contrib.admin`` を ``INSTALLED_APPS`` に追加します。
 
-    2. Determine which of your application's models should be editable in the
-       admin interface.
+    2. admin インタフェースでの編集を可能にするモデルを決めます。
 
-    3. For each of those models, optionally create a ``ModelAdmin`` class that
-       encapsulates the customized admin functionality and options for that
-       particular model.
+    3. 2 で決めたモデルに対して、必要なら ``ModelAdmin`` クラスを定義します。
+       ``ModelAdmin`` はモデルごとにカスタマイズした admin の機能やオプショ
+       ンをカプセル化しています。
 
-    4. Instantiate an ``AdminSite`` and tell it about each of your models and
-       ``ModelAdmin`` classes.
+    4. ``AdminSite`` をインスタンス化して、モデルや ``ModelAdmin`` クラスを
+       指定します。
 
-    5. Hook the ``AdminSite`` instance into your URLconf.
+    5. ``AdminSite`` インスタンスを URLconf にフックします。
 
-``ModelAdmin`` objects
-======================
 
-The ``ModelAdmin`` class is the representation of a model in the admin
-interface. These are stored in a file named ``admin.py`` in your application.
-Let's take a look at a very simple example the ``ModelAdmin``::
+.. _`ModelAdmin objects`:
+
+``ModelAdmin`` オブジェクト
+=============================
+
+``ModelAdmin`` クラスは、 admin インタフェース上のモデルを表現しています。
+このクラスは、アプリケーションの ``admin.py`` という名前のファイルに保存し
+ます。 ``ModelAdmin`` の簡単な例を以下に示します::
 
     from django.contrib import admin
     from myproject.myapp.models import Author
@@ -50,12 +59,14 @@ Let's take a look at a very simple example the ``ModelAdmin``::
         pass
     admin.site.register(Author, AuthorAdmin)
 
-``ModelAdmin`` Options
-----------------------
+.. _`ModelAdmin Options`:
 
-The ``ModelAdmin`` is very flexible. It has several options for dealing with
-customizing the interface. All options are defined on the ``ModelAdmin``
-subclass::
+``ModelAdmin`` のオプション
+---------------------------------
+
+``ModelAdmin`` はとてもフレキシブルなクラスです。このクラスには、 admin イ
+ンタフェースをカスタマイズするためのオプションがいくつもあります。オプショ
+ンは、全て、 ``ModelAdmin`` のサブクラスで以下のように指定します::
 
     class AuthorAdmin(admin.ModelAdmin):
         date_hierarchy = 'pub_date'
@@ -63,13 +74,16 @@ subclass::
 ``date_hierarchy``
 ~~~~~~~~~~~~~~~~~~
 
-Set ``date_hierarchy`` to the name of a ``DateField`` or ``DateTimeField`` in
-your model, and the change list page will include a date-based drilldown
-navigation by that field.
+``date_hierarchy`` をモデルの ``DateField`` や ``DateTimeField`` に指定する
+と、変更リストのページに、指定フィールドの日付を使って日付ベースで絞り込み
+できるナビゲーションが組み込まれます。
 
-Example::
+例::
 
     date_hierarchy = 'pub_date'
+
+
+.. TBD
 
 ``form``
 ~~~~~~~~
@@ -84,18 +98,19 @@ For an example see the section `Adding custom validation to the admin`_.
 ``fieldsets``
 ~~~~~~~~~~~~~
 
-Set ``fieldsets`` to control the layout of admin "add" and "change" pages.
+admin の「追加 (add)」および「変更 (change)」ページのレイアウトを制御するに
+は、 ``fieldsets`` を使います。
 
-``fieldsets`` is a list of two-tuples, in which each two-tuple represents a
-``<fieldset>`` on the admin form page. (A ``<fieldset>`` is a "section" of the
-form.)
+``fieldsets`` は 2 要素のタプルのリストです。各タプルは admin フォームペー
+ジ上の ``<fieldset>`` を表します (``<fieldset>`` はいわばフォームの「セクショ
+ン」です)。
 
-The two-tuples are in the format ``(name, field_options)``, where ``name`` is a
-string representing the title of the fieldset and ``field_options`` is a
-dictionary of information about the fieldset, including a list of fields to be
-displayed in it.
+フィールドセットは ``(name, field_options)`` の形式をとります。 ``name``
+はフィールドセットの名前を表す文字列で、 ``field_options`` はフィールドセッ
+ト内で表示したいフィールドの情報を入れた辞書です。この情報の中に、表示した
+いフィールドのリストも指定します。
 
-A full example, taken from the ``django.contrib.flatpages.FlatPage`` model::
+``django.contrib.flatpages.FlatPage`` モデルから抜き出した例を示します::
 
     class FlatPageAdmin(admin.ModelAdmin):
         fieldsets = (
@@ -108,58 +123,58 @@ A full example, taken from the ``django.contrib.flatpages.FlatPage`` model::
             }),
         )
 
-This results in an admin page that looks like:
+このフィールドセットによって、 admin のページは以下のようになります:
 
     .. image:: _images/flatfiles_admin.png
 
-If ``fieldsets`` isn't given, Django will default to displaying each field
-that isn't an ``AutoField`` and has ``editable=True``, in a single fieldset,
-in the same order as the fields are defined in the model.
+``fieldsets`` を指定しない場合、 Django は ``AutoField`` でなく、かつ
+``editable=True`` であるようなフィールドを、モデルに定義した順番に個別のフィー
+ルドセットとして表示します。
 
-The ``field_options`` dictionary can have the following keys:
+``field_options`` 辞書には以下のようなキーを指定できます:
 
-    * ``fields``
-        A tuple of field names to display in this fieldset. This key is
-        required.
+    * ``fields`` フィールドセット内に表示するフィールド名からなるタプルです。
+      必須のキーです。
         
-        Example::
+        使い方::
         
             {
             'fields': ('first_name', 'last_name', 'address', 'city', 'state'),
             }
-            
-        To display multiple fields on the same line, wrap those fields in
-        their own tuple. In this example, the ``first_name`` and ``last_name``
-        fields will display on the same line::
+
+        同じ行に複数のフィールドを表示したい場合、それらのフィールドをタプ
+        ルでラップして入れます。下の例では、 ``first_name`` と
+        ``last_name`` が同じ行に表示されます::
 
             {
             'fields': (('first_name', 'last_name'), 'address', 'city', 'state'),
             }
 
     * ``classes``
-        A list containing extra CSS classes to apply to the fieldset.
+        フィールドセットに適用される追加の CSS クラス名です。
         
-        Example::
+        使い方::
         
             {
             'classes': ['wide', 'extrapretty'],
             }
 
-        Two useful classes defined by the default admin-site stylesheet are
-        ``collapse`` and ``wide``. Fieldsets with the ``collapse`` style will
-        be initially collapsed in the admin and replaced with a small
-        "click to expand" link. Fieldsets with the ``wide`` style will be
-        given extra horizontal space.
+        admin サイトのデフォルトのスタイルシートで定義されている便利なクラ
+        スとして ``collapse`` と ``wide`` があります。 ``collapse`` スタイ
+        ルのフィールドセットは、 admin ページでは最初折り畳まれ (collapse)
+        ており、小さな"クリックして展開 (click to expand)" リンクに置き換わっ
+        ています。 ``wide`` スタイルのフィールドセットには水平方向に追加のス
+        ペースが加わります。
 
     * ``description``
-        A string of optional extra text to be displayed at the top of each
-        fieldset, under the heading of the fieldset.
+        各フィールドセットの先頭の、ヘッダのすぐ下に表示する追加の文字列で、
+        オプションです。
 
-        Note that this value is *not* HTML-escaped when it's displayed in
-        the admin interface. This lets you include HTML if you so desire.
-        Alternatively you can use plain text and
-        ``django.utils.html.escape()`` to escape any HTML special
-        characters.
+        この文字列は admin 上で HTML エスケープ *されません* 。そのため、必
+        要ならそのまま HTML を入れられます。また、 HTML 固有の文字をエスケー
+        プたければ、``django.utils.html.escape()`` を使ってください。
+
+.. TBD
 
 ``fields``
 ~~~~~~~~~~
@@ -210,29 +225,31 @@ exactly the same fields.
 ``filter_horizontal``
 ~~~~~~~~~~~~~~~~~~~~~
 
-Use a nifty unobtrusive JavaScript "filter" interface instead of the
-usability-challenged ``<select multiple>`` in the admin form. The value is a
-list of fields that should be displayed as a horizontal filter interface. See
-``filter_vertical`` to use a vertical interface.
+ユーザビリティが紙一重の ``<select multiple>`` の代わりに、気の利いた控えめ
+な Javascript の「フィルタ」インタフェースを使います。フィルタインタフェー
+スを横並びにして表示させたいフィールドのリストを指定してください。フィルタ
+インタフェースを縦並びにしたい場合は ``filter_vertical`` を使ってください。
 
 ``filter_vertical``
 ~~~~~~~~~~~~~~~~~~~
 
-Same as ``filter_horizontal``, but is a vertical display of the filter
-interface.
+``filter_horizontal`` とほぼ同じですが、フィルタインタフェースを縦並びで表
+示します。
 
 ``list_display``
 ~~~~~~~~~~~~~~~~
 
-Set ``list_display`` to control which fields are displayed on the change list
-page of the admin.
+admin の変更リストページに表示するフィールドを制御するには ``list_display``
+を使います。
 
-Example::
+使い方::
 
     list_display = ('first_name', 'last_name')
 
-If you don't set ``list_display``, the admin site will display a single column
-that displays the ``__unicode__()`` representation of each object.
+``list_display`` を指定しなければ、 admin サイトは各オブジェクトの
+``__unicode__()`` 表現を表示するカラムを一つだけ表示します。
+
+.. TBD
 
 You have four possible values that can be used in ``list_display``:
 
@@ -276,26 +293,27 @@ You have four possible values that can be used in ``list_display``:
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('name', 'decade_born_in')
 
-A few special cases to note about ``list_display``:
+``list_display`` にはいくつか特殊なケースがあります:
 
-    * If the field is a ``ForeignKey``, Django will display the
-      ``__unicode__()`` of the related object.
+    * フィールドが ``ForeignKey`` の場合、関連づけられているオブジェクトの
+      ``__unicode__()`` を表示します。
 
-    * ``ManyToManyField`` fields aren't supported, because that would entail
-      executing a separate SQL statement for each row in the table. If you
-      want to do this nonetheless, give your model a custom method, and add
-      that method's name to ``list_display``. (See below for more on custom
-      methods in ``list_display``.)
+    * ``ManyToManyField`` フィールドの表示は、テーブルの各行に対して個別に
+      SQL 文を実行することになってしまうのでサポートしていません。どうして
+      も表示させたいなら、カスタムメソッドをモデルに実装して、メソッドの名
+      前を ``list_display`` に追加してください (``list_display`` へのカスタ
+      ムメソッドの追加については、後で詳しく説明しています)。
 
-    * If the field is a ``BooleanField`` or ``NullBooleanField``, Django will
-      display a pretty "on" or "off" icon instead of ``True`` or ``False``.
+    * フィールドが ``BooleanField`` や ``NullBooleanField`` の場合、
+      ``True`` や ``False`` の代りに "オン" や "オフ" を示すアイコンを表示
+      します。
 
-    * If the string given is a method of the model, ``ModelAdmin`` or a
-      callable, Django will HTML-escape the output by default. If you'd rather
-      not escape the output of the method, give the method an ``allow_tags``
-      attribute whose value is ``True``.
+    * モデルや ``ModelAdmin`` のメソッド、呼び出し可能オブジェクトの名前を
+      指定した場合、 Django はデフォルトでメソッドの出力を HTML エスケープ
+      します。メソッドの出力をエスケープしたくない場合には、メソッドの
+      ``allow_tags`` 属性の値を ``True`` にしてください。
       
-      Here's a full example model::
+      以下に例を示します::
 
           class Person(models.Model):
               first_name = models.CharField(max_length=50)
@@ -309,12 +327,12 @@ A few special cases to note about ``list_display``:
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('first_name', 'last_name', 'colored_name')
 
-    * If the string given is a method of the model, ``ModelAdmin`` or a
-      callable that returns True or False Django will display a pretty "on" or
-      "off" icon if you give the method a ``boolean`` attribute whose value is
-      ``True``.
+    * ``True`` か ``False`` を返すようなモデルの ``ModelAdmin`` のメソッド、
+      呼び出し可能オブジェクトの名前を指定した返す場合、メソッドの
+      ``boolean`` 属性を ``True`` に設定しておくと、Django は「オン」や「オ
+      フ」のアイコンを表示します。
 
-      Here's a full example model::
+      以下に例を示します::
 
           class Person(models.Model):
               first_name = models.CharField(max_length=50)
@@ -328,21 +346,22 @@ A few special cases to note about ``list_display``:
               list_display = ('name', 'born_in_fifties')
 
 
-    * The ``__str__()`` and ``__unicode__()`` methods are just as valid in
-      ``list_display`` as any other model method, so it's perfectly OK to do
-      this::
+    * ``__str__()`` および ``__unicode__()`` メソッドは他のモデルメソッドと
+      同じように ``list_display`` に入れられるので、以下のように書いても全
+      く問題ありません::
 
           list_display = ('__unicode__', 'some_other_field')
 
-    * Usually, elements of ``list_display`` that aren't actual database fields
-      can't be used in sorting (because Django does all the sorting at the
-      database level).
+    * 通常、 ``list_display`` の要素のうち、実際のデータベースのフィールド
+      に対応していないものは、変更リストページで並び順を変えるときのカラム
+      には使えません。 Django はソートをすべてデータベースレベルで行うから
+      です。
+      
+      ただし、 ``list_display`` のいずれかの要素が実際にデータベース上のあ
+      るフィールドを指している場合、 ``admin_order_field`` という属性を使っ
+      て、 Django にそのことを教えられます。
 
-      However, if an element of ``list_display`` represents a certain database
-      field, you can indicate this fact by setting the ``admin_order_field``
-      attribute of the item.
-
-      For example::
+      例を示しましょう::
 
         class Person(models.Model):
             first_name = models.CharField(max_length=50)
@@ -356,105 +375,109 @@ A few special cases to note about ``list_display``:
         class PersonAdmin(admin.ModelAdmin):
             list_display = ('first_name', 'colored_first_name')
 
-      The above will tell Django to order by the ``first_name`` field when
-      trying to sort by ``colored_first_name`` in the admin.
+      この例では、 Django は Admin 上で ``colored_first_name`` を並べ変える
+      際に ``first_name`` フィールドを使います。
 
 ``list_display_links``
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Set ``list_display_links`` to control which fields in ``list_display`` should
-be linked to the "change" page for an object.
+``list_display_links`` を設定すると、 ``list_display`` のどのフィールドを
+オブジェクトの「変更」ページにリンクするかを制御できます。
 
-By default, the change list page will link the first column -- the first field
-specified in ``list_display`` -- to the change page for each item. But
-``list_display_links`` lets you change which columns are linked. Set
-``list_display_links`` to a list or tuple of field names (in the same format as
-``list_display``) to link.
+デフォルトでは、変更リストページはオブジェクトの変更ページ中の第一カラム、
+すなわち ``list_display`` の先頭に指定したフィールドにリンクを張ります。
+``list_display_links`` を使うと、リンク先のカラムを変更できます。
+``list_display_links`` には、フィールド名のリストまたはタプルを
+(``list_display`` と同じ形式で) 指定します。
 
-``list_display_links`` can specify one or many field names. As long as the
-field names appear in ``list_display``, Django doesn't care how many (or how
-few) fields are linked. The only requirement is: If you want to use
-``list_display_links``, you must define ``list_display``.
+``list_display_links`` に指定するフィールド名は、一つでも複数でも構いません。
+フィールド名が ``list_display`` に列挙されている限り、 Django はどんなに多
+くの (あるいはどんなにわずかな) フィールドがリンクされていても問題にしませ
+ん。必要なのは、 ``list_display_links`` を使うには ``list_display`` を定義
+しておかねばならない、ということだけです。
 
-In this example, the ``first_name`` and ``last_name`` fields will be linked on
-the change list page::
+以下の例では、 ``first_name`` および ``last_name`` フィールドが変更リス
+トページにリンクされます::
 
     class PersonAdmin(admin.ModelAdmin):
         list_display = ('first_name', 'last_name', 'birthday')
         list_display_links = ('first_name', 'last_name')
 
-Finally, note that in order to use ``list_display_links``, you must define
-``list_display``, too.
+最後に、 ``list_display_links`` を使うには ``list_display`` も指定せねばな
+らないので注意しましょう。
 
 ``list_filter``
 ~~~~~~~~~~~~~~~
 
-Set ``list_filter`` to activate filters in the right sidebar of the change list
-page of the admin. This should be a list of field names, and each specified
-field should be either a ``BooleanField``, ``CharField``, ``DateField``,
-``DateTimeField``, ``IntegerField`` or ``ForeignKey``.
+admin の変更リストページの右側のサイドバーにあるフィルタを有効にするには、
+``list_filter`` を設定します。この値はフィールド名のリストにします。
+各フィールド名は ``BooleanField``, ``CharField``, ``DateField``,
+``DateTimeField``, ``IntegerField``, ``ForeignKey`` のいずれかでなければ
+なりません。
 
-This example, taken from the ``django.contrib.auth.models.User`` model, shows
-how both ``list_display`` and ``list_filter`` work::
+以下の例は ``django.contrib.auth.models.User`` モデルからとったもので、
+``list_display`` と ``list_filter`` の仕組みを示しています::
 
     class UserAdmin(admin.ModelAdmin):
         list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
         list_filter = ('is_staff', 'is_superuser')
 
-The above code results in an admin change list page that looks like this:
+上のコードによって、 admin の変更リストは以下のようになります:
 
     .. image:: _images/users_changelist.png
 
-(This example also has ``search_fields`` defined. See below.)
+(この例では、後述の ``search_fields`` も定義しています。)
 
 ``list_per_page``
 ~~~~~~~~~~~~~~~~~
 
-Set ``list_per_page`` to control how many items appear on each paginated admin
-change list page. By default, this is set to ``100``.
+admin 変更リストをページ分割 (paginate) で表示するときに、各ページに何個の
+アイテムを表示するかを決めます。デフォルト値は ``100`` です。
 
 ``list_select_related``
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Set ``list_select_related`` to tell Django to use ``select_related()`` in
-retrieving the list of objects on the admin change list page. This can save you
-a bunch of database queries.
+``list_select_related`` を設定すると、 admin の変更リストページに表示するオ
+ブジェクトリストを取得する際に ``select_related()`` を使うよう Django に指
+示できます。これにより、データベースクエリの発行数を抑えられます。
 
-The value should be either ``True`` or ``False``. Default is ``False``.
+値は ``True`` または ``False`` にします。デフォルトは ``False`` です。
 
-Note that Django will use ``select_related()``, regardless of this setting,
-if one of the ``list_display`` fields is a ``ForeignKey``.
+``list_display`` のいずれかのフィールドが ``ForeignKey`` の場合、 Django は
+この設定に関わらず ``select_related()`` を使います。
 
-For more on ``select_related()``, see
-:ref:`the select_related() docs <select-related>`.
+``select_related()`` の詳細は
+:ref:`select_related() のドキュメント <select-related>` を参照してください。
+
 
 ``inlines``
 ~~~~~~~~~~~
 
-See ``InlineModelAdmin`` objects below.
+後述の ``InlineModelAdmin`` を参照してください。
 
 ``ordering``
 ~~~~~~~~~~~~
 
-Set ``ordering`` to specify how objects on the admin change list page should be
-ordered. This should be a list or tuple in the same format as a model's
-``ordering`` parameter.
+``ordering`` を設定すると、 admin の変更リストにおける整列順を指定できます。
+値はタプルからなるリストで、モデルの ``ordering`` パラメタと同じ形式で指定
+します。
 
-If this isn't provided, the Django admin will use the model's default ordering.
+この値を指定しない場合、 Django はモデルのデフォルトの整列順を使います。
 
 .. admonition:: Note
 
-    Django will only honor the first element in the list/tuple; any others
-    will be ignored.
+    Django はリストやタプルの最初の要素だけを考慮して、後の要素は無視します。
 
 ``prepopulated_fields``
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Set ``prepopulated_fields`` to a dictionary mapping field names to the fields
-it should prepopulate from::
+フィールドの値を別のフィールドの値からセットさせたい場合は、以下のように、
+``prepopulated_fields`` にフィールド名を対応付けた辞書を設定してください::
 
     class ArticleAdmin(admin.ModelAdmin):
         prepopulated_fields = {"slug": ("title",)}
+
+.. TBD
 
 When set, the given fields will use a bit of JavaScript to populate from the
 fields assigned. The main use for this functionality is to automatically
@@ -463,36 +486,38 @@ generated value is produced by concatenating the values of the source fields,
 and then by transforming that result into a valid slug (e.g. substituting
 dashes for spaces).
 
-``prepopulated_fields`` doesn't accept ``DateTimeField``, ``ForeignKey``, nor
-``ManyToManyField`` fields.
+``DateTimeField``, ``ForeignKey`` および ``ManyToManyField`` は
+``prepopulated_fields`` に指定できません。
 
 ``radio_fields``
 ~~~~~~~~~~~~~~~~
 
-By default, Django's admin uses a select-box interface (<select>) for
-fields that are ``ForeignKey`` or have ``choices`` set. If a field is present
-in ``radio_fields``, Django will use a radio-button interface instead.
-Assuming ``group`` is a ``ForeignKey`` on the ``Person`` model::
+デフォルトでは、Django の admin は ``ForeignKey`` のフィールドや
+``choices`` の設定されたフィールドに対してセレクタボックス (<select>) イン
+タフェースを使います。 ``radio_fields`` にフィールド名を指定しておくと、
+Django はセレクタボックスの代りにラジオボタンのインタフェースを使います。
+例えば、 ``group`` が ``Person`` モデル上の  ``ForeignKey`` フィールド
+であれば、以下のように書けます::
 
     class PersonAdmin(admin.ModelAdmin):
         radio_fields = {"group": admin.VERTICAL}
 
-You have the choice of using ``HORIZONTAL`` or ``VERTICAL`` from the
-``django.contrib.admin`` module.
+ラジオボタンの並び方を指定するシンボル、 ``HORIZONTAL`` または ``VERTICAL``
+は ``django.contrib.admin`` モジュールにあります。
 
-Don't include a field in ``radio_fields`` unless it's a ``ForeignKey`` or has
-``choices`` set.
+``ForeignKey`` や ``choices`` パラメタのセットされたフィールド以外に
+``radio_fields`` を使ってはなりません。
 
 ``raw_id_fields``
 ~~~~~~~~~~~~~~~~~
 
-By default, Django's admin uses a select-box interface (<select>) for
-fields that are ``ForeignKey``. Sometimes you don't want to incur the
-overhead of having to select all the related instances to display in the
-drop-down.
+デフォルトでは、Django の admin サイトは ``ForeignKey`` フィールドに対して
+セレクタボックス (<select>) インタフェースを使います。しかし、時にはリレー
+ション先の全てのオブジェクトの入ったセレクタボックスが生成され、ドロップダ
+ウン表示されるのを避けたい場合もあります。
 
-``raw_id_fields`` is a list of fields you would like to change
-into a ``Input`` widget for either a ``ForeignKey`` or ``ManyToManyField``::
+``raw_id_fields`` には、ウィジェットを ``Input`` に変更したいフィールドのリ
+ストを指定します。 ``ForeignKey`` または ``ManyToManyField`` を指定できます::
 
     class ArticleAdmin(admin.ModelAdmin):
         raw_id_fields = ("newspaper",)
@@ -500,88 +525,93 @@ into a ``Input`` widget for either a ``ForeignKey`` or ``ManyToManyField``::
 ``save_as``
 ~~~~~~~~~~~
 
-Set ``save_as`` to enable a "save as" feature on admin change forms.
+``save_as`` を指定すると、 admin の編集フォームで「別名で保存 (save as)」機
+能を使えるようになります。
 
-Normally, objects have three save options: "Save", "Save and continue editing"
-and "Save and add another". If ``save_as`` is ``True``, "Save and add another"
-will be replaced by a "Save as" button.
+通常、編集フォームには三つの保存オプション、すなわち「保存 (Save)」、「保存
+して編集を続ける (Save and continue editing)」、「保存してもう一つ追加
+(Save and add another)」があります。 ``save_as`` を ``True`` にすると「保存
+してもう一つ追加」は「別名で保存 (Save as)」に置き換わります。
 
-"Save as" means the object will be saved as a new object (with a new ID),
-rather than the old object.
+「別名で保存」は、現在のオブジェクトをそのまま保存するのではなく、(新たな
+ID を持った) 別のオブジェクトとして保存することです。
 
-By default, ``save_as`` is set to ``False``.
+デフォルトでは、 ``save_as`` は ``False`` に設定されています。
 
 ``save_on_top``
 ~~~~~~~~~~~~~~~
 
-Set ``save_on_top`` to add save buttons across the top of your admin change
-forms.
+``save_on_top`` を指定すると、 admin の変更フォームの最上部に保存ボタンを追
+加できます。
 
-Normally, the save buttons appear only at the bottom of the forms. If you set
-``save_on_top``, the buttons will appear both on the top and the bottom.
+通常、保存ボタンはフォームの最下部だけに表示されます。 ``save_on_top`` を指
+定すると、ボタンは最下部だけでなく最上部にも表示されます。
 
-By default, ``save_on_top`` is set to ``False``.
+デフォルトでは、 ``save_on_top`` は ``False`` です。
 
 ``search_fields``
 ~~~~~~~~~~~~~~~~~
 
-Set ``search_fields`` to enable a search box on the admin change list page.
-This should be set to a list of field names that will be searched whenever
-somebody submits a search query in that text box.
+``search_fields`` を指定すると、 admin の変更リストページで検索ボックスを使
+えるようになります。この値は、ユーザが検索クエリをテキストボックスに入力し
+たときに検索の対象に含めるフィールド名のリストです。
 
-These fields should be some kind of text field, such as ``CharField`` or
-``TextField``. You can also perform a related lookup on a ``ForeignKey`` with
-the lookup API "follow" notation::
+フィールドは ``CharField`` や ``TextField`` のような何らかのテキストフィー
+ルドでなければなりません。 DB API の「リレーションを追跡する」表記を使えば、
+``ForeignKey`` を介したフィールドの指定も行えます::
 
     search_fields = ['foreign_key__related_fieldname']
 
-When somebody does a search in the admin search box, Django splits the search
-query into words and returns all objects that contain each of the words, case
-insensitive, where each word must be in at least one of ``search_fields``. For
-example, if ``search_fields`` is set to ``['first_name', 'last_name']`` and a
-user searches for ``john lennon``, Django will do the equivalent of this SQL
-``WHERE`` clause::
+admin の検索ボックスで検索を実行すると、 Django は検索クエリを単語に分解し
+て、各単語を含むような全てのオブジェクトを返します。検索は大小文字を区別せ
+ず、 ``search_fields`` に指定したフィールドのうち少なくとも一つに単語が入っ
+ていればヒットします。例えば、 ``search_fields`` が
+``['first_name', 'last_name']`` に設定されている場合、ユーザが 
+``john lennon`` を検索すると、 Django は以下のような ``WHERE`` 節を持った
+SQL と等価な検索を実行します::
 
     WHERE (first_name ILIKE '%john%' OR last_name ILIKE '%john%')
     AND (first_name ILIKE '%lennon%' OR last_name ILIKE '%lennon%')
 
-For faster and/or more restrictive searches, prefix the field name
-with an operator:
+より高速な、あるいはより制約の厳しい検索を行うには、フィールド名の前に以下
+のような演算子を置きます:
 
 ``^``
-    Matches the beginning of the field. For example, if ``search_fields`` is
-    set to ``['^first_name', '^last_name']`` and a user searches for
-    ``john lennon``, Django will do the equivalent of this SQL ``WHERE``
-    clause::
+    フィールドの先頭にマッチします。例えば、 ``search_fields`` を
+    ``['^first_name', '^last_name']`` にして、ユーザが ``john lennon`` を検
+    索した場合、Django は以下のような ``WHERE`` 節の SQL に等価な検索を実行
+    します::
 
         WHERE (first_name ILIKE 'john%' OR last_name ILIKE 'john%')
         AND (first_name ILIKE 'lennon%' OR last_name ILIKE 'lennon%')
 
-    This query is more efficient than the normal ``'%john%'`` query, because
-    the database only needs to check the beginning of a column's data, rather
-    than seeking through the entire column's data. Plus, if the column has an
-    index on it, some databases may be able to use the index for this query,
-    even though it's a ``LIKE`` query.
+    このクエリを使うと、データベースはカラムの先頭部分だけをチェックすれば
+    よく、カラム中のデータ全体を調べなくてもよくなるため、通常の
+    ``'%john%'`` クエリよりも効率的に検索を実行できます。加えて、カラムにイ
+    ンデクスが設定されていれば、データベースによっては  ``LIKE`` クエリであっ
+    てもインデクスを使ったクエリを実行できるという利点があります。
 
 ``=``
-    Matches exactly, case-insensitive. For example, if
-    ``search_fields`` is set to ``['=first_name', '=last_name']`` and
-    a user searches for ``john lennon``, Django will do the equivalent
-    of this SQL ``WHERE`` clause::
+    大小文字を区別しない厳密一致です。例えば、 ``search_fields`` を
+    ``['=first_name', '=last_name']`` にして、ユーザが ``john lennon`` を検
+    索した場合、 Django は以下のような ``WHERE`` 節の SQL に等価な検索を実行
+    します::
 
         WHERE (first_name ILIKE 'john' OR last_name ILIKE 'john')
         AND (first_name ILIKE 'lennon' OR last_name ILIKE 'lennon')
 
-    Note that the query input is split by spaces, so, following this example,
-    it's currently not possible to search for all records in which
-    ``first_name`` is exactly ``'john winston'`` (containing a space).
+    クエリ入力はスペース区切りなので、この例に従うと、 ``first_name`` が
+    ``'john winston'`` である (スペースを含む) ようなレコードは検索でき
+    ないので注意してください。
 
 ``@``
-    Performs a full-text match. This is like the default search method but uses
-    an index. Currently this is only available for MySQL.
+    全文検索マッチを実行します。デフォルトの search メソッドに似ていますが、
+    インデクスを使います。現在のところ MySQL でしか使えません。
 
-``ModelAdmin`` methods
-----------------------
+.. _`ModelAdmin methods`:
+
+``ModelAdmin`` のメソッド
+-------------------------
 
 ``save_model(self, request, obj, form, change)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -615,12 +645,13 @@ model instance::
                 instance.save()
             formset.save_m2m()
 
-``ModelAdmin`` media definitions
+.. _`ModelAdmin media definitions`:
+
+``ModelAdmin`` のメディア定義
 --------------------------------
 
-There are times where you would like add a bit of CSS and/or JavaScript to
-the add/change views. This can be accomplished by using a Media inner class
-on your ``ModelAdmin``::
+たまに、 CSS や JavaScript を追加・変更ビューに追加したい場合があります。
+``ModelAdmin`` に内部クラス ``Media`` を定義すれば、これを実現できます::
 
     class ArticleAdmin(admin.ModelAdmin):
         class Media:
@@ -629,8 +660,14 @@ on your ``ModelAdmin``::
             }
             js = ("my_code.js",)
 
+これらのメディア名のパスには ``MEDIA_URL`` の内容が前置されます。また、
+:ref:`forms の通常のメディア定義 <topics-forms-media>` と同じ規則が当てはま
+ります。
+
 Keep in mind that this will be prepended with ``MEDIA_URL``. The same rules
-apply as :ref:`regular media definitions on forms <topics-forms-media>`.
+apply as 
+
+.. TBD
 
 Adding custom validation to the admin
 -------------------------------------
@@ -659,13 +696,14 @@ It is important you use a ``ModelForm`` here otherwise things can break. See the
 <ref-forms-validation>` for more information.
 
 .. _admin-inlines:
+.. _`InlineModelAdmin objects`:
 
-``InlineModelAdmin`` objects
-============================
+``InlineModelAdmin`` オブジェクト
+====================================
 
-The admin interface has the ability to edit models on the same page as a
-parent model. These are called inlines. You can add them to a model by
-specifying them in a ``ModelAdmin.inlines`` attribute::
+admin インタフェースには、他のモデルクラスのインスタンスを同じページで編集
+する機能があります。この機能をインライン編集と呼びます。インラインモデルを
+指定するには、 ``ModelAdmin.inlines`` 属性を使います::
 
     class BookInline(admin.TabularInline):
         model = Book
@@ -675,58 +713,64 @@ specifying them in a ``ModelAdmin.inlines`` attribute::
             BookInline,
         ]
 
-Django provides two subclasses of ``InlineModelAdmin`` and they are:
+Django は、 ``InlineModelAdmin`` のサブクラスとして、以下の二つを提供してい
+ます::
 
     * ``TabularInline``
     * ``StackedInline``
 
-The difference between these two is merely the template used to render them.
 
-``InlineModelAdmin`` options
------------------------------
+これら二つの違いは、単にレンダリングに使われるテンプレートに過ぎません。
 
-The ``InlineModelAdmin`` class is a subclass of ``ModelAdmin`` so it inherits
-all the same functionality as well as some of its own:
+.. _`InlineModelAdmin options`:
+
+``InlineModelAdmin`` のオプション
+-----------------------------------
+
+
+``InlineModelAdmin`` クラスは ``ModelAdmin`` のサブクラスなので、以下に挙げ
+る独自の機能の他に、 ``ModelAdmin`` の機能を全て継承しています:
 
 ``model``
 ~~~~~~~~~
 
-The model in which the inline is using. This is required.
+インライン編集する対象のモデルです。必須の引数です。
 
 ``fk_name``
 ~~~~~~~~~~~
 
-The name of the foreign key on the model. In most cases this will be dealt
-with automatically, but ``fk_name`` must be specified explicitly if there are
-more than one foreign key to the same parent model.
+モデルの外部キーの名前です。たいていの場合、外部キーは自動的に決定できます
+が、親モデルに対して外部キーを複数張っているようなモデルの場合は、
+``fk_name`` を明示的に決める必要があります。
 
 ``formset``
 ~~~~~~~~~~~
 
-This defaults to ``BaseInlineFormSet``. Using your own formset can give you
-many possibilities of customization. Inlines are built around
-:ref:`model formsets <model-formsets>`.
+デフォルト値は ``BaseInlineFormset`` です。独自のフォームセットを指定すれば、
+色々とカスタマイズできます。インラインオブジェクトのフォームは
+:ref:`モデルフォームセット<model-formsets>` で生成されています。
 
 ``form``
 ~~~~~~~~
 
-The value for ``form`` is inherited from ``ModelAdmin``. This is what is
-passed through to ``formset_factory`` when creating the formset for this
-inline.
+``form`` の値は ``ModelAdmin`` から継承されます。この値は、インラインオブジェ
+クトのフォームセットを生成するときに ``fomrset_factory`` に渡されます。
 
 ``extra``
 ~~~~~~~~~
 
-This controls the number of extra forms the formset will display in addition
-to the initial forms. See the
-:ref:`formsets documentation <topics-forms-formsets>` for more information.
+フォームセットが、初期のフォームに加えて表示する追加のフォーム数を制御しま
+す。詳しくは :ref:`formsets のドキュメント <topics-forms-formsets>` を参照
+してください。
 
 ``max_num``
 ~~~~~~~~~~~
 
-This controls the maximum number of forms to show in the inline. This doesn't
-directly correlate to the number of objects, but can if the value is small
-enough. See :ref:`model-formsets-max-num` for more information.
+インラインで表示するフォームの最大個数を制御します。この値は直接オブジェク
+トの数には関係しませんが、あまり小さな値が設定されていると、影響することも
+あります。詳しくは :ref:`model-formsets-max-num` を参照してください。
+
+.. TBD
 
 ``raw_id_fields``
 ~~~~~~~~~~~~~~~~~
@@ -746,32 +790,35 @@ into a ``Input`` widget for either a ``ForeignKey`` or ``ManyToManyField``::
 ``template``
 ~~~~~~~~~~~~
 
-The template used to render the inline on the page.
+インラインオブジェクトをレンダリングするときに使われるテンプレートです。
 
 ``verbose_name``
 ~~~~~~~~~~~~~~~~
 
-An override to the ``verbose_name`` found in the model's inner ``Meta`` class.
+モデルの内部クラス ``Meta`` の ``verbose_name`` の設定をオーバライドします。
 
 ``verbose_name_plural``
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-An override to the ``verbose_name_plural`` found in the model's inner ``Meta``
-class.
+モデルの内部クラス ``Meta`` の ``verbose_name_plural`` の設定をオーバライド
+します。
 
-Working with a model with two or more foreign keys to the same parent model
+
+.. _Working with a model with two or more foreign keys to the same parent model:
+
+一つのモデルから複数の外部キーが張られている場合のインライン編集の扱い
 ---------------------------------------------------------------------------
 
-It is sometimes possible to have more than one foreign key to the same model.
-Take this model for instance::
+一つのモデルに対して、複数の外部キーが張られている場合があります。以下のよ
+うなモデルを例に考えてみましょう::
 
     class Friendship(models.Model):
         to_person = models.ForeignKey(Person, related_name="friends")
         from_person = models.ForeignKey(Person, related_name="from_friends")
 
-If you wanted to display an inline on the ``Person`` admin add/change pages
-you need to explicitly define the foreign key since it is unable to do so
-automatically::
+``Person`` の admin サイトで、インラインの追加・編集ページを表示したくても、
+どの外部キーを辿らせるかは自動で決められません。従って、明示的に決めてやる
+必要があります::
 
     class FriendshipInline(admin.TabularInline):
         model = Friendship
@@ -781,6 +828,8 @@ automatically::
         inlines = [
             FriendshipInline,
         ]
+
+.. TBD
 
 Working with Many-to-Many Intermediary Models
 ----------------------------------------------
@@ -871,6 +920,8 @@ example app::
         ]
     
     admin.site.register(Product, ProductAdmin)
+
+.. TBD
 
 ``django.contrib.contenttypes.generic`` provides both a ``GenericTabularInline``
 and ``GenericStackedInline`` and behave just like any other inline. See the
@@ -975,8 +1026,12 @@ If you wish to change the index or login templates, you are better off creating
 your own ``AdminSite`` instance (see below), and changing the ``index_template``
 or ``login_template`` properties.
 
-``AdminSite`` objects
-=====================
+.. _`AdminSite objects`:
+
+``AdminSite`` オブジェクト
+===========================
+
+.. TBD
 
 A Django administrative site is represented by an instance of
 ``django.contrib.admin.sites.AdminSite``; by default, an instance of
@@ -991,15 +1046,18 @@ Python class), and register your models and ``ModelAdmin`` subclasses
 with it instead of using the default.
 
 
-Hooking ``AdminSite`` instances into your URLconf
--------------------------------------------------
+.. _`Hooking AdminSite instances into your URLconf`:
 
-The last step in setting up the Django admin is to hook your ``AdminSite``
-instance into your URLconf. Do this by pointing a given URL at the
-``AdminSite.root`` method.
+URLconf に ``AdminSite`` インスタンスをフックする
+---------------------------------------------------
 
-In this example, we register the default ``AdminSite`` instance
-``django.contrib.admin.site`` at the URL ``/admin/`` ::
+Django admin サイト構築の最後のステップは、 ``AdminSite`` インスタンスの
+URLconf への設置です。設置を行うには、 URL を ``AdminSite.root`` メソッドに
+振り向けます。
+
+以下の例では、デフォルトの ``AdminSite`` インスタンスである
+``django.contrib.admin.site`` を、 ``/admin/`` という URL にマップしていま
+す::
 
     # urls.py
     from django.conf.urls.defaults import *
@@ -1011,11 +1069,11 @@ In this example, we register the default ``AdminSite`` instance
         ('^admin/(.*)', admin.site.root),
     )
 
-Above we used ``admin.autodiscover()`` to automatically load the
-``INSTALLED_APPS`` admin.py modules.
+この例では、 ``admin.autodiscover()`` を使って、 ``INSTALLED_APPS`` の
+``admin.py`` モジュールを自動的にロードしています。
 
-In this example, we register the ``AdminSite`` instance
-``myproject.admin.admin_site`` at the URL ``/myadmin/`` ::
+次の例では、 ``AdminSite`` インスタンス ``myproject.admin.admin_site`` 
+を ``/myadmin/`` という URL にマップしています::
 
     # urls.py
     from django.conf.urls.defaults import *
@@ -1025,24 +1083,27 @@ In this example, we register the ``AdminSite`` instance
         ('^myadmin/(.*)', admin_site.root),
     )
 
-There is really no need to use autodiscover when using your own ``AdminSite``
-instance since you will likely be importing all the per-app admin.py modules
-in your ``myproject.admin`` module.
+このように、 ``AdminSite`` インスタンスを自作している場合は、
+``myproject.admin`` モジュールの中で各アプリケーションの admin.py モジュー
+ルを import しているはずなので、 ``autodiscover`` を呼ぶ必要はありません。
 
-Note that the regular expression in the URLpattern *must* group everything in
-the URL that comes after the URL root -- hence the ``(.*)`` in these examples.
+URLパターンの正規表現には、 admin サイトのルート URL の後ろ全ての URL 部分
+を含むようなグループ表記を *必ず* 入れておかねばなりません。この例では
+``(.*)`` を使っています。
 
-Multiple admin sites in the same URLconf
-----------------------------------------
+.. _Multiple admin sites in the same URLconf:
 
-It's easy to create multiple instances of the admin site on the same
-Django-powered Web site. Just create multiple instances of ``AdminSite`` and
-root each one at a different URL.
+一つの URLconf で複数の admin サイトを使う
+-------------------------------------------
 
-In this example, the URLs ``/basic-admin/`` and ``/advanced-admin/`` feature
-separate versions of the admin site -- using the ``AdminSite`` instances
-``myproject.admin.basic_site`` and ``myproject.admin.advanced_site``,
-respectively::
+Django で作られた一つの Web サイト上で、複数の admin サイトインスタンスを簡
+単に運営できます。方法は、単に ``AdminSite`` インスタンスを複数にして別々の
+URL で設置するだけです。
+
+下の例では、  ``/basic-admin/`` と ``/advanced-admin/`` という二つの URL で、
+``myproject.admin.basic_site`` と ``myproject.admin.advanced_site`` という
+``AdminSite`` インスタンスを使って、別々のバージョンの admin サイトを運営し
+ています::
 
     # urls.py
     from django.conf.urls.defaults import *

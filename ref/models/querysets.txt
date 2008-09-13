@@ -4,6 +4,8 @@
 QuerySet API reference
 ======================
 
+:revision-up-to: 8961 (1.0)
+
 .. currentmodule:: django.db.models
 
 This document describes the details of the ``QuerySet`` API. It builds on the
@@ -16,56 +18,64 @@ Throughout this reference we'll use the :ref:`example weblog models
 <topics-db-queries>`.
 
 .. _when-querysets-are-evaluated:
+.. _When QuerySets are evaluated:
 
-When QuerySets are evaluated
-============================
+クエリセットはいつ評価されるのか
+=================================
+
+.. TBD
 
 Internally, a ``QuerySet`` can be constructed, filter, sliced, and generally
 passed around without actually hitting the database. No database activity
 actually occurs until you do something to evaluate the queryset.
 
-You can evaluate a ``QuerySet`` in the following ways:
+以下の方法を使うと、クエリセットを評価できます:
 
-    * **Iteration.** A ``QuerySet`` is iterable, and it executes its database
-      query the first time you iterate over it. For example, this will print
-      the headline of all entries in the database::
+    * **イテレーション。** クエリセットはイテレーション可能オブジェクトであ
+      り、オブジェクトに対して最初にイテレーション操作を行ったときにデータ
+      ベースクエリを実行します。例えば、以下の例はデータベース中の全てのエ
+      ントリのヘッドラインを出力します::
 
           for e in Entry.objects.all():
               print e.headline
 
-    * **Slicing.** As explained in :ref:`limiting-querysets`, a ``QuerySet`` can
-      be sliced, using Python's array-slicing syntax. Usually slicing a
-      ``QuerySet`` returns another (unevaluated )``QuerySet``, but Django will
-      execute the database query if you use the "step" parameter of slice
-      syntax.
+    * **スライス。** :ref:`limiting-querysets` で説明しているように、
+      Python の配列スライス表記を使うとクエリセットをスライスできます。通常、
+      クエリセットに対するスライスは (未評価の) 別のクエリセットを返します
+      が、スライス表記に「ステップ (step)」パラメタを使った場合には、データ
+      ベースクエリを実行します。
 
-    * **repr().** A ``QuerySet`` is evaluated when you call ``repr()`` on it.
-      This is for convenience in the Python interactive interpreter, so you can
-      immediately see your results when using the API interactively.
+    * **repr().** クエリセットに対して ``repr()`` を呼び出すと、クエリセッ
+      トは値評価されます。これは Python 対話インタプリタでの利便性のための
+      仕様で、 API を対話的に使うときに結果を即座に見られるようにしています。
 
-    * **len().** A ``QuerySet`` is evaluated when you call ``len()`` on it.
-      This, as you might expect, returns the length of the result list.
+    * **len().** クエリセットに対して ``len()`` を呼び出すと、クエリセッ
+      トは値評価されます。予想に違わず、 ``len()`` はクエリ結果リストの長さ
+      を返します。
 
-      Note: *Don't* use ``len()`` on ``QuerySet``\s if all you want to do is
-      determine the number of records in the set. It's much more efficient to
-      handle a count at the database level, using SQL's ``SELECT COUNT(*)``,
-      and Django provides a ``count()`` method for precisely this reason. See
-      ``count()`` below.
+      注意: クエリセット中のレコードの数を知りたいだけなら、 ``len()`` は
+      *使わないでください* 。レコード数の計算はデータベース上で SQL 文の
+      ``SELECT COUNT(*)`` 使って行う方が遥かに効率的であり、まさにその理由
+      から Django では ``count()`` メソッドを提供しています。後述の
+      ``count()`` を参照してください。
 
-    * **list().** Force evaluation of a ``QuerySet`` by calling ``list()`` on
-      it. For example::
+    * **list().** クエリセットに対して ``list()`` を呼び出すと、値評価を強
+      制できます。例えば::
 
           entry_list = list(Entry.objects.all())
 
-      Be warned, though, that this could have a large memory overhead, because
-      Django will load each element of the list into memory. In contrast,
-      iterating over a ``QuerySet`` will take advantage of your database to
-      load data and instantiate objects only as you need them.
+      とはいえ、この方法を使うと、Django が全ての要素のリストをメモリ上にロー
+      ドするため、巨大なメモリオーバヘッドを引き起こす可能性があるので十分
+      注意してください。これに対し、クエリセットに対するイテレーション操作
+      では、必要な分だけデータをロードしてオブジェクトをインスタンス化する
+      という利点があります。
 
 .. _queryset-api:
 
 QuerySet API
 ============
+
+.. TBD
 
 Though you usually won't create one manually -- you'll go through a :class:`Manager` -- here's the formal declaration of a ``QuerySet``:
 
@@ -74,95 +84,98 @@ Though you usually won't create one manually -- you'll go through a :class:`Mana
 Usually when you'll interact with a ``QuerySet`` you'll use it by :ref:`chaining
 filters <chaining-filters>`. To make this work, most ``QuerySet`` methods return new querysets.
 
-QuerySet methods that return new QuerySets
-------------------------------------------
+.. _QuerySet methods that return new QuerySets:
 
-Django provides a range of ``QuerySet`` refinement methods that modify either
-the types of results returned by the ``QuerySet`` or the way its SQL query is
-executed.
+新たなクエリセットを返すクエリセットメソッド
+---------------------------------------------
+
+Django は、クエリセットの返す結果の形式や、 SQL クエリの実行方法を変更する
+ためのリファインメソッドを幅広く提供しています。
 
 ``filter(**kwargs)``
 ~~~~~~~~~~~~~~~~~~~~
 
-Returns a new ``QuerySet`` containing objects that match the given lookup
-parameters.
+指定の照合パラメタに一致するオブジェクトの入った新たなクエリセットを返しま
+す。
 
-The lookup parameters (``**kwargs``) should be in the format described in
-`Field lookups`_ below. Multiple parameters are joined via ``AND`` in the
-underlying SQL statement.
+照合パラメタ (``**kwargs``) は後述の `フィールドの照合`_ で説明するフォーマッ
+トにします。複数のパラメタを指定すると、背後の SQL 文では ``AND`` で結合さ
+れます。
 
 ``exclude(**kwargs)``
 ~~~~~~~~~~~~~~~~~~~~~
 
-Returns a new ``QuerySet`` containing objects that do *not* match the given
-lookup parameters.
+指定の照合パラメタに一致 *しない* オブジェクトの入った新たなクエリセットを
+返します。
 
-The lookup parameters (``**kwargs``) should be in the format described in
-`Field lookups`_ below. Multiple parameters are joined via ``AND`` in the
-underlying SQL statement, and the whole thing is enclosed in a ``NOT()``.
+照合パラメタ (``**kwargs``) は後述の `フィールドの照合`_ で説明するフォーマッ
+トにします。複数のパラメタを指定すると、背後の SQL 文では ``AND`` で結合さ
+れ、制約条件節全体を ``NOT()`` で囲みます。
 
-This example excludes all entries whose ``pub_date`` is later than 2005-1-3
-AND whose ``headline`` is "Hello"::
+以下の例では、 ``pub_date`` が 2005 年 1 月 3 日より未来の日時になっていて、
+*かつ* ``headline`` が "Hello" で始まる全てのエントリを除外します::
 
     Entry.objects.exclude(pub_date__gt=datetime.date(2005, 1, 3), headline='Hello')
 
-In SQL terms, that evaluates to::
+SQL では以下のようなクエリの評価と同じです::
 
     SELECT ...
     WHERE NOT (pub_date > '2005-1-3' AND headline = 'Hello')
 
-This example excludes all entries whose ``pub_date`` is later than 2005-1-3
-OR whose headline is "Hello"::
+また、以下の例では、 ``pub_date`` が 2005 年 1 月 3 日より未来の日時で
+あるか、 *または* ``headline`` が "Hello" で始まる全てのエントリを除外しま
+す::
 
     Entry.objects.exclude(pub_date__gt=datetime.date(2005, 1, 3)).exclude(headline='Hello')
 
-In SQL terms, that evaluates to::
+SQL では以下のようなクエリの評価と同じです::
 
     SELECT ...
     WHERE NOT pub_date > '2005-1-3'
     AND NOT headline = 'Hello'
 
-Note the second example is more restrictive.
+二つ目の例の方が制約が厳しいことに注意して下さい。
 
 ``order_by(*fields)``
 ~~~~~~~~~~~~~~~~~~~~~
 
-By default, results returned by a ``QuerySet`` are ordered by the ordering
-tuple given by the ``ordering`` option in the model's ``Meta``. You can
-override this on a per-``QuerySet`` basis by using the ``order_by`` method.
+デフォルトでは、 ``QuerySet`` の返す結果はモデルの ``Meta`` の ``ordering``
+オプションに指定した整列条件のタプルに従って整列されます。 ``order_by`` を
+使うと、この挙動を ``QuerySet`` 単位でオーバライドできます。
 
-Example::
+例えば::
 
     Entry.objects.filter(pub_date__year=2005).order_by('-pub_date', 'headline')
 
-The result above will be ordered by ``pub_date`` descending, then by
-``headline`` ascending. The negative sign in front of ``"-pub_date"`` indicates
-*descending* order. Ascending order is implied. To order randomly, use ``"?"``,
-like so::
+このクエリを実行すると、検索結果はまず ``pub_date`` で降順に並べられ、次い
+で ``headline`` で昇順に並べられます。 ``"-pub_date"`` の先頭にあるマイナス
+記号が  *降順* を表しています。何も指定しないと昇順です。整列をランダムにし
+たければ、以下のように "?" を使います::
 
     Entry.objects.order_by('?')
 
-Note: ``order_by('?')`` queries may be expensive and slow, depending on the
-database backend you're using.
+注意: ``order_by('?')`` を使うと、使っているバックエンドによってはコストの
+かかる低速なクエリを実行してしまいます。
 
-To order by a field in a different model, use the same syntax as when you are
-querying across model relations. That is, the name of the field, followed by a
-double underscore (``__``), followed by the name of the field in the new model,
-and so on for as many models as you want to join. For example::
+別のモデル内のフィールドを使ってモデルを整列させるには、モデルのリレーショ
+ン追跡と同じ構文を使ってフィールドを指定します。すなわち、フィールド名の後
+ろにアンダースコア 2 つ (``__``) 、さらに新たなモデルのフィールド名を続けま
+す。この調子で、任意の深さまでモデルを追跡できます。例えば::
 
     Entry.objects.order_by('blog__name', 'headline')
 
-If you try to order by a field that is a relation to another model, Django will
-use the default ordering on the related model (or order by the related model's
-primary key if there is no ``Meta.ordering`` specified. For example::
+他のモデルへのリレーションを使ってモデルインスタンスを整列しようとすると、
+Django はリレーション先のモデルのデフォルトの整列順 (``Meta.ordering`` が指
+定されていなければプライマリキー) を使います。例えば::
 
     Entry.objects.order_by('blog')
 
-...is identical to::
+は、 ``Blog`` モデルにデフォルトの整列順が指定されていないので、以下のコー
+ドと同じです::
 
     Entry.objects.order_by('blog__id')
 
-...since the ``Blog`` model has no default ordering specified.
+..TBD
 
 Be cautious when ordering by fields in related models if you are also using
 ``distinct()``. See the note in the `distinct()`_ section for an explanation
@@ -178,19 +191,22 @@ fields with care and make sure the results are what you expect.
 
 .. versionadded:: 1.0
 
-If you don't want any ordering to be applied to a query, not even the default
-ordering, call ``order_by()`` with no parameters.
+クエリをデフォルトの整列も含めて一切整列させたくない場合には、
+``order_by()`` を引数なしで呼び出してください。
 
 .. versionadded:: 1.0
 
-The syntax for ordering across related models has changed. See the `Django 0.96
-documentation`_ for the old behaviour.
+リレーションをまたいでモデルを整列する際の構文が変更されました。以前の動作
+仕様は `Django 0.96 のドキュメント`_ を参照してください。
 
 .. _Django 0.96 documentation: http://www.djangoproject.com/documentation/0.96/model-api/#floatfield
+.. _`Django 0.96 のドキュメント`: `Django 0.96 documentation`_
 
-There's no way to specify whether ordering should be case sensitive. With
-respect to case-sensitivity, Django will order results however your database
-backend normally orders them.
+大小文字の区別を考慮して整列するかどうかを指定する方法はありません。大小文
+字の区別については、 Django は現在使っているデータベースバックエンドの整列
+方法に従います。
+
+.. TBD
 
 Also, note that ``reverse()`` should generally only be called on a
 ``QuerySet`` which has a defined ordering (e.g., when querying against
@@ -204,14 +220,14 @@ undefined afterward).
 ``distinct()``
 ~~~~~~~~~~~~~~
 
-Returns a new ``QuerySet`` that uses ``SELECT DISTINCT`` in its SQL query. This
-eliminates duplicate rows from the query results.
+SQL クエリに ``SELECT DISTINCT`` を使う新たな ``QuerySet`` を返します。
+``distinct()`` を使うと、クエリ結果から重複する行をなくします。
 
-By default, a ``QuerySet`` will not eliminate duplicate rows. In practice, this
-is rarely a problem, because simple queries such as ``Blog.objects.all()``
-don't introduce the possibility of duplicate result rows. However, if your
-query spans multiple tables, it's possible to get duplicate results when a
-``QuerySet`` is evaluated. That's when you'd use ``distinct()``.
+デフォルトでは、 ``QuerySet`` は重複する行を除去しません。通常は、
+``Blog.objects.all()`` のような単純なクエリは重複する行を含むような結果にな
+らないため、これはあまり問題ではありません。しかし、クエリが複数のテーブル
+にわたる場合、 ``QuerySet`` の評価結果に重複する結果が入る場合があります。
+その場合には ``distinct()`` を使って下さい。
 
 .. note::
     Any fields used in an `order_by(*fields)`_ call are included in the SQL
@@ -223,64 +239,75 @@ query spans multiple tables, it's possible to get duplicate results when a
     support ordering), it sometimes looks like non-distinct results are being
     returned.
 
-    Similarly, if you use a ``values()`` query to restrict the columns
-    selected, the columns used in any ``order_by()`` (or default model
-    ordering) will still be involved and may affect uniqueness of the results.
+    ``order_by(*fields)`` に指定したフィールドは、 SQL レベルで ``SELECT``
+    されます。そのため、 ``order_by()`` と ``distinct()`` と組み合わせると
+    予期しない結果を生むことがあります。例えば、リレーション先のモデルフィー
+    ルドを使って整列を行うと、それらのフィールドも ``SELECT`` されるため、
+    リレーション元のオブジェクトは同じ値で、リレーション先のフィールド値だ
+    けが違うレコードは異なる (distinct) レコードとみなされます。リレーショ
+    ン先のレコードカラムは (順序を制御するために使われるだけなので) 返され
+    ず、その結果、distinct 制約を満たしていないクエリ結果が返されるように見
+    えてしまいます。
 
-    The moral here is that if you are using ``distinct()`` be careful about
-    ordering by related models. Similarly, when using ``distinct()`` and
-    ``values()`` together, be careful when ordering by fields not in the
-    ``values()`` call.
+    同様に、 ``values()`` クエリを使って ``SELECT`` 対象のカラムを制約する
+    場合も、 ``order_by()`` に指定したカラム (またはモデルのデフォルトの順
+    序制御カラム) が自動的にクエリ結果に含められ、結果の一意性に影響を及ぼ
+    します。
 
+    ``distinct()`` を使う場合、リレーション先のフィールドを使った並べ替えに
+    はよく注意しましょう。同様に、 ``distinct()`` と ``values()`` を同時に
+    使うときにも、 ``values()`` の対象とするフィールドに順序カラムが入って
+    いない場合はよく注意してください。
 
 ``values(*fields)``
 ~~~~~~~~~~~~~~~~~~~
 
-Returns a ``ValuesQuerySet`` -- a ``QuerySet`` that evaluates to a list of
-dictionaries instead of model-instance objects.
+``ValueQuerySet`` を返します。 ``ValueQuerySet`` は ``QuerySet`` のサブクラ
+スで、評価結果としてモデルインスタンスオブジェクトの代りに辞書のリストを返
+す ``QuerySet`` です。
 
-Each of those dictionaries represents an object, with the keys corresponding to
-the attribute names of model objects.
+リスト中の各辞書は個々のオブジェクトを表現しており、キーがモデルオブジェク
+トの各属性名に、対応しています。
 
-This example compares the dictionaries of ``values()`` with the normal model
-objects::
+以下の例では、 ``values()`` の辞書と通常のモデルオブジェクトを比較していま
+す::
 
-    # This list contains a Blog object.
+    # Blog オブジェクトのリストを返します。
     >>> Blog.objects.filter(name__startswith='Beatles')
     [<Blog: Beatles Blog>]
 
-    # This list contains a dictionary.
+    # 辞書のリストを返します。
     >>> Blog.objects.filter(name__startswith='Beatles').values()
     [{'id': 1, 'name': 'Beatles Blog', 'tagline': 'All the latest Beatles news.'}]
 
-``values()`` takes optional positional arguments, ``*fields``, which specify
-field names to which the ``SELECT`` should be limited. If you specify the
-fields, each dictionary will contain only the field keys/values for the fields
-you specify. If you don't specify the fields, each dictionary will contain a
-key and value for every field in the database table.
+``values()`` オプションの可変長の引数 ``*fields`` を取れます。このオプションは
+``SELECT`` の制限に使うフィールド名を列挙したものです。 ``fields`` を指定し
+た場合、辞書には指定した名前のフィールドのキーと値だけが入ります。
+``*fields`` を指定しなければ、辞書にはテーブルの全てのフィールドのキーと値
+が入ります。
 
-Example::
+例を示します::
 
     >>> Blog.objects.values()
     [{'id': 1, 'name': 'Beatles Blog', 'tagline': 'All the latest Beatles news.'}],
     >>> Blog.objects.values('id', 'name')
     [{'id': 1, 'name': 'Beatles Blog'}]
 
-A couple of subtleties that are worth mentioning:
+注意すべき点が 2 つほどあります:
 
-    * The ``values()`` method does not return anything for
-      :class:`~django.db.models.ManyToManyField` attributes and will raise an
-      error if you try to pass in this type of field to it.
-    * If you have a field called ``foo`` that is a
-      :class:`~django.db.models.ForeignKey`, the default ``values()`` call
-      will return a dictionary key called ``foo_id``, since this is the name
-      of the hidden model attribute that stores the actual value (the ``foo``
-      attribute refers to the related model). When you are calling
-      ``values()`` and passing in field names, you can pass in either ``foo``
-      or ``foo_id`` and you will get back the same thing (the dictionary key
-      will match the field name you passed in).
+    * ``values()`` メソッドは :class:`~django.db.models.ManyToManyField` の
+      内容を返しません。 :class:`~django.db.models.ManyToManyField` 型のフィー
+      ルド名を渡すと、エラーを送出します。
+    * :class:`~django.db.models.ForeignKey` ``foo`` がモデルに入っている場
+      合、 ``values()`` がデフォルトで返す辞書には、 ``foo_id`` というキー
+      が入ります。これは、リレーションの実際の値が入っているモデル内部の隠
+      しフィールドの名前です (``foo`` はリレーション先のモデルインスタンス
+      への参照です)。一方、 ``values()`` にフィールド名を指定して呼び出す
+      場合は、 ``foo`` と ``foo_id`` のどちらでも渡せますが、得られる結果は
+      同じ (辞書のキーは渡したフィールド名と同じ) で、リレーションの実際の
+      値です。
 
-      For example::
+      例を以下に示します::
 
         >>> Entry.objects.values()
         [{'blog_id: 1, 'headline': u'First Entry', ...}, ...]
@@ -290,48 +317,47 @@ A couple of subtleties that are worth mentioning:
 
         >>> Entry.objects.values('blog_id')
         [{'blog_id': 1}, ...]
-    * When using ``values()`` together with ``distinct()``, be aware that
-      ordering can affect the results. See the note in the `distinct()`_
-      section, above, for details.
+    * ``values()`` と ``distinct()`` を組み合わせて使う場合、カラム値による
+      並べ替えが結果に思わぬ影響をもたらすことがあります。詳しくは
+      `distinct()`_ の節を参照してください。
 
 .. versionadded:: 1.0
 
-Previously, it was not possible to pass ``blog_id`` to ``values()`` in the above
-example, only ``blog``.
+以前は、 ``values()`` に渡せるのは ``blog`` だけで、 ``blog_id`` は使えませ
+んでした。
 
-A ``ValuesQuerySet`` is useful when you know you're only going to need values
-from a small number of the available fields and you won't need the
-functionality of a model instance object. It's more efficient to select only
-the fields you need to use.
+``ValuesQuerySet`` が便利なのは、わずかな数のフィールドの値しか必要でなく、
+モデルインスタンスオブジェクトの機能が必要でないと分かっている場合です。
+必要なフィールドだけを選択すると、さらに効率的です。
 
-Finally, note a ``ValuesQuerySet`` is a subclass of ``QuerySet``, so it has all
-methods of ``QuerySet``. You can call ``filter()`` on it, or ``order_by()``, or
-whatever. Yes, that means these two calls are identical::
+最後に、 ``ValuesQuerySet`` は ``QuerySet`` のサブクラスなので、
+``QuerySet`` の全てのメソッドを持っている点に注意してください。
+``ValuesQuerySet`` に対して ``filter()`` や ``order_by()`` といった操作を行
+えます。つまり、以下の二つの呼び出しは等価です::
 
     Blog.objects.values().order_by('id')
     Blog.objects.order_by('id').values()
 
-The people who made Django prefer to put all the SQL-affecting methods first,
-followed (optionally) by any output-affecting methods (such as ``values()``),
-but it doesn't really matter. This is your chance to really flaunt your
-individualism.
+Django の作者たちは、全ての SQL 関係のメソッドを先に配置し、その後に (必要
+なら) 出力関係のメソッド (``values()`` など) を配置するやり方を好んでいます。
+とはいえ、これは実際上問題ではないので、個人的な信条を反映させてかまいませ
+ん。
 
 ``values_list(*fields)``
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. versionadded:: 1.0
 
-This is similar to ``values()`` except that instead of returning a list of
-dictionaries, it returns a list of tuples. Each tuple contains the value from
-the respective field passed into the ``values_list()`` call -- so the first
-item is the first field, etc. For example::
+``values()`` に似ていますが、辞書のリストを返すのではなく、タプルのリストを
+返します。各タプルには ``values_list()`` の引数に渡したフィールドの値が、引
+数の順番に一致して入っています。例えば::
 
     >>> Entry.objects.values_list('id', 'headline')
     [(1, u'First entry'), ...]
 
-If you only pass in a single field, you can also pass in the ``flat``
-parameter. If ``True``, this will mean the returned results are single values,
-rather than one-tuples. An example should make the difference clearer::
+フィールドを一つだけ指定する場合、 ``flat`` というパラメタも指定できます。
+このパラメタを ``True`` にすると、結果は 1 要素のタプルではなく一つの値とし
+て返されます。以下の例を見れば、違いがはっきりするでしょう::
 
     >>> Entry.objects.values_list('id').order_by('id')
     [(1,), (2,), (3,), ...]
@@ -339,33 +365,35 @@ rather than one-tuples. An example should make the difference clearer::
     >>> Entry.objects.values_list('id', flat=True).order_by('id')
     [1, 2, 3, ...]
 
-It is an error to pass in ``flat`` when there is more than one field.
+複数のフィールドを指定しているときに ``flat`` を渡すとエラーを送出します。
 
-If you don't pass any values to ``values_list()``, it will return all the
-fields in the model, in the order they were declared.
+``values_list()`` に引数を渡さなければ、モデルの全てのフィールドを定義順に
+並べたタプルのリストを返します。
 
 ``dates(field, kind, order='ASC')``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Returns a ``DateQuerySet`` -- a ``QuerySet`` that evaluates to a list of
-``datetime.datetime`` objects representing all available dates of a particular
-kind within the contents of the ``QuerySet``.
+``DateQuerySet`` を返します。 ``DateQuerySet`` は ``QuerySet`` のサブクラス
+で、評価結果としてクエリセット内のコンテンツの全日付を
+``datetime.datetime`` オブジェクトとして返します。
 
-``field`` should be the name of a ``DateField`` or ``DateTimeField`` of your
-model.
+``field`` はモデルの ``DateField`` または ``DateTimeField`` の名前です。
 
-``kind`` should be either ``"year"``, ``"month"`` or ``"day"``. Each
-``datetime.datetime`` object in the result list is "truncated" to the given
-``type``.
+``kind`` は ``"year"``, ``"month"`` または ``"day"`` です。
+結果リスト中の各 ``datetime.datetime`` オブジェクトは ``type`` の指定に従っ
+て切り詰められます。
 
-    * ``"year"`` returns a list of all distinct year values for the field.
-    * ``"month"`` returns a list of all distinct year/month values for the field.
-    * ``"day"`` returns a list of all distinct year/month/day values for the field.
+    * ``"year"`` を指定すると、フィールドの年部分の値の重複しないリストを返
+      します。
+    * ``"month"`` を指定すると、フィールドの年／月部分の値の重複しないリス
+      トを返します。
+    * ``"day"`` を指定すると、フィールドの年／月／日部分の値の重複しないリ
+      ストを返します。
 
-``order``, which defaults to ``'ASC'``, should be either ``'ASC'`` or
-``'DESC'``. This specifies how to order the results.
+``order`` には結果の並び順を指定します。デフォルト値は ``'ASC'`` で、
+``"ASC"`` または ``"DESC"`` にできます。
 
-Examples::
+例を示します::
 
     >>> Entry.objects.dates('pub_date', 'year')
     [datetime.datetime(2005, 1, 1)]
@@ -383,12 +411,12 @@ Examples::
 
 .. versionadded:: 1.0
 
-Returns an ``EmptyQuerySet`` -- a ``QuerySet`` that always evaluates to
-an empty list. This can be used in cases where you know that you should
-return an empty result set and your caller is expecting a ``QuerySet``
-object (instead of returning an empty list, for example.)
+``EmptyQuerySet`` を返します。 ``EmptyQuerySet`` とは、評価結果が常に空の
+リストであるクエリセットです。関数の戻り値などで空の照合結果を返したいけれ
+ども、呼び出し側が (空のリストなどではなく) クエリセットオブジェクトの戻り
+値を期待しているような場合に便利です。
 
-Examples::
+例::
 
     >>> Entry.objects.none()
     []
@@ -398,32 +426,32 @@ Examples::
 ``select_related()``
 ~~~~~~~~~~~~~~~~~~~~
 
-Returns a ``QuerySet`` that will automatically "follow" foreign-key
-relationships, selecting that additional related-object data when it executes
-its query. This is a performance booster which results in (sometimes much)
-larger queries but means later use of foreign-key relationships won't require
-database queries.
+自動的に外部キーのリレーションを「追跡」し、クエリを実行したときにリレーショ
+ン先のオブジェクトも加えて選択するような ``QuerySet`` を返します。
+これはパフォーマンスを向上させるための機構で、クエリは (ときに非常に) 巨大
+になりますが、以後の外部キーへのリレーションでデータベースクエリが必要なく
+なります。
 
-The following examples illustrate the difference between plain lookups and
-``select_related()`` lookups. Here's standard lookup::
+以下の例では、通常の照合と ``select_related()`` を使った照合との違いを比較
+しています。通常の照合では::
 
-    # Hits the database.
+    # データベースを操作します。
     e = Entry.objects.get(id=5)
 
-    # Hits the database again to get the related Blog object.
+    # リレーション先の Blog オブジェクトを取得するために再度データベースを
+    # 操作します。
     b = e.blog
 
-And here's ``select_related`` lookup::
+一方、 ``select_related()`` を使った照合では::
 
-    # Hits the database.
+    # データベースを操作します。
     e = Entry.objects.select_related().get(id=5)
 
-    # Doesn't hit the database, because e.blog has been prepopulated
-    # in the previous query.
+    # e.blog は上のクエリで取得済みなので、データベースを操作しません。
     b = e.blog
 
-``select_related()`` follows foreign keys as far as possible. If you have the
-following models::
+``select_related`` は可能な限り外部キーを追跡することに注意してください。以
+下のようなモデル::
 
     class City(models.Model):
         # ...
@@ -436,75 +464,76 @@ following models::
         # ...
         author = models.ForeignKey(Person)
 
-...then a call to ``Book.objects.select_related().get(id=4)`` will cache the
-related ``Person`` *and* the related ``City``::
+の場合、 ``Book.objects.select_related().get(id=4)`` 
+を実行すると、リレーションの張られた ``Person`` *に加えて*  ``City`` もキャッ
+シュします::
 
     b = Book.objects.select_related().get(id=4)
-    p = b.author         # Doesn't hit the database.
-    c = p.hometown       # Doesn't hit the database.
+    p = b.author         # データベースを操作しません。
+    c = p.hometown       # データベースを操作しません。
 
-    b = Book.objects.get(id=4) # No select_related() in this example.
-    p = b.author         # Hits the database.
-    c = p.hometown       # Hits the database.
+    b = Book.objects.get(id=4) # select_related() しない場合
+    p = b.author         # データベースを操作します。
+    c = p.hometown       # データベースを操作します。
 
-Note that ``select_related()`` does not follow foreign keys that have
-``null=True``.
+``select_related()`` は、デフォルトの状態では ``null=True`` であるような外
+部キーカラムを追跡しないので注意してください。
 
-Usually, using ``select_related()`` can vastly improve performance because your
-app can avoid many database calls. However, in situations with deeply nested
-sets of relationships ``select_related()`` can sometimes end up following "too
-many" relations, and can generate queries so large that they end up being slow.
+通常、 ``select_related()`` を使うと、データベースの呼び出し回数を減らせる
+ので、大幅にパフォーマンスを向上できます。しかし、リレーションが深くネスト
+しているような状況では、 ``select_related()`` が追跡するリレーションが「多
+すぎる」ために、巨大なクエリを生成してしまい、結果的にパフォーマンスの低下
+を招く場合があります。
 
-In these situations, you can use the ``depth`` argument to ``select_related()``
-to control how many "levels" of relations ``select_related()`` will actually
-follow::
+こうした状況に対応するため、 ``select_related()`` に ``depth`` 引数を指定す
+ると、以下の例のようにリレーションを何「レベル」まで追跡するかを制御できま
+す::
 
     b = Book.objects.select_related(depth=1).get(id=4)
-    p = b.author         # Doesn't hit the database.
-    c = p.hometown       # Requires a database call.
+    p = b.author         # 追跡済みのリレーション。データベースを操作しません。
+    c = p.hometown       # 未追跡のリレーション。データベースを呼び出します。
 
 .. versionadded:: 1.0
 
-The ``depth`` argument is new in Django version 1.0.
+``depth`` 引数は Django 1.0 で新たに追加された機能です。
 
 ``extra(select=None, where=None, params=None, tables=None, order_by=None, select_params=None)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Sometimes, the Django query syntax by itself can't easily express a complex
-``WHERE`` clause. For these edge cases, Django provides the ``extra()``
-``QuerySet`` modifier -- a hook for injecting specific clauses into the SQL
-generated by a ``QuerySet``.
+時として、 Django のクエリ表記法だけでは複雑な ``WHERE`` 節を容易に表現でき
+ない場合があります。こうした特異な場合のために、 Django では ``extra()``
+というクエリセット修飾子を提供しています。このメソッドは、クエリセットが
+生成する SQL 文中に特定の SQL 節を挿入するためのフックです。
 
-By definition, these extra lookups may not be portable to different database
-engines (because you're explicitly writing SQL code) and violate the DRY
-principle, so you should avoid them if possible.
+定義上、これらの拡張照合機能は (直接 SQL コードを書いているため) データベー
+スエンジン間の可搬性がありません。また、 DRY 則の侵犯でもあります。可能な限
+り使わないようにして下さい。
 
-Specify one or more of ``params``, ``select``, ``where`` or ``tables``. None
-of the arguments is required, but you should use at least one of them.
+``params``, ``select``, ``where``,  ``tables`` のいずれかを指定します。
+いずれの引数も必須ではありませんが、少なくとも一つは指定せねばなりません。
 
 ``select``
-    The ``select`` argument lets you put extra fields in the ``SELECT`` clause.
-    It should be a dictionary mapping attribute names to SQL clauses to use to
-    calculate that attribute.
+    ``select`` キーワードを使うと、 ``SELECT`` 節に追加のフィールドを選択で
+    きます。この引数は、属性名とその属性値を計算するための SQL 節を対応づけ
+    た辞書にします。
 
-    Example::
+    例えば::
 
         Entry.objects.extra(select={'is_recent': "pub_date > '2006-01-01'"})
 
-    As a result, each ``Entry`` object will have an extra attribute,
-    ``is_recent``, a boolean representing whether the entry's ``pub_date`` is
-    greater than Jan. 1, 2006.
+    のようにすると、 ``Entry`` オブジェクトは、エントリの ``pub_date`` が
+    Jan. 1, 2006 より大きいかどうかを示すブール値の属性 ``is_recent`` を
+    持つようになります。
 
-    Django inserts the given SQL snippet directly into the ``SELECT``
-    statement, so the resulting SQL of the above example would be::
+    Django は指定された SQL を直接 ``SELECT`` 文に挿入するので、上の例の
+    SQL 文は以下のようになります::
 
         SELECT blog_entry.*, (pub_date > '2006-01-01')
         FROM blog_entry;
 
-
-    The next example is more advanced; it does a subquery to give each
-    resulting ``Blog`` object an ``entry_count`` attribute, an integer count
-    of associated ``Entry`` objects::
+    次の例はもっと高度です。この例では、 ``Blog`` オブジェクトに関連づけら
+    れている ``Entry`` オブジェクトの個数を表す整数を、 ``Blog`` オブジェク
+    トの ``entry_count`` 属性に持たせるためにサブクエリを実行しています::
 
         Blog.objects.extra(
             select={
@@ -512,34 +541,36 @@ of the arguments is required, but you should use at least one of them.
             },
         )
 
-    (In this particular case, we're exploiting the fact that the query will
-    already contain the ``blog_blog`` table in its ``FROM`` clause.)
+    (上の場合では、クエリの ``FROM`` 節に ``blog_blog`` が入るという事実を
+    利用しています。)
 
-    The resulting SQL of the above example would be::
+    上の例の場合、 SQL は以下のようになります::
 
         SELECT blog_blog.*, (SELECT COUNT(*) FROM blog_entry WHERE blog_entry.blog_id = blog_blog.id)
         FROM blog_blog;
 
-    Note that the parenthesis required by most database engines around
-    subqueries are not required in Django's ``select`` clauses. Also note that
-    some database backends, such as some MySQL versions, don't support
-    subqueries.
+    ほとんどのデータベースエンジンでは、サブセレクションの周りに丸括弧が必
+    要ですが、Django の ``select`` 節では必要ないということに注意してくださ
+    い。また、 MySQL の一部のバージョンのように、データベースバックエンドに
+    よってはサブクエリをサポートしないので注意してください。
 
     .. versionadded:: 1.0
 
-    In some rare cases, you might wish to pass parameters to the SQL fragments
-    in ``extra(select=...)```. For this purpose, use the ``select_params``
-    parameter. Since ``select_params`` is a sequence and the ``select``
-    attribute is a dictionary, some care is required so that the parameters
-    are matched up correctly with the extra select pieces.  In this situation,
-    you should use a ``django.utils.datastructures.SortedDict`` for the
-    ``select`` value, not just a normal Python dictionary.
+    ごく稀に、 ``extra(select=...)`` に指定する SQL にパラメタを渡したい場
+    場合があります。そんなときは ``select_params`` パラメタを使ってください。
+    ただし、 ``select_params`` はシーケンス型で、 ``select`` は辞書なので、
+    ``select=`` の中でパラメタが正しく一致するように注意する必要があります。
+    ``select`` に通常の辞書型を渡す代わりに
+    ``django.utils.datastructures.SortedDict`` を指定すれば、こうした状況を
+    うまく扱えます。
 
-    This will work, for example::
+    例えば、以下のコードは期待通りに動作します::
 
         Blog.objects.extra(
             select=SortedDict([('a', '%s'), ('b', '%s')]),
             select_params=('one', 'two'))
+
+    .. TBD
 
     The only thing to be careful about when using select parameters in
     ``extra()`` is to avoid using the substring ``"%%s"`` (that's *two*
@@ -548,113 +579,116 @@ of the arguments is required, but you should use at least one of them.
     like this isn't detected. That will lead to incorrect results.
 
 ``where`` / ``tables``
-    You can define explicit SQL ``WHERE`` clauses -- perhaps to perform
-    non-explicit joins -- by using ``where``. You can manually add tables to
-    the SQL ``FROM`` clause by using ``tables``.
+    明示的に追加の ``WHERE`` 節を渡す必要がある場合 -- おそらく非明示的な結
+    合を行っている場合 -- には、 ``where`` キーワードを使って下さい。
+    ``tables`` を使えば、 SQL の ``FROM`` 節に手動でテーブル名を追加できま
+    す。
 
-    ``where`` and ``tables`` both take a list of strings. All ``where``
-    parameters are "AND"ed to any other search criteria.
+    ``where`` や ``tables`` は、ともに文字列のリストを引数にとります。
+    ``where`` パラメタの内容は全て、多の検索条件と "AND" で結合されます。
 
-    Example::
+    例えば::
 
         Entry.objects.extra(where=['id IN (3, 4, 5, 20)'])
 
-    ...translates (roughly) into the following SQL::
+    は、(大雑把にいって) 以下のような SQL 文に変換されます::
 
         SELECT * FROM blog_entry WHERE id IN (3, 4, 5, 20);
 
-    Be careful when using the ``tables`` parameter if you're specifying
-    tables that are already used in the query. When you add extra tables
-    via the ``tables`` parameter, Django assumes you want that table included
-    an extra time, if it is already included. That creates a problem,
-    since the table name will then be given an alias. If a table appears
-    multiple times in an SQL statement, the second and subsequent occurrences
-    must use aliases so the database can tell them apart. If you're
-    referring to the extra table you added in the extra ``where`` parameter
-    this is going to cause errors.
+    ``tables`` パラメタを使う場合、クエリ中にすでに登場しているテーブルを指
+    定していないか注意が必要です。 ``tables`` パラメタに追加のテーブル名を
+    指定して、それがすでにクエリ中に含まれているテーブルであった場合、
+    Django はユーザがそのテーブルをさらに加えようとしているものとみなします。
+    その場合、追加されたテーブルの名前にはエイリアスがつけられるので、問題
+    を引き起こします。 SQL 文の中に同じテーブルを複数回登場させる場合、デー
+    タベースがそれぞれのテーブルを区別できるように、2度目以降のテーブル名に
+    はエイリアスをつけねばなりません。そのため、 ``where`` パラメタにすでに
+    クエリ中に存在するテーブル名を渡すと、エラーを引き起こすのです。
 
-    Normally you'll only be adding extra tables that don't already appear in
-    the query. However, if the case outlined above does occur, there are a few
-    solutions. First, see if you can get by without including the extra table
-    and use the one already in the query. If that isn't possible, put your
-    ``extra()`` call at the front of the queryset construction so that your
-    table is the first use of that table. Finally, if all else fails, look at
-    the query produced and rewrite your ``where`` addition to use the alias
-    given to your extra table. The alias will be the same each time you
-    construct the queryset in the same way, so you can rely upon the alias
-    name to not change.
+    通常は、すでにクエリ中に存在するテーブル名を追加するような作業はしない
+    はずです。しかし、上で述べたようなことが起きてしまう場合には、いくつか
+    解決方法があります。まず、追加でテーブル名を指定しなくても正しくクエリ
+    を実行できるか試してください。それがだめなら、クエリセットを構築する際
+    に、 ``extra()`` を先に呼び出して、テーブル名を最初に登場させてみてく
+    ださい。最後に、どうしてもうまくいかないのなら、生成されるクエリを見て、
+    ``where`` を書き直し、テーブル名にエイリアスを与えてみてください。
+    エイリアスは同じ方法でクエリセットを生成している限り同じ名前を持つので、
+    エイリアス名は変化しないものとして扱えます。
 
 ``order_by``
-    If you need to order the resulting queryset using some of the new fields
-    or tables you have included via ``extra()`` use the ``order_by`` parameter
-    to ``extra()`` and pass in a sequence of strings. These strings should
-    either be model fields (as in the normal ``order_by()`` method on
-    querysets), of the form ``table_name.column_name`` or an alias for a column
-    that you specified in the ``select`` parameter to ``extra()``.
+    クエリセットの評価結果を、 ``extra()`` に入れたフィールドやテーブルに基
+    づいて並べ替えたい場合は、 ``extra()`` に ``order_by`` パラメタを指定し
+    てください。 ``order_by`` は文字列のシーケンスで指定します。各文字列は
+    (``order_by()`` メソッドで指定するような) モデルフィールド名か、
+    ``table_name.column_name`` 形式か、 ``extra()`` の ``select`` パラメ
+    タに指定したカラムのエイリアスのいずれかで指定します。
 
-    For example::
+    例を示しましょう::
 
         q = Entry.objects.extra(select={'is_recent': "pub_date > '2006-01-01'"})
         q = q.extra(order_by = ['-is_recent'])
 
-    This would sort all the items for which ``is_recent`` is true to the front
-    of the result set (``True`` sorts before ``False`` in a descending
-    ordering).
+    上の例は、 ``is_recent`` が真であるような結果を先に表示します (``True``
+    よりも ``False`` が先にくるのは降順のときだからです)。
 
-    This shows, by the way, that you can make multiple calls to
-    ``extra()`` and it will behave as you expect (adding new constraints each
-    time).
+    ちなみに、上の例でわかるように、 ``extra()`` は何度も呼び出しできます。
+    (その度に、制約条件が追加されてゆきます)。
 
 ``params``
-    The ``where`` parameter described above may use standard Python database
-    string placeholders -- ``'%s'`` to indicate parameters the database engine
-    should automatically quote. The ``params`` argument is a list of any extra
-    parameters to be substituted.
+    上で説明した ``where`` パラメタでは、標準の Python の文字列プレースホル
+    ダ ``'%s'`` を使って、データベースエンジンが自動的にパラメタをクオート
+    するよう指示できます。 ``params`` 引数には、プレースホルダで置き換えら
+    れるパラメタのリストを指定します。
 
-    Example::
+    例えば::
 
         Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
 
-    Always use ``params`` instead of embedding values directly into ``where``
-    because ``params`` will ensure values are quoted correctly according to
-    your particular backend. (For example, quotes will be escaped correctly.)
+    ``where`` の中に直接値を埋め込まず、常に ``params`` を使うようにしてく
+    ださい。というのも、 ``params`` を使えば、バックエンド固有の方法でパラ
+    メタの値を正しくクオートするからです。 (例えば引用符文字などを正しくエ
+    スケープします)
 
-    Bad::
+    悪い例::
 
         Entry.objects.extra(where=["headline='Lennon'"])
 
-    Good::
+    良い例::
 
         Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
 
-QuerySet methods that do not return QuerySets
----------------------------------------------
+.. _QuerySet methods that do not return QuerySets:
 
-The following ``QuerySet`` methods evaluate the ``QuerySet`` and return
-something *other than* a ``QuerySet``.
+QuerySet を返さないクエリセットメソッド
+---------------------------------------
 
-These methods do not use a cache (see :ref:`caching-and-querysets`). Rather,
-they query the database each time they're called.
+以下のクエリセットメソッドは、クエリセットを評価して、クエリセット *でない*
+値を返します。
+
+これらのメソッドはキャッシュを使わず (後述の :ref:`caching-and-querysets`
+を参照してください)、メソッド呼び出しごとにデータベースにクエリをかけます。
 
 .. _get-kwargs:
 
 ``get(**kwargs)``
 ~~~~~~~~~~~~~~~~~
 
-Returns the object matching the given lookup parameters, which should be in
-the format described in `Field lookups`_.
+照合パラメタに一致するオブジェクトを返します。照合パラメタは後述の 
+`フィールドの照合`_ で説明するフォーマットにします。
+
+.. TBD
 
 ``get()`` raises ``AssertionError`` if more than one object was found.
 
-``get()`` raises a ``DoesNotExist`` exception if an object wasn't found for the
-given parameters. The ``DoesNotExist`` exception is an attribute of the model
-class. Example::
+指定パラメタに対するオブジェクトが見つからなかった場合には ``get()`` は
+``DoesNotExist`` 例外を送出します。 ``DoesNotExist`` 例外はモデルクラスの属
+性の一つです。例えば::
 
     Entry.objects.get(id='foo') # raises Entry.DoesNotExist
 
-The ``DoesNotExist`` exception inherits from
-``django.core.exceptions.ObjectDoesNotExist``, so you can target multiple
-``DoesNotExist`` exceptions. Example::
+``DoesNotExist`` 例外は ``django.core.exceptions.ObjectDoesNotExist`` を継
+承しているので、複数の ``DoesNotExist`` 例外を ``except:`` のターゲットにで
+きます。例えば::
 
     from django.core.exceptions import ObjectDoesNotExist
     try:
@@ -666,16 +700,19 @@ The ``DoesNotExist`` exception inherits from
 ``create(**kwargs)``
 ~~~~~~~~~~~~~~~~~~~~
 
-A convenience method for creating an object and saving it all in one step.  Thus::
+ワンステップでオブジェクトを生成して保存するための便宜メソッドです。
+すなわち、以下の文::
 
     p = Person.objects.create(first_name="Bruce", last_name="Springsteen")
 
-and::
+と、以下の文::
 
     p = Person(first_name="Bruce", last_name="Springsteen")
     p.save(force_insert=True)
 
-are equivalent.
+は等価です。
+
+.. TBD
 
 The :ref:`force_insert <ref-models-force-insert>` parameter is documented
 elsewhere, but all it means is that a new object will always be created.
@@ -688,15 +725,15 @@ exception if you are using manual primary keys.
 ``get_or_create(**kwargs)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A convenience method for looking up an object with the given kwargs, creating
-one if necessary.
+kwargs に指定したオブジェクトを照合し、なければ生成するための便宜メソッドで
+す。
 
-Returns a tuple of ``(object, created)``, where ``object`` is the retrieved or
-created object and ``created`` is a boolean specifying whether a new object was
-created.
+``(object, created)`` の形式のタプルを返します。 ``object`` は取得または作
+成されたオブジェクトであり、 ``created`` はブール値で、オブジェクトが新たに
+生成されたかどうかを示します。
 
-This is meant as a shortcut to boilerplatish code and is mostly useful for
-data-import scripts. For example::
+このメソッドは、お決まりのコードを書く上でのショートカットとして定義されて
+おり、データを取り込むスクリプトを書くときに便利です。例えば::
 
     try:
         obj = Person.objects.get(first_name='John', last_name='Lennon')
@@ -704,18 +741,19 @@ data-import scripts. For example::
         obj = Person(first_name='John', last_name='Lennon', birthday=date(1940, 10, 9))
         obj.save()
 
-This pattern gets quite unwieldy as the number of fields in a model goes up.
-The above example can be rewritten using ``get_or_create()`` like so::
+このようなコードパターンでは、モデル中のフィールドが増えると手に負えなくな
+ります。 ``get_or_create()`` を使うと、上のコード例は以下のように書き直せま
+す::
 
     obj, created = Person.objects.get_or_create(first_name='John', last_name='Lennon',
                       defaults={'birthday': date(1940, 10, 9)})
 
-Any keyword arguments passed to ``get_or_create()`` -- *except* an optional one
-called ``defaults`` -- will be used in a ``get()`` call. If an object is found,
-``get_or_create()`` returns a tuple of that object and ``False``. If an object
-is *not* found, ``get_or_create()`` will instantiate and save a new object,
-returning a tuple of the new object and ``True``. The new object will be
-created roughly according to this algorithm::
+``get_or_create()`` に渡されたキーワード引数は、 (オプションの引数である
+``defaults`` を除いて) 全て ``get()`` の呼び出し時の引数として渡されます。
+オブジェクトが見つかった場合、 ``get_or_create()`` は見つかったオブジェクト
+と ``False`` を返します。オブジェクトが *見つからなかった* 場合、新たに生成
+されたオブジェクトと ``True`` を返します。新たなオブジェクトは以下のアルゴ
+リズムで作成されます::
 
     defaults = kwargs.pop('defaults', {})
     params = dict([(k, v) for k, v in kwargs.items() if '__' not in k])
@@ -723,66 +761,73 @@ created roughly according to this algorithm::
     obj = self.model(**params)
     obj.save()
 
-In English, that means start with any non-``'defaults'`` keyword argument that
-doesn't contain a double underscore (which would indicate a non-exact lookup).
-Then add the contents of ``defaults``, overriding any keys if necessary, and
-use the result as the keyword arguments to the model class. As hinted at
+.. TBD
+
+上のコードを日本語で表すなら、まず ``'defaults'`` でないキーワード引数のう
+ち、二重アンダースコアを含まないもの (二重アンダースコアはあいまい照合のキー
+ワードなので除外します) を使ってパラメタ ``params`` を作成し、必要に応じて
+デフォルト値 ``defaults`` で内容を更新して、その結果をモデルクラスを呼び出
+すときのキーワード引数に使います。 As hinted at
 above, this is a simplification of the algorithm that is used, but it contains
 all the pertinent details. The internal implementation has some more
 error-checking than this and handles some extra edge-conditions; if you're
 interested, read the code.
 
-If you have a field named ``defaults`` and want to use it as an exact lookup in
-``get_or_create()``, just use ``'defaults__exact'``, like so::
+``defaults`` という名前のフィールド名を持っていて、 ``get_or_create()`` の
+中で厳密照合に使いたければ、以下のように ``'defaults__exact'`` を使います::
 
     Foo.objects.get_or_create(defaults__exact='bar', defaults={'defaults': 'baz'})
 
+.. TBD
 
 The ``get_or_create()`` method has similar error behaviour to ``create()``
 when you are using manually specified primary keys. If an object needs to be
 created and the key already exists in the database, an ``IntegrityError`` will
 be raised.
 
-Finally, a word on using ``get_or_create()`` in Django views. As mentioned
-earlier, ``get_or_create()`` is mostly useful in scripts that need to parse
-data and create new records if existing ones aren't available. But if you need
-to use ``get_or_create()`` in a view, please make sure to use it only in
-``POST`` requests unless you have a good reason not to. ``GET`` requests
-shouldn't have any effect on data; use ``POST`` whenever a request to a page
-has a side effect on your data. For more, see `Safe methods`_ in the HTTP spec.
+最後に、 Django ビューの中で ``get_or_create()`` を使う場合についてひとこと
+注意しておきましょう。上で説明したように、主として ``get_or_create()`` が有
+用なのは、データを解析し、該当する既存のデータが存在しない場合に新たなレコー
+ドを生成するようなスクリプトを書く場合です。ビューで ``get_or_create()`` を
+使いたいのなら、特に理由のない限り ``POST`` リクエスト中で使うようにしましょ
+う。一般論として、 ``GET`` リクエストの処理中ではデータに影響を及ぼすべきで
+はありません。データに副作用をもたらすようなページのリクエストには常に
+``POST`` を使うようにしましょう。詳しくは、 HTTP 仕様における
+`安全なメソッド`_ を参照してください。
 
 .. _Safe methods: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
+.. _`安全なメソッド`: `Safe methods`_
 
 ``count()``
 ~~~~~~~~~~~
 
-Returns an integer representing the number of objects in the database matching
-the ``QuerySet``. ``count()`` never raises exceptions.
+クエリセットに一致するデータベース上のオブジェクトの個数を表す整数を返しま
+す。 ``count()`` は例外を送出しません。
 
-Example::
+例えば::
 
-    # Returns the total number of entries in the database.
+    # データベース中のエントリの総数を返します。
     Entry.objects.count()
 
-    # Returns the number of entries whose headline contains 'Lennon'
+    # ヘッドラインが 'Lennon' を含むエントリの総数を返します。
     Entry.objects.filter(headline__contains='Lennon').count()
 
-``count()`` performs a ``SELECT COUNT(*)`` behind the scenes, so you should
-always use ``count()`` rather than loading all of the record into Python
-objects and calling ``len()`` on the result.
+``count()`` は背後で ``SELECT COUNT(*)`` を実行するので、単にオブジェクトの
+個数を数えたい場合には、全てのレコードを Python オブジェクトとしてロードし
+てから ``len()`` を呼び出すのではなく、常に ``count()`` を使うようにしてく
+ださい。
 
-Depending on which database you're using (e.g. PostgreSQL vs. MySQL),
-``count()`` may return a long integer instead of a normal Python integer. This
-is an underlying implementation quirk that shouldn't pose any real-world
-problems.
+(PostgreSQL や MySQL といった) どのデータベースを使っているかによって、
+``count()`` の戻り値が Python の通常の整数型ではなく、長整数になることもあ
+ります。これは実装上の問題であり、現実的に問題になることはありません。
 
 ``in_bulk(id_list)``
 ~~~~~~~~~~~~~~~~~~~~
 
-Takes a list of primary-key values and returns a dictionary mapping each
-primary-key value to an instance of the object with the given ID.
+主キーの値のリストを引数にとり、各主キー値とオブジェクトを対応づけた辞書を
+返します。
 
-Example::
+例えば::
 
     >>> Blog.objects.in_bulk([1])
     {1: <Blog: Beatles Blog>}
@@ -791,44 +836,46 @@ Example::
     >>> Blog.objects.in_bulk([])
     {}
 
-If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
+``in_bulk()`` に空のリストを渡すと空の辞書を返します。
 
 ``iterator()``
 ~~~~~~~~~~~~~~
 
-Evaluates the ``QuerySet`` (by performing the query) and returns an
-`iterator`_ over the results. A ``QuerySet`` typically reads all of
-its results and instantiates all of the corresponding objects the
-first time you access it; ``iterator()`` will instead read results and
-instantiate objects in discrete chunks, yielding them one at a
-time. For a ``QuerySet`` which returns a large number of objects, this
-often results in better performance and a significant reduction in
-memory use.
+``QuerySet`` を評価し (クエリを実行し) て、その結果の入った `イテレータ`_
+を返します。 ``QuerySet`` は通常、最初にアクセスした時点で、全ての検索結果
+を読み込んで、対応するオブジェクトのインスタンスを生成してしまいます。
+一方、 ``iterator()`` は、離散的なチャンク単位で検索結果を読み出し、オブジェ
+クトをインスタンス化して、一度に一つづつ yield します。 ``QuerySet`` は膨大
+な数のオブジェクトを返す場合があるので、その場合には ``iterator()`` を使う
+ことでパフォーマンスを改善し、メモリの使用量を劇的に減らせます。
 
-Note that using ``iterator()`` on a ``QuerySet`` which has already
-been evaluated will force it to evaluate again, repeating the query.
+すでに値にアクセス済みの ``QuerySet`` に対して ``iterator()`` を呼び出すと、
+値の評価が再度行われ、クエリが繰り返し発行されるので注意してください。
 
 .. _iterator: http://www.python.org/dev/peps/pep-0234/
+.. _`イテレータ`: iterator_
 
 ``latest(field_name=None)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Returns the latest object in the table, by date, using the ``field_name``
-provided as the date field.
+日付フィールドである ``field_name`` の値に応じて、テーブル中の最新のオブジェ
+クトを返します。
 
-This example returns the latest ``Entry`` in the table, according to the
-``pub_date`` field::
+以下の例では、 ``pub_date`` フィールドに応じて、テーブル中の最新の
+``Entry`` を返します::
 
     Entry.objects.latest('pub_date')
 
-If your model's ``Meta`` specifies ``get_latest_by``, you can leave off the
-``field_name`` argument to ``latest()``. Django will use the field specified in
-``get_latest_by`` by default.
+モデルの ``Meta`` で  ``get_latest_by`` を指定している場合、 ``latest()``
+の ``field_name`` 引数は省略できます。 Django は ``get_latest_by`` に指定し
+たフィールドをデフォルト値にします。
 
-Like ``get()``, ``latest()`` raises ``DoesNotExist`` if an object doesn't
-exist with the given parameters.
+``get()`` と同様、 ``latest()`` は指定パラメタに一致するオブジェクトがない
+場合に ``DoesNotExist`` を送出します。
 
-Note ``latest()`` exists purely for convenience and readability.
+``latest()`` は純粋に利便性と可読性のためだけに存在しています。
+
+.. TBD
 
 .. _field-lookups:
 
@@ -844,24 +891,27 @@ For an introduction, see :ref:`field-lookups-intro`.
 exact
 ~~~~~
 
-Exact match. If the value provided for comparison is ``None``, it will
-be interpreted as an SQL ``NULL`` (See isnull_ for more details).
+厳密な一致です、比較対象の値を ``None`` にすると、SQL における ``NULL`` と
+の比較として扱われます (詳しくは isnull_ を参照してください)。
 
-Examples::
+使い方の例を示します::
+
 
     Entry.objects.get(id__exact=14)
     Entry.objects.get(id__exact=None)
 
-SQL equivalents::
+これは、以下の SQL と等価です::
 
     SELECT ... WHERE id = 14;
     SELECT ... WHERE id IS NULL;
 
 .. versionchanged:: 1.0
-   The semantics of ``id__exact=None`` have
-   changed in the development version. Previously, it was (intentionally)
-   converted to ``WHERE id = NULL`` at the SQL level, which would never match
-   anything. It has now been changed to behave the same as ``id__isnull=True``.
+   バージョン 1.0 から、 ``id__exact=None`` のセマンティクスが変更されまし
+   た。以前は SQL レベルで (意図的に) ``WHERE id = NULL`` に置き換えられて
+   いましたが、この SQL はいかなるレコードにもマッチしません。バージョン
+   1.0 では、 ``id__isnull=True`` と同じ挙動を示すように変更されています。
+
+.. TBD
 
 .. admonition:: MySQL comparisons
 
@@ -876,71 +926,76 @@ SQL equivalents::
 iexact
 ~~~~~~
 
-Case-insensitive exact match.
+大小文字の区別をしない一致です。
 
-Example::
+使い方の例を示します::
+
 
     Blog.objects.get(name__iexact='beatles blog')
 
-SQL equivalent::
+これは、以下の SQL と等価です::
 
     SELECT ... WHERE name ILIKE 'beatles blog';
 
-Note this will match ``'Beatles Blog'``, ``'beatles blog'``,
-``'BeAtLes BLoG'``, etc.
+この例は、 ``'Beatles Blog'``, ``'beatles blog'``, ``'BeAtLes BLoG'``
+などにマッチします。
 
 contains
 ~~~~~~~~
 
-Case-sensitive containment test.
+大小文字を区別する包含テストです。
 
-Example::
+使い方の例を示します::
+
 
     Entry.objects.get(headline__contains='Lennon')
 
-SQL equivalent::
+これは、以下の SQL と等価です::
 
     SELECT ... WHERE headline LIKE '%Lennon%';
 
-Note this will match the headline ``'Today Lennon honored'`` but not
-``'today lennon honored'``.
+この例では、 ``'Today Lennon honored'`` というヘッドラインには一致しますが、
+``'today lennon honored'`` には一致しません。
 
-SQLite doesn't support case-sensitive ``LIKE`` statements; ``contains`` acts
-like ``icontains`` for SQLite.
+SQLite は大小文字を区別する ``LIKE`` をサポートしないので、 ``contains`` は
+``icontains`` と同じになります。
 
 icontains
 ~~~~~~~~~
 
-Case-insensitive containment test.
+大小文字を区別しない包含テストです。
 
-Example::
+使い方の例を示します::
+
 
     Entry.objects.get(headline__icontains='Lennon')
 
-SQL equivalent::
+これは、以下の SQL と等価です::
 
     SELECT ... WHERE headline ILIKE '%Lennon%';
 
 in
-~~
+~~~
 
-In a given list.
+指定のリストに入っているものに一致します。
 
-Example::
+使い方の例を示します::
 
     Entry.objects.filter(id__in=[1, 3, 4])
 
-SQL equivalent::
+これは、以下の SQL と等価です::
 
     SELECT ... WHERE id IN (1, 3, 4);
 
-You can also use a queryset to dynamically evaluate the list of values
-instead of providing a list of literal values. The queryset must be
-reduced to a list of individual values using the ``values()`` method,
-and then converted into a query using the ``query`` attribute::
+リテラル値のリストを渡す代わりに、クエリセットを使って動的なリストとして評
+価してもかまいません。クエリセットは ``values()`` メソッドを使って個々のオ
+ブジェクト値からなるリストに変換できねばならず、 ``query`` 属性を使ってクエ
+リセットに変換してから渡さねばなりません::
 
     q = Blog.objects.filter(name__contains='Cheddar').values('pk').query
     e = Entry.objects.filter(blog__in=q)
+
+.. TBD
 
 .. warning::
 
@@ -948,174 +1003,179 @@ and then converted into a query using the ``query`` attribute::
     It's fine to use it like above, but its API may change between Django
     versions.
 
-This queryset will be evaluated as subselect statement::
+上のクエリセットを評価すると、以下の SQL 文と同様の結果を得ます::
 
     SELECT ... WHERE blog.id IN (SELECT id FROM ... WHERE NAME LIKE '%Cheddar%')
 
 gt
-~~
+~~~
 
-Greater than.
+より大きい値に一致します。
 
-Example::
+使い方の例を示します::
+
 
     Entry.objects.filter(id__gt=4)
 
-SQL equivalent::
+これは、以下の SQL と等価です::
 
     SELECT ... WHERE id > 4;
 
 gte
 ~~~
 
-Greater than or equal to.
+等しいか、より大きい値に一致します。
 
 lt
-~~
+~~~
 
-Less than.
+より少ない値に一致します。
 
 lte
 ~~~
 
-Less than or equal to.
+等しいか、より少ない値に一致します。
 
 startswith
 ~~~~~~~~~~
 
-Case-sensitive starts-with.
+大小文字を区別する starts-with です。
 
-Example::
+使い方の例を示します::
 
     Entry.objects.filter(headline__startswith='Will')
 
-SQL equivalent::
+これは、以下の SQL と等価です::
 
     SELECT ... WHERE headline LIKE 'Will%';
 
-SQLite doesn't support case-sensitive ``LIKE`` statements; ``startswith`` acts
-like ``istartswith`` for SQLite.
+SQLite は大小文字を区別する ``LIKE`` をサポートしないので、 ``startswith``
+は ``istartswith`` と同じになります。
 
 istartswith
 ~~~~~~~~~~~
 
-Case-insensitive starts-with.
+大小文字を区別しない starts-with です。
 
-Example::
+使い方の例を示します::
 
     Entry.objects.filter(headline__istartswith='will')
 
-SQL equivalent::
+これは、以下の SQL と等価です::
 
     SELECT ... WHERE headline ILIKE 'Will%';
 
 endswith
 ~~~~~~~~
 
-Case-sensitive ends-with.
+大小文字を区別する ends-with です。
 
-Example::
+使い方の例を示します::
+
 
     Entry.objects.filter(headline__endswith='cats')
 
-SQL equivalent::
+これは、以下の SQL と等価です::
 
     SELECT ... WHERE headline LIKE '%cats';
 
-SQLite doesn't support case-sensitive ``LIKE`` statements; ``endswith`` acts
-like ``iendswith`` for SQLite.
+SQLite は大小文字を区別する ``LIKE`` をサポートしないので、 ``endswith``
+は ``iendswith`` と同じです。
 
 iendswith
 ~~~~~~~~~
 
-Case-insensitive ends-with.
+大小文字を区別しない ends-with です。
 
-Example::
+使い方の例を示します::
+
 
     Entry.objects.filter(headline__iendswith='will')
 
-SQL equivalent::
+これは、以下の SQL と等価です::
 
     SELECT ... WHERE headline ILIKE '%will'
 
 range
 ~~~~~
 
-Range test (inclusive).
+範囲テスト (閉包テスト) です。
 
-Example::
+使い方の例を示します::
 
     start_date = datetime.date(2005, 1, 1)
     end_date = datetime.date(2005, 3, 31)
     Entry.objects.filter(pub_date__range=(start_date, end_date))
 
-SQL equivalent::
+これは、以下の SQL と等価です::
 
     SELECT ... WHERE pub_date BETWEEN '2005-01-01' and '2005-03-31';
 
-You can use ``range`` anywhere you can use ``BETWEEN`` in SQL -- for dates,
-numbers and even characters.
+``range`` は日付、数値、文字など、SQL で ``BETWEEN`` を使える場所ならどこで
+も使えます。
 
 year
 ~~~~
 
-For date/datetime fields, exact year match. Takes a four-digit year.
+date/datetime フィールドに対する、 year の厳密一致です。
 
-Example::
+使い方の例を示します::
 
     Entry.objects.filter(pub_date__year=2005)
 
-SQL equivalent::
+これは、以下の SQL と等価です::
 
     SELECT ... WHERE EXTRACT('year' FROM pub_date) = '2005';
 
-(The exact SQL syntax varies for each database engine.)
+(厳密な SQL シンタクスはデータベースエンジンによって違います。)
 
 month
 ~~~~~
 
-For date/datetime fields, exact month match. Takes an integer 1 (January)
-through 12 (December).
+date/datetime フィールドに対する、 month の厳密一致です。 1 (1月)
+から 12 (12 月) までの整数を引数にとります。
 
-Example::
+使い方の例を示します::
 
     Entry.objects.filter(pub_date__month=12)
 
-SQL equivalent::
+これは、以下の SQL と等価です::
 
     SELECT ... WHERE EXTRACT('month' FROM pub_date) = '12';
 
-(The exact SQL syntax varies for each database engine.)
+(厳密な SQL シンタクスはデータベースエンジンによって違います。)
 
 day
 ~~~
 
-For date/datetime fields, exact day match.
+date/datetime フィールドに対する day の厳密一致です。
 
-Example::
+使い方の例を示します::
 
     Entry.objects.filter(pub_date__day=3)
 
-SQL equivalent::
+これは、以下の SQL と等価です::
 
     SELECT ... WHERE EXTRACT('day' FROM pub_date) = '3';
 
 (The exact SQL syntax varies for each database engine.)
 
-Note this will match any record with a pub_date on the third day of the month,
-such as January 3, July 3, etc.
+(厳密な SQL シンタクスはデータベースエンジンによって違います。)
+
+このクエリ文は、「1 月 3 日」や「7 月 3 日」のように、毎月 3 日にマッチし
+ます。
 
 isnull
 ~~~~~~
 
-Takes either ``True`` or ``False``, which correspond to SQL queries of
-``IS NULL`` and ``IS NOT NULL``, respectively.
+``True`` または ``False`` を引数にとり、それぞれが ``IS NULL`` および
+``IS NOT NULL`` に対応しています。
 
-Example::
+使い方の例を示します::
 
     Entry.objects.filter(pub_date__isnull=True)
 
-SQL equivalent::
+これは、以下の SQL と等価です::
 
     SELECT ... WHERE pub_date IS NULL;
 
@@ -1130,28 +1190,28 @@ SQL equivalent::
 search
 ~~~~~~
 
-A boolean full-text search, taking advantage of full-text indexing. This is
-like ``contains`` but is significantly faster due to full-text indexing.
+全文インデクスを活用した全文検索で、ブール値を返します。このメソッドは
+``contains`` に似ていますが、全文インデクスを使うためはるかに高速です。
 
-Note this is only available in MySQL and requires direct manipulation of the
-database to add the full-text index.
+この機能は MySQL でだけ利用可能です。また、全文インデクスを追加するにはデー
+タベースを直接操作する必要があります。
 
 regex
 ~~~~~
 
 .. versionadded:: 1.0
 
-Case-sensitive regular expression match.
+正規表現による大小文字を区別した検索を行います。
 
-The regular expression syntax is that of the database backend in use. In the
-case of SQLite, which doesn't natively support regular-expression lookups, the
-syntax is that of Python's ``re`` module.
+正規表現の構文は各データベースバックエンドで使われているものと同じです。
+正規表現による照合をサポートしない ``sqlite`` バックエンドの場合に、Python
+の ``re`` モジュールと同じ構文を使います。
 
-Example::
+使い方の例を示します::
 
     Entry.objects.get(title__regex=r'^(An?|The) +')
 
-SQL equivalents::
+これは、以下の SQL と等価です::
 
     SELECT ... WHERE title REGEXP BINARY '^(An?|The) +'; -- MySQL
 
@@ -1161,21 +1221,21 @@ SQL equivalents::
 
     SELECT ... WHERE title REGEXP '^(An?|The) +'; -- SQLite
 
-Using raw strings (e.g., ``r'foo'`` instead of ``'foo'``) for passing in the
-regular expression syntax is recommended.
+正規表現を指定する場合には raw 文字列を使う (``'foo'`` でなく ``r'foo'`` を
+使う)よう勧めます。
 
 iregex
 ~~~~~~
 
 .. versionadded:: 1.0
 
-Case-insensitive regular expression match.
+正規表現による大小文字を区別しない検索を行います。
 
-Example::
+使い方の例を示します::
 
     Entry.objects.get(title__iregex=r'^(an?|the) +')
 
-SQL equivalents::
+これは、以下の SQL と等価です::
 
     SELECT ... WHERE title REGEXP '^(an?|the) +'; -- MySQL
 

@@ -1,91 +1,106 @@
 .. _ref-templates-api:
+.. _The Django template language For Python programmers:
 
-====================================================
-The Django template language: For Python programmers
-====================================================
+=======================================================
+Python プログラマのための Django テンプレート言語ガイド
+=======================================================
 
-This document explains the Django template system from a technical
-perspective -- how it works and how to extend it. If you're just looking for
-reference on the language syntax, see :ref:`topics-templates`.
+:revision-up-to: 8961 (1.0)
 
-If you're looking to use the Django template system as part of another
-application -- i.e., without the rest of the framework -- make sure to read
-the `configuration`_ section later in this document.
+このドキュメントでは、 Django のテンプレートシステムを技術的な側面、すなわ
+ちどのように動作し、どうやって拡張するかという観点から解説します。テンプレー
+ト言語の構文リファレンスを探しているのなら、 :ref:`topics-templates` を参照
+してください。
+
+Django テンプレートシステムを他のアプリケーションの部品として使いたい場合、
+すなわち Django フレームワークの他の部分は必要ない場合、このドキュメントの
+後の方にある `設定`_ の節に必ず目を通して下さい。
 
 .. _configuration: `configuring the template system in standalone mode`_
+.. _`設定`: configuration_
 
-Basics
-======
+.. _Basics:
 
-A **template** is a text document, or a normal Python string, that is marked-up
-using the Django template language. A template can contain **block tags** or
-**variables**.
+基礎
+====
 
-A **block tag** is a symbol within a template that does something.
+**テンプレート (template)** とは、 Django テンプレート言語を使ってマークアッ
+プしたテキストドキュメントや Python 文字列です。テンプレートには
+**ブロックタグ (block tag)** や **変数 (variable)** を入れられます。
 
-This definition is deliberately vague. For example, a block tag can output
-content, serve as a control structure (an "if" statement or "for" loop), grab
-content from a database or enable access to other template tags.
+**ブロックタグ** はテンプレート中で何らかの処理を行う部分を表すシンボルです。
 
-Block tags are surrounded by ``"{%"`` and ``"%}"``.
+とはいえ、この定義はいささか曖昧ですね。例えば、ブロックタグを使うと、何ら
+かのコンテンツを出力したり、制御構造 ("if" 文や "for" ループ) を記述したり、
+データベースからコンテンツを取り出したり、他のテンプレートタグにアクセスし
+たりします。
 
-Example template with block tags::
+ブロックタグは ``"{%"`` と ``"%}"`` で囲みます。
+
+ブロックタグを使ったテンプレートの例を示します::
 
     {% if is_logged_in %}Thanks for logging in!{% else %}Please log in.{% endif %}
 
-A **variable** is a symbol within a template that outputs a value.
+**変数** はテンプレート中で何らかの値を出力する部分を表すシンボルです。
 
-Variable tags are surrounded by ``"{{"`` and ``"}}"``.
+変数は ``"{{"`` と ``"}}"`` で囲みます。
 
-Example template with variables::
+変数を使ったテンプレートの例を示します。::
 
     My first name is {{ first_name }}. My last name is {{ last_name }}.
 
-A **context** is a "variable name" -> "variable value" mapping that is passed
-to a template.
+**コンテキスト (context)** はテンプレートに渡される「変数名」から「変数の値」
+へのマッピングです。
 
-A template **renders** a context by replacing the variable "holes" with values
-from the context and executing all block tags.
+テンプレートの **レンダリング (rendering)** では、コンテキストから値を取り
+出して変数という「穴」に埋め、全てのブロックタグを実行します。
 
-Using the template system
-=========================
+.. _Using the template system:
 
-Using the template system in Python is a two-step process:
+テンプレートシステムの利用
+==========================
 
-    * First, you compile the raw template code into a ``Template`` object.
-    * Then, you call the ``render()`` method of the ``Template`` object with a
-      given context.
+Python でテンプレートを使うには、以下の 2 段階のプロセスを踏みます:
 
-Compiling a string
+    * 生のテンプレートをコンパイルして ``Template`` オブジェクトを生成しま
+      す。
+    * コンテキストを指定して、 ``Template`` オブジェクトの ``render()`` メ
+      ソッドを呼び出します。 
+
+.. _Compiling a string:
+
+文字列のコンパイル
 ------------------
 
-The easiest way to create a ``Template`` object is by instantiating it
-directly. The class lives at ``django.template.Template``. The constructor
-takes one argument -- the raw template code::
+``Template`` オブジェクトを作成するには、直接インスタンスを生成する方法が最
+も簡単です。 ``Template`` クラスは ``django.template.Template`` にあります。
+コンストラクタは引数に生のテンプレートコードを取ります::
 
     >>> from django.template import Template
     >>> t = Template("My name is {{ my_name }}.")
     >>> print t
     <django.template.Template instance>
 
-.. admonition:: Behind the scenes
+.. admonition:: 舞台裏
 
-    The system only parses your raw template code once -- when you create the
-    ``Template`` object. From then on, it's stored internally as a "node"
-    structure for performance.
+    このシステムは ``Template`` オブジェクトを生成するときに生のテンプレー
+    トコードを一度しか解析しません。コンパイル後のテンプレートはパフォーマ
+    ンス上の目的から "node" データ構造に保存されます。
 
-    Even the parsing itself is quite fast. Most of the parsing happens via a
-    single call to a single, short, regular expression.
+    テンプレートコードの解析自体もきわめて高速です。解析のほとんどは短い正
+    規表現を一つ呼び出すだけで終わります。
 
-Rendering a context
--------------------
+.. _Rendering a context:
 
-Once you have a compiled ``Template`` object, you can render a context -- or
-multiple contexts -- with it. The ``Context`` class lives at
-``django.template.Context``, and the constructor takes one (optional)
-argument: a dictionary mapping variable names to variable values. Call the
-``Template`` object's ``render()`` method with the context to "fill" the
-template::
+コンテキストのレンダリング
+--------------------------
+
+コンパイル済みの ``Template`` オブジェクトを作成したら、オブジェクトを使っ
+てコンテキストをレンダリングできるようになります。 ``Context`` クラスは
+``django.template.Context`` にあります。コンテキストクラスのコンストラクタ
+は単一の (省略可能な) 引数として、変数名を変数の値に対応づける辞書をとりま
+す。コンテキストの値でテンプレートを「埋める」には、 ``Template``  オブジェ
+クトの ``render()`` メソッドを使います::
 
     >>> from django.template import Context, Template
     >>> t = Template("My name is {{ my_name }}.")
@@ -98,22 +113,22 @@ template::
     >>> t.render(c)
     "My name is Dolores."
 
-Variable names must consist of any letter (A-Z), any digit (0-9), an underscore
-or a dot.
+変数名には、任意の文字 (A-Z)、数字 (0-9)、アンダースコアまたはドットしか
+使えません。
 
-Dots have a special meaning in template rendering. A dot in a variable name
-signifies **lookup**. Specifically, when the template system encounters a dot
-in a variable name, it tries the following lookups, in this order:
+ドットはテンプレートレンダリングにおいて特殊な意味を持ちます。変数名中の
+ドットは、 **値の照合 (lookup)** を意味します。もっと詳しく言えば、テンプレー
+トシステムが変数名中にドットを見つけた場合、以下の順で値の照合を試みます:
 
-    * Dictionary lookup. Example: ``foo["bar"]``
-    * Attribute lookup. Example: ``foo.bar``
-    * Method call. Example: ``foo.bar()``
-    * List-index lookup. Example: ``foo[bar]``
+    * ``foo["bar"]`` のような辞書としての照合。
+    * ``foo.bar`` のような属性値の照合。
+    * ``foo.bar()`` のようなメソッド呼び出し。
+    * ``foo[bar]`` のようなリストのインデクス指定。
 
-The template system uses the first lookup type that works. It's short-circuit
-logic.
+テンプレートシステムは最初に成功した照合結果を使います。いわば短絡的ロジッ
+ク (short-circuit logic) です。
 
-Here are a few examples::
+いくつか例を示します::
 
     >>> from django.template import Context, Template
     >>> t = Template("My name is {{ person.first_name }}.")
@@ -140,14 +155,14 @@ Here are a few examples::
     >>> t.render(c)
     "The first stooge in the list is Larry."
 
-Method lookups are slightly more complex than the other lookup types. Here are
-some things to keep in mind:
+メソッドの照合は他の照合よりもちょっと複雑です。いくつか心に留めておくべき
+ことを挙げておきます:
 
-    * If, during the method lookup, a method raises an exception, the exception
-      will be propagated, unless the exception has an attribute
-      ``silent_variable_failure`` whose value is ``True``. If the exception
-      *does* have a ``silent_variable_failure`` attribute, the variable will
-      render as an empty string. Example::
+    * メソッドの照合中にメソッドが送出した例外に
+      ``silent_variable_failure`` という属性があり、かつ値が ``True`` に設
+      定されている場合を除き、例外はそのまま伝播します。例外が
+      ``silent_variable_failure`` という属性を持つ場合、変数は空文字列にレ
+      ンダリングされます。例えば::
 
         >>> t = Template("My name is {{ person.first_name }}.")
         >>> class PersonClass3:
@@ -168,78 +183,83 @@ some things to keep in mind:
         >>> t.render(Context({"person": p}))
         "My name is ."
 
-      Note that ``django.core.exceptions.ObjectDoesNotExist``, which is the
-      base class for all Django database API ``DoesNotExist`` exceptions, has
-      ``silent_variable_failure = True``. So if you're using Django templates
-      with Django model objects, any ``DoesNotExist`` exception will fail
-      silently.
+      全ての Django データベース API の ``DoesNotExist`` 例外の基底クラスで
+      ある ``django.core.exceptions.ObjectDoesNotExist`` では
+      ``silent_variable_failure = True`` になっているので注意してください。
+      つまり、 Django テンプレートと Django モデルオブジェクトを使っている
+      限り、 ``DoesNotExist`` 例外が出ても暗黙のうちに失敗するだけなのです。
 
-    * A method call will only work if the method has no required arguments.
-      Otherwise, the system will move to the next lookup type (list-index
-      lookup).
+    * メソッド呼び出しがうまくいくのは、メソッドに必須の引数が存在しない場
+      合だけです。必須の引数がある場合、メソッドは呼び出されず、次の照合タ
+      イプ (リストのインデクス指定による照合) に移ります。
 
-    * Obviously, some methods have side effects, and it'd be either foolish or
-      a security hole to allow the template system to access them.
+    * 言うまでもないことですが、メソッドによっては副作用があります。
+      副作用のあるメソッドをテンプレートからアクセスできるようにしておくと、
+      間抜けな結果になったりセキュリティホールを作ったりしてしまうことがある
+      ので注意して下さい。
+      
+      分かりやすい例に、 Django モデルオブジェクトの ``delete()`` メソッド
+      があります。テンプレートシステムでは、以下のような書き方を許すべきで
+      はありません::
 
-      A good example is the ``delete()`` method on each Django model object.
-      The template system shouldn't be allowed to do something like this::
+        大事なデータを消しちゃいますよ。 {{ data.delete }}
 
-        I will now delete this valuable data. {{ data.delete }}
-
-      To prevent this, set a function attribute ``alters_data`` on the method.
-      The template system won't execute a method if the method has
-      ``alters_data=True`` set. The dynamically-generated ``delete()`` and
-      ``save()`` methods on Django model objects get ``alters_data=True``
-      automatically. Example::
+      このような操作を防ぐには、メソッドに ``alters_data`` 関数属性を設定し
+      ます。テンプレートシステムは、 ``alters_data=True`` の設定されたメソッ
+      ドを実行しません。 Django モデルオブジェクトが動的に生成する
+      ``delete()`` および ``save()`` メソッドには ``alters_data=True`` が自
+      動的に設定されます。 ``alters_data=True`` の例を以下に示します::
 
         def sensitive_function(self):
             self.database_record.delete()
         sensitive_function.alters_data = True
 
 .. _invalid-template-variables:
+.. _How invalid variables are handled:
 
-How invalid variables are handled
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+無効な値の扱い
+~~~~~~~~~~~~~~
 
-Generally, if a variable doesn't exist, the template system inserts the
-value of the :setting:`TEMPLATE_STRING_IF_INVALID` setting, which is set to
-``''`` (the empty string) by default.
+基本的に、変数が存在しなければ、 テンプレートシステムは
+:setting:`TEMPLATE_STRING_IF_INVALID` の設定値を挿入します。この値のデフォルトは
+``''`` (空文字列) です。
 
-Filters that are applied to an invalid variable will only be applied if
-:setting:`TEMPLATE_STRING_IF_INVALID` is set to ``''`` (the empty string). If
-:setting:`TEMPLATE_STRING_IF_INVALID` is set to any other value, variable
-filters will be ignored.
+無効な値に対してフィルタが適用されるのは、
+:setting:`TEMPLATE_STRING_IF_INVALID` の値が ``''`` に設定されている場合だ
+けです。 :setting:`TEMPLATE_STRING_IF_INVALID` が ``''`` 以外の値になってい
+ると、フィルタは無視されます。
 
-This behavior is slightly different for the ``if``, ``for`` and ``regroup``
-template tags. If an invalid variable is provided to one of these template
-tags, the variable will be interpreted as ``None``. Filters are always
-applied to invalid variables within these template tags.
+ただし、 ``if``, ``for``, ``regroup`` といったテンプレートタグの中では、少
+し違った挙動になります。これらのテンプレートタグ中では、無効な値は ``None``
+であると解釈されます。また、これらのテンプレートタグ中のフィルタは、無効な
+値に対しも常に適用されます。
 
-If :setting:`TEMPLATE_STRING_IF_INVALID` contains a ``'%s'``, the format marker will
-be replaced with the name of the invalid variable.
+:setting:`TEMPLATE_STRING_IF_INVALID` にフォーマット指示文字の ``'%s'`` が
+入っている場合、 ``'%s'`` は不正な変数の変数名で置き換えられます。
 
-.. admonition:: For debug purposes only!
+.. admonition:: デバッグ専用です!
 
-    While :setting:`TEMPLATE_STRING_IF_INVALID` can be a useful debugging tool,
-    it is a bad idea to turn it on as a 'development default'.
+    :setting:`TEMPLATE_STRING_IF_INVALID` はデバッグには便利ですが、「開発
+    時のデフォルトの設定」としてオンにするのはよい考えではありません。
+    
+    Admin サイトのテンプレートをはじめとする多くのテンプレートは、実在し
+    ない値を呼び出しても何も出力しないという動作を前提に作られています。
+    ``''`` 以外の値を :setting:`TEMPLATE_STRING_IF_INVALID` に指定した場合、
+    こうしたテンプレートやサイトのレンダリングで問題が生じるかもしれません。
+    
+    一般に、 :setting:`TEMPLATE_STRING_IF_INVALID` を有効にするのは特定のテ
+    ンプレートに対する問題を解決したいときだけにして、デバッグが終わったら
+    すぐに無効にしておくべきです。
 
-    Many templates, including those in the Admin site, rely upon the
-    silence of the template system when a non-existent variable is
-    encountered. If you assign a value other than ``''`` to
-    :setting:`TEMPLATE_STRING_IF_INVALID`, you will experience rendering
-    problems with these templates and sites.
+.. _Playing with Context objects:
 
-    Generally, :setting:`TEMPLATE_STRING_IF_INVALID` should only be enabled
-    in order to debug a specific template problem, then cleared
-    once debugging is complete.
+コンテキストオブジェクトの操作
+------------------------------
 
-Playing with Context objects
-----------------------------
-
-Most of the time, you'll instantiate ``Context`` objects by passing in a
-fully-populated dictionary to ``Context()``. But you can add and delete items
-from a ``Context`` object once it's been instantiated, too, using standard
-dictionary syntax::
+皆さんはほとんどの場合、全ての値を入れた辞書を ``Context()`` に渡して
+``Context`` オブジェクトのインスタンスを生成していることでしょう。しかし、
+``Context`` オブジェクトはインスタンス化した後にも、通常の辞書と同じように
+値を追加したり削除したりできます::
 
     >>> c = Context({"foo": "bar"})
     >>> c['foo']
@@ -251,9 +271,9 @@ dictionary syntax::
     >>> c['newvariable']
     'hello'
 
-A ``Context`` object is a stack. That is, you can ``push()`` and ``pop()`` it.
-If you ``pop()`` too much, it'll raise
-``django.template.ContextPopException``::
+``Context`` オブジェクトは一種のスタックです。すなわち、 ``push()`` や
+``pop()`` 操作を行えます。 ``pop()`` しすぎると、
+``django.template.ContextPopException`` を送出します::
 
     >>> c = Context()
     >>> c['foo'] = 'first level'
@@ -272,44 +292,46 @@ If you ``pop()`` too much, it'll raise
     ...
     django.template.ContextPopException
 
-Using a ``Context`` as a stack comes in handy in some custom template tags, as
-you'll see below.
+``Context`` をスタック的に使うと、後述するカスタムテンプレートタグで便利な
+ことがあります。
 
 .. _subclassing-context-requestcontext:
+.. _`Subclassing Context: RequestContext`:
 
-Subclassing Context: RequestContext
------------------------------------
+コンテキストのサブクラス: RequestContext
+----------------------------------------
 
-Django comes with a special ``Context`` class,
-``django.template.RequestContext``, that acts slightly differently than the
-normal ``django.template.Context``. The first difference is that it takes an
-:class:`~django.http.HttpRequest` as its first argument. For example::
+Django には ``django.template.RequestContext`` という特別なコンテキストクラ
+スがあります。このクラスは通常の ``django.template.Context`` とは少し異なる
+部分があります。まず、 ``RequestContext`` は第一引数に
+:class:`~django.http.HttpRequest` をとります。例えば::
 
     c = RequestContext(request, {
         'foo': 'bar',
     }
 
-The second difference is that it automatically populates the context with a few
-variables, according to your :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting`.
+第二に、 ``RequestContext`` は :setting:`TEMPLATE_CONTEXT_PROCESSORS` 設定
+に従っていくつかの値を自動的にコンテキストに入れます。
 
-The :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting is a tuple of callables --
-called **context processors** -- that take a request object as their argument
-and return a dictionary of items to be merged into the context. By default,
-:setting:`TEMPLATE_CONTEXT_PROCESSORS` is set to::
+:setting:`TEMPLATE_CONTEXT_PROCESSORS` 設定は呼び出し可能オブジェクトのタプルになっ
+ています。個々の呼び出し可能オブジェクトは **コンテキストプロセッサ** と呼
+ばれ、リクエストオブジェクトを引数にとって。何らかの値を要素に持った辞書を
+返します。この辞書はコンテキストオブジェクトに統合されます。デフォルトでは、
+:setting:`TEMPLATE_CONTEXT_PROCESSORS` は以下のようになっています::
 
     ("django.core.context_processors.auth",
     "django.core.context_processors.debug",
     "django.core.context_processors.i18n",
     "django.core.context_processors.media")
 
-Each processor is applied in order. That means, if one processor adds a
-variable to the context and a second processor adds a variable with the same
-name, the second will override the first. The default processors are explained
-below.
+各プロセッサはタプルに列挙した順に適用されます。従って、あるプロセッサが
+ある変数をコンテキストに入れた後、別のプロセッサが同じ名前の変数を入れれば、
+後者が前者の内容を上書きします。デフォルトのプロセッサについては後で説明し
+ます。
 
-Also, you can give ``RequestContext`` a list of additional processors, using the
-optional, third positional argument, ``processors``. In this example, the
-``RequestContext`` instance gets a ``ip_address`` variable::
+``RequestContext`` にはオプションの第三引数 ``processors`` に追加のプロセッ
+サのリストを指定できます。下記の例では、 ``RequestContext`` に
+``ip_address`` 変数が入ります::
 
     def ip_address_processor(request):
         return {'ip_address': request.META['REMOTE_ADDR']}
@@ -322,12 +344,12 @@ optional, third positional argument, ``processors``. In this example, the
         return t.render(c)
 
 .. note::
-    If you're using Django's ``render_to_response()`` shortcut to populate a
-    template with the contents of a dictionary, your template will be passed a
-    ``Context`` instance by default (not a ``RequestContext``). To use a
-    ``RequestContext`` in your template rendering, pass an optional third
-    argument to ``render_to_response()``: a ``RequestContext``
-    instance. Your code might look like this::
+    Django の ``render_to_response()`` ショートカットを使っていて、辞書オブ
+    ジェクトを渡してコンテキストの変数を追加している場合、テンプレートはデ
+    フォルトで (``RequestContext`` ではなく) ``Context`` になります。テンプ
+    レートのレンダリングに ``RequestContext`` を使うには、
+    ``render_to_response()`` の 3 つめの引数に ``RequestContext`` インスタ
+    ンスを指定します。コードは以下のようになるでしょう::
 
         def some_view(request):
             # ...
@@ -335,278 +357,296 @@ optional, third positional argument, ``processors``. In this example, the
                                       my_data_dictionary,
                                       context_instance=RequestContext(request))
 
-Here's what each of the default processors does:
+各デフォルトプロセッサの動作を以下に示します:
 
 django.core.context_processors.auth
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain these three variables:
+このプロセッサが :setting:`TEMPLATE_CONTEXT_PROCESSORS` にある場合、以下の
+3 つの変数が ``RequestContext`` に入ります:
 
-    * ``user`` -- An ``auth.User`` instance representing the currently
-      logged-in user (or an ``AnonymousUser`` instance, if the client isn't
-      logged in).
+    * ``user`` -- 現在ログインしているユーザを表す ``auth.User`` インスタン
+      ス (クライアントがログインしていない場合には ``AnonymousUser`` インス
+      タンス) です。
 
-    * ``messages`` -- A list of messages (as strings) for the currently
-      logged-in user. Behind the scenes, this calls
-      ``request.user.get_and_delete_messages()`` for every request. That method
-      collects the user's messages and deletes them from the database.
+    * ``messages`` -- 現在ログインしているユーザ宛の (文字列の) メッセージ
+      のリストです。舞台裏では、この変数を参照するたびに
+      ``request.user.get_and_delete_messaages()`` を呼び出しています。
+      ``request.user.get_and_delete_messaages()`` は、ユーザ宛の全メッセー
+      ジを集めて返し、 ``Message`` オブジェクトを削除します。
 
-      Note that messages are set with ``user.message_set.create``.
+      メッセージは ``user.message_set.create`` で設定します。
 
-    * ``perms`` -- An instance of
-      ``django.core.context_processors.PermWrapper``, representing the
-      permissions that the currently logged-in user has.
+    * ``perms`` -- 現在ログインしているユーザが有しているパーミッションを表
+      す、 ``django.core.context_processors.PermWrapper`` のインスタンスで
+      す。
 
 django.core.context_processors.debug
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain these two variables -- but only if your
-:setting:`DEBUG` setting is set to ``True`` and the request's IP address
-(``request.META['REMOTE_ADDR']``) is in the :setting:`INTERNAL_IPS` setting:
+このプロセッサが :setting:`TEMPLATE_CONTEXT_PROCESSORS` にある場合、以下の
+2 つの変数が ``RequestContext`` に入ります。ただし、 ``DEBUG`` の設定が
+``True`` で、リクエストの IP アドレス (``request.META['REMOTE_ADDR']``) が
+:setting:`INTERNAL_IPS` 設定に入っている場合だけです:
 
-    * ``debug`` -- ``True``. You can use this in templates to test whether
-      you're in :setting:`DEBUG` mode.
-    * ``sql_queries`` -- A list of ``{'sql': ..., 'time': ...}`` dictionaries,
-      representing every SQL query that has happened so far during the request
-      and how long it took. The list is in order by query.
+    * ``debug`` -- ``True`` です。 :setting:`DEBUG` モードかどうかをテスト
+      するのに使えます。 
+    * ``sql_queries`` -- ``{'sql': ..., 'time': ...}`` 辞書のリストです。
+      このリストはリクエスト処理中に実行された SQL クエリと、それにかかった
+      時間を表しています。リストはクエリの実行順にならんでいます。
 
 django.core.context_processors.i18n
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain these two variables:
+このプロセッサが :setting:`TEMPLATE_CONTEXT_PROCESSORS` にある場合、以下の
+2 つの変数が ``RequestContext`` に入ります:
 
-    * ``LANGUAGES`` -- The value of the :setting:`LANGUAGES` setting.
-    * ``LANGUAGE_CODE`` -- ``request.LANGUAGE_CODE``, if it exists. Otherwise,
-      the value of the :setting:`LANGUAGE_CODE` setting`.
+    * ``LANGUAGES`` -- :setting:`LANGUAGES` 設定の値です。
+    * ``LANGUAGE_CODE`` -- ``request.LANGUAGE_CODE`` が存在する場合、その値
+      です。値がなければ :setting:`LANGUAGE_CODE` 設定の値になります。
 
-See :ref:`topics-i18n` for more.
+詳しくは :ref:`topics-i18n` を参照してください。
 
 django.core.context_processors.media
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. versionadded:: 1.0
 
-If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain a variable ``MEDIA_URL``, providing the
-value of the :setting:`MEDIA_URL` setting.
+:setting:`TEMPLATE_CONTEXT_PROCESSORS` にこのコンテキストプロセッサを入れる
+と、 ``RequestContext`` に ``MEDIA_URL`` というコンテキスト変数が入ります。
+``MEDIA_URL`` には :setting:`MEDIA_URL` 設定の値が入っています。
 
 django.core.context_processors.request
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain a variable ``request``, which is the current
-:class:`~django.http.HttpRequest`. Note that this processor is not enabled by default;
-you'll have to activate it.
+このプロセッサが :setting:`TEMPLATE_CONTEXT_PROCESSORS` にある場合、変数
+``request`` が ``RequestContext`` に入ります。この変数は現在の
+`HttpRequest オブジェクト`_ を表現します。このプロセッサはデフォルトでは有
+効でないので注意してください。利用したければ有効にせねばなりません。
 
-Writing your own context processors
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A context processor has a very simple interface: It's just a Python function
-that takes one argument, an ``HttpRequest`` object, and returns a dictionary
-that gets added to the template context. Each context processor *must* return
-a dictionary.
+.. _Writing your own context processors:
 
-Custom context processors can live anywhere in your code base. All Django cares
-about is that your custom context processors are pointed-to by your
-:setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
+コンテキストプロセッサを自作する
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Loading templates
------------------
+コンテキストプロセッサのインタフェースはとても簡単です。コンテキストプロセッ
+サは単なる Python の関数で、 ``HttpRequest`` オブジェクトを引数にとり、
+テンプレートコンテキストに追加できるような辞書を返します。コンテキストプロ
+セッサは、 **必ず** 辞書型を返さねばなりません。
 
-Generally, you'll store templates in files on your filesystem rather than using
-the low-level ``Template`` API yourself. Save templates in a directory
-specified as a **template directory**.
+自分のコードベースに自作のコンテキストプロセッサを入れてもかまいません。
+Django 側からは、自作のコンテキストプロセッサを
+:setting:`TEMPLATE_CONTEXT_PROCESSORS` 設定で指定するようにしてください。
 
-Django searches for template directories in a number of places, depending on
-your template-loader settings (see "Loader types" below), but the most basic
-way of specifying template directories is by using the :setting:`TEMPLATE_DIRS`
-setting.
+.. _Loading templates:
 
-The TEMPLATE_DIRS setting
-~~~~~~~~~~~~~~~~~~~~~~~~~
+テンプレートのロード
+--------------------
 
-Tell Django what your template directories are by using the
-:setting:`TEMPLATE_DIRS` setting in your settings file. This should be set to a
-list or tuple of strings that contain full paths to your template
-directory(ies). Example::
+一般的には、低水準の ``Template`` API を自分で使うことはほとんどなく、テン
+プレートはファイルの形でファイルシステム上に保存することになるでしょう。
+**テンプレートディレクトリ** に指定したディレクトリにテンプレートファイルを
+保存してください。
+
+Django はテンプレートローダの設定 (「Loader 型」を参照してください)
+に従って、いくつものテンプレートディレクトリを検索しますが、最も基本的なテ
+ンプレートディレクトリ指定方法は :setting:`TEMPLATE_DIRS` を使う方法です。
+
+.. _The TEMPLATE_DIRS setting:
+
+TEMPLATE_DIRS 設定
+~~~~~~~~~~~~~~~~~~
+
+設定ファイル中で、 :setting:`TEMPLATE_DIRS` 設定を使ってどのディレクトリに
+テンプレートが収められているかを指定してください。この値は文字列のリストか
+タプルで指定します。文字列にはテンプレートディレクトリへの完全なパスを指定
+せねばなりません。例えば::
 
     TEMPLATE_DIRS = (
         "/home/html/templates/lawrence.com",
         "/home/html/templates/default",
     )
 
-Your templates can go anywhere you want, as long as the directories and
-templates are readable by the Web server. They can have any extension you want,
-such as ``.html`` or ``.txt``, or they can have no extension at all.
+Web サーバがテンプレートディレクトリの中身を読みだせる限り、テンプレートは
+どこにでも置けます。拡張子はなんでもよく、 ``.html`` でも ``.txt`` でも
+かまいませんし、拡張子を付けなくてもかまいません。
 
-Note that these paths should use Unix-style forward slashes, even on Windows.
+Windows を使っている場合でも、パスは Unix 形式のスラッシュを使った表記法で
+指定せねばならないので注意して下さい。
 
 .. _ref-templates-api-the-python-api:
 
-The Python API
+Python API
 ~~~~~~~~~~~~~~
 
-Django has two ways to load templates from files:
+Django でファイルからテンプレートを読み出すには二通りの方法があります:
 
 ``django.template.loader.get_template(template_name)``
-    ``get_template`` returns the compiled template (a ``Template`` object) for
-    the template with the given name. If the template doesn't exist, it raises
-    ``django.template.TemplateDoesNotExist``.
+    ``get_template`` は、指定した名前のテンプレートに対応したコンパイル済み
+    のテンプレート (``Template`` オブジェクト) を返します。テンプレートが存
+    在しなければ ``django.template.TemplateDoesNotExist`` を送出します。
 
 ``django.template.loader.select_template(template_name_list)``
-    ``select_template`` is just like ``get_template``, except it takes a list
-    of template names. Of the list, it returns the first template that exists.
+    ``select_template`` は ``get_template`` と同じです。ただし、テンプレー
+    ト名のリストを引数にとります。リストの中で最初に見つかったテンプレート
+    を返します。
 
-For example, if you call ``get_template('story_detail.html')`` and have the
-above :setting:`TEMPLATE_DIRS` setting, here are the files Django will look for,
-in order:
+例えば ``get_template('story_detail.html')`` を呼び出した場合、前述のような
+:setting:`TEMPLATE_DIRS` の設定をしていれば、Django は以下のような順番でテ
+ンプレートファイルを探します:
 
     * ``/home/html/templates/lawrence.com/story_detail.html``
     * ``/home/html/templates/default/story_detail.html``
 
-If you call ``select_template(['story_253_detail.html', 'story_detail.html'])``,
-here's what Django will look for:
+``select_template(['story_253_detail.html', 'story_detail.html'])`` なら、
+以下の順で探します:
 
     * ``/home/html/templates/lawrence.com/story_253_detail.html``
     * ``/home/html/templates/default/story_253_detail.html``
     * ``/home/html/templates/lawrence.com/story_detail.html``
     * ``/home/html/templates/default/story_detail.html``
 
-When Django finds a template that exists, it stops looking.
+テンプレートが見つかった時点で Django は検索を停止します。
 
 .. admonition:: Tip
 
-    You can use ``select_template()`` for super-flexible "templatability." For
-    example, if you've written a news story and want some stories to have
-    custom templates, use something like
-    ``select_template(['story_%s_detail.html' % story.id, 'story_detail.html'])``.
-    That'll allow you to use a custom template for an individual story, with a
-    fallback template for stories that don't have custom templates.
+    ``select_template()`` を使うと、極めて柔軟な「テンプレート構成機能
+    (templatability)」を実現できます。例えば、あるニュース記事を書いていて、
+    記事によってはカスタムのテンプレートを使いたいとします。 
+    ``select_template(['story_%s_detail.html' % story.id, 'story_detail.html'])``
+    のようにすると、個々の記事にカスタムのテンプレートを使いながら、カスタ
+    ムのテンプレートがない記事に対してはフォールバックのテンプレートを用意
+    できるというわけです。
 
-Using subdirectories
-~~~~~~~~~~~~~~~~~~~~
+.. _Using subdirectories:
 
-It's possible -- and preferable -- to organize templates in subdirectories of
-the template directory. The convention is to make a subdirectory for each
-Django app, with subdirectories within those subdirectories as needed.
+サブディレクトリの使用
+~~~~~~~~~~~~~~~~~~~~~~~
 
-Do this for your own sanity. Storing all templates in the root level of a
-single directory gets messy.
+テンプレートディレクトリを複数のサブディレクトリで構成するのは可能ですし、
+お勧めでもあります。慣習的には各 Django アプリケーション毎にサブディレク
+トリを作成します。必要に応じてさらにサブディレクトリを作成します。
 
-To load a template that's within a subdirectory, just use a slash, like so::
+精神衛生のためにもぜひテンプレートを階層化しましょう。一つのディレクトリの
+ルートレベルに全てのテンプレートを保存するのは、だらしないことこの上ありま
+せん。
+
+サブディレクトリ下にあるテンプレートをロードするには、以下のようにスラッシュ
+を使って指定します::
 
     get_template('news/story_detail.html')
 
-Using the same :setting:`TEMPLATE_DIRS` setting from above, this example
-``get_template()`` call will attempt to load the following templates:
+この例の ``get_template()`` は、上の :setting:`TEMPLATE_DIRS` と同じ設定を
+使った場合、以下の順番でテンプレートをロードしようと試みます:
 
     * ``/home/html/templates/lawrence.com/news/story_detail.html``
     * ``/home/html/templates/default/news/story_detail.html``
 
 .. _template-loaders:
+.. _Loader types:
 
-Loader types
-~~~~~~~~~~~~
+Loader 型
+~~~~~~~~~
 
-By default, Django uses a filesystem-based template loader, but Django comes
-with a few other template loaders, which know how to load templates from other
-sources.
+デフォルトでは、 Django はファイルシステムベースのテンプレートローダを使っ
+ていますが、 Django には他のテンプレートローダも付属しており、その他のデー
+タソースからテンプレートをロードできるようになっています。
 
-These other loaders are disabled by default, but you can activate them by
-editing your :setting:`TEMPLATE_LOADERS` setting. :setting:`TEMPLATE_LOADERS`
-should be a tuple of strings, where each string represents a template loader.
-Here are the template loaders that come with Django:
+ファイルシステムベース以外のテンプレートローダはデフォルトでは無効化されて
+いますが、 :setting:`TEMPLATE_LOADERS` 設定を編集して有効にできます。
+:setting:`TEMPLATE_LOADERS` は文字列のタプルで、各文字列がテンプレートロー
+ダを表します。組み込みのテンプレートローダを以下に示します:
 
 ``django.template.loaders.filesystem.load_template_source``
-    Loads templates from the filesystem, according to :setting:`TEMPLATE_DIRS`.
+    :setting:`TEMPLATE_DIRS` の設定に従って、ファイルシステムからテンプレー
+    トをロードします。
 
 ``django.template.loaders.app_directories.load_template_source``
-    Loads templates from Django apps on the filesystem. For each app in
-    :setting:`INSTALLED_APPS`, the loader looks for a ``templates`` subdirectory. If
-    the directory exists, Django looks for templates in there.
+    ファイルシステム上の Django アプリケーションからテンプレートをロードし
+    ます。このローダは :setting:`INSTALLED_APPS` の各アプリケーションについ
+    て ``templates`` サブディレクトリを探します。ディレクトリが存在すれば、
+    Django はその中からテンプレートを探します。
 
-    This means you can store templates with your individual apps. This also
-    makes it easy to distribute Django apps with default templates.
+    これはすなわち、個々のアプリケーションにテンプレートを保存しておけると
+    いうことです。このローダを使うと、 Django アプリケーションをデフォルト
+    のテンプレート付きで配りやすくなります。
 
-    For example, for this setting::
+    例えば、以下のように設定します::
 
         INSTALLED_APPS = ('myproject.polls', 'myproject.music')
 
-    ...then ``get_template('foo.html')`` will look for templates in these
-    directories, in this order:
+    ``get_template('foo.html')`` は以下のディレクトリを順番に探します:
 
         * ``/path/to/myproject/polls/templates/foo.html``
         * ``/path/to/myproject/music/templates/foo.html``
 
-    Note that the loader performs an optimization when it is first imported:
-    It caches a list of which :setting:`INSTALLED_APPS` packages have a ``templates``
-    subdirectory.
+    このローダは最初に import した時に最適化処理を行います。すなわち、
+    :setting:`INSTALLED_APPS` パッケージリストの中で、 ``templates`` サブディ
+    レクトリを持つものをキャッシュします。
 
 ``django.template.loaders.eggs.load_template_source``
-    Just like ``app_directories`` above, but it loads templates from Python
-    eggs rather than from the filesystem.
+    ``app_directories`` と同じですが、ファイルシステムではなく Python eggs
+    からテンプレートをロードします。
 
-Django uses the template loaders in order according to the :setting:`TEMPLATE_LOADERS`
-setting. It uses each loader until a loader finds a match.
+Django はテンプレートローダを :setting:`TEMPLATE_LOADERS` 設定の順番に従っ
+て試してゆき、マッチするテンプレートが見つかるまで探します。
 
-The ``render_to_string()`` shortcut
-===================================
+.. _`The render_to_string() shortcut`:
 
-To cut down on the repetitive nature of loading and rendering
-templates, Django provides a shortcut function which largely
-automates the process: ``render_to_string()`` in
-``django.template.loader``, which loads a template, renders it and
-returns the resulting string::
+``render_to_string()`` ショートカット
+======================================
+
+テンプレートのロードとレンダの反復を減らすため、 Django は作業を自動化する
+ためのショートカットとして、 ``django.template.loader`` で
+``render_to_string()`` を提供しています。このショートカットは、テンプレート
+をロードし、レンダして、結果を文字列として返します::
 
     from django.template.loader import render_to_string
     rendered = render_to_string('my_template.html', { 'foo': 'bar' })
 
-The ``render_to_string`` shortcut takes one required argument --
-``template_name``, which should be the name of the template to load
-and render -- and two optional arguments::
+``render_to_string`` ショートカットは、必須の引数として、レンダリング時にロー
+ドするテンプレートの名前  ``template_name`` をとります。また、オプション引
+数を二つとります::
 
     dictionary
-        A dictionary to be used as variables and values for the
-        template's context. This can also be passed as the second
-        positional argument.
+        テンプレートのコンテキストとして使う値の入った辞書です。第二固定引
+        数として渡しても構いません。
 
     context_instance
-        An instance of ``Context`` or a subclass (e.g., an instance of
-        ``RequestContext``) to use as the template's context. This can
-        also be passed as the third positional argument.
+        ``Context`` またはサブクラス (例えば ``RequestContext``) のインスタ
+        ンスです。テンプレートのコンテキストとして使われます。第三固定引数
+        として渡してもかまいません。
 
-See also the :func:`~django.shortcuts.render_to_response()` shortcut, which
-calls ``render_to_string`` and feeds the result into an ``HttpResponse``
-suitable for returning directly from a view.
+:func:`~django.shortcuts.render_to_response()` ショートカットも参照してくだ
+さい。このショートカットは、結果を ``HttpResponse`` に入れて、ビューからレ
+ンダ内容を直接返せるようにしています。
 
-Configuring the template system in standalone mode
-==================================================
+.. _Configuring the template system in standalone mode:
+
+テンプレートシステムをスタンドアロンモードに設定する
+====================================================
 
 .. note::
 
-    This section is only of interest to people trying to use the template
-    system as an output component in another application. If you're using the
-    template system as part of a Django application, nothing here applies to
-    you.
+    この節は、テンプレートシステムを他のアプリケーションの出力用コンポーネ
+    ントとして使ってみたいと考えている人のためのものです。テンプレートシス
+    テムを Django の一部として使っている人には、この節の内容はあてはまりま
+    せん。
 
-Normally, Django will load all the configuration information it needs from its
-own default configuration file, combined with the settings in the module given
-in the :setting:`DJANGO_SETTINGS_MODULE` environment variable. But if you're
-using the template system independently of the rest of Django, the environment
-variable approach isn't very convenient, because you probably want to configure
-the template system in line with the rest of your application rather than
-dealing with settings files and pointing to them via environment variables.
+通常、 Django は必要な全ての設定情報を、デフォルトの設定ファイル上の設定と
+環境変数 :setting:`DJANGO_SETTING_FILE` に指定したファイル上の設定を合わせ
+たものからロードします。ただし、 Django の他の部分からテンプレートシステム
+を切り離して使いたい場合は、環境変数を介して設定ファイルを扱うよりも、アプ
+リケーション内でテンプレートシステムを初期化したいでしょうから、環境変数を
+使う方法はあまり便利とはいえないでしょう。
 
-To solve this problem, you need to use the manual configuration option described
-in :ref:`settings-without-django-settings-module`. Simply import the appropriate
-pieces of the templating system and then, *before* you call any of the
-templating functions, call ``django.conf.settings.configure()`` with any
-settings you wish to specify. You might want to consider setting at least
-:setting:`TEMPLATE_DIRS` (if you're going to use template loaders),
-:setting:`DEFAULT_CHARSET` (although the default of ``utf-8`` is probably fine)
-and :setting:`TEMPLATE_DEBUG`. All available settings are described in the
-:ref:`settings documentation <ref-settings>`, and any setting starting with
-``TEMPLATE_`` is of obvious interest.
+この問題を解決するためには、 :ref:`settings-without-django-settings-module`
+に書かれている手動設定の方法を使う必要があります。テンプレートシステムの必
+要な部分を import して、何らかのテンプレート関連の関数を呼ぶ *前に* 、指定
+したい設定を引数にして ``django.conf.settings.configure`` を呼び出して下さ
+い。少なくとも :setting:`TEMPLATE_DIRS` (テンプレートローダを使いたい場合),
+:setting:`DEFAULT_CHARSET` (通常はデフォルトの ``utf-8`` で十分です), 
+:setting:`TEMPLATE_DEBUG` などを設定することになるでしょう。設定可能な変数
+は、 :ref:`設定ファイルのドキュメント <ref-settings>` に書かれています。関
+係のある変数は *TEMPLATE_* で始まっている設定です。
