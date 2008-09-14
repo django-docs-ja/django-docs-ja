@@ -1,51 +1,58 @@
 .. _topics-templates:
+.. _The Django template language:
 
 ============================
-The Django template language
+Django テンプレート言語
 ============================
 
-.. admonition:: About this document
+:revision-up-to: 8961 (1.0)
 
-    This document explains the language syntax of the Django template system. If
-    you're looking for a more technical perspective on how it works and how to
-    extend it, see :ref:`ref-templates-api`.
+.. admonition:: このドキュメントについて
 
-Django's template language is designed to strike a balance between power and
-ease. It's designed to feel comfortable to those used to working with HTML. If
-you have any exposure to other text-based template languages, such as Smarty_
-or CheetahTemplate_, you should feel right at home with Django's templates.
+    このドキュメントでは、Django テンプレートシステムの文法について説明して
+    います。技術的な観点からのテンプレートシステムの仕組みや拡張方法に関す
+    る説明は、 :ref:`ref-templates-api` を参照してください。
 
-.. admonition:: Philosophy
+Django のテンプレート言語は、釣合いの取れたパワーと簡便さを実現するように、
+また HTML を扱いなれた人にとっては快適になるように設計されています。
+Smarty_ や CheetahTemplate_ のようなテキストベースのテンプレート言語を経験
+したことがあるなら、 Django のテンプレートはしっくりくるはずです。
 
-    If you have a background in programming, or if you're used to languages
-    like PHP which mix programming code directly into HTML, you'll want to
-    bear in mind that the Django template system is not simply Python embedded
-    into HTML. This is by design: the template system is meant to express
-    presentation, not program logic.
+.. admonition:: 設計哲学
 
-    The Django template system provides tags which function similarly to some
-    programming constructs -- an :ttag:`if` tag for boolean tests, a :ttag:`for`
-    tag for looping, etc. -- but these are not simply executed as the
-    corresponding Python code, and the template system will not execute
-    arbitrary Python expressions. Only the tags, filters and syntax listed below
-    are supported by default (although you can add :ref:`your own extensions
-    <howto-custom-template-tags>` to the template language as needed).
+    プログラミングの知識があったり、 PHP のようなプログラムコードを直接
+    HTML に混ぜ込む言語を使ったことがあるなら、 Django のテンプレートシステ
+    ムが単に HTML に Python を埋め込んだものでないことに疑問を持つでしょう。
+    しかし、これは設計上意図して決まっていることです。テンプレートシステム
+    はプレゼンテーション層を表現するためのもので、プログラムロジックではな
+    いのです。
 
-.. _`The Django template language: For Python programmers`: ../templates_python/
+    Django のテンプレートシステムは、プログラムの構成部品に似たタグ、例えば
+    ブールテストのための ``{% if %}`` タグやループ処理のための 
+    ``{% for %}`` タグを備えています。しかし、これらのタグは単に同じ意味の
+    Python コードとして実行されるのではなく、テンプレートシステムは Python
+    の式を解釈実行したりはしません。テンプレートシステムがサポートしている
+    のは、以下で定義されているデフォルトのタグ、フィルタおよびその構文だけ
+    です (もちろん、必要に応じてテンプレート言語を 
+    :ref:`拡張する <howto-custom-template-tags>` のは可能です)。
+
 .. _Smarty: http://smarty.php.net/
 .. _CheetahTemplate: http://www.cheetahtemplate.org/
 
-Templates
-=========
+.. _Templates:
 
-A template is simply a text file. It can generate any text-based format (HTML,
-XML, CSV, etc.).
+テンプレート
+============
 
-A template contains **variables**, which get replaced with values when the
-template is evaluated, and **tags**, which control the logic of the template.
+テンプレートは単なるテキストファイルでできています。 テンプレートはあらゆる
+テキストベースのデータ形式 (HTML, XML, CSV など) を生成できます。
 
-Below is a minimal template that illustrates a few basics. Each element will be
-explained later in this document.::
+テンプレートには、テンプレートを処理する際に実際の値に置き換えられる
+**変数 (variable)** と、テンプレート上でロジックを制御する **タグ (tag)**
+が入っています。
+
+以下に示すのは、基本的な項目をいくつか組み込んだ最小限のテンプレートです。
+各項目についてはこのドキュメントの後の部分で詳しく説明します::
 
     {% extends "base_generic.html" %}
 
@@ -64,67 +71,76 @@ explained later in this document.::
     {% endfor %}
     {% endblock %}
 
-.. admonition:: Philosophy
+.. admonition:: 設計哲学
 
-    Why use a text-based template instead of an XML-based one (like Zope's
-    TAL)? We wanted Django's template language to be usable for more than
-    just XML/HTML templates. At World Online, we use it for e-mails,
-    JavaScript and CSV. You can use the template language for any text-based
-    format.
+    なぜ (Zope における TAL のような) XML ベースのテキストベースのテンプレー
+    トではなく、テキストベースのテンプレートを使うのでしょうか ? それは、
+    Django のテンプレート言語を XML/HTML テンプレート以外にも使いたいと考え
+    ているからです。 World Online では、e-mail や JavaScript、 CSV にテンプ
+    レートを使っています。テンプレートはテキストベースの形式なら何にでも使
+    えるのです。
 
-    Oh, and one more thing: Making humans edit XML is sadistic!
+    そう、もう一つあります: 人間に XML を編集させるなんて、サディスティック
+    でしかありません！
 
-Variables
-=========
+.. _Variables:
 
-Variables look like this: ``{{ variable }}``. When the template engine
-encounters a variable, it evaluates that variable and replaces it with the
-result.
+変数
+====
 
-Use a dot (``.``) to access attributes of a variable.
+変数 (variable) は ``{{ variable }}`` のような形式になります。テンプレート
+エンジンが変数名を見つけると、変数を評価して値を置き換えたものを出力します。
 
-.. admonition:: Behind the scenes
+変数の属性値にアクセスするには、ドット (``.``) 表記を使います。
 
-    Technically, when the template system encounters a dot, it tries the
-    following lookups, in this order:
+.. admonition:: 舞台裏で行われていること
 
-        * Dictionary lookup
-        * Attribute lookup
-        * Method call
-        * List-index lookup
+    技術的には、テンプレートシステムが dot を見つけた場合、以下の順で値の評
+    価を試みます:
 
-In the above example, ``{{ section.title }}`` will be replaced with the
-``title`` attribute of the ``section`` object.
+        * 辞書の照合 (lookup) 
+        * 属性の照合
+        * メソッドの呼び出し
+        * リストをインデクス指定して照合
 
-If you use a variable that doesn't exist, the template system will insert
-the value of the ``TEMPLATE_STRING_IF_INVALID`` setting, which is set to ``''``
-(the empty string) by default.
+上の例では、 ``{{ section.title }}`` は ``section`` オブジェクトの
+``title`` 属性に置き換えられます。
 
-See `Using the built-in reference`_, below, for help on finding what variables
-are available in a given template.
+実在しない変数を使うと、テンプレートシステムは ``TEMPLATE_STRING_INVALID``
+の設定値を挿入します。デフォルトの値は ``''`` (空文字列) です。
 
-Filters
-=======
+後述の「 `組み込みのリファレンスドキュメント`_ 」を読めば、テンプレートで使
+える変数名を調べる手がかりになります。
 
-You can modify variables for display by using **filters**.
+.. _Filters:
 
-Filters look like this: ``{{ name|lower }}``. This displays the value of the
-``{{ name }}`` variable after being filtered through the ``lower`` filter,
-which converts text to lowercase. Use a pipe (``|``) to apply a filter.
+フィルタ
+========
 
-Filters can be "chained." The output of one filter is applied to the next.
-``{{ text|escape|linebreaks }}`` is a common idiom for escaping text contents,
-then converting line breaks to ``<p>`` tags.
+変数を表示するために手を加えたい場合には **フィルタ (filter)** を使います。
 
-Some filters take arguments. A filter argument looks like this: ``{{
-bio|truncatewords:30 }}``. This will display the first 30 words of the ``bio``
-variable.
+フィルタは ``{{ name|lower }}`` のように書きます。この例では、変数 ``{{
+name }}`` の値は ``lower`` フィルタ、すなわち文字を小文字に変換するフィルタ
+を通してから表示します。フィルタの適用は (``|``) で表します。
 
-Filter arguments that contain spaces must be quoted; for example, to join a list
-with commas and spaced you'd use ``{{ list|join:", " }}``.
+フィルタは「連鎖 (chain)」できます。フィルタを連鎖させると、あるフィルタか
+らの出力を別のフィルタに渡せます。例えば、 ``{{ text|escape|linebreaks }}``
+は、テキストの内容をエスケープして、改行を ``<p>`` タグに置き換える時の慣用
+句としてよく使われています。
 
-Django provides about thirty built-in template filters. You can read all about
-them in the :ref:`built-in filter reference <ref-templates-builtins-filters>`.
+フィルタによっては引数をとります。フィルタの引数は 
+``{{ bio|truncatewords:"30" }}`` のような形式で表します。この例では、変数
+``bio`` の最初の 30 語を表示します。
+
+フィルタの引数にスペースが入っている場合は、二重引用符で囲ってください。例
+えば、カンマとスペースでリストを結合するには ``{{ list|join:", " }}``
+のようにします。
+
+:ref:`組み込みフィルタリファレンス<ref-templates-builtins-filters>` では、
+全ての組み込みフィルタについて説明しています。
+
+.. TBD
+
 To give you a taste of what's available, here are some of the more commonly used
 template filters:
 
@@ -161,15 +177,21 @@ Again, these are just a few examples; see the :ref:`built-in filter reference
 You can also create your own custom template filters; see
 :ref:`howto-custom-template-tags`.
 
-Tags
+.. _Tags:
+
+タグ
 ====
 
-Tags look like this: ``{% tag %}``. Tags are more complex than variables: Some
-create text in the output, some control flow by performing loops or logic, and
-some load external information into the template to be used by later variables.
+タグは  ``{% tag %}`` のように書きます。タグの考え方は、変数よりもやや複雑
+です。出力されるテキストを生成するものもありますし、ループやロジックを実行
+して、処理の流れを制御するものもあります。また、外部の情報を取り込んで、後
+に出て来る変数から使えるようにするものもあります。
 
-Some tags require beginning and ending tags (i.e. ``{% tag %} ... tag contents
-... {% endtag %}``).
+タグによっては、開始タグと終了タグ 
+(``{% tag %} ... tag contents ... {% endtag %}``) を必要とするものがありま
+す。
+
+.. TBD
 
 Django ships with about two dozen built-in template tags. You can read all about
 them in the :ref:`built-in tag reference <ref-templates-builtins-tags>`. To give
@@ -222,34 +244,39 @@ tag reference <ref-templates-builtins-tags>` for the complete list.
 You can also create your own custom template tags; see
 :ref:`howto-custom-template-tags`.
 
-Comments
+.. _Comments:
+
+コメント
 ========
 
-To comment-out part of a line in a template, use the comment syntax: ``{# #}``.
+テンプレート中で行内の一部をコメントアウトするには、コメント構文 ``{# #}``
+を使います。
 
-For example, this template would render as ``'hello'``::
+例えば、以下のテンプレートをレンダすると ``'hello'`` になります::
 
     {# greeting #}hello
 
-A comment can contain any template code, invalid or not. For example::
+コメント内には任意のテンプレートコードを入れられます。コメント内の
+テンプレートコードが無効なものであってもエラーにはなりません::
 
     {# {% if foo %}bar{% else %} #}
 
-This syntax can only be used for single-line comments (no newlines are permitted
-between the ``{#`` and ``#}`` delimiters). If you need to comment out a
-multiline portion of the template, see the :ttag:`comment` tag.
+この構文を使えるのは、一行のコメントの場合だけです (``{#`` と ``#}`` の間に
+は改行を入れられません)。複数行のコメントアウトを行いたければ、後述の
+:ttag:`comment` タグを使ってください。
 
-.. _template-inheritance:
+.. _`Template inheritance`:
 
-Template inheritance
-====================
+テンプレートの継承
+==================
 
-The most powerful -- and thus the most complex -- part of Django's template
-engine is template inheritance. Template inheritance allows you to build a base
-"skeleton" template that contains all the common elements of your site and
-defines **blocks** that child templates can override.
+Django のテンプレートエンジンにおいて、テンプレートの継承 (inheritance) は
+最もパワフル -- かつ最も難解 -- な部分です。テンプレートの継承は、自分のサ
+イトで共通に使われる全ての要素の入った、ベースとなる「骨組みの」テンプレー
+トを作っておき、その中に子のテンプレートでオーバライドできる 
+**ブロック(block)** を定義できます。
 
-It's easiest to understand template inheritance by starting with an example::
+テンプレートの継承を理解するには、まず例を挙げるのが一番でしょう::
 
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -275,15 +302,16 @@ It's easiest to understand template inheritance by starting with an example::
     </body>
     </html>
 
-This template, which we'll call ``base.html``, defines a simple HTML skeleton
-document that you might use for a simple two-column page. It's the job of
-"child" templates to fill the empty blocks with content.
+このテンプレートは、単純な 2 カラム形式のページで使うような HTML のスケルト
+ンドキュメントです。これを ``base.html`` と呼びましょう。空のブロックをコン
+テンツで埋めるのは「子 (child)」のテンプレートの仕事です。
 
-In this example, the ``{% block %}`` tag defines three blocks that child
-templates can fill in. All the ``block`` tag does is to tell the template
-engine that a child template may override those portions of the template.
+この例では、 ``{% block %}`` タグを使って 3 つのブロックを定義し、子テンプ
+レートが値を埋められるようにしています。 ``block`` タグの役割は、テンプレー
+ト中のタグで囲まれた部分を子テンプレートでオーバライドできることをテンプレー
+トエンジンに知らせることにあります。
 
-A child template might look like this::
+子テンプレートは以下のようになります::
 
     {% extends "base.html" %}
 
@@ -296,14 +324,15 @@ A child template might look like this::
     {% endfor %}
     {% endblock %}
 
-The ``{% extends %}`` tag is the key here. It tells the template engine that
-this template "extends" another template. When the template system evaluates
-this template, first it locates the parent -- in this case, "base.html".
+``{% extends %}`` タグが継承のカギです。このタグはテンプレートエンジンに対
+して、自分自身が他のテンプレートを拡張 (extend) していることを教えます。テ
+ンプレートシステムがこのテンプレートを処理する際、システムはまず親となるテ
+ンプレート -- ここでは "base.html" を探します。
 
-At that point, the template engine will notice the three ``{% block %}`` tags
-in ``base.html`` and replace those blocks with the contents of the child
-template. Depending on the value of ``blog_entries``, the output might look
-like::
+さて、この時点で、テンプレートエンジンは ``base.html`` 内に三箇所の
+``{% block %}`` が定義されていることに気づき、これらのブロックを子テンプレー
+トの該当するブロックで置き換えます。 ``blog_entries`` の値に応じて、出力は
+以下のようになります::
 
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -331,172 +360,183 @@ like::
     </body>
     </html>
 
-Note that since the child template didn't define the ``sidebar`` block, the
-value from the parent template is used instead. Content within a ``{% block %}``
-tag in a parent template is always used as a fallback.
+子テンプレートには ``sidebar`` ブロックが定義されていないので、親テンプレー
+トの値がそのまま使われます。親テンプレートの ``{% block %}`` タグの内容は、
+常にフォールバックの値として使われます。
 
-You can use as many levels of inheritance as needed. One common way of using
-inheritance is the following three-level approach:
+テンプレートの継承は必要に応じて何段階にもできます。継承を使うよくある場合
+の一つに、以下のような三段階のアプローチがあります:
 
-    * Create a ``base.html`` template that holds the main look-and-feel of your
-      site.
-    * Create a ``base_SECTIONNAME.html`` template for each "section" of your
-      site. For example, ``base_news.html``, ``base_sports.html``. These
-      templates all extend ``base.html`` and include section-specific
-      styles/design.
-    * Create individual templates for each type of page, such as a news
-      article or blog entry. These templates extend the appropriate section
-      template.
+    * サイトの主なルック & フィールを決める ``base.html`` テンプレートを作
+      成します。
+    * サイトの各「セクション」ごとに ``base_SECTIONNAME.html`` テンプレート
+      を作成します。たとえば、 ``base_news.html`` , ``base_sports.html`` と
+      いった具合です。これらのテンプレートでは ``base.html`` を拡張して、セ
+      クション固有のスタイルやデザインを取り込んでおきます。
+    * ニュース記事やブログエントリといった各種ページ用の個々のテンプレート
+      を作成します。これらのテンプレートでは適切なセクションテンプレートを
+      拡張します。
 
-This approach maximizes code reuse and makes it easy to add items to shared
-content areas, such as section-wide navigation.
+このようなアプローチを取れば、コードの最利用性を最大限に高め、セクション毎
+のナビゲーションのような項目を簡単に共通のコンテンツ領域に追加できます。
 
-Here are some tips for working with inheritance:
+継承を扱うときの小技をいくつか挙げておきます:
 
-    * If you use ``{% extends %}`` in a template, it must be the first template
-      tag in that template. Template inheritance won't work, otherwise.
+    * テンプレートで ``{% extends %}`` を使う場合は、テンプレート中の最初の
+      テンプレートタグにせねばなりません。さもなければテンプレート継承はう
+      まく動作しません。
 
-    * More ``{% block %}`` tags in your base templates are better. Remember,
-      child templates don't have to define all parent blocks, so you can fill
-      in reasonable defaults in a number of blocks, then only define the ones
-      you need later. It's better to have more hooks than fewer hooks.
+    * ベースのテンプレートで ``{% block %}`` を多用すればするほど、よりよい
+      テンプレートになります。子テンプレートは親テンプレートのブロックを必
+      ずしも全て定義しなくてもよいことを思い出して下さい。ブロックをたくさ
+      ん用意しておき、適切なデフォルト値を入れておいて、子テンプレートで必
+      要な値だけを再定義すればよいのです。フックは少ないよりも沢山ある方が
+      よいのです。
 
-    * If you find yourself duplicating content in a number of templates, it
-      probably means you should move that content to a ``{% block %}`` in a
-      parent template.
+    * 同じような内容を含むテンプレートをいくつも作っていることに気づいたら、
+      それはすなわちその内容を親テンプレートの ``{% block %}`` に入れるべき
+      だということです。
 
-    * If you need to get the content of the block from the parent template,
-      the ``{{ block.super }}`` variable will do the trick. This is useful
-      if you want to add to the contents of a parent block instead of
-      completely overriding it. Data inserted using ``{{ block.super }}`` will
-      not be automatically escaped (see the `next section`_), since it was
-      already escaped, if necessary, in the parent template.
+    * 親テンプレートのブロックに入っているコンテンツを取り出す必要がある場
+      合、 ``{{ block.super }}`` とするとうまくいきます。親テンプレートのブ
+      ロックをオーバライドするのではなく、内容を追加したい場合に便利です。
+      ``{{ block.super }}`` で挿入されたデータは、通常、親テンプレートで
+      既にエスケープされているので、自動的にエスケープされません 
+      (:ref:`automatic-html-escaping` を参照)。
 
-    * For extra readability, you can optionally give a *name* to your
-      ``{% endblock %}`` tag. For example::
+    * 可読性を高めるために、例えば以下のように、 ``{% endblock %}`` にブロッ
+      クの *名前* を指定できます::
 
           {% block content %}
           ...
           {% endblock content %}
 
-      In larger templates, this technique helps you see which ``{% block %}``
-      tags are being closed.
+      大きなテンプレートの編集で、どこで ``{% block %}`` タグが閉じているか
+      探すのに便利です。
 
-Finally, note that you can't define multiple ``{% block %}`` tags with the same
-name in the same template. This limitation exists because a block tag works in
-"both" directions. That is, a block tag doesn't just provide a hole to fill --
-it also defines the content that fills the hole in the *parent*. If there were
-two similarly-named ``{% block %}`` tags in a template, that template's parent
-wouldn't know which one of the blocks' content to use.
+最後に、同じテンプレート中に同じ名前の ``{% block %}`` を複数定義できないこ
+とに注意して下さい。この制限は、ブロックタグが「双方向」に作用するため、す
+なわち、あるブロックタグは何らかの値を埋めるための穴であるだけでなく、穴を
+埋める *親テンプレートの* コンテンツも定義しているために存在しています。同
+じ名前の ``{% block %}`` が一つのテンプレート内に複数あると、そのテンプレー
+トの親テンプレートは、該当するブロックの内容を子テンプレートのどの
+``{% block %}`` 設定で置き換えればよいのか分からなくなってしまいます。 
 
 .. _next section: #automatic-html-escaping
-.. _automatic-html-escaping:
 
-Automatic HTML escaping
+.. _automatic-html-escaping:
+.. _Automatic HTML escaping:
+
+HTML の自動エスケープ
 =======================
 
 .. versionadded:: 1.0
 
-When generating HTML from templates, there's always a risk that a variable will
-include characters that affect the resulting HTML. For example, consider this
-template fragment::
+テンプレートから HTML を生成するときには、変数内の文字が HTML のレンダリン
+グ結果を壊してしまうというリスクが常に付きまといます。例えば、以下のような
+テンプレートフラグメントを考えてみましょう::
 
-    Hello, {{ name }}.
+    こんにちは {{ name }} さん
 
-At first, this seems like a harmless way to display a user's name, but consider
-what would happen if the user entered his name as this::
+一件、このコードはユーザ名を表示するだけの無害なものに見えますが、名前を以
+下のような値にすると、何が起こるでしょう::
 
     <script>alert('hello')</script>
 
-With this name value, the template would be rendered as::
+テンプレートは以下のようにレンダされます::
 
     Hello, <script>alert('hello')</script>
 
-...which means the browser would pop-up a JavaScript alert box!
+その結果、 JavaScript の警告ボックスを表示できてしまいます！
 
-Similarly, what if the name contained a ``'<'`` symbol, like this?
+同様に、名前に以下のようにして ``'<'`` 文字をいれると同でしょう::
 
     <b>username
 
-That would result in a rendered template like this::
+レンダ結果は以下のようになります::
 
     Hello, <b>username
 
-...which, in turn, would result in the remainder of the Web page being bolded!
+これで、以降のWebページは全部ボールド表示になってしまいます！
 
-Clearly, user-submitted data shouldn't be trusted blindly and inserted directly
-into your Web pages, because a malicious user could use this kind of hole to
-do potentially bad things. This type of security exploit is called a
-`Cross Site Scripting`_ (XSS) attack.
+言うまでもなく、ユーザが入力したデータは盲目に信頼してはならず、直接 Web ペー
+ジに挿入すべきでもありません。悪意のあるユーザはこの手の穴を使って悪さをす
+るものです。こうしたセキュリティホールは、
+`クロスサイトスクリプティング`_ (XSS) 攻撃と呼ばれています。
 
-To avoid this problem, you have two options:
+クロスサイトスクリプティングを防ぐには、二つの方法があります:
 
-    * One, you can make sure to run each untrusted variable through the
-      ``escape`` filter (documented below), which converts potentially harmful
-      HTML characters to unharmful ones. This was the default solution
-      in Django for its first few years, but the problem is that it puts the
-      onus on *you*, the developer / template author, to ensure you're escaping
-      everything. It's easy to forget to escape data.
+    * まず、信頼できない変数は全て (後述の) ``escape`` フィルタを通します。
+      このフィルタは危険を及ぼす可能性のある HTML 文字を無害な文字に変換し
+      ます。 Django では、初期の数年はこの方法をデフォルトとして採用してい
+      ましたが、ユーザ、すなわち開発者やテンプレートの作者に、全てをエスケー
+      プするよう気配りする負荷をかけるという問題がありました。
+      
+    * もう一つは、自動 HTML エスケープを使うというものです。この節の後半で
+      は、自動エスケープのからくりについて述べています。
 
-    * Two, you can take advantage of Django's automatic HTML escaping. The
-      remainder of this section describes how auto-escaping works.
+開発版の Django では、デフォルトの設定として、全てのテンプレートは変数タグ
+を自動的にエスケープします。具体的には、以下の 5 つの文字がエスケープされます:
 
-By default in the Django development version, every template automatically
-escapes the output of every variable tag. Specifically, these five characters
-are escaped:
+    * ``<`` は ``"&lt;"`` に変換されます。
+    * ``>`` は ``"&gt;"`` に変換されます。
+    * ``"'"`` (クオート) は ``'&#39;'`` に変換されます。
+    * ``'"'`` (二重クオート) は ``'&quot;'`` に変換されます。
+    * ``"&"`` は ``"&amp;"``  に変換されます。
 
-    * ``<`` is converted to ``&lt;``
-    * ``>`` is converted to ``&gt;``
-    * ``'`` (single quote) is converted to ``&#39;``
-    * ``"`` (double quote) is converted to ``&quot;``
-    * ``&`` is converted to ``&amp;``
-
-Again, we stress that this behavior is on by default. If you're using Django's
-template system, you're protected.
+この動作はデフォルトで適用されていることを強調しておきます。Django テンプレー
+トシステムを使っているかぎり、エスケープに関する問題からは守られているのです。
 
 .. _Cross Site Scripting: http://en.wikipedia.org/wiki/Cross-site_scripting
+.. _`クロスサイトスクリプティング`: http://ja.wikipedia.org/wiki/クロスサイトスクリプティング
 
-How to turn it off
-------------------
+.. _How to turn it off:
 
-If you don't want data to be auto-escaped, on a per-site, per-template level or
-per-variable level, you can turn it off in several ways.
+自動エスケープを切るには
+---------------------------
 
-Why would you want to turn it off? Because sometimes, template variables
-contain data that you *intend* to be rendered as raw HTML, in which case you
-don't want their contents to be escaped. For example, you might store a blob of
-HTML in your database and want to embed that directly into your template. Or,
-you might be using Django's template system to produce text that is *not* HTML
--- like an e-mail message, for instance.
+サイト単位やテンプレート単位、変数単位でデータの自動エスケープを切るには、
+いくつかの方法があります。
 
-For individual variables
-~~~~~~~~~~~~~~~~~~~~~~~~
+どんなときに、自動エスケープを切る必要があるのでしょうか。テンプレート変数
+の中には、生の HTML としてレンダするように *意図された* データがあります。
+そうした場合にはコンテンツがエスケープされてほしくはないでしょう。例えば、
+データベースに HTML を保存していて、テンプレートに直接埋め込みたい場合を考
+えてみましょう。また、 Django のテンプレートシステムを使って、 HTML *以外*
+のデータ、例えば電子メールメッセージなどを生成したい場合がそうです。
 
-To disable auto-escaping for an individual variable, use the ``safe`` filter::
+.. _For individual variables:
 
-    This will be escaped: {{ data }}
-    This will not be escaped: {{ data|safe }}
+変数単位の制御
+~~~~~~~~~~~~~~~~
 
-Think of *safe* as shorthand for *safe from further escaping* or *can be
-safely interpreted as HTML*. In this example, if ``data`` contains ``'<b>'``,
-the output will be::
+変数個々に自動エスケープを無効にするには、 ``safe`` フィルタを使います::
 
-    This will be escaped: &lt;b&gt;
-    This will not be escaped: <b>
+    エスケープされる: {{ data }}
+    エスケープされない: {{ data|safe }}
 
-For template blocks
-~~~~~~~~~~~~~~~~~~~
+*safe* という言葉を、 *これ以上エスケープしないよう保護(safe)する* とか、
+*HTML として解釈しても安全(safe)である* という意味だと考えてください。
+例えば、 ``data`` に ``'<b>'`` が入っていた場合、出力は以下のようになります::
 
-To control auto-escaping for a template, wrap the template (or just a
-particular section of the template) in the ``autoescape`` tag, like so::
+    エスケープされる: &lt;b&gt;
+    エスケープされない: <b>
+
+.. _For template blocks:
+
+テンプレートブロック単位の制御
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+テンプレートで自動エスケープを制御するには、テンプレート (または
+テンプレートの一部) を、以下のように ``autoescape`` タグで囲みます::
 
     {% autoescape off %}
-        Hello {{ name }}
+        こんにちは {{ name }} さん
     {% endautoescape %}
 
-The ``autoescape`` tag takes either ``on`` or ``off`` as its argument. At
-times, you might want to force auto-escaping when it would otherwise be
-disabled. Here is an example template::
+``autoescape`` タグは、 ``on`` または ``off`` を引数にとります。
+テンプレートのある範囲を自動エスケープして、さらにその一部で自動エスケープ
+を切りたい場合には、以下のように入れ子にできます::
 
     Auto-escaping is on by default. Hello {{ name }}
 
@@ -509,9 +549,9 @@ disabled. Here is an example template::
         {% endautoescape %}
     {% endautoescape %}
 
-The auto-escaping tag passes its effect onto templates that extend the
-current one as well as templates included via the ``include`` tag, just like
-all block tags. For example::
+自動エスケープのタグは、他のブロックタグと同様、タグを設定したテンプレート
+を継承している他のテンプレートや、 ``include`` で取り込んだテンプレートでも
+有効です。例えば::
 
     # base.html
 
@@ -528,119 +568,132 @@ all block tags. For example::
     {% block title %}This & that{% endblock %}
     {% block content %}{{ greeting }}{% endblock %}
 
-Because auto-escaping is turned off in the base template, it will also be
-turned off in the child template, resulting in the following rendered
-HTML when the ``greeting`` variable contains the string ``<b>Hello!</b>``::
+自動エスケープがベースのテンプレートで無効化されているので、子テンプレート
+でも自動エスケープは無効化されます。結果として、 ``greeting`` 変数の値が
+``<b>Hello!</b>`` の時には以下の HTML がレンダされます::
 
     <h1>This & that</h1>
     <b>Hello!</b>
 
-Notes
------
+.. _Notes:
 
-Generally, template authors don't need to worry about auto-escaping very much.
-Developers on the Python side (people writing views and custom filters) need to
-think about the cases in which data shouldn't be escaped, and mark data
-appropriately, so things Just Work in the template.
+注意点
+-------
 
-If you're creating a template that might be used in situations where you're
-not sure whether auto-escaping is enabled, then add an ``escape`` filter to any
-variable that needs escaping. When auto-escaping is on, there's no danger of
-the ``escape`` filter *double-escaping* data -- the ``escape`` filter does not
-affect auto-escaped variables.
+一般に、テンプレートの作者は自動エスケープをあまり意識するべきではありませ
+ん。 Python サイドの開発者 (ビューやカスタムフィルタ) の作者が、どのデータ
+をエスケープすべきでないかを考え、データを適切にマークして、テンプレートに
+うまく表示されるようにすべきなのです。
 
-String literals and automatic escaping
---------------------------------------
+テンプレートを作成していて、自動エスケープが有効な環境で使われるかどうか分
+からないような場合には、エスケープの必要な変数全てに  ``escape`` フィルタを
+追加してください。自動エスケープがオンの場合、 ``escape`` フィルタがデータ
+を *二重にエスケープする* ような危険性はありません。 ``escape`` フィルタは
+変数の自動エスケープには影響しないのです。
 
-As we mentioned earlier, filter arguments can be strings::
+.. _String literals and automatic escaping:
 
-    {{ data|default:"This is a string literal." }}
+文字列リテラルと自動エスケープ
+-------------------------------
 
-All string literals are inserted **without** any automatic escaping into the
-template -- they act as if they were all passed through the ``safe`` filter.
-The reasoning behind this is that the template author is in control of what
-goes into the string literal, so they can make sure the text is correctly
-escaped when the template is written.
+先に説明したように、フィルタの引数は文字列であってもかまいません::
 
-This means you would write ::
+    {{ data|default:"文字列リテラルだよ" }}
+
+文字列リテラルは、自動エスケープ **されずに** テンプレート内に挿入されます。
+文字列リテラルは、 ``safe`` フィルタを通して渡されたかのように振る舞います。
+このような仕様になっているのは、テンプレートの作者が文字列リテラルがどのよ
+うに処理されるかを制御でき、テンプレートを書くときにテキストが正しくエスケー
+プされるよう配慮できるからです。
+
+従って、以下のようにテンプレートを書いてください::
 
     {{ data|default:"3 &lt; 2" }}
 
-...rather than ::
+以下のようにはしないでください::
 
-    {{ data|default:"3 < 2" }}  <-- Bad! Don't do this.
+    {{ data|default:"3 < 2" }}  <-- ダメ。こんな書き方をしてはいけません
 
-This doesn't affect what happens to data coming from the variable itself.
-The variable's contents are still automatically escaped, if necessary, because
-they're beyond the control of the template author.
+引数にリテラルを使っても、変数自体に対するエスケープの挙動には影響しません。
+変数はテンプレート作者の制御の範囲外にあり、自動的にエスケープされます。
 
 .. _template-built-in-reference:
+.. _`Using the built-in reference`:
 
-Using the built-in reference
-============================
+組み込みのリファレンスドキュメント
+==================================
 
-Django's admin interface includes a complete reference of all template tags and
-filters available for a given site. To see it, go to your admin interface and
-click the "Documentation" link in the upper right of the page.
+Django の admin インタフェースには、サイトで使える全てのテンプレート関連要
+素のリファレンスがあります。このドキュメントを読みたければ、 admin インタ
+フェースにアクセスして、ページの右上部分にある「ドキュメント
+(Documentation)」というリンクをクリックして下さい。
 
-The reference is divided into 4 sections: tags, filters, models, and views.
+リファレンスは、タグ(Tags)、フィルタ(Filters)、モデル(Models)、そしてビュー
+(Views)の 4 つのセクションに分かれています。
 
-The **tags** and **filters** sections describe all the built-in tags (in fact,
-the tag and filter references below come directly from those pages) as well as
-any custom tag or filter libraries available.
+**Tags** や **Filters** セクションでは、全ての組み込みタグについて解説して
+います。 (実際、後で示すタグやフィルタのリファレンスは全てこれらのセクショ
+ンから直接取り出したものです) また、利用可能なカスタムのタグやフィルタライ
+ブラリについてのリファレンスもあります。 
 
-The **views** page is the most valuable. Each URL in your site has a separate
-entry here, and clicking on a URL will show you:
+最も大事なのは **Views** ページです。サイトの各 URL には個別のエントリが
+表示され、 URL をクリックすると以下のような内容を表示します:
 
-    * The name of the view function that generates that view.
-    * A short description of what the view does.
-    * The **context**, or a list of variables available in the view's template.
-    * The name of the template or templates that are used for that view.
+    * ビューを生成する view 関数の名前。
+    * ビューの役割を示す短い説明。
+    * **コンテキスト** 、ビューのテンプレートで使える変数のリスト。
+    * ビューで使われているテンプレートの名前。
 
-Each view documentation page also has a bookmarklet that you can use to jump
-from any page to the documentation page for that view.
+各ビューのドキュメントにはブックマークレット(bookmarklet)があり、別のページ
+からこのビューのドキュメントにジャンプするために使えます。
 
-Because Django-powered sites usually use database objects, the **models**
-section of the documentation page describes each type of object in the system
-along with all the fields available on that object.
+Django で作成したサイトは通常、データベースオブジェクト中心に動いているので、
+**Models** のセクションはシステム中の各タイプのオブジェクトと、そのオブジェ
+クトで利用できる全てのフィールドについて説明しています。
 
-Taken together, the documentation pages should tell you every tag, filter,
-variable and object available to you in a given template.
+ドキュメントのページを読めば、全てのタグ、フィルタ、テンプレートで利用でき
+る変数やオブジェクトが分かります。
 
 .. _loading-custom-template-libraries:
+.. _Custom tag and filter libraries:
 
-Custom tag and filter libraries
-===============================
+カスタムタグとカスタムフィルタのライブラリ
+==========================================
 
-Certain applications provide custom tag and filter libraries. To access them in
-a template, use the ``{% load %}`` tag::
+アプリケーションによっては、カスタムのタグやフィルタライブラリを提供してい
+ます。こうしたタグをテンプレートで使いたい場合、 ``{% load %}`` タグを使い
+ます::
 
     {% load comments %}
 
     {% comment_form for blogs.entries entry.id with is_public yes %}
 
-In the above, the ``load`` tag loads the ``comments`` tag library, which then
-makes the ``comment_form`` tag available for use. Consult the documentation
-area in your admin to find the list of custom libraries in your installation.
+上の例では、 ``load`` タグは ``comments`` という名前のタグライブラリを読み
+込んでいます。このタグライブラリを読み込むと、 ``comment_form`` タグを使え
+るようになります。カスタムライブラリのリストを探したければ、自分のサイトの
+admin でドキュメント置場を参照してください。
 
-The ``{% load %}`` tag can take multiple library names, separated by spaces.
-Example::
+``{% load %}`` タグは複数のライブラリ名を同時に読み込めます。ライブラリ名は
+スペースで区切って下さい::
 
     {% load comments i18n %}
     
-See :ref:`howto-custom-template-tags` for information on writing your own custom
-template libraries.
+カスタムのテンプレートライブラリを作成する方法は
+:ref:`howto-custom-template-tags` を参照してください。
 
-Custom libraries and template inheritance
------------------------------------------
+.. _Custom libraries and template inheritance:
 
-When you load a custom tag or filter library, the tags/filters are only made
-available to the current template -- not any parent or child templates along
-the template-inheritance path.
+カスタムのライブラリとテンプレートの継承
+----------------------------------------
 
-For example, if a template ``foo.html`` has ``{% load comments %}``, a child
-template (e.g., one that has ``{% extends "foo.html" %}``) will *not* have
-access to the comments template tags and filters. The child template is
-responsible for its own ``{% load comments %}``.
+カスタムタグやフィルタライブラリをロードした場合、タグやフィルタは現在のテ
+ンプレートだけで利用でき、テンプレート継承パス上の親テンプレートや子テンプ
+レートでは利用できません。
 
-This is a feature for the sake of maintainability and sanity.
+例えば、 ``foo.html`` に ``{% load comments %}`` というタグを入れておいても、
+子テンプレート (``{% extends "foo.html" %}`` を使っているテンプレート) で
+comments という名前のテンプレートタグやフィルタを使えるわけでは
+*ありません* 。子テンプレート側で独自に ``{% load comments %}`` を入れてお
+く必要があります。
+
+これはメンテナンス性を高めるための仕様です。
