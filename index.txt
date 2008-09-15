@@ -67,7 +67,7 @@ Django を使う
 ===============
 
 :ref:`モデル (Models) <topics-db-index>`
-    Design a single, definitive source of data about your data.
+    データを記述する、ただ一つのデータソースであるモデルを設計しましょう。
     
 :ref:`リクエストの処理 (Handling web requests) <topics-http-index>`
     リクエストを処理して、ビューに結びつけ、ページを生成して返しましょう。
