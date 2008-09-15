@@ -1107,10 +1107,10 @@ Subversion 上では、 Django の各リリースは `tags/releases_` でタグ�
     * +0: "いいんじゃないかな (Sounds OK to me.)"
 
     * -0: "あまりわくわくしないが、反対もしない (I'm not thrilled, but I
-       won't stand in the way.)"
+      won't stand in the way.)"
 
     * -1: "強く反対。このアイデアが実現したらとても嫌 (I strongly disagree
-       and would be very unhappy to see the idea turn into reality.)"
+      and would be very unhappy to see the idea turn into reality.)"
 
 django-developers での投票は正式なものではありませんが、その結果は真摯に受
 け止められます。適切な投票期間を経て、明らかな合意を形成できた場合には、投
