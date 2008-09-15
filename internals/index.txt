@@ -1,23 +1,21 @@
 .. _internals-index:
 
-Django internals
+Django の内部
 ================
-
-.. TBD
 
 :revision-up-to: 8961 (1.0)
 
-Documentation for people hacking on Django itself. This is the place to go if
-you'd like to help improve Django, learn or learn about how Django works "under
-the hood".
+ここにあるのは、 Django 自体をハックする人達のためのドキュメントです。
+Django の改善を手伝ったり、 Django が舞台裏でやっていることを学んだりしたけ
+れば、ここにあるドキュメントを読みましょう。
 
 .. warning::
 
-    Elsewhere in the Django documentation, coverage of a feature is a sort of a
-    contract: once an API is in the official documentation, we consider it
-    "stable" and don't change it without a good reason. APIs covered here,
-    however, are considered "internal-only": we reserve the right to change
-    these internals if we must.
+    Django ドキュメントの他のセクションでは、書かれている内容に一定の保証が
+    あります。すなわち、ある API がひとたび公式のドキュメントとして公開され
+    たら、その API は「安定」であるとみなされ、十分妥当な理由がない限り変更
+    されません。しかし、ここで扱っている API は「内部向け」であり、必要であ
+    れば変更する余地を残しています。
 
 .. toctree::
    :maxdepth: 1
