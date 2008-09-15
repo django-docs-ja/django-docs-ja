@@ -1,16 +1,15 @@
 .. _ref-templates-index:
 
-Template reference
-==================
+テンプレートシステムリファレンス
+==================================
 
 :revision-up-to: 8961 (1.0)
 
-.. TBD
-
-Django's template engine provides a powerful mini-language for defining the
-user-facing layer of your application, encouraging a clean separation of
-application and presentation logic. Templates can be maintained by anyone with
-an understanding of HTML; no knowledge of Python is required.
+Django のテンプレートエンジンは、アプリケーションの中でもユーザの目に触れる
+レイヤを定義する、強力ながらコンパクトな言語を提供しています。テンプレート
+言語によって、アプリケーションとプレゼンテーションのロジックをきれいに分割
+できます。テンプレートは HTML を理解していれば誰でも編集でき、 Python の知
+識は必要ありません。
 
 .. toctree::
    :maxdepth: 2
@@ -20,5 +19,5 @@ an understanding of HTML; no knowledge of Python is required.
 
 .. seealso::
 
-    For information on writing your own custom tags and filters, see
-    :ref:`howto-custom-template-tags`.
+    タグやフィルタの自作方法は :ref:`howto-custom-template-tags` を参照して
+    ください。
