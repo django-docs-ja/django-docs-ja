@@ -1,8 +1,13 @@
 .. _ref-models-options:
+.. _`Model Meta options`:
 
-======================
-Model ``Meta`` options
-======================
+===============================
+モデルの ``Meta`` オプション
+===============================
+
+:revision-up-to: 8961 (1.0)
+
+.. TBD
 
 This document explains all the possible :ref:`metadata options <meta-options>`  that you can give your model in its internal
 ``class Meta``.
@@ -17,16 +22,20 @@ Available ``Meta`` options
 
 .. attribute:: Options.abstract
 
-If ``True``, this model will be an :ref:`abstract base class <abstract-base-classes>`.
+``True`` に設定すると、モデルを 
+:ref:`抽象ベースクラス <abstract-base-classes>` にします。
 
 ``db_table``
 ------------
 
 .. attribute:: Options.db_table
 
-The name of the database table to use for the model::
+モデルの使うデータベーステーブルの名前です::
 
     db_table = 'music_album'
+
+
+.. TBD
 
 .. _table-names:
 
@@ -57,34 +66,35 @@ Django quotes column and table names behind the scenes.
 
 .. versionadded:: 1.0
 
-The name of the database tablespace to use for the model. If the backend doesn't
-support tablespaces, this option is ignored.
+このフィールドをインデクス化する際に、データベースのテーブルスペース上での
+フィールドのインデクスの名前に使います。テーブルスペースをサポートしていな
+いバックエンドでは、このオプションは無視されます。
 
 ``get_latest_by``
 -----------------
 
 .. attribute:: Options.get_latest_by
 
-The name of a :class:`DateField` or :class:`DateTimeField` in the model. This
-specifies the default field to use in your model :class:`Manager`'s
-:class:`~QuerySet.latest` method.
+モデル中の :class:`DateField` または :class:`DateTimeField` の名前です。こ
+のオプションは、モデルの :class:`Manager` の :class:`~QuerySet.latest` メソッ
+ドが使うデフォルトのフィールドを指定します。
 
-Example::
+例えば::
 
     get_latest_by = "order_date"
 
-See the docs for :meth:`~django.db.models.QuerySet.latest` for more.
+詳しくは :meth:`~django.db.models.QuerySet.latest` を参照してください。
 
 ``order_with_respect_to``
 -------------------------
 
 .. attribute:: Options.order_with_respect_to
 
-Marks this object as "orderable" with respect to the given field. This is almost
-always used with related objects to allow them to be ordered with respect to a
-parent object. For example, if an ``Answer`` relates to a ``Question`` object,
-and a question has more than one answer, and the order of answers matters, you'd
-do this::
+オブジェクトを指定のフィールドで「並べ替え可能 (orderable)」にします。この
+オプションを使うのは、リレーションの張られたオブジェクトを、親オブジェクト
+に従って並べ替えたい場合がほとんどです。例えば、 ``Answer`` が ``Question``
+にリレーションを張っており、一つの ``Question`` に複数の ``Answer`` があっ
+て、 ``Answer`` の順番が重要である場合は以下のようにします::
 
     class Answer(models.Model):
         question = models.ForeignKey(Question)
@@ -98,28 +108,30 @@ do this::
 
 .. attribute:: Options.ordering
 
-The default ordering for the object, for use when obtaining lists of objects::
+オブジェクトのリストを取得するときに使われる、オブジェクトのデフォルトの並
+び順規則です::
 
     ordering = ['-order_date']
 
-This is a tuple or list of strings. Each string is a field name with an optional
-"-" prefix, which indicates descending order. Fields without a leading "-" will
-be ordered ascending. Use the string "?" to order randomly.
+値は文字列のタプルやリストです。各文字列はフィールドの名前で、降順に並べる
+場合にはオプションの "-" を先頭に付けます。先頭に "-" のないフィールドは昇
+順に並べられます。順番をランダムにするには "?" を使って下さい。
 
 .. note:: 
 
-    Regardless of how many fields are in :attr:`~Options.ordering`, the admin
-    site uses only the first field.
+    :attr:`~Options.ordering` にいくつフィールド名を指定しても、 admin は先
+    頭のフィールドだけを考慮します。
 
-For example, to order by a ``pub_date`` field ascending, use this::
+例えば、 ``pub_date`` フィールドで昇順に並べる場合には以下のようにします::
 
     ordering = ['pub_date']
 
-To order by ``pub_date`` descending, use this::
+``pub_date`` フィールドで降順に並べる場合には以下のようにします::
 
     ordering = ['-pub_date']
 
-To order by ``pub_date`` descending, then by ``author`` ascending, use this::
+``pub_date`` フィールドで降順に並べ、さらに ``author`` で昇順に場合には以下
+のようにします::
 
     ordering = ['-pub_date', 'author']
 
@@ -128,34 +140,34 @@ To order by ``pub_date`` descending, then by ``author`` ascending, use this::
 
 .. attribute:: Options.permissions
 
-Extra permissions to enter into the permissions table when creating this object.
-Add, delete and change permissions are automatically created for each object
-that has ``admin`` set. This example specifies an extra permission,
-``can_deliver_pizzas``::
+オブジェクトの生成時にパーミッションテーブルに追加するパーミッションのリス
+トです。 ``admin`` セットをもつオブジェクトには、追加、削除、変更のパーミッ
+ションが自動的に生成されます。以下の例では、 ``can_deliver_pizzas`` という追
+加のパーミッションを定義しています::
 
     permissions = (("can_deliver_pizzas", "Can deliver pizzas"),)
 
-This is a list or tuple of 2-tuples in the format ``(permission_code,
-human_readable_permission_name)``.
+``(permission_code, human_readable_permission_name)`` の形式をとる 2 要素の
+タプルからなるリストです。
 
 ``unique_together``
 -------------------
 
 .. attribute:: Options.unique_together
 
-Sets of field names that, taken together, must be unique::
+組み合わせとして一意にしなければならないフィールドセットのリストです::
 
     unique_together = (("driver", "restaurant"),)
 
-This is a list of lists of fields that must be unique when considered together.
-It's used in the Django admin and is enforced at the database level (i.e., the
-appropriate ``UNIQUE`` statements are included in the ``CREATE TABLE``
-statement).
+このリストは、フィールド名のリストからなるリストです。各要素のリストに入っ
+ているフィールドの値の組み合わは、データベース上で一意でなければなりません。
+この制約は Django の admin 上で使われるとともに、データベースレベルでも強制
+されます (すなわち、適切な ``UNIQUE`` 文が ``CREATE TABLE`` 文に入ります)。
 
 .. versionadded:: 1.0
 
-For convenience, unique_together can be a single list when dealing with a single
-set of fields::
+便宜上、 ``unique_together`` は一つのリストのときは単一セットのフィールドと
+して扱います::
 
     unique_together = ("driver", "restaurant")
 
@@ -164,20 +176,21 @@ set of fields::
 
 .. attribute:: Options.verbose_name
 
-A human-readable name for the object, singular::
+人間可読なオブジェクト名の単数形です::
 
     verbose_name = "pizza"
 
-If this isn't given, Django will use a munged version of the class name:
-``CamelCase`` becomes ``camel case``.
+この引数を指定しない場合、Django はクラス名を解体した文字列を使います。例え
+ば ``CamelCase`` は ``camel case`` になります。
 
 ``verbose_name_plural``
 -----------------------
 
 .. attribute:: Options.verbose_name_plural
 
-The plural name for the object::
+オブジェクトの複数形名です::
 
     verbose_name_plural = "stories"
 
-If this isn't given, Django will use :attr:`~Options.verbose_name` + ``"s"``.
+この引数を指定しない場合、Django は :attr:`~Options.verbose_name` + "s"``
+を使います。

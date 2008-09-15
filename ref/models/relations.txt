@@ -1,8 +1,11 @@
 .. _ref-models-relations:
+.. _Related objects reference:
 
-=========================
-Related objects reference
-=========================
+=====================================
+リレーションオブジェクトリファレンス
+=====================================
+
+.. TBD
 
 Extra methods on managers when used in a ForeignKey context
 ===========================================================

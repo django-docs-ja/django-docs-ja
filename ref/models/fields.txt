@@ -1,8 +1,13 @@
 .. _ref-models-fields:
+.. _Model field reference:
 
-=====================
-Model field reference
-=====================
+==============================
+モデルフィールドリファレンス
+==============================
+
+:revision-up-to: 8961 (1.0)
+
+.. TBD
 
 .. module:: django.db.models.fields
    :synopsis: Built-in field types.
@@ -23,64 +28,69 @@ This document contains all the gory details about all the `field options`_ and
     ``models.<Foo>Field``.
 
 .. _common-model-field-options:
+.. _Field options:
 
-Field options
-=============
+フィールドオプション
+======================
 
-The following arguments are available to all field types. All are optional.
+全てのフィールド型で、以下の引数を指定できます。これらの引数はすべてオプショ
+ンです。
 
 ``null``
 --------
 
 .. attribute:: Field.null
 
-If ``True``, Django will store empty values as ``NULL`` in the database. Default
-is ``False``.
+``True`` にすると、 Django は空の値を ``NULL`` としてデータベースに入れます。
+デフォルト値は ``False`` です。
 
-Note that empty string values will always get stored as empty strings, not as
-``NULL``. Only use ``null=True`` for non-string fields such as integers,
-booleans and dates. For both types of fields, you will also need to set
-``blank=True`` if you wish to permit empty values in forms, as the
-:attr:`~Field.null` parameter only affects database storage (see
-:attr:`~Field.blank`).
+空の文字列値は ``NULL`` ではなく空文字列として保存されることに注意して下さ
+い。 ``null=True`` が使えるのは、整数型やブール型、日付のような、文字列では
+ないフィールド型の場合だけです。 :attr:`~Field.null` はデータベースでの記録
+操作にのみかかわるパラメタなので、フォーム上で空の値を入力できるようにした
+ければ ``blank=True`` も指定する必要があるでしょう (:attr:`~Field.blank` も
+参照してください)。
 
-Avoid using :attr:`~Field.null` on string-based fields such as
-:class:`CharField` and :class:`TextField` unless you have an excellent reason.
-If a string-based field has ``null=True``, that means it has two possible values
-for "no data": ``NULL``, and the empty string. In most cases, it's redundant to
-have two possible values for "no data;" Django convention is to use the empty
-string, not ``NULL``.
+特別な理由のない限り、 :class:`CharField` や :class:`TextField` のような、
+文字列ベースのフィールドには :attr:`~Field.null` を指定しないでください。
+文字列ベースのフィールドが ``nill=True`` であるということは、「データがない」
+ことを表すのに ``NULL`` と空文字列という二つの値が存在することを示します。
+多くの場合、「データがない」ことを表すのに二つのを取り得るのは冗長でしかあ
+りません。 Django の慣習では、データのない文字列フィールドの値は ``NULL``
+ではなく空文字列です。
 
 .. note::
 
-    When using the Oracle database backend, the ``null=True`` option will be
-    coerced for string-based fields that can blank, and the value ``NULL`` will
-    be stored to denote the empty string.
+    Oracle バックエンドを使っている場合、データベースの制約のため、
+    空文字列を許すような文字列ベースのフィールドは、 ``null=True`` オプショ
+    ンが強制的に付加され、 ``NULL`` は空の文字列を指します。
 
 ``blank``
 ---------
 
 .. attribute:: Field.blank
 
-If ``True``, the field is allowed to be blank. Default is ``False``.
+``True`` にすると、フィールドの値を空白 (blank) にできます。デフォルト値は
+``False`` です。
 
-Note that this is different than :attr:`~Field.null`. :attr:`~Field.null` is
-purely database-related, whereas :attr:`~Field.blank` is validation-related. If
-a field has ``blank=True``, validation on Django's admin site will allow entry
-of an empty value. If a field has ``blank=False``, the field will be required.
+:attr:`~Field.null` とは違うことに注意してください。 :attr:`~Field.null` が
+純粋にデータベース上の表現に関わる概念であるのに対し、 :attr:`~Field.blank`
+とは値の検証 (validation) に関わる概念です。あるフィールドに ``blank=True``
+を指定すると、 Django の admin サイト上で、空の値のエントリを作成できます。
+``blank=False`` にすると、そのフィールドには必ず値を入れねばなりません。
 
 ``choices``
 -----------
 
 .. attribute:: Field.choices
 
-An iterable (e.g., a list or tuple) of 2-tuples to use as choices for this
-field.
+2 要素のタプルからなる iterable (リストまたはタプル) を、フィールドの値の選
+択肢にします。
 
-If this is given, Django's admin will use a select box instead of the standard
-text field and will limit choices to the choices given.
+この値を指定すると、 Django の admin には標準的なテキストフィールドの代わり
+に選択ボックスが表示され、指定された選択肢だけをえらべます。
 
-A choices list looks like this::
+選択肢リストは以下のように指定します::
 
     YEAR_IN_SCHOOL_CHOICES = (
         ('FR', 'Freshman'),
@@ -90,10 +100,10 @@ A choices list looks like this::
         ('GR', 'Graduate'),
     )
 
-The first element in each tuple is the actual value to be stored. The second
-element is the human-readable name for the option.
+各タプルの最初の要素は、データベースに実際に保存される値です。二つ目の値は
+各オプションに対する人間可読な名前です。
 
-The choices list can be defined either as part of your model class::
+選択肢リストは、モデルクラスの一部として定義できます::
 
     class Foo(models.Model):
         GENDER_CHOICES = (
@@ -102,7 +112,7 @@ The choices list can be defined either as part of your model class::
         )
         gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
 
-or outside your model class altogether::
+また、モデルクラスの外でも定義できます::
 
     GENDER_CHOICES = (
         ('M', 'Male'),
@@ -111,8 +121,7 @@ or outside your model class altogether::
     class Foo(models.Model):
         gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
 
-You can also collect your available choices into named groups that can
-be used for organizational purposes::
+また、選択肢をグループごとに集めて、名前をつけられます::
 
     MEDIA_CHOICES = (
         ('Audio', (
@@ -128,43 +137,43 @@ be used for organizational purposes::
         ('unknown', 'Unknown'),
     )
 
-The first element in each tuple is the name to apply to the group. The 
-second element is an iterable of 2-tuples, with each 2-tuple containing
-a value and a human-readable name for an option. Grouped options may be 
-combined with ungrouped options within a single list (such as the 
-`unknown` option in this example).
+各タプルの最初の要素は、選択肢グループの名前です。二つ目の要素は、2 要素の
+タプルからなるイテレーション可能なオブジェクトです。各 2 要素タプルには、
+選択肢の値と、人間可読な名前を指定します。(上の例の ``unknown`` オプション
+のように) グループ化されたオプションとされていないオプションを混ぜても構い
+ません。
 
-For each model field that has :attr:`~Field.choices` set, Django will add a
-method to retrieve the human-readable name for the field's current value. See
-:meth:`~django.db.models.Model.get_FOO_display` in the database API
-documentation.
+:attr:`~Field.choices` セットを持つモデルフィールド各々について、 Django は
+特殊なメソッドを追加し、フィールドの現在値を人間可読な形式で取得できるよう
+にします。データベース API ドキュメントの 
+:meth:`~django.db.models.Model.get_FOO_display` を参照してください。
 
-Finally, note that choices can be any iterable object -- not necessarily a list
-or tuple. This lets you construct choices dynamically. But if you find yourself
-hacking :attr:`~Field.choices` to be dynamic, you're probably better off using a
-proper database table with a :class:`ForeignKey`. :attr:`~Field.choices` is
-meant for static data that doesn't change much, if ever.
+最後に、 choices はリストやタプルでなくてもよく、任意の iterable オブジェク
+トでかまわないことに注意してください。つまり、 choices は動的生成できるので
+す。とはいえ、 :attr:`~Field.choices` を動的生成するようなハックをするくら
+いなら、適当なデータベーステーブルを :class:`ForeignKey` で参照した方がよい
+でしょう。というのも、 :attr:`~Field.choices` はあまり変更のない静的な選択
+肢のためのオプションだからです。
 
 ``db_column``
 -------------
 
 .. attribute:: Field.db_column
 
-The name of the database column to use for this field. If this isn't given,
-Django will use the field's name.
+フィールドに使うデータベースカラム名です。この値を指定しなければ、 Django
+はフィールド名を使います。
 
-If your database column name is an SQL reserved word, or contains
-characters that aren't allowed in Python variable names -- notably, the
-hyphen -- that's OK. Django quotes column and table names behind the
-scenes.
+データベースカラム名が SQL の予約語であったり、 Python で変数名として使えな
+い文字を含んでいる (よくあるのはハイフンです) 場合でも問題ありません。
+Django は必要に応じてカラム名やテーブル名をクオートします。
 
 ``db_index``
 ------------
 
 .. attribute:: Field.db_index
 
-If ``True``, djadmin:`django-admin.py sqlindexes <sqlindexes>` will output a
-``CREATE INDEX`` statement for this field.
+``True`` にすると :djadmin:`django-admin.py sqlindexes <sqlindexes>`
+を実行した時に、フィールドに対して ``CREATE INDEX`` 文を出力します。
 
 ``db_tablespace``
 -----------------
@@ -173,102 +182,110 @@ If ``True``, djadmin:`django-admin.py sqlindexes <sqlindexes>` will output a
 
 .. versionadded:: 1.0
 
-The name of the database tablespace to use for this field's index, if this field
-is indexed. The default is the project's :setting:`DEFAULT_INDEX_TABLESPACE`
-setting, if set, or the :attr:`~Field.db_tablespace` of the model, if any. If
-the backend doesn't support tablespaces, this option is ignored.
+フィールドの値をインデクス化する際、フィールドのインデクスとして使うデータ
+ベースのテーブル空間 (tablespace) の名前です。デフォルトの値は、プロジェク
+トで設定されている :setting:`DEFAULT_INDEX_TABLESPACE` です。この値がなけれ
+ば、モデルの :attr:`~Field.db_tablespace` を使います。データベースバックエ
+ンドがテーブルスペースをサポートしていなければ、このオプションは無視されま
+す。
 
 ``default``
 -----------
 
 .. attribute:: Field.default
 
-The default value for the field. This can be a value or a callable object. If
-callable it will be called every time a new object is created.
+フィールドのデフォルト値です。この値は、何らかの値でも、呼び出し可能オブジェ
+クトでもかまいません。呼び出し可能オブジェクトの場合、新たなオブジェクトが
+生成されるたびに呼び出されます。
 
 ``editable``
 ------------
 
 .. attribute:: Field.editable
 
-If ``False``, the field will not be editable in the admin or via forms
-automatically generated from the model class. Default is ``True``.
+``False`` にすると、 admin 上や、モデルクラスから生成したフォームの上でフィー
+ルドの値を編集できなくなります。デフォルト値は ``True`` です。
 
 ``help_text``
 -------------
 
 .. attribute:: Field.help_text
 
-Extra "help" text to be displayed under the field on the object's admin form.
-It's useful for documentation even if your object doesn't have an admin form.
+オブジェクトの admin フォームの下に表示される、追加の「ヘルプ」テキストです。
+とはいえ、オブジェクトが admin のフォームを持っていなくてもドキュメントとし
+て有用でしょう。
 
-Note that this value is *not* HTML-escaped when it's displayed in the admin
-interface. This lets you include HTML in :attr:`~Field.help_text` if you so
-desire. For example::
+この値は admin インタフェース上に表示されるときに HTML エスケープされ 
+*ない* ので注意してください。必要ならば、下記の例のように
+:attr:`~Field.help_text` にHTML を含めてもかまいません::
 
     help_text="Please use the following format: <em>YYYY-MM-DD</em>."
 
-Alternatively you can use plain text and
-``django.utils.html.escape()`` to escape any HTML special characters.
+プレーンテキストを使って、 ``django.utils.html.escape()`` でHTML の特殊文字
+をエスケープしてもかまいません。
 
 ``primary_key``
 ---------------
 
 .. attribute:: Field.primary_key
 
-If ``True``, this field is the primary key for the model.
+``True`` に指定すると、フィールドをモデルの主キーにします。
 
-If you don't specify ``primary_key=True`` for any fields in your model, Django
-will automatically add an :class:`IntegerField` to hold the primary key, so you
-don't need to set ``primary_key=True`` on any of your fields unless you want to
-override the default primary-key behavior. For more, see
-:ref:`automatic-primary-key-fields`.
+モデルのどのフィールドにも ``primary_key=True`` を指定しなければ、Django は
+自動的に :class:`IntegerField` を追加して主キーを保存します。従って、デフォ
+ルトの主キーの振舞いを変更したいのでないかぎり、 ``primary_key=True`` をフィー
+ルドに指定しておく必要はありません。詳しくは
+:ref:`automatic-primary-key-fields` を参照してください。
 
-``primary_key=True`` implies :attr:`null=False <Field.null>` and :attr:`unique=True <Field.unique>`. 
-Only one primary key is allowed on an object.
+``primary_key=True`` であるということは、 :attr:`null=False <Field.null>`
+かつ :attr:`unique=True <Field.unique>` であることを指します。一つのオブジェ
+クトには一つしか主キーを指定できません。
 
 ``unique``
 ----------
 
 .. attribute:: Field.unique
 
-If ``True``, this field must be unique throughout the table.
+``True`` であれば、フィールドはテーブル全体で一意の値を取らねばなりません。
 
-This is enforced at the database level and at the Django admin-form level. If
-you try to save a model with a duplicate value in a :attr:`~Field.unique`
-field, a :exc:`django.db.IntegrityError` will be raised by the model's
-:meth:`~django.db.models.Model.save` method.
+この制約は、データベースレベルと Django の admin のレベルで適用されます。
+重複した値を持つ :attr:`~Field.unique` フィールドを含んだモデルを保存しよう
+とすると、モデルの :meth:`~django.db.models.Model.save`  メソッドによって
+:exc:`django.db.IntegrityError` が送出されます。
 
-This options is valid on all field types except :class:`ManyToManyField`.
+このオプションは、 :class:`ManyToManyField` 以外の全てのフィールドで利用で
+きます。
 
 ``unique_for_date``
 -------------------
 
 .. attribute:: Field.unique_for_date
 
-Set this to the name of a :class:`DateField` or :class:`DateTimeField` to
-require that this field be unique for the value of the date field.
+:class:`DateField` や :class:`DateTimeField` 型のフィールドの名前を指定して
+おくと、そのフィールドの日付に対して一意な値になるように制約します。
 
-For example, if you have a field ``title`` that has
-``unique_for_date="pub_date"``, then Django wouldn't allow the entry of two
-records with the same ``title`` and ``pub_date``.
+例えば、 ``title`` という名前のフィールドがあり、
+``unique_for_date="pub_date"`` が指定されていたとすると、 Django は同じ
+``title`` や ``pub_date`` の値を持つようなエントリを受け入れません。
 
-This is enforced at the Django admin-form level but not at the database level.
+この制約は Django の admin フォームのレベルで適用され、データベースレベルで
+は適用されません。
 
 ``unique_for_month``
 --------------------
 
 .. attribute:: Field.unique_for_month
 
-Like :attr:`~Field.unique_for_date`, but requires the field to be unique with
-respect to the month.
+:attr:`~Field.unique_for_date` と同様ですが、フィールドの値が月ごとに一意で
+あるように制約します。
 
 ``unique_for_year``
 -------------------
 
 .. attribute:: Field.unique_for_year
 
-Like :attr:`~Field.unique_for_date` and :attr:`~Field.unique_for_month`.
+:attr:`~Field.unique_for_date` や :attr:`~Field.unique_for_month` と同じで
+す。
 
 .. _model-field-types:
 
@@ -282,19 +299,21 @@ Field types
 
 .. class:: AutoField(**options)
 
-An :class:`IntegerField` that automatically increments
-according to available IDs. You usually won't need to use this directly; a
-primary key field will automatically be added to your model if you don't specify
-otherwise. See :ref:`automatic-primary-key-fields`.
+:class:`IntegerField` の一種で、利用可能な ID の中から自動的にインクリメン
+トしていきます。通常、このフィールドが直接必要になることはないでしょう。主
+キーのフィールドは、特に指定しない限り自動的に追加されます。 
+:ref:`automatic-primary-key-fields` を参照してください。
 
 ``BooleanField``
 ----------------
 
 .. class:: BooleanField(**options)
 
-A true/false field.
+真偽 (true/false) 値を表すフィールドです。
 
-The admin represents this as a checkbox.
+admin ではこのフィールドはチェックボックスとして表現されます。
+
+.. TBD
 
 .. admonition:: MySQL users..
 
@@ -314,19 +333,21 @@ The admin represents this as a checkbox.
 
 .. class:: CharField(max_length=None, [**options])
 
-A string field, for small- to large-sized strings.
+文字列フィールドで、短い文字列からやや長いものに適しています。
 
-For large amounts of text, use :class:`~django.db.models.TextField`.
+大量のテキストを入れたい場合には :class:`~django.db.models.TextField` を使っ
+て下さい。
 
-The admin represents this as an ``<input type="text">`` (a single-line input).
+admin では ``<input type="text">`` (一行の入力フィールド) で表現されます。
 
-:class:`CharField` has one extra required argument:
+:class:`CharField` 必須の引数があります:
 
 .. attribute:: CharField.max_length
 
-    The maximum length (in characters) of the field. The max_length is enforced
-    at the database level and in Django's validation.
+    フィールドの (文字数で表した) 最大長です。 ``max_length`` への制約はデー
+    タベースと Django 内の検証の両方のレベルで行われます。
 
+.. TBD
 .. admonition:: MySQL users
 
     If you are using this field with MySQLdb 1.2.2 and the ``utf8_bin``
@@ -340,41 +361,41 @@ The admin represents this as an ``<input type="text">`` (a single-line input).
 
 .. class:: CommaSeparatedIntegerField(max_length=None, [**options])
 
-A field of integers separated by commas. As in :class:`CharField`, the
-:attr:`~CharField.max_length` argument is required.
+カンマで区切った整数からなるフィールドです。 :class:`CharField` と同じく、
+:attr:`~CharField.max_length` 引数が必要です。
 
 ``DateField``
 -------------
 
 .. class:: DateField([auto_now=False, auto_now_add=False, **options])
 
-A date field. Has a few extra optional arguments:
+日付フィールドです。オプションの引数がいくつかあります:
 
 .. attribute:: DateField.auto_now
 
-    Automatically set the field to now every time the object is saved. Useful
-    for "last-modified" timestamps. Note that the current date is *always* used;
-    it's not just a default value that you can override.
+    オブジェクトを保存する度に、その時の時刻を自動的に設定します。
+    "last-modified"  タイムスタンプの実現に便利です。この値はオーバライドで
+    きるデフォルト値ではなく、 *常に* 現在の日付になるので注意してください。
 
 .. attribute:: DateField.auto_now_add
 
-    Automatically set the field to now when the object is first created. Useful
-    for creation of timestamps. Note that the current date is *always* used;
-    it's not just a default value that you can override.
+    オブジェクトを生成した時の時刻を自動的に設定します。タイムスタンプの生
+    成に便利です。この値はオーバライドできるデフォルト値ではなく、 *常に*
+    現在の日付になるので注意してください。
 
-The admin represents this as an ``<input type="text">`` with a JavaScript
-calendar, and a shortcut for "Today".  The JavaScript calendar will always start
-the week on a Sunday.
+admin では、 JavaScript のカレンダーと 「今日」へのショートカットのついた
+``<input type="text">`` として表現されます。 JavaScript カレンダーは常に日
+曜日から週が始まります。
 
 ``DateTimeField``
 -----------------
 
 .. class:: DateTimeField([auto_now=False, auto_now_add=False, **options])
 
-A date and time field. Takes the same extra options as :class:`DateField`.
+日付と時刻のフィールドです。 :class:`DateField` と同じオプションを取ります。
 
-The admin represents this as two ``<input type="text">`` fields, with JavaScript
-shortcuts.
+admin では JavaScript のショートカットのついた ``<input type="text">``
+フィールドで表現されます。
 
 ``DecimalField``
 ----------------
@@ -383,57 +404,60 @@ shortcuts.
 
 .. class:: DecimalField(max_digits=None, decimal_places=None, [**options])
 
-A fixed-precision decimal number, represented in Python by a
-:class:`~decimal.Decimal` instance. Has two **required** arguments:
+固定精度の 10 進小数です。 Python の :class:`~deciaml.Decimal` 型インスタン
+スとして表現されます。 **必須の** 引数が 2 つあります:
 
 .. attribute:: DecimalField.max_digits
 
-    The maximum number of digits allowed in the number
+    値を表現するのに使える最大桁数です。
 
 .. attribute:: DecimalField.decimal_places
 
-    The number of decimal places to store with the number
+    小数部の保存に使われる桁数です。
 
-For example, to store numbers up to 999 with a resolution of 2 decimal places,
-you'd use::
+例えば、小数部が 2 桁で、 999 までの数を表現できるようなフィールドを作成す
+るには、以下のようにします::
 
     models.DecimalField(..., max_digits=5, decimal_places=2)
 
-And to store numbers up to approximately one billion with a resolution of 10
-decimal places::
+小数部の精度が 10 桁で、 10 億までの数を表現できるようにしたければ、以下の
+ようにします::
 
     models.DecimalField(..., max_digits=19, decimal_places=10)
 
-The admin represents this as an ``<input type="text">`` (a single-line input).
+admin では、 ``<input type="text">`` (一行のテキスト入力) で表現されます。
 
 ``EmailField``
 --------------
 
 .. class:: EmailField([max_length=75, **options])
 
-A :class:`CharField` that checks that the value is a valid e-mail address.
+値が有効な e-mail アドレスであるかチェックする :class:`CharField` です。
 
-In Django 0.96, this doesn't accept :attr:`~CharField.max_length`; its
-:class:`~CharField.max_length` is automatically set to 75. In the Django
-development version, :class:`~CharField.max_length` is set to 75 by default, but
-you can specify it to override default behavior.
+Django 0.96 では、 :attr:`~CharField.max_length` を指定できません。
+:attr:`~CharField.max_length` は常に 75 にセットされるからです。
+バージョン 1.0 の Django では、 :attr:`~CharField.max_length` はデフォルト
+で 75 にセットされますが、デフォルト値を書き換えるよう指定できます。
 
 ``FileField``
 -------------
 
 .. class:: FileField(upload_to=None, [max_length=100, **options])
 
-A file-upload field. Has one **required** argument:
+ファイルアップロードのためのフィールドです。 **必須の** 引数を一つ持ちます:
 
 .. attribute:: FileField.upload_to
     
-    A local filesystem path that will be appended to your :setting:`MEDIA_ROOT`
-    setting to determine the value of the :attr:`~django.core.files.File.url`
-    attribute.
+    ローカルのファイルシステム上のパスです。このパスは
+    :setting:`MEDIA_ROOT` に設定したパスの後ろにつけられ、
+    :attr:`~django.core.files.File.url` 属性の値を決める際に使われます。
 
-    This path may contain `strftime formatting`_, which will be replaced by the
-    date/time of the file upload (so that uploaded files don't fill up the given
-    directory).
+    パスには `strftime によるフォーマット`_ を入れてもかまいません、フォー
+    マット文字列が入っていれば、(ディレクトリが同名のアップロードファイルで
+    埋まらないように)ファイルのアップロード日時に置き換わります。
+
+
+    .. TBD
     
     .. versionchanged:: 1.0
 
@@ -470,55 +494,58 @@ Also has one optional argument:
     Optional. A storage object, which handles the storage and retrieval of your
     files. See :ref:`topics-files` for details on how to provide this object.
 
-The admin represents this field as an ``<input type="file">`` (a file-upload
-widget).
+admin では、 ``<input type="file">`` (ファイルアップロードウィジェット)
+で表現されます。
 
-Using a :class:`FileField` or an :class:`ImageField` (see below) in a model
-takes a few steps:
+モデル中で :class:`FileField` や :class:`ImageField` (下記参照) を使うには、
+以下のようなステップが必要です:
 
-    1. In your settings file, you'll need to define :setting:`MEDIA_ROOT` as the
-       full path to a directory where you'd like Django to store uploaded files.
-       (For performance, these files are not stored in the database.) Define
-       :setting:`MEDIA_URL` as the base public URL of that directory. Make sure
-       that this directory is writable by the Web server's user account.
+    1. Django にアップロードされたファイルを保存させたい場所のフルパスを設
+       定ファイル中の :setting:`MEDIA_ROOT` に指定します。(パフォーマンス上
+       の理由から、アップロードされたファイルはデータベースに保存されませ
+       ん。) 保存場所への公開 URL を :setting:`MEDIA_URL` に指定します。
+       ディレクトリが Web サーバのユーザアカウントによって書き込み可能であ
+       るか確認してください。
 
-    2. Add the :class:`FileField` or :class:`ImageField` to your model, making
-       sure to define the :attr:`~FileField.upload_to` option to tell Django 
-       to which subdirectory of :setting:`MEDIA_ROOT` it should upload files.
+    2. :class:`FileField` や :class:`ImageField` をモデルに定義します。この
+       とき、 :attr:`~FileField.upload_to` オプションを指定して、
+       :setting:`MEDIA_ROOT` 下のサブディレクトリのどこにアップロードされた
+       ファイルを置くべきかを Django に教えます。
 
-    3. All that will be stored in your database is a path to the file
-       (relative to :setting:`MEDIA_ROOT`). You'll most likely want to use the
-       convenience :attr:`~django.core.files.File.url` function provided by 
-       Django. For example, if your :class:`ImageField` is called ``mug_shot``, 
-       you can get the absolute URL to your image in a template with 
-       ``{{ object.mug_shot.url }}``.
+    3. データベースに保存されるのはファイルへのパス (:setting:`MEDIA_ROOT`
+       からの相対) です。Django の提供している
+       :attr:`~django.core.files.File.url` を使うことになるでしょう。例えば、
+       ``mug_shot`` という名前の :class:`ImageField` があれば、画像への絶対
+       URL は ``{{ object.get_mug_shot_url }}`` で取得できます。
 
-For example, say your :setting:`MEDIA_ROOT` is set to ``'/home/media'``, and
-:attr:`~FileField.upload_to` is set to ``'photos/%Y/%m/%d'``. The ``'%Y/%m/%d'``
-part of :attr:`~FileField.upload_to` is `strftime formatting`_; ``'%Y'`` is the
-four-digit year, ``'%m'`` is the two-digit month and ``'%d'`` is the two-digit
-day. If you upload a file on Jan. 15, 2007, it will be saved in the directory
-``/home/media/photos/2007/01/15``.
+例えば、 :setting:`MEDIA_ROOT` を ``'/home/media'`` にして、 
+:attr:`~FileField.upload_to` を ``'photos/%Y/%m/%d'`` に設定したとします。
+``upload_to`` の ``'%Y/%m/%d'`` の部分は strftime と同じフォーマット文字を
+使っています。すなわち、 ``'%Y'`` が 4 桁の年号、 ``'%m'`` が 2 桁の月、
+``'%d'`` が 2 桁の日を表します。従って、ファイルを 2007 年の 1 月 15 日にアッ
+プロードすると、 ``/home/media/photos/2007/01/15`` に保存されます。
 
-If you want to retrieve the upload file's on-disk filename, or a URL that refers
-to that file, or the file's size, you can use the 
-:attr:`~django.core.files.File.name`, :attr:`~django.core.files.File.url`
-and :attr:`~django.core.files.File.size` attributes; see :ref:`topics-files`.
+アップロードファイルのディスク上でのファイル名を取得したい場合や、ファイル
+にアクセスするための URL を調べたい場合、ファイルのサイズを知りたい場合は、
+それぞれ :attr:`~django.core.files.File.name`,
+:attr:`~django.core.files.File.url`, :attr:`~django.core.files.File.size`
+メソッドを使えます。詳しくは :ref:`topics-files` を参照してください。
 
-Note that whenever you deal with uploaded files, you should pay close attention
-to where you're uploading them and what type of files they are, to avoid
-security holes. *Validate all uploaded files* so that you're sure the files are
-what you think they are. For example, if you blindly let somebody upload files,
-without validation, to a directory that's within your Web server's document
-root, then somebody could upload a CGI or PHP script and execute that script by
-visiting its URL on your site. Don't allow that.
+ファイルのアップロードを処理するときには、常にアップロード先の場所やアップ
+ロードされるファイルに注意して、セキュリティホールを避けるようにしてくださ
+い。 *アップロードされる全てのファイルをチェックして* 、予想外のファイルが
+アップロードされないようにしましょう。例えば、バリデーションを行わずに Web
+サーバのドキュメントルート下へのファイルのアップロードを盲目的に受け入れる
+と、そこに誰かが CGI や PHP スクリプトをアップロードして、あなたのサイト上
+の URL を訪問した人にスクリプトを実行させられてしまいます。そんなことを許し
+てはなりません。
 
 .. versionadded:: 1.0
-   The ``max_length`` argument was added in this version.
+   ``max_length`` 引数が追加されました。
 
-By default, :class:`FileField` instances are
-created as ``varchar(100)`` columns in your database. As with other fields, you
-can change the maximum length using the :attr:`~CharField.max_length` argument.
+デフォルトでは、 :class:`FileField` インスタンスは ``varchar(100)`` カラム
+をデータベースに作成します。他のフィールドと同様、
+:attr:`~CharField.max_length` 引数を使って最大長を変更できます。
 
 .. _`strftime formatting`: http://docs.python.org/lib/module-time.html#l2h-1941
 
@@ -527,44 +554,45 @@ can change the maximum length using the :attr:`~CharField.max_length` argument.
 
 .. class:: FilePathField(path=None, [match=None, recursive=False, max_length=100, **options])
 
-A :class:`CharField` whose choices are limited to the filenames in a certain
-directory on the filesystem. Has three special arguments, of which the first is
-**required**:
+ファイルシステム上のあるディレクトリ下のファイル名だけを選べるようになって
+いる :class:`CharField` です。 3 つの特別な引数があり、そのうち最初の一つは
+**必須** です:
 
 .. attribute:: FilePathField.path
 
-    Required. The absolute filesystem path to a directory from which this
-    :class:`FilePathField` should get its choices. Example: ``"/home/images"``.
+    必須です。 :class:`FilePathField` が選択肢を作成するためのディレクトリ
+    への絶対パスです。例: ``"/home/images"``
 
 .. attribute:: FilePathField.match
 
-    Optional. A regular expression, as a string, that :class:`FilePathField`
-    will use to filter filenames. Note that the regex will be applied to the
-    base filename, not the full path. Example: ``"foo.*\.txt$"``, which will
-    match a file called ``foo23.txt`` but not ``bar.txt`` or ``foo23.gif``.
+    オプションです。正規表現を表す文字列で、 :class:`FilePathField` がファ
+    イル名のフィルタに使います。正規表現はフルパスではなくファイル名に適用
+    されるので注意してください。 例: ``"foo.*\.txt$"`` は ``foo23.txt`` に
+    はマッチしますが、 ``bar.txt`` や ``foo23.gif`` にはマッチしません。
 
 .. attribute:: FilePathField.recursive
     
-    Optional. Either ``True`` or ``False``. Default is ``False``. Specifies
-    whether all subdirectories of :attr:`~FilePathField.path` should be included
+    オプションです。 ``True`` または ``False`` です。デフォルトは ``False``
+    で、 :attr:`~FilePathField.path` のサブディレクトリを含めるかどうかを指
+    定します。
 
-Of course, these arguments can be used together.
+もちろん、これらの引数を組み合わせて使ってもかまいません。
 
-The one potential gotcha is that :attr:`~FilePathField.match` applies to the
-base filename, not the full path. So, this example::
+よくある勘違いは、 :attr:`~FilePathField.match` がファイル名ではなくフルパ
+スに適用されると思ってしまうことです。以下の例::
 
     FilePathField(path="/home/images", match="foo.*", recursive=True)
 
-...will match ``/home/images/foo.gif`` but not ``/home/images/foo/bar.gif``
-because the :attr:`~FilePathField.match` applies to the base filename
-(``foo.gif`` and ``bar.gif``).
+は ``/home/images/foo.gif`` にはマッチしますが、ファイル名本体 (``foo.gif``
+や ``bar.gif``) にマッチするため、 ``/home/images/foo/bar.gif`` にはマッチ
+しません。
 
 .. versionadded:: 1.0
-   The ``max_length`` argument was added in this version.
+   ``max_length`` 引数が追加されました。
 
-By default, :class:`FilePathField` instances are
-created as ``varchar(100)`` columns in your database. As with other fields, you
-can change the maximum length using the :attr:`~CharField.max_length` argument.
+:class:`FilePathField` インスタンスは ``varchar(100)`` カラムをデータベース
+に作成します。他のフィールドと同様、 :attr:`~CharField.max_length` 引数を使っ
+て最大長を変更できます。
 
 ``FloatField``
 --------------
@@ -573,22 +601,25 @@ can change the maximum length using the :attr:`~CharField.max_length` argument.
 
 .. versionchanged:: 1.0
 
-A floating-point number represented in Python by a ``float`` instance.
+浮動小数点数です。Python の ``float`` 型インスタンスで表現されます。
 
-The admin represents this as an ``<input type="text">`` (a single-line input).
+admin では、 ``<input type="text">`` (一行の入力フィールド) で表現されます。
 
-**NOTE:** The semantics of :class:`FloatField` have changed in the Django
-development version. See the `Django 0.96 documentation`_ for the old behavior.
+**NOTE:** Django 1.0 から、 ``FloatField`` の仕様が変更されています。
+以前の仕様は、 `Django 0.96 のドキュメント`_ を参照してください。
 
 .. _Django 0.96 documentation: http://www.djangoproject.com/documentation/0.96/model-api/#floatfield
+.. _`Django 0.96 のドキュメント`: `Django 0.96 documentation`_
 
 ``ImageField``
 --------------
 
 .. class:: ImageField(upload_to=None, [height_field=None, width_field=None, max_length=100, **options])
 
-Like :class:`FileField`, but validates that the uploaded object is a valid
-image. Has two extra optional arguments:
+:class:`FileField` に似ていますが、アップロードされたオブジェクトが有効なイ
+メージかどうか検証します。二つのオプション引数があります:
+
+.. TBD
 
 .. attribute:: ImageField.height_field
 
@@ -600,91 +631,93 @@ image. Has two extra optional arguments:
     Name of a model field which will be auto-populated with the width of the
     image each time the model instance is saved.
     
-In addition to the special attributes that are available for :class:`FileField`,
-an :class:`ImageField` also has ``File.height`` and ``File.width`` attributes.
-See :ref:`topics-files`.
+:class:`FileField` で使える特殊属性の他に、 :class:`ImageField` で
+:attr:`File.height` および :attr:`File.width` を使えます。
+:ref:`topics-files` を参照してください。
 
-Requires the `Python Imaging Library`_.
+`Python Imaging Library`_ が必要です。
 
 .. _Python Imaging Library: http://www.pythonware.com/products/pil/
 
 .. versionadded:: 1.0
-   The ``max_length`` argument was added in this version.
+   ``max_length`` 引数が追加されました。
 
-By default, :class:`ImageField` instances are
-created as ``varchar(100)`` columns in your database. As with other fields, you
-can change the maximum length using the :attr:`~CharField.max_length` argument.
+:class:`ImageField` インスタンスは ``varchar(100)`` カラムをデータベースに
+作成します。他のフィールドと同様、 :attr:`~CharField.max_length` 引数を使っ
+て最大長を変更できます。
 
 ``IntegerField``
 ----------------
 
 .. class:: IntegerField([**options])
 
-An integer. The admin represents this as an ``<input type="text">`` (a
-single-line input).
+整数です。 admin では、 ``<input type="text">`` (一行の入力フィールド) で表
+現されます。
 
 ``IPAddressField``
 ------------------
 
 .. class:: IPAddressField([**options])
 
-An IP address, in string format (e.g. "192.0.2.30"). The admin represents this
-as an ``<input type="text">`` (a single-line input).
+IP アドレスを 文字列形式で表したもの (例: "192.0.2.30") です。admin では、
+``<input type="text">`` (一行の入力フィールド) で表現されます。
 
 ``NullBooleanField``
 --------------------
 
 .. class:: NullBooleanField([**options])
 
-Like a :class:`BooleanField`, but allows ``NULL`` as one of the options. Use
-this instead of a :class:`BooleanField` with ``null=True``. The admin represents
-this as a ``<select>`` box with "Unknown", "Yes" and "No" choices.
+:class:`BooleanField` と同じですが、 ``NULL`` を選択肢に使えます。
+``null=True`` の :class:`BooleanField` の代わりに使って下さい。 admin では、
+「不明」 ("Unknown") 「はい」 ("Yes")、「いいえ」 ("No") の選択肢をもつ
+``<select>`` ボックスで表現されます。
 
 ``PositiveIntegerField``
 ------------------------
 
 .. class:: PositiveIntegerField([**options])
 
-Like an :class:`IntegerField`, but must be positive.
+:class:`IntegerField` と同じですが、正の数でなければなりません。
 
 ``PositiveSmallIntegerField``
 -----------------------------
 
 .. class:: PositiveSmallIntegerField([**options])
 
-Like a :class:`PositiveIntegerField`, but only allows values under a certain
-(database-dependent) point.
+:class:`PositiveIntegerField` と同じですが、ある範囲以下 (データベース依存
+です)の値しか使えません。
 
 ``SlugField``
 -------------
 
 .. class:: SlugField([max_length=50, **options])
 
-:term:`Slug` is a newspaper term. A slug is a short label for something,
-containing only letters, numbers, underscores or hyphens. They're generally used
-in URLs.
+「 :term:`スラグ` (:term:`slug`)」は新聞業界の用語で、内容を示す短いラベル
+です。スラグは文字、数字、アンダースコア、ハイフンだけからなります。スラグ
+はよく URL に使われます。
 
-Like a CharField, you can specify :attr:`~CharField.max_length`. If
-:attr:`~CharField.max_length` is not specified, Django will use a default length
-of 50.
+:class:`CharField` と同様、 :attr:`~CharField.max_length` を指定できます。
+指定しなかった場合、Django はデフォルト値の 50 を使います。
 
-Implies setting :attr:`Field.db_index` to ``True``.
+:attr:`Field.db_index` を ``True`` に設定します。
 
 ``SmallIntegerField``
 ---------------------
 
 .. class:: SmallIntegerField([**options])
 
-Like an :class:`IntegerField`, but only allows values under a certain
-(database-dependent) point.
+:class:`IntegerField` と同様ですが、ある (データベース依存の) 範囲の値しか
+使えません。
 
 ``TextField``
 -------------
 
 .. class:: TextField([**options])
 
-A large text field. The admin represents this as a ``<textarea>`` (a multi-line
-input).
+長いテキストのためのフィールドです。admin では、 ``<textarea>`` (複数行の入
+力フィールド) で表現されます。
+
+.. TBD
 
 .. admonition:: MySQL users
 
@@ -698,40 +731,40 @@ input).
 
 .. class:: TimeField([auto_now=False, auto_now_add=False, **options])
 
-A time. Accepts the same auto-population options as :class:`DateField` and
-:class:`DateTimeField`. The admin represents this as an ``<input type="text">``
-with some JavaScript shortcuts.
+時刻です。 :class:`DateField` や :class:`DateTimeField` と同じく、自動的に
+値を埋めるためのオプションを使えます。admin では、JavaScript のショートカッ
+トがついた ``<input type="text">`` で表現されます。
 
 ``URLField``
 ------------
 
 .. class:: URLField([verify_exists=True, max_length=200, **options])
 
-A :class:`CharField` for a URL. Has one extra optional argument:
+URL を表すための :class:`CharField` です。引数を一つとります:
 
 .. attribute:: URLField.verify_exists
 
-    If ``True`` (the default), the URL given will be checked for existence
-    (i.e., the URL actually loads and doesn't give a 404 response).
+    ``True`` (デフォルト値です) にすると、指定された URL が実在する (URL は
+    実際にロードでき、かつ 404 応答を返さない) かどうか検証します。
 
-The admin represents this as an ``<input type="text">`` (a single-line input).
+admin では、 ``<input type="text">`` (一行の入力フィールド) で表現されます。
 
-Like all ::class:`CharField` subclasses, :class:`URLField` takes the optional
-:attr:`~CharField.max_length`argument. If you don't specify
-:attr:`~CharField.max_length`, a default of 200 is used.
+:class:`CharField` の他のサブクラスと同じく、 :class:`URLField` にはオプショ
+ンの引数として、フィールドの最大長 (文字数) を表す
+:attr:`~CharField.max_length` を指定できます。
+:attr:`~CharField.max_length` を指定しないときのデフォルトの値は 200 です。
 
 ``XMLField``
 ------------
 
 .. class:: XMLField(schema_path=None, [**options])
 
-A :class:`TextField` that checks that the value is valid XML that matches a
-given schema. Takes one required argument:
+:class:`TextField` と同様ですが、指定されたスキーマに従って、値が有効な XML であ
+るか検証します。必須の引数を一つとります:
 
 .. attribute:: schema_path
 
-    The filesystem path to a RelaxNG_ schema against which to validate the
-    field.
+    検証に使う RelaxNG_ スキーマを指すファイルシステム上のパス名です。
 
 .. _RelaxNG: http://www.relaxng.org/
 
@@ -752,18 +785,18 @@ Django also defines a set of fields that represent relations.
 
 .. class:: ForeignKey(othermodel, [**options])
 
-A many-to-one relationship. Requires a positional argument: the class to which
-the model is related. 
+多対一のリレーションです。必須の固定引数として、リレーションを張るモデルの
+クラスをとります。
 
 .. _recursive-relationships:
 
-To create a recursive relationship -- an object that has a many-to-one
-relationship with itself -- use ``models.ForeignKey('self')``.
+再帰的なリレーションを張る、つまり自分自身への多対一のリレーションを張る場
+合には、 ``models.ForeignKey('self')`` を使います。
 
 .. _lazy-relationships:
 
-If you need to create a relationship on a model that has not yet been defined,
-you can use the name of the model, rather than the model object itself::
+未定義のモデルへのリレーションを作成したい場合、モデルオブジェクトではなく
+モデルの名前も使えます::
 
     class Car(models.Model):
         manufacturer = models.ForeignKey('Manufacturer')
@@ -772,27 +805,30 @@ you can use the name of the model, rather than the model object itself::
     class Manufacturer(models.Model):
         # ...
 
+.. TBD
+
 Note, however, that this only refers to models in the same ``models.py`` file --
 you cannot use a string to reference a model defined in another application or
 imported from elsewhere.
 
 .. versionchanged:: 1.0
-   Refering models in other applications must include the application label.
+   他のアプリケーションで定義されているモデルを参照する場合には、アプリケー
+   ションラベルを入れなければならなくなりました。
 
-To refer to models defined in another
-application, you must instead explicitly specify the application label. For
-example, if the ``Manufacturer`` model above is defined in another application
-called ``production``, you'd need to use::
+他のアプリケーションで定義されているモデルを参照したければ、アプリケーショ
+ンラベルを明示的に指定せねばなりません。例えば、上の例の ``Manufacturer``
+モデルが、 ``production`` という別のアプリケーションで定義されているのなら、
+以下のように書かねばなりません::
 
     class Car(models.Model):
         manufacturer = models.ForeignKey('production.Manufacturer')
 
-Behind the scenes, Django appends ``"_id"`` to the field name to create its
-database column name. In the above example, the database table for the ``Car``
-model will have a ``manufacturer_id`` column. (You can change this explicitly by
-specifying :attr:`~Field.db_column`) However, your code should never have to
-deal with the database column name, unless you write custom SQL. You'll always
-deal with the field names of your model object.
+舞台裏では、 Django はフィールド名に ``"_id"`` をつけた名前でデータベースの
+カラム名を生成します。上の例では、 ``Car`` モデルのデータベーステーブルには
+``manufacturer_id`` カラムが入ります (このカラム名は ``db_column`` を明示的
+に指定して変更できます。詳しくは :attr:`~Field.db_column` を参照してくださ
+い) 。とはいえ、カスタムのSQL 文を発行するのでないかぎり、データベースのカ
+ラム名をコードで直接扱う必要はありません。
 
 .. _foreign-key-arguments:
 
@@ -819,17 +855,17 @@ define the details of how the relation works.
    
 .. attribute:: ForeignKey.related_name
 
-    The name to use for the relation from the related object back to this one.
-    See the :ref:`related objects documentation <backwards-related-objects>` for
-    a full explanation and example. Note that you must set this value
-    when defining relations on :ref:`abstract models
-    <abstract-base-classes>`; and when you do so
-    :ref:`some special syntax <abstract-related-name>` is available.
+    リレーション先のオブジェクトから逆参照するときに使われる名前です。
+    詳しくは :ref:`related objects documentation <backwards-related-objects>` 
+    を参照してください。 :ref:`抽象ベースクラス <abstract-related-name>` で
+    リレーションを定義する場合、この値を設定せねばなりません。また、抽象ベー
+    スクラスで定義する場合には、 :ref:`特殊な表記法 <abstract-related-name>`
+    を使えます。
 
 .. attribute:: ForeignKey.to_field
 
-    The field on the related object that the relation is to. By default, Django
-    uses the primary key of the related object.
+    リレーション先のオブジェクトの、リレーションを張る対象のフィールド名で
+    す。デフォルトでは、リレーション先のオブジェクトの主キーを使います。
 
 .. _ref-manytomany:
 
@@ -838,13 +874,16 @@ define the details of how the relation works.
 
 .. class:: ManyToManyField(othermodel, [**options])
 
+
+.. TBD
+
 A many-to-many relationship. Requires a positional argument: the class to which
 the model is related. This works exactly the same as it does for
 :class:`ForeignKey`, including all the options regarding :ref:`recursive
 <recursive-relationships>` and :ref:`lazy <lazy-relationships>` relationships.
 
-Behind the scenes, Django creates an intermediary join table to represent the
-many-to-many relationship. By default, this table name is generated using the
+背後では、 Django は中間の join テーブルを生成して、多対多のリレーション
+を表現します。By default, this table name is generated using the
 names of the two tables being joined. Since some databases don't support table
 names above a certain length (often 32 characters), these table names will be
 automatically truncated to 32 characters and a uniqueness hash will be used.
@@ -859,44 +898,46 @@ that control how the relationship functions.
 
 .. attribute:: ManyToManyField.related_name
 
-    Same as :attr:`ForeignKey.related_name`.
+    :attr:`ForeignKey.related_name` と同じです。
     
 .. attribute:: ManyToManyFields.limit_choices_to
 
-    Same as :attr:`ForeignKey.limit_choices_to`.
+    :attr:`ForeignKey.limit_choices_to` と同じです。
     
-    ``limit_choices_to`` has no effect when used on a ``ManyToManyField`` with
-    an intermediate table.
+    ``ManyToManyField`` を中間テーブル (internmediate table) と一緒に使うと、
+    ``limit_choices_to`` の効果はなくなります。
 
 .. attribute:: ManyToManyFields.symmetrical
 
-    Only used in the definition of ManyToManyFields on self. Consider the
-    following model::
+    自分自身への :class:`~django.db.models.fields.ManyToManyField` を定義すると
+    きにのみ使います。以下のようなモデルを考えます::
 
         class Person(models.Model):
             friends = models.ManyToManyField("self")
          
-    When Django processes this model, it identifies that it has a
-    :class:`ManyToManyField` on itself, and as a result, it doesn't add a
-    ``person_set`` attribute to the ``Person`` class. Instead, the
-    :class:`ManyToManyField` is assumed to be symmetrical -- that is, if I am
-    your friend, then you are my friend.
-    
-    If you do not want symmetry in many-to-many relationships with ``self``, set
-    :attr:`~ManyToManyField.symmetrical` to ``False``. This will force Django to
-    add the descriptor for the reverse relationship, allowing
-    :class:`ManyToManyField` relationships to be non-symmetrical.
+    Django がこのモデルを処理する際、自分自身に対する
+    :class:`ManyToManyField` が定義されていることを認識して、 ``Person`` ク
+    ラスに ``person_set`` 属性を追加しないようにします。その代り、 
+    :class:`ManyToManyField` を対称的 (symmetrical) であるとみなします。す
+    なわち、私があなたの友達なら、あなたは私の友達である、というようにです。
+
+    ``self`` に対する多対多の関係に対称性を望まない場合は、
+    :attr:`~ManyToManyField.symmetrical` を ``False`` にしてください。これ
+    により、 Django に逆参照用のデスクリプタを追加させて、
+    :class:`ManyToManyField` を非対称にできます。
     
 .. attribute:: ManyToManyField.db_table
 
-    The name of the table to create for storing the many-to-many data. If this
-    is not provided, Django will assume a default name based upon the names of
-    the two tables being joined.
+    多対多のリレーション情報を保存するために作成されるテーブルの名前です。
+    名前を指定しなければ、Django はデフォルトの名前を使います。デフォルトの
+    名前は、結合する二つのテーブルの名前に基づいて決められます。
 
 .. _ref-onetoone:
 
 ``OneToOneField``
 -----------------
+
+.. TBD
 
 .. class:: OneToOneField(othermodel, [parent_link=False, **options])
 
@@ -921,8 +962,7 @@ accepted by :class:`ForeignKey`, plus one extra argument:
 
 .. attribute:: OneToOneField.parent_link
 
-    When ``True`` and used in a model which inherits from another
-    (concrete) model, indicates that this field should be used as the
-    link back to the parent class, rather than the extra
-    ``OneToOneField`` which would normally be implicitly created by
-    subclassing.
+    他のモデルを継承しているモデル中で ``True`` にすると、子のクラスのイン
+    スタンスから親のクラスのインスタンスに向けたリンクのフィールドとして
+    使います。通常は、サブクラス化によって暗黙のうちに ``OneToOneField``
+    が作成されます。

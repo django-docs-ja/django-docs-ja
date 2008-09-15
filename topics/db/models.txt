@@ -6,33 +6,37 @@ Writing models
 
 .. module:: django.db.models
 
-A model is the single, definitive source of data about your data. It contains
-the essential fields and behaviors of the data you're storing. Generally, each
-model maps to a single database table.
+モデルとは、サイトを構成するデータの、ただ一つかつ最終的なデータソースを指
+します。モデルには、保存したいデータに不可欠なデータフィールドと、その振舞
+いが収められています。一般的に、各モデルは単一のデータベーステーブルに対応
+づけられています。
 
-The basics:
+基本として、まず以下のことを知っておきましょう:
 
-    * Each model is a Python class that subclasses
-      :class:`django.db.models.Model`.
-    
-    * Each attribute of the model represents a database field.
+    * 各モデルは Python のクラスで、 :class:`django.db.models.Model` のサブ
+      クラスです。
 
-    * With all of this, Django gives you an automatically-generated
-      database-access API; see :ref:`topics-db-queries`.
+    * モデルの各属性値は、データベース上のあるフィールドを表現します。
+
+    * これらの情報をもとに、 Django はデータベース API を自動生成します。
+      API の詳細は :ref:`topics-db-queries` で解説します。
 
 .. seealso::
 
-    A companion to this document is the `official repository of model
-    examples`_. (In the Django source distribution, these examples are in the
-    ``tests/modeltests`` directory.)
+    このドキュメントを理解する上で、 `モデル例の公式リポジトリ`_ 
+    が参考になるでしょう。 (Django のソース配布物中では、これらの例は
+    ``tests/modeltests`` ディレクトリに収められています。)
 
     .. _official repository of model examples: http://www.djangoproject.com/documentation/models/
+    .. _`モデル例の公式リポジトリ`: `official repository of model examples`_
 
-Quick example
-=============
+.. _Quick example:
 
-This example model defines a ``Person``, which has a ``first_name`` and
-``last_name``::
+簡単な例
+========
+
+以下のモデル例では、 ``first_name`` および ``last_name`` というフィールドを
+持った ``Person`` を定義しています::
 
     from django.db import models
 
@@ -40,10 +44,11 @@ This example model defines a ``Person``, which has a ``first_name`` and
         first_name = models.CharField(max_length=30)
         last_name = models.CharField(max_length=30)
 
-``first_name`` and ``last_name`` are fields_ of the model. Each field is
-specified as a class attribute, and each attribute maps to a database column.
+``first_name`` と ``last_name`` はモデルの *フィールド (fields)* です。各
+フィールドはクラス属性として定義され、各属性がデータベースのカラムに対応し
+ます。
 
-The above ``Person`` model would create a database table like this:
+上の ``Person`` モデルは、以下のようなデータベーステーブルを生成します:
 
 .. code-block:: sql
 
@@ -53,31 +58,33 @@ The above ``Person`` model would create a database table like this:
         "last_name" varchar(30) NOT NULL
     );
 
-Some technical notes:
+以下に技術的な注意点を示します:
 
-    * The name of the table, ``myapp_person``, is automatically derived from
-      some model metadata but can be overridden. See :ref:`table-names` for more
-      details..
-      
-    * An ``id`` field is added automatically, but this behavior can be
-      overridden. See :ref:`automatic-primary-key-fields`.
-            
-    * The ``CREATE TABLE`` SQL in this example is formatted using PostgreSQL
-      syntax, but it's worth noting Django uses SQL tailored to the database
-      backend specified in your :ref:`settings file <topics-settings>`.
+    * テーブルの名前、 ``myapp_person`` はモデルのメタデータから自動的に導
+      出したものですが、オーバライドもできます。 :ref:`table-names` を参照
+      してください。
 
-Using models
+    * ``id`` は自動的に追加されますが、この挙動もまたオーバライドできます。
+      :ref:`automatic-primary-key-fields` を参照してください。
+
+    * この例の ``CREATE TABLE`` SQL 文は PostgreSQL の書式で書かれています
+      が、 Django は :ref:`settings file <topics-settings>` に指定されたデー
+      タベースバックエンド向けの SQL を使います。
+
+
+.. _Using models:
+
+モデルを使う
 ============
 
-Once you have defined your models, you need to tell Django you're going to *use*
-those models. Do this by editing your settings file and changing the
-:setting:`INSTALLED_APPS` setting to add the name of the module that contains
-your ``models.py``.
+モデルを定義したら、そのモデルを *使う* と Django に教えます。設定ファイル
+を編集して、 ``models.py`` の入ったモジュールの名前を
+:setting:`INSTALLED_APPS` 設定に追加してください。
 
-For example, if the models for your application live in the module
-``mysite.myapp.models`` (the package structure that is created for an
-application by the :djadmin:`manage.py startapp <startapp>` script),
-:setting:`INSTALLED_APPS` should read, in part::
+例えば、アプリケーションのモデルが ``mysite.myapp.models`` モジュール
+( :djadmin:`manage.py startapp <startapp>` スクリプトで作成した、アプリケー
+ションのパッケージ構造) に収められている場合、 :setting:`INSTALLED_APPS` は
+以下のようになります::
 
     INSTALLED_APPS = (
         #...
@@ -85,17 +92,20 @@ application by the :djadmin:`manage.py startapp <startapp>` script),
         #...
     )
 
-When you add new apps to :setting:`INSTALLED_APPS`, be sure to run
-:djadmin:`manage.py syncdb <syncdb>`.
+新しいアプリケーションを :setting:`INSTALLED_APPS` に追加したら、
+:djadmin:`manage.py syncdb <syncdb>` を忘れずに実行してください。
 
-Fields
-======
 
-The most important part of a model -- and the only required part of a model --
-is the list of database fields it defines. Fields are specified by class
-attributes.
+.. _Fields:
 
-Example::
+フィールド
+==========
+
+モデルで最も重要であり、かつモデル定義で最小限必要な部分は、モデル内が定義
+しているデータベースフィールドのリストです。フィールドはクラスの属性として
+定義されています。
+
+例を示します::
 
     class Musician(models.Model):
         first_name = models.CharField(max_length=50)
@@ -108,28 +118,34 @@ Example::
         release_date = models.DateField()
         num_stars = models.IntegerField()
 
-Field types
------------
+.. _Field types:
 
-Each field in your model should be an instance of the appropriate
-:class:`~django.db.models.Field` class. Django uses the field class types to
-determine a few things:
+フィールドのタイプ
+------------------
 
-    * The database column type (e.g. ``INTEGER``, ``VARCHAR``).
+モデルの各フィールドは適切な :class:`~django.db.models.Field` クラスのイン
+スタンスにせねばなりません。 Django はフィールドクラス型を以下のいくつかの
+判定に使います:
 
-    * The widget to use in Django's admin interface, if you care to use it
-      (e.g. ``<input type="text">``, ``<select>``).
+    * データベースのカラム型 (``INTEGER``, ``VARCHAR`` など)。
 
-    * The minimal validation requirements, used in Django's admin and in
-      automatically-generated forms.
+    * Django の admin サイトで使うウィジェットの選択 
+      (``<input type="text">``, ``<select>`` など)。
+
+    * Django の admin やマニピュレータで使われている最小限のバリデーション
+      (validation)。
+
+.. TBD
 
 Django ships with dozens of built-in field types; you can find the complete list
 in the :ref:`model field reference <model-field-types>`. You can easily write
 your own fields if Django's built-in ones don't do the trick; see
 :ref:`howto-custom-model-fields`.
 
-Field options
--------------
+.. _Field options:
+
+フィールドのオプション
+----------------------
 
 Each field takes a certain set of field-specific arguments (documented in the
 :ref:`model field reference <model-field-types>`). For example,
@@ -143,26 +159,28 @@ optional. They're fully explained in the :ref:`reference
 ones:
 
     :attr:`~Field.null`
-        If ``True``, Django will store empty values as ``NULL`` in the database.
-        Default is ``False``.
+        ``True`` にすると、 Django は空の値を ``NULL`` としてデータベースに
+        入れます。デフォルト値は ``False`` です。
 
     :attr:`~Field.blank`
-        If ``True``, the field is allowed to be blank. Default is ``False``.
+        ``True`` にすると、フィールドの値を空白 (blank) にできます。デフォ
+        ルト値は ``False`` です。
 
-        Note that this is different than :attr:`~Field.null`.
-        :attr:`~Field.null` is purely database-related, whereas
-        :attr:`~Field.blank` is validation-related. If a field has
-        :attr:`blank=True <Field.blank>`, validation on Django's admin site will
-        allow entry of an empty value. If a field has :attr:`blank=False
-        <Field.blank>`, the field will be required.
+        :attr:`~Field.null` とは違うことに注意してください。
+        :attr:`~Field.null` が純粋にデータベース上の表現に関わる概念である
+        のに対し、 :attr:`~Field.blank` とは値の検証 (validation) に関わ
+        る概念です。あるフィールドに :attr:`blank=True <Field.blank>` を指
+        定すると、 Djangoの adminサイト上で、空の値のエントリを作れるように
+        なります。 :attr:`blank=False <Field.blank>` にすると、そのフィール
+        ドには必ず値を入れねばなりません。
 
     :attr:`~Field.choices`
-        An iterable (e.g., a list or tuple) of 2-tuples to use as choices for
-        this field. If this is given, Django's admin will use a select box
-        instead of the standard text field and will limit choices to the choices
-        given.
+        2 要素のタプルからなる iterable (リストまたはタプル) を、フィールド
+        の値の選択肢にします。この値を指定すると、 Django の admin には標準
+        的なテキストフィールドの代わりに選択ボックスが表示され、指定された
+        選択肢だけをえらべるようになります。
 
-        A choices list looks like this::
+        選択肢リストは以下のようになります::
 
             YEAR_IN_SCHOOL_CHOICES = (
                 ('FR', 'Freshman'),
@@ -173,17 +191,19 @@ ones:
             )
 
     :attr:`~Field.default`
-        The default value for the field. This can be a value or a callable
-        object. If callable it will be called every time a new object is
-        created.
+        フィールドのデフォルト値です。この値は、何らかの値でも、呼び出し可
+        能オブジェクトでもかまいません。呼び出し可能オブジェクトの場合、新
+        たなオブジェクトが生成されるたびに呼び出されます。
 
     :attr:`~Field.help_text`
-        Extra "help" text to be displayed under the field on the object's admin
-        form. It's useful for documentation even if your object doesn't have an
-        admin form.
+        オブジェクトの admin フォームの下に表示される、追加の「ヘルプ」テキ
+        ストです。オブジェクトが admin のフォームを持っていなくても、ドキュ
+        メントとして有用でしょう。
 
     :attr:`~Field.primary_key`
-        If ``True``, this field is the primary key for the model.
+        ``True`` を指定すると、フィールドをモデルの主キーにします。
+
+        .. TBD
 
         If you don't specify :attr:`primary_key=True <Field.primary_key>` for
         any fields in your model, Django will automatically add an
@@ -193,82 +213,93 @@ ones:
         see :ref:`automatic-primary-key-fields`.
 
     :attr:`~Field.unique`
-        If ``True``, this field must be unique throughout the table.
+        ``True`` であれば、フィールドはテーブル全体で一意の値を取らねばなり
+        ません。
 
 Again, these are just short descriptions of the most common field options. Full
 details can be found in the :ref:`common model field option reference
 <common-model-field-options>`.
 
 .. _automatic-primary-key-fields:
+.. _Automatic primary key fields:
 
-Automatic primary key fields
+自動的な主キーフィールド
 ----------------------------
 
-By default, Django gives each model the following field::
+デフォルトでは、 Django は各モデルに以下のフィールド::
 
     id = models.AutoField(primary_key=True)
 
-This is an auto-incrementing primary key.
+を追加します。これは自動的に値をインクリメントして追加してゆくフィールドで、
+主キーに使われます。
 
-If you'd like to specify a custom primary key, just specify
-:attr:`primary_key=True <Field.primary_key>` on one of your fields. If Django
-sees you've explicitly set :attr:`Field.primary_key`, it won't add the automatic
-``id`` column.
+カスタムの主キーを指定したければ、いずれかのフィールドに
+:attr:`primary_key=True <Field.primary_key>` を指定してください。
+:attr:`Field.primary_key` の設定を見つけると、Django は ``id`` カラムを自動
+的に追加しません。
 
-Each model requires exactly one field to have :attr:`primary_key=True
-<Field.primary_key>`.
+各モデルには必ず一つ :attr:`primary_key=True <Field.primary_key>` のフィー
+ルドが必要です。
 
-Verbose field names
--------------------
+.. _Verbose field names:
 
-Each field type, except for :class:`~django.db.models.ForeignKey`,
-:class:`~django.db.models.ManyToManyField` and
-:class:`~django.db.models.OneToOneField`, takes an optional first positional
-argument -- a verbose name. If the verbose name isn't given, Django will
-automatically create it using the field's attribute name, converting underscores
-to spaces.
+詳細なフィールド名
+------------------
 
-In this example, the verbose name is ``"Person's first name"``::
+各フィールドの型は、  :class:`~django.db.models.fields.ForeignKey`,
+:class:`~django.db.models.fields.ManyToManyField` および
+:class:`~django.db.models.fields.OneToOneField` を除き、オプションの固定引
+数 (positional argument) を第一引数として指定できます。この引数には人間可読
+なカラム名を指定します。引数を指定しなければ、 Django はカラム名のアンダー
+スコアをスペースに変換して、自動的に人間可読なカラム名を生成します。
+
+下の例では、人間可読なカラム名は ``"Person's first name"`` です::
 
     first_name = models.CharField("Person's first name", max_length=30)
 
-In this example, the verbose name is ``"first name"``::
+下の例では ``"first name"`` です::
 
     first_name = models.CharField(max_length=30)
 
-:class:`~django.db.models.ForeignKey`,
-:class:`~django.db.models.ManyToManyField` and
-:class:`~django.db.models.OneToOneField` require the first argument to be a
-model class, so use the :attr:`~Field.verbose_name` keyword argument::
+:class:`~django.db.models.fields.ForeignKey`,
+:class:`~django.db.models.fields.ManyToManyField` および
+:class:`~django.db.models.fields.OneToOneField` では、第一引数は必須で、モ
+デルのクラスにします。従って、人間可読なカラム名を指定するには、
+:attr:`~Field.verbose_name` キーワード引数を使います::
 
     poll = models.ForeignKey(Poll, verbose_name="the related poll")
     sites = models.ManyToManyField(Site, verbose_name="list of sites")
     place = models.OneToOneField(Place, verbose_name="related place")
 
-The convention is not to capitalize the first letter of the
-:attr:`~Field.verbose_name`. Django will automatically capitalize the first
-letter where it needs to.
+慣習的に、 :attr:`~Field.verbose_name` の先頭の文字は大文字にしません。
+Django は必要なときに先頭の文字を自動的に大文字にします。
 
-Relationships
--------------
+.. _Relationships:
 
-Clearly, the power of relational databases lies in relating tables to each
-other. Django offers ways to define the three most common types of database
-relationships: many-to-one, many-to-many and one-to-one.
+リレーション
+------------
 
-Many-to-one relationships
-~~~~~~~~~~~~~~~~~~~~~~~~~
+関係データベースの威力はテーブルを相互に関連づけることにあるのはいうまでも
+ありません。Django ではよく使われるデータベースリレーション (relationship)、
+多対一 (many-to-one)、多対多 (many-to-many)、一対一 (one-to-one) を定義する
+方法を提供しています。
 
-To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`.
-You use it just like any other :class:`~django.db.models.Field` type: by
-including it as a class attribute of your model.
+.. _Many-to-one relationships:
 
-:class:`~django.db.models.ForeignKey` requires a positional argument: the class
-to which the model is related.
+多対一のリレーション
+~~~~~~~~~~~~~~~~~~~~
 
-For example, if a ``Car`` model has a ``Manufacturer`` -- that is, a
-``Manufacturer`` makes multiple cars but each ``Car`` only has one
-``Manufacturer`` -- use the following definitions::
+多対一のリレーションを定義するには
+:class:`~django.db.models.fields.ForeignKey` を使います。このフィールドは他
+のフィールド型と同じように、モデルのクラス属性に含めて使えます。
+
+:class:`~django.db.models.fields.ForeignKey` には、固定引数が一つあり、リレー
+ションを張る対象のクラスを指定します。
+
+例えば、 ``Car`` モデルに ``Manufacturer`` というフィールドを持たせたいとし
+ましょう。すなわち、ある ``Manufacturer`` には複数の ``Car`` が対応するが、
+各 ``Car`` には一つだけ ``Manufacturer`` が対応するようにしたいとしましょう。
+この場合、以下のように定義します::
 
     class Manufacturer(models.Model):
         # ...
@@ -277,6 +308,8 @@ For example, if a ``Car`` model has a ``Manufacturer`` -- that is, a
         manufacturer = models.ForeignKey(Manufacturer)
         # ...
         
+.. TBD
+
 You can also create :ref:`recursive relationships <recursive-relationships>` (an
 object with a many-to-one relationship to itself) and :ref:`relationships to
 models not yet defined <lazy-relationships>`; see :ref:`the model field
@@ -302,20 +335,22 @@ arguments which are explained in :ref:`the model field reference
 <foreign-key-arguments>`. These options help define how the relationship should
 work; all are optional.
 
-Many-to-many relationships
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _Many-to-many relationships:
 
-To define a many-to-many relationship, use
-:class:`~django.db.models.ManyToManyField`. You use it just like any other
-:class:`~django.db.models.Field` type: by including it as a class attribute of
-your model.
+多対多のリレーション
+~~~~~~~~~~~~~~~~~~~~
 
-:class:`~django.db.models.ManyToManyField` requires a positional argument: the
-class to which the model is related.
+多対多の (many-to-many) リレーションを定義するには
+:class:`~django.db.models.fields.ManyToManyField` を使います。このフィール
+ドは他のフィールド型と同じように、モデルのクラス属性に含めて使えます。
 
-For example, if a ``Pizza`` has multiple ``Topping`` objects -- that is, a
-``Topping`` can be on multiple pizzas and each ``Pizza`` has multiple toppings
--- here's how you'd represent that::
+:class:`~django.db.models.fields.ManyToManyField` には固定引数が一つあり、
+リレーションを張る対象のクラスを指定します。
+
+例えば、 ``Pizza`` には複数の ``Topping`` オブジェクトを持たせられます。
+すなわち、ある ``Topping`` は複数のピザの上に置けて、逆にそれぞれのピザには
+複数のトッピングを置けるというわけです。このリレーションを表すには次のように
+します::
 
     class Topping(models.Model):
         # ...
@@ -324,33 +359,40 @@ For example, if a ``Pizza`` has multiple ``Topping`` objects -- that is, a
         # ...
         toppings = models.ManyToManyField(Topping)
 
+.. TBD
+
 As with :class:`~django.db.models.ForeignKey`, you can also create
 :ref:`recursive relationships <recursive-relationships>` (an object with a
 many-to-one relationship to itself) and :ref:`relationships to models not yet
 defined <lazy-relationships>`; see :ref:`the model field reference
 <ref-manytomany>` for details.
 
-It's suggested, but not required, that the name of a
-:class:`~django.db.models.ManyToManyField` (``toppings`` in the example above)
-be a plural describing the set of related model objects.
+必須ではありませんが、 :class:`~django.db.models.fields.ManyToManyField` の
+名前 (上の例では ``toppings``)は、リレーション先のモデル名の複数形にするよ
+う勧めます。
 
-It doesn't matter which model gets the
-:class:`~django.db.models.ManyToManyField`, but you only need it in one of the
-models -- not in both.
+どちらのモデルで :class:`~django.db.models.fields.ManyToManyField` を定義し
+てもかまいませんが、どちらか片方のモデルにしか必要ありません -- 両方には指
+定できません。
 
-Generally, :class:`~django.db.models.ManyToManyField` instances should go in the
-object that's going to be edited in the admin interface, if you're using
-Django's admin. In the above example, ``toppings`` is in ``Pizza`` (rather than
-``Topping`` having a ``pizzas`` :class:`~django.db.models.ManyToManyField` )
-because it's more natural to think about a ``Pizza`` having toppings than a
-topping being on multiple pizzas. The way it's set up above, the ``Pizza`` admin
-form would let users select the toppings.
+一般的に、 Django の admin を使っている場合、
+:class:`~django.db.models.fields.ManyToManyField` インスタンスを入れておく
+のは、 admin インタフェースで編集される側のオブジェクトにしておきます。上の
+例では、 ``topping`` は (``Topping`` に
+:class:`~django.db.models.fields.ManyToManyField` の ``pizzas`` をもたせる
+のではなく) ``Pizza`` に入れておきます。というのも、「トッピングを乗せるピ
+ザ」と考えるよりも「ピザの上に乗せるトッピング」を考える方が自然だからです。
+こうして上の例では、 ``Pizza`` の admin フォームでユーザにトッピングを選ば
+せることになります。
 
 .. seealso:: 
 
-    See the `Many-to-many relationship model example`_ for a full example.
+    完全な例は `多対多のリレーションを持つモデルの例`_ を参照してください。
 
 .. _Many-to-many relationship model example: http://www.djangoproject.com/documentation/models/many_to_many/
+.. _`多対多のリレーションを持つモデルの例`: `Many-to-many relationship model example`_
+
+.. TBD
 
 :class:`~django.db.models.ManyToManyField` fields also accept a number of extra
 arguments which are explained in :ref:`the model field reference
@@ -491,28 +533,33 @@ of the intermediate model::
     [<Person: Ringo Starr]
     
 
-One-to-one relationships
-~~~~~~~~~~~~~~~~~~~~~~~~
+.. _One-to-one relationships:
 
-To define a one-to-one relationship, use
-:class:`~django.db.models.OneToOneField`. You use it just like any other
-``Field`` type: by including it as a class attribute of your model.
+一対一のリレーション
+~~~~~~~~~~~~~~~~~~~~
 
-This is most useful on the primary key of an object when that object "extends"
-another object in some way.
+一対一のリレーションを定義するには、
+:class:`~django.db.models.fields.OneToOneField` を使います。このフィールド
+は他のフィールド型と同じように、モデルのクラス属性に含めて使えます。
 
-:class:`~django.db.models.OneToOneField` requires a positional argument: the
-class to which the model is related.
+このリレーションがもっとも有用なのは、あるオブジェクトが別のオブジェクトを
+何らかの形で「拡張」している場合の主キーとして使う場合です。
 
-For example, if you were building a database of "places", you would
-build pretty standard stuff such as address, phone number, etc. in the
-database. Then, if you wanted to build a database of restaurants on
-top of the places, instead of repeating yourself and replicating those
-fields in the ``Restaurant`` model, you could make ``Restaurant`` have
-a :class:`~django.db.models.OneToOneField` to ``Place`` (because a
-restaurant "is a" place; in fact, to handle this you'd typically use
-:ref:`inheritance <model-inheritance>`, which involves an implicit
-one-to-one relation).
+:class:`~django.db.models.fields.OneToOneField` には固定引数が一つあり、リ
+レーションを張る対象のクラスを指定します。
+
+例えば、「場所 (place)」のデータベースを作るときには、アドレス、電話番号、
+といった標準的なものを作成します。その上で、レストランデータベースを作成
+するときに、 ``Restaurant`` モデルの中に同じフィールドをつくるような
+繰り返し作業 (repeat yourself) をする代わりに、場所データベースを基盤にして
+レストランのデータベースを作成したいとしましょう。このとき、 ``Restaurant`` 
+には ``Place`` への :class:`~django.db.models.fields.OneToOneField` をもた
+せられます (レストランは場所に対して "is-a" の関係だからです。実際には、こ
+のような状況を扱うのに :ref:`モデルの継承 <model-inehritance>` を使いますが、
+モデル継承は :class:`~django.db.models.fields.OneToOneField` で実現されてい
+ます)。
+
+.. TBD
 
 As with :class:`~django.db.models.ForeignKey`, a
 :ref:`recursive relationship <recursive-relationships>`
@@ -524,27 +571,32 @@ for details.
 
 .. seealso::
 
-    See the `One-to-one relationship model example`_ for a full example.
+    詳細な例は `一対一のリレーションを持つモデルの例`_ を参照してください。
 
 .. _One-to-one relationship model example: http://www.djangoproject.com/documentation/models/one_to_one/
+.. _`一対一のリレーションを持つモデルの例`: `One-to-one relationship model example`_
 
 .. versionadded:: 1.0
+
+.. TBD
 
 :class:`~django.db.models.OneToOneField` fields also accept one optional argument
 described in the :ref:`model field reference <ref-onetoone>`.
 
-:class:`~django.db.models.OneToOneField` classes used to automatically become
-the primary key on a model. This is no longer true (although you can manually
-pass in the :attr:`~django.db.models.Field.primary_key` argument if you like).
-Thus, it's now possible to have multiple fields of type
-:class:`~django.db.models.OneToOneField` on a single model.
+以前は、モデル中で :class:`~django.db.models.fields.OneToOneField` を使うと、
+そのフィールドは自動的にモデルの主キーになっていました。この仕様はもうなく
+なりましたが、主キーにしたければ手動で ``primary_key`` に指定できます。この
+変更により、一つのモデル中で複数の
+:class:`~django.db.models.fields.OneToOneField` を使えるようになりました。
 
-Models across files
--------------------
+.. _Models across files:
 
-It's perfectly OK to relate a model to one from another app. To do this, just
-import the related model at the top of the model that holds your model. Then,
-just refer to the other model class wherever needed. For example::
+ファイル間にまたがるモデル
+-----------------------------
+
+あるモジュールから別のモジュールへのリレーションは全く問題なく張れます。リ
+レーションを張るには、モデル定義の先頭でリレーション対称のモデルを import
+しておき、必要なところでそのモデルクラスを参照します。例えば::
 
     from mysite.geography.models import ZipCode
 
@@ -552,48 +604,54 @@ just refer to the other model class wherever needed. For example::
         # ...
         zip_code = models.ForeignKey(ZipCode)
 
-Field name restrictions
------------------------
+.. _Field name restrictions:
 
-Django places only two restrictions on model field names:
+フィールド名の制約
+------------------
 
-    1. A field name cannot be a Python reserved word, because that would result
-       in a Python syntax error. For example::
+Django がモデルのフィールド名に課している制約は二つしかありません:
+
+    1. フィールド名は Python の予約語であってはなりません。さもなければ
+       Python のシンタクスエラーを引き起こすからです。例えば::
 
            class Example(models.Model):
                pass = models.IntegerField() # 'pass' is a reserved word!
 
-    2. A field name cannot contain more than one underscore in a row, due to
-       the way Django's query lookup syntax works. For example::
+    2. フィールド名には二つ以上の連続するアンダースコアを入れてはなりません。
+       なぜなら、Django のクエリ照合構文で使われているからです。例えば::
 
            class Example(models.Model):
                foo__bar = models.IntegerField() # 'foo__bar' has two underscores!
 
-These limitations can be worked around, though, because your field name doesn't
-necessarily have to match your database column name. See the
-:attr:`~Field.db_column` option.
+フィールドの名前は必ずしもデータベースのカラム名と一致していなくてもよいの
+で、これらの制約は回避可能です。詳しくは後述の :attr:`~Field.db_column` を
+参照してください。
 
-SQL reserved words, such as ``join``, ``where`` or ``select``, *are* allowed as
-model field names, because Django escapes all database table names and column
-names in every underlying SQL query. It uses the quoting syntax of your
-particular database engine.
+``join`` や ``where``, ``select`` のような SQL の予約語は、モデルのフィール
+ド名に使っても *かまいません* 。というのも、Django はいかなる SQL クエリ文
+でも全てのデータベーステーブル名やカラム名をエスケープするからです。エスケー
+プにはデータベースエンジン固有のクオートシンタクスを使います。
 
-Custom field types
-------------------
+.. _Custom field types:
+
+カスタムのフィールド型
+-----------------------
 
 .. versionadded:: 1.0
 
-If one of the existing model fields cannot be used to fit your purposes, or if
-you wish to take advantage of some less common database column types, you can
-create your own field class. Full coverage of creating your own fields is
-provided in :ref:`howto-custom-model-fields`.
+既存のモデルフィールドが目的とするアプリケーションに合わない場合や、あまり
+一般的でないデータベースカラムタイプを活用したい場合のために、独自のフィー
+ルドクラスを作成できます。独自のフィールドの作成方法の詳細は
+:ref:`howto-custom-model-fields` で説明しています。
 
 .. _meta-options:
+.. _Meta options:
 
-Meta options
-============
+Meta オプション
+===============
 
-Give your model metadata by using an inner ``class Meta``, like so::
+モデルにメタデータを指定するには、以下のようにモデルの内部クラス
+``Meta`` を使います::
 
     class Ox(models.Model):
         horn_length = models.IntegerField()
@@ -601,6 +659,8 @@ Give your model metadata by using an inner ``class Meta``, like so::
         class Meta:
             ordering = ["horn_length"]
             verbose_name_plural = "oxen"
+
+.. TBD
 
 Model metadata is "anything that's not a field", such as ordering options
 (:attr:`~Options.ordering`), database table name (:attr:`~Options.db_table`), or
@@ -612,18 +672,20 @@ A complete list of all possible ``Meta`` options can be found in the :ref:`model
 option reference <ref-models-options>`.
 
 .. _model-methods:
+.. _Model methods:
 
-Model methods
-=============
+モデルのメソッド
+================
 
-Define custom methods on a model to add custom "row-level" functionality to your
-objects. Whereas :class:`~django.db.models.Manager` methods are intended to do
-"table-wide" things, model methods should act on a particular model instance.
+カスタムの行レベル ("row-level") の機能をオブジェクトに実装するには、カスタ
+ムのメソッドを定義します。 :class:`~django.db.models.Manager` メソッドの目
+的が「テーブル級 (table-wide)」 の操作であるのに対し、モデルメソッドは個々
+のモデルインスタンスに対して作用します。
 
-This is a valuable technique for keeping business logic in one place -- the
-model.
+このモデルメソッドは、ビジネスロジックをモデルというただ一箇所にまとめてお
+くのに有用なテクニックになります。
 
-For example, this model has a few custom methods::
+例えば、以下のモデル例にはいくつかカスタムメソッドがあります::
 
     from django.contrib.localflavor.us.models import USStateField
     class Person(models.Model):
@@ -652,10 +714,13 @@ For example, this model has a few custom methods::
             return '%s %s' % (self.first_name, self.last_name)
         full_name = property(_get_full_name)
 
-The last method in this example is a :term:`property`. `Read more about
-properties`_.
+この例の最後のメソッドは :term:`プロパティ` (:term:`property`) です。詳しく
+は `プロパティの説明`_ を参照してください。
 
 .. _Read more about properties: http://www.python.org/download/releases/2.2/descrintro/#property
+.. _`プロパティの説明`: `Read more about properties`_
+
+.. TBD
 
 The :ref:`model instance reference <ref-models-instances>` has a complete list
 of :ref:`methods automatically given to each model <model-instance-methods>`.
@@ -680,6 +745,8 @@ below -- but there are a couple that you'll almost always want to define:
         Any object that has a URL that uniquely identifies it should define this
         method.
 
+.. TBD
+
 Overriding predefined model methods
 -----------------------------------
 
@@ -691,9 +758,9 @@ particular you'll often want to change the way :meth:`~Model.save` and
 You're free to override these methods (and any other model method) to alter
 behavior.
 
-A classic use-case for overriding the built-in methods is if you want something
-to happen whenever you save an object. For example (see
-:meth:`~Model.save` for documentation of the parameters it accepts)::
+組み込みメソッドをオーバライドする古典的なユースケースは、オブジェクトを保
+存する際に何か別の処理を行うというものです。例を示しましょう
+(:meth:`~Model.save` のパラメタはドキュメントを参照してください。)::
 
     class Blog(models.Model):
         name = models.CharField(max_length=100)
@@ -701,10 +768,10 @@ to happen whenever you save an object. For example (see
 
         def save(self, force_insert=False, force_update=False):
             do_something()
-            super(Blog, self).save(force_insert, force_update) # Call the "real" save() method.
+            super(Blog, self).save(force_insert, force_insert) # 「実際の」 save() を呼び出します。
             do_something_else()
 
-You can also prevent saving::
+また、以下のようにすれば保存を抑止できます::
 
     class Blog(models.Model):
         name = models.CharField(max_length=100)
@@ -712,16 +779,20 @@ You can also prevent saving::
 
         def save(self, force_insert=False, force_update=False):
             if self.name == "Yoko Ono's blog":
-                return # Yoko shall never have her own blog!
+                return # Yoko は自分のブログを持っていません！
             else:
                 super(Blog, self).save(force_insert, force_update) # Call the "real" save() method.
+
+.. TBD
 
 It's important to remember to call the superclass method -- that's that
 ``super(Blog, self).save()`` business -- to ensure that the object still gets
 saved into the database. If you forget to call the superclass method, the
 default behavior won't happen and the database won't get touched.
 
-Executing custom SQL
+.. _Executing custom SQL:
+
+カスタム SQL の実行
 --------------------
 
 Another common pattern is writing custom SQL statements in model methods and
@@ -758,42 +829,41 @@ the :meth:`~QuerySet.extra` lookup method, which lets you add custom SQL to a
 query.
 
 .. _model-inheritance:
+.. _Model inheritance:
 
-Model inheritance
+モデルの継承
 =================
 
 .. versionadded:: 1.0
 
-Model inheritance in Django works almost identically to the way normal
-class inheritance works in Python. The only decision you have to make
-is whether you want the parent models to be models in their own right
-(with their own database tables), or if the parents are just holders
-of common information that will only be visible through the child
-models.
+Django のモデルクラス継承は、 Python の通常のクラス継承とほぼ同じように動作
+します。モデル継承を実現するには、一つだけきめておかねばならないことがあり
+ます。それは、親クラスに独自のデータベーステーブルを持たせるか、親クラスを
+単なるホルダとして使い、子クラスで共通の情報を持たせるだけにするかです。
 
-Often, you will just want to use the parent class to hold information
-that you don't want to have to type out for each child model. This
-class isn't going to ever be used in isolation, so
-:ref:`abstract-base-classes` are what you're after. However, if you're
-subclassing an existing model (perhaps something from another
-application entirely), or want each model to have its own database
-table, :ref:`multi-table-inheritance` is the way to go.
+複数の子モデルクラスでいちいち同じ情報を入力せずに済ませるために、親モデル
+クラスに共通の情報を持たせたいことはよくあります。親モデルクラスを単体で使
+うことがないのなら、 :ref:`abstract-base-classes` を使うのがよいでしょう。
+一方、(他のアプリケーションなどにある) 既存のモデルをサブクラス化して拡張し
+たり、個々のモデルに固有のデータベースを持たせたいような場合には、 
+:ref:`multi-table-inheritance` を使うのがよいでしょう。
 
 .. _abstract-base-classes:
+.. _Abstract base classes:
 
-Abstract base classes
+抽象ベースクラス
 ---------------------
 
-Abstract base classes are useful when you want to put some common
-information into a number of other models. You write your base class
-and put ``abstract=True`` in the :ref:`Meta <meta-options>`
-class. This model will then not be used to create any database
-table. Instead, when it is used as a base class for other models, its
-fields will be added to those of the child class. It is an error to
-have fields in the abstract base class with the same name as those in
-the child (and Django will raise an exception).
+抽象ベースクラスは、たくさんのモデルに共通する情報を入れておきたいときに便
+利な仕組みです。抽象ベースクラスを定義するには、ベースクラス定義の、
+:ref:`Meta <meta-options>` に ``abstract=True`` を入れておきます。モデルを
+抽象ベースクラスとして定義すると、そのクラスはデータベーステーブルを生成し
+ません。その代り、他のモデルを定義するときに抽象ベースクラスを親にすると、
+ベースクラスのフィールドが子クラスに追加されます。抽象ベースクラスで定義し
+たフィールドと同じ名前のフィールドを子クラスで定義しようとするとエラーを引
+き起こします (Django は例外を送出します)。
 
-An example::
+例を示しましょう::
 
     class CommonInfo(models.Model):
         name = models.CharField(max_length=100)
@@ -805,23 +875,26 @@ An example::
     class Student(CommonInfo):
         home_group = models.CharField(max_length=5)
 
-The ``Student`` model will have three fields: ``name``, ``age`` and
-``home_group``. The ``CommonInfo`` model cannot be used as a normal Django
-model, since it is an abstract base class. It does not generate a database
-table or have a manager, and cannot be instantiated or saved directly.
+このように定義すると、 ``Student`` モデルは ``name``, ``age`` および
+``home_group`` の三つのフィールドを持つようになります。. ``CommonInfo`` モ
+デルは抽象ベースクラスなので、通常の Django モデルとしては使えません。
+``CommonInfo`` はデータベーステーブルを作らず、マネジャなども持ちません。
 
-For many uses, this type of model inheritance will be exactly what you want.
-It provides a way to factor out common information at the Python level, whilst
-still only creating one database table per child model at the database level.
+ほとんどの用途で使えるのは、このタイプのモデル継承でしょう。抽象ベースクラ
+スは、子クラスで共通の情報を Python レベルに切り出しながらも、データベース
+レベルでは、各子クラスに一つのデータベーステーブルを生成します。
 
-``Meta`` inheritance
+.. _`Meta inheritance`:
+
+``Meta`` の継承
 ~~~~~~~~~~~~~~~~~~~~
 
-When an abstract base class is created, Django makes any :ref:`Meta <meta-options>`
-inner class you declared on the base class available as an
-attribute. If a child class does not declared its own :ref:`Meta <meta-options>`
-class, it will inherit the parent's :ref:`Meta <meta-options>`. If the child wants to
-extend the parent's :ref:`Meta <meta-options>` class, it can subclass it. For example::
+抽象ベースクラスを作成するとき、 Django は抽象ベースクラスの内部クラス
+:ref:`Meta <meta-options>` をクラス属性として参照できるようにします。子クラ
+スで :ref:`Meta <meta-options>` クラスを定義しない場合、親クラスの
+:ref:`Meta <meta-options>` がそのまま継承されます。子クラスで 
+:ref:`Meta <meta-options>` を拡張したければ、親クラスをサブクラス化できます。
+以下に例を示しましょう::
 
     class CommonInfo(models.Model):
         ...
@@ -834,34 +907,40 @@ extend the parent's :ref:`Meta <meta-options>` class, it can subclass it. For ex
         class Meta(CommonInfo.Meta):
             db_table = 'student_info'
 
-Django does make one adjustment to the :ref:`Meta <meta-options>` class of an abstract base
-class: before installing the :ref:`Meta <meta-options>` attribute, it sets ``abstract=False``.
-This means that children of abstract base classes don't automatically become
-abstract classes themselves. Of course, you can make an abstract base class
-that inherits from another abstract base class. You just need to remember to
-explicitly set ``abstract=True`` each time.
+Django は抽象ベースクラスの :ref:`Meta <meta-options>` クラスを生成するとき
+に一つだけ手を加えます。すなわち、 :ref:`Meta <meta-options>` の属性を組み
+込む前に、 ``abstract=False`` を設定するのです。これにより、抽象ベースクラ
+スの子クラスが自動的に非抽象ベースクラスになります。もちろん、他の抽象ベー
+スクラスを継承した新たな抽象ベースクラスも定義できます。継承するには、明示
+的に ``abstract=True`` をセットしてください。
 
-Some attributes won't make sense to include in the :ref:`Meta <meta-options>` class of an
-abstract base class. For example, including ``db_table`` would mean that all
-the child classes (the ones that don't specify their own :ref:`Meta <meta-options>`) would use
-the same database table, which is almost certainly not what you want.
+:ref:`Meta <meta-options>` クラスの属性の中には、抽象ベースクラスで定義して
+も意味のないものもあります。例えば、 ``db_table`` を抽象ベースクラスの
+:ref:`Meta <meta-options>` で定義すると、その子クラス全て (で、独自に
+:ref:`Meta <meta-options>` を定義しないもの) が、同じデータベーステーブルを
+使おうとしてしまいます。
 
 .. _abstract-related-name:
+.. _`Be careful with related_name`:
 
-Be careful with ``related_name``
+``related_name`` に注意
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you are using the :attr:`~django.db.models.ForeignKey.related_name` attribute on a ``ForeignKey`` or
-``ManyToManyField``, you must always specify a *unique* reverse name for the
-field. This would normally cause a problem in abstract base classes, since the
-fields on this class are included into each of the child classes, with exactly
-the same values for the attributes (including :attr:`~django.db.models.ForeignKey.related_name`) each time.
+:class:`~django.db.models.fields.ForeignKey` や
+:class:`~django.db.models.fields.ManyToManyField` に ``related_name`` 属性
+を使っている場合には、フィールドの *一意な* 逆リレーション名を指定してくだ
+さい。抽象ベースクラスのフィールドは
+(:attr:`~django.db.models.ForeignKey.related_name` の設定値を含み) 子クラス
+にそのまま組み込まれるので、 子クラスで同じ
+:attr:`~django.db.models.ForeignKey.related_name` のフィールドができてしま
+うため、問題を引き起こします。
 
-To work around this problem, when you are using :attr:`~django.db.models.ForeignKey.related_name` in an
-abstract base class (only), part of the name should be the string
-``'%(class)s'``. This is replaced by the lower-cased name of the child class
-that the field is used in. Since each class has a different name, each related
-name will end up being different. For example::
+この問題を回避するには、抽象ベースクラスで
+:attr:`~django.db.models.ForeignKey.related_name` を使うときに(かつその時に
+限り)、文字列の一部に ``'%(class)s'`` を付加してください。そうすると、
+``'%(class)s'`` は子クラスでクラスの小文字名に置き換えられます。各クラスは
+個別の名前をもっているので、結果的にリレーション名は個別の名前に
+なります。例えば::
 
     class Base(models.Model):
         m2m = models.ManyToMany(OtherModel, related_name="%(class)s_related")
@@ -875,31 +954,33 @@ name will end up being different. For example::
     class ChildB(Base):
         pass
 
-The reverse name of the ``ChildA.m2m`` field will be ``childa_related``,
-whilst the reverse name of the ``ChildB.m2m`` field will be
-``childb_related``. It is up to you how you use the ``'%(class)s'`` portion to
-construct your related name, but if you forget to use it, Django will raise
-errors when you validate your models (or run :djadmin:`syncdb`).
+この例で、 ``ChildA.m2m`` フィールドの逆リレーション名は ``childa_related``
+になり、 ``ChildB.m2m`` フィールドの逆リレーション名は ``childb_related``
+になります。逆リレーション名の定義で ``'%(class)s'`` をどう使うかはユーザ次
+第ですが、 ``'%(class)s'`` を使いわすれると、モデルの検証時 (または
+:djadmin:`syncdb` 時) に例外を送出します。
 
-If you don't specify a :attr:`~django.db.models.ForeignKey.related_name` attribute for a field in an
-abstract base class, the default reverse name will be the name of the
-child class followed by ``'_set'``, just as it normally would be if
-you'd declared the field directly on the child class. For example, in
-the above code, if the :attr:`~django.db.models.ForeignKey.related_name` attribute was omitted, the
-reverse name for the ``m2m`` field would be ``childa_set`` in the
-``ChildA`` case and ``childb_set`` for the ``ChildB`` field.
+抽象ベースクラスのフィールドに
+:attr:`~django.db.models.ForeignKey.related_name`
+属性を指定しない場合、子クラスの名前に ``'_set'`` をつけた名前をデフォルト
+の逆リレーション名として使います。これは子クラスで直接リレーションフィール
+ドを定義した場合と同じ挙動です。例えば、上のコードで
+:attr:`~django.db.models.ForeignKey.related_name` 属性を省略すると、
+``m2m`` フィールドの逆リレーション名は ``ChildA`` では ``childa_set`` 、
+``ChildB`` では ``childb_set`` です。
 
 .. _multi-table-inheritance:
+.. _Multi-table inheritance:
 
-Multi-table inheritance
+マルチテーブル継承
 -----------------------
 
-The second type of model inheritance supported by Django is when each model in
-the hierarchy is a model all by itself. Each model corresponds to its own
-database table and can be queried and created indvidually. The inheritance
-relationship introduces links between the child model and each of its parents
-(via an automatically-created :class`~django.db.models.fields.OneToOneField`).
-For example::
+Django では、継承の各階層にいるクラスが抽象クラスでない実際のモデルであるよ
+うな、もう一つのタイプのモデル継承をサポートしています。各モデルはそれぞれ
+が一個のデータベーステーブルを表現していて、個別にクエリを発行したり、イン
+スタンスを生成したりできます。継承の関係によって、親クラスと子クラスの間に
+は (自動生成された :class:`~django.db.models.fields.OneToOneField` によって)
+リンクが張られます。以下の例で説明しましょう::
 
     class Place(models.Model):
         name = models.CharField(max_length=50)
@@ -909,68 +990,75 @@ For example::
         serves_hot_dogs = models.BooleanField()
         serves_pizza = models.BooleanField()
 
-All of the fields of ``Place`` will also be available in ``Restaurant``,
-although the data will reside in a different database table. So these are both
-possible::
+``Place`` の全てのフィールドは、 ``Restaurant`` からも使えます。しかし、そ
+れぞれのフィールドのデータは別々のテーブルに格納されます。従って、以下のよ
+うな操作をどちらも実行できます::
 
     >>> Place.objects.filter(name="Bob's Cafe")
     >>> Restaurant.objects.filter(name="Bob's Cafe")
 
-If you have a ``Place`` that is also a ``Restaurant``, you can get from the
-``Place`` object to the ``Restaurant`` object by using the lower-case version
-of the model name::
+例えば、 ``Place`` であり、かつ ``Restaurant`` でもあるようなオブジェクトが
+あれば、モデル名を小文字にした属性を使って、 ``Place`` から ``Restaurant``
+を取り出せます::
 
     >>> p = Place.objects.filter(name="Bob's Cafe")
-    # If Bob's Cafe is a Restaurant object, this will give the child class:
+    # Bob's Cafe が Restaurant オブジェクトなら、子クラスを返す:
     >>> p.restaurant
     <Restaurant: ...>
 
-However, if ``p`` in the above example was *not* a ``Restaurant`` (it had been
-created directly as a ``Place`` object or was the parent of some other class),
-referring to ``p.restaurant`` would give an error.
+ただし、上の ``p`` が ``Restaurant`` クラスで *ない* のなら (``Place`` から
+直接生成されたオブジェクトや、他のクラスの親クラスなら)  ``p.restaurant``
+はエラーを引き起こします。
 
-``Meta`` and multi-table inheritance
+.. _`Meta and multi-table inheritance`:
+
+``Meta`` とマルチテーブル継承
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In the multi-table inheritance situation, it doesn't make sense for a child
-class to inherit from its parent's :ref:`Meta <meta-options>` class. All the :ref:`Meta <meta-options>` options
-have already been applied to the parent class and applying them again would
-normally only lead to contradictory behaviour (this is in contrast with the
-abstract base class case, where the base class doesn't exist in its own
-right).
+マルチテーブル継承では、子クラスが親クラスの :ref:`Meta <meta-options>` ク
+ラスを継承する意味がありません。 :ref:`Meta <meta-options>` オプションは全
+て親クラスだけに適用されるべきもので、他のクラスに同じ内容を適用しても、矛
+盾した振る舞いを引き起こすだけです(これは、独自のテーブルを持たない抽象ベー
+スクラスと対照的な部分です)。
 
-So a child model does not have access to its parent's :ref:`Meta <meta-options>` class. However,
-there are a few limited cases where the child inherits behaviour from the
-parent: if the child does not specify an :attr:`django.db.models.Options.ordering` attribute or a
-:attr:`django.db.models.Options.get_latest_by` attribute, it will inherit these from its parent.
+従って、マルチテーブル継承の子クラスは親クラスの :ref:`Meta <meta-options>`
+クラスにアクセスする方法を持ちません。ただし、限られたケースで、子クラスが
+親クラスの挙動を継承する場合があります。それは、子クラスで 
+:attr:`django.db.models.Options.ordering` または
+:attr:`django.db.models.Options.get_latest_by` 属性を指定していない場合に、
+親クラスの属性を継承するというものです。
 
-If the parent has an ordering and you don't want the child to have any natural
-ordering, you can explicity set it to be empty::
+親クラスで整列カラムが指定されていて、子クラス側で整列カラムを指定したくな
+い場合は、明示的に空の整列カラムを指定してください::
 
     class ChildModel(ParentModel):
         ...
         class Meta:
-            # Remove parent's ordering effect
+            # 親クラスの整列カラム設定の効果を除去する
             ordering = []
 
-Inheritance and reverse relations
+.. _Inheritance and reverse relations:
+
+継承と逆リレーション
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Because multi-table inheritance uses an implicit
-:class:`~django.db.models.fields.OneToOneField` to link the child and
-the parent, it's possible to move from the parent down to the child,
-as in the above example. However, this uses up the name that is the
-default :attr:`~django.db.models.ForeignKey.related_name` value for
-:class:`django.db.models.fields.ForeignKey` and
-:class:`django.db.models.fields.ManyToManyField` relations.  If you
-are putting those types of relations on a subclass of another model,
-you **must** specify the
-:attr:`~django.db.models.ForeignKey.related_name` attribute on each
-such field. If you forget, Django will raise an error when you run
-:djadmin:`validate` or :djadmin:`syncdb`.
+マルチテーブル継承は親クラスと子クラスを暗黙の
+:class:`~django.db.models.fields.OneToOneField` でリンクするので、前述の例
+のように、親クラスから子クラスをたどれます。しかし、子クラスをたどるときに
+使う名前は、 :class:`~django.db.models.fields.ForeignKey` や
+:class:`~django.db.models.fields.ManyToManyField` リレーションを定義したと
+きのデフォルトの :attr:`~django.db.models.ForeignKey.related_name` と同じ値
+を使っています。従って、子クラスで
+:class:`~django.db.models.fields.ForeignKey` や
+:class:`~django.db.models.fields.ManyToManyField` を別のクラスに向けて張る
+ときには、 **必ず** :attr:`~django.db.models.ForeignKey.related_name` をフィー
+ルドに指定せねばなりません。指定し忘れると、 Django は 
+:djadmin:`manage.py validate <validate>` や :djadmin:`syncdb` 時にエラーを
+送出します。
 
-For example, using the above ``Place`` class again, let's create another
-subclass with a :class:`~django.db.models.fields.ManyToManyField`::
+例えば、上の ``Place`` クラスに対して、
+:class:`~django.db.models.fields.ManyToManyField` を持った別のサブクラスを
+定義するには、以下のように書きます::
 
     class Supplier(Place):
         # Must specify related_name on all relations.
@@ -978,30 +1066,34 @@ subclass with a :class:`~django.db.models.fields.ManyToManyField`::
                 related_name='provider')
 
 
-Specifying the parent link field
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _Specifying the parent link field:
 
-As mentioned, Django will automatically create a
-:class:`~django.db.models.fields.OneToOneField` linking your child
-class back any non-abstract parent models. If you want to control the
-name of the attribute linking back to the parent, you can create your
-own :class:`~django.db.models.fields.OneToOneField` and set
-:attr:`parent_link=True <django.db.models.fields.OneToOneField.parent_link>` 
-to indicate that your field is the link back to the parent class.
+親クラスのリンクフィールドを定義する
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Multiple inheritance
---------------------
+すでに触れたように、 Django は子クラスと抽象クラスでない親クラスにリンクし
+た :class:`~django.db.models.fields.OneToOneField` を自動的に生成します。親
+クラスへのリンク名を操作したければ、自分で
+:class:`~django.db.models.fields.OneToOneField` を作成し、パラメタに
+:attr:`parent_link=True <django.db.models.fields.OneToOneField.parent_link>`
+を渡してください。
 
-Just as with Python's subclassing, it's possible for a Django model to inherit
-from multiple parent models. Keep in mind that normal Python name resolution
-rules apply. The first base class that a particular name appears in (e.g.
-:ref:`Meta <meta-options>`) will be the one that is used; for example,
-his means that if multiple parents contain a :ref:`Meta <meta-options>` class, only
-the first one is going to be used, and all others will be ignored.
+.. _Multiple inheritance:
 
-Generally, you won't need to inherit from multiple parents. The main use-case
-where this is useful is for "mix-in" classes: adding a particular extra
-field or method to every class that inherits the mix-in. Try to keep your
-inheritance hierarchies as simple and straightforward as possible so that you
-won't have to struggle to work out where a particular piece of information is
-coming from.
+多重継承
+----------
+
+Python のサブクラスと同様、 Django のモデルも複数の親モデルクラスを継承でき
+ます。クラス内の名前解決には、 Python の通常の名前解決規則が適用されるので
+注意してください。子クラスで特定の名前 (例えば :ref:`Meta <meta-options>`)
+を参照する場合、その名前を定義している最初のベースクラスの定義を使い、最初
+に名前が見つかった時点で、それ以降同じ名前のオブジェクトの解決は行われませ
+ん。従って、複数の親クラスで別々に :ref:`Meta <meta-options>` クラスを定義
+していても、最初のベースクラスの :ref:`Meta <meta-options>` だけが使われ、
+それ以外は全て無視されます。
+
+通常は、モデルの多重継承は必要ないでしょう。多重継承が便利なのは、主に特定
+のフィールドやメソッドを追加するための ''mix-in'' クラスを使う場合です。
+継承の階層構造はできるだけ単純に、分かりやすくしておきましょう。さもないと、
+子クラスで扱っている情報が、どの親クラスから来たか調べるために四苦八苦する
+はめになるでしょう。

@@ -1,29 +1,34 @@
 .. _topics-db-managers:
+.. _Managers:
 
 ========
-Managers
+マネジャ
 ========
+
+:revision-up-to: 8961 (1.0)
 
 .. currentmodule:: django.db.models
 
 .. class:: Manager()
 
-A ``Manager`` is the interface through which database query operations are
-provided to Django models. At least one ``Manager`` exists for every model in
-a Django application.
+マネジャ (``Manager``) とは、データベースクエリ操作を Django モデルに提供し
+ているインタフェースです。 Django アプリケーション内のモデルは全て少なくと
+も一つマネジャを備えています。
 
-The way ``Manager`` classes work is documented :ref:`topics-db-queries`; this
-document specifically touches on model options that customize ``Manager``
-behavior.
+マネジャクラス ``Manager`` の動作はデータベース API ドキュメントの
+:ref:`topics-db-queries` で説明していますが、この節ではマネジャの挙動をカス
+タマイズするためのモデルオプションについて具体的に触れます。
 
-Manager names
-=============
+.. _Manager names:
 
-By default, Django adds a ``Manager`` with the name ``objects`` to every Django
-model class. However, if you want to use ``objects`` as a field name, or if you
-want to use a name other than ``objects`` for the ``Manager``, you can rename
-it on a per-model basis. To rename the ``Manager`` for a given class, define a
-class attribute of type ``models.Manager()`` on that model. For example::
+マネジャの名前
+================
+
+デフォルトでは、 Django は全ての Django モデルクラスに ``object`` という名
+前で  ``Manager`` オブジェクトを追加します。ただし、 ``objects`` をフィール
+ド名として使いたい場合や、マネジャに ``objects`` 以外の名前をつけたい場合に
+は、モデルごとに名前を変えてやる必要があります。クラス中でマネジャの名前を
+変更するには、 ``models.Manager()`` 型のクラス属性を定義します。例えば::
 
     from django.db import models
 
@@ -31,36 +36,39 @@ class attribute of type ``models.Manager()`` on that model. For example::
         #...
         people = models.Manager()
 
-Using this example model, ``Person.objects`` will generate an
-``AttributeError`` exception, but ``Person.people.all()`` will provide a list
-of all ``Person`` objects.
+このようにすると、 ``Person.people.all()`` が ``Person`` オブジェクトのリス
+トを提供し、 ``Person.objects`` の参照は ``AttributeError`` 例外を送出します。
 
 .. _custom-managers:
+.. _Custom Managers:
 
-Custom Managers
-===============
+カスタムマネジャ
+=================
 
-You can use a custom ``Manager`` in a particular model by extending the base
-``Manager`` class and instantiating your custom ``Manager`` in your model.
+ベースクラスの ``Manager`` クラスを拡張して、モデル中でカスタムのマネジャを
+インスタンス化すれば、モデルでカスタムのマネジャを使えます。
 
-There are two reasons you might want to customize a ``Manager``: to add extra
-``Manager`` methods, and/or to modify the initial ``QuerySet`` the ``Manager``
-returns.
+マネジャをカスタマイズする理由は大きく分けて二つあります。一つはマネジャに
+追加のメソッドを持たせたい場合、もう一つはマネジャの返す初期 ``QuerySet`` 
+を変更したい場合です。
 
-Adding extra Manager methods
+.. _Adding extra Manager methods:
+
+追加のマネジャメソッド定義
 ----------------------------
 
-Adding extra ``Manager`` methods is the preferred way to add "table-level"
-functionality to your models. (For "row-level" functionality -- i.e., functions
-that act on a single instance of a model object -- use :ref:`Model methods
-<model-methods>`, not custom ``Manager`` methods.)
+モデルに「テーブルレベル」の機能を持たせたい場合、マネジャへのメソッドは良
+い方法です。 (「行レベル」の機能を持たせたい、例えばモデルオブジェクトの個々
+のインスタンスに影響する関数を実装したい場合には、カスタムのマネジャメソッ
+ドではなく :ref:`モデルのメソッド <model-methods>` を使って下さい。)
 
-A custom ``Manager`` method can return anything you want. It doesn't have to
-return a ``QuerySet``.
+カスタムのマネジャメソッドは何を返してもかまいません。 ``QuerySet`` を返さ
+なくてもよいのです。
 
-For example, this custom ``Manager`` offers a method ``with_counts()``, which
-returns a list of all ``OpinionPoll`` objects, each with an extra
-``num_responses`` attribute that is the result of an aggregate query::
+例えば、以下のカスタムマネジャでは、 ``with_counts()`` というメソッドを提供
+しています。このメソッドは全ての ``OpinionPoll`` オブジェクトからなるリスト
+を返しますが、その際に集約クエリの結果である ``num_responses`` という追加の
+属性を追加します::
 
     class PollManager(models.Manager):
         def with_counts(self):
@@ -89,62 +97,66 @@ returns a list of all ``OpinionPoll`` objects, each with an extra
         person_name = models.CharField(max_length=50)
         response = models.TextField()
 
-With this example, you'd use ``OpinionPoll.objects.with_counts()`` to return
-that list of ``OpinionPoll`` objects with ``num_responses`` attributes.
+この例では、 ``OpinionPoll.objects.with_counts()`` を使うと、
+``num_responses`` 属性を備えた ``OpinionPoll`` オブジェクトのリストを返しま
+す。
 
-Another thing to note about this example is that ``Manager`` methods can
-access ``self.model`` to get the model class to which they're attached.
+この例でもう一つ注意して欲しいのは、マネジャメソッドが自分の属しているモデ
+ルクラスを取り出すために ``self.model`` にアクセスできるという点です。
 
-Modifying initial Manager QuerySets
------------------------------------
+.. _Modifying initial Manager QuerySets:
 
-A ``Manager``'s base ``QuerySet`` returns all objects in the system. For
-example, using this model::
+初期 QuerySet の変更
+----------------------
+
+マネジャのベースの ``QuerySet`` は、システム上の全てのオブジェクトを返しま
+す。例えば、以下のモデル::
 
     class Book(models.Model):
         title = models.CharField(max_length=100)
         author = models.CharField(max_length=50)
 
-...the statement ``Book.objects.all()`` will return all books in the database.
+では、 ``Book.objects.all()`` とすると、データベース上の全ての books を返し
+ます。
 
-You can override a ``Manager``\'s base ``QuerySet`` by overriding the
-``Manager.get_query_set()`` method. ``get_query_set()`` should return a
-``QuerySet`` with the properties you require.
+``Manager.get_query_set()`` メソッドをオーバライドすれば、 ``Manager`` のベー
+スの ``QuerySet`` をオーバライドできます。 ``get_query_set()`` は必要なプロ
+パティを備えた ``QuerySet`` を返さねばなりません。
 
-For example, the following model has *two* ``Manager``\s -- one that returns
-all objects, and one that returns only the books by Roald Dahl::
+例えば、以下のモデルには *二つの* マネジャがあります。片方は全てのオブジェ
+クトを返し、もう一方は Roald Dahl の書いた本だけを返します::
 
-    # First, define the Manager subclass.
+    # まず Manager のサブクラスを定義します。
     class DahlBookManager(models.Manager):
         def get_query_set(self):
             return super(DahlBookManager, self).get_query_set().filter(author='Roald Dahl')
 
-    # Then hook it into the Book model explicitly.
+    # 次に Book モデルに明示的にフックします。
     class Book(models.Model):
         title = models.CharField(max_length=100)
         author = models.CharField(max_length=50)
 
-        objects = models.Manager() # The default manager.
-        dahl_objects = DahlBookManager() # The Dahl-specific manager.
+        objects = models.Manager() # デフォルトマネジャ。
+        dahl_objects = DahlBookManager() # Dahl 縛りのマネジャ。
 
-With this sample model, ``Book.objects.all()`` will return all books in the
-database, but ``Book.dahl_objects.all()`` will only return the ones written by
-Roald Dahl.
+このモデル例では、 ``Book.objects.all()`` はデータベース上の Book を全て返
+しますが、 ``Book.dahl_objects.all()`` は Roald Dahl の書いた本だけを返しま
+す。
 
-Of course, because ``get_query_set()`` returns a ``QuerySet`` object, you can
-use ``filter()``, ``exclude()`` and all the other ``QuerySet`` methods on it.
-So these statements are all legal::
+``get_query_set()`` は ``QuerySet`` オブジェクトを返すので、もちろん
+``filter()`` や ``exclude()`` をはじめ全ての ``QuerySet`` メソッドを使えま
+す。従って、以下のような文を実行できます::
 
     Book.dahl_objects.all()
     Book.dahl_objects.filter(title='Matilda')
     Book.dahl_objects.count()
 
-This example also pointed out another interesting technique: using multiple
-managers on the same model. You can attach as many ``Manager()`` instances to
-a model as you'd like. This is an easy way to define common "filters" for your
-models.
+この例はもう一つ興味深いテクニックの存在を示しています。それは同じモデルで
+複数のマネジャを使えるということです。モデルには、好きなだけマネジャのイン
+スタンスをアタッチできます。この手法を使うと、よく利用するフィルタをモデル
+に簡単に実装できます。
 
-For example::
+例えば::
 
     class MaleManager(models.Manager):
         def get_query_set(self):
@@ -162,18 +174,20 @@ For example::
         men = MaleManager()
         women = FemaleManager()
 
-This example allows you to request ``Person.men.all()``, ``Person.women.all()``,
-and ``Person.people.all()``, yielding predictable results.
+この例では、 ``Person.men.all()``, ``Person.women.all()``,
+``Person.people.all()`` といったクエリを発行できるようになっており、期待通
+りの結果を得られます。
 
-If you use custom ``Manager`` objects, take note that the first
-``Manager`` Django encounters (in the order in which they're defined
-in the model) has a special status. Django interprets this first
-``Manager`` defined in a class as the "default" ``Manager``, and
-several parts of Django (though not the admin application) will use
-that ``Manager`` exclusively for that model. As a result, it's often a
-good idea to be careful in your choice of default manager, in order to
-avoid a situation where overriding of ``get_query_set()`` results in
-an inability to retrieve objects you'd like to work with.
+カスタムのマネジャオブジェクトを使う場合、 Django がモデル内に最初に見つけ
+たマネジャ (モデルに定義した順番で最初のマネジャ) は特別扱いされるというこ
+とに注意してください。 Django はクラス内で最初に見つけたマネジャを「デフォ
+ルトの」マネジャにし、このデフォルトマネジャを (admin アプリケーション以外
+でも) あちこちでモデルのマネジャとして使います。ですから、
+``get_query_set()`` のオーバライドによって、扱いたいオブジェクトを取り出せ
+なくなるような羽目に陥らないように、デフォルトマネジャの選択には細心の注意
+を払ってください。
+
+.. TBD
 
 Using managers for related object access
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

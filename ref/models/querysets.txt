@@ -1,8 +1,9 @@
 .. _ref-models-querysets:
+.. _QuerySet API reference:
 
-======================
-QuerySet API reference
-======================
+=========================
+QuerySet API リファレンス
+=========================
 
 :revision-up-to: 8961 (1.0)
 
@@ -230,15 +231,6 @@ SQL クエリに ``SELECT DISTINCT`` を使う新たな ``QuerySet`` を返し�
 その場合には ``distinct()`` を使って下さい。
 
 .. note::
-    Any fields used in an `order_by(*fields)`_ call are included in the SQL
-    ``SELECT`` columns. This can sometimes lead to unexpected results when
-    used in conjunction with ``distinct()``. If you order by fields from a
-    related model, those fields will be added to the selected columns and they
-    may make otherwise duplicate rows appear to be distinct. Since the extra
-    columns don't appear in the returned results (they are only there to
-    support ordering), it sometimes looks like non-distinct results are being
-    returned.
-
     ``order_by(*fields)`` に指定したフィールドは、 SQL レベルで ``SELECT``
     されます。そのため、 ``order_by()`` と ``distinct()`` と組み合わせると
     予期しない結果を生むことがあります。例えば、リレーション先のモデルフィー

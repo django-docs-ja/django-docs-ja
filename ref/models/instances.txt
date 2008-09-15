@@ -4,6 +4,8 @@
 Model instance reference
 ========================
 
+:revision-up-to: 8961 (1.0)
+
 .. currentmodule:: django.db.models
    
 This document describes the details of the ``Model`` API. It builds on the
@@ -62,21 +64,20 @@ ID の値は Django ではなくデータベースによって計算されるの
 いかぎり、デフォルトでは各モデルに ``id`` という名前の ``AutoField``
 が追加されます。詳しくは ``AutoField`` のドキュメントを参照してください。)
 
-.. TBD
+.. _`The pk property`:
 
-The ``pk`` property
+``pk`` プロパティ
 ~~~~~~~~~~~~~~~~~~~
 
 .. versionadded:: 1.0
 
 .. attribute:: Model.pk
 
-Regardless of whether you define a primary key field yourself, or let Django
-supply one for you, each model will have a property called ``pk``. It behaves
-like a normal attribute on the model, but is actually an alias for whichever
-attribute is the primary key field for the model. You can read and set this
-value, just as you would for any other attribute, and it will update the
-correct field in the model.
+主キーを自前で定義しているか、 Django によって供給されているかに関係なく、
+それぞれのモデルは ``pk`` と呼ばれるプロパティを持ちます。 これはモデルの通
+常の属性のように振る舞いますが、実はモデルの主キーフィールドのエイリアスで
+す。その他の属性と同じように、この値は読み書き可能で、モデルのフィールドを
+修正し更新できます。
 
 .. _Explicitly specifying auto-primary-key values:
 
@@ -197,27 +198,29 @@ errors that are difficult to track down. This feature is for advanced use
 only.
 
 .. _model-instance-methods:
+.. _Other model instance methods:
 
-Other model instance methods
-============================
+その他のモデルインスタンスメソッド
+=====================================
 
-A few object methods have special purposes.
+モデルには、特殊な使われ方をするメソッドがあります:
 
 ``__str__``
 -----------
 
 .. method:: Model.__str__()
 
-``__str__()`` is a Python "magic method" that defines what should be returned
-if you call ``str()`` on the object. Django uses ``str(obj)`` (or the related
-function, ``unicode(obj)`` -- see below) in a number of places, most notably
-as the value displayed to render an object in the Django admin site and as the
-value inserted into a template when it displays an object. Thus, you should
-always return a nice, human-readable string for the object's ``__str__``.
-Although this isn't required, it's strongly encouraged (see the description of
-``__unicode__``, below, before putting ``__str__`` methods everywhere).
+``__str__()`` は、オブジェクトに対して ``str()`` を呼び出した際に返す内容を
+定義するための Python の特殊メソッドです。 Django はそこかしこで
+``str(obj)`` (または ``unicode(obj)`` -- 下記参照) を使っています。ほとんど
+は、 Django の admin サイトでオブジェクトをレンダリングして表示したときの値
+として、またオブジェクトを表示するときにテンプレートに挿入される値として使
+われています。従って、オブジェクトの ``__str__`` は、人間可読なわかりやすい
+文字列を返さねばなりません。必須ではありませんが、強く推奨します (ただし、
+そこかしこに ``__str__`` メソッドを突っ込んでしまう前に ``__unicode__`` の
+説明を良く読んでくださいね)。
 
-For example::
+例を示します::
 
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
@@ -233,11 +236,11 @@ For example::
 
 .. method:: Model.__unicode__()
 
-The ``__unicode__()`` method is called whenever you call ``unicode()`` on an
-object. Since Django's database backends will return Unicode strings in your
-model's attributes, you would normally want to write a ``__unicode__()``
-method for your model. The example in the previous section could be written
-more simply as::
+``__unicode__()`` メソッドは、オブジェクトに対して ``unicode()`` を呼び出し
+た際に呼び出されます。Django のデータベースバックエンドはモデルの属性値とし
+て Unicode 文字列を返すので、通常はモデルの ``__unicode__()`` メソッドを定
+義するとよいでしょう。前節の例を ``__unicode__()`` を使って書き直すと、以下
+のように簡単になります::
 
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
@@ -246,73 +249,76 @@ more simply as::
         def __unicode__(self):
             return u'%s %s' % (self.first_name, self.last_name)
 
-If you define a ``__unicode__()`` method on your model and not a ``__str__()``
-method, Django will automatically provide you with a ``__str__()`` that calls
-``__unicode__()`` and then converts the result correctly to a UTF-8 encoded
-string object. This is recommended development practice: define only
-``__unicode__()`` and let Django take care of the conversion to string objects
-when required.
+モデルに ``__unicode__()`` メソッドだけを定義して、 ``__str__()`` は定義し
+ないでおくと、 Django が自動的に ``__str__()`` メソッドをモデルに追加します。
+この ``__str__()`` メソッドは、 ``__unicode__()`` を呼び出して、その戻り値
+を UTF-8 でエンコードした文字列を返します。開発上はこの仕様に従い、
+``__unicode__()`` だけを定義して、文字列オブジェクトへの変換は Django 任せ
+にするよう勧めます。
 
 ``get_absolute_url``
 --------------------
 
 .. method:: Model.get_absolute_url()
 
-Define a ``get_absolute_url()`` method to tell Django how to calculate the
-URL for an object. For example::
+オブジェクトの URL を演算する方法を Django に教えるには
+``get_absolute_url`` メソッドを定義してください。例えば::
 
     def get_absolute_url(self):
         return "/people/%i/" % self.id
 
-Django uses this in its admin interface. If an object defines
-``get_absolute_url()``, the object-editing page will have a "View on site"
-link that will jump you directly to the object's public view, according to
-``get_absolute_url()``.
+Django はこのメソッドを admin インタフェースで使います。オブジェクトが
+``get_absolute_url()`` を定義していた場合、オブジェクトの詳細ページには「サ
+イト上で表示 (View on site)」というリンクが表示されます。このリンクは、オブ
+ジェクトの ``get_absolute_url()`` に基づいて、オブジェクトを公開しているビュー
+に直接飛べるようになっています。
 
-Also, a couple of other bits of Django, such as the :ref:`syndication feed
-framework <ref-contrib-syndication>`, use ``get_absolute_url()`` as a
-convenience to reward people who've defined the method.
+また、その他にも、例えば 
+:ref:`配信フィードフレームワーク <ref-contrib-syndication>` などで、
+``get_absolute_url()`` を使うことでユーザの利便性を高めています。
 
-It's good practice to use ``get_absolute_url()`` in templates, instead of
-hard-coding your objects' URLs. For example, this template code is bad::
+テンプレートでオブジェクトの URL を表示する場合、ハードコードするのでは
+なく ``get_absolute_url()`` を使うようにするとよいでしょう。例えば、以下の
+テンプレート::
 
     <a href="/people/{{ object.id }}/">{{ object.name }}</a>
 
-But this template code is good::
+は良い例ではなく、以下のようにするとよいでしょう::
 
     <a href="{{ object.get_absolute_url }}">{{ object.name }}</a>
 
 .. note::
-    The string you return from ``get_absolute_url()`` must contain only ASCII
-    characters (required by the URI spec, `RFC 2396`_) that have been
-    URL-encoded, if necessary. Code and templates using ``get_absolute_url()``
-    should be able to use the result directly without needing to do any
-    further processing. You may wish to use the
-    ``django.utils.encoding.iri_to_uri()`` function to help with this if you
-    are using unicode strings a lot.
+    ``get_absolute_url()`` の返す文字列は ASCII 文字だけで構成しなければな
+    りません (`RFC 2396`_ の URI 仕様でそのように要求されています)。また、
+    必要に応じて URL エンコードせねばなりません。 ``get_absolute_url()`` を
+    使うコードやテンプレートが、 ``get_absolute_url()`` の返す文字列を、追
+    加の処理を施さなくても直接利用できるようにせねばならないのです。
+    URI に Unicode 文字列を沢山使っているのなら、
+    ``django.utils.encoding.iri_to_uri`` も使うことになるでしょう。
 
 .. _RFC 2396: http://www.ietf.org/rfc/rfc2396.txt
 
-The ``permalink`` decorator
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _`The permalink decorator`:
 
-The problem with the way we wrote ``get_absolute_url()`` above is that it
-slightly violates the DRY principle: the URL for this object is defined both
-in the URLConf file and in the model.
+``permalink`` デコレータ
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can further decouple your models from the URLconf using the ``permalink``
-decorator:
+上に述べた ``get_absolute_url()`` には、いささか DRY 則の侵犯である、すなわ
+ちURLconf とモデルの両方で URL が定義されているという問題があります。
+
+``permalink`` デコレータを使うと、 URLconf からモデルを脱カップリングできま
+す:
 
 .. function:: django.db.models.permalink()
 
-This decorator is passed the view function, a list of positional parameters and
-(optionally) a dictionary of named parameters. Django then works out the correct
-full URL path using the URLconf, substituting the parameters you have given into
-the URL. For example, if your URLconf contained a line such as::
+このデコレータには、ビュー関数、引数のリスト、そして (オプションとして)
+名前つきパラメタの入った辞書を指定します。これらの情報から、 Django は
+指定したパラメタで URLconf を置き換えて完全な URL パスを計算します。例えば、
+以下のような URLconf が定義されていたとしましょう::
 
     (r'^people/(\d+)/$', 'people.views.details'),
 
-...your model could have a ``get_absolute_url`` method that looked like this::
+また、モデルの ``get_absolute_url`` メソッドは以下のように定義できます::
 
     from django.db import models
 
@@ -320,11 +326,11 @@ the URL. For example, if your URLconf contained a line such as::
     def get_absolute_url(self):
         return ('people.views.details', [str(self.id)])
 
-Similarly, if you had a URLconf entry that looked like::
+また、以下のような URLconf のエントリがあったとします::
 
     (r'/archive/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', archive_view)
 
-...you could reference this using ``permalink()`` as follows::
+``permalink`` は以下のように使えます::
 
     @models.permalink
     def get_absolute_url(self):
@@ -333,23 +339,21 @@ Similarly, if you had a URLconf entry that looked like::
             'month': self.created.month,
             'day': self.created.day})
 
-Notice that we specify an empty sequence for the second parameter in this case,
-because we only want to pass keyword parameters, not positional ones.
+この例では、第 2 引数に空の配列 (空のタプル) を指定していますが、これは引数
+リストを渡さず、キーワード引数だけを渡したいからです。
 
-In this way, you're tying the model's absolute URL to the view that is used
-to display it, without repeating the URL information anywhere. You can still
-use the ``get_absolute_url`` method in templates, as before.
+``permalink`` を使えば、 URL に関する情報を繰り返すことなく、モデルの絶対
+URL と表示に使ったビューを結びつけられます。以前と同様、
+``get_absolute_url`` はテンプレート中でも使えます。
 
-In some cases, such as the use of generic views or the re-use of
-custom views for multiple models, specifying the view function may
-confuse the reverse URL matcher (because multiple patterns point to
-the same view).
+汎用ビューを使う場合や、複数のモデルに対して同じビューを再利用する場合、ビュー
+関数そのものを指定すると、（複数のパターンが同じビューを指してしまうため）
+URLディスパッチャが混乱をきたします。
 
-For that problem, Django has **named URL patterns**. Using a named
-URL pattern, it's possible to give a name to a pattern, and then
-reference the name rather than the view function. A named URL
-pattern is defined by replacing the pattern tuple by a call to
-the ``url`` function)::
+この問題を解決するために、 Django には **名前つき URL パターン** があります。
+名前つき URL パターンを使えば、 URL パターンに固有の名前をつけておき、ビュー
+関数の代わりに参照できます。名前つき URL パターンを定義するには、タプル表記
+の URL パターンを ``url`` 関数に置き換えます::
 
     from django.conf.urls.defaults import *
 
@@ -357,8 +361,7 @@ the ``url`` function)::
         'django.views.generic.list_detail.object_detail',
         name='people_view'),
 
-...and then using that name to perform the reverse URL resolution instead
-of the view name::
+この名前を使って、URL からビューの名前を以下のようにして逆解決します::
 
     from django.db.models import permalink
 
@@ -366,8 +369,8 @@ of the view name::
         return ('people_view', [str(self.id)])
     get_absolute_url = permalink(get_absolute_url)
 
-More details on named URL patterns are in the :ref:`URL dispatch documentation
-<topics-http-urls>`.
+名前つき URL パターンの詳細は 
+:ref:`URL ディスパッチャのドキュメント<topics-http-urls>` を参照してください。
 
 .. _Extra instance methods:
 

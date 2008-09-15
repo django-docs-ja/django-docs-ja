@@ -3,9 +3,10 @@
 Models and databases
 ====================
 
-A model is the single, definitive source of data about your data. It contains
-the essential fields and behaviors of the data you're storing. Generally, each
-model maps to a single database table.
+モデルとは、サイトを構成するデータの、ただ一つかつ最終的なデータソースを指
+します。モデルには、保存したいデータに不可欠なデータフィールドと、その振舞
+いが収められています。一般的に、各モデルは単一のデータベーステーブルに対応
+づけられています。
 
 .. toctree::
    :maxdepth: 1

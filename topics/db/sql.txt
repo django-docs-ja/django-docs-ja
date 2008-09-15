@@ -1,14 +1,19 @@
 .. _topics-db-sql:
+.. _Performing raw SQL queries:
 
-Performing raw SQL queries
+SQL クエリの直接実行
 ==========================
 
-Feel free to write custom SQL statements in custom model methods and
-module-level methods. The object ``django.db.connection`` represents the
-current database connection. To use it, call ``connection.cursor()`` to get a
-cursor object. Then, call ``cursor.execute(sql, [params])`` to execute the SQL
-and ``cursor.fetchone()`` or ``cursor.fetchall()`` to return the resulting
-rows. Example::
+:revision-up-to: 8961 (1.0)
+
+自作のモデルメソッドやモジュールレベルのメソッドでは、自由にカスタムの SQL
+文を書けます。 ``django.db.connection`` というオブジェクトが現在のデータベー
+ス接続を表現しています。カスタムSQL を使うには、まず
+``connection.cursor()`` を呼び出してカーソルオブジェクトを取得し、次いで
+``cursor.execute(sql, [params])`` を呼び出して SQL を実行した後、
+``cursor.fetchone()`` や ``cursor.fetchall()`` を読んで結果行を返します。例
+えば::
+
 
     def my_custom_sql(self):
         from django.db import connection
@@ -17,19 +22,19 @@ rows. Example::
         row = cursor.fetchone()
         return row
 
-``connection`` and ``cursor`` mostly implement the standard `Python DB-API`_
-(except when it comes to :ref:`transaction handling <topics-db-transactions>`).
-If you're not familiar with the Python DB-API, note that the SQL statement in
-``cursor.execute()`` uses placeholders, ``"%s"``, rather than adding parameters
-directly within the SQL. If you use this technique, the underlying database
-library will automatically add quotes and escaping to your parameter(s) as
-necessary. (Also note that Django expects the ``"%s"`` placeholder, *not* the
-``"?"`` placeholder, which is used by the SQLite Python bindings. This is for
-the sake of consistency and sanity.)
+``connection`` や ``cursor`` は標準の `Python DB-API`_ が提供する機能の
+(:ref:`トランザクションの扱い <topics-db-transactions>` を除いた) ほとんど
+を実装しています。 Python DB-API に詳しくないのなら、上の SQL 文の
+``cursor.execute()`` でパラメタを直接 SQL に入れるのではなく、プレースホル
+ダ ``"%s"`` を使っていることに注意して下さい。このテクニックを使うと、根底
+にあるデータベースライブラリは必要に応じて自動的にパラメタをクオートしたり
+エスケープ処理したりします。 (また、Django はプレースホルダ文字として
+SQLite の Python バインディングが使っている ``"?"`` **ではなく** ``"%s"``
+を使うので注意してください。これはインタフェースに一貫性をもたせるための設
+計です。)
 
-A final note: If all you want to do is a custom ``WHERE`` clause, you can just
-use the ``where``, ``tables`` and ``params`` arguments to the standard lookup
-API. 
+注意: ``WHERE`` 節を自分で設定したいだけなら、標準の照合 API に ``where``
+や ``tables`` 、 ``params`` といった引数を指定して実現できます。
 
 .. _Python DB-API: http://www.python.org/peps/pep-0249.html
 

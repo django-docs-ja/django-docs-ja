@@ -1,9 +1,11 @@
 .. _ref-models-index:
+.. _Models:
 
-Models
+モデル
 ======
 
-Model API reference. For introductory material, see :ref:`topics-db-models`.
+モデルの API リファレンスです。モデルの解説は :ref:`topics-db-models` を参
+照してください。
 
 .. toctree::
    :maxdepth: 1
