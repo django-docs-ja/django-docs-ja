@@ -5,6 +5,8 @@
 フォームフィールド
 ======================
 
+:revision-up-to: 8961 (1.0)
+
 .. module:: django.forms.fields
    :synopsis: Django の組み込みフォームフィールドです。
 

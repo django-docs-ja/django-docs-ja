@@ -4,6 +4,10 @@
 Django's comments framework
 ===========================
 
+:revision-up-to: 8961 (1.0)
+
+.. TBD
+
 .. module:: django.contrib.comments
    :synopsis: Django's comment framework
 

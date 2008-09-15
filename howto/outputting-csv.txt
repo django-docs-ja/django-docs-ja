@@ -121,7 +121,7 @@ Python には CSV ライブラリモジュール ``csv`` がついてきます�
 その他のテキストベース形式
 ===========================
 
-.. TBD::
+.. TBD
  
 Notice that there isn't very much specific to CSV here -- just the specific
 output format. You can use either of these techniques to output any text-based

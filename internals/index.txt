@@ -3,6 +3,10 @@
 Django internals
 ================
 
+.. TBD
+
+:revision-up-to: 8961 (1.0)
+
 Documentation for people hacking on Django itself. This is the place to go if
 you'd like to help improve Django, learn or learn about how Django works "under
 the hood".

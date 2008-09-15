@@ -136,8 +136,7 @@ Django を使う
 :ref:`テンプレートタグの自作 (Custom template tags) <howto-custom-template-tags>`
     Django のテンプレート言語に独自の拡張を追加しましょう。
     
-:ref:`CSV の生成 (Generating CSV) <howto-outputting-csv>` 
-& :ref:`PDF の生成 (Generating PDF) <howto-outputting-pdf>`
+:ref:`CSV の生成 (Generating CSV) <howto-outputting-csv>` & :ref:`PDF の生成 (Generating PDF) <howto-outputting-pdf>`
     HTML 以外のコンテンツを Django で生成しましょう。
     
 他にも:

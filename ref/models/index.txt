@@ -1,8 +1,11 @@
 .. _ref-models-index:
-.. _Models:
+
+.. Models:
 
 モデル
 ======
+
+:revision-up-to: 8961 (1.0)
 
 モデルの API リファレンスです。モデルの解説は :ref:`topics-db-models` を参
 照してください。

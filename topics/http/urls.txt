@@ -19,7 +19,7 @@ URL はすっきりした扱いやすいものにすべきであるという主�
 
 .. _Cool URIs don't change: http://www.w3.org/Provider/Style/URI
 
-.. _Overview:
+.. Overview:
 
 概要
 ====
@@ -61,7 +61,7 @@ Django のリクエスト処理
        数には正規表現でキャプチャした値が渡されます。
 
 
-.. _Examples:
+.. Examples:
 
 凡例
 ====
@@ -342,7 +342,7 @@ Python 文字列型になります。例えば、下のような URLconf の行:
 コードを繰り返し書かなくてもよいように、 ``patterns()`` 呼び出しの中で共通
 のプレフィクスを指定できます。
 
-:ref:`Django の概要 <intero-overview>` からとってきた URLconf の例を示します::
+:ref:`Django の概要 <intro-overview>` からとってきた URLconf の例を示します::
 
     from django.conf.urls.defaults import *
 
@@ -479,7 +479,7 @@ URLconf タプルにはオプションとして 3 つめの要素を指定でき
 
     year='2005', foo='bar'
 
-このテクニックは :ref:`汎用ビュー <ref-generic-view>` や 
+このテクニックは :ref:`汎用ビュー <ref-generic-views>` や 
 :ref:`配信フィードフレームワーク <ref-contrib-syndication>` で、メタデータ
 やビューへのオプションを渡すために使われています。
 

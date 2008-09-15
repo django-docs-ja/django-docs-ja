@@ -38,20 +38,20 @@ Django には，既存のデータベースにイントロスペクションを�
 きるコマンド、 :djadmin:`inspectdb` が付属しています．出力を見るには以下の
 コマンドを実行します:
 
-.. highlight:: bash
+.. code-block:: bash
 
     python manage.py inspectdb
 
 標準の Unix 出力リダイレクションを使って，この内容をファイルに保存しておき
 ます:
 
-.. highlight:: bash
+.. code-block:: bash
 
     python manage.py inspectdb > appname.py
 
 この機能はショートカット目的で，正しいモデル生成を行うためのものではありま
-せん．詳しくは :ref:`django-admin.py のドキュメント <inspectdb>` を参照して
-ください．
+せん．詳しくは :djadmin:`django-admin.py のドキュメント <inspectdb>` を参照
+してください．
 
 モデルを削除し終えたら，モジュールをアプリケーションの ``models.py`` 
 に入れ，アプリケーションを収めているパッケージ内に配置し，
@@ -65,7 +65,7 @@ Django のコアデータテーブルのインストール
 次に， :djadmin:`syncdb` コマンドを実行して， Django のコアデータテーブルを
 データベースにインストールします:
 
-.. highlight:: bash
+.. code-block:: bash
 
     python manage.py syncdb
 

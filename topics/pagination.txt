@@ -18,7 +18,7 @@ Django は、ページ分割された (paginated) データを扱うためのペ
 を指します。ペジネータのクラスは、 :file:`django/core/paginator.py` モジュー
 ルで定義されています。
 
-.. _Example:
+.. Example:
 
 例
 =======

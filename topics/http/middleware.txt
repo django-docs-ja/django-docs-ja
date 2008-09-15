@@ -17,10 +17,8 @@ Django には ``XViewMiddleware`` ミドルウェアコンポーネントがあ�
 このドキュメントでは、 Django についてくる全てのミドルウェアコンポーネント
 の使用法と、自分で新たにミドルウェアを作る方法を説明します。
 
-.. TBD 
-Django ships with some built-in middleware you
-can use right out of the box; they're documented in the :ref:`built-in
-middleware guide <ref-middleware>`.
+Django には、すぐに使える組み込みのミドルウェアが付属しています。
+:ref:`組み込みミドルウェアガイド <ref-middleware>` を参照してください。
 
 .. _Activating middleware:
 

@@ -4,6 +4,10 @@
 Built-in signal reference
 =========================
 
+:revision-up-to: 8961 (1.0)
+
+.. TBD
+
 A list of all the signals that Django sends.
 
 .. seealso::

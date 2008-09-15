@@ -1,13 +1,17 @@
 .. _howto-custom-file-storage:
 
-Writing a custom storage system
-===============================
+カスタムのストレージシステムを作成する
+=======================================
+
+:revision-up-to: 8961 (1.0)
 
 .. currentmodule:: django.core.files.storage
 
-If you need to provide custom file storage -- a common example is storing files
-on some remote system -- you can do so by defining a custom storage class.
-You'll need to follow these steps:
+ファイルを遠隔のシステム上に保存したい場合のように、カスタムのファイルスト
+レージを作成したいときのために、カスタムストレージクラスを定義できます。
+カスタムストレージは、以下のステップに従って作成します:
+
+.. TBD
 
 #. Your custom storage system must be a subclass of
    ``django.core.files.storage.Storage``::

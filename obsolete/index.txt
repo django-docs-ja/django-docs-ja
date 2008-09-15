@@ -3,6 +3,10 @@
 Deprecated/obsolete documentation
 =================================
 
+:revision-up-to: 8961 (1.0)
+
+.. TBD
+
 These documents cover features that have been deprecated or that have been
 replaced in newer versions of Django. They're preserved here for folks using old
 versions of Django or those still using deprecated APIs. No new code based on

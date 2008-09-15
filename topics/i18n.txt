@@ -9,7 +9,7 @@
 Django はコードとテンプレートの双方で国際化をフルサポートしています。このド
 キュメントでは国際化の仕組みについて説明します。
 
-.. _Overview:
+.. Overview:
 
 概要
 ====
@@ -175,7 +175,6 @@ Python コード内での指定
 せねばならない場合があるからです。
 
 .. _lazy-translations:
-.. _Lazy translation:
 
 翻訳を遅延させる
 ~~~~~~~~~~~~~~~~
@@ -491,7 +490,7 @@ Django には ``django-admin.py makemessages`` というツールが付属して
 'djangojs' ドメインを使ってください。
 
 .. _create a JavaScript translation catalog: `Creating JavaScript translation catalogs`_
-.. _`JavaScript の翻訳カタログ: `create a JavaScript translation catalog`_
+.. _`JavaScript の翻訳カタログ`: `create a JavaScript translation catalog`_
 
 .. admonition:: gettext がなかったら?
 

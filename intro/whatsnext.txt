@@ -6,7 +6,7 @@ What to read next
 
 :revision-up-to: 8961 (1.0)
 
-.. TBD::
+.. TBD
 
 So you've read all the :ref:`introductory material <intro-index>` and have
 decided you'd like to keep using Django. We've only just scratched the surface

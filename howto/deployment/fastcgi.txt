@@ -96,7 +96,7 @@ Unix ドメインソケット (Win32 システムにおける「名前付きパ�
 引数として， ``socket``, ``protocol``, または， ``host`` および ``port`` を
 指定せねばなりません．さらに， Web サーバをセットアップする際に，FastCGI サー
 バを起動するときに使ったソケット名か，ホスト/ポート番号の組合せを指定せねば
-なりません．後述の `例`_ を参照してください。
+なりません．後述の `実行例`_ を参照してください。
 
 .. _Protocols:
 
@@ -243,7 +243,7 @@ URL を ``mysite.fcgi`` (または ``FastCGIExternalServer`` ディレクティ�
 
 .. _mod_rewrite: http://httpd.apache.org/docs/2.0/mod/mod_rewrite.html
 
-.. TBD::
+.. TBD
 
 Django will automatically use the pre-rewrite version of the URL when
 constructing URLs with the ``{% url %}`` template tag (and similar methods).
@@ -396,7 +396,7 @@ Admin メディアファイルの提供
 法を考えておかねばなりません． :ref:`modpython <serving-the-admin-files>`
 での運用に関するドキュメントには，上記の構成でも使えるアドバイスがあります．
 
-.. TBD::
+.. TBD
 
 Forcing the URL prefix to a particular value
 ============================================

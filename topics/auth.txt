@@ -13,7 +13,7 @@ Django にはユーザ認証システムがついてきます。 Django のユ�
 ユーザアカウント、グループ、パーミッションとクッキーベースのユーザセッショ
 ンを扱えます。このドキュメントでは、ユーザ認証の仕組みについて説明します。
 
-.. _Overview:
+.. Overview:
 
 概要
 ====
@@ -28,7 +28,7 @@ Django にはユーザ認証システムがついてきます。 Django のユ�
     * メッセージ (Messages): 指定のユーザ(達) に対するメッセージをキューす
       るための簡単な方法です。
 
-.. _Installation:
+.. Installation:
 
 インストール
 ============
@@ -470,7 +470,7 @@ MD5 ハッシュを使っていました。この形式は、以前のバージ�
 .. _Chapter 12 of the Django book: http://www.djangobook.com/en/1.0/chapter12/#cn222
 .. _`Django book の 12 章`: `Chapter 12 of the Django book`_
 
-
+.. _topics-http-auth:
 .. _Authentication in Web requests:
 
 Web リクエストに対する認証
@@ -482,7 +482,7 @@ API について扱ってきました。より高水準の API では、 Django 
 ステム内にフックできます。
 
 まず、 :class:`~django.contrib.sessions.middleware.SessionMiddleware` およ
- び :class:`~django.contrib.auth.middleware.AuthenticationMiddleware` を
+び :class:`~django.contrib.auth.middleware.AuthenticationMiddleware` を
 :setting:`MIDDLEWARE_CLASSES` 設定に追加して、これらのミドルウェアをインス
 トールします。詳しくは
 :ref:`セッションのドキュメント <topics-http-sessions>` を参照してください。
@@ -1023,7 +1023,7 @@ permission_required デコレータ
 アクセスを汎用ビューに制限する
 ------------------------------
 
-アクセスを :ref:`汎用ビュー <ref-generic-views>`_ に制限するには、ビューを
+アクセスを :ref:`汎用ビュー <ref-generic-views>` に制限するには、ビューを
 囲む薄いラッパコードを書き、URLconf を変更して、ジェネリックビュー自体では
 なくラッパコードを指すようにします。例えば::
 
@@ -1159,7 +1159,7 @@ API リファレンス
    :ref:`RequestContext のドキュメント <subclassing-context-requestcontext>`
    を参照してください。
    
-.. _Users:
+.. Users:
 
 ユーザ
 ------

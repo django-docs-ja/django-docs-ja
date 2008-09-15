@@ -3,6 +3,10 @@
 Handling HTTP requests
 ======================
 
+:revision-up-to: 8961 (1.0)
+
+.. TBD
+
 Information on handling HTTP requests in Django:
 
 .. toctree::

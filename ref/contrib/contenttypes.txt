@@ -14,13 +14,13 @@ Django には、 :mod:`contenttypes` アプリケーションが付属してい�
 てのモデルを追跡できます。また、 ``contenttypes`` では、モデルを扱うための
 高水準かつ汎用的なインタフェースを提供しています。
 
-.. _Overview:
+.. Overview:
 
 概要
 =====
 
 ``contenttypes``  アプリケーションの心臓部は、 
-``django.contrib.contenttypes.models.ContentType` で定義されている
+:mod:`django.contrib.contenttypes.models` で定義されている
 :class:`~django.contrib.contenttypes.models.ContentType` モデルです。
 :class:`django.contrib.contenttypes.models.ContentType` のインスタンスは、
 プロジェクト上にインストールされているモデルの情報を表現したり保存したりし
@@ -67,8 +67,8 @@ Django には、 :mod:`contenttypes` アプリケーションが付属してい�
 
 .. _The ContentType model:
 
-:class:`~django.contrib.contenttypes.models.ContentType`  モデル
-=========================
+``ContentType``  モデル
+========================
 
 .. class:: models.ContentType
 
@@ -89,6 +89,7 @@ Django には、 :mod:`contenttypes` アプリケーションが付属してい�
         モデルクラスの名前です。
 
     .. attribute:: models.ContentType.name
+
         人間可読なモデル名です。この値は、モデルの 
         :attr:`verbose_name <django.db.models.fields.Field.verbose_name>`
 	から取り出されます。

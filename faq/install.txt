@@ -1,12 +1,11 @@
 .. _faq-install:
 
-.. _`FAQ: Installation`:
+.. FAQ: Installation
 
 FAQ: インストール
 =================
 
-How do I get started?
----------------------
+:revision-up-to: 8961 (1.0)
 
 .. _How do I get started?:
 

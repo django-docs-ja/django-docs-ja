@@ -1,9 +1,10 @@
 .. _ref-models-relations:
-.. _Related objects reference:
 
 =====================================
-リレーションオブジェクトリファレンス
+Related objects reference
 =====================================
+
+:revision-up-to: 8961 (1.0)
 
 .. TBD
 

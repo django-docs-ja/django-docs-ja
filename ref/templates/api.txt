@@ -421,8 +421,8 @@ django.core.context_processors.request
 
 このプロセッサが :setting:`TEMPLATE_CONTEXT_PROCESSORS` にある場合、変数
 ``request`` が ``RequestContext`` に入ります。この変数は現在の
-`HttpRequest オブジェクト`_ を表現します。このプロセッサはデフォルトでは有
-効でないので注意してください。利用したければ有効にせねばなりません。
+:class:`~django.http.HttpRequest` を表現します。このプロセッサはデフォルト
+では有効でないので注意してください。利用したければ有効にせねばなりません。
 
 
 .. _Writing your own context processors:

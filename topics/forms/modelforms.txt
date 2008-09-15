@@ -34,7 +34,7 @@
     >>> article = Article.objects.get(pk=1)
     >>> form = ArticleForm(instance=article)
 
-.. _Field types:
+.. Field types:
 
 フィールド型
 -------------
@@ -421,7 +421,7 @@ parent class's ``clean()`` method.
 モデルフォームセット
 =======================
 
-:ref:`通常のフォームセット <topics-form-formsets>` と同様、モデル由来のフォー
+:ref:`通常のフォームセット <topics-forms-formsets>` と同様、モデル由来のフォー
 ムをうまく扱えるように拡張された特殊なフォームセットクラスがあります。上の
 ``Author`` モデルを使って説明しましょう::
 

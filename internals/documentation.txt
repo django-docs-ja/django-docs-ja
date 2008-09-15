@@ -3,6 +3,8 @@
 How the Django documentation works
 ==================================
 
+:revision-up-to: 8961 (1.0)
+
 \... and how to contribute.
 
 Django's documentation uses the Sphinx__ documentation system, which in turn is

@@ -1,9 +1,11 @@
 .. _internals-committers:
 
-.. TBD::
+.. TBD
 
 Django committers
 =================
+
+:revision-up-to: 8961 (1.0)
 
 The original team
 =================

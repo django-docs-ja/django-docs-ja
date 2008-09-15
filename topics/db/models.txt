@@ -4,6 +4,8 @@
 Writing models
 ==============
 
+:revision-up-to: 8961 (1.0)
+
 .. module:: django.db.models
 
 モデルとは、サイトを構成するデータの、ただ一つかつ最終的なデータソースを指
@@ -142,7 +144,7 @@ in the :ref:`model field reference <model-field-types>`. You can easily write
 your own fields if Django's built-in ones don't do the trick; see
 :ref:`howto-custom-model-fields`.
 
-.. _Field options:
+.. Field options:
 
 フィールドのオプション
 ----------------------
@@ -555,7 +557,7 @@ of the intermediate model::
 レストランのデータベースを作成したいとしましょう。このとき、 ``Restaurant`` 
 には ``Place`` への :class:`~django.db.models.fields.OneToOneField` をもた
 せられます (レストランは場所に対して "is-a" の関係だからです。実際には、こ
-のような状況を扱うのに :ref:`モデルの継承 <model-inehritance>` を使いますが、
+のような状況を扱うのに :ref:`モデルの継承 <model-inheritance>` を使いますが、
 モデル継承は :class:`~django.db.models.fields.OneToOneField` で実現されてい
 ます)。
 
@@ -829,7 +831,6 @@ the :meth:`~QuerySet.extra` lookup method, which lets you add custom SQL to a
 query.
 
 .. _model-inheritance:
-.. _Model inheritance:
 
 モデルの継承
 =================

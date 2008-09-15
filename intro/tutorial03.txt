@@ -46,7 +46,7 @@ Poll アプリケーションの場合には、以下の 4 つのビューを作
 
 Django では、各ビューは簡単な Python の関数として表現されます。
 
-.. _Design your URLs:
+.. Design your URLs:
 
 URL スキームの設計
 ==================

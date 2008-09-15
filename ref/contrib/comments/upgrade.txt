@@ -4,6 +4,10 @@
 Upgrading from Django's previous comment system
 ===============================================
 
+:revision-up-to: 8961 (1.0)
+
+.. TBD
+
 Prior versions of Django included an outdated, undocumented comment system. Users who reverse-engineered this framework will need to upgrade to use the
 new comment system; this guide explains how.
 

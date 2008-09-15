@@ -4,6 +4,10 @@
 Running Django on Jython
 ========================
 
+.. TBD
+
+:revision-up-to: 8961 (1.0)
+
 .. index:: Jython, Java, JVM
 
 Jython_ is an implementation of Python that runs on the Java platform (JVM).

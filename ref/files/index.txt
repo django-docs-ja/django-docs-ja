@@ -3,6 +3,10 @@
 File handling reference
 =======================
 
+:revision-up-to: 8961 (1.0)
+
+.. TBD
+
 .. module:: django.core.files
    :synopsis: File handling and storage
 

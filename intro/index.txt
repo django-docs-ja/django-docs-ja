@@ -3,6 +3,10 @@
 Getting started
 ===============
 
+:revision-up-to: 8961 (1.0)
+
+.. TBD
+
 New to Django? Or to web development in general? Well, you came to the right
 place: read this material to quickly get up and running.
 

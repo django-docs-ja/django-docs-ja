@@ -8,7 +8,7 @@ flatpages アプリケーション
 
 .. module:: django.contrib.flatpages
    :synopsis: ?フラットな? HTML コンテンツをデータベース上で管理するための
-   簡単なアプリケーションです。
+              簡単なアプリケーションです。
 
 Django にはオプションのアプリケーション、 "flatpages" が付属しています。
 "flatpages" を使うと、データベースに素 ("flat") の HTML コンテンツを Django
@@ -55,7 +55,7 @@ flatpages アプリケーションをインストールするには、以下の�
     4. :djadmin:`python manage.py syncdb <syncdb>` を実行します。
 
 
-.. _How it works:
+.. How it works:
 
 flatpages の仕組み
 ==================

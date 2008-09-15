@@ -4,6 +4,10 @@
 Django 1.0 alpha 2 release notes
 ================================
 
+:revision-up-to: 8961 (1.0)
+
+.. TBD
+
 Welcome to Django 1.0 alpha 2!
 
 This is the second in a series of preview/development releases leading

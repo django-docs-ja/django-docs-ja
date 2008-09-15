@@ -35,20 +35,20 @@ Django には低水準のフィード生成 API もついてきます。 Web コ
 以後の部分) を使って、どのフィードを出力するかを決めます。
 
 フィードを生成するには、 :class:`~django.contrib.syndication.feeds.Feed` ク
-ラスを書き、 :url:`URLConf <topics-http-urls>` 内で指定します。
+ラスを書き、 :ref:`URLConf <topics-http-urls>` 内で指定します。
 
-.. _Initialization:
+.. Initialization:
 
 初期化
 --------------
 
 最新の開発版の Django を使っていないのなら、 sites フレームワークがインストー
 ルされていて、データベースのテーブルが生成されているか確認してください。
-(詳しくは :ref:`sites フレームワークのドキュメント <django.contrib.sites>`
+(詳しくは :mod:`sites フレームワークのドキュメント <django.contrib.sites>`
 を参照してください)。 sites への依存性は開発版の Django で変更され、現在で
 は配信フィードフレームワークは sites フレームワークに依存していません。
 
-Django サイトで配信フィードを使うには、 :url:`URLConf <topics-http-urls>`
+Django サイトで配信フィードを使うには、 :ref:`URLConf <topics-http-urls>`
 に以下のような行を追加します::
 
     (r'^feeds/(?P<url>.*)/$', 'django.contrib.syndication.views.feed', {'feed_dict': feeds}),
@@ -265,22 +265,22 @@ bit にどのような意味を与え、フィード公開する項目の選択�
 このクラスに URL :file:`/rss/beats/0613/` でアクセスしたときの、 RSS フレー
 ムワークの基本的なアルゴリズムは以下の通りです:
 
-    * フレームワークに URL :ref:`/rss/beats/0613/` が渡されます。フレームワー
-      クは slug 以後に追加の URL bit があることに気づき、 slug 以後の文字列
-      をスラッシュ (``"/"``) で分割して、
+    * フレームワークに URL :file:`/rss/beats/0613/` が渡されます。フレーム
+      ワークは slug 以後に追加の URL bit があることに気づき、 slug 以後の文
+      字列をスラッシュ (``"/"``) で分割して、
       :class:`~django.contrib.syndication.feeds.Feed` クラスの
       :meth:`get_object()` メソッドの引数に渡して呼び出します。上の例では、
       bit は ``['0613']`` になります。リクエストが 
-      :ref:`/rss/beats/0613/foo/bar/` であれば bit は
+      :file:`/rss/beats/0613/foo/bar/` であれば bit は
       ``['0613', 'foo', 'bar']`` です。
 
     * :meth:`get_object()` は指定された ``bit`` を使って適切な巡回区域を選
       択する役割を担っています。上の場合では、 Django のデータベース API を
       使って巡回区域を決定しています。 無効なパラメタが指定された場合、
       :meth:`get_object()` は
-      :ext:`django.core.exceptions.ObjectDoesNotExist` を返さねばなりません。
-      関数が失敗すると :ext:`Beat.DoesNotExist` を送出し、
-      :ext:`Beat.DoesNotExist` は :exc:`ObjectDoesNotExist` のサブクラスなので、
+      :exc:`django.core.exceptions.ObjectDoesNotExist` を返さねばなりません。
+      関数が失敗すると :exc:`Beat.DoesNotExist` を送出し、
+      :exc:`Beat.DoesNotExist` は :exc:`ObjectDoesNotExist` のサブクラスなので、
       ``Beat.objects.get()`` 呼び出しの周りには ``try``/``except`` がありま
       せん。 :meth:`get_object()` の中で ``ObjectDoesNotExist`` を送出すると、
       Django はリクエストに対して 404 エラーを返します。

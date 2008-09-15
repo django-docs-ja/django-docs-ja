@@ -172,7 +172,7 @@ cStringIO_ ライブラリを使ってください． cStringIO ライブラリ�
 Other formats
 =============
 
-.. TBD::
+.. TBD
 
 Notice that there isn't a lot in these examples that's PDF-specific -- just the
 bits using ``reportlab``. You can use a similar technique to generate any

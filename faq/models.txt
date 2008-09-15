@@ -1,9 +1,11 @@
 .. _faq-models:
 
-.. _`FAQ: Databases and models`:
+.. FAQ: Databases and models
 
 FAQ: データベースとモデル
 ==========================
+
+:revision-up-to: 8961 (1.0)
 
 .. _How can I see the raw SQL queries Django is running?:
 

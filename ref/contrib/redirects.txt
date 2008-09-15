@@ -13,7 +13,7 @@ Django にはオプションとして redirects アプリケーションがつ�
 アプリケーションを使うと，リダイレクト先をデータベースに保存し，適切なリダ
 イレクト処理をおこなってくれます．
 
-.. _Installation:
+.. Installation:
 
 インストール
 ============
@@ -28,7 +28,7 @@ redirects アプリケーションをインストールするには，以下の 
        を追加します．
     3. :djadmin:`manage.py syncdb <syncdb>` を実行します．
 
-.. _How it works:
+.. How it works:
 
 動作の仕組み
 ============
@@ -72,7 +72,7 @@ Django の自動 admin インタフェースを有効にしていれば， "Redi
 前のセクションが admin のインデクスページに表示されているはずです．Django
 の他のオブジェクトと同じように編集してください．
 
-.. _Via the Python API:
+.. Via the Python API:
 
 Python API から
 ---------------
@@ -83,3 +83,5 @@ Python API から
     準の :ref:`Django モデル <topics-db-models>` で表現されています。
     :ref:`Django のデータベース API <topics-db-queries>` を使えば、リダイレ
     クトオブジェクトにアクセスできます．
+
+.. _django/contrib/redirects/models.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/redirects/models.py

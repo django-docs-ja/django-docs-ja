@@ -548,6 +548,7 @@ admin では、 ``<input type="file">`` (ファイルアップロードウィジ
 :attr:`~CharField.max_length` 引数を使って最大長を変更できます。
 
 .. _`strftime formatting`: http://docs.python.org/lib/module-time.html#l2h-1941
+.. _`strftime によるフォーマット`: http://www.python.jp/doc/release/lib/module-time.html#l2h-1915
 
 ``FilePathField``
 -----------------

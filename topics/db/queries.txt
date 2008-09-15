@@ -17,7 +17,7 @@
 :ref:`データモデルリファレンス <ref-models-index>` を参照してください。
 
 このリファレンスでは、以下のような Poll アプリケーションを参考に話を進めま
-す::
+す:
 
 .. _queryset-model-example:
 
@@ -694,7 +694,7 @@ Q オブジェクトを使った複雑な照合
 
 .. seealso::
 
-    `OR lookups examples page`_ の例には、 ``Q`` を使った Django のユニット
+    `OR lookups examples`_ の例には、 ``Q`` を使った Django のユニット
     テストがあります。
 
     .. _OR lookups examples: http://code.djangoproject.com/browser/django/trunk/tests/modeltests/or_lookups/models.py
@@ -966,7 +966,7 @@ Django はまた、リレーションの「相手側」へのアクセス API、
 操作結果は追加、新規作成、削除といった操作を行う度に即座に自動的にデータベー
 スに保存されます。
 
-.. _Many-to-many relationships:
+.. Many-to-many relationships:
 
 多対多のリレーション
 --------------------
@@ -995,7 +995,7 @@ Django はまた、リレーションの「相手側」へのアクセス API、
 ``related_name='entries'`` を指定していた場合、 ``Author`` インスタンスは
 ``entry_set`` ではなく ``entries`` という属性を持つようになります。
 
-.. _One-to-one relationships:
+.. One-to-one relationships:
 
 一対一のリレーション
 ------------------------

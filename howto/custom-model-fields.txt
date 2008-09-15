@@ -616,11 +616,6 @@ parameters (which is implemented by ``get_db_prep_value``).
 
 .. method:: value_to_string(self, obj)
 
-This method is used by the serializers to convert the field into a string for
-output. Calling :meth:``Field._get_val_from_obj(obj)`` is the best way to get the
-value to serialize. For example, since our ``HandField`` uses strings for its
-data storage anyway, we can reuse some existing conversion code::
-
 このメソッドは、シリアライザがフィールドの値を出力する際に文字列に変換する
 ために使います。シリアライズデータを生成するには、
 :meth:`Field._get_val_from_obj(obj)` を呼び出すとよいでしょう。例えば、例え

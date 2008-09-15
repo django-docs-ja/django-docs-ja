@@ -1,13 +1,13 @@
 .. _faq-general:
 
-.. _`FAQ: General`:
+.. FAQ: General
 
 FAQ: 全般
 ============
 
 :revision-up-to: 8961 (1.0)
 
-.. _Why does this project exist?:
+.. Why does this project exist?
 
 なぜこんなプロジェクトがあるのですか？
 --------------------------------------
@@ -39,7 +39,7 @@ WorldOnline では、効果的な Web アプリケーションを、ジャーナ
 .. _Python: http://www.python.org/
 .. _PostgreSQL: http://www.postgresql.org/
 
-.. _What does "Django" mean, and how do you pronounce it?:
+.. What does "Django" mean, and how do you pronounce it?
 
 "Django" とはどういう意味で、どのように発音するのですか？
 ---------------------------------------------------------
@@ -61,8 +61,7 @@ Django は **JANG**-oh ('a' は伸ばす) と発音します。韻は FANG-oh �
 .. _`ジャンゴ・ラインハルト`: http://ja.wikipedia.org/wiki/%E3%82%B8%E3%83%A3%E3%83%B3%E3%82%B4%E3%83%BB%E3%83%A9%E3%82%A4%E3%83%B3%E3%83%8F%E3%83%AB%E3%83%88
 .. _`正しい発音の音声ファイル`: `audio clip of the pronunciation`_
 
-
-.. _Is Django stable?:
+.. Is Django stable?
 
 Django は安定していますか？
 ---------------------------
@@ -72,7 +71,7 @@ Django で構築したサイトは、これまでに 100 万ヒット／時を�
 スパイクに見舞われたことがあり、何度もスラッシュドット効果を喰らっています。
 そうですね。きわめて安定です。
 
-.. _Does Django scale?:
+.. Does Django scale?
 
 Django はスケールしますか？
 ---------------------------
@@ -89,17 +88,17 @@ Django はアプリケーションレイヤからのデータベースレイヤ�
 プルながら強力な  :ref:`キャッシュフレームワーク <topics-cache>` を備えてい
 ます。
 
-.. _Who's behind this?:
+.. Who's behind this?
 
 Django の舞台裏には誰がいるのですか？
 ---------------------------------------
 
 Django は米国カンザス州ローレンス (Lawrence, Kansas, USA) のとある新聞の
-Web 部門である `World Online`_ で開発されました。今では、 Django は国際的な
+Web 部門である World Online で開発されました。今では、 Django は国際的な
 ボランティアのチームによって開発されています。 開発者たちの人となりは
 :ref:`コミッタ一覧 <internals-committers>` で読めます。
 
-.. _Which sites use Django?:
+.. Which sites use Django?
 
 どんなサイトが Django を使っているのですか？
 --------------------------------------------
@@ -111,9 +110,9 @@ Django wiki には `Django で作られたサイト一覧`_ という特集ペ�
 .. _`Django で作られたサイト一覧`: `list of Django-powered sites`_
 
 
-.. _mtv:
 
-.. _Django appears to be a MVC framework, but you call the Controller the "view", and the View the "template". How come you don't use the standard names?:
+.. Django appears to be a MVC framework, but you call the Controller the "view", and the View the "template". How come you don't use the standard names?
+.. _mtv:
 
 Django は MVC フレームワークのようですが、コントローラ (Controller) を「ビュー (view)」と呼び、ビュー (View) を「テンプレート (template)」と呼んでいます。どうして標準的な呼び方をしないのですか？
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -145,7 +144,7 @@ Django は MVC フレームワークのようですが、コントローラ (Con
 Django はわれわれにとって最も理にかなった方法で問題を解決しているのです。
 
 
-.. _<Framework X> does <feature Y> -- why doesn't Django?:
+.. <Framework X> does <feature Y> -- why doesn't Django?
 
 <フレームワーク X> には <機能 Y> があります -- どうして Django にないのですか？
 -------------------------------------------------------------------------------
@@ -156,7 +155,7 @@ Django はまさに私達が旧態然の Web フレームワークに不満だ�
 れたのであって、「<Framework X> だとできるから」という理由は Django に機能
 を追加する十分な理由にはならないということに注意して下さい。
 
-.. _Why did you write all of Django from scratch, instead of using other Python libraries?:
+.. Why did you write all of Django from scratch, instead of using other Python libraries?
 
 なぜ既存の Python ライブラリを使わずスクラッチで Django を作ったのですか？
 --------------------------------------------------------------------------
@@ -194,7 +193,7 @@ Django を書き始めた約 2 年前、 Adrian と Simon は少し時間を取�
 かもしれないので、それまではスクリーンキャストにまださほどエネルギーを使い
 たくないということです。
 
-.. _Is Django a content-management-system (CMS)?:
+.. Is Django a content-management-system (CMS)?
 
 Django はコンテンツ管理システム (CMS) なのでしょうか?
 -----------------------------------------------------
@@ -215,7 +214,7 @@ Django はコンテンツ管理システム (CMS) なのでしょうか?
 
 .. _Drupal: http://drupal.org/
 
-.. _When will you release Django 1.0?:
+.. When will you release Django 1.0?
 
 いつになったら Django 1.0 をリリースするのですか？
 --------------------------------------------------
@@ -247,7 +246,7 @@ Django リリースのドキュメントよりも多くの情報を提供して�
 .. _stored in revision control: http://code.djangoproject.com/browser/django/trunk/docs
 
 
-.. _Where can I find Django developers for hire?:
+.. Where can I find Django developers for hire?
 
 Django 開発者はどこで雇えますか？
 ---------------------------------

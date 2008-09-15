@@ -3,6 +3,10 @@
 The ``File`` object
 ===================
 
+:revision-up-to: 8961 (1.0)
+
+.. TBD
+
 .. currentmodule:: django.core.files
 
 .. class:: File(file_object)

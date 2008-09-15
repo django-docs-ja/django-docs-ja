@@ -29,7 +29,7 @@ Django には、 :ref:`フォーム <topics-forms-index>` を複数のページ�
 .. _explained on Wikipedia: http://en.wikipedia.org/wiki/Wizard_%28software%29
 .. _`Wikipedia で解説されています`: http://ja.wikipedia.org/wiki/ウィザード_%28ソフトウェア%29
 
-.. _How it works:
+.. How it works:
 
 フォームウィザードの仕組み
 ====================================

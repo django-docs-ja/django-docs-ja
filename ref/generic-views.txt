@@ -211,6 +211,7 @@ URL に ``None`` を指定すると、 ``HttpResponseGone`` (410) を発行し�
       す。デフォルトでは ``False`` です。
 
     .. versionadded:: 1.0
+
     * ``template_object_name``: テンプレートコンテキストをテンプレート変数
       として渡すときの名前です。デフォルト値は ``'latest'`` です。
 

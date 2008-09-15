@@ -146,7 +146,7 @@ Django を使っていると， Unicode 文字列とバイト文字列の他に�
 
     * ``force_unicode(s, encoding='utf-8', string_only=False, errors='strict')``
       は，ほとんどの場合 ``smart_unicode()`` と同じように動作します．ただし，
-      第一引数が :ref:`遅延翻訳オブジェクト <lazy-translation>` の場合には
+      第一引数が :ref:`遅延翻訳オブジェクト <lazy-translations>` の場合には
       動作が異なります．
       ``smart_unicode()`` は遅延翻訳オブジェクトをそのままにしておきますが，
       ``force_unicode()`` を使うと，(その場で翻訳を行って) Unicode 文字列を
@@ -229,7 +229,7 @@ ASCII 文字が正しい値にエンコードされるようにしてくださ�
 .. _IRI: http://www.ietf.org/rfc/rfc3987.txt
 .. _RFC 3987: IRI_
 
-.. _Models:
+.. Models:
 
 モデル
 ======

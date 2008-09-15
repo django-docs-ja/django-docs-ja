@@ -1,6 +1,6 @@
 .. _faq-usage:
 
-.. _`FAQ: Using Django`:
+.. FAQ: Using Django
 
 FAQ: Django を使う
 ====================

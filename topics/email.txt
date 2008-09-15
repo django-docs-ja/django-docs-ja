@@ -19,7 +19,7 @@ Python の `smtplib ライブラリ`_ を使えば、比較的簡単に電子メ
 .. _smtplib library: http://www.python.org/doc/current/lib/module-smtplib.html
 
 
-.. _Quick example:
+.. Quick example:
 
 お手軽な例
 ==========
@@ -109,9 +109,9 @@ send_mass_mail() と send_mail()
 mail_admins()
 =============
 
-``django.core.mail.mail_admins()`` は :setting:`ADMINS`に書かれたサイト管理
-者への電子メール送信を行うためのショートカットです。関数の定義は以下の通り
-です:
+``django.core.mail.mail_admins()`` は :setting:`ADMINS` に書かれたサイト管
+理者への電子メール送信を行うためのショートカットです。関数の定義は以下の通
+りです:
 
     .. function:: mail_admins(subject, message, fail_silently=False)
 
@@ -131,7 +131,7 @@ mail_managers()
 
     .. function:: mail_managers(subject, message, fail_silently=False)
 
-.. _Examples:
+.. Examples:
 
 例
 ===

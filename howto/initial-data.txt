@@ -4,6 +4,10 @@
 Providing initial data for models
 =================================
 
+.. TBD
+
+:revision-up-to: 8961 (1.0)
+
 It's sometimes useful to pre-populate your database with hard-coded data when
 you're first setting up an app. There's a couple of ways you can have Django
 automatically create this data: you can provide `initial data via fixtures`_, or

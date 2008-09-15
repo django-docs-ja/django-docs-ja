@@ -16,7 +16,7 @@ Django には， `サイトマップ`_ XML ファイルを簡単に生成でき�
 .. _sitemap: http://www.sitemaps.org/
 .. _`サイトマップ`: `sitemap`_
 
-.. _Overview:
+.. Overview:
 
 概要
 ====
@@ -33,7 +33,7 @@ sitemaps は Django の :ref:`配信フレームワーク <ref-contrib-syndicati
 によく似ています．サイトマップの生成は簡単で，ただ ``Sitemap`` クラスを書い
 て， :ref:`URLconf <topics-http-urls>` に指定するだけです．
 
-.. _Installation:
+.. Installation:
 
 インストール
 ============
@@ -248,9 +248,10 @@ sitemaps フレームワークでは，よく使われる状況向けに，二�
 しています:
 
 .. class:: FlatPageSitemap
+
     :class:`django.contrib.sitemaps.FlatPageSitemap` クラスは，現在の
-    :setting:`SITE_ID` (:ref:`sites のドキュメント <django.contrib.sites>`
-    参照) 向けの全ての :ref:`フラットページ <django.contrib.flatpages>` を
+    :setting:`SITE_ID` (:mod:`sites のドキュメント <django.contrib.sites>`
+    参照) 向けの全ての :mod:`フラットページ <django.contrib.flatpages>` を
     検索し，サイトマップのエントリを生成します．各エントリには
     :attr:`~Sitemap.location` 属性だけが設定され，
     :attr:`~Sitemap.lastmod`, :attr:`~Sitemap.changefreq`,

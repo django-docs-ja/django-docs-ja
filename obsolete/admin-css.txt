@@ -207,7 +207,7 @@ admin のフォームは ``fieldset`` エレメントでグループごとに分
 ばなりません。行内に収めるフィールドが必須のフィールドの場合、
 ``div.form-row`` には ``required`` クラスを追加せねばなりません。
 
-.. image:: .. image:: _images/formrow.gif
+.. image:: _images/formrow.gif
    :alt: Example use of form-row class
 
 .. _Labels:

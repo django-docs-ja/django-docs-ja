@@ -3,6 +3,10 @@
 Using Django
 ============
 
+:revision-up-to: 8961 (1.0)
+
+.. TBD
+
 Introductions to all the key parts of Django you'll need to know:
 
 .. toctree::

@@ -8,7 +8,7 @@ Django のインストール
 
 このドキュメントを読めば Django を動かせるようになります。
 
-.. _Install Python:
+.. Install Python:
 
 Python のインストール
 =====================
@@ -60,6 +60,7 @@ WSGI_ 仕様に従っているので、様々なサーバプラットフォー�
 .. _`サーバ構成に関する wiki ページ`: http://code.djangoproject.com/wiki/ServerArrangements
 .. _server-arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
 
+.. _database-installation:
 .. _Get your database running:
 
 データベースを動かす
@@ -115,7 +116,6 @@ Django の ``manage.py syncdb`` を使って、モデルに対応するテーブ
 .. _Oracle: http://www.oracle.com/
 
 .. _removing-old-versions-of-django:
-.. _Remove any old versions of Django:
 
 旧バージョンの Django の除去
 ============================
@@ -172,7 +172,7 @@ OS ごとのインストールパッケージによるインストール
 スの更新を行ってくれたりします。
  
 
-.. _Installing an official release:
+.. _installing-official-release:
 
 公式リリースのインストール
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

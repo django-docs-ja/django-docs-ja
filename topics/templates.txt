@@ -39,7 +39,7 @@ Smarty_ や CheetahTemplate_ のようなテキストベースのテンプレー
 .. _Smarty: http://smarty.php.net/
 .. _CheetahTemplate: http://www.cheetahtemplate.org/
 
-.. _Templates:
+.. Templates:
 
 テンプレート
 ============
@@ -265,6 +265,7 @@ You can also create your own custom template tags; see
 は改行を入れられません)。複数行のコメントアウトを行いたければ、後述の
 :ttag:`comment` タグを使ってください。
 
+.. _template-inheritance:
 .. _`Template inheritance`:
 
 テンプレートの継承

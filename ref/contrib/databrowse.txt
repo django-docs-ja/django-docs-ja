@@ -8,7 +8,7 @@ databrowse
 
 .. module:: django.contrib.databrowse
    :synopsis: データのブラウジングを実現するための Django アプリケーション
-   です。
+              です。
 
 Django の Admin サイトはモデルに対するイントロスペクションによって、動的に
 管理サイトを構築しています。 databrowse も同様に、モデル定義からリッチなブ

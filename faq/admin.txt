@@ -7,7 +7,7 @@ FAQ: admin
 
 :revision-up-to: 8961 (1.0)
 
-.. _`I can't log in. When I enter a valid username and password, it just brings up the login page again, with no error messages.`:
+.. I can't log in. When I enter a valid username and password, it just brings up the login page again, with no error messages.
 
 ログインできません。正しいユーザ名とパスワードを入力したのに、エラーメッセージも出ず再度ログインページが表示されるのです。
 --------------------------------------------------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ Django の発行するクッキーのドメインと、ブラウザに格納さ�
       "127.0.0.1" のように指定してアクセスしてください。また、
       ``SESSION_COOKIE_DOMAIN`` もそれに合わせて変更してください。
 
-.. _`I can't log in. When I enter a valid username and password, it brings up the login page again, with a "Please enter a correct username and password" error.`:
+.. I can't log in. When I enter a valid username and password, it brings up the login page again, with a "Please enter a correct username and password" error.
 
 ログインできません。正しいユーザ名とパスワードを入力したところ、「正しいユーザ名とパスワードを入力してください」というエラーメッセージの表示されたログインページが表示されます。
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ Django の発行するクッキーのドメインと、ブラウザに格納さ�
 い。 admin サイトにアクセスできるのは、これら二つのフィールドが共に
 ``True`` であるユーザだけです。
 
-.. _How can I prevent the cache middleware from caching the admin site?:
+.. How can I prevent the cache middleware from caching the admin site?
 
 キャッシュミドルウェアに admin サイトをキャッシュさせなくするにはどうすればよいですか？
 ---------------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ Django の発行するクッキーのドメインと、ブラウザに格納さ�
 :setting:`CACHE_MIDDLEWARE_ANONYMOUS_ONLY` 設定を ``True`` にしてください。
 詳しくは :ref:`キャッシュのドキュメント <topics-cache>` を参照してください。
 
-.. _How do I automatically set a field's value to the user who last edited the object in the admin?:
+.. How do I automatically set a field's value to the user who last edited the object in the admin?
 
 admin 上でフィールドの値をオブジェクトを最後に編集したユーザの指定した値と同じにするにはどうすればよいですか？
 -----------------------------------------------------------------------------------------------------------------
@@ -62,14 +62,14 @@ admin 上でフィールドの値をオブジェクトを最後に編集した�
 
 .. _solution that doesn't require patching Django: http://lukeplant.me.uk/blog.php?id=1107301634
 
-.. _How do I limit admin access so that objects can only be edited by the users who created them?:
+.. How do I limit admin access so that objects can only be edited by the users who created them?
 
 admin でオブジェクトを作成したユーザだけがオブジェクトを編集できるようにアクセス制限するにはどうすればよいですか？
 -------------------------------------------------------------------------------------------------------------------
 
 一つ前の質問の答えを見て下さい。
 
-.. _My admin-site CSS and images showed up fine using the development server, but they're not displaying when using mod_python.:
+.. My admin-site CSS and images showed up fine using the development server, but they're not displaying when using mod_python.
 
 開発サーバでは admin サイトの CSS や画像がうまく表示されるのに、 mod_python を使うと表示されません。
 ----------------------------------------------------------------------------------------------------
@@ -78,7 +78,7 @@ admin でオブジェクトを作成したユーザだけがオブジェクト�
 :ref:`admin ファイルの提供 <howto-deployment-modpython-serving-the-admin-files>`
 を参照してください
 
-.. _My "list_filter" contains a ManyToManyField, but the filter doesn't display.:
+.. My "list_filter" contains a ManyToManyField, but the filter doesn't display.
 
 "list_filter" に ManyToManyField を入れたのに、フィルタが表示されません。
 -------------------------------------------------------------------------
@@ -90,7 +90,7 @@ Django が ``ManyToManyField`` に対してフィルタを表示するのはオ�
 つしかサイトが登録されていなければ、 "Site" フィルタは表示されません。
 この状況では、サイトによるフィルタは無意味だからです。
 
-.. _How can I customize the functionality of the admin interface?:
+.. How can I customize the functionality of the admin interface?
 
 admin インタフェースの機能をカスタマイズするにはどうすればよいですか？
 ------------------------------------------------------------------------
@@ -108,7 +108,7 @@ JavaScript モジュールを指しています。
 
 admin のルック & フィールをカスタマイズしたいのなら、次の質問に進んで下さい。
 
-.. _The dynamically-generated admin site is ugly! How can I change it?:
+.. The dynamically-generated admin site is ugly! How can I change it?
 
 動的に生成される admin サイトがみっともありません！どうすれば変更できますか？
 ------------------------------------------------------------------------------
@@ -120,8 +120,7 @@ admin のルック & フィールをカスタマイズしたいのなら、次�
 :ref:`admin で使われているCSS のガイド <obsolete-admin-css>`
 を用意してあります。
 
-
-.. _How do I create users without having to edit password hashes?:
+.. How do I create users without having to edit password hashes?
 
 パスワードハッシュを編集せずにユーザを作成するにはどうすればよいですか？
 -------------------------------------------------------------------------

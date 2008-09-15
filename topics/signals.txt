@@ -4,6 +4,10 @@
 Signals
 =======
 
+:revision-up-to: 8961 (1.0)
+
+.. TBD
+
 .. module:: django.dispatch
    :synopsis: Signal dispatch
 

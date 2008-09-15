@@ -1,4 +1,4 @@
-.. _intro-tutorial02
+.. _intro-tutorial02:
 
 =====================================
 はじめての Django アプリ作成、その 2
@@ -79,7 +79,7 @@ admin サイトの有効化
 チュートリアルその 1 で、開発サーバを以下のように起動したのを思い出してくだ
 さい:
 
-.. code-block:: base
+.. code-block:: bash
 
     python manage.py runserver
 

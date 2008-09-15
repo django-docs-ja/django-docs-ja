@@ -56,7 +56,7 @@ Django の :term:`プロジェクト` (:term:`project`) を構成するコード
    OS X のような Unix ベースのシステムでは、ファイルをプログラムとして実行
    したい場合に、ファイルに「プログラムとして実行可能」というマークをつけて
    おく必要があるためです。ファイルに実行可能マークをつけるには、
-   Terminal.app を起動して、 :ref:`django-admin.py <ref-admin-django>` を収
+   Terminal.app を起動して、 :ref:`django-admin.py <ref-django-admin>` を収
    めているディレクトリに ( ``cd`` コマンドで) 移動して、 
    ``chmod +x django-admin.py`` を実行してください。
 
@@ -68,9 +68,9 @@ Django の :term:`プロジェクト` (:term:`project`) を構成するコード
     Python パッケージ名と被ります) を使わないようにしましょう。
 
 ``python setup.py`` ユーティリティで Django をインストールしたのなら、
-:ref:`django-admin.py` はシステムパスのどこかにあるはずです。パス上になけれ
-ば、 ``site-packages/django/bin`` にあります。 ``site-packages`` は Python
-インストールディレクトリの中にあります。パス上のどこか、例えば
+:file:`django-admin.py` はシステムパスのどこかにあるはずです。パス上になけ
+れば、 ``site-packages/django/bin`` にあります。 ``site-packages`` は
+Python インストールディレクトリの中にあります。パス上のどこか、例えば
 :file:`/usr/local/bin` にシンボリックリンクを張っておきましょう。)
 
 .. admonition:: コードはどこに置くの？
@@ -163,18 +163,18 @@ Database の設定
 Django の設定を表現する通常の Python モジュールです。設定を書き換えて、お使
 いのデータベースへの接続パラメタに合わせましょう:
 
-    * :settings:`DATABASE_ENGINE` -- 'postgresql_psycopg2', 'mysql' または
+    * :setting:`DATABASE_ENGINE` -- 'postgresql_psycopg2', 'mysql' または
       'sqlite3'のいずれかです。他にも :setting:`いくつか <DATABASE_ENGINE>`
       あります。
-    * :settings:`DATABASE_NAME`` -- データベースの名前です。 SQLite を使っ
+    * :setting:`DATABASE_NAME`` -- データベースの名前です。 SQLite を使っ
       ている場合にはデータベースファイルのフルパス (絶対パス) にします。
       指定したパスのファイルが存在しなければ、 Django は最初にデータベース
       の同期を実行したときにファイルを生成します (後で解説します)。
-    * :settings:`DATABASE_USER` -- データベースのユーザ名です (SQLite では
+    * :setting:`DATABASE_USER` -- データベースのユーザ名です (SQLite では
       使いません)。
-    * :settings:`DATABASE_PASSWORD` -- データベースのパスワードです。
+    * :setting:`DATABASE_PASSWORD` -- データベースのパスワードです。
       (SQLite では使いません)。
-    * :settings:`DATABASE_HOST` -- データベースのあるホストです。データベー
+    * :setting:`DATABASE_HOST` -- データベースのあるホストです。データベー
       スサーバが物理的に同じマシン上にあるのなら空文字列にしておきます。
       (SQLite では使いません)。
 
@@ -308,9 +308,9 @@ Django では、こうした概念を簡単な Python クラスで表現でき�
         choice = models.CharField(max_length=200)
         votes = models.IntegerField()
 
-.. admonition:: :attr:`~django.db.models.Field.max_length` にまつわるエラー
+.. admonition:: \  :attr:`~django.db.models.Field.max_length` にまつわるエラー
 
-   Django が :attr:`~django.db.models.Field.max_length`` が正しい引数でない
+   Django が :attr:`~django.db.models.Field.max_length` が正しい引数でない
    というエラーを出す場合、古いバージョンの Django を使っているはずです。
    (チュートリアルのこのバージョンは、最新の開発版 Django に準拠しています)
    Subversion を使って開発版の Django をチェックアウトしている場合 (詳しい
@@ -321,12 +321,6 @@ Django では、こうした概念を簡単な Python クラスで表現でき�
    `バージョン 0.96 用のチュートリアル`_ を参照するよう勧めます。というのも、
    このチュートリアルのカバーしている機能には、開発版の Django にしかないも
    のがあるからです。
-
-.. _the installation docs: ../install/
-.. _the Django 0.96 tutorial: http://www.djangoproject.com/documentation/0.96/tutorial01/
-.. _`インストール方法`: `the installation docs`_
-.. _`バージョン 0.96 用のチュートリアル`: `the Django 0.96 tutorial`_
-
 
 コードは単純明解ですね。各モデルは一つのクラスで表現され、いずれも
 :class:`django.db.models.Model` のサブクラスです。各モデルには複数のクラス
@@ -592,7 +586,7 @@ polls 関係のモデルを少し修正して、 ``Poll`` と ``Choice`` に
         def __unicode__(self):
             return self.choice
 
-.. admonition:: :meth:`~django.db.models.Model.__unicode__` がうまく動かない場合には
+.. admonition:: \ :meth:`~django.db.models.Model.__unicode__` がうまく動かない場合には
 
    モデルに :meth:`~django.db.models.Model.__unicode__` メソッドを追加した
    のに、オブジェクトの表示が何も変化しないのなら、古いバージョンの Django
@@ -602,7 +596,7 @@ polls 関係のモデルを少し修正して、 ``Poll`` と ``Choice`` に
    を参照してください) 、うまく動作するはずです。
 
    古いバージョンの Django を使わねばならない場合、
-    `バージョン 0.96 用のチュートリアル`_ を参照するよう勧めます。というのも、
+   `バージョン 0.96 用のチュートリアル`_ を参照するよう勧めます。というのも、
    このチュートリアルでは、開発版の Django にしかない機能をカバーしているか
    らです。
 

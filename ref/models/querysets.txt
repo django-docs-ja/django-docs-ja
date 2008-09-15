@@ -870,9 +870,10 @@ be raised.
 .. TBD
 
 .. _field-lookups:
+.. Field lookups
 
-Field lookups
--------------
+フィールドの照合
+----------------
 
 Field lookups are how you specify the meat of an SQL ``WHERE`` clause. They're
 specified as keyword arguments to the ``QuerySet`` methods ``filter()``,

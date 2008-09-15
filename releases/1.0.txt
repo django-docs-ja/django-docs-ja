@@ -4,6 +4,10 @@
 Django 1.0 release notes
 ========================
 
+:revision-up-to: 8961 (1.0)
+
+.. TBD
+
 Welcome to Django 1.0!
 
 We've been looking forward to this moment for over three years, and it's finally

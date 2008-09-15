@@ -178,7 +178,7 @@ Django の :ref:`データ-モデルシンタクス <topics-db-models>` はモ�
 (や顧客) がデータを投入できるようにしておいてから、データを公開するための方
 法を開発してゆくというものです。
 
-.. _Design your URLs:
+.. Design your URLs:
 
 自由な URL 設計
 ===============

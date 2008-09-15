@@ -7,7 +7,7 @@ FAQ: コードへの貢献
 
 :revision-up-to: 8961 (1.0)
 
-.. _How can I get started contributing code to Django?:
+.. How can I get started contributing code to Django?
 
 Django プロジェクトにコードを寄贈したいんですが、どうすればよいですか？
 -----------------------------------------------------------------------
@@ -16,7 +16,7 @@ Django プロジェクトにコードを寄贈したいんですが、どうす�
 あります。 :ref:`Django プロジェクトへの貢献 <internals-contributing>` とい
 う文書です。
 
-.. _I submitted a bug fix in the ticket system several weeks ago. Why are you ignoring my patch?:
+.. I submitted a bug fix in the ticket system several weeks ago. Why are you ignoring my patch?
 
 何週間も前にチケットシステムにバグフィクスを提出したんですが。何で私のパッチを無視するんですか？
 ------------------------------------------------------------------------------------------------

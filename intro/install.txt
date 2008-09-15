@@ -63,7 +63,7 @@ Oracle といった、SQLite 以外の「大掛かりな」データベースエ
 :ref: `新しいバージョンをインストールする前に、まず旧バージョンをアンインス
 トールしておく <removing-old-versions-of-django>` 必要があります。
 
-.. TBD::
+.. TBD
 
 .. _Install Django:
 

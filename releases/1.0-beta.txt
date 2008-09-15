@@ -4,6 +4,10 @@
 Django 1.0 beta 1 release notes
 ===============================
 
+:revision-up-to: 8961 (1.0)
+
+.. TBD
+
 Welcome to Django 1.0 beta 1!
 
 This is the third in a series of preview/development releases leading

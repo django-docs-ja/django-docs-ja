@@ -4,6 +4,8 @@
 Django FAQ
 ==========
 
+:revision-up-to: 8961 (1.0)
+
 .. toctree::
    :maxdepth: 2
    

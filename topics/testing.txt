@@ -212,7 +212,7 @@ doctest と同様、 Django のテストランナは、以下の二つの場所�
 をもう一つ提供しています:  ``models.py`` や ``tests.py`` で ``suite()`` メ
 ソッドを定義している場合、 Django のテストランナはこのメソッドを使ってテス
 トスイートを構築します。この仕様は、ユニットテストにおいて 
-:ref:`おすすめのテストスイート構築方法 <>` に従っています。複雑なテストスイー
+`おすすめのテストスイート構築方法`_ に従っています。複雑なテストスイー
 トの構築方法についての詳細は Python のドキュメントを参照してください。
 
 ``unittest`` の詳細は `標準ライブラリドキュメントの unittest の項`_ を参照
@@ -705,7 +705,7 @@ Python のクラスです。テストクライアントを使うと、ビュー�
         (``'admin/index.html'`` のような形式の文字列です)。
 
 	複数のテンプレートをレンダリングしている場合 (例えば
-	:ref:`テンプレートの継承 <template-inheritance>`_ を使っている場合)、
+	:ref:`テンプレートの継承 <template-inheritance>` を使っている場合)、
 	``template`` はレンダリング順に並んだ  ``Template`` オブジェクトの
 	リストです。
 
@@ -715,7 +715,7 @@ Python のクラスです。テストクライアントを使うと、ビュー�
 
 .. _RFC2616: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 
-.. _Exceptions:
+.. Exceptions:
 
 例外
 ~~~~
@@ -763,7 +763,7 @@ Python のクラスです。テストクライアントを使うと、ビュー�
 .. _Cookie module documentation: http://docs.python.org/lib/module-Cookie.html
 .. _`Cookie モジュールのドキュメント`: `Cookie module documentation`_
 
-.. _Example:
+.. Example:
              
 ユニットテストの例
 ~~~~~~~~~~~~~~~~~~
@@ -875,8 +875,8 @@ Django は拡張用に以下のベースクラスを提供しています:
 
 最も素直なフィクスチャの作成方法は、 ``manage.py dumpdata`` コマンドを使う
 というものです。 ``dumpdata`` を使うにはデータベースに既に何らかのデータが
-入っていなければなりません。詳しくは :ref:`dumpdata のドキュメント <dumpdata>`
-を参照してください。
+入っていなければなりません。詳しくは 
+:djadmin:`dumpdata のドキュメント <dumpdata>` を参照してください。
 
 .. note::
     ``manage.py syncdb`` を実行したことがあるなら、あなたの知らないうちにフィ
@@ -913,7 +913,8 @@ Django は拡張用に以下のベースクラスを提供しています:
   * 次に、テストケースクラスに指定した全てのフィクスチャをインストールしま
     す。上の例では、 ``mammals`` という名前の JSON フィクスチャと、
     ``birds`` という名前のフィクスチャがインストールされます。フィクスチャ
-    の定義とインストールに関する詳細は :ref:`loaddata のドキュメント <loaddata>`
+    の定義とインストールに関する詳細は 
+    :djadmin:`loaddata のドキュメント <loaddata>`
     を参照してください。
 
 このフラッシュ／ロードの作業はテストケースの実行毎に繰り返されるので、テス
@@ -1053,7 +1054,7 @@ Django は、テストフレームワークを初期化する際、通常の
 
 テストの実行中、 Django から送信されたメールは ``djnago.core.mail.outbox``
 に保存されます。 ``djnago.core.mail.outbox`` はその時点で送信された全ての
-:class:`<~django.core.mail.EmailMessage>` インスタンスからなるリストで、テ
+:class:`~django.core.mail.EmailMessage` インスタンスからなるリストで、テ
 スト時以外には存在しません。このダミー送信箱は、テストのセットアップ時に、
 ダミーの :class:`~django.core.mail.SMTPConnection` と組で初期化されます。テ
 ストが終了すると、通常の :class:`~django.core.mail.SMTPConnection` が復帰し、

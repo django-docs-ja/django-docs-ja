@@ -4,6 +4,10 @@
 Managing files
 ==============
 
+:revision-up-to: 8961 (1.0)
+
+.. TBD
+
 .. versionadded:: 1.0
 
 This document describes Django's file access APIs.

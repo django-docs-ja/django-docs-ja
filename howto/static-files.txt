@@ -75,7 +75,7 @@ Django 自体では，画像やスタイルシート，ビデオといった静�
 ========================
 
 オプションとして， ``show_indexes`` パラメタを 
-:ref:`~django.views.static.serve` ビューに渡せます．デフォルトの値は
+:func:`~django.views.static.serve` ビューに渡せます．デフォルトの値は
 ``False`` です． ``True`` にすると，Django はディレクトリに対して内容リスト
 を表示します．
 

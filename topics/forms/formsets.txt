@@ -1,5 +1,4 @@
 .. _topics-forms-formsets:
-.. _formsets:
 
 フォームセット (formsets)
 =============================

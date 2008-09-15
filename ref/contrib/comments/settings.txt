@@ -4,6 +4,10 @@
 Comment settings
 ================
 
+:revision-up-to: 8961 (1.0)
+
+.. TBD
+
 These settings configure the behavior of the comments framework:
 
 .. setting:: COMMENTS_HIDE_REMOVED

@@ -3,6 +3,10 @@
 File storage API
 ================
 
+:revision-up-to: 8961 (1.0)
+
+.. TBD
+
 ``Storage.exists(name)``
 ~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -4,6 +4,10 @@
 Signals sent by the comments app
 ================================
 
+:revision-up-to: 8961 (1.0)
+
+.. TBD
+
 .. module:: django.contrib.comments.signals
    :synopsis: Signals sent by the comment module.
 
