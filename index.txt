@@ -6,7 +6,7 @@ Django ドキュメント
 
 :revision-up-to: 8961 (1.0)
 
-.. rubric:: Everything you need to know about Django (and then some).
+.. rubric:: Django を使いこなすための全てがここにあります。
 
 助けを求める
 ==============
