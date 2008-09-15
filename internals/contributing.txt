@@ -758,6 +758,7 @@ Django の Subversion リポジトリにコードをコミットする場合に�
       "magic-removal: Fixed #123 -- Added whizbang feature." のようにします。
 
       ちなみに、この機能は `Trac の post-commit フック`_ で実現しています。
+
       .. _Trac post-commit hook: http://trac.edgewall.org/browser/trunk/contrib/trac-post-commit-hook
       .. _`Trac の post-commit フック`: http://trac.edgewall.org/browser/trunk/contrib/trac-post-commit-hook
 
