@@ -1,14 +1,12 @@
 .. _misc-index:
 
-Meta-documentation and miscellany
-=================================
+ドキュメントのドキュメント、その他
+====================================
 
 :revision-up-to: 8961 (1.0)
 
-.. TBD
-
-Documentation that we can't find a more organized place for. Like that drawer in
-your kitchen with the scissors, batteries, duct tape, and other junk.
+ここには、他に適切な置場のないドキュメントがあります。ハサミや養生テープや
+がらくたがごっちゃになったキッチンの引きだしのようなものです。
 
 .. toctree::
    :maxdepth: 2
