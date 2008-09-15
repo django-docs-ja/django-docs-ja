@@ -113,14 +113,15 @@ APIの安定性とは
 セキュリティ上の問題の修正
 ----------------------------
 
-.. TBD
-
-If we become aware of a security problem -- hopefully by someone following our
-:ref:`security reporting policy <reporting-security-issues>` -- we'll do
-everything necessary to fix it. This might mean breaking backwards compatibility; security trumps the compatibility guarantee.
+セキュリティ上の問題を認識した (理想的には
+:ref:`セキュリティレポートのポリシ <reporting-security-issues>` に基づいて
+報告された) 場合、必要な修正を行います。その結果、互換性が失われる可能性が
+あります。セキュリティ上の問題の解決は、互換性の保証よりも優先です。
 
 コントリビュートアプリケーション (``django.contrib``)
 ----------------------------------------------------------
+
+.. TBD
 
 While we'll make every effort to keep these APIs stable -- and have no plans to
 break any contrib apps -- this is an area that will have more flux between
@@ -141,7 +142,10 @@ worth noting if you're building apps that depend on ``django.contrib``.
 内部 API
 ----------
 
-Certain APIs are explicitly marked as "internal" in a couple of ways:
+API の中には、以下の二つの理由から「内部使用 (internal)」とマークされている
+ものがあります:
+
+.. TBD
 
     - Some documentation refers to internals and mentions them as such. If the
       documentation says that something is internal, we reserve the right to
