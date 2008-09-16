@@ -7,13 +7,10 @@
 
 :revision-up-to: 8961 (1.0)
 
-.. TBD
-
-
-This document describes Django's built-in template tags and filters. It is
-recommended that you use the :ref:`automatic documentation
-<template-built-in-reference>`, if available, as this will also include
-documentation for any custom tags or filters installed.
+このドキュメントでは、 Django の組み込みテンプレートタグおよびフィルタにつ
+いて解説しています。 また、 :ref:`自動生成ドキュメント
+<template-built-in-reference>` を使えば、インストールされている組み込みタグ
+とカスタムタグのドキュメントを読めるのでお勧めです。
 
 .. _ref-templates-builtins-tags:
 .. _Built-in tag reference:
@@ -173,7 +170,6 @@ for
     {% endfor %}
     </ul>
 
-のようにします。
 
 ``{% for obj in list reversed %}`` のようにすると、リストに対して逆順のルー
 プを実行できます。
@@ -685,14 +681,12 @@ DRY 則の侵犯を避けられます::
 :ref:`名前つき URL パターン <naming-url-patterns>` を使っている場合、
 ``url`` タグにはビューのパス名の代わりにパターン名を指定できます。
 
-.. TBD
+逆変換しようとしている URL が存在しない場合、 :exc:`NoReverseMatch` 例外を
+送出するため、エラーページが表示されます。
 
-Note that if the URL you're reversing doesn't exist, you'll get an
-:exc:`NoReverseMatch` exception raised, which will cause your site to display an
-error page.
+.. versionadded:: 1.0
 
-**New in development verson:** If you'd like to retrieve a URL without displaying it,
-you can use a slightly different call:
+URL を表示せず、取り出したいだけなら、以下のような形式で呼び出せます:
 
 .. code-block:: html+django
 
@@ -700,8 +694,8 @@ you can use a slightly different call:
     
     <a href="{{ the_url }}">I'm linking to {{ the_url }}</a>
     
-This ``{% url ... as var %}`` syntax will *not* cause an error if the view is
-missing. In practice you'll use this to link to views that are optional:
+``{% url ... as var %}`` の形式は、 URL からビューを解決できなくてもエラー
+を送出 *しません* 。従って、ビューへのリンクは以下のようにも書けます:
 
 .. code-block:: html+django
 

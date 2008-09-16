@@ -352,15 +352,14 @@ Django は標準的な Python テストフレームワークの両方をサポ�
 レーション(collation) を指定できます。これらの設定については、 
 :ref:`settings ファイルのドキュメント<ref-settings>` を参照してください。
 
-.. TBD
+.. Other test conditions
 
-Other test conditions
+その他のテスト条件
 ---------------------
 
-Regardless of the value of the :setting:`DEBUG` setting in your configuration
-file, all Django tests run with :setting:`DEBUG=False`. This is to ensure that
-the observed output of your code matches what will be seen in a production
-setting.
+設定ファイル上の :setting:`DEBUG` の値にかかわらず、 Django は全てのテスト
+を :setting:`DEBUG=False` で動かします。これは、テストコードに実運用環境と
+同じ内容を出力させるためです。
 
 .. _Understanding the test output:
 
@@ -1191,10 +1190,8 @@ TestCase 内の各テストケースの開始時点で抹消されます。手�
     ど、テスト後の全体的な後始末を行い、メールサービスを通常の状態に復帰し
     ます。
 
-.. TBD
-
-The creation module of the database backend (``connection.creation``) also
-provides some utilities that can be useful during testing.
+データベースバックエンドの生成モジュール (``connection.creation``) にも、テ
+スト時に便利なユーティリティがあります。
 
 .. function:: create_test_db(verbosity=1, autoclobber=False)
 

@@ -139,43 +139,46 @@ name }}`` の値は ``lower`` フィルタ、すなわち文字を小文字に�
 :ref:`組み込みフィルタリファレンス<ref-templates-builtins-filters>` では、
 全ての組み込みフィルタについて説明しています。
 
-.. TBD
-
-To give you a taste of what's available, here are some of the more commonly used
-template filters:
+組み込みフィルタでできることを知ってもらうために、よく使うテンプレートフィ
+ルタをいくつか挙げましょう:
 
     :tfilter:`default`
-        If a variable is false or empty, use given default. Otherwise, use the
-        value of the variable
+        入力が空や ``False`` の場合、引数に指定したデフォルト値を使いま
+        す。そうでなければ、入力をそのまま使います
 
-        For example::
+        使用例::
 
             {{ value|default:"nothing" }}
 
-        If ``value`` isn't provided or is empty, the above will display
-        "``nothing``".
+        ``value`` が存在しなかったり空だったりすると、 "``nothing``" を出力
+        します。
         
     :tfilter:`length`
-        Returns the length of the value. This works for both strings and lists;
-        for example::
+        入力値の長さを返します。文字列とリストいずれにも作用します。
+
+        使用例::
 
             {{ value|length }}
 
-        If ``value`` is ``['a', 'b', 'c', 'd']``, the output will be ``4``.
+        ``value`` が ``['a', 'b', 'c', 'd']`` なら、 ``4`` を出力します。
     
     :tfilter:`striptags`
-        Strips all [X]HTML tags. For example::
+        [X]HTML タグを全てはぎとります。
+
+        使用例::
 
             {{ value|striptags }}
 
-        If ``value`` is ``"<b>Joel</b> <button>is</button> a
-        <span>slug</span>"``, the output will be ``"Joel is a slug"``.
+        ``value`` が 
+        ``"<b>Joel</b> <button>is</button> a <span>slug</span>"``
+        なら、 ``"Joel is a slug"`` を出力します。
 
-Again, these are just a few examples; see the :ref:`built-in filter reference
-<ref-templates-builtins-filters>` for the complete list.
+これらはほんの一部に過ぎません。全ての組み込みフィルタの一覧は
+:ref:`組み込みフィルタリファレンス <ref-templates-builtins-filters>` を参照
+してください。
 
-You can also create your own custom template filters; see
-:ref:`howto-custom-template-tags`.
+テンプレートフィルタは自作できます。 :ref:`howto-custom-template-tags`
+を参照してください。
 
 .. _Tags:
 
@@ -191,16 +194,14 @@ You can also create your own custom template filters; see
 (``{% tag %} ... tag contents ... {% endtag %}``) を必要とするものがありま
 す。
 
-.. TBD
-
-Django ships with about two dozen built-in template tags. You can read all about
-them in the :ref:`built-in tag reference <ref-templates-builtins-tags>`. To give
-you a taste of what's available, here are some of the more commonly used
-tags:
+Django にはたくさんの組み込みタグが付属しています。組み込みタグの解説は
+:ref:`組み込みタグリファレンス <ref-templates-builtins-tags>` にあります。
+組み込みタグでできることを知ってもらうために、よく使うタグをいくつか挙げま
+しょう:
 
     :ttag:`for`
-        Loop over each item in an array.  For example, to display a list of athletes
-        provided in ``athlete_list``::
+        アレイの各要素に渡ってループします。例えば、アスリート (athlete) の
+        リストを ``athlete_list`` で渡して表示するには、以下のようにします::
 
             <ul>
             {% for athlete in athlete_list %}
@@ -209,8 +210,8 @@ tags:
             </ul>
         
     :ttag:`if` and :ttag:`else`
-        Evaluates a variable, and if that variable is "true" the contents of the
-        block are displayed::
+        変数を評価して、値が「真」 (値が存在して、空の配列でなく、ブール値
+        が偽でない) の場合、ブロック内のコンテンツを出力します::
 
             {% if athlete_list %}
                 Number of athletes: {{ athlete_list|length }}
@@ -218,31 +219,32 @@ tags:
                 No athletes.
             {% endif %}
 
-        In the above, if ``athlete_list`` is not empty, the number of athletes
-        will be displayed by the ``{{ athlete_list|length }}`` variable.
+        上の例では、 ``athlete_list`` が空でなければ、アスリートの人数を
+	``{{ athlete_list|length }}`` で表示します。
         
     :ttag:`ifequal` and :ttag:`ifnotequal`
-        Display some contents if two arguments are or are not equal. For example::
+        2 つの引数が互いに等しい場合にブロックの内容を出力します。例えば::
 
             {% ifequal athlete.name coach.name %}
                 ...
             {% endifequal %}
 
-        Or::
+        あるいは、以下のように書きます::
 
             {% ifnotequal athlete.name "Joe" %}
                 ...
             {% endifequal %}
-    
+
     :ttag:`block` and :ttag:`extends`
-        Set up `template inheritance`_ (see below), a powerful way
-        of cutting down on "boilerplate" in templates.
+        テンプレートで「定型文 ("boilerplate")」を切り出す強力な方法である、
+        :ref:`テンプレートの継承 <template-inheritance>` を組みます。
 
-Again, the above is only a selection of the whole list; see the :ref:`built-in
-tag reference <ref-templates-builtins-tags>` for the complete list.
+これらはほんの一部に過ぎません。全ての組み込みフィルタの一覧は
+:ref:`組み込みタグリファレンス <ref-templates-builtins-tags>` を参照してく
+ださい。
 
-You can also create your own custom template tags; see
-:ref:`howto-custom-template-tags`.
+テンプレートタグは自作できます。 :ref:`howto-custom-template-tags`
+を参照してください。
 
 .. _Comments:
 

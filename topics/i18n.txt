@@ -1018,30 +1018,32 @@ Django 翻訳の特徴
       ``xgettext`` や ``msgfmt`` を Python ラッパ越しに使います。これは便宜
       上の理由によります。
 
+.. _gettext on Windows:
 
-.. TBD
+Windows で ``gettext`` を使う
+==============================
 
-``gettext`` on Windows
-======================
+この節の操作が必要なのは、 メッセージ ID を抜き出したり、メッセージファイル
+を (``.po`` に) コンパイルしたいときだけです。翻訳の作業自体はファイルを編
+集するだけですが、メッセージファイルを自分で作成したい場合や、変更したメッ
+セージファイルをテストしたりコンパイルしたい場合には、以下のようにして
+``gettext`` ユーティリティを入れる必要があります:
 
-This is only needed for people who either want to extract message IDs or compile
-message files (``.po``). Translation work itself just involves editing existing
-files of this type, but if you want to create your own message files, or want to
-test or compile a changed message file, you will need the ``gettext`` utilities:
-
-    * Download the following zip files from
-      http://sourceforge.net/projects/gettext
+    * 以下の ZIP ファイルを http://sourceforge.net/projects/gettext
+      から取得します:
 
       * ``gettext-runtime-X.bin.woe32.zip``
       * ``gettext-tools-X.bin.woe32.zip``
       * ``libiconv-X.bin.woe32.zip``
 
-    * Extract the 3 files in the same folder (i.e. ``C:\Program
-      Files\gettext-utils``)
+    * ダウンロードしたファイルを同じフォルダ (例えば
+      ``C:\ProgramFiles\gettext-utils``) に展開します。
 
-    * Update the system PATH:
+    * システム環境変数の PATH を変更します:
 
-      * ``Control Panel > System > Advanced > Environment Variables``
-      * In the ``System variables`` list, click ``Path``, click ``Edit``
-      * Add ``;C:\Program Files\gettext-utils\bin`` at the end of the
-        ``Variable value`` field
+      * ``コントロールパネル > システム > 高度な設定 > 環境変数`` の順に辿
+        ります。
+      * ``システム環境変数`` リストで、 ``Path`` を選び、 ``編集`` を押しま
+        す。
+      * ``変数値`` フィールドの値の末尾に
+        ``;C:\Program Files\gettext-utils\bin`` を追加します。

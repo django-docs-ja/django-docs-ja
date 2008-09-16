@@ -1,27 +1,24 @@
 .. _topics-http-views:
 
 =============
-Writing Views
+ビューを書く
 =============
-
-.. TBD:
 
 :revision-up-to: 8961 (1.0)
 
-A view function, or *view* for short, is simply a Python function that takes a
-Web request and returns a Web response. This response can be the HTML contents
-of a Web page, or a redirect, or a 404 error, or an XML document, or an image .
-. . or anything, really. The view itself contains whatever arbitrary logic is
-necessary to return that response. This code can live anywhere you want, as long
-as it's on your Python path. There's no other requirement--no "magic," so to
-speak. For the sake of putting the code *somewhere*, let's create a file called
-``views.py`` in the ``mysite`` directory, which you created in the previous
-chapter.
+ビュー関数、あるいは単に *ビュー* とは、簡単にいえばウェブリクエストを引数
+にとり、ウェブレスポンスを返す関数です。レスポンスはウェブページを表す HTML
+コンテンツでもよいし、リダイレクトでも、 404 エラーでも、 XML ドキュメント
+でも、画像でも、何でもかまいません。ビューの中には、レスポンスを生成する上
+で必要なロジックを自由に書けます。ビューのコードは、 Python パス上にあるか
+ぎり、どこに置いてもかまいません。他にはなんの制限も「黒魔術」もありません。
+とはいえ、この節の例では、 ``mysite`` ディレクトリ下に ``views.py`` という
+名前のファイルを作成して、そこにビューのコードを置くことにしましょう。
 
-A simple view
+簡単なビュー
 =============
 
-Here's a view that returns the current date and time, as an HTML document:
+以下に示すのは、現在の日付や時刻を HTML 形式で返すビューの例です:
 
 .. code-block:: python
 
@@ -35,35 +32,36 @@ Here's a view that returns the current date and time, as an HTML document:
 
 Let's step through this code one line at a time:
 
-    * First, we import the class ``HttpResponse``, which lives in the
-      ``django.http`` module, along with Python's ``datetime`` library.
+    * まず、 ``django.http`` モジュールから ``HttpResponse`` クラスを
+      import しています。 Python の ``datetime`` ライブラリもロードしておき
+      ます。
 
-    * Next, we define a function called ``current_datetime``. This is the view
-      function. Each view function takes an ``HttpRequest`` object as its first
-      parameter, which is typically named ``request``.
+    * 次に、 ``current_datetime`` という関数を定義しています。これがビュー
+      関数です。ビュー関数は第一引数に ``HttpRequest`` オブジェクトを取りま
+      す。慣習的に、この引数の名前は ``request`` にしています。
 
-      Note that the name of the view function doesn't matter; it doesn't have to
-      be named in a certain way in order for Django to recognize it. We're
-      calling it ``current_datetime`` here, because that name clearly indicates
-      what it does.
+      ビュー関数はどんな名前でもかまいません。Django にビュー関数として認識
+      してもらうために、何らかの特殊な命名規則に従う必要はないのです。ここ
+      では、 ``current_datetime`` という名前を付けて、どんな機能のビューか
+      分かりやすくしています。
 
-    * The view returns an ``HttpResponse`` object that contains the
-      generated response. Each view function is responsible for returning an
-      ``HttpResponse`` object. (There are exceptions, but we'll get to those
-      later.)
+    * ビューは、生成したレスポンスコンテンツの入った ``HttpResponse`` オブ
+      ジェクトを返します。ビュー関数は ``HttpResponse`` オブジェクトを返さ
+      ねばなりません (例外も返してよいのですが、それについては後で説明しま
+      す)。
 
-.. admonition:: Django's Time Zone
+.. admonition:: Django のタイムゾーン設定
     
-    Django includes a ``TIME_ZONE`` setting that defaults to
-    ``America/Chicago``. This probably isn't where you live, so you might want
-    to change it in your settings file.
+    Django には :setting:`TIME_ZONE` 設定があり、デフォルト値は
+    ``America/Chicago`` に設定されています。お住まいの地域がここでなければ、
+    変更しておいてください。
 
-Mapping URLs to Views
-=====================
+URL をビューにマップする
+===========================
 
-So, to recap, this view function returns an HTML page that includes the current
-date and time. To display this view at a particular URL, you'll need to create a
-*URLconf*; see :ref:`topics-http-urls` for instructions.
+このビュー関数は、現在の日付と時刻が入った HTML ページを生成して返します。
+何らかの URL でこのビューを表示したければ、 *URLconf* を作成する必要があり
+ます。 :ref:`topics-http-urls` の説明を読んでください。
 
 .. _Returning errors:
 

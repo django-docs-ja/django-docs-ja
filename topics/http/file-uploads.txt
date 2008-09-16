@@ -157,26 +157,28 @@ Django がアップロードされたファイルを扱うとき、ファイル�
         デフォルト値はシステム標準の一時ファイルディレクトリです
 	(UNIX ライクのシステムでは ``/tmp`` です)。
 
-.. TBD
-        
     :setting:`FILE_UPLOAD_PERMISSIONS`
-        The numeric mode (i.e. ``0644``) to set newly uploaded files to. For
-        more information about what these modes mean, see the `documentation for
-        os.chmod`_
+        アップロードされたファイルに設定するファイルモードで、数字で表現
+        (例: ``0644``) します。ファイルモードの意味は
+	`os.chmod のドキュメント`_ を参照してください。
+
+	.. _documentation for os.chmod: http://docs.python.org/lib/os-file-dir.html 
+	.. _`os.chmod のドキュメント`: `documentation for os.chmod`_
         
-        If this isn't given or is ``None``, you'll get operating-system
-        dependent behavior. On most platforms, temporary files will have a mode
-        of ``0600``, and files saved from memory will be saved using the
-        system's standard umask.
+        この値を設定しないか、 ``None`` にすると、アップロードされたファイ
+	ルのモードはオペレーティングシステムに依存します。ほとんどのプラッ
+	トフォームでは、一時ファイルのファイルモードは ``0600`` で、メモリ
+	からファイルにデータを書き出すときにはシステム標準の umask を使いま
+	す。
         
         .. warning::
         
-            If you're not familiar with file modes, please note that the leading
-            ``0`` is very important: it indicates an octal number, which is the
-            way that modes must be specified. If you try to use ``644``, you'll
-            get totally incorrect behavior.
+            ファイルモードにあまりくわしくないのなら、先頭の ``0`` がとても
+            重要だということに注意してください。先頭の 0 は、値が 8 進数で
+            あることを示しています。 ``644`` のように指定すると、全くおかし
+            な挙動になってしまうでしょう。
             
-            **Always prefix the mode with a ``0``.**
+            **ファイルモードの先頭には常に ``0`` をつけてください**.
 
     :setting:`FILE_UPLOAD_HANDLERS`
         アップロードファイルを処理する実際のハンドラです。
@@ -220,22 +222,20 @@ Django がアップロードされたファイルを扱うとき、ファイル�
         アップロードファイルがディスクに一時保存されているときにのみ使える
         メソッドで、一時ファイルの完全なパスを返します。
 
-.. TBD
-
 .. note::
 
-    Like regular Python files, you can read the file line-by-line simply by
-    iterating over the uploaded file:
+    通常の Python のファイルオブジェクトと同じく、アップロードファイルをイ
+    テレータとして扱うと、ファイルの内容を一行づつ読めます:
     
     .. code-block:: python
         
         for line in uploadedfile:
             do_something_with(line)
-            
-    However, *unlike* standard Python files, :class:`UploadedFile` only
-    understands ``\n`` (also known as "Unix-style") line endings. If you know
-    that you need to handle uploaded files with different line endings, you'll
-    need to do so in your view.
+
+    しかし、標準の Python ファイルとは *違って* 、 :class:`UploadedFile` は
+    改行文字として ``\n`` (いわゆる Unix形式) しか認識しません。 ``\n`` 以
+    外の改行で終端されたアップロードファイルを処理する必要があるのなら、ビュー
+    内で適切に処理する必要があります。
 
 .. _Upload Handlers:
 

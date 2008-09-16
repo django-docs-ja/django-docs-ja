@@ -135,17 +135,14 @@ Django のキャッシュシステムにセッションデータを保存する�
 
 また、以下のメソッドを持ちます:
 
-.. TBD
-
     * ``flush()``
 
       .. versionadded:: 1.0
 
-      Delete the current session data from the database and regenerate the
-      session key value that is sent back to the user in the cookie. This is
-      used if you want to ensure that the previous session data can't be
-      accessed again from the user's browser (for example, the
-      ``django.contrib.auth.logout()`` method calls it).
+      現在のセッションデータをデータベースから削除し、後でクッキーに入れて
+      ユーザに送り返すために新たなセッションキーを生成します。ユーザの使っ
+      ているブラウザに、以前のセッションデータにアクセスさせたくない場合に
+      使います (例えば ``django.contrib.auth.logout()`` で呼び出されます)。
 
     * ``set_test_cookie()``
 
@@ -153,7 +150,6 @@ Django のキャッシュシステムにセッションデータを保存する�
       るかどうかを調べられるようにします。クッキーの動作仕様上、次にブラウ
       ザがリクエストを送信してくるまでテストは行えません。詳しくは後述の
       「 `テストクッキーを設定する`_ 」を参照してください。
-
 
     * ``test_cookie_worked()``
 
@@ -263,12 +259,10 @@ Django のキャッシュシステムにセッションデータを保存する�
             pass
         return HttpResponse("You're logged out.")
 
-.. TBD
-
-The standard ``django.contrib.auth.logout()`` function actually does a bit
-more than this to prevent inadvertent data leakage. It calls
-``request.session.flush()``. We are using this example as a demonstration of
-how to work with session objects, not as a full ``logout()`` implementation.
+実際には、標準の ``django.contrib.auth.logout()`` は、うっかりデータが漏洩
+してしまうのを防ぐために、 ``request.session.flush()`` を呼び出しています。
+上の例はセッションオブジェクトの仕組みを説明するためのもので、完全な
+``logout()`` の実装ではありません。
 
 .. _Setting test cookies:
 

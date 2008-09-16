@@ -138,29 +138,29 @@ Django はビューが例外を送出した際に ``process_exception()`` を呼
 をそのままブラウザに返します。それ以外の場合、デフォルトの例外処理を起動し
 ます。
 
-.. TBD
-
 ``__init__``
 ------------
 
-Most middleware classes won't need an initializer since middleware classes are
-essentially placeholders for the ``process_*`` methods. If you do need some
-global state you may use ``__init__`` to set up. However, keep in mind a couple
-of caveats:
+ほとんどのミドルウェアクラスは、実質的に単なる ``process_*`` メソッドの置き
+場でしかないので、初期化メソッドは必要ありません。ミドルウェアのグローバル
+な状態を保存するのに ``__init__`` メソッドを使ってもかまいませんが、以下の
+点に注意してください:
 
-    * Django initializes your middleware without any arguments, so you can't
-      define ``__init__`` as requiring any arguments.
-      
-    * Unlike the ``process_*`` methods which get called once per request,
-      ``__init__`` gets called only *once*, when the web server starts up.
+    * Django はミドルウェアクラスを引数なしで初期化するので、 ``__init__``
+      には必須の引数を定義できません。
 
-Marking middleware as unused
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    * ``process_*`` メソッドはリクエストごとに呼び出されますが、
+      ``__init__`` は Web サーバの起動時に *一度* しか呼び出されません。
 
-It's sometimes useful to determine at run-time whether a piece of middleware
-should be used. In these cases, your middleware's ``__init__`` method may raise
-``django.core.exceptions.MiddlewareNotUsed``. Django will then remove that piece
-of middleware from the middleware process.
+.. Marking middleware as unused
+
+ミドルウェアを動的に有効にする
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ミドルウェアを使うかどうかを実行時に決められると便利なことがあります。ミド
+ルウェアの ``__init__`` メソッドで
+:exc:`django.core.exceptions.MiddlewareNotUsed` を送出すると、 Django はそ
+のミドルウェアを処理から外します。
 
 .. _Guidelines:
 
