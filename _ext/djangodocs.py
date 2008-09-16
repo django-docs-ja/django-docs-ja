@@ -1,3 +1,4 @@
+# coding: utf-8
 """
 Sphinx plugins for Django documentation.
 """
@@ -15,33 +16,33 @@ def setup(app):
     app.add_crossref_type(
         directivename = "setting",
         rolename      = "setting",
-        indextemplate = "pair: %s; setting",
+        indextemplate = u"pair: %s; 設定",
     )
     app.add_crossref_type(
         directivename = "templatetag",
         rolename      = "ttag",
-        indextemplate = "pair: %s; template tag"
+        indextemplate = u"pair: %s; テンプレートタグ"
     )
     app.add_crossref_type(
         directivename = "templatefilter",
         rolename      = "tfilter",
-        indextemplate = "pair: %s; template filter"
+        indextemplate = u"pair: %s; テンプレートフィルタ"
     )
     app.add_crossref_type(
         directivename = "fieldlookup",
         rolename      = "lookup",
-        indextemplate = "pair: %s, field lookup type",
+        indextemplate = u"pair: %s, フィールド照合タイプ",
     )
     app.add_description_unit(
         directivename = "django-admin",
         rolename      = "djadmin",
-        indextemplate = "pair: %s; django-admin command",
+        indextemplate = u"pair: %s; django-admin コマンド",
         parse_node    = parse_django_admin_node,
     )
     app.add_description_unit(
         directivename = "django-admin-option",
         rolename      = "djadminopt",
-        indextemplate = "pair: %s; django-admin command-line option",
+        indextemplate = u"pair: %s; django-admin コマンドラインオプション",
         parse_node    = lambda env, sig, signode: sphinx.directives.parse_option_desc(signode, sig),
     )
     app.add_transform(SuppressBlockquotes)
@@ -110,9 +111,9 @@ class DjangoHTMLTranslator(sphinx.htmlwriter.SmartyPantsHTMLTranslator):
     # that work and I think it'll require Sphinx 0.5 anyway.
     #
     version_text = {
-        'deprecated':       'Deprecated in Django %s',
-        'versionchanged':   'Changed in Django %s',
-        'versionadded':     'New in Django %s',
+        'deprecated':       u'Django %s で撤廃されました',
+        'versionchanged':   u'Django %s で変更されました',
+        'versionadded':     u'Django %s で新たに登場しました',
     }
     
     def visit_versionmodified(self, node):
