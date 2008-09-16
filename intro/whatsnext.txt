@@ -1,7 +1,7 @@
 .. _intro-whatsnext:
 
 =================
-What to read next
+次のステップへ
 =================
 
 :revision-up-to: 8961 (1.0)
@@ -171,43 +171,46 @@ Python コードの更新と同様， ``svn update`` を実行してください
 
 テキストドキュメントの便利でローテクな使い方の一つに Unix の ``grep`` ユー
 ティリティを使った全ドキュメント検索があります．例えば，以下のようにすれば，
-"max_length" について触ている部分を表示できます::
+"max_length" について触ている部分を表示できます:
 
 .. code-block:: bash
 
     $ grep -r max_length /path/to/django/docs/
-    
-As HTML, locally
-----------------
 
-You can get a local copy of the HTML documentation following a few easy steps:
+ローカルで HTML で読む
+------------------------
 
-    * Django's documentation uses a system called Sphinx__ to convert from
-      plain text to HTML. You'll need to install Sphinx by either downloading
-      and installing the package from the Sphinx website, or by Python's
-      ``easy_install``:
+以下のステップを踏めば、 HTML ドキュメントのローカルコピーを手に入れられま
+す:
+
+    * Django のドキュメントは、 Sphinx__ というシステムを使ってプレーンテキ
+      ストから HTML への変換を行っています。 Sphinx のウェブサイトから
+      Sphinx をダウンロードしてインストールするか、 Python の
+      ``easy_install`` を使ってインストールします:
       
       .. code-block:: bash
         
             $ easy_install Sphinx
     
-    * Then, just use the included ``Makefile`` to turn the documentation into
-      HTML:
+    * Django のドキュメントディレクトリにある ``Makefile`` を使って、ドキュ
+      メントを HTML に変換します:
       
       .. code-block:: bash
       
             $ cd path/to/django/docs
             $ make html
     
-      You'll need `GNU Make`__ installed for this.
+      `GNU Make`__ がインストールされている必要があります。
       
-    * The HTML documentation will be placed in ``docs/_build/html``.
+    * HTML ドキュメントが ``docs/_build/html`` に生成されます。
     
 .. warning::
 
-    At the time of this writing, Django's using a version of Sphinx not
-    yet released, so you'll currently need to install Sphinx from the
-    source. We'll fix this shortly.
+    この節を書いている時点では、 Django はリリース前の Sphinx を使っていま
+    す。そのため、ソースコードから Sphinx をインストールせねばなりません。
+    この問題はすぐに修正する予定です。
+
+    (訳注: バージョン 0.4.1 または trunk の Sphinx を使ってください。)
     
 __ http://sphinx.pocoo.org/
 __ http://www.gnu.org/software/make/
