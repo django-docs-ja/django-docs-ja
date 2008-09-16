@@ -8,6 +8,18 @@ Django ドキュメント
 
 .. rubric:: Django を使いこなすための全てがここにあります。
 
+.. admonition:: 和訳について
+
+    このドキュメントは、 `Django の標準ドキュメント`_ の和訳です。
+    現在、和訳は Yasushi Masuda によって進められており、 Takanao Endoh
+    をはじめとする日本 Django ユーザ会の有志の手でメンテナンスされています。
+    和訳に関する問い合わせは、 
+    **Django プロジェクトのトラッカではなく** 、 Yasushi Masuda
+    (whosaysni-at-gmail.com) または django-ja メーリングリストにお寄せくだ
+    さい。
+
+    .. _`Django の標準ドキュメント`: http://docs.djangoproject.com/
+
 助けを求める
 ==============
 
