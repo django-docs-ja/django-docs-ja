@@ -137,17 +137,17 @@
     * Django の admin やマニピュレータで使われている最小限のバリデーション
       (validation)。
 
-.. TBD
-
-Django ships with dozens of built-in field types; you can find the complete list
-in the :ref:`model field reference <model-field-types>`. You can easily write
-your own fields if Django's built-in ones don't do the trick; see
-:ref:`howto-custom-model-fields`.
+Django にはたくさんの組み込みフィールド型が付属しています。全フィールドのリ
+ストは :ref:`モデルフィールドリファレンス <model-field-types>` を参照してく
+ださい。組み込みのフィールドで実現できないことがあれば、独自にフィールドを
+定義できます :ref:`howto-custom-model-fields` を参照してください。
 
 .. Field options:
 
 フィールドのオプション
 ----------------------
+
+.. TBD
 
 Each field takes a certain set of field-specific arguments (documented in the
 :ref:`model field reference <model-field-types>`). For example,
