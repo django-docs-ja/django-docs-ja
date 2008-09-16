@@ -169,13 +169,11 @@ cStringIO_ ライブラリを使ってください． cStringIO ライブラリ�
 .. _HTMLdoc: http://www.htmldoc.org/
 .. _forge_fdf in Python: http://www.accesspdf.com/article.php/20050421092951834
 
-Other formats
-=============
+その他のフォーマット
+=====================
 
-.. TBD
-
-Notice that there isn't a lot in these examples that's PDF-specific -- just the
-bits using ``reportlab``. You can use a similar technique to generate any
-arbitrary format that you can find a Python library for. Also see
-:ref:`howto-outputting-csv` for another example and some techniques you can use
-when generated text-based formats.
+ここで示した例の大部分は、 PDF 固有の内容ではないことに注意してください。
+PDF に関する部分といえば ``reportlab`` くらいのものです。同じようなテクニッ
+クを使えば、 Python のライブラリが扱えるどんなフォーマットのデータでも生成
+できるのです。もう一つの例として、テキストベースの出力をしている
+:ref:`howto-outputting-csv` も参照してください。

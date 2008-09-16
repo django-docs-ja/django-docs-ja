@@ -121,9 +121,9 @@ Python には CSV ライブラリモジュール ``csv`` がついてきます�
 その他のテキストベース形式
 ===========================
 
-.. TBD
- 
-Notice that there isn't very much specific to CSV here -- just the specific
-output format. You can use either of these techniques to output any text-based
-format you can dream of. You can also use a similar technique to generate
-arbitrary binary data; see :ref:`howto-outputting-pdf` for an example.
+ここで示した例の大部分は、 CSV 固有の内容ではないことに注意してください。
+CSV に関する部分といえば、出力形式くらいのものです。同じようなテクニックを
+使えば、 どんなテキスト形式のデータでも生成できるのです。バイナリデータを生
+成するときにも、同じようなテクニックを使えます。
+:ref:`howto-outputting-pdf` を参照してください。
+

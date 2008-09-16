@@ -205,8 +205,6 @@ ones:
     :attr:`~Field.primary_key`
         ``True`` を指定すると、フィールドをモデルの主キーにします。
 
-        .. TBD
-
         If you don't specify :attr:`primary_key=True <Field.primary_key>` for
         any fields in your model, Django will automatically add an
         :class:`IntegerField` to hold the primary key, so you don't need to set
@@ -217,6 +215,8 @@ ones:
     :attr:`~Field.unique`
         ``True`` であれば、フィールドはテーブル全体で一意の値を取らねばなり
         ません。
+
+.. TBD
 
 Again, these are just short descriptions of the most common field options. Full
 details can be found in the :ref:`common model field option reference

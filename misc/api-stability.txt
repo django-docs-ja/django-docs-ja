@@ -121,8 +121,6 @@ APIの安定性とは
 コントリビュートアプリケーション (``django.contrib``)
 ----------------------------------------------------------
 
-.. TBD
-
 While we'll make every effort to keep these APIs stable -- and have no plans to
 break any contrib apps -- this is an area that will have more flux between
 releases. As the web evolves, Django must evolve with it.
@@ -145,12 +143,11 @@ worth noting if you're building apps that depend on ``django.contrib``.
 API の中には、以下の二つの理由から「内部使用 (internal)」とマークされている
 ものがあります:
 
-.. TBD
-
-    - Some documentation refers to internals and mentions them as such. If the
-      documentation says that something is internal, we reserve the right to
-      change it.
+    - ドキュメント内で、内部使用の API について触れていることがあります。
+      ドキュメント上で内部使用であると書かれていれば、将来変更される余地が
+      あると考えてください。 
       
-    - Functions, methods, and other objects prefixed by a leading underscore
-      (``_``). This is the standard Python way of indicating that something is
-      private; if any method starts with a single ``_``, it's an internal API.
+    - アンダースコア (``_``) で始まる関数、メソッド、その他のオブジェクト。
+      アンダースコアを先頭に付けるのは、 Python でプライベートなものを示す
+      のに使われる方法です。メソッドが ``_`` 一つで開始していたら、内部 API
+      です。

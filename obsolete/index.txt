@@ -1,16 +1,14 @@
 .. _obsolete-index:
 
-Deprecated/obsolete documentation
+撤廃された機能のドキュメント
 =================================
 
 :revision-up-to: 8961 (1.0)
 
-.. TBD
-
-These documents cover features that have been deprecated or that have been
-replaced in newer versions of Django. They're preserved here for folks using old
-versions of Django or those still using deprecated APIs. No new code based on
-these APIs should be written.
+このセクションのカバーしている機能は、現在の Django ではすでに撤廃されたか、
+別の機能にとって代わられています。ここに残しているのは、古いバージョンの
+Django を使っているユーザや、撤廃された API を使っているユーザのためです。
+新しくコードを書くときには、このセクションにある API を使わないでください。
 
 .. toctree::
    :maxdepth: 1

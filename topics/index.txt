@@ -1,13 +1,11 @@
 .. _topics-index:
 
-Using Django
-============
+Django を使う
+===============
 
 :revision-up-to: 8961 (1.0)
 
-.. TBD
-
-Introductions to all the key parts of Django you'll need to know:
+このセクションでは、Django を使う上での鍵となる要素について解説しています。
 
 .. toctree::
    :maxdepth: 1

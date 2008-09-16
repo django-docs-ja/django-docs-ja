@@ -6,78 +6,76 @@
 
 :revision-up-to: 8961 (1.0)
 
-.. TBD
+さあ、ここにきたあなたは、 :ref:`入門編 <intro-index>` をあらかた読み終えて、
+Django を使い続ける決心をしたことだと思います。入門編では、 Django のほんの
+表面的な部分に触れただけにすぎません (実際、入門編の分量は、全体のドキュメ
+ントの 10% にも満たないのです)。
 
-So you've read all the :ref:`introductory material <intro-index>` and have
-decided you'd like to keep using Django. We've only just scratched the surface
-with this intro (in fact, if you've read every single word you've still read
-less than 10% of the overall documentation).
+さて、次は何をしましょうか？
 
-So what's next?
+そうですね、私達は実践を通して学ぶのがとても大好きですよね。今や、読者のみ
+なさんは自分のプロジェクトを作成して、いろいろと遊んでみるのに十分な段階に
+あります。新しい技を身に付けたければ、いつでもここに戻って来てください。
 
-Well, we've always been big fans of learning by doing. At this point you should
-know enough to start a project of your own and start fooling around. As you need
-to learn new tricks, come back to the documentation.
+私達は、 Django ドキュメントを有意義で、読みやすく、可能な限り完璧にしよう
+と努力しています。このドキュメントの残りの部分では、読者の皆さんが Django
+のドキュメントをできるだけ活用できるように、ドキュメントがどういう仕組みに
+なっているのかを説明しています。
 
-We've put a lot of effort into making Django's documentation useful, easy to
-read and as complete as possible. The rest of this document explains more about
-how the documentation works so that you can get the most out of it.
+(そう、これはいわばドキュメントのドキュメントです。ただし、このドキュメント
+の読み方を説明するドキュメントを書いたりはしませんから心配しないでください
+ね。)
 
-(Yes, this is documentation about documentation. Rest assured we have no plans
-to write a document about how to read the document about documentation.)
-
-Finding documentation
+ドキュメントを探す
 =====================
 
-Django's got a *lot* of documentation -- almost 200,000 words -- so finding what
-you need can sometimes be tricky. A few good places to start the :ref:`search`
-and the :ref:`genindex`.
+Django には、いまや 200,000 語を越す *たくさん* のドキュメントがあります。
+その中から必要なものを捜し出すのは大変です。そういうときは、 :ref:`search`
+や :ref:`genindex` から辿るとよいでしょう。
 
-Or you can just browse around!
+もちろん、片っ端から読み進むのもいいですけどね。
 
-How the documentation is organized
-==================================
+ドキュメントの構成
+====================
 
-Django's main documentation is broken up into "chunks" designed to fill
-different needs:
+Django のドキュメントは、用途に応じていくつかの塊に分けられています:
 
-    * The :ref:`introductory material <intro-index>` is designed for people new
-      to Django -- or to web development in general. It doesn't cover anything
-      in depth, but instead gives a high-level overview of how developing in
-      Django "feels".
+    * :ref:`入門編 <intro-index>` は、 Django や、ウェブ開発全般の初心者を
+      対象に作られています。あまり詳細な解説はありませんが、高い視点で
+      Django の開発が「どのようなものか」を見られます。
       
-    * The :ref:`topic guides <topics-index>`, on the other hand, dive deep into
-      individual parts of Django. There are complete guides to Django's
-      :ref:`model system <topics-db-index>`, :ref:`template engine
-      <topics-templates>`, :ref:`forms framework <topics-forms-index>`, and much
-      more.`
-      
-      This is probably where you'll want to spent most of your time; if you work
-      your way through these guides you should come out knowing pretty much
-      everything there is to know about Django.
+    * :ref:`トピック別ガイド <topics-index>` では、 Django の個々の構成要素
+      について詳しく解説しています。このセクションでは、 Django の
+      :ref:`モデルシステム <topics-db-index>`, :ref:`テンプレートエンジン
+      <topics-templates>`, :ref:`フォームフレームワーク
+      <topics-forms-index>` といったトピックを解説しています。
 
-    * Web development is often broad, not deep -- problems span many domains.
-      We've written a set of :ref:`how-to guides <howto-index>` that answer
-      common "How do I ...?" questions. Here you'll find information about
-      :ref:`generating PDFs with Django <howto-outputting-pdf>`, :ref:`writing
-      custom template tags <howto-custom-template-tags>`, and more.
+      おそらく、読者の皆さんはこのセクションを読み進むのに多くの時間を費す
+      でしょう。このガイドを全て読破したら、 Django を扱う上で必要なことは
+      ほとんど知っているはずです。
 
-      Answers to really common questions can also be found in the :ref:`FAQ
-      <faq-index>`.
+    * ウェブ開発に必要な知識は、いくつもの領域にまたがって広く、浅く分布し
+      ているものです。 このセクションには、「〜をするにはどうしたらよいです
+      か？」といった質問に答える、 :ref:`ハウツー <howto-index>` が書かれて
+      います。例えば、 :ref:`Django で PDF を生成する方法
+      <howto-outputting-pdf>` や、 :ref:`テンプレートタグを自作する方法
+      <howto-custom-template-tags>` などです。
 
-    * The guides and how-to's don't cover every single class, function, and
-      method available in Django -- that would be overwhelming when you're
-      trying to learn. Instead, details about individual classes, functions,
-      methods, and modules are kept in the :ref:`reference <ref-index>`. This is
-      where you'll turn to find the details of a particular function or
-      whathaveyou.
+      よくある質問は、これとは別に :ref:`FAQ <faq-index>` で扱っています。
+
+    * ガイドやハウツードキュメントは、 Django の全てのクラスや関数、メソッ
+      ドを解説しているわけではありません。 Django を学ぼうとする人に最初か
+      ら全てを教えようとしても、溢れてしまうからです。その代わりに、個々の
+      クラスや関数、メソッド、モジュールの解説を :ref:`リファレンス
+      <ref-index>` に置きました。特定の関数の仕様や、どんな機能を使えるかを
+      調べたければ、このセクションを参照してください。
     
-    * Finally, there's some "specialized" documentation not usually relevant to
-      most developers. This includes the :ref:`release notes <releases-index>`,
-      :ref:`documentation of obsolete features <obsolete-index>`,
-      :ref:`internals documentation <internals-index>` for those who want to add
-      code to Django itself, and a :ref:`few other things that simply don't fit
-      elsewhere <misc-index>`.
+    * 最後に、ほとんどの開発者にとってはあまり関係のない「特殊な」ドキュメ
+      ントとして、  :ref:`リリースノート <releases-index>`,
+      :ref:`撤廃された機能のドキュメント <obsolete-index>`, Django 自体にコー
+      ドを追加したい人のための :ref:`内部仕様のドキュメント
+      <internals-index>`, そして :ref:`その他、分類の難しい雑多なドキュメン
+      ト <misc-index>` があります。
       
 
 .. _How documentation is updated:
