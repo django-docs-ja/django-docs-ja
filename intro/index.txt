@@ -1,14 +1,12 @@
 .. _intro-index:
 
-Getting started
-===============
+さあ始めましょう
+==================
 
 :revision-up-to: 8961 (1.0)
 
-.. TBD
-
-New to Django? Or to web development in general? Well, you came to the right
-place: read this material to quickly get up and running.
+Django は初めてですか？ Web 開発全般も？なら、ここに来て正解ですね。
+ここにあるドキュメントを読んで、行動に移してみましょう。
 
 .. toctree::
    :maxdepth: 1
@@ -23,20 +21,34 @@ place: read this material to quickly get up and running.
    
 .. seealso::
 
-    If you're new to Python_, you might want to start by getting an idea of what
-    the language is like. Django is 100% Python, so if you've got minimal
-    comfort with Python you'll probably get a lot more out of Django.
+    Python_ の初心者なら、まずは Python で何ができるかを理解しましょう。
+    Django は 100% Python で書かれているので、ほんの最小限 Python を理解す
+    るだけで Django をより深く理解できるはずです。
+
+    プログラミング全般の初心者なら、 
+    `非プログラマのための Python リソース一覧`_  から始めてみるとよいでしょ
+    う。
     
-    If you're new to programming entirely, you might want to start with this
-    `list of Python resources for non-programmers`_
-    
-    If you already know a few other languages and want to get up to speed with
-    Python quickly, we recommend `Dive Into Python`_ (also available in a
-    `dead-tree version`_). If that's not quite your style, there are quite
-    a few other `books about Python`_.
+    Python 以外の言語を学んだことがあって、 Python を素早く学びたいのなら、
+    `Dive Into Python`_ をお勧めします (`木を伐って作ったヤツ`_ もあります)。
+    Dive Into Python があまりお好きでなくても、 `Python の本`_ はたくさんあ
+    りますよ。
+
+    .. admonition:: 訳注: 日本語の読者のために
+
+        日本語の Python の情報を探しているなら、
+	`日本 Python ユーザ会のページ <http://www.python.jp/Zope/>`_
+	を訪れてみてください。
+
+        日本語で書かれた Python の書籍を探しているなら、	
+	http://wiki.python.org/moin/JapanesePythonBooks をチェックしてみて
+	もよいでしょう。
     
     .. _python: http://python.org/
     .. _list of Python resources for non-programmers: http://wiki.python.org/moin/BeginnersGuide/NonProgrammers
+    .. _`非プログラマのための Python リソース一覧`: `list of Python resources for non-programmers`_
     .. _dive into python: http://diveintopython.org/
     .. _dead-tree version: http://www.amazon.com/exec/obidos/ASIN/1590593561/ref=nosim/jacobian20
+    .. _`木を伐って作ったヤツ`: `dead-tree version`_
     .. _books about Python: http://wiki.python.org/moin/PythonBooks
+    .. _`Python の本`: `books about Python`_
