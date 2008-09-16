@@ -1,7 +1,7 @@
 .. _topics-db-models:
 
 ==============
-Writing models
+モデルの作成
 ==============
 
 :revision-up-to: 8961 (1.0)
