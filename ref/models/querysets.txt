@@ -9,16 +9,14 @@ QuerySet API リファレンス
 
 .. currentmodule:: django.db.models
 
-.. TBD
+このドキュメントでは、 クエリセット(``QuerySet``) API について詳しく解説し
+ます。このドキュメントは、 :ref:`モデル <topics-db-models>` と
+:ref:`データベースクエリ <topics-db-queries>` に基づいて書かれているので、
+あらかじめ読んでおくよう勧めます。
 
-This document describes the details of the ``QuerySet`` API. It builds on the
-material presented in the :ref:`model <topics-db-models>` and `database query
-<topics-db-queries>` guides, so you'll probably want to read and understand
-those documents before reading this one.
-
-Throughout this reference we'll use the :ref:`example weblog models
-<queryset-model-example>` presented in the :ref:`database query guide
-<topics-db-queries>`.
+このリファレンスを通じて、例題には :ref:`データベースクエリガイド
+<topics-db-queries>` で取り上げた :ref:`ブログのモデル例
+<queryset-model-example>` を使います。
 
 .. _when-querysets-are-evaluated:
 .. _When QuerySets are evaluated:
@@ -26,11 +24,9 @@ Throughout this reference we'll use the :ref:`example weblog models
 クエリセットはいつ評価されるのか
 =================================
 
-.. TBD
-
-Internally, a ``QuerySet`` can be constructed, filter, sliced, and generally
-passed around without actually hitting the database. No database activity
-actually occurs until you do something to evaluate the queryset.
+内部的には、クエリセットの生成、フィルタ操作、スライス、コード間の受渡しは、
+データベースを操作することなく行えます。クエリセットを何らかの形で評価しな
+い限り、データベースの操作は実際には起こらないのです。
 
 以下の方法を使うと、クエリセットを評価できます:
 
@@ -75,17 +71,17 @@ actually occurs until you do something to evaluate the queryset.
 
 .. _queryset-api:
 
-QuerySet API
-============
+クエリセット API
+=================
 
-.. TBD
-
-Though you usually won't create one manually -- you'll go through a :class:`Manager` -- here's the formal declaration of a ``QuerySet``:
+クエリセットは手動で作成できません (:class:`Manager` を介してしか生成できま
+せん) が、 ``QuerysSet`` クラスのコンストラクタの正式な定義は以下の通りです:
 
 .. class:: QuerySet([model=None])
 
-Usually when you'll interact with a ``QuerySet`` you'll use it by :ref:`chaining
-filters <chaining-filters>`. To make this work, most ``QuerySet`` methods return new querysets.
+通常、クエリセットを操作するときには、 :ref:`フィルタを連鎖
+<chaining-filters>` させます。クエリセットに対するフィルタ操作は、ほとんど
+が新たなクエリセットを返します。
 
 .. _QuerySet methods that return new QuerySets:
 
@@ -178,19 +174,17 @@ Django はリレーション先のモデルのデフォルトの整列順 (``Met
 
     Entry.objects.order_by('blog__id')
 
-..TBD
+リレーション先のモデルのフィールドを使った整列と ``distinct()`` を組み合わ
+せる場合は注意が必要です。リレーション先のモデルの整列が、 ``distinct()``
+によってどのように影響を受けるかは、 `distinct()`_ の説明を参照してください。
 
-Be cautious when ordering by fields in related models if you are also using
-``distinct()``. See the note in the `distinct()`_ section for an explanation
-of how related model ordering can change the expected results.
-
-It is permissible to specify a multi-valued field to order the results by (for
-example, a ``ManyToMany`` field). Normally this won't be a sensible thing to
-do and it's really an advanced usage feature. However, if you know that your
-queryset's filtering or available data implies that there will only be one
-ordering piece of data for each of the main items you are selecting, the
-ordering may well be exactly what you want to do. Use ordering on multi-valued
-fields with care and make sure the results are what you expect.
+クエリ結果の整列には、 (``ManyToMany`` のような)複数の値で構成されるフィー
+ルドも指定できます。通常、こうした指定にはあまり意味がなく、本当に高度な使
+い方です。しかし、クエリセットをフィルタした結果や、もともとのデータにおい
+て、リレーション元のオブジェクトから参照しているオブジェクトが一つしかない
+ことが暗黙的に決まっているとはっきりしていれば、整列結果は期待通りになるで
+しょう。複数の値で構成されるフィールドで整列を行う場合には、十分注意して、
+期待通りの結果が得られるか確認してください。
 
 .. versionadded:: 1.0
 
@@ -209,16 +203,12 @@ fields with care and make sure the results are what you expect.
 字の区別については、 Django は現在使っているデータベースバックエンドの整列
 方法に従います。
 
-.. TBD
-
-Also, note that ``reverse()`` should generally only be called on a
-``QuerySet`` which has a defined ordering (e.g., when querying against
-a model which defines a default ordering, or when using
-``order_by()``). If no such ordering is defined for a given
-``QuerySet``, calling ``reverse()`` on it has no real effect (the
-ordering was undefined prior to calling ``reverse()``, and will remain
-undefined afterward).
-
+また、 ``reverse()`` は一般に、すでに整列方法の定義されているクエリセット
+(デフォルトの整列順の定義されたモデルから取り出したクエリセットや、
+``order_by()`` で整列されたもの) に対して呼びだすべきものです。整列方法の定
+義されていないクエリセットに対して  ``reverse()`` を呼び出しても、何ら効果
+をもたらしません (``reverse()`` を呼び出す前に整列方法が定義されていなけれ
+ば、呼び出した後の整列方法も未定義のままです)。
 
 ``distinct()``
 ~~~~~~~~~~~~~~
@@ -564,13 +554,11 @@ Django の作者たちは、全ての SQL 関係のメソッドを先に配置�
             select=SortedDict([('a', '%s'), ('b', '%s')]),
             select_params=('one', 'two'))
 
-    .. TBD
-
-    The only thing to be careful about when using select parameters in
-    ``extra()`` is to avoid using the substring ``"%%s"`` (that's *two*
-    percent characters before the ``s``) in the select strings. Django's
-    tracking of parameters looks for ``%s`` and an escaped ``%`` character
-    like this isn't detected. That will lead to incorrect results.
+    ``extra()`` に SELECT パラメタを渡す時には、 ``"%%s"`` (``s`` の前のパー
+    セント記号が *二重* のもの) だけは使わないでください。 Django は
+    ``%s`` を探してパラメタの挿入位置を追跡しますが、  ``"%%s"`` のように
+    ``%`` がエスケープされていると検出しないからです。そのため、クエリ結果
+    が正しくなくなります。
 
 ``where`` / ``tables``
     明示的に追加の ``WHERE`` 節を渡す必要がある場合 -- おそらく非明示的な結
@@ -670,9 +658,8 @@ QuerySet を返さないクエリセットメソッド
 照合パラメタに一致するオブジェクトを返します。照合パラメタは後述の 
 `フィールドの照合`_ で説明するフォーマットにします。
 
-.. TBD
-
-``get()`` raises ``AssertionError`` if more than one object was found.
+複数のオブジェクトがみつかると、 ``get()`` は ``AssertionError`` を送出しま
+す。
 
 指定パラメタに対するオブジェクトが見つからなかった場合には ``get()`` は
 ``DoesNotExist`` 例外を送出します。 ``DoesNotExist`` 例外はモデルクラスの属
@@ -706,15 +693,13 @@ QuerySet を返さないクエリセットメソッド
 
 は等価です。
 
-.. TBD
-
-The :ref:`force_insert <ref-models-force-insert>` parameter is documented
-elsewhere, but all it means is that a new object will always be created.
-Normally you won't need to worry about this. However, if your model contains a
-manual primary key value that you set and if that value already exists in the
-database, a call to ``create()`` will fail with an ``IntegrityError`` since
-primary keys must be unique. So remember to be prepared to handle the
-exception if you are using manual primary keys.
+:ref:`force_insert <ref-models-force-insert>` パラメタはここでは説明してい
+ませんが、このパラメタを指定すると、常に新たなオブジェクトを生成します。
+通常は、このパラメタのことを気にする必要はありません。しかし、モデルに手動
+で設定した主キーが存在していて、すでにデータベース上にある主キーと同じ値を
+もったオブジェクトを ``create()`` して保存しようとすると、主キーの一意性が
+破れてしまうため、 ``IntegrityError`` を引き起こしてしまいます。ですから、
+手動で主キーを設定したときには、例外処理を忘れずに準備しておいてください。
 
 ``get_or_create(**kwargs)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -755,29 +740,24 @@ kwargs に指定したオブジェクトを照合し、なければ生成する�
     obj = self.model(**params)
     obj.save()
 
-.. TBD
-
 上のコードを日本語で表すなら、まず ``'defaults'`` でないキーワード引数のう
 ち、二重アンダースコアを含まないもの (二重アンダースコアはあいまい照合のキー
 ワードなので除外します) を使ってパラメタ ``params`` を作成し、必要に応じて
 デフォルト値 ``defaults`` で内容を更新して、その結果をモデルクラスを呼び出
-すときのキーワード引数に使います。 As hinted at
-above, this is a simplification of the algorithm that is used, but it contains
-all the pertinent details. The internal implementation has some more
-error-checking than this and handles some extra edge-conditions; if you're
-interested, read the code.
+すときのキーワード引数に使う、という処理に相当します。上で示唆したように、
+ここではアルゴリズムを簡単化して、必要な部分だけを記述しています。内部実装
+では、もっと細かくエラーチェックを行い、境界条件を処理しています。興味があ
+るなら、ぜひコードを読んでみてください。
 
 ``defaults`` という名前のフィールド名を持っていて、 ``get_or_create()`` の
 中で厳密照合に使いたければ、以下のように ``'defaults__exact'`` を使います::
 
     Foo.objects.get_or_create(defaults__exact='bar', defaults={'defaults': 'baz'})
 
-.. TBD
-
-The ``get_or_create()`` method has similar error behaviour to ``create()``
-when you are using manually specified primary keys. If an object needs to be
-created and the key already exists in the database, an ``IntegrityError`` will
-be raised.
+主キーを手動で指定している場合、 ``get_or_create()`` メソッドは
+``create()`` とおなじようなエラーを引き起こします。すなわち、すでにデータベー
+ス上に存在するキーを使ってオブジェクトを生成しようとすると、
+``IntegrityError`` を送出します。
 
 最後に、 Django ビューの中で ``get_or_create()`` を使う場合についてひとこと
 注意しておきましょう。上で説明したように、主として ``get_or_create()`` が有
@@ -869,19 +849,18 @@ be raised.
 
 ``latest()`` は純粋に利便性と可読性のためだけに存在しています。
 
-.. TBD
-
 .. _field-lookups:
 .. Field lookups
 
 フィールドの照合
 ----------------
 
-Field lookups are how you specify the meat of an SQL ``WHERE`` clause. They're
-specified as keyword arguments to the ``QuerySet`` methods ``filter()``,
-``exclude()`` and ``get()``.
+フィールドの照合操作によって、 SQL の ``WHERE`` 節の中身が決まります。フィー
+ルドの照合を行うには、 ``filter()``, ``exclude()`` および ``get()`` といっ
+たクエリセットのメソッドのキーワード引数を指定します。
 
-For an introduction, see :ref:`field-lookups-intro`.
+フィールド照合について知りたければ、 :ref:`field-lookups-intro` を参照して
+ください。
 
 exact
 ~~~~~
@@ -906,17 +885,15 @@ exact
    いましたが、この SQL はいかなるレコードにもマッチしません。バージョン
    1.0 では、 ``id__isnull=True`` と同じ挙動を示すように変更されています。
 
-.. TBD
+.. admonition:: MySQL での比較
 
-.. admonition:: MySQL comparisons
-
-    In MySQL, whether or not ``exact`` comparisons are case-insensitive by
-    default. This is controlled by the collation setting on the database
-    tables (this is a database setting, *not* a Django setting).  It is
-    possible to configured you MySQL tables to use case-sensitive comparisons,
-    however there are some trade-offs involved. For more information about
-    this, see the :ref:`collation section <mysql-collation>` in the
-    :ref:`databases <ref-databases>` documentation.
+    MySQL では、デフォルト構成での ``exact`` 比較の判定は大小文字を区別しま
+    せん。大小文字の区別は、データベーステーブルごとのコレーション
+    (collation) 設定で制御されています (データベースの設定であって、 Django
+    の設定では *ありません*)。 MySQL のテーブルは大小文字を区別して比較する
+    ように構成できますが、トレードオフもあります。詳しくは、
+    :ref:`databases <ref-databases>` ドキュメントの :ref:`コレーションの節
+    <mysql-collation>` を参照してください。
 
 iexact
 ~~~~~~
@@ -990,13 +967,11 @@ in
     q = Blog.objects.filter(name__contains='Cheddar').values('pk').query
     e = Entry.objects.filter(blog__in=q)
 
-.. TBD
-
 .. warning::
 
-    This ``query`` attribute should be considered an opaque internal attribute.
-    It's fine to use it like above, but its API may change between Django
-    versions.
+    ``query`` 属性は、まだ明確に仕様の定まっていない内部的な属性です。
+    現在は上記のように問題なく使えますが、将来のバージョンで API が変更され
+    るかもしれません。
 
 上のクエリセットを評価すると、以下の SQL 文と同様の結果を得ます::
 
@@ -1153,8 +1128,6 @@ date/datetime フィールドに対する day の厳密一致です。
 
     SELECT ... WHERE EXTRACT('day' FROM pub_date) = '3';
 
-(The exact SQL syntax varies for each database engine.)
-
 (厳密な SQL シンタクスはデータベースエンジンによって違います。)
 
 このクエリ文は、「1 月 3 日」や「7 月 3 日」のように、毎月 3 日にマッチし
@@ -1174,13 +1147,13 @@ isnull
 
     SELECT ... WHERE pub_date IS NULL;
 
-.. admonition:: ``__isnull=True`` vs ``__exact=None``
+.. admonition:: ``__isnull=True`` と ``__exact=None``
 
-    There is an important difference between ``__isnull=True`` and
-    ``__exact=None``. ``__exact=None`` will *always* return an empty result
-    set, because SQL requires that no value is equal to ``NULL``.
-    ``__isnull`` determines if the field is currently holding the value
-    of ``NULL`` without performing a comparison.
+    ``__isnull=True`` と ``__exact=None`` には重要な違いがあります。
+    SQL の仕様上、いかなる値も ``NULL`` と等価ではないので、
+    ``__exact=None`` は *常に* 空の結果セットを返します。一方、
+    ``__isnull`` はフィールドの値が ``NULL`` であるかどうかだけを調べ、比較
+    を実行しません。
 
 search
 ~~~~~~
