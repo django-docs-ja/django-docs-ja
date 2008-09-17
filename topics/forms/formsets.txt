@@ -348,16 +348,14 @@
 このショートカットは、フォームセットの ``as_table`` を呼び出した時と同じ内
 容を出力します。
 
-.. TBD
+複数のフォームセットを一つのビュー内で使う
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Using more than one formset in a view
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-You are able to use more than one formset in a view if you like. Formsets
-borrow much of its behavior from forms. With that said you are able to use
-``prefix`` to prefix formset form field names with a given value to allow
-more than one formset to be sent to a view without name clashing. Lets take
-a look at how this might be accomplished::
+お望みなら、複数のフォームセットを一つのビューで扱えます。フォームセットは
+フォームとほとんど同じく動作します。つまり、 ``prefix`` を使ってフォームセッ
+トのフォームフィールド名にプレフィクスをつければ、複数のフォームセットを
+一つのビューに入れても問題なく動作するのです。複数のフォームセットがどのよ
+うに動作するか、以下の例で示しましょう::
 
     def manage_articles(request):
         ArticleFormSet = formset_factory(ArticleForm)
@@ -375,6 +373,6 @@ a look at how this might be accomplished::
             'book_formset': book_formset,
         })
 
-You would then render the formsets as normal. It is important to point out
-that you need to pass ``prefix`` on both the POST and non-POST cases so that
-it is rendered and processed correctly.
+これで、フォームセットは通常通りレンダできます。重要なのは、 ``prefix`` を
+POST リクエストの場合とそうでない場合の両方に指定して、正しくレンダさせるこ
+とです。

@@ -1,31 +1,34 @@
 .. _topics-forms-index:
 
 ==================
-Working with forms
+フォームの操作
 ==================
 
 :revision-up-to: 8961 (1.0)
 
-.. TBD
+.. admonition:: このドキュメントについて
 
-.. admonition:: About this document
+    このドキュメントでは、 Django のフォーム処理機能を紹介しています。
+    フォーム API の詳細は、 :ref:`ref-forms-api` を参照してください。
+    利用できるフィールドタイプのドキュメントは :ref:`ref-forms-fields`
+    を参照してください。
 
-    This document provides an introduction to Django's form handling features.
-    For a more detailed look at the forms API, see :ref:`ref-forms-api`. For
-    documentation of the available field types, see :ref:`ref-forms-fields`.
+``django.forms`` は、 Django のフォーム処理ライブラリです。
 
-``django.forms`` is Django's form-handling library.
+フォームによって提出 (submit) されたデータの処理は、Django の
+:class:`~django.http.HttpRequest` クラスだけでも実現できます。しかし、フォー
+ムライブラリを使うと、フォーム処理に必要な共通のタスクの面倒を見てくれます。
+フォームライブラリを使えば、以下のようなことを実現できます:
 
-While it is possible to process form submissions just using Django's
-:class:`~django.http.HttpRequest` class, using the form library takes care of a
-number of common form-related tasks. Using it, you can:
+    1. フォームウィジェットから、 HTML フォームを自動的に生成して表示できま
+       す。
+    2. 提出されたデータに対して、バリデーション規則 (validation rule) を適
+       用できます。
+    3. バリデーションエラーを検出したときに、フォームをエラーメッセージ付き
+       で表示できます。
+    4. 提出されたデータを、適切な Python のデータ型に変換できます。
 
-    1. Display an HTML form with automatically generated form widgets.
-    2. Checking submitted data against a set of validation rules.
-    3. Redisplaying a form in the case of validation errors.
-    4. Converting submitted form data to the relevant Python data types.
-
-Overview
+概要
 ========
 
 このライブラリでは、以下のような概念を扱います:
@@ -85,6 +88,8 @@ Django のデータベースモデルによく似た方法でフォームのフ�
 :ref:`ModelForm <topics-forms-modelforms>` を使えば、フォームを使って
 Django のモデルを直接追加したり編集したりしたいときに、モデルと重複する記述
 をせずにすみます。
+
+.. TBD
 
 Using a form in a view
 ----------------------
@@ -197,12 +202,12 @@ can also :ref:`customize the way in which labels and ids are generated
 You can also use ``form.as_table`` to output table rows (you'll need to provide
 your own ``<table>`` tags) and ``form.as_ul`` to output list items.
 
-Customizing the form template
------------------------------
+フォームテンプレートのカスタマイズ
+-----------------------------------
 
-If the default generated HTML is not to your taste, you can completely customize
-the way a form is presented using the Django template language. Extending the
-above example::
+デフォルトの HTML 出力が気に入らなければ、 Django のテンプレート言語を使っ
+て、フォームの表示方法をいくらでもカスタマイズできます。例えば、前掲の例は
+以下のように拡張できます::
 
     <form action="/contact/" method="POST">
         <div class="fieldWrapper">
@@ -228,18 +233,18 @@ above example::
         <p><input type="submit" value="Send message"></p>
     </form>
 
-Each named form-field can be output to the template using
-``{{ form.name_of_field }}``, which will produce the HTML needed to display the
-form widget. Using ``{{ form.name_of_field.errors }}`` displays a list of form
-errors, rendered as an unordered list. This might look like::
+各フォームフィールドは、その名前に従って、 ``{{ form.name_of_field }}``
+で出力でき、フォームウィジェットを表示するための適切な HTML を生成します。
+``{{ form.name_of_field.errors }}`` はフォームエラーのリストを以下のような
+無番号リストで表示します::
 
    <ul class="errorlist">
        <li>Sender is required.</li>
    </ul>
 
-The list has a CSS class of ``errorlist`` to allow you to style its appearance.
-If you wish to further customize the display of errors you can do so by looping
-over them::
+リストには ``errorlist`` という CSS があてられていて、表示スタイルを変更で
+きます。エラーの表示方法をもっと細かく制御したければ、ループを使って以下の
+ように表現できます::
 
     {% if form.subject.errors %}
         <ol>
@@ -249,10 +254,11 @@ over them::
         </ol>
     {% endif %}
     
-Further topics
-==============
+その他のトピック
+==================
 
-This covers the basics, but forms can do a whole lot more:
+ここではフォームの基本を説明しましたが、フォームライブラリのできることはもっ
+とたくさんあります:
 
 .. toctree::
    :maxdepth: 1
@@ -263,4 +269,4 @@ This covers the basics, but forms can do a whole lot more:
    
 .. seealso::
 
-    The :ref:`form API reference <ref-forms-index>`.
+    :ref:`フォーム API リファレンス <ref-forms-index>`

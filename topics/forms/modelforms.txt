@@ -362,17 +362,15 @@ Author モデルには ``'name'``, ``'title'``, ``'birth_date'`` の 3 つ
    ...     class Meta:
    ...         model = Article
 
-.. TBD
+clean() メソッドのオーバライド
+-------------------------------
 
-Overriding the clean() method
------------------------------
-
-You can override the ``clean()`` method on a model form to provide additional
-validation in the same way you can on a normal form. However, by default the
-``clean()`` method validates the uniqueness of fields that are marked as unique
-or unique_together on the model. Therefore, if you would like to override
-the ``clean()`` method and maintain the default validation, you must call the
-parent class's ``clean()`` method.
+バリデーションの動作を追加するために、モデルフォームの ``clean()`` メソッド
+を通常のフォームと同じ方法でオーバライドできます。しかし、デフォルトの
+``clean()`` メソッドは、モデルの ``unique`` や ``unique_together`` に指定し
+た内容に従って、オブジェクトの一意性をチェックします。従って、 ``clean()``
+をオーバライドして、なおかつデフォルトのバリデーションも行いたいときは、
+親クラスの ``clean()`` メソッドを必ず呼び出してください。
 
 .. _Form inheritance:
 
@@ -472,22 +470,22 @@ parent class's ``clean()`` method.
 
     >>> AuthorFormSet = modelformset_factory(Author, formset=BaseAuthorFormSet)
 
-.. TBD
+フォームセットに含めるフィールドを ``fields`` や ``exclude`` で制御する
+------------------------------------------------------------------------
 
-Controlling which fields are used with ``fields`` and ``exclude``
------------------------------------------------------------------
-
-By default a model formset will use all fields in the model that are not marked
-with ``editable=False``. However, this can be overidden at the formset level::
+デフォルトでは、モデルフォームセットは、モデル中の ``editable=False`` でな
+い全てのフィールドを使おうとします。ただし、フォームセットレベルでこの挙動
+はオーバライドできます::
 
     >>> AuthorFormSet = modelformset_factory(Author, fields=('name', 'title'))
 
-Using ``fields`` will restrict the formset to use just the given fields. Or if
-you need to go the other way::
+このように、 ``fields`` を使えば、フォームセットに組み込むフィールドを指定
+したものだけに制限できます。一方::
 
     >>> AuthorFormSet = modelformset_factory(Author, exclude=('birth_date',))
 
-Using ``exclude`` will prevent the given fields from being used in the formset.
+このように、 ``exclude`` を使えば、指定したフィールドをフォームセットから除
+外できます。
 
 .. _saving-objects-in-the-formset:
 .. _Saving objects in the formset:
@@ -553,13 +551,12 @@ Using ``exclude`` will prevent the given fields from being used in the formset.
     <tr><th><label for="id_form-2-name">Name:</label></th><td><input id="id_form-2-name" type="text" name="form-2-name" value="Walt Whitman" maxlength="100" /><input type="hidden" name="form-2-id" value="2" id="id_form-2-id" /></td></tr>
     <tr><th><label for="id_form-3-name">Name:</label></th><td><input id="id_form-3-name" type="text" name="form-3-name" maxlength="100" /><input type="hidden" name="form-3-id" id="id_form-3-id" /></td></tr>
 
-.. TBD
+ビュー内でモデルフォームセットを使う
+-------------------------------------
 
-Using a model formset in a view
--------------------------------
-
-Model formsets are very similar to formsets. Lets say we want to present a
-formset to a user to edit ``Author`` model instances::
+モデルフォームセットは、フォームセットと良く似ています。例として、
+ユーザが ``Author`` モデルインスタンスを編集できるようなフォームセットを考
+えましょう::
 
     def manage_authors(request):
         AuthorFormSet = modelformset_factory(Author)
@@ -574,10 +571,10 @@ formset to a user to edit ``Author`` model instances::
             "formset": formset,
         })
 
-As you can see the view is not drastically different than how to use a formset
-in a view. The only difference is that we call ``formset.save()`` to save the
-data into the database. This is described above in
-:ref:`saving-objects-in-the-formset`.
+このように、ビューの構造は通常のフォームセットを使ったときとほとんど変わり
+ません。違うのは、 ``formset.save()`` を使って、データをデータベースに保存
+していることくらいです。 ``formset.save()`` は、
+:ref:`saving-objects-in-the-formset` で解説しています。
 
 .. _`Using inlineformset_factory`:
 

@@ -161,13 +161,13 @@ DATABASE_ENGINE
 クエンドは、 ``'postgresql_psycopg2'``, ``'postgresql'``, ``'mysql'``,
 ``'sqlite3'``, ``'oracle'`` です。
 
-.. TBD
+.. versionchanged:: 1.0
 
-In the Django development version, you can use a database backend that doesn't
-ship with Django by setting ``DATABASE_ENGINE`` to a fully-qualified path (i.e.
-``mypackage.backends.whatever``). Writing a whole new database backend from
-scratch is left as an exercise to the reader; see the other backends for
-examples.
+    Django 1.0 から、 Django に組み込まれていないデータベースバックエンドを
+    組み込むために、 ``DATABASE_ENGINE`` にバックエンドモジュールの完全指定
+    パス (例えば ``mypackage.backends.whatever``) を指定できます。全く新し
+    いデータベースバックエンドの作成は、読者の皆さんに委ねます。他のバック
+    エンドの例を参照してください。
 
 .. setting:: DATABASE_HOST
 
@@ -331,12 +331,11 @@ DEFAULT_CONTENT_TYPE
 DEFAULT_FILE_STORAGE
 --------------------
 
-.. TBD
+デフォルト値: ``django.core.files.storage.FileSystemStorage``
 
-Default: ``django.core.files.storage.FileSystemStorage``
-
-Default file storage class to be used for any file-related operations that don't
-specify a particular storage system. See :ref:`topics-files`.
+特定のストレージシステムに依存せずにファイル関連の操作を行うときに使う、
+デフォルトのファイルストレージクラスです。 :ref:`topics-files` を参照してく
+ださい。
 
 DEFAULT_FROM_EMAIL
 ------------------
@@ -550,12 +549,9 @@ FORCE_SCRIPT_NAME
 
 デフォルト値: ``None``
 
-.. TBD
-
-If not ``None``, this will be used as the value of the ``SCRIPT_NAME``
-environment variable in any HTTP request. This setting can be used to override
-the server-provided value of ``SCRIPT_NAME``, which may be a rewritten version
-of the preferred value or not supplied at all.
+``None`` に指定すると、 HTTMP リクエストの ``SCRIPT_NAME`` 環境変数の代わり
+に指定値を使います。この設定は、サーバが指定する ``SCRIPT_NAME`` の内容を上
+書きしたり、 ``SCRIPT_NAME`` を空にしたりするために使えます。
 
 .. setting:: IGNORABLE_404_ENDS
 
@@ -863,14 +859,6 @@ Django で作られたページに空でないリファラつきで訪問した�
 場合にしか使われません。(:ref:`topics-http-middleware` を参照してください。)
 ``IGNORABLE_404_STARTS``, ``IGNORABLE_404_ENDS`` および
 :ref:`howto-error-reporting` も参照してください。
-
-.. TBD
-
-Whether to send an e-mail to the ``MANAGERS`` each time somebody visits a
-Django-powered page that is 404ed with a non-empty referer (i.e., a broken
-link). This is only used if ``CommonMiddleware`` is installed (see
-. See also ``IGNORABLE_404_STARTS``,
-``IGNORABLE_404_ENDS`` and .
 
 .. setting:: SERIALIZATION_MODULES
 

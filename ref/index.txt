@@ -1,11 +1,9 @@
 .. _ref-index:
 
-API Reference
-=============
+API リファレンス
+===================
 
 :revision-up-to: 8961 (1.0)
-
-.. TBD
 
 .. toctree::
    :maxdepth: 1

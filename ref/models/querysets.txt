@@ -9,6 +9,8 @@ QuerySet API リファレンス
 
 .. currentmodule:: django.db.models
 
+.. TBD
+
 This document describes the details of the ``QuerySet`` API. It builds on the
 material presented in the :ref:`model <topics-db-models>` and `database query
 <topics-db-queries>` guides, so you'll probably want to read and understand

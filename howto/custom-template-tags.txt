@@ -6,35 +6,33 @@
 
 :revision-up-to: 8961 (1.0)
 
-.. TBD
-
-
-Introduction
+はじめに
 ============
 
-Django's template system comes a wide variety of :ref:`built-in tags and filters
-<ref-templates-builtins>` designed to address the presentation logic needs of
-your application. Nevertheless, you may find yourself needing functionality that
-is not covered by the core set of template primitives. You can extend the
-template engine by defining custom tags and filters using Python, and then make
-them available to your templates using the ``{% load %}`` tag.
+Django テンプレートシステムには、広範な :ref:`組み込みタグとフィルタ
+<ref-templates-builtins>` が付属していて、アプリケーションのプレゼンテーショ
+ンロジックに纏わる問題を解決できます。とはいえ、コアのテンプレートタグ
+プリミティブだけでは、要求を満たせない場合もあります。そういう場合のために、
+テンプレートエンジンを拡張できます。Python で自作のタグやフィルタを書き、
+テンプレート上で ``{% load %}`` タグを使って使えるのです。
 
-Code layout
------------
+コードの配置
+-------------
 
-Custom template tags and filters must live inside a Django app. If they relate
-to an existing app it makes sense to bundle them there; otherwise, you should
-create a new app to hold them.
+カスタムのテンプレートタグやフィルタは Django のアプリケーション内に置きま
+す。既存のアプリケーションに関連があるのなら、そのアプリケーションにバンド
+ルすればよいでしょう。そうでなければ、コードを入れておくための新たなアプリ
+ケーションを作成します。
 
-The app should contain a ``templatetags`` directory, at the same level as
-``models.py``, ``views.py``, etc. If this doesn't already exist, create it -
-don't forget the ``__init__.py`` file to ensure the directory is treated as a
-Python package.
+アプリケーション内には、 ``templatetags`` ディレクトリを置かねばなりません。
+このディレクトリは、 ``models.py`` や ``views.py`` などと同じ階層に置きます。
+``templatetags`` がなければ、作成してください。ディレクトリ内に
+``__init__.py`` を置いて、パッケージ化するのを忘れないでください。
 
-Your custom tags and filters will live in a module inside the ``templatetags``
-directory. The name of the module file is the name you'll use to load the tags
-later, so be careful to pick a name that won't clash with custom tags and
-filters in another app.
+カスタムのタグやフィルタは、 ``templatetags`` ディレクトリの下に置きます。
+モジュールファイルの名前は、あとでタグをロードするときに使う名前にします。
+ですから、他のアプリケーションのカスタムタグやフィルタと名前が衝突しないよ
+う、よく注意して名前を決めましょう。
 
 ``poll_extras.py`` という名前のファイルに自作のタグ／フィルタを入れているの
 なら、アプリケーションのレイアウトは以下のようになるでしょう::

@@ -243,11 +243,8 @@ URL を ``mysite.fcgi`` (または ``FastCGIExternalServer`` ディレクティ�
 
 .. _mod_rewrite: http://httpd.apache.org/docs/2.0/mod/mod_rewrite.html
 
-.. TBD
-
-Django will automatically use the pre-rewrite version of the URL when
-constructing URLs with the ``{% url %}`` template tag (and similar methods).
-
+Django は、 ``{% url %}`` テンプレートタグ (や、同様のメソッド) で URL を構
+築する際、自動的にリライト前の URL を使います。
 
 .. _lighttpd setup:
 

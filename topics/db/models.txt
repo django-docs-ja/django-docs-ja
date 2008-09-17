@@ -147,18 +147,15 @@ Django にはたくさんの組み込みフィールド型が付属していま�
 フィールドのオプション
 ----------------------
 
-.. TBD
+各フィールドには、それぞれフィールド固有の引数がいくつかあります(詳しくは
+:ref:`モデルフィールドリファレンス <model-field-types>` を参照してください)。
+例えば、 :class:`~django.db.models.CharField` (とそのサブクラス) は、データ
+を保存するときの ``VARCHAR`` データベースフィールドの長さを指定するために、
+必須の引数 :attr:`~django.db.models.CharField.max_length` が必要です。
 
-Each field takes a certain set of field-specific arguments (documented in the
-:ref:`model field reference <model-field-types>`). For example,
-:class:`~django.db.models.CharField` (and its subclasses) require a
-:attr:`~django.db.models.CharField.max_length` argument which specifies the size
-of the ``VARCHAR`` database field used to store the data.
-
-There's also a set of common arguments available to all field types. All are
-optional. They're fully explained in the :ref:`reference
-<common-model-field-options>`, but here's a quick summary of the most often-used
-ones:
+また、全てのフィールドに共通の引数もあります。共通の引数は全てオプションで、
+詳しくは :ref:`リファレンス <common-model-field-options>` で説明しています。
+ここでは、良く使われる引数を簡単に紹介しましょう:
 
     :attr:`~Field.null`
         ``True`` にすると、 Django は空の値を ``NULL`` としてデータベースに
@@ -205,22 +202,22 @@ ones:
     :attr:`~Field.primary_key`
         ``True`` を指定すると、フィールドをモデルの主キーにします。
 
-        If you don't specify :attr:`primary_key=True <Field.primary_key>` for
-        any fields in your model, Django will automatically add an
-        :class:`IntegerField` to hold the primary key, so you don't need to set
-        :attr:`primary_key=True <Field.primary_key>` on any of your fields
-        unless you want to override the default primary-key behavior. For more,
-        see :ref:`automatic-primary-key-fields`.
+	モデルのどのフィールドにも :attr:`primary_key=True
+	<Field.primary_key>` を指定しなければ、Django は自動的に
+	:class:`IntegerField` を追加して主キーを保存します。従って、デフォ
+	ルトの主キーの振舞いを変更したいのでないかぎり、 
+	:attr:`primary_key=True<Field.primary_key>` をフィールドに指定して
+	おく必要はありません。詳しくは
+	:ref:`automatic-primary-key-fields` を参照してください。
 
     :attr:`~Field.unique`
         ``True`` であれば、フィールドはテーブル全体で一意の値を取らねばなり
         ません。
 
-.. TBD
-
-Again, these are just short descriptions of the most common field options. Full
-details can be found in the :ref:`common model field option reference
-<common-model-field-options>`.
+前にも述べたように、ここではよく使われるフィールドオプションを簡単に説明す
+るにとどめます。全てのオプションの詳細な情報は 
+:ref:`共通のモデルフィールドオプションのリファレンス
+<common-model-field-options>` を参照してください。
 
 .. _automatic-primary-key-fields:
 .. _Automatic primary key fields:
@@ -310,17 +307,14 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
         manufacturer = models.ForeignKey(Manufacturer)
         # ...
         
-.. TBD
+:ref:`再帰的リレーション <recursive-relationships>` (自分自身に対する多対多
+のリレーション) や、 :ref:`未定義のモデルに対するリレーション
+<lazy-relationships>` も定義できます。 :ref:`モデルフィールドのリファレンス
+<ref-foreignkey>` を参照してください。
 
-You can also create :ref:`recursive relationships <recursive-relationships>` (an
-object with a many-to-one relationship to itself) and :ref:`relationships to
-models not yet defined <lazy-relationships>`; see :ref:`the model field
-reference <ref-foreignkey>` for details.
-
-It's suggested, but not required, that the name of a
-:class:`~django.db.models.ForeignKey` field (``manufacturer`` in the example
-above) be the name of the model, lowercase. You can, of course, call the field
-whatever you want. For example::
+必須ではありませんが、 :class:`~django.db.models.ForeignKey` の名前
+(上の例では ``manufacturer``) には、モデル名を小文字にしたものを使うよう勧
+めます。もちろん好きな名前を付けてもかまいません。例えば::
 
     class Car(models.Model):
         company_that_makes_it = models.ForeignKey(Manufacturer)
@@ -328,14 +322,16 @@ whatever you want. For example::
 
 .. seealso::
 
-    See the `Many-to-one relationship model example`_ for a full example.
+    詳しい例は `多対一のリレーションを持つモデルの例`_ を参照してください。
 
 .. _Many-to-one relationship model example: http://www.djangoproject.com/documentation/models/many_to_one/
+.. _`多対一のリレーションを持つモデルの例`: `Many-to-one relationship model example`_
 
-:class:`~django.db.models.ForeignKey` fields also accept a number of extra
-arguments which are explained in :ref:`the model field reference
-<foreign-key-arguments>`. These options help define how the relationship should
-work; all are optional.
+:class:`~django.db.models.ForeignKey` フィールドは、リレーションの動作を定
+義するための引数をいくつかとれます。各引数は 
+:ref:`モデルフィールドのリファレンス <foreign-key-arguments>` で解説してい
+ます。そうした引数を使うと、リレーションのふるまいを定義する上で役に立ちま
+す。引数は全てオプションです。
 
 .. _Many-to-many relationships:
 
@@ -361,13 +357,11 @@ work; all are optional.
         # ...
         toppings = models.ManyToManyField(Topping)
 
-.. TBD
-
-As with :class:`~django.db.models.ForeignKey`, you can also create
-:ref:`recursive relationships <recursive-relationships>` (an object with a
-many-to-one relationship to itself) and :ref:`relationships to models not yet
-defined <lazy-relationships>`; see :ref:`the model field reference
-<ref-manytomany>` for details.
+:class:`~django.db.models.ForeignKey` と同様、 :ref:`再帰的リレーション
+<recursive-relationships>` (自分自身に対する多対一のリレーション) や、
+:ref:`未定義のモデルに対するリレーション<lazy-relationships>` も定義できま
+す。 :ref:`モデルフィールドのリファレンス <ref-foreignkey>` を参照してくだ
+さい。
 
 必須ではありませんが、 :class:`~django.db.models.fields.ManyToManyField` の
 名前 (上の例では ``toppings``)は、リレーション先のモデル名の複数形にするよ
@@ -394,12 +388,12 @@ defined <lazy-relationships>`; see :ref:`the model field reference
 .. _Many-to-many relationship model example: http://www.djangoproject.com/documentation/models/many_to_many/
 .. _`多対多のリレーションを持つモデルの例`: `Many-to-many relationship model example`_
 
-.. TBD
+:class:`~django.db.models.ManyToManyField` フィールドは、リレーションの動作
+を定義するための引数をいくつかとれます。各引数は :ref:`モデルフィールドのリ
+ファレンス <foreign-key-arguments>` で解説しています。引数は全てオプション
+です。
 
-:class:`~django.db.models.ManyToManyField` fields also accept a number of extra
-arguments which are explained in :ref:`the model field reference
-<manytomany-arguments>`. These options help define how the relationship should
-work; all are optional.
+.. TBD
 
 Extra fields on many-to-many relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -561,15 +555,11 @@ of the intermediate model::
 モデル継承は :class:`~django.db.models.fields.OneToOneField` で実現されてい
 ます)。
 
-.. TBD
-
-As with :class:`~django.db.models.ForeignKey`, a
-:ref:`recursive relationship <recursive-relationships>`
-can be defined and
-:ref:`references to as-yet undefined models <lazy-relationships>`
-can be made; see
-:class:`the model field reference <django.db.models.fields.OneToOneField>`
-for details.
+:class:`~django.db.models.ForeignKey` と同様、
+:ref:`再帰的リレーション <recursive-relationships>` や
+:ref:`未定義のモデルに対するリレーション <lazy-relationships>` も定義できま
+す。詳しくは :class:`モデルフィールドのリファレンス
+<django.db.models.fields.OneToOneField>` を参照してください。
 
 .. seealso::
 
@@ -580,10 +570,9 @@ for details.
 
 .. versionadded:: 1.0
 
-.. TBD
-
-:class:`~django.db.models.OneToOneField` fields also accept one optional argument
-described in the :ref:`model field reference <ref-onetoone>`.
+:class:`~django.db.models.OneToOneField` フィールドは、オプションの引数を一
+つとります。引数は :ref:`モデルフィールドリファレンス <ref-onetoone>` で解
+説しています。
 
 以前は、モデル中で :class:`~django.db.models.fields.OneToOneField` を使うと、
 そのフィールドは自動的にモデルの主キーになっていました。この仕様はもうなく
@@ -662,16 +651,15 @@ Meta オプション
             ordering = ["horn_length"]
             verbose_name_plural = "oxen"
 
-.. TBD
+モデルのメタデータとは、モデルインスタンスの整列順
+(:attr:`~Options.ordering`)や、データベース上のテーブル名
+(:attr:`~Options.db_table`)、人間可読な名前の単数形や複数形
+(:attr:`~Options.verbose_name`, :attr:`~Options.verbose_name_plural`)といっ
+た、「フィールドの情報でない」情報です。必須のメタデータはなく、モデルに
+``class Meta`` を追加するかどうか自体オプションです。
 
-Model metadata is "anything that's not a field", such as ordering options
-(:attr:`~Options.ordering`), database table name (:attr:`~Options.db_table`), or
-human-readable singular and plural names (:attr:`~Options.verbose_name` and
-:attr:`~Options.verbose_name_plural`). None are required, and adding ``class
-Meta`` to a model is completely optional.
-
-A complete list of all possible ``Meta`` options can be found in the :ref:`model
-option reference <ref-models-options>`.
+``Meta`` に指定できるオプションの一覧は、 :ref:`モデルオプションのリファレ
+ンス <ref-models-options>` で解説しています。
 
 .. _model-methods:
 .. _Model methods:
@@ -722,43 +710,40 @@ option reference <ref-models-options>`.
 .. _Read more about properties: http://www.python.org/download/releases/2.2/descrintro/#property
 .. _`プロパティの説明`: `Read more about properties`_
 
-.. TBD
-
-The :ref:`model instance reference <ref-models-instances>` has a complete list
-of :ref:`methods automatically given to each model <model-instance-methods>`.
-You can override most of these -- see `overriding predefined model methods`_,
-below -- but there are a couple that you'll almost always want to define:
+:ref:`モデルインスタンスのリファレンス <ref-models-instances>` では、
+:ref:`各モデルに自動的に付与されるメソッド <model-instance-methods>` を全て
+紹介しています。ほとんどのメソッドはオーバライド可能です。詳しくは後述の
+`既存のモデルメソッドをオーバライドする`_ を参照してください。とはいえ、
+ほとんどの場合は、以下の 2 つのメソッドをオーバライドするでしょう:
 
     :meth:`~Model.__unicode__`
-        A Python "magic method" that returns a unicode "representation" of any
-        object. This is what Python and Django will use whenever a model
-        instance needs to be coerced and displayed as a plain string. Most
-        notably, this happens when you display an object in an interactive
-        console or in the admin.
+        オブジェクトの「Unicode 表現」を返す、Python の「マジックメソッド」
+        です。 Python や Django はこのメソッドを使ってモデルインスタンスに
+        型強制を適用し、通常の文字列に変換したり表示したりしています。特に、
+        対話コンソールや admin でオブジェクトを表示するときに使われています。
         
-        You'll always want to define this method; the default isn't very helpful
-        at all.
+        このメソッドは常に定義するよう勧めます。定義しておくと、いろいろと
+	便利だからです。
         
     :meth:`~Model.get_absolute_url`
-        This tells Django how to calculate the URL for an object. Django uses
-        this in its admin interface, and any time it needs to figure out a URL
-        for an object.
+        このメソッドを定義しておくと、 Django にオブジェクトの URL を計算さ
+        せられます。 Django は admin インタフェースをはじめとして、オブジェ
+        クトから URL を特定する必要があるときにこのメソッドを使います。
         
-        Any object that has a URL that uniquely identifies it should define this
-        method.
+        オブジェクトを一意に特定できるような URL を持たせたいときには、この
+	メソッドを定義しましょう。
 
-.. TBD
+.. _overriding-predefined-model-methods:
 
-Overriding predefined model methods
------------------------------------
+既存のモデルメソッドをオーバライドする
+----------------------------------------
 
-There's another set of :ref:`model methods <model-instance-methods>` that
-encapsulate a bunch of database behavior that you'll want to customize. In
-particular you'll often want to change the way :meth:`~Model.save` and
-:meth:`~Model.delete` work.
+他にも、データベースの動作をカプセル化していて、カスタマイズ可能な :ref:`モ
+デルメソッド <model-instance-methods>` があります。特によく変更するのは、
+:meth:`~Model.save` や :meth:`~Model.delete` の動作でしょう。
 
-You're free to override these methods (and any other model method) to alter
-behavior.
+これらのメソッド (や、他のモデルメソッド) は、モデルのふるまいを変更するた
+めに自由にオーバライドしてかまいません。
 
 組み込みメソッドをオーバライドする古典的なユースケースは、オブジェクトを保
 存する際に何か別の処理を行うというものです。例を示しましょう
@@ -785,27 +770,24 @@ behavior.
             else:
                 super(Blog, self).save(force_insert, force_update) # Call the "real" save() method.
 
-.. TBD
-
-It's important to remember to call the superclass method -- that's that
-``super(Blog, self).save()`` business -- to ensure that the object still gets
-saved into the database. If you forget to call the superclass method, the
-default behavior won't happen and the database won't get touched.
+スーパクラスのメソッド呼び出し、つまり ``super(Blog, self).save()`` を忘れ
+ないでください。この呼び出しを忘れると、デフォルトの動作が行われないため、
+データベースにデータが保存されません。
 
 .. _Executing custom SQL:
 
 カスタム SQL の実行
 --------------------
 
-Another common pattern is writing custom SQL statements in model methods and
-module-level methods. The object :class:`django.db.connection
-<django.db.backends.DatabaseWrapper>` represents the current database
-connection. To use it, call :meth:`connection.cursor()
-<django.db.backends.DatabaseWrapper.cursor>` to get a cursor object. Then, call
-``cursor.execute(sql, [params])`` to execute the SQL and
-:meth:`cursor.fetchone() <django.db.backends.CursorWrapper.fetchone>` or
-:meth:`cursor.fetchall() <django.db.backends.CursorWrapper.fetchall>` to return
-the resulting rows. For example::
+もう一つよくあるパターンは、カスタムの SQL 文をモデルメソッドやモジュールレ
+ベルのメソッドにに書くというものです。まず、現在のデータベース接続を表現す
+る :class:`django.db.connection<django.db.backends.DatabaseWrapper>` オブジェ
+クを import します。このオブジェクトを使うには、 :meth:`connection.cursor()
+<django.db.backends.DatabaseWrapper.cursor>` を呼び出してカーソルオブジェク
+トを作成し、 ``cursor.execute(sql, [params])`` で SQL 文を実行して、
+:meth:`cursor.fetchone() <django.db.backends.CursorWrapper.fetchone>` や
+:meth:`cursor.fetchall() <django.db.backends.CursorWrapper.fetchall>` で結
+果のレコード行を取り出します。例えば::
 
     def my_custom_sql(self):
         from django.db import connection
@@ -814,21 +796,21 @@ the resulting rows. For example::
         row = cursor.fetchone()
         return row
 
-:class:`connection <django.db.backends.DatabaseWrapper>` and
-:class:`<django.db.backends.CursorWrapper>` mostly implement the standard Python
-DB-API -- see :pep:`249` -- with the addition of Django's :ref:`transaction
-handling <topics-db-transactions>`. If you're not familiar with the Python
-DB-API, note that the SQL statement in :meth:`cursor.execute()
-<django.db.backends.CursorWrapper.execute>` uses placeholders, ``"%s"``, rather
-than adding parameters directly within the SQL. If you use this technique, the
-underlying database library will automatically add quotes and escaping to your
-parameter(s) as necessary. (Also note that Django expects the ``"%s"``
-placeholder, *not* the ``"?"`` placeholder, which is used by the SQLite Python
-bindings. This is for the sake of consistency and sanity.)
+:class:`connection <django.db.backends.DatabaseWrapper>` や
+:class:`<django.db.backends.CursorWrapper>` は、 :pep:`249` で定義されてい
+る標準的な Python DB-API のほぼ全てに加えて、 Django の :ref:`トランザクショ
+ン処理 <topics-db-transactions>` を実装しています。 Python DB-API にあまり
+詳しくないのなら、パラメタつきの SQL を実行するときに、SQL 文にパラメタを直
+接指定して実行するのではなく、 :meth:`cursor.execute()
+<django.db.backends.CursorWrapper.execute>` の SQL 文内でプレースホルダ
+``"%s"`` を使うことに注意してください。このテクニックを使えば、データベース
+ライブラリの中で自動的にクオート処理が行われます。 (また、 Django の使って
+いるプレースホルダ ``"%s"`` は、 SQLite の Python バインディングで使われて
+いる ``"?"`` と違うということにも注意しましょう。この設計は、一貫性と安全性
+に配慮して決められています。)
 
-A final note: If all you want to do is a custom ``WHERE`` clause, you can use
-the :meth:`~QuerySet.extra` lookup method, which lets you add custom SQL to a
-query.
+最後に、カスタムの ``WHERE`` 節を持つ SQL を実行したいだけなら、
+:meth:`~QuerySet.extra` 照合メソッドを使えることにも注意しておきましょう。
 
 .. _model-inheritance:
 

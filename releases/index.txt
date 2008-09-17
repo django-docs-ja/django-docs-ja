@@ -1,7 +1,7 @@
 .. _releases-index:
 
-Release notes
-=============
+リリースノート
+===============
 
 :revision-up-to: 8961 (1.0)
 
