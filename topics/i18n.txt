@@ -57,6 +57,7 @@ Django の国際化フックはデフォルトで有効になっているので�
     3. Django の設定でロケールミドルウェアを有効化します。
 
 .. admonition:: 舞台裏では
+    :class: admonition-behind-the-scenes
 
     Django の翻訳機構は、 Python に付属の ``gettext`` モジュールを使ってい
     ます。

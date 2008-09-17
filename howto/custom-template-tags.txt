@@ -74,6 +74,7 @@ filters in another app.
 を実行しておいてください。
 
 .. admonition:: 舞台裏
+    :class: admonition-behind-the-scenes
 
     Django のデフォルトのフィルタやタグのソースコードには大量のサンプルが
     収められています。ソースコードはそれぞれ

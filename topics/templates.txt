@@ -19,6 +19,7 @@ Smarty_ や CheetahTemplate_ のようなテキストベースのテンプレー
 したことがあるなら、 Django のテンプレートはしっくりくるはずです。
 
 .. admonition:: 設計哲学
+    :class: admonition-philosophy
 
     プログラミングの知識があったり、 PHP のようなプログラムコードを直接
     HTML に混ぜ込む言語を使ったことがあるなら、 Django のテンプレートシステ
@@ -72,6 +73,7 @@ Smarty_ や CheetahTemplate_ のようなテキストベースのテンプレー
     {% endblock %}
 
 .. admonition:: 設計哲学
+    :class: admonition-philosophy
 
     なぜ (Zope における TAL のような) XML ベースのテキストベースのテンプレー
     トではなく、テキストベースのテンプレートを使うのでしょうか ? それは、
@@ -93,7 +95,8 @@ Smarty_ や CheetahTemplate_ のようなテキストベースのテンプレー
 
 変数の属性値にアクセスするには、ドット (``.``) 表記を使います。
 
-.. admonition:: 舞台裏で行われていること
+.. admonition:: 舞台裏
+    :class: admonition-behind-the-scenes
 
     技術的には、テンプレートシステムが dot を見つけた場合、以下の順で値の評
     価を試みます:

@@ -82,6 +82,7 @@ Python でテンプレートを使うには、以下の 2 段階のプロセス�
     <django.template.Template instance>
 
 .. admonition:: 舞台裏
+    :class: admonition-behind-the-scenes
 
     このシステムは ``Template`` オブジェクトを生成するときに生のテンプレー
     トコードを一度しか解析しません。コンパイル後のテンプレートはパフォーマ

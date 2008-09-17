@@ -356,6 +356,7 @@ import する必要はなくなりました。
 在しなければ :exc:`~django.http.Http404` を送出します。
 
 .. admonition:: 設計哲学
+    :class: admonition-philosophy
 
     なぜ :exc:`~django.core.exceptions.ObjectDoesNotExist` 例外を高水準で自
     動的にキャッチせず、ヘルパー関数
