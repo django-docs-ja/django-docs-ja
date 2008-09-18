@@ -83,17 +83,15 @@ Django admin サイトは、以下の 5 つのステップを通して有効化�
     date_hierarchy = 'pub_date'
 
 
-.. TBD
-
 ``form``
 ~~~~~~~~
 
-By default a ``ModelForm`` is dynamically created for your model. It is used
-to create the form presented on both the add/change pages. You can easily
-provide your own ``ModelForm`` to override any default form behavior on the
-add/change pages.
+デフォルトの設定では、モデルに対して ``ModelForm`` が動的に生成され、追加／
+変更ページでフォームを生成するときに使われます。 ``form`` を独自の
+``ModelForm`` と置き換えれば、追加／変更ページのふるまいを変更できます。
 
-For an example see the section `Adding custom validation to the admin`_.
+詳しくは、 `admin にカスタムのバリデーションを追加する <Adding custom
+validation to the admin>`_ を参照してください。
 
 ``fieldsets``
 ~~~~~~~~~~~~~
@@ -174,43 +172,41 @@ admin の「追加 (add)」および「変更 (change)」ページのレイア�
         要ならそのまま HTML を入れられます。また、 HTML 固有の文字をエスケー
         プたければ、``django.utils.html.escape()`` を使ってください。
 
-.. TBD
-
 ``fields``
 ~~~~~~~~~~
 
-Use this option as an alternative to ``fieldsets`` if the layout does not
-matter and if you want to only show a subset of the available fields in the
-form. For example, you could define a simpler version of the admin form for
-the ``django.contrib.flatpages.FlatPage`` model as follows::
+レイアウトを気にせず、単にモデルの一部のフィールドだけをフォームに表示した
+いだけの場合に、 ``fieldsets`` の代わりに使ってください。例えば、
+``django.contrib.flatpages.FlatPage`` モデルの admin フォームの簡単なバージョ
+ンを以下のように定義できます::
 
     class FlatPageAdmin(admin.ModelAdmin):
         fields = ('url', 'title', 'content')
 
-In the above example, only the fields 'url', 'title' and 'content' will be
-displayed, sequentially, in the form.
+上の例では、 'url', 'title', 'content' フィールドだけが順番にフォームに表示
+されます。
 
 .. admonition:: Note
 
-    This ``fields`` option should not be confused with the ``fields``
-    dictionary key that is within the ``fieldsets`` option, as described in
-    the previous section.
+    この ``fields`` オプションと ``fieldsets`` オプションの中の ``fields``
+    キーとを混同しないでくださいね。
 
 ``exclude``
 ~~~~~~~~~~~
 
-This attribute, if given, should be a list of field names to exclude from the
-form.
+この属性にフィールドの名前のリストを指定すると、指定したフィールドがフォー
+ムから除去されます。
 
-For example, let's consider the following model::
+例えば、以下のようなモデルがあったとします::
 
     class Author(models.Model):
         name = models.CharField(max_length=100)
         title = models.CharField(max_length=3)
         birth_date = models.DateField(blank=True, null=True)
 
-If you want a form for the ``Author`` model that includes only the ``name``
-and ``title`` fields, you would specify ``fields`` or ``exclude`` like this::
+``name`` と ``title`` フィールドだけを含む ``Author`` モデルのフォームを
+表示したければ、 ``fields`` や ``exclude`` を使って、それぞれ以下のように
+定義できます::
     
     class AuthorAdmin(admin.ModelAdmin):
         fields = ('name', 'title')
@@ -218,9 +214,9 @@ and ``title`` fields, you would specify ``fields`` or ``exclude`` like this::
     class AuthorAdmin(admin.ModelAdmin):
         exclude = ('birth_date',)
 
-Since the Author model only has three fields, ``name``, ``title``, and
-``birth_date``, the forms resulting from the above declarations will contain
-exactly the same fields.
+``Author`` モデルは 3 つのフィールド ``name``, ``title``, ``birth_date``
+しか持たないので、上の 2 つの例は全く同じフィールドを含むフォームを生成しま
+す。
 
 ``filter_horizontal``
 ~~~~~~~~~~~~~~~~~~~~~
@@ -477,14 +473,12 @@ admin 変更リストをページ分割 (paginate) で表示するときに、�
     class ArticleAdmin(admin.ModelAdmin):
         prepopulated_fields = {"slug": ("title",)}
 
-.. TBD
-
-When set, the given fields will use a bit of JavaScript to populate from the
-fields assigned. The main use for this functionality is to automatically
-generate the value for ``SlugField`` fields from one or more other fields. The
-generated value is produced by concatenating the values of the source fields,
-and then by transforming that result into a valid slug (e.g. substituting
-dashes for spaces).
+``prepopulated_fields`` をセットすると、フィールドに小さな JavaScript のア
+クションが設定され、引数に指定したフィールドから値を自動的に取り込みます。
+``prepopulated_fields`` は、主に他の複数のフィールドから ``SlugField`` フィー
+ルドの値を生成するときに使います。値は、まず各ソースフィールドの値を結合し
+て、その結果が有効なスラグになるよう変換 (スペースをダッシュに置換するなど) 
+して生成します。
 
 ``DateTimeField``, ``ForeignKey`` および ``ManyToManyField`` は
 ``prepopulated_fields`` に指定できません。
@@ -770,18 +764,17 @@ Django は、 ``InlineModelAdmin`` のサブクラスとして、以下の二つ
 トの数には関係しませんが、あまり小さな値が設定されていると、影響することも
 あります。詳しくは :ref:`model-formsets-max-num` を参照してください。
 
-.. TBD
-
 ``raw_id_fields``
 ~~~~~~~~~~~~~~~~~
 
-By default, Django's admin uses a select-box interface (<select>) for
-fields that are ``ForeignKey``. Sometimes you don't want to incur the
-overhead of having to select all the related instances to display in the
-drop-down.
+デフォルトの設定では、 Django の admin は ``ForeignKey`` の選択に選択ボック
+スインタフェース (<select>) を使います。しかし、リレーション先の全てのイン
+スタンスをドロップダウンに表示するときのオーバヘッドを防ぎたいときがありま
+す。
 
-``raw_id_fields`` is a list of fields you would like to change
-into a ``Input`` widget for either a ``ForeignKey`` or ``ManyToManyField``::
+``raw_id_fields`` には、モデルの ``ForeignKey`` や ``ManyToManyField`` をリ
+ストで指定します。 ``raw_id_fields`` に指定したフィールドは、 ``Input`` ウィ
+ジェットを使います::
 
     class BookInline(admin.TabularInline):
         model = Book
@@ -1031,19 +1024,14 @@ or ``login_template`` properties.
 ``AdminSite`` オブジェクト
 ===========================
 
-.. TBD
+Django の管理サイトは ``django.contrib.admin.sites.AdminSite`` のインスタン
+スを使って表現しています。デフォルトでは、このクラスのインスタンスは
+``django.contrib.admin.site`` としてすでに作成されていて、モデルや
+``ModelAdmin`` インスタンスを登録できます。
 
-A Django administrative site is represented by an instance of
-``django.contrib.admin.sites.AdminSite``; by default, an instance of
-this class is created as ``django.contrib.admin.site`` and you can
-register your models and ``ModelAdmin`` instances with it.
-
-If you'd like to set up your own administrative site with custom
-behavior, however, you're free to subclass ``AdminSite`` and override
-or add anything you like. Then, simply create an instance of your
-``AdminSite`` subclass (the same way you'd instantiate any other
-Python class), and register your models and ``ModelAdmin`` subclasses
-with it instead of using the default.
+独自のふるまいを実現する管理サイトを作りたければ、 ``AdminSite`` のサブクラ
+スを作成して、 (他の Python クラスと同様に) 必要な機能をオーバライドし、
+作成したインスタンスにモデルや ``ModelAdmin`` サブクラスを登録してください。
 
 
 .. _`Hooking AdminSite instances into your URLconf`:

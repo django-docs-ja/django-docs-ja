@@ -1,18 +1,16 @@
 .. _internals-committers:
 
-.. TBD
-
 =================
-Django committers
+Django のコミッタ
 =================
 
 :revision-up-to: 8961 (1.0)
 
-The original team
+オリジナルチーム
 =================
 
-Django originally started at World Online, the Web department of the `Lawrence
-Journal-World`_ of Lawrence, Kansas, USA.
+Django プロジェクトは、米国ローレンス州カンザスにある `Lawrence
+Journal-World`_ 社の Web 開発部門、 World Online で生まれました。
 
 `Adrian Holovaty`_
     Adrian はジャーナリズムのバックグラウンドを持った Web 開発者です。ジャー
@@ -34,14 +32,16 @@ Journal-World`_ of Lawrence, Kansas, USA.
     
     イングランドのブライトン在住です。
 
+.. TBD
+
 `Jacob Kaplan-Moss`_
-    Jacob is a software architect at `Whiskey Media`_, one of those newfangled
-    Web 1.0 companies you've read so much about. A good deal of Jacob's work
-    time is devoted to working on Django. Jacob previous worked for the Lawrence
-    Journal-World, where he was the lead developer of Ellington, a commercial
-    web publishing platform for media companies.
+    Jacob は最新の Web 1.0 企業の一つ、 `Whiskey Media`_ のソフトウェアアー
+    キテクトです。 Jacob の仕事時間の大半は、 Django に関する仕事に割り当て
+    られています。Jacob はかつて Lawrence Journal-World で働いていましたが、
+    当時はメディア企業向けの商用パブリッシングプラットフォームである
+    Ellington のリードデベロッパでした。
     
-    Jacob lives in Lawrence, Kansas, USA.
+    ローレンス州カンザス在住です。
     
 `Wilson Miner`_
     Django をかっこよく見せているのは Wilson のデザインの力です。今あなたが
@@ -61,8 +61,8 @@ Journal-World`_ of Lawrence, Kansas, USA.
 .. _whiskey media: http://whiskeymedia.com/
 .. _wilson miner: http://wilsonminer.com/
 
-Current developers
-==================
+現在の開発者
+=============
 
 Currently, Django is led by a team of volunteers from around the globe.
 

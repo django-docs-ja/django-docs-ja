@@ -20,8 +20,6 @@ verbose name」を保存しています．
 
 sites フレームワークは，簡単なモデルだけでできています:
 
-.. TBD
-
 .. class:: django.contrib.sites.models.Site
 
 モデルには， :attr:`~django.contrib.sites.models.Site.domain` と

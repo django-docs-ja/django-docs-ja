@@ -857,22 +857,20 @@ Feed クラスリファレンス
 の XML を生成しています。このフレームワーク自体は、
 `django/utils/feedgenerator.py`_ に単一のモジュールとして収められています。
 
-.. TBD
-
-You use this framework on your own, for lower-level feed generation. You can
-also create custom feed generator subclasses for use with the ``feed_type``
-``Feed`` option.
+このフレームワークを使って、自分で低水準のフィード生成処理を実装できます。
+また、フィードジェネレータのサブクラスを作成すれば、 ``Feed`` の
+``feed_type`` オプションに指定して使えます。
 
 .. _SyndicationFeed classes:
 
 ``SyndicationFeed`` クラス
 ---------------------------
 
-The :mod:`~django.utils.feedgenerator` module contains a base class:
+:mod:`~django.utils.feedgenerator` モジュールには、ベースクラス:
 
 .. class:: django.utils.feedgenerator.SyndicationFeed
 
-and several subclasses:
+と、以下のサブクラスが定義されています:
 
 .. class:: django.utils.feedgenerator.RssUserland091Feed
 .. class:: django.utils.feedgenerator.Rss201rev2Feed
@@ -881,18 +879,16 @@ and several subclasses:
 これらのクラスはいずれも、特定のタイプの XML を生成する方法を知っており、
 以下のような共通のインタフェースを持っています:
 
-.. TBD
-
 .. method:: SyndicationFeed.__init__(**kwargs)
 
-    Initialize the feed with the given dictionary of metadata, which applies to
-    the entire feed. Required keyword arguments are:
+    メタデータの入った辞書をもとにフィードを生成します。メタデータはフィー
+    ド全体に適用されます。以下の引数が必須です:
     
         * ``title``
         * ``link``
         * ``description``
     
-    There's also a bunch of other optional keywords:
+    また、以下のようなオプションキーワードをサポートしています:
 
         * ``language``
         * ``author_email``
@@ -905,30 +901,30 @@ and several subclasses:
         * ``feed_guid``
         * ``ttl``
     
-    Any extra keyword arguments you pass to ``__init__`` will be stored in
-    ``self.feed`` for use with `custom feed generators`_.
+    これ以外のキーワード引数を ``__init__`` に渡すと、 ``self.feed`` に保存
+    されます。使い方は 
+    `カスタムのフィードジェネレータ <custom feed generators>`_ を参照してく
+    ださい。
 
-    All parameters should be Unicode objects, except ``categories``, which
-    should be a sequence of Unicode objects.
-
-.. TBD
+    パラメタは全て Unicode オブジェクトで指定します。ただし、
+    ``categories`` は Unicode オブジェクトのリストです。
 
 .. method:: SyndicationFeed.add_item(**kwargs)
 
-    Add an item to the feed with the given parameters. 
+    指定のパラメタをもった項目をフィードに追加します。
 
-    Required keyword arguments are:
+    以下の引数は必須です:
 
         * ``title``
         * ``link``
         * ``description``
 
-    Optional keyword arguments are:
+    また、以下のオプションの引数があります:
 
         * ``author_email``
         * ``author_name``
         * ``author_link``
-        * ``pubdate``
+	* ``pubdate``
         * ``comments``
         * ``unique_id``
         * ``enclosure``
@@ -936,7 +932,9 @@ and several subclasses:
         * ``item_copyright``
         * ``ttl``
 
-    Extra keyword arguments will be stored for `custom feed generators`_.
+    それ以外のキーワード引数は
+    `カスタムのフィードジェネレータ <custom feed generators>`_ 用に保存され
+    ます。
 
     パラメタには Unicode オブジェクトを指定します。ただし:
 
@@ -974,10 +972,12 @@ and several subclasses:
 .. _Python datetime object: http://www.python.org/doc/current/lib/module-datetime.html
 .. _`Python datetime 型オブジェクト`: `Python datetime object`_
 
-.. TBD
+.. _Custom feed generators:
 
-Custom feed generators
-----------------------
+カスタムのフィードジェネレータ
+---------------------------------
+
+.. TBD
 
 If you need to produce a custom feed format, you've got a couple of options.
     

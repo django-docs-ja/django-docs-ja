@@ -1,9 +1,7 @@
 .. _howto-deployment-index:
 
-.. TBD
-
-Deploying Django
-================
+Django のデプロイ
+===================
 
 :revision-up-to: 8961 (1.0)
 

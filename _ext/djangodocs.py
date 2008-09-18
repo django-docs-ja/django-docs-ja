@@ -12,7 +12,11 @@ import sphinx.directives
 import sphinx.environment
 import sphinx.htmlwriter
 
+def populate_index_to_rebuilds(app, doctree):
+    app.builder.env.files_to_rebuild['index'] = set([])
+
 def setup(app):
+    app.connect('doctree-read', populate_index_to_rebuilds)
     app.add_crossref_type(
         directivename = "setting",
         rolename      = "setting",

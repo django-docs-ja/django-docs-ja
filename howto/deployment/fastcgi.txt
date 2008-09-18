@@ -393,33 +393,31 @@ Admin メディアファイルの提供
 法を考えておかねばなりません． :ref:`modpython <serving-the-admin-files>`
 での運用に関するドキュメントには，上記の構成でも使えるアドバイスがあります．
 
-.. TBD
-
-Forcing the URL prefix to a particular value
+URL のプレフィクス部分を特定の値にする
 ============================================
 
-Because many of these fastcgi-based solutions require rewriting the URL at
-some point inside the webserver, the path information that Django sees may not
-resemble the original URL that was passed in. This is a problem if the Django
-application is being served from under a particular prefix and you want your
-URLs from the ``{% url %}`` tag to look like the prefix, rather than the
-rewritten version, which might contain, for example, ``mysite.fcgi``.
+FastCGI を使った設置方法は、ほとんどが URL をリライトしてウェブサーバ内部の
+別の場所を指すようにしています。このとき、 Django から見えるパス情報には、
+もともとの URL が反映されません。そのため、 Django アプリケーションを特定の
+プレフィクスの下で動かしていて、 ``{% url %}`` タグで表示される URL を、
+``mysite.fcgi`` のようなリライト後のものでなく、プレフィクスのついた URL に
+したいときに問題が生じます。
 
-Django makes a good attempt to work out what the real script name prefix
-should be. In particular, if the webserver sets the ``SCRIPT_URL`` (specific
-to Apache's mod_rewrite), or ``REDIRECT_URL`` (set by a few servers, including
-Apache + mod_rewrite in some situations), Django will work out the original
-prefix automatically.
+Django は実際のスクリプト名プレフィクスが何だったかをそれなりにうまく調べよ
+うとします。特に、ウェブサーバが ``SCRIPT_URL`` を設定する場合(Apache の
+modo_rewrite 特有の機能です) や、 ``REDIRECT_URL`` を設定する場合 (Apache
+と mod_rewrite をある構成で使ったとき) には、もとのプレフィクスを自動的に
+見つけ出します。
 
-In the cases where Django cannot work out the prefix correctly and where you
-want the original value to be used in URLs, you can set the
-``FORCE_SCRIPT_NAME`` setting in your main ``settings`` file. This sets the
-script name uniformly for every URL served via that settings file. Thus you'll
-need to use different settings files is you want different sets of URLs to
-have different script names in this case, but that is a rare situation.
+Django がプレフィクスを正しく見付けられない場合や、リライト前の値を URL に
+使いたい場合には、設定ファイル中で :setting:`FORCE_SCRIPT_NAME` を設定して
+ください。この変数には、全ての URL に共通なスクリプト名を指定します。したがっ
+て、別々のスクリプト名を持った URL に対応するには個別に設定ファイルを用意せ
+ねばなりませんが、そのようなケースは稀でしょう。
 
-As an example of how to use it, if your Django configuration is serving all of
-the URLs under ``'/'`` and you wanted to use this setting, you would set
-``FORCE_SCRIPT_NAME = ''`` in your settings file.
+例えば、全てのコンテンツを ``'/'`` 以下の URL で提供するように Django を構
+成しているなら、設定ファイルには ``FORCE_SCRIPT_NAME = ''`` と指定してくだ
+さい。
+
 
 

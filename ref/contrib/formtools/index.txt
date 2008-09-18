@@ -5,9 +5,7 @@ django.contrib.formtools
 
 :revision-up-to: 8961 (1.0)
 
-.. TBD
-
-A set of high-level abstractions for Django forms (:mod:`django.forms`).
+Django のフォーム (:mod:`django.forms`) を扱うための高水準の抽象 API です。
 
 .. toctree::
    :maxdepth: 1

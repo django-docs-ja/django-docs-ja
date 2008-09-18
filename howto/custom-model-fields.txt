@@ -445,13 +445,11 @@ Python オブジェクトをデータベース保存用の値に変換する
 
 .. method:: get_db_prep_save(self, value)
 
-.. TBD
-
-Same as the above, but called when the Field value must be *saved* to the
-database. As the default implementation just calls ``get_db_prep_value``, you
-shouldn't need to implement this method unless your custom field need a special
-conversion when being saved that is not the same as the used for normal query
-parameters (which is implemented by ``get_db_prep_value``).
+前述のメソッドと同じですが、フィールドの値をデータベースに *保存* せねばな
+らないときに呼び出されます。デフォルトの実装では単に ``get_db_prep_value``
+を呼び出しています。従って、データベースにデータを保存するときに、
+(``get_db_prep_value`` で実装している) 通常のクエリパラメタと違うものを使わ
+ねばならないような特殊な状況を除き、このメソッドを実装する必要はありません。
 
 .. _Preprocessing values before saving:
 
@@ -654,44 +652,39 @@ parameters (which is implemented by ``get_db_prep_value``).
        :meth:`__unicode__` メソッドを定義しておき、 Python オブジェクトが自
        動的に文字列形式に変換されるようにしておけば、作業を大幅に減らせます。
 
+``FileField`` のサブクラスを定義する
+=======================================
 
-.. TBD
+上に挙げたメソッドに加えて、ファイルを扱うフィールドを定義するときには、い
+くつか必要な条件があります。データベースストレージの操作やデータの取得など、
+フィールド定義に必要なメカニズムのほとんどは ``FileField`` で定義しています
+が、特定のタイプのファイルをサポートするための処理はサブクラスに委ねていま
+す。
 
-Writing a ``FileField`` subclass
-=================================
+Django はファイルのコンテンツや操作をプロキシする ``File`` クラスを提供して
+います。このクラスはサブクラス化でき、ファイルのアクセス方法やメソッドをカ
+スタマイズできます。 ``File`` クラスは ``django.db.models.fields.files`` で
+定義されており、デフォルトの動作は :ref:`ファイルクラスのドキュメント
+<ref-files-file>` で解説しています。
 
-In addition to the above methods, fields that deal with files have a few other
-special requirements which must be taken into account. The majority of the
-mechanics provided by ``FileField``, such as controlling database storage and
-retrieval, can remain unchanged, leaving subclasses to deal with the challenge
-of supporting a particular type of file.
+``File`` のサブクラスを作ったら、 ``FileField`` サブクラスの ``attr_class``
+に指定して、 ``FileField`` サブクラスに指定のファイルクラスを使うよう指示し
+てください。
 
-Django provides a ``File`` class, which is used as a proxy to the file's
-contents and operations. This can be subclassed to customize how the file is
-accessed, and what methods are available. It lives at
-``django.db.models.fields.files``, and its default behavior is explained in the
-:ref:`file documentation <ref-files-file>`.
+アドバイス
+------------
 
-Once a subclass of ``File`` is created, the new ``FileField`` subclass must be
-told to use it. To do so, simply assign the new ``File`` subclass to the special
-``attr_class`` attribute of the ``FileField`` subclass.
+上に挙げた説明に加えて、カスタムフィールドのコードの効率や可読性を挙げるた
+めのガイドラインをいくつか示しておきます。
 
-A few suggestions
-------------------
+    1. Django の ``ImageField`` (``django/db/models/fields/files.py``) は、
+       ``FileField`` をサブクラス化して特定のファイルタイプをサポートしてい
+       る素晴らしい例題です。このクラスでは、上に述べたテクニックを余すとこ
+       ろ無く使っています。
 
-In addition to the above details, there are a few guidelines which can greatly
-improve the efficiency and readability of the field's code.
-
-    1. The source for Django's own ``ImageField`` (in
-       ``django/db/models/fields/files.py``) is a great example of how to
-       subclass ``FileField`` to support a particular type of file, as it
-       incorporates all of the techniques described above.
-
-    2. Cache file attributes wherever possible. Since files may be stored in
-       remote storage systems, retrieving them may cost extra time, or even
-       money, that isn't always necessary. Once a file is retrieved to obtain
-       some data about its content, cache as much of that data as possible to
-       reduce the number of times the file must be retrieved on subsequent
-       calls for that information.
-
+    2. 可能な限り、ファイルの属性をキャッシュしましょう。ファイルは遠隔のス
+       トレージシステム上にあるので、ファイルデータの取得には時間もお金もか
+       かります。しかも、常に必要なわけではありません。一度ファイルを取得し
+       て、コンテンツに関するデータを収集したら、データ可能な限りキャッシュ
+       して、以後のアクセスでファイルを再取得する回数を減らしましょう。
 

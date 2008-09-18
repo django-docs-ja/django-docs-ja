@@ -428,19 +428,19 @@ makemessages
 
     django-admin.py makemessages --all
 
-.. TBD
-
 --extension
 ~~~~~~~~~~~
 
-Use the ``--extension`` or ``-e`` option to specify a list of file extensions
-to examine (default: ".html").
+メッセージを取り出す対象に含めるファイルの拡張子を指定するには
+``--extension`` または ``-e`` オプションを使います(デフォルトは ".html" で
+す)。
 
-Example usage::
+使い方::
 
     django-admin.py makemessages --locale=de --extension xhtml
 
-Separate multiple extensions with commas or use -e or --extension multiple times::
+複数の拡張子を指定するには、カンマで区切るか、 ``--extension`` や ``-e`` 
+を複数使います::
 
     django-admin.py makemessages --locale=de --extension=html,txt --extension xml
 
@@ -685,13 +685,10 @@ startproject <projectname>
 現在のディレクトリに、 projectname に指定した名前の Django プロジェク
 トディレクトリ階層を作成します。
 
-.. TBD
-
-This command is disabled when the ``--settings`` option to
-``django-admin.py`` is used, or when the environment variable
-``DJANGO_SETTINGS_MODULE`` has been set. To re-enable it in these
-situations, either omit the ``--settings`` option or unset
-``DJANGO_SETTINGS_MODULE``.
+``--settings`` オプションを指定して ``django-admin.py`` を呼び出したときや、
+環境変数 ``DJANGO_SETTINGS_MODULE`` が指定されていると、このコマンドを使え
+ません。 ``startproject`` を使いたければ、 ``--settings`` オプションを外し、
+``DJANGO_SETTINGS_MODULE`` を unset してください。
 
 syncdb
 ------
@@ -859,10 +856,8 @@ validate
 デフォルトのオプション
 ======================
 
-.. TBD
-
-Although some subcommands may allow their own custom options, every subcommand
-allows for the following options:
+各々のサブコマンドの独自のオプションの他に、以下の共通のオプションがありま
+す:
 
 --pythonpath
 ------------

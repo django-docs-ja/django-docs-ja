@@ -7,12 +7,11 @@
 
 :revision-up-to: 8961 (1.0)
 
-.. TBD
+このドキュメントでは、モデルの内部クラス ``Meta`` に指定できる
+:ref:`メタデータオプション <meta-options>` について解説しています。
 
-This document explains all the possible :ref:`metadata options <meta-options>`  that you can give your model in its internal
-``class Meta``.
 
-Available ``Meta`` options
+``Meta`` オプション
 ==========================
 
 .. currentmodule:: django.db.models

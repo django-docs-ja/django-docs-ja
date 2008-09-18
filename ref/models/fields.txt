@@ -7,25 +7,24 @@
 
 :revision-up-to: 8961 (1.0)
 
-.. TBD
-
 .. module:: django.db.models.fields
-   :synopsis: Built-in field types.
+   :synopsis: 組み込みフィールド型です。
 
-This document contains all the gory details about all the `field options`_ and
-`field types`_ Django's got to offer.
+このドキュメントは、 Django が提供している `フィールドのオプション <field
+options>`_ や `フィールド型 <field types>`_ の雑多で細かい解説です。
 
 .. seealso:: 
 
-    If the built-in fields don't do the trick, you can easily :ref:`write your
-    own custom model fields <howto-custom-model-fields>`.
+    組み込みのフィールド型で不足なことがあれば、簡単に :ref:`独自のカスタム
+    モデルフィールドを作成できます <howto-custom-model-fields>` 。
 
 .. note::
 
-    Technically, these models are defined in :mod:`django.db.models.fields`, but
-    for convenience they're imported into :mod:`django.db.models`; the standard
-    convention is to use ``from django.db import models`` and refer to fields as
-    ``models.<Foo>Field``.
+    技術的には、モデルフィールドは :mod:`django.db.models.fields` モジュー
+    ルで定義されていますが、便宜上、 :mod:`django.db.models` 内で import さ
+    れています。モデルフィールドを使うときは、慣習的に 
+    ``from django.db import models`` として、 ``models.<Foo>Field`` のよう
+    に参照します。
 
 .. _common-model-field-options:
 .. _Field options:
@@ -313,20 +312,18 @@ Field types
 
 admin ではこのフィールドはチェックボックスとして表現されます。
 
-.. TBD
+.. admonition:: MySQL ユーザへの注意
 
-.. admonition:: MySQL users..
-
-    A boolean field in MySQL is stored as a ``TINYINT`` column with a value of
-    either 0 or 1 (most databases have a proper ``BOOLEAN`` type instead). So,
-    for MySQL, only, when a ``BooleanField`` is retrieved from the database
-    and stored on a model attribute, it will have the values 1 or 0, rather
-    than ``True`` or ``False``. Normally, this shouldn't be a problem, since
-    Python guarantees that ``1 == True`` and ``0 == False`` are both true.
-    Just be careful if you're writing something like ``obj is True`` when
-    ``obj`` is a value from a boolean attribute on a model. If that model was
-    constructed using the ``mysql`` backend, the "``is``" test will fail.
-    Prefer an equality test (using "``==``") in cases like this.
+    MySQL では、ブール型のフィールドの値を ``TINYINT`` カラムに 0 または 1
+    で保存します (ほとんどのデータベースでは、適切な ``BOOLEAN`` 型を使いま
+    す)。従って、 MySQL に限って、 ``BooleanField`` の値をデータベースから
+    取り出してモデルの属性に保存すると、その値は ``True`` や ``False`` では
+    なく 1 や 0 になります。 Python は ``1 == True`` かつ ``0 == False`` を
+    保証しているので、通常、この動作が問題になることはありません。ただし、
+    ``obj is True`` のような式を書いていて、 ``obj`` がモデルのブール型属性
+    を指してるときには注意してください。 ``mysql`` バックエンドを使ってモデ
+    ルを構築すると、この ``is`` テストは常に失敗します。 (``==`` を使って)
+    等値比較を行ってください。
 
 ``CharField``
 -------------
@@ -347,13 +344,12 @@ admin では ``<input type="text">`` (一行の入力フィールド) で表現�
     フィールドの (文字数で表した) 最大長です。 ``max_length`` への制約はデー
     タベースと Django 内の検証の両方のレベルで行われます。
 
-.. TBD
-.. admonition:: MySQL users
+.. admonition:: MySQL ユーザへの注意
 
-    If you are using this field with MySQLdb 1.2.2 and the ``utf8_bin``
-    collation (which is *not* the default), there are some issues to be aware
-    of. Refer to the :ref:`MySQL database notes <mysql-collation>` for
-    details.
+    MySQLdb 1.2.2 でこのフィールドを使っていて、コレーションを (デフォルト
+    設定 *でない*) ``utf8_bin`` に設定していると、いろいろと問題を引き起こ
+    します。詳しくは :ref:`MySQL データベースに関する注意
+    <mysql-collation>` を参照してください。
 
 
 ``CommaSeparatedIntegerField``
@@ -457,42 +453,42 @@ Django 0.96 では、 :attr:`~CharField.max_length` を指定できません。
     埋まらないように)ファイルのアップロード日時に置き換わります。
 
 
-    .. TBD
-    
     .. versionchanged:: 1.0
 
-    This may also be a callable, such as a function, which will be called to
-    obtain the upload path, including the filename. This callable must be able
-    to accept two arguments, and return a Unix-style path (with forward slashes)
-    to be passed along to the storage system. The two arguments that will be
-    passed are:
+    ``upload_to`` には、関数のような呼び出し可能オブジェクトも指定できます。
+    呼び出し可能オブジェクトを指定すると、ファイル名を含むアップロードパス
+    を決めるために呼び出されます。この呼び出し可能オブジェクトを定義する場
+    合、二つの引数をとり、 (スラッシュで始まる) Unix 形式のパスを返さねば
+    なりません。返したパスはストレージシステムで使われます。二つの引数の説
+    明を以下に示します:
     
         ======================  ===============================================
-        Argument                Description                                    
+        引数                    説明
         ======================  ===============================================
-        ``instance``            An instance of the model where the 
-                                ``FileField`` is defined. More specifically,
-                                this is the particular instance where the
-                                current file is being attached.
-                                
-                                In most cases, this object will not have been
-                                saved to the database yet, so if it uses the
-                                default ``AutoField``, *it might not yet have a
-                                value for its primary key field*.
+        ``instance``            ``FileField`` を定義しているモデルのインス
+                                タンスです。もっと正確には、ファイルを添付
+                                しようとしているインスタンスです。ほとんど
+                                の場合、このオブジェクトはまだデータベース
+                                に保存されていないので、デフォルトの
+                                ``AutoField`` を使っている場合、
+                                *まだ主キーフィールドの値が決まっていない*
+                                ことがあります。
     
-        ``filename``            The filename that was originally given to the 
-                                file. This may or may not be taken into account
-                                when determining the final destination path.
+        ``filename``            もともとファイルに付けられていたファイル名
+                                です。最終的なファイルの保存パスを決めると
+                                きに考慮してもよいですし、しなくてもかまい
+                                ません。
         ======================  ===============================================
     
-Also has one optional argument:
+また、オプションの引数を一つとります:
 
 .. attribute:: FileField.storage
 
     .. versionadded:: 1.0
     
-    Optional. A storage object, which handles the storage and retrieval of your
-    files. See :ref:`topics-files` for details on how to provide this object.
+    省略可能です。ストレージの操作と、ファイルの取得を行うストレージオブジェ
+    クトです。このオブジェクトの作り方は、 :ref:`topics-files` を参照してく
+    ださい。
 
 admin では、 ``<input type="file">`` (ファイルアップロードウィジェット)
 で表現されます。
@@ -620,17 +616,15 @@ admin では、 ``<input type="text">`` (一行の入力フィールド) で表�
 :class:`FileField` に似ていますが、アップロードされたオブジェクトが有効なイ
 メージかどうか検証します。二つのオプション引数があります:
 
-.. TBD
-
 .. attribute:: ImageField.height_field
 
-    Name of a model field which will be auto-populated with the height of the
-    image each time the model instance is saved.
+    モデルインスタンスを保存する際に画像の高さを自動的に入れたいモデルフィー
+    ルドの名前です。
 
 .. attribute:: ImageField.width_field
 
-    Name of a model field which will be auto-populated with the width of the
-    image each time the model instance is saved.
+    モデルインスタンスを保存する際に画像の幅を自動的に入れたいモデルフィー
+    ルドの名前です。
     
 :class:`FileField` で使える特殊属性の他に、 :class:`ImageField` で
 :attr:`File.height` および :attr:`File.width` を使えます。
@@ -718,14 +712,12 @@ IP アドレスを 文字列形式で表したもの (例: "192.0.2.30") です�
 長いテキストのためのフィールドです。admin では、 ``<textarea>`` (複数行の入
 力フィールド) で表現されます。
 
-.. TBD
+.. admonition:: MySQL ユーザへの注意
 
-.. admonition:: MySQL users
-
-    If you are using this field with MySQLdb 1.2.1p2 and the ``utf8_bin``
-    collation (which is *not* the default), there are some issues to be aware
-    of. Refer to the :ref:`MySQL database notes <mysql-collation>` for
-    details.
+    MySQLdb 1.2.2 でこのフィールドを使っていて、コレーションを (デフォルト
+    設定 *でない*) ``utf8_bin`` に設定していると、いろいろと問題を引き起こ
+    します。詳しくは :ref:`MySQL データベースに関する注意
+    <mysql-collation>` を参照してください。
 
 ``TimeField``
 -------------
@@ -769,15 +761,17 @@ admin では、 ``<input type="text">`` (一行の入力フィールド) で表�
 
 .. _RelaxNG: http://www.relaxng.org/
 
-Relationship fields
-===================
+.. _Relationship fields:
+
+リレーションフィールド
+=========================
 
 .. module:: django.db.models.fields.related
-   :synopsis: Related field types
+   :synopsis: リレーションを定義するフィールド型です。
    
 .. currentmodule:: django.db.models
 
-Django also defines a set of fields that represent relations.
+Django は、リレーションを表現するためのフィールドも定義しています。
 
 .. _ref-foreignkey:
 
@@ -806,11 +800,10 @@ Django also defines a set of fields that represent relations.
     class Manufacturer(models.Model):
         # ...
 
-.. TBD
-
-Note, however, that this only refers to models in the same ``models.py`` file --
-you cannot use a string to reference a model defined in another application or
-imported from elsewhere.
+とはいえ、この指定方法を使えるのは、対象のモデルが同じ ``models.py`` ファイ
+ル内で定義されている場合だけです。他のアプリケーションで定義されているモデ
+ルや、どこかから import してきたモデルに対しては、文字列による指定はできま
+せん。
 
 .. versionchanged:: 1.0
    他のアプリケーションで定義されているモデルを参照する場合には、アプリケー
@@ -833,26 +826,27 @@ imported from elsewhere.
 
 .. _foreign-key-arguments:
 
-:class:`ForeignKey` accepts an extra set of arguments -- all optional -- that
-define the details of how the relation works.
+:class:`ForeignKey` は、他にもいくつかオプションの引数をとります。これらの
+引数を使うと、リレーションの細かい動作を定義できます。
 
 .. attribute:: ForeignKey.limit_choices_to
 
-    A dictionary of lookup arguments and values (see :ref:`topics-db-queries`)
-    that limit the available admin choices for this object. Use this with
-    functions from the Python ``datetime`` module to limit choices of objects by
-    date. For example::
+    データベースの照合オプション (:ref:`topics-db-queries` 参照) と値を対応
+    づけた辞書で、 admin で選択肢を表示するときに、表示するオブジェクトを絞
+    り込むために使えます。 Python の ``datetime`` モジュールと組み合わせれ
+    ば、表示するオブジェクトを日付に基づいて制限できます。例えば::
 
         limit_choices_to = {'pub_date__lte': datetime.now}
 
-    only allows the choice of related objects with a ``pub_date`` before the
-    current date/time to be chosen.
-     
-    Instead of a dictionary this can also be a :class:`~django.db.models.Q`
-    object (an object with a :meth:`get_sql` method) for more complex queries.
-   
-    ``limit_choices_to`` has no effect on the inline FormSets that are created
-    to display related objects in the admin.
+    のようにすると、 ``pub_date`` が現在の日時より前のオブジェクトだけを選
+    べます。
+
+    辞書の代りに :class:`~django.db.models.Q` オブジェクト (:meth:`get_sql`
+    メソッドを備えたオブジェクト) も指定でき、より複雑なクエリを実現できま
+    す。
+
+    ``limit_choices_to`` は、 admin でリレーション先のオブジェクトを表示す
+    るときに使われるインラインフォームセットには影響を及ぼしません。
    
 .. attribute:: ForeignKey.related_name
 
@@ -876,26 +870,25 @@ define the details of how the relation works.
 .. class:: ManyToManyField(othermodel, [**options])
 
 
-.. TBD
+多対多のリレーションです。必須の固定引数として、リレーション先のモデルを表
+すクラスをとります。 ``ManyToManyField`` の引数は、 :ref:`再帰的リレーショ
+ン <recursive-relationships>` や :ref:`遅延型のリレーション定義
+<lazy-relationships>` に関するオプションを含め、  :class:`ForeignKey` と
+全く同じです。
 
-A many-to-many relationship. Requires a positional argument: the class to which
-the model is related. This works exactly the same as it does for
-:class:`ForeignKey`, including all the options regarding :ref:`recursive
-<recursive-relationships>` and :ref:`lazy <lazy-relationships>` relationships.
-
-背後では、 Django は中間の join テーブルを生成して、多対多のリレーション
-を表現します。By default, this table name is generated using the
-names of the two tables being joined. Since some databases don't support table
-names above a certain length (often 32 characters), these table names will be
-automatically truncated to 32 characters and a uniqueness hash will be used.
-This means you might see table names like ``author_books_9cdf4``; this is
-perfectly normal. You can manually provide the name of the join table using
-the :attr:`~ManyToManyField.db_table` option.
+背後では、 Django は中間の結合テーブル (join table) を生成して、多対多のリ
+レーションを表現します。デフォルトの設定では、テーブル名は結合対象の二つの
+テーブル名をつないで作ります。データベースによっては (例えば 32 文字といっ
+た) テーブル名の長さ制限があるので、テーブル名が 32 文字を越える場合には、
+長さを自動的に切り詰めて、一意な名前を付けます。そのため、
+``author_books_9cdf4`` のような名前のテーブルが生成されることがあります。こ
+れは仕様通りの動作です。結合テーブルの名前は、
+:attr:`~ManyToManyField.db_table` オプションで手動指定できます。
 
 .. _manytomany-arguments:
 
-:class:`ManyToManyField` accepts an extra set of arguments -- all optional --
-that control how the relationship functions.
+:class:`ManyToManyField` は、他にもいくつかオプションの引数をとります。これ
+らの引数を使うと、リレーションの細かい動作を定義できます。
 
 .. attribute:: ManyToManyField.related_name
 
@@ -938,28 +931,27 @@ that control how the relationship functions.
 ``OneToOneField``
 -----------------
 
-.. TBD
-
 .. class:: OneToOneField(othermodel, [parent_link=False, **options])
 
-A one-to-one relationship. Conceptually, this is similar to a
-:class:`ForeignKey` with :attr:`unique=True <Field.unique>`, but the
-"reverse" side of the relation will directly return a single object.
+一対一のリレーションです。一対一のリレーションは、概念的には
+:attr:`unique=True <Field.unique>` であるような :class:`ForeignKey` に似て
+いますが、リレーションの「逆」を辿ったときに、単一のオブジェクトを直接返す
+点が違います。
 
-This is most useful as the primary key of a model which "extends"
-another model in some way; :ref:`multi-table-inheritance` is
-implemented by adding an implicit one-to-one relation from the child
-model to the parent model, for example.
+最も ``OneToOneField`` が便利な局面は、他のモデルを何らかの形で拡張するとき
+のモデルの主キーとして使う場合です。例えば、 :ref:`multi-table-inheritance`
+は、一対一のリレーションを子のモデルから親のモデルに自動的に張ることで実現
+しています。
 
-One positional argument is required: the class to which the model will be
-related. This works exactly the same as it does for :class:`ForeignKey`,
-including all the options regarding :ref:`recursive <recursive-relationships>`
-and :ref:`lazy <lazy-relationships>` relationships.
+必須の固定引数として、リレーション先のモデルを表すクラスをとります。
+引数は、 :ref:`再帰的リレーション <recursive-relationships>` や :ref:`遅延
+型のリレーション定義<lazy-relationships>` に関するオプションを含め、
+:class:`ForeignKey` と全く同じです。
 
 .. _onetoone-arguments:
 
-Additionally, ``OneToOneField`` accepts all of the extra arguments
-accepted by :class:`ForeignKey`, plus one extra argument:
+``OneToOneField`` は、 :class:`ForeignKey` で指定できる引数に加えて、以下の
+引数を指定できます:
 
 .. attribute:: OneToOneField.parent_link
 

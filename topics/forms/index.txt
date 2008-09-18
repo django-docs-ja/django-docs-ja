@@ -89,12 +89,12 @@ Django のデータベースモデルによく似た方法でフォームのフ�
 Django のモデルを直接追加したり編集したりしたいときに、モデルと重複する記述
 をせずにすみます。
 
-.. TBD
+.. _Using a form in a view:
 
-Using a form in a view
-----------------------
+ビュー内でフォームを使う
+-----------------------------
 
-The standard pattern for processing a form in a view looks like this::
+フォームをビュー内で処理するときの標準的なパターンを以下に示します::
 
    def contact(request):
        if request.method == 'POST': # If the form has been submitted...
@@ -110,42 +110,46 @@ The standard pattern for processing a form in a view looks like this::
            'form': form,
        })
 
+このパターンには、 3 つのコードパスがあります:
 
-There are three code paths here:
-
-    1. If the form has not been submitted, an unbound instance of ContactForm is
-       created and passed to the template.
-    2. If the form has been submitted, a bound instance of the form is created
-       using ``request.POST``. If the submitted data is valid, it is processed
-       and the user is re-directed to a "thanks" page.
-    3. If the form has been submitted but is invalid, the bound form instance is
-       passed on to the template.
+    1. フォームデータが提出されていなければ、非束縛の ``ContactForm`` イン
+       スタンスを生成して、テンプレートに渡します。
+    2. フォームデータが提出されていれば、 ``request.POST`` を使って束縛フォー
+       ムを生成します。入力データのバリデーションに成功したら、フォームデー
+       タを処理して、ユーザを「ありがとう」ページにリダイレクトします。
+    3. フォームデータが提出され、バリデーションに成功しなければ、束縛フォー
+       ムインスタンスをテンプレートに渡します。
 
 .. versionchanged:: 1.0
-    The ``cleaned_data`` attribute was called ``clean_data`` in earlier releases.
+    ``cleaned_data`` 属性は、以前のリリースでは ``clean_data`` という名前で
+    した。
 
-The distinction between **bound** and **unbound** forms is important. An unbound
-form does not have any data associated with it; when rendered to the user, it
-will be empty or will contain default values. A bound form does have submitted
-data, and hence can be used to tell if that data is valid. If an invalid bound
-form is rendered it can include inline error messages telling the user where
-they went wrong.
 
-See :ref:`ref-forms-api-bound-unbound` for further information on the
-differences between bound and unbound forms.
+**束縛** フォームと **非束縛** フォームの違いはとても重要です。非束縛フォー
+ムには、何らデータが結び付いていません。非束縛フォームをレンダしてユーザに
+呈示すると、フォームには空の値かデフォルトの値が表示されます。束縛フォーム
+にはユーザから提出されたデータが入るので、そのデータが有効であるかどうか調
+べられます。入力データが無効な束縛フォームをレンダすると、入力データの何が
+おかしいのかを示すエラーメッセージが各行に出力されます。
 
-Processing the data from a form
--------------------------------
+束縛フォームと非束縛フォームの違いについてもっと詳しく知りたければ、
+:ref:`ref-forms-api-bound-unbound` を参照してください。
 
-Once ``is_valid()`` returns ``True``, you can process the form submission safe
-in the knowledge that it conforms to the validation rules defined by your form.
-While you could access ``request.POST`` directly at this point, it is better to
-access ``form.cleaned_data``. This data has not only been validated but will
-also be converted in to the relevant Python types for you. In the above example,
-``cc_myself`` will be a boolean value. Likewise, fields such as ``IntegerField``
-and ``FloatField`` convert values to a Python int and float respectively.
+.. _Processing the data from a form:
 
-Extending the above example, here's how the form data could be processed::
+フォームから入力されたデータを処理する
+----------------------------------------
+
+フォームの ``is_valid()`` が ``True`` を返すなら、入力データはフォームに設
+定しておいたバリデーション条件を満たしているので、提出されたフォームを安全
+に処理できます。この時点でも、 ``request.POST`` には直接アクセスできますが、
+``form.cleaned_data`` にアクセスする方がよいでしょう。
+``form.cleaned_data`` 内のデータはバリデーション済みであるだけでなく、適切
+な Python の型に変換されているからです。上の例では、 ``cc_myself`` はブール
+型の値に変換されています。同様に、 ``IntegerField`` や ``FloatField`` は、
+それぞれ Python の整数型や浮動小数型の値に変換されています。
+
+上の例を拡張すると、フォームデータの処理は以下のように書けます::
 
     if form.is_valid():
         subject = form.cleaned_data['subject']
@@ -161,25 +165,28 @@ Extending the above example, here's how the form data could be processed::
         send_mail(subject, message, sender, recipients)
         return HttpResponseRedirect('/thanks/') # Redirect after POST
 
-For more on sending e-mail from Django, see :ref:`topics-email`.
+この例ではメールを送信しています。Django からメールを送信する方法の詳細は
+:ref:`topics-email` を参照してください。
 
-Displaying a form using a template
-----------------------------------
+.. _Displaying a form using a template:
 
-Forms are designed to work with the Django template language. In the above
-example, we passed our ``ContactForm`` instance to the template using the
-context variable ``form``. Here's a simple example template::
+テンプレートを使ってフォームを表示する
+----------------------------------------
+
+フォームは Django のテンプレート言語を使うように設計されています。上の例で
+は、コンテキスト変数 ``form`` を使ってテンプレートに ``ContactForm`` インス
+タンスを渡しています。簡単なテンプレートの例を示します::
 
     <form action="/contact/" method="POST">
     {{ form.as_p }}
     <input type="submit" value="Submit">
     </form>
 
-The form only outputs its own fields; it is up to you to provide the surrounding
-``<form>`` tags and the submit button.
+フォームインスタンスはフィールドのマークアップだけを出力します。前後の
+``<form>`` タグや、 submit ボタンは自分で追加します。
 
-``form.as_p`` will output the form with each form field and accompanying label
-wrapped in a paragraph. Here's the output for our example template::
+``form.as_p`` を参照すると、各フィールドとラベルをパラグラフ (``<p>``) タグ
+で囲って出力します。上のテンプレートの例を出力すると、以下のようになります::
 
    <form action="/contact/" method="POST">
    <p><label for="id_subject">Subject:</label>
@@ -192,15 +199,16 @@ wrapped in a paragraph. Here's the output for our example template::
        <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>
    <input type="submit" value="Submit">
    </form>
-   
-Note that each form field has an ID attribute set to ``id_<field-name>``, which
-is referenced by the accompanying label tag. This is important for ensuring
-forms are accessible to assistive technology such as screen reader software. You
-can also :ref:`customize the way in which labels and ids are generated
-<ref-forms-api-configuring-label>`.
 
-You can also use ``form.as_table`` to output table rows (you'll need to provide
-your own ``<table>`` tags) and ``form.as_ul`` to output list items.
+各フォームフィールドには、 ``id_<field-name>`` の形式で id 属性が付加されて
+おり、すぐそばのラベルで参照されています。これは、画面読み上げソフトウェア
+のような入出力補助技術でフォームを扱うために重要な仕組みです。
+:ref:`ラベルや idの出力方法はカスタマイズできます
+<ref-forms-api-configuring-label>` 。
+
+``form.as_table`` を使うと、各フィールドがテーブルの各行になるように出力で
+きます (自分で ``<table>`` タグで囲む必要があります)。また、
+``form.as_ul`` を使えば、リストとして出力できます。
 
 フォームテンプレートのカスタマイズ
 -----------------------------------

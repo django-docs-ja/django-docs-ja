@@ -55,8 +55,6 @@ import パスになるよう、自分の環境に合わせて置き換えて下�
 :ref:`DJANGO_SETTINGS_MODULE <django-settings-module>` を渡して、
 mod_python にどこに設定ファイルがあるのか教えます。
 
-.. TBD
-
 .. versionadded:: 1.0
     ``PythonOption django.root ...`` が新たに登場しました。
 

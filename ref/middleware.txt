@@ -9,11 +9,10 @@
 .. module:: django.middleware
    :synopsis: Django の組み込みミドルウェアクラスです。
 
-.. TBD
-
-This document explains all middleware components that come with Django. For
-information on how how to use them and how to write your own middleware, see the
-:ref:`middleware usage guide <topics-http-middleware>`.
+このドキュメントでは、 Django に付属している全ミドルウェアコンポーネントに
+ついて解説しています。ミドルウェアの使い方や自作のミドルウェアの書き方はm
+:ref:`ミドルウェアの使い方ガイド <topics-http-middleware>` を参照してくださ
+い。
 
 利用できるミドルウェア
 ======================

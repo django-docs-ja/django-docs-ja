@@ -1,14 +1,12 @@
 .. _ref-files-index:
 
-File handling reference
-=======================
+ファイル操作 API リファレンス
+================================
 
 :revision-up-to: 8961 (1.0)
 
-.. TBD
-
 .. module:: django.core.files
-   :synopsis: File handling and storage
+   :synopsis: ファイル操作とストレージの API です。
 
 .. toctree::
    :maxdepth: 1

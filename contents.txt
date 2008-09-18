@@ -8,7 +8,7 @@ Django ドキュメント 目次
 
 .. toctree::
    :maxdepth: 2
-   
+
    intro/index
    topics/index
    howto/index
