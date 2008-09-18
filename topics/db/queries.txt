@@ -272,20 +272,21 @@ Django はエラーを出します。
     >>> q = q.exclude(body_text__icontains="food")
     >>> print q
 
-.. TBD
-    
-Though this looks like three database hits, in fact it hits the database only
-once, at the last line (``print q``). In general, the results of a ``QuerySet``
-aren't fetched from the database until you "ask" for them. When you do, the
-``QuerySet`` is *evaluated* by accessing the database. For more details on
-exactly when evaluation takes place, see :ref:`when-querysets-are-evaluated`.
+この例では、データベースに 3 度アクセスするように見えますが、実際には一度だ
+け、最後の行のとき (``print q``) しかアクセスしません。一般に、
+``QuerySet`` の結果は、その内容を「調べる」まで、データベースから取り出され
+ません。 ``QuerySet`` は、クエリの内容を調べたときにはじめて *値評価* され
+るのです。値評価がいつ行われているかは、
+:ref:`when-querysets-are-evaluated` で詳しく説明しています。
 
-Other QuerySet methods
-~~~~~~~~~~~~~~~~~~~~~~
+その他のクエリセットメソッド
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Most of the time you'll use ``all()``, ``filter()`` and ``exclude()`` when you
-need to look up objects from the database. However, that's far from all there is; see the :ref:`QuerySet API Reference <queryset-api>` for a complete list
-of all the various ``QuerySet`` methods.
+ほとんどの場合、データベース上のオブジェクトを照合するには、 ``all()``,
+``filter()``, ``exclude()`` メソッドで事足ります。とはいえ、クエリセットが
+サポートしているメソッドはもっとたくさんあります。クエリセットメソッドの詳
+細な説明は、 :ref:`クエリセット API リファレンス <queryset-api>` を参照して
+ください。
 
 .. _limiting-querysets:
 .. _Limiting QuerySets:
@@ -362,62 +363,58 @@ of all the various ``QuerySet`` methods.
 ファレンスは :ref:`フィールド照合リファレンス <field-lookups>` を参照してく
 ださい。ここでは、よく使う照合タイプをいくつか示します:
 
-.. TBD
-
     :lookup:`exact`
-        An "exact" match. For example::
+        「厳密一致」です。例えば::
         
             >>> Entry.objects.get(headline__exact="Man bites dog")
 
-        World generate SQL along these lines:
+        は、以下のような SQL を生成します:
         
         .. code-block:: sql
 
             SELECT ... WHERE headline = 'Man bits dog';
             
-        If you don't provide a lookup type -- that is, if your keyword argument
-        doesn't contain a double underscore -- the lookup type is assumed to be
-        ``exact``.
+        照合タイプを指定しなかった場合、つまり二重アンダースコアの入ったキー
+	ワード引数を使わないかぎり、照合条件は ``exact`` とみなされます。
 
-        For example, the following two statements are equivalent::
+        例えば、以下の二つの文は同じ意味です::
 
             >>> Blog.objects.get(id__exact=14)  # Explicit form
             >>> Blog.objects.get(id=14)         # __exact is implied
 
-        This is for convenience, because ``exact`` lookups are the common case.
+        ``exact`` はよく使われるため、便宜的にこのような仕様にしています。
         
     :lookup:`iexact`
-        A case-insensitive match. So, the query::
+        大小文字を区別しない一致です。以下のクエリ::
         
             >>> Blog.objects.get(name__iexact="beatles blog")
             
-        Would match a ``Blog`` titled "Beatles Blog", "beatles blog", or even
-        "BeAtlES blOG".
+        は、 "Beatles Blog", "beatles blog", "BeAtlES blOG" といったタイト
+        ルの ``Blog`` オブジェクトにマッチします。
     
     :lookup:`contains`
-        Case-sensitive containment test. For example::
+        大小文字を区別する部分一致テストです。以下のクエリ::
 
             Entry.objects.get(headline__contains='Lennon')
 
-        Roughly translates to this SQL:
+        は、おおざっぱにいって以下の SQL に変換されます:
         
         .. code-block:: sql
 
             SELECT ... WHERE headline LIKE '%Lennon%';
 
-        Note this will match the headline ``'Today Lennon honored'`` but not
-        ``'today lennon honored'``.
+        ``'Today Lennon honored'`` には一致しますが、 
+	``'today lennon honored'`` には一致しないので注意してください。
         
-        There's also a case-insensitive version, :lookup:`icontains`.
+        大小文字を区別しない :lookup:`icontains` もあります。
         
     :lookup:`startswith`, :lookup:`endswith`
-        Starts-with and ends-with search, respectively. There are also
-        case-insensitive versions called :lookup:`istartswith` and
-        :lookup:`iendswith`.
-    
-Again, this only scratches the surface. A complete reference can be found in the
-:ref:`field lookup reference <field-lookups>`.
+        それぞれ、前方一致と後方一致です。大小文字を区別しない 
+        :lookup:`istartswith` や :lookup:`iendswith` もあります。
 
+ここに挙げたのはほんの一部です。全ての照合タイプの解説は
+:ref:`フィールド照合タイプのリファレンス <field-lookups>` を参照してくださ
+い。
 
 .. _Lookups that span relationships:
 
@@ -445,26 +442,24 @@ Django では、背後で自動的に SQL ``JOIN`` を処理し、照合の際�
 
     >>> Blog.objects.filter(entry__headline__contains='Lennon')
 
-.. TBD
-
-If you are filtering across multiple relationships and one of the intermediate
-models doesn't have a value that meets the filter condition, Django will treat
-it as if there is an empty (all values are ``NULL``), but valid, object there.
-All this means is that no error will be raised. For example, in this filter::
+複数のリレーションをまたいでフィルタを行っていて、中間のモデルにフィルタ条
+件に合致する値が存在しないと、 Django はその値が空である (``NULL`` が入って
+いる) だけの有意なオブジェクトとして扱います。つまり、エラーを送出しません。
+例えば、以下のフィルタを考えましょう::
 
     Blog.objects.filter(entry__author__name='Lennon')
 
-(if there was a related ``Author`` model), if there was no ``author``
-associated with an entry, it would be treated as if there was also no ``name``
-attached, rather than raising an error because of the missing ``author``.
-Usually this is exactly what you want to have happen. The only case where it
-might be confusing is if you are using ``isnull``. Thus::
+(``Author`` モデルは存在するものとします) ``entry`` の ``author`` を空にし
+ていると、 Django は ``author`` が存在しないために ``name`` を辿れませんが、
+エラーは送出せず、あたかも ``name`` も空であるかのように扱います。たいてい
+は、この仕様で期待通りに動きますが、 ``isnull`` を使うと、少し混乱をきたし
+ます。すなわち::
 
     Blog.objects.filter(entry__author__name__isnull=True)
 
-will return ``Blog`` objects that have an empty ``name`` on the ``author`` and
-also those which have an empty ``author`` on the ``entry``. If you don't want
-those latter objects, you could write::
+は、 ``author`` の ``name`` が空の ``Blog`` だけでなく、 ``entry`` の
+``author`` が空の ``Blog`` も返してしまうのです。後者のオブジェクトを返して
+欲しくないのなら、以下のように書いてください::
 
     Blog.objetcs.filter(entry__author__isnull=False,
             entry__author__name__isnull=True)
@@ -729,7 +724,6 @@ Q オブジェクトを使った複雑な照合
 ソッドはオブジェクトをただちに削除し、戻り値を返しません。例えば::
 
     e.delete()
-
 複数のオブジェクトの一斉削除も可能です。 ``QuerySet`` には ``delete()``
 メソッドがあり、 ``QuerySet`` の全てのメンバを削除します。
 
@@ -738,16 +732,13 @@ Q オブジェクトを使った複雑な照合
 
     Entry.objects.filter(pub_date__year=2005).delete()
 
-.. TBD
-
-Keep in mind that this will, whenever possible, be executed purely in
-SQL, and so the ``delete()`` methods of individual object instances
-will not necessarily be called during the process. If you've provided
-a custom ``delete()`` method on a model class and want to ensure that
-it is called, you will need to "manually" delete instances of that
-model (e.g., by iterating over a ``QuerySet`` and calling ``delete()``
-on each object individually) rather than using the bulk ``delete()``
-method of a ``QuerySet``.
+忘れてならないのは、この処理はできる限り SQL レベルで行われるため、
+``delete()`` メソッドが全てのインスタンスの ``delete()`` メソッドを呼ぶとは
+限らないということです。モデルクラス上で ``delete()`` をカスタマイズしてい
+て、オブジェクトを削除するときに呼び出したいのなら、 ``QuerySet`` の
+``delete()`` メソッドで一括削除するのではなく、直接(``QuerySet`` の各要素を
+取り出して逐次 ``delete()`` を呼ぶなどして) 「手動で」インスタンスを削除せ
+ねばなりません。
 
 Django は、オブジェクトを削除する際に、SQLでいう ``ON DELETE CASCADE`` 制約
 をエミュレートします。すなわち、削除対象のオブジェクトを指すような外部キー
