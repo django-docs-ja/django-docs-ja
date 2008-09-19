@@ -187,15 +187,13 @@
 なくなるような羽目に陥らないように、デフォルトマネジャの選択には細心の注意
 を払ってください。
 
-.. TBD
+マネジャを使ってリレーション先のオブジェクトにアクセスする
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Using managers for related object access
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-By default, Django uses a "bare" (i.e. default) manager when accessing related
-objects (i.e. ``choice.poll``). If this default isn't appropriate for your
-default manager, you can force Django to use a custom manager for related object
-attributes by giving it a ``use_for_related_fields`` property::
+デフォルトでは、 Django は「素の」マネジャを使って (``choice.poll`` のよう
+な)リレーション先のオブジェクトにアクセスします。リレーションを扱うときに
+別のマネジャを使いたいのなら、 ``use_for_related_fields`` プロパティの設定
+されたカスタムマネジャを定義してください::
 
     class MyManager(models.Manager)::
         use_for_related_fields = True
@@ -203,6 +201,8 @@ attributes by giving it a ``use_for_related_fields`` property::
         
 
         ...
+
+.. TBD
 
 Custom managers and model inheritance
 -------------------------------------
