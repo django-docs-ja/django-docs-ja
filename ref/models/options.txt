@@ -34,29 +34,26 @@
     db_table = 'music_album'
 
 
-.. TBD
-
 .. _table-names:
 
-Table names
+テーブル名
 ~~~~~~~~~~~
 
-To save you time, Django automatically derives the name of the database table
-from the name of your model class and the app that contains it. A model's
-database table name is constructed by joining the model's "app label" -- the
-name you used in ``manage.py startapp`` -- to the model's class name, with an
-underscore between them.
+手間を省くため、 Django はモデルクラスやアプリケーションの名前を元にデータ
+ベーステーブルの名前を導出します。モデルのデータベーステーブル名は、モデル
+の「アプリケーションラベル (app label)」、つまり ``manage.py startapp`` で
+指定した名前と、モデルのクラス名をアンダースコアで結んで生成します。
 
-For example, if you have an app ``bookstore`` (as created by
-``manage.py startapp bookstore``), a model defined as ``class Book`` will have
-a database table named ``bookstore_book``.
+例えば、 (``manage.py startapp bookstore`` で作成した) ``bookstore`` という
+アプリケーションの中に ``class Book`` で定義したモデルがあった場合そのデー
+タベーステーブルの名前は ``bookstore_book`` です。
 
-To override the database table name, use the ``db_table`` parameter in
-``class Meta``.
+データベーステーブル名をオーバライドしたければ、 ``class Meta`` に
+``db_table`` パラメタを設定します。
 
-If your database table name is an SQL reserved word, or contains characters that
-aren't allowed in Python variable names -- notably, the hyphen -- that's OK.
-Django quotes column and table names behind the scenes.
+データベーステーブル名が SQL の予約語と一致している場合や、ハイフンのように
+Python の変数名として扱えない文字を含んでいても問題ありません。 Django はカ
+ラムとテーブル名を舞台裏でクオート処理するからです。
 
 ``db_tablespace``
 -----------------

@@ -9,58 +9,58 @@ redirects アプリケーション
 .. module:: django.contrib.redirects
    :synopsis: リダイレクションを管理するためのフレームワークです。
 
-Django にはオプションとして redirects アプリケーションがついてきます．この
-アプリケーションを使うと，リダイレクト先をデータベースに保存し，適切なリダ
-イレクト処理をおこなってくれます．
+Django にはオプションとして redirects アプリケーションがついてきます。この
+アプリケーションを使うと、リダイレクト先をデータベースに保存し、適切なリダ
+イレクト処理をおこなってくれます。
 
 .. Installation:
 
 インストール
 ============
 
-redirects アプリケーションをインストールするには，以下の 3 ステップの操作を
+redirects アプリケーションをインストールするには、以下の 3 ステップの操作を
 行います:
 
     1. :setting:`INSTALLED_APPS` に ``"django.contrib.redirects"`` を追加し
-       ます．
+       ます。
     2. :setting:`MIDDLEWARE_CLASSES` に
        ``"django.contrib.redirects.middleware.RedirectFallbackMiddleware"``
-       を追加します．
-    3. :djadmin:`manage.py syncdb <syncdb>` を実行します．
+       を追加します。
+    3. :djadmin:`manage.py syncdb <syncdb>` を実行します。
 
 .. How it works:
 
 動作の仕組み
 ============
 
-``manage.py syncdb`` を実行すると，データベースに ``django_redirects`` とい
-う名のテーブルを作成します．このテーブルは ``site_id``, ``old_path`` および
-``new_path`` というフィールドを持った検索テーブルです．
+``manage.py syncdb`` を実行すると、データベースに ``django_redirects`` とい
+う名のテーブルを作成します。このテーブルは ``site_id``, ``old_path`` および
+``new_path`` というフィールドを持った検索テーブルです。
 
-全ての処理は ``RedirectFallbackMiddleware`` で行われます． Django アプリケー
-ション内で 404 エラーが送出されると，このミドルウェアは最後の手段として
-redirects データベースにリクエスト URL がないか調べます．特に，
-:setting:`SITE_ID` に対応するサイト ID を持った ``old_path`` を探します．
+全ての処理は ``RedirectFallbackMiddleware`` で行われます。 Django アプリケー
+ション内で 404 エラーが送出されると、このミドルウェアは最後の手段として
+redirects データベースにリクエスト URL がないか調べます。特に、
+:setting:`SITE_ID` に対応するサイト ID を持った ``old_path`` を探します。
 
-    * 一致するエントリが見つかり，かつ ``new_path`` が空でなければ
-      ``new_path`` にリダイレクトします．
-    * 一致するエントリは見つかったが ``new_path`` が空の場合には， 410
-      ("Gone") HTTP ヘッダと空の (コンテンツのない) 応答を送信します．
-    * 一致するエントリがなければ，リクエストを通常通りに処理します．
+    * 一致するエントリが見つかり、かつ ``new_path`` が空でなければ
+      ``new_path`` にリダイレクトします。
+    * 一致するエントリは見つかったが ``new_path`` が空の場合には、 410
+      ("Gone") HTTP ヘッダと空の (コンテンツのない) 応答を送信します。
+    * 一致するエントリがなければ、リクエストを通常通りに処理します。
 
-ミドルウェアが起動されるのは 404 エラーに対してだけで， 500 やその他の状態
-コードでは起動されません．
+ミドルウェアが起動されるのは 404 エラーに対してだけで、 500 やその他の状態
+コードでは起動されません。
 
-:setting:`MIDDLEWARE_CLASSES` の設定順には注意が必要です．一般に，
-``RedirectFallbackMiddleware`` はリクエスト処理の最終手段なので，リストの末
-尾に指定します．
+:setting:`MIDDLEWARE_CLASSES` の設定順には注意が必要です。一般に、
+``RedirectFallbackMiddleware`` はリクエスト処理の最終手段なので、リストの末
+尾に指定します。
 
 ミドルウェアについての詳しい情報は 
-`ミドルウェアのドキュメント <topics-http-middleware>` を参照してください．
+`ミドルウェアのドキュメント <topics-http-middleware>` を参照してください。
 
 .. _How to add, change and delete redirects:
 
-リダイレクトの追加，変更，削除
+リダイレクトの追加、変更、削除
 ==============================
 
 .. _Via the admin interface:
@@ -68,9 +68,9 @@ redirects データベースにリクエスト URL がないか調べます．�
 admin インタフェースから
 ------------------------
 
-Django の自動 admin インタフェースを有効にしていれば， "Redirects" という名
-前のセクションが admin のインデクスページに表示されているはずです．Django
-の他のオブジェクトと同じように編集してください．
+Django の自動 admin インタフェースを有効にしていれば、 "Redirects" という名
+前のセクションが admin のインデクスページに表示されているはずです。Django
+の他のオブジェクトと同じように編集してください。
 
 .. Via the Python API:
 
@@ -82,6 +82,6 @@ Python API から
     リダイレクトは `django/contrib/redirects/models.py`_ で定義されている標
     準の :ref:`Django モデル <topics-db-models>` で表現されています。
     :ref:`Django のデータベース API <topics-db-queries>` を使えば、リダイレ
-    クトオブジェクトにアクセスできます．
+    クトオブジェクトにアクセスできます。
 
 .. _django/contrib/redirects/models.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/redirects/models.py

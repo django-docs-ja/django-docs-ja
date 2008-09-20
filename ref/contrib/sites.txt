@@ -10,51 +10,51 @@
    :synopsis: 複数のウェブサイトを一つのデータベースと Django プロジェクト
               で操作できるようにします。
 
-Django にはオプションとして使える "sites" フレームワークが付属しています．
+Django にはオプションとして使える "sites" フレームワークが付属しています。
 "sites" はオブジェクトや機能を特定の Web サイトに関連付けるためのフックであ
-ると同時に， Django で作成したサイトのドメイン名と「分かりやすい名前
-verbose name」を保存しています．
+ると同時に、 Django で作成したサイトのドメイン名と「分かりやすい名前
+verbose name」を保存しています。
 
-一つの Django で複数のサイトを管理していて，サイト間に違いを持たせたい場合
-に使ってください．
+一つの Django で複数のサイトを管理していて、サイト間に違いを持たせたい場合
+に使ってください。
 
-sites フレームワークは，簡単なモデルだけでできています:
+sites フレームワークは、簡単なモデルだけでできています:
 
 .. class:: django.contrib.sites.models.Site
 
-モデルには， :attr:`~django.contrib.sites.models.Site.domain` と
+モデルには、 :attr:`~django.contrib.sites.models.Site.domain` と
 :attr:`~django.contrib.sites.models.Site.name` という二つのフィールドがあり
 ます。あるサイトの設定ファイルの  :setting:`SITE_ID` 設定は、そのサイトを表
 す :class:`~django.contrib.sites.models.Site` オブジェクトのデータベース上
-での ID を指定します．
+での ID を指定します。
 
-site の使い道は自由ですが， Django では簡単な呼び出し規約で自動的に sites
-を使える方法を 2 種類提供しています．
+site の使い道は自由ですが、 Django では簡単な呼び出し規約で自動的に sites
+を使える方法を 2 種類提供しています。
 
 .. _Example usage:
 
 使用例
 ======
 
-どういう状況で sites を使うのでしょうか？例を挙げて説明しましょう．
+どういう状況で sites を使うのでしょうか？例を挙げて説明しましょう。
 
 .. _Associating content with multiple sites:
 
 コンテンツを複数のサイトに関連づける
 ------------------------------------
 
-LJWorld.com_ と Lawrence.com_ は同じニュース組織，Kansaz 州 Lawrence にある
-Lawrence Journal-World newspaper が管理しています． LJWorld.com はニュース
-に， Lawrence.com は地域の娯楽情報にフォーカスしていますが，編集者は 
-*両方の* サイトで同じニュースを公開したいと考える場合もあります．
+LJWorld.com_ と Lawrence.com_ は同じニュース組織、Kansaz 州 Lawrence にある
+Lawrence Journal-World newspaper が管理しています。 LJWorld.com はニュース
+に、 Lawrence.com は地域の娯楽情報にフォーカスしていますが、編集者は 
+*両方の* サイトで同じニュースを公開したいと考える場合もあります。
 
-この問題を何も考えずに処理するなら，サイト構築担当者に対して， LJWorld.com
-と Lawrence.com に同じ記事を出すよう 2 度依頼することになります．しかしこれ
-はサイト構築担当にとって非効率的ですし，同じ記事のコピーが複数データベース
-に入ることになってしまいます．
+この問題を何も考えずに処理するなら、サイト構築担当者に対して、 LJWorld.com
+と Lawrence.com に同じ記事を出すよう 2 度依頼することになります。しかしこれ
+はサイト構築担当にとって非効率的ですし、同じ記事のコピーが複数データベース
+に入ることになってしまいます。
 
-もっとましで簡単な方法ががあります: どちらのサイトも同じデータベースを使い，
-1 つの記事を複数のサイトに関連づけるというものです．この関係は， Django モ
+もっとましで簡単な方法ががあります: どちらのサイトも同じデータベースを使い、
+1 つの記事を複数のサイトに関連づけるというものです。この関係は、 Django モ
 デルの用語で言えば ``Article`` モデルの
 :class:`~django.db.models.ManyToManyField` で表現されます::
 
@@ -66,16 +66,16 @@ Lawrence Journal-World newspaper が管理しています． LJWorld.com はニ�
         # ...
         sites = models.ManyToManyField(Site)
 
-このモデルは，以下のようにいくつかの点で優れています:
+このモデルは、以下のようにいくつかの点で優れています:
 
     * site 構築担当が 1 つのインタフェース (Django admin サイト) で両方のサ
-      イトにある全てのコンテンツを編集できます．
+      イトにある全てのコンテンツを編集できます。
 
-    * 同じ記事をデータベース上に何度も書き込まなくて済み，一つのレコードと
-      して保存できます．
+    * 同じ記事をデータベース上に何度も書き込まなくて済み、一つのレコードと
+      して保存できます。
 
-    * サイト開発者は同じビューコードを両方のサイトで使えます．ビューコード
-      では，リクエストされている記事が現在のサイト用のものかチェックします．
+    * サイト開発者は同じビューコードを両方のサイトで使えます。ビューコード
+      では、リクエストされている記事が現在のサイト用のものかチェックします。
       例えば以下のようなコードになるでしょう::
 
           from django.conf import settings
@@ -97,9 +97,9 @@ Lawrence Journal-World newspaper が管理しています． LJWorld.com はニ�
 
 あるモデルを :class:`~django.db.models.fields.related.ForeignKey` を使って
 他対一の関係で :class:`~django.contrib.sites.models.Site` に関連づけても構
-いません．
+いません。
 
-例えば，ある記事をあるサイトだけで表示できるようにしたければ，モデルは以下
+例えば、ある記事をあるサイトだけで表示できるようにしたければ、モデルは以下
 のように書きます::
 
     from django.db import models
@@ -110,15 +110,15 @@ Lawrence Journal-World newspaper が管理しています． LJWorld.com はニ�
         # ...
         site = models.ForeignKey(Site)
 
-この方法でも，前節で述べたのと同じような恩恵を得られます．
+この方法でも、前節で述べたのと同じような恩恵を得られます。
 
 .. _Hooking into the current site from views:
 
 ビュー内で現在のサイトをフックに使う
 ------------------------------------
 
-低水準では， Django ビューの中で sites フレームワークを使って，ビューを呼び
-出しているサイトごとに固有の処理を実行できます．
+低水準では、 Django ビューの中で sites フレームワークを使って、ビューを呼び
+出しているサイトごとに固有の処理を実行できます。
 
 例えば::
 
@@ -130,9 +130,9 @@ Lawrence Journal-World newspaper が管理しています． LJWorld.com はニ�
         else:
             # Do something else.
 
-もちろん，上のようにサイト ID をハードコードするのは見栄えよくありません．
-この種のハードコード化は，すぐに実行しなければならないハックのときにはベス
-トでしょう．同じことをよりクリーンに実現するには，サイトのドメイン名をチェッ
+もちろん、上のようにサイト ID をハードコードするのは見栄えよくありません。
+この種のハードコード化は、すぐに実行しなければならないハックのときにはベス
+トでしょう。同じことをよりクリーンに実現するには、サイトのドメイン名をチェッ
 クします::
 
     from django.conf import settings
@@ -147,8 +147,8 @@ Lawrence Journal-World newspaper が管理しています． LJWorld.com はニ�
 
 :setting:`settings.SITE_ID <SITE_ID>` の値から 
 :class:`~django.contrib.sites.models.Site` オブジェクトを取得するというイディ
-オムはよく使われるので， :class:`~django.contrib.sites.models.Site` のモデ
-ルマネジャには ``get_current()`` メソッドがあります．以下の例は上の例と同じ
+オムはよく使われるので、 :class:`~django.contrib.sites.models.Site` のモデ
+ルマネジャには ``get_current()`` メソッドがあります。以下の例は上の例と同じ
 です::
 
     from django.contrib.sites.models import Site
@@ -165,17 +165,17 @@ Lawrence Journal-World newspaper が管理しています． LJWorld.com はニ�
 現在のドメインをディスプレイ用に取得する
 ----------------------------------------
 
-LJWorld.com と Lawrence.com には e-mail による通知機能があり，読者が登録し
-ておくとニュースが届いたときに通知メールを受け取れるようになっています．こ
-のからくりは簡単で， Web フォームから登録すると，「ご登録ありがとうございま
-した」という内容のメールを受け取ります．
+LJWorld.com と Lawrence.com には e-mail による通知機能があり、読者が登録し
+ておくとニュースが届いたときに通知メールを受け取れるようになっています。こ
+のからくりは簡単で、 Web フォームから登録すると、「ご登録ありがとうございま
+した」という内容のメールを受け取ります。
 
-登録処理を行うコードを二度開発するのは非効率的で冗長なので，舞台裏では複数
-サイトで同じコードを使うようにします．ただし，「ご登録ありがとうございます」
-通知はサイトごとに変えなければなりません． 
-:class:`~django.contrib.sites.models.Site` オブジェクトを使えば，現在のサイ
+登録処理を行うコードを二度開発するのは非効率的で冗長なので、舞台裏では複数
+サイトで同じコードを使うようにします。ただし、「ご登録ありがとうございます」
+通知はサイトごとに変えなければなりません。 
+:class:`~django.contrib.sites.models.Site` オブジェクトを使えば、現在のサイ
 トの ``name`` と ``domain`` の値を使って「ありがとうございます」メッセージ
-を抽象化できます．
+を抽象化できます。
 
 フォーム処理ビューの例は以下の通りです::
 
@@ -194,13 +194,13 @@ LJWorld.com と Lawrence.com には e-mail による通知機能があり，読�
 
         # ...
 
-Lawrence.com では， e-mail の件名は "Thanks for subscribing to lawrence.com
-alerts." です． LJWorld.com では，件名は "Thanks for subscribing to
-LJWorld.com alerts." で，メール本体も同様です．
+Lawrence.com では、 e-mail の件名は "Thanks for subscribing to lawrence.com
+alerts." です。 LJWorld.com では、件名は "Thanks for subscribing to
+LJWorld.com alerts." で、メール本体も同様です。
 
-より柔軟 (で，重量な) 方法として， Django テンプレートシステムを使った方法
-と比較してみましょう． Lawrence.com と LJWorld.com は別々のテンプレートディ
-レクトリ (:setting:`TEMPLATE_DIRS`) を持っているので，以下のようにすればサ
+より柔軟 (で、重量な) 方法として、 Django テンプレートシステムを使った方法
+と比較してみましょう。 Lawrence.com と LJWorld.com は別々のテンプレートディ
+レクトリ (:setting:`TEMPLATE_DIRS`) を持っているので、以下のようにすればサ
 イト間の違いをテンプレートシステムに追い出せます::
 
     from django.core.mail import send_mail
@@ -216,23 +216,23 @@ LJWorld.com alerts." で，メール本体も同様です．
 
         # ...
 
-この場合， LJWorld.com と Lawrence.com のテンプレートディレクトリ下に
-:file:`subject.txt` と :file:`message.txt` の二つのテンプレートを作成します．
-ただし，こうすればより柔軟にはなりますが，複雑さは増します．
+この場合、 LJWorld.com と Lawrence.com のテンプレートディレクトリ下に
+:file:`subject.txt` と :file:`message.txt` の二つのテンプレートを作成します。
+ただし、こうすればより柔軟にはなりますが、複雑さは増します。
 
-不要な複雑さと冗長性を排除するためには， 
+不要な複雑さと冗長性を排除するためには、 
 :class:`~django.contrib.sites.models.Site` オブジェクトを可能な限り使うとよ
-いでしょう．
+いでしょう。
 
 .. _Getting the current domain for full URLs:
 
 現在のドメインの完全な URL を取得する
 -------------------------------------
 
-Django の ``get_absolute_url()`` は，オブジェクトの URL をドメイン名なしで
-取得する際には便利ですが，場合によっては，完全な URL，すなわち ``http://``
-とドメイン名，その他全てを表示したいこともあるでしょう．これには sites フレー
-ムワークを使います．簡単な例を示します::
+Django の ``get_absolute_url()`` は、オブジェクトの URL をドメイン名なしで
+取得する際には便利ですが、場合によっては、完全な URL、すなわち ``http://``
+とドメイン名、その他全てを表示したいこともあるでしょう。これには sites フレー
+ムワークを使います。簡単な例を示します::
 
     >>> from django.contrib.sites.models import Site
     >>> obj = MyModel.objects.get(id=3)
@@ -284,17 +284,17 @@ Django の ``get_absolute_url()`` は，オブジェクトの URL をドメイ�
 .. class:: django.contrib.sites.managers.CurrentSiteManager
 
 アプリケーション内で :class:`~django.contrib.sites.models.Site` が重要な働
-きを持っている場合， 
+きを持っている場合、 
 :class:`~django.contrib.sites.managers.CurrentSiteManager` という便利なクラ
-スを検討してみてください．
+スを検討してみてください。
 
 :class:`~django.contrib.sites.managers.CurrentSiteManager` はモデルの 
-:ref:`マネジャ <topics-db-managers>` クラスで，クエリ結果を現在の
+:ref:`マネジャ <topics-db-managers>` クラスで、クエリ結果を現在の
 :class:`~django.contrib.sites.models.Site` に関連づけられたオブジェクトだけ
-に自動的にフィルタします．
+に自動的にフィルタします。
 
-:class:`~django.contrib.sites.managers.CurrentSiteManager` を使うには，モデ
-ルの中に明示的に追加します．例を示します::
+:class:`~django.contrib.sites.managers.CurrentSiteManager` を使うには、モデ
+ルの中に明示的に追加します。例を示します::
 
     from django.db import models
     from django.contrib.sites.models import Site
@@ -308,12 +308,12 @@ Django の ``get_absolute_url()`` は，オブジェクトの URL をドメイ�
         objects = models.Manager()
         on_site = CurrentSiteManager()
 
-このモデルでは， ``Photo.objects.all()`` を使うとデーターベース上の全ての
-``Photo`` オブジェクトを返しますが， ``Photo.on_site.all()`` を使うと，
-:setting:`SITE_ID` 設定に従って，現在のサイトに関連づけられた  ``Photo`` オ
-ブジェクトだけを返します．
+このモデルでは、 ``Photo.objects.all()`` を使うとデーターベース上の全ての
+``Photo`` オブジェクトを返しますが、 ``Photo.on_site.all()`` を使うと、
+:setting:`SITE_ID` 設定に従って、現在のサイトに関連づけられた  ``Photo`` オ
+ブジェクトだけを返します。
 
-つまり，以下の二つの文は等価になります::
+つまり、以下の二つの文は等価になります::
 
     Photo.objects.filter(site=settings.SITE_ID)
     Photo.on_site.all()
@@ -322,11 +322,11 @@ Django の ``get_absolute_url()`` は，オブジェクトの URL をドメイ�
 どのフィールドが :class:`~django.contrib.sites.models.Site` なのかをどうやっ
 て見付けるのでしょう？
 :class:`~django.contrib.sites.managers.CurrentSiteManager` はデフォルトでは
-``site`` という名前のフィールドを探します．モデル内で ``site`` *以外の*
+``site`` という名前のフィールドを探します。モデル内で ``site`` *以外の*
 名前の :class:`~django.db.models.fields.related.ForeignKey` や
 :class:`~django.db.models.fields.related.ManyToManyField`` を定義している場
-合， :class:`~django.contrib.sites.managers.CurrentSiteManager` に明示的に
-フィールド名を渡す必要があります．以下のモデルでは， ``publish_on`` という
+合、 :class:`~django.contrib.sites.managers.CurrentSiteManager` に明示的に
+フィールド名を渡す必要があります。以下のモデルでは、 ``publish_on`` という
 名前のフィールドがその例です::
 
     from django.db import models
@@ -341,20 +341,20 @@ Django の ``get_absolute_url()`` は，オブジェクトの URL をドメイ�
         objects = models.Manager()
         on_site = CurrentSiteManager('publish_on')
 
-:class:`~django.contrib.sites.managers.CurrentSiteManager` を使って，存在し
-ないフィールド名を渡そうとすると， Django は :exc:`ValueError` を送出します．
+:class:`~django.contrib.sites.managers.CurrentSiteManager` を使って、存在し
+ないフィールド名を渡そうとすると、 Django は :exc:`ValueError` を送出します。
 
 :class:`~django.contrib.sites.managers.CurrentSiteManager` を使っていたとし
-ても，結局は (サイト固有でない) 通常の ``Manager`` をモデル内に持っておく必
-要に迫られるでしょう． :ref:`マネジャのドキュメント <topics-db-managers>`
-でも説明しましたが，手動でマネジャを定義すると，Django は 
+ても、結局は (サイト固有でない) 通常の ``Manager`` をモデル内に持っておく必
+要に迫られるでしょう。 :ref:`マネジャのドキュメント <topics-db-managers>`
+でも説明しましたが、手動でマネジャを定義すると、Django は 
 ``objects = models.Manager()`` を使った自動マネジャ生成を行わなくなるからで
-す．また， Django の一部 (例えば admin サイトや汎用ビュー) では，モデル内で
-*最初に定義されている* マネジャを常に使うようになっています．そのため，
+す。また、 Django の一部 (例えば admin サイトや汎用ビュー) では、モデル内で
+*最初に定義されている* マネジャを常に使うようになっています。そのため、
 admin サイトから全てのオブジェクトにアクセスしたい (サイト固有のフィルタリ
-ングを行わない) 場合には，モデル内で ``objects = models.Manager()``
+ングを行わない) 場合には、モデル内で ``objects = models.Manager()``
 を :class:`~django.contrib.sites.managers.CurrentSiteManager` の定義より前
-に配置しておかねばなりません．
+に配置しておかねばなりません。
 
 :class:`~django.contrib.sites.managers.CurrentSiteManager`
 
@@ -363,48 +363,48 @@ admin サイトから全てのオブジェクトにアクセスしたい (サイ
 Django 内での site フレームワークの役割
 =======================================
 
-Django を使う際，必ずしも sites フレームワークを使わねばならないというわけ
-ではありません．とはいえ， Django はいくつかの場所で sites の恩恵を利用でき
-るので，ぜひとも sites を活用するよう勧めます． Django を単一のサイトを駆動
-するためだけに使っているとしても，ひと手間かけてサイトオブジェクトを作成し，
-``domain`` と ``name`` を指定して，その ID を :setting:`SITE_ID` 設定に指定
-してみてください．
+Django を使う際、必ずしも sites フレームワークを使わねばならないというわけ
+ではありません。とはいえ、 Django はいくつかの場所で sites の恩恵を利用でき
+るので、ぜひとも sites を活用するよう勧めます。 Django を単一のサイトを駆動
+するためだけに使っているとしても、ひと手間かけてサイトオブジェクトを作成し、
+``domain`` と ``name`` を指定して、その ID を :setting:`SITE_ID` 設定に指定
+してみてください。
 
 Django における sites フレームワークの役割は以下の通りです:
 
-* :mod:`リダイレクションフレームワーク <django.contrib.redirects>` では，各
-  リダイレクトオブジェクトが特定のサイトに関連づけられています． Django が
-  リダイレクト先を探すとき，フ
-  レームワークは現在の :setting:`SITE_ID` を考慮します．
+* :mod:`リダイレクションフレームワーク <django.contrib.redirects>` では、各
+  リダイレクトオブジェクトが特定のサイトに関連づけられています。 Django が
+  リダイレクト先を探すとき、フ
+  レームワークは現在の :setting:`SITE_ID` を考慮します。
 
-* コメントフレームワークでは，各コメントが特定のサイトに関連づけられて
-  います．コメントが投稿されると， ``site`` は現在の :setting:`SITE_ID` に
-  設定されます．コメントを何らかのテンプレートタグでリスト表示する場合，現
-  在のサイトに関するコメントだけが表示されます．
+* コメントフレームワークでは、各コメントが特定のサイトに関連づけられて
+  います。コメントが投稿されると、 ``site`` は現在の :setting:`SITE_ID` に
+  設定されます。コメントを何らかのテンプレートタグでリスト表示する場合、現
+  在のサイトに関するコメントだけが表示されます。
 
-* :mod:`フラットページフレームワーク <django.contrib.flatpages>` では，各フ
-  ラットページは特定のサイトに関連づけられています．フラットページを作成す
-  る際には， ``site`` を指定せねばなりません．
+* :mod:`フラットページフレームワーク <django.contrib.flatpages>` では、各フ
+  ラットページは特定のサイトに関連づけられています。フラットページを作成す
+  る際には、 ``site`` を指定せねばなりません。
   :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
-  は現在の :setting:`SITE_ID` をチェックして，表示すべきフラットページを取
-  得します．
+  は現在の :setting:`SITE_ID` をチェックして、表示すべきフラットページを取
+  得します。
 
-* :mod:`配信フレームワーク <django.contrib.syndication>` では， ``title``
+* :mod:`配信フレームワーク <django.contrib.syndication>` では、 ``title``
   および ``description`` のテンプレートから自動的に ``{{ site }}`` にアクセ
-  スできます． ``{{ site }}`` は :class:`~django.contrib.sites.models.Site`
-  オブジェクトで，現在の site を表現します．また，フィード項目の URL を提供
-  するためのフックでは，完全指定 (full-qualified) のドメインを指定していな
-  い場合，現在の :class:`~django.contrib.sites.models.Site` オブジェクトの
-  ``domain`` を使います．
+  スできます。 ``{{ site }}`` は :class:`~django.contrib.sites.models.Site`
+  オブジェクトで、現在の site を表現します。また、フィード項目の URL を提供
+  するためのフックでは、完全指定 (full-qualified) のドメインを指定していな
+  い場合、現在の :class:`~django.contrib.sites.models.Site` オブジェクトの
+  ``domain`` を使います。
 
-* :mod:`認証フレームワーク <django.contrib.auth>` では，
+* :mod:`認証フレームワーク <django.contrib.auth>` では、
   :func:`django.contrib.auth.views.login` ビューが現在の
   :class:`~django.contrib.sites.models.Site` 名を ``{{ site_name }}`` とい
-  う形でテンプレートに渡しています．
+  う形でテンプレートに渡しています。
 
-* ショートカットビュー (:func:`django.views.defaults.shortcut`) では，オブ
+* ショートカットビュー (:func:`django.views.defaults.shortcut`) では、オブ
   ジェクトの URL のドメイン部を計算する際に現在の
-  :class:`~django.contrib.sites.models.Site` オブジェクトを使います．
+  :class:`~django.contrib.sites.models.Site` オブジェクトを使います。
 
 * :class:`~django.contrib.sites.models.Site` オブジェクトに完全指定のホスト
   名を定義しておくと、 admin フレームワークで、現在の 
@@ -419,25 +419,25 @@ Django における sites フレームワークの役割は以下の通りです
 
 .. versionadded:: 1.0
 
-:ref:`django.contrib <ref-contrib-index>` 内のアプリケーションの中には，
-sites フレームワークを利用はできるけれども， *必須にはしない* ようなものが
-あります (sites を使いたくない人や， sites フレームワークが必要とするデータ
-ベーステーブルの作成が *不可能な* 人もいるためです)．こうした場合のために，
+:ref:`django.contrib <ref-contrib-index>` 内のアプリケーションの中には、
+sites フレームワークを利用はできるけれども、 *必須にはしない* ようなものが
+あります (sites を使いたくない人や、 sites フレームワークが必要とするデータ
+ベーステーブルの作成が *不可能な* 人もいるためです)。こうした場合のために、
 sites フレームワークでは :class:`~django.contrib.sites.models.RequestSite`
-クラスを提供しています．このクラスは，データベースバックエンド上に sites フ
-レームワークがない場合のフォールバックとして使われます．
+クラスを提供しています。このクラスは、データベースバックエンド上に sites フ
+レームワークがない場合のフォールバックとして使われます。
 
-:class:`~django.contrib.sites.models.RequestSite` オブジェクトは，通常の
+:class:`~django.contrib.sites.models.RequestSite` オブジェクトは、通常の
 :class:`~django.contrib.sites.models.Site` オブジェクトと同様のインタフェー
-スを備えていますが，
+スを備えていますが、
 :meth:`~django.contrib.sites.models.RequestSite.__init__` が 
-:class:`~django.http.HttpRequest` オブジェクトを取るところが違います．この
+:class:`~django.http.HttpRequest` オブジェクトを取るところが違います。この
 オブジェクトはリクエストのドメイン情報を見ることで ``domain`` や ``name``
-を決定します． :class:`~django.contrib.sites.models.Site` オブジェクトとイ
-ンタフェースを合わせるため，
+を決定します。 :class:`~django.contrib.sites.models.Site` オブジェクトとイ
+ンタフェースを合わせるため、
 :class:`~django.contrib.sites.models.RequestSite` オブジェクトにも
 :meth:`~django.contrib.sites.models.RequestSite.save` や 
 :meth:`~django.contrib.sites.models.RequestSite.delete` といったメソッドが
-ありますが，これらのメソッドを呼び出すと :exc:`NotImplementedError` を送出
-します．
+ありますが、これらのメソッドを呼び出すと :exc:`NotImplementedError` を送出
+します。
 

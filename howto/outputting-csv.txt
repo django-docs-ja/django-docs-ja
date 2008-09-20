@@ -6,10 +6,10 @@ Django で CSV を出力する
 
 :revision-up-to: 8961 (1.0)
 
-このドキュメントでは， Django のビューを使って動的に CSV (Comma Separated
+このドキュメントでは、 Django のビューを使って動的に CSV (Comma Separated
 Values: カンマ区切りのフィールドデータ) ファイルを生成する方法について説明
-します．  CSV の生成には `Python CSV ライブラリ`_ ， **または** Django テン
-プレートシステムが必要です．
+します。  CSV の生成には `Python CSV ライブラリ`_ 、 **または** Django テン
+プレートシステムが必要です。
 
 .. _`Python CSV ライブラリ`: http://www.python.jp/doc/release/lib/module-csv.html
 
@@ -18,10 +18,10 @@ Values: カンマ区切りのフィールドデータ) ファイルを生成す�
 CSV ライブラリを使う
 ====================
 
-Python には CSV ライブラリモジュール ``csv`` がついてきます．Django で
-``csv`` を使う上での鍵は，モジュールの CSV 生成機能がファイルライクオ
-ブジェクトを扱えることと， Django の :class:`~django.http.HttpResponse` オ
-ブジェクトがファイルライクオブジェクトであることです．
+Python には CSV ライブラリモジュール ``csv`` がついてきます。Django で
+``csv`` を使う上での鍵は、モジュールの CSV 生成機能がファイルライクオ
+ブジェクトを扱えることと、 Django の :class:`~django.http.HttpResponse` オ
+ブジェクトがファイルライクオブジェクトであることです。
 
 一例を示します::
 
@@ -29,7 +29,7 @@ Python には CSV ライブラリモジュール ``csv`` がついてきます�
     from django.http import HttpResponse
 
     def some_view(request):
-        # 適切な CSV 用ヘッダとともに HttpResponse オブジェクトを生成します．
+        # 適切な CSV 用ヘッダとともに HttpResponse オブジェクトを生成します。
         response = HttpResponse(mimetype='text/csv')
         response['Content-Disposition'] = 'attachment; filename=somefilename.csv'
 
@@ -39,40 +39,40 @@ Python には CSV ライブラリモジュール ``csv`` がついてきます�
 
         return response
 
-コードとコメントを読めば一目瞭然ですが，いくつか注意しておいたほうがよいで
+コードとコメントを読めば一目瞭然ですが、いくつか注意しておいたほうがよいで
 しょう:
 
-    * レスポンスの MIME タイプは ``text/csv`` にします．これにより，
-      ブラウザにドキュメントが CSV であると指示します． MIME タイプを指定し
-      ないと，出力を HTML として解釈するので，ブラウザウィンドウに見苦しい
-      ごみのような出力が表示されてしまいます．
+    * レスポンスの MIME タイプは ``text/csv`` にします。これにより、
+      ブラウザにドキュメントが CSV であると指示します。 MIME タイプを指定し
+      ないと、出力を HTML として解釈するので、ブラウザウィンドウに見苦しい
+      ごみのような出力が表示されてしまいます。
 
-    * さらに，レスポンスオブジェクトには ``Content-Disposition`` ヘッダを指
-      定しています．このヘッダは CSV ファイルの名前にします．ファイル名には
-      何を指定しても構いません．この名前は，ブラウザが「名前を付けて保存」
-      ダイアログなどで使います．
+    * さらに、レスポンスオブジェクトには ``Content-Disposition`` ヘッダを指
+      定しています。このヘッダは CSV ファイルの名前にします。ファイル名には
+      何を指定しても構いません。この名前は、ブラウザが「名前を付けて保存」
+      ダイアログなどで使います。
 
     * CSV 生成 API のフックは簡単です: ``response`` を ``csv.writer`` の第
-      一引数に指定します． ``csv.writer`` クラスはファイルライクオブジェク
-      トを扱うようになっているので， :class:`~django.http.HttpResponse` オ
-      ブジェクトを使えます．
+      一引数に指定します。 ``csv.writer`` クラスはファイルライクオブジェク
+      トを扱うようになっているので、 :class:`~django.http.HttpResponse` オ
+      ブジェクトを使えます。
 
     * CSV ファイルの各行ごとにリストやタプルのようなイテレーション可能オブ
-      ジェクトを渡して ``writer.writerow`` を呼び出します．
+      ジェクトを渡して ``writer.writerow`` を呼び出します。
 
-    * CSV モジュールはクオート処理を行ってくれるので，文字列中にクオートや
-      カンマがあっても心配することはありません．出力したい値を
-      ``writerow()`` に渡せば，モジュールが正しく処理してくれます．
+    * CSV モジュールはクオート処理を行ってくれるので、文字列中にクオートや
+      カンマがあっても心配することはありません。出力したい値を
+      ``writerow()`` に渡せば、モジュールが正しく処理してくれます。
 
 テンプレートシステムを使う
 ==========================
 
 ``csv`` を使う代りに :ref:`Django テンプレートシステム <topics-templates>`
-を使っても CSV を生成できます．この方法よりも ``csv`` モジュールを使った方
-がより高水準で実現できますが，完全さのために紹介しておきます．
+を使っても CSV を生成できます。この方法よりも ``csv`` モジュールを使った方
+がより高水準で実現できますが、完全さのために紹介しておきます。
 
-基本的な考え方は，テンプレートに要素リストを渡し，テンプレート上の
-:ttag:`for` ループの中でコンマとともに出力するというものです．
+基本的な考え方は、テンプレートに要素リストを渡し、テンプレート上の
+:ttag:`for` ループの中でコンマとともに出力するというものです。
 
 上と同じ CSV ファイルを生成する例を示します::
 
@@ -81,12 +81,12 @@ Python には CSV ライブラリモジュール ``csv`` がついてきます�
 
     def some_view(request):
         # 適切な CSV 用応答ヘッダを持った HttpResponse オブジェクトを
-        # 作成します．
+        # 作成します。
         response = HttpResponse(mimetype='text/csv')
         response['Content-Disposition'] = 'attachment; filename=somefilename.csv'
 
-        # ここではデータをハードコードしていますが，実際にはデータベースな
-	# のデータソースから取り出せます．
+        # ここではデータをハードコードしていますが、実際にはデータベースな
+	# のデータソースから取り出せます。
         csv_data = (
             ('First row', 'Foo', 'Bar', 'Baz'),
             ('Second row', 'A', 'B', 'C', '"Testing"', "Here's a quote"),
@@ -99,22 +99,22 @@ Python には CSV ライブラリモジュール ``csv`` がついてきます�
         response.write(t.render(c))
         return response
 
-前節の例との違いは， CSV モジュールの代りにテンプレートをロードしている点だ
-けです．それ以外のコード，例えば ``mimetype='text/csv'`` のような部分はまっ
-たく同じです．
+前節の例との違いは、 CSV モジュールの代りにテンプレートをロードしている点だ
+けです。それ以外のコード、例えば ``mimetype='text/csv'`` のような部分はまっ
+たく同じです。
 
-次に， ``my_template_name.txt`` というテンプレートを以下のように書きます:
+次に、 ``my_template_name.txt`` というテンプレートを以下のように書きます:
 
 .. code-block:: html+django
 
     {% for row in data %}"{{ row.0|addslashes }}", "{{ row.1|addslashes }}", "{{ row.2|addslashes }}", "{{ row.3|addslashes }}", "{{ row.4|addslashes }}"
     {% endfor %}
 
-このテンプレートはきわめて基本的なものです．テンプレートは指定されたデータ
-に渡って繰り返し CSV の各行を表示してゆきます．クオートで問題が生じないよう，
-:tfilter:`addslashes`  テンプレートフィルタを使っています．データに引用符
+このテンプレートはきわめて基本的なものです。テンプレートは指定されたデータ
+に渡って繰り返し CSV の各行を表示してゆきます。クオートで問題が生じないよう、
+:tfilter:`addslashes`  テンプレートフィルタを使っています。データに引用符
 (一重と二重の両方) が入っていないと保証できる場合は :tfilter:`addslashes`
-フィルタを外してもかまいません．
+フィルタを外してもかまいません。
 
 .. _Other text-based formats:
 

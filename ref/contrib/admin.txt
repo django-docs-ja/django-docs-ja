@@ -90,8 +90,8 @@ Django admin サイトは、以下の 5 つのステップを通して有効化�
 変更ページでフォームを生成するときに使われます。 ``form`` を独自の
 ``ModelForm`` と置き換えれば、追加／変更ページのふるまいを変更できます。
 
-詳しくは、 `admin にカスタムのバリデーションを追加する <Adding custom
-validation to the admin>`_ を参照してください。
+詳しくは、  :ref:`admin にカスタムのバリデーションを追加する
+<admin-add-custom-validation>` を参照してください。
 
 ``fieldsets``
 ~~~~~~~~~~~~~
@@ -170,7 +170,7 @@ admin の「追加 (add)」および「変更 (change)」ページのレイア�
 
         この文字列は admin 上で HTML エスケープ *されません* 。そのため、必
         要ならそのまま HTML を入れられます。また、 HTML 固有の文字をエスケー
-        プたければ、``django.utils.html.escape()`` を使ってください。
+        プしたければ、 ``django.utils.html.escape()`` を使ってください。
 
 ``fields``
 ~~~~~~~~~~
@@ -245,17 +245,14 @@ admin の変更リストページに表示するフィールドを制御する�
 ``list_display`` を指定しなければ、 admin サイトは各オブジェクトの
 ``__unicode__()`` 表現を表示するカラムを一つだけ表示します。
 
-.. TBD
+``list_display`` には 4 通りの設定方法があります:
 
-You have four possible values that can be used in ``list_display``:
-
-    * A field of the model. For example::
+    * モデルのフィールド名::
     
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('first_name', 'last_name')
-    
-    * A callable that accepts one parameter for the model instance. For
-      example::
+
+    * モデルインスタンスを引数にとる呼び出し可能オブジェクト::
     
           def upper_case_name(obj):
               return "%s %s" % (obj.first_name, obj.last_name).upper()
@@ -264,8 +261,8 @@ You have four possible values that can be used in ``list_display``:
           class PersonAdmin(admin.ModelAdmin):
               list_display = (upper_case_name,)
     
-    * A string representing an attribute on the ``ModelAdmin``. This behaves
-      same as the callable. For example::
+    * ``ModelAdmin`` の属性名を表す文字列。呼び出し可能オブジェクトと同じよ
+      うに動作します::
       
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('upper_case_name',)
@@ -274,9 +271,8 @@ You have four possible values that can be used in ``list_display``:
                 return "%s %s" % (obj.first_name, obj.last_name).upper()
               upper_case_name.short_description = 'Name'
     
-    * A string representing an attribute on the model. This behaves almost
-      the same as the callable, but ``self`` in this context is the model
-      instance. Here's a full model example::
+    * モデルの属性名を表す文字列。ただし、 ``self`` はモデルインスタンスを
+      表します::
 
           class Person(models.Model):
               name = models.CharField(max_length=50)
@@ -610,11 +606,12 @@ SQL と等価な検索を実行します::
 ``save_model(self, request, obj, form, change)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``save_model`` method is given the ``HttpRequest``, a model instance,
-a ``ModelForm`` instance and a boolean value based on whether it is adding or
-changing the object. Here you can do any pre- or post-save operations.
+``save_model`` メソッドは ``HttpRequest``, モデルインスタンス、
+``ModelForm`` インスタンス、オブジェクトの追加か変更かを表すブール値 (変更
+の場合には ``True``) を引数にとります。このメソッドを使えば、オブジェクトの
+保存前 (pre-save) および保存後 (post-save) 処理を実行できます。
 
-For example to attach ``request.user`` to the object prior to saving::
+保存前に ``request.user`` をオブジェクトに保存するには、以下のようにします::
 
     class ArticleAdmin(admin.ModelAdmin):
         def save_model(self, request, obj, form, change):
@@ -624,12 +621,12 @@ For example to attach ``request.user`` to the object prior to saving::
 ``save_formset(self, request, form, formset, change)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``save_formset`` method is given the ``HttpRequest``, the parent
-``ModelForm`` instance and a boolean value based on whether it is adding or
-changing the parent object.
+``save_formset`` メソッドは ``HttpRequest``, モデルインスタンス、親クラスの
+``ModelForm`` インスタンス、オブジェクトの追加か変更かを表すブール値 (変更
+の場合には ``True``) を引数にとります。
 
-For example to attach ``request.user`` to each changed formset
-model instance::
+フォームセットの各モデルインスタンスの保存前に ``request.user`` をオブジェ
+クトに保存するには、以下のようにします::
 
     class ArticleAdmin(admin.ModelAdmin):
         def save_formset(self, request, form, formset, change):
@@ -658,24 +655,20 @@ model instance::
 :ref:`forms の通常のメディア定義 <topics-forms-media>` と同じ規則が当てはま
 ります。
 
-Keep in mind that this will be prepended with ``MEDIA_URL``. The same rules
-apply as 
+.. _admin-add-custom-validation:
 
-.. TBD
+admin にカスタムのバリデーションを追加する
+------------------------------------------------
 
-Adding custom validation to the admin
--------------------------------------
-
-Adding custom validation of data in the admin is quite easy. The automatic admin
-interfaces reuses :mod:`django.forms`, and the ``ModelAdmin`` class gives you
-the ability define your own form::
+admin にカスタムのバリデーションを追加するのはとても簡単です。 admin インタ
+フェースは :mod:`django.forms` を再利用しているので、 ``ModelAdmin`` クラス
+を使えばフォームを指定できます::
 
     class ArticleAdmin(admin.ModelAdmin):
         form = MyArticleAdminForm
 
-``MyArticleAdminForm`` can be defined anywhere as long as you import where
-needed. Now within your form you can add your own custom validation for
-any field::
+``MyArticleAdminForm`` は、 import できる場所ならどこにでも置けます。フォー
+ムの中で、任意のフィールドにカスタムのバリデーションコードを追加できます::
     
     class MyArticleAdminForm(forms.ModelForm):
         class Meta:
@@ -685,9 +678,9 @@ any field::
             # do something that validates your data
             return self.cleaned_data["name"]
 
-It is important you use a ``ModelForm`` here otherwise things can break. See the
-:ref:`forms <ref-forms-index>` documentation on :ref:`custom validation
-<ref-forms-validation>` for more information.
+このとき、 ``ModelForm`` を使うことが重要です。他のクラスではうまくいきませ
+ん。詳しくは :ref:`forms <ref-forms-index>` ドキュメント内の
+:ref:`カスタムのバリデーション<ref-forms-validation>` を参照してください。
 
 .. _admin-inlines:
 .. _`InlineModelAdmin objects`:
@@ -822,22 +815,20 @@ Django は、 ``InlineModelAdmin`` のサブクラスとして、以下の二つ
             FriendshipInline,
         ]
 
-.. TBD
-
-Working with Many-to-Many Intermediary Models
+中間モデルを介した多対多リレーションを扱う
 ----------------------------------------------
 
-By default, admin widgets for many-to-many relations will be displayed inline
-on whichever model contains the actual reference to the ``ManyToManyField``.
-However, when you specify an intermediary model using the ``through``
-argument to a ``ManyToManyField``, the admin will not display a widget by 
-default. This is because each instance of that intermediary model requires
-more information than could be displayed in a single widget, and the layout
-required for multiple widgets will vary depending on the intermediate model.
+デフォルトの設定では、 admin で多対多のリレーションを表す場合、
+``ManyToManyField`` を定義しているモデルの中でインライン表示されるウィジェッ
+トを使います。しかし、 ``ManyToManyField`` の ``through`` 引数に中間モデル
+を指定した場合、 admin は ``ManyToManyField`` のウィジェットを表示しません。
+これは、中間モデルの各インスタンスを表示するのに一つのウィジェットでは足り
+ないためと、複数ウィジェットを表示するために必要なレイアウトが中間モデルに
+よって変わってしまうためです。
 
-However, we still want to be able to edit that information inline. Fortunately,
-this is easy to do with inline admin models. Suppose we have the following
-models::
+しかし、それでもインラインで編集を行いたい場合があります。好運なことに、イ
+ンライン admin モデル (inline admin model) を使えば簡単に実現できます。
+例として、以下のようなモデルを考えましょう::
 
     class Person(models.Model):
         name = models.CharField(max_length=128)
@@ -852,18 +843,19 @@ models::
         date_joined = models.DateField()
         invite_reason = models.CharField(max_length=64)
 
-The first step in displaying this intermediate model in the admin is to
-define an inline class for the ``Membership`` model::
+中間モデルを admin で表示するには、まず ``Membership`` モデルに対するインラ
+インクラスを作成します::
 
     class MembershipInline(admin.TabularInline):
         model = Membership
         extra = 1
 
-This simple example uses the default ``InlineModelAdmin`` values for the
-``Membership`` model, and limits the extra add forms to one. This could be
-customized using any of the options available to ``InlineModelAdmin`` classes.
+上の簡単な例では、デフォルトの ``Membership`` モデルを扱うインライン admin
+クラスを定義して、追加用のフォームの数を 1 つに制限する他はデフォルトの
+``InlineModelAdmin`` クラスの値を使っています。他にも、
+``InlineModelAdmin`` クラスのオプションを使って色々と設定できます。
 
-Now create admin views for the ``Person`` and ``Group`` models::
+次に、 ``Person`` や ``Group`` モデルの ``ModelAdmin`` クラスを定義します::
 
     class PersonAdmin(admin.ModelAdmin):
         inlines = (MembershipInline,)
@@ -871,19 +863,19 @@ Now create admin views for the ``Person`` and ``Group`` models::
     class GroupAdmin(admin.ModelAdmin):
         inlines = (MembershipInline,)
 
-Finally, register your ``Person`` and ``Group`` models with the admin site::
+最後に、 ``Person`` と ``Group`` を admin サイトに登録します::
     
     admin.site.register(Person, PersonAdmin)
     admin.site.register(Group, GroupAdmin)
 
-Now your admin site is set up to edit ``Membership`` objects inline from
-either the ``Person`` or the ``Group`` detail pages.
+これで、 admin サイトの ``Person`` と ``Group`` の両方で、 
+``MembershipInline`` オブジェクトをインライン編集できます。
 
-Using generic relations as an inline
+一般化リレーションをインラインで扱う
 ------------------------------------
 
-It is possible to use an inline with generically related objects. Let's say
-you have the following models::
+一般化リレーションオブジェクトもインラインで扱えます。以下のようなモデルが
+定義されていたとしましょう::
 
     class Image(models.Model):
         image = models.ImageField(upload_to="images")
@@ -894,10 +886,10 @@ you have the following models::
     class Product(models.Model):
         name = models.CharField(max_length=100)
 
-If you want to allow editing and creating ``Image`` instance on the ``Product``
-add/change views you can simply use ``GenericInlineModelAdmin`` provided by
-``django.contrib.contenttypes.generic``. In your ``admin.py`` for this
-example app::
+``Product`` の追加／変更ビューで ``Image`` インスタンスを編集したり追加した
+りしたいなら、 ``django.contrib.contenttypes.generic`` の
+``GenericInlineModelAdmin`` を使います。 ``admin.py`` で、以下のように設定
+してください::
 
     from django.contrib import admin
     from django.contrib.contenttypes import generic
@@ -914,61 +906,60 @@ example app::
     
     admin.site.register(Product, ProductAdmin)
 
-.. TBD
+``django.contrib.contenttypes.generic`` は ``GenericTabularInline`` と
+``GenericStackedInline`` を提供していて、その動作は通常のインライン編集と
+同じです。詳しくは :ref:`contenttypes のドキュメント
+<ref-contrib-contenttypes>` を参照してください。
 
-``django.contrib.contenttypes.generic`` provides both a ``GenericTabularInline``
-and ``GenericStackedInline`` and behave just like any other inline. See the
-:ref:`contenttypes documentation <ref-contrib-contenttypes>` for more specific
-information.
+admin テンプレートのオーバライド
+==================================
 
-Overriding Admin Templates
-==========================
+admin モジュールが admin サイトの様々なページを生成するときに使うテンプレー
+トは、その大半を比較的簡単にオーバライドできます。オーバライドは、特定のア
+プリケーションやモデルだけのためにもオーバライドできます。
 
-It is relatively easy to override many of the templates which the admin module
-uses to generate the various pages of an admin site. You can even override a few
-of these templates for a specific app, or a specific model.
+プロジェクトの admin テンプレートディレクトリを設定する
+----------------------------------------------------------
 
-Set up your projects admin template directories
------------------------------------------------
+admin テンプレートファイルは ``contrib/admin/templates/admin`` ディレクトリ
+に入っています。
 
-The admin template files are located in the ``contrib/admin/templates/admin``
-directory.
+テンプレートをオーバライドするには、まずプロジェクトの ``templates`` ディレ
+クトリ内に ``admin`` ディレクトリを作成します。プロジェクトのテンプレートディ
+レクトリとは、 ``TEMPLATE_DIRS`` の中に設定されているディレクトリのいずれか
+です。
 
-In order to override one or more of them, first create an ``admin`` directory in
-your project's ``templates`` directory. This can be any of the directories you
-specified in ``TEMPLATE_DIRS``.
+次に、 ``admin`` ディレクトリ内に、アプリケーションの名前から取った名前のディ
+レクトリを作成します。アプリケーションのサブディレクトリの中に、さらにモデ
+ルからとった名前のサブディレクトリを作成します。このとき、 admin アプリケー
+ションはモデル名を小文字に変換した名前でディレクトリを探すことに注意しましょ
+う。ですから、大小文字を区別するファイルシステム上にアプリケーションを配置
+しているのなら、ディレクトリ名が全て小文字で構成されているか確認してくださ
+い。
 
-Within this ``admin`` directory, create sub-directories named after your app.
-Within these app subdirectories create sub-directories named after your models.
-Note, that the admin app will lowercase the model name when looking for the
-directory, so make sure you name the directory in all lowercase if you are going
-to run your app on a case-sensitive filesystem.
+特定のアプリケーション向けに admin テンプレートをオーバライドしたければ、テ
+ンプレートを ``django/contrib/admin/templates/admin`` からアプリケーション
+名のディレクトリ下にコピーして編集してください。
 
-To override an admin template for a specific app, copy and edit the template
-from the ``django/contrib/admin/templates/admin`` directory, and save it to one
-of the directories you just created.
+例えば、 ``my_app`` の全てのモデルの変更リストにツールメニューを追加したい
+なら、 ``contrib/admin/templates/admin/change_list.html`` をプロジェクトの
+``templates/admin/my_app/`` ディレクトリにコピーして必要な変更を施します。
 
-For example, if we wanted to add a tool to the change list view for all the
-models in an app named ``my_app``, we would copy
-``contrib/admin/templates/admin/change_list.html`` to the
-``templates/admin/my_app/`` directory of our project, and make any necessary
-changes.
+``Page`` という名前のモデルの変更リストだけにツールメニューを追加したいなら、
+ファイルを ``templates/admin/my_app/page`` ディレクトリにコピーします。
 
-If we wanted to add a tool to the change list view for only a specific model
-named 'Page', we would copy that same file to the
-``templates/admin/my_app/page`` directory of our project.
-
-Overriding vs. replacing an admin template
+admin テンプレートのオーバライドと置き換え
 ------------------------------------------
 
-Because of the modular design of the admin templates, it is usually neither
-necessary nor advisable to replace an entire template. It is almost always
-better to override only the section of the template which you need to change.
+admin テンプレートはモジュラー構造で設計されているので、必ずしもいつもテン
+プレート全体を置き換える必要はありませんし、そうしないよう勧めます。基本的
+には、変更の必要のあるセクションだけをオーバライドするのがよいでしょう。
 
-To continue the example above, we want to add a new link next to the ``History``
-tool for the ``Page`` model. After looking at ``change_form.html`` we determine
-that we only need to override the ``object-tools`` block. Therefore here is our
-new ``change_form.html`` ::
+上に挙げた例の続きとして説明しましょう。 ``Page`` モデルの ``History`` ツー
+ルの隣に新しくリンクを追加したいとします。 ``change_from.html`` を眺めたあ
+と、オーバライドする必要があるのは ``object-tools`` ブロックだけだと分かっ
+たとしましょう。その場合、新たな ``change_form.html`` は以下のように書けま
+す::
 
     {% extends "admin/change_form.html" %}
     {% load i18n %}
@@ -986,38 +977,40 @@ new ``change_form.html`` ::
     {% endif %}{% endif %}
     {% endblock %}
 
-And that's it! If we placed this file in the ``templates/admin/my_app``
-directory, our link would appear on every model's change form.
+これだけです！このファイルを ``templates/admin/my_app`` ディレクトリに置け
+ば、全てのモデル変更フォームでリンクが表示されるでしょう。
 
-Templates which may be overridden per app or model
---------------------------------------------------
+アプリケーションやモデル単位でオーバライドできるテンプレート
+---------------------------------------------------------------
 
-Not every template in ``contrib\admin\templates\admin`` may be overridden per
-app or per model. The following can:
+``contrib/admin/templates/admin`` のテンプレートの全てが、アプリケーション
+やモデル単位でオーバライドできるわけではありません。以下のテンプレートはオー
+バライドできます:
 
     * ``change_form.html``
     * ``change_list.html``
     * ``delete_confirmation.html``
     * ``object_history.html``
 
-For those templates that cannot be overridden in this way, you may still
-override them for your entire project. Just place the new version in your
-``templates/admin`` directory. This is particularly useful to create custom 404
-and 500 pages.
+この節で述べた方法でテンプレートをオーバライドできなくても、オーバライドし
+たい内容を ``templates/admin`` ディレクトリに配置することで、プロジェクト全
+体の設定としてオーバライドできます。この方法は、カスタムの 404 ページや 500
+ページをオーバライドするときに特に便利です。
 
 .. note::
 
-    Some of the admin templates, such as ``change_list_request.html`` are used
-    to render custom inclusion tags. These may be overridden, but in such cases
-    you are probably better off creating your own version of the tag in question
-    and giving it a different name. That way you can use it selectively.
+    ``change_list_request.html`` のようなテンプレートは、カスタムの
+    inclusion タグをレンダするために使われています。このテンプレートはオー
+    バライドできますが、テンプレートを変更するときには、独自の inclusion タ
+    グを作成しておいて、別の名前を付けておき、テンプレートで呼び出す方が
+    よいでしょう。そうすれば、テンプレートを選択して使えるからです。
 
-Root and login templates
-------------------------
+ルートテンプレートとログインテンプレート
+-----------------------------------------
 
-If you wish to change the index or login templates, you are better off creating
-your own ``AdminSite`` instance (see below), and changing the ``index_template``
-or ``login_template`` properties.
+インデクスページやログインページのテンプレートを変更したければ、
+``AdminSite`` インスタンスを自作して、 ``index_template`` や
+``login_template`` プロパティの値を変更してください。
 
 .. _`AdminSite objects`:
 

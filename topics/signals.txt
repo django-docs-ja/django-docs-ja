@@ -1,7 +1,7 @@
 .. _topics-signals:
 
 ===========
-シグナル
+Signals
 ===========
 
 :revision-up-to: 8961 (1.0)

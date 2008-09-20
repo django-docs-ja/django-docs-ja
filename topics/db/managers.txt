@@ -202,10 +202,10 @@
 
         ...
 
-.. TBD
-
-Custom managers and model inheritance
+カスタムマネジャとモデルの継承
 -------------------------------------
+
+.. TBD
 
 Class inheritance and model managers aren't quite a perfect match for each
 other. Managers are often specific to the classes they are defined on and

@@ -6,18 +6,18 @@ Apache での認証に Django のユーザデータベースを使う
 
 :revision-up-to: 8961 (1.0)
 
-Apache を使っていると，同期を保ちながら複数の認証データベースを維持するとい
-う問題によくぶつかります．そこで， Django の 
+Apache を使っていると、同期を保ちながら複数の認証データベースを維持するとい
+う問題によくぶつかります。そこで、 Django の 
 :ref:`認証システム <topics-auth>` に対して直接 Apache から認証をかけるよう
-設定できます．例えば以下のような処理を実現できます:
+設定できます。例えば以下のような処理を実現できます:
 
-    * 認証ユーザだけを対象に，静的ファイル／メディアファイルを Apache から
-      直接提供できます．
+    * 認証ユーザだけを対象に、静的ファイル／メディアファイルを Apache から
+      直接提供できます。
 
     * 特定のパーミッションを持つ Django ユーザだけに Subversion_ リポジト
-      リへのアクセスを許すよう認証をかけられます．
+      リへのアクセスを許すよう認証をかけられます。
 
-    * mod_dav_ で作成した WebDAV 共有への接続を特定ユーザに許可できます．
+    * mod_dav_ で作成した WebDAV 共有への接続を特定ユーザに許可できます。
 
 .. _Subversion: http://subversion.tigris.org/
 .. _mod_dav: http://httpd.apache.org/docs/2.0/mod/mod_dav.html
@@ -28,7 +28,7 @@ Apache の設定
 =============
 
 Django の認証データベースを Apache 設定ファイルからチェックするには
-mod_python の標準の ``Auth*`` および ``Require`` ディレクティブと共に，
+mod_python の標準の ``Auth*`` および ``Require`` ディレクティブと共に、
 ``PythonAuthenHandler`` ディレクティブを使います:
 
 .. code-block:: apache
@@ -87,39 +87,39 @@ mod_python の標準の ``Auth*`` および ``Require`` ディレクティブと
             PythonAuthenHandler django.contrib.auth.handlers.modpython
         </Location>
 
-デフォルトでは，認証ハンドラは staff のマークのついたメンバだけに
-``/example/`` へのアクセスを制限します．この挙動を変更したければ，
+デフォルトでは、認証ハンドラは staff のマークのついたメンバだけに
+``/example/`` へのアクセスを制限します。この挙動を変更したければ、
 以下の ``PythonOption`` ディレクティブを使います:
 
     ================================  =========================================
     ``PythonOption``                  説明
     ================================  =========================================
-    ``DjangoRequireStaffStatus``      ``on`` に設定すると， "staff" ユーザ
+    ``DjangoRequireStaffStatus``      ``on`` に設定すると、 "staff" ユーザ
                                       (``is_staff`` フラグの立っているユーザ)
-                                      だけにアクセスを許可します．
+                                      だけにアクセスを許可します。
 
-                                      デフォルトは ``on`` です．
+                                      デフォルトは ``on`` です。
 
-    ``DjangoRequireSuperuserStatus``  ``on`` に設定すると，スーパユーザ
+    ``DjangoRequireSuperuserStatus``  ``on`` に設定すると、スーパユーザ
                                       (``is_superuser`` フラグの立っている
-                                      ユーザ) だけにアクセスを許可します．
+                                      ユーザ) だけにアクセスを許可します。
 
-                                      デフォルトは ``off`` です．
+                                      デフォルトは ``off`` です。
 
     ``DjangoPermissionName``          アクセスに必要なパーミッションの名前
-                                      です．詳しくは 
+                                      です。詳しくは 
                                       :ref:`カスタムのパーミッション
                                       <custom-permissions>` を参照
-                                      してください．
+                                      してください。
 
                                       デフォルトでは特定のパーミッションを
-                                      必要としません．
+                                      必要としません。
     ================================  =========================================
 
-場合によって， ``SetEnv`` が mod_python の設定としてうまく働かない場合があ
-ります．この原因はよくわかっていません． mod_python が
-``DJANGO_SETTINGS_MODULE`` をうまく認識できない場合， ``SetEnv`` の代りに
-``PythonOption`` を使ってみて下さい．以下の二つのディレクティブは同じ意味で
+場合によって、 ``SetEnv`` が mod_python の設定としてうまく働かない場合があ
+ります。この原因はよくわかっていません。 mod_python が
+``DJANGO_SETTINGS_MODULE`` をうまく認識できない場合、 ``SetEnv`` の代りに
+``PythonOption`` を使ってみて下さい。以下の二つのディレクティブは同じ意味で
 す::
 
     SetEnv DJANGO_SETTINGS_MODULE mysite.settings

@@ -5,11 +5,9 @@
 
 :revision-up-to: 8961 (1.0)
 
-.. TBD
-
-Releases notes for the official Django releases. Each release note will tell you
-what's new in each version, and will also describe any backwards-incompatible
-changes made in that version.
+ここにあるのは、 Django の公式リリースのリリースノートです。各リリースノー
+トでは、新たなバージョンで登場した機能や、以前のバージョンに対する互換性の
+ない変更について解説しています。
 
 .. toctree::
    :maxdepth: 1
@@ -23,10 +21,10 @@ changes made in that version.
    1.0
 
 .. seealso::
-
-    The list of `backwards-incompatible changes`_ made in the current
-    development "trunk". If you're running versions of Django newer than an
-    official release, you should keep track of new pieces pointed there. It's
-    also fun reading if you're looking forward to new versions of Django.
+    `互換性のない変更 <backwards-incompatible changes>`_ のページには、現在
+    開発中の「トランク (trunk)」での変更が記載されています。公式リリースよ
+    りも新しいバージョンの Django を動かしているなら、このページに注意を払っ
+    ておくとよいでしょう。もちろん、新たなバージョンが待ち遠しい人にとって
+    も、楽しく読めますよ。
 
 .. _backwards-incompatible changes: http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
