@@ -119,64 +119,61 @@ Django から利用できる MySQL の全ての機能を使うには、 バー�
 .. _create your database: http://dev.mysql.com/doc/refman/5.0/en/create-database.html
 .. _データベースを作成: `create your database`_
 
-.. TBD
-
 .. _mysql-collation:
 
-Collation settings
-~~~~~~~~~~~~~~~~~~
+コレーションに関する設定
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The collation setting for a column controls the order in which data is sorted
-as well as what strings compare as equal. It can be set on a database-wide
-level and also per-table and per-column. This is `documented thoroughly`_ in
-the MySQL documentation. In all cases, you set the collation by directly
-manipulating the database tables; Django doesn't provide a way to set this on
-the model definition.
+カラムのコレーション設定は、データの保存方法や、文字列の等価性の定義を制御
+しています。コレーションはデータベース全体でも、テーブル単位でも、カラム単
+位でも設定できます。コレーションの詳細は MySQL のドキュメントで 
+`詳しく解説されています <documented thoroughly>`_ 。いずれの場合でも、コレー
+ションの設定は直接データベーステーブルに対して行ってください。 Django はモ
+デル定義でコレーションを設定する方法を提供していません。
 
 .. _documented thoroughly: http://dev.mysql.com/doc/refman/5.0/en/charset.html
 
-By default, with a UTF-8 database, MySQL will use the
-``utf8_general_ci_swedish`` collation. This results in all string equality
-comparisons being done in a *case-insensitive* manner. That is, ``"Fred"`` and
-``"freD"`` are considered equal at the database level. If you have a unique
-constraint on a field, it would be illegal to try to insert both ``"aa"`` and
-``"AA"`` into the same column, since they compare as equal (and, hence,
-non-unique) with the default collation.
+デフォルトの構成では、 MySQL は UTF-8 のデータベースに対して
+``utf8_general_ci_swedish`` コレーションを使います。この設定では、全ての文
+字列の等値比較が *大小文字を区別* せず行われます。つまり、 ``"Fred"`` と
+``"freD"`` はデータベースレベルでは同じ値だとみなされるのです。そのため、デ
+フォルトのコレーションを使っていると、フィールドに ``unique`` 制約をかけた
+ときに、 ``"aa"`` と ``"AA"`` は等しいとみなされ (一意性が破れるので) 同じ
+カラムに入れられなくなります。
 
-In many cases, this default will not be a problem. However, if you really want
-case-sensitive comparisons on a particular column or table, you would change
-the column or table to use the ``utf8_bin`` collation. The main thing to be
-aware of in this case is that if you are using MySQLdb 1.2.2, the database backend in Django will then return
-bytestrings (instead of unicode strings) for any character fields it returns
-receive from the database. This is a strong variation from Django's normal
-practice of *always* returning unicode strings. It is up to you, the
-developer, to handle the fact that you will receive bytestrings if you
-configure your table(s) to use ``utf8_bin`` collation. Django itself should work
-smoothly with such columns, but if your code must be prepared to call
-``django.utils.encoding.smart_unicode()`` at times if it really wants to work
-with consistent data -- Django will not do this for you (the database backend
-layer and the model population layer are separated internally so the database
-layer doesn't know it needs to make this conversion in this one particular
-case).
+大抵のケースでは、デフォルトの設定はさして問題を起こしません。しかし、特定
+のカラムやテーブルで大小文字を区別させたいなら、そのカラムやテーブルに
+``utf8_bin`` コレーションを指定せねばなりません。その場合、注意すべきなのは、
+MySQLdb 1.2.2 を使っていると、 Django のデータベースバックエンドが、データ
+ベースから取り出した文字列フィールドの値として (unicode 文字列ではなく)
+bytestring を返すということです。このふるまいは、 *常に* unicode を返す、と
+いう Django の通常のやりかたから大きくかけ離れています。コレーションを
+``utf8_bin`` にして、 bytestring を受け取ったときの扱いは、開発者に委ねられ
+ています。 Django 自体はこのカラムを問題なく扱えますが、一貫性をもってデー
+タを処理したければ、 ``django.utils.encoding.smart_unicode()`` を何度も
+呼び出すことになるでしょう。(データベースバックエンドレイヤとモデルの操作レ
+イヤは内部的に分離しているため、変換が必要かどうかをデータベースレイヤでは
+判断できないので) Django はこの変換に関知しないのです。
 
-If you're using MySQLdb 1.2.1p2, Django's standard
-:class:`~django.db.models.CharField` class will return unicode strings even
-with ``utf8_bin`` collation. However, :class:`~django.db.models.TextField`
-fields will be returned as an ``array.array`` instance (from Python's standard
-``array`` module). There isn't a lot Django can do about that, since, again,
-the information needed to make the necessary conversions isn't available when
-the data is read in from the database. This problem was `fixed in MySQLdb
-1.2.2`_, so if you want to use :class:`~django.db.models.TextField` with
-``utf8_bin`` collation, upgrading to version 1.2.2 and then dealing with the
-bytestrings (which shouldn't be too difficult) is the recommended solution.
+MySQLdb 1.2.1p2 を使っているなら、コレーションを ``utf8_bin`` にしても、
+:class:`~django.db.models.CharField` は unicode 文字列を返します。しかし、
+今度は :class:`~django.db.models.TextField` が (Python 標準モジュール
+``array`` の) ``array.array`` を返します。データをデータベースから読み出す
+ときに、変換に必要な情報が手にはいらないので、 Django 側ではどうしようもあ
+りません。
+この問題は `MySQLdb 1.2.2 で解決済み <fixed in MySQLdb 1.2.2>`_ なので、
+``itf8_bin`` コレーションで :class:`~django.db.models.TextField` を使いたけ
+れば、バージョンを 1.2.2 に上げて、バイト文字列として扱うよう勧めます (それ
+ほど難しくはありません)。
 
-Should you decide to use ``utf8_bin`` collation for some of your tables with
-MySQLdb 1.2.1p2, you should still use ``utf8_collation_ci_swedish`` (the
-default) collation for the :class:`django.contrib.sessions.models.Session`
-table (usually called ``django_session`` and the table
-:class:`django.contrib.admin.models.LogEntry` table (usually called
-``django_admin_log``). Those are the two standard tables that use
-:class:`~django.db.model.TextField` internally.
+MySQLdb 1.2.1p2 で ``utf8_bin`` コレーションの設定されたテーブルを使うのな
+ら、 :class:`django.contrib.sessions.models.Session` のテーブル
+(通常は ``django_session``) や、
+:class:`django.contrib.admin.models.LogEntry` のテーブル
+(通常は ``django_admin_log``) のコレーションに
+``utf8_collation_ci_swedish`` (デフォルトのコレーション) を使わねばなりませ
+ん。これらは標準の Django のテーブルのうち、内部的に
+:class:`~django.db.model.TextField` を使っているものだからです。
 
 .. _fixed in MySQLdb 1.2.2: http://sourceforge.net/tracker/index.php?func=detail&aid=1495765&group_id=22307&atid=374932
 
@@ -263,51 +260,47 @@ Django はスキーマを作成する際にストレージエンジンを指定�
 
 .. _AlterModelOnSyncDB: http://code.djangoproject.com/wiki/AlterModelOnSyncDB
 
-.. TBD
+``BooleanField`` に関する注意
+-------------------------------
 
-Boolean fields in Django
--------------------------
-
-Since MySQL doesn't have a direct ``BOOLEAN`` column type, Django uses a
-``TINYINT`` column with values of ``1`` and ``0`` to store values for the
-:class:`~django.db.models.BooleanField` model field. Refer to the documentation
-of that field for more details, but usually this won't be something that will
-matter unless you're printing out the field values and are expecting to see
-``True`` and ``False.``.
+MySQL には直接的な ``BOOLEAN`` カラム型がないので、 Django は
+:class:`~django.db.models.BooleanField` の値を ``TINYINT`` カラムを使って 0
+または 1 で保存します。詳しくはモデルフィールドのドキュメントを参照してくだ
+さい。ただし、フィールドの値を出力したり、値が ``True`` や ``False`` でなけ
+ればならないような場合を除いて、特に問題はありません。
 
 .. _sqlite-notes:
 
-SQLite notes 
-============ 
+SQLite に関する注意
+=====================
  
-Versions of SQLite 3.3.5 and older `contain a bug`_ when handling ``ORDER BY``
-parameters. This can cause problems when you use the ``select`` parameter for
-the ``extra()`` QuerySet method. The bug can be identified by the error message
-``OperationalError: ORDER BY terms must not be non-integer constants``. The
-problem can be solved updating SQLite to version 3.3.6 or newer, possibly also
-updating the ``pysqlite2`` Python module in the process.
+バージョン 3.3.5 以前の SQLite には、 ``ORDER_BY`` パラメタの扱いかたに
+`バグがあります <contain a bug>`_ 。そのため、クエリセットメソッド
+``extra()`` を使って ``select`` のパラメタを指定しようとすると問題を引き起
+こします。このバグは、
+``OperationalError: ORDER BY terms must not be non-integer constants`` とい
+うメッセージを出力します。 SQLite のバージョンを 3.3.6 に上げ、
+``pysqlite2`` モジュールを更新すれば、問題を解決できます。
  
 .. _contain a bug: http://www.sqlite.org/cvstrac/tktview?tn=1768 
+
+バージョン 3.3.6 は 2006 年の 4 月にリリースされており、現在手に入る各プラッ
+トフォームのほとんどのバイナリ配布物で、Python から ``pysqlite2`` や
+``sqlite3`` を介して使える SQLite は新しいバージョンなので、あまり大きなイ
+ンパクトはありません。
+
+ただし、 Windows の場合、 Python 2.5 の公式の安定版リリースのバイナリ配布物
+には (今のところ 2.5.2 も)、 SQLite 3.3.4 が組み込まれているため、バグが確
+認されています。このため (Django 1.0 で) 3 つのテストスイートが失敗します。
+この問題は、上で述べたように、 新しいバージョン SQLite が組み込まれた
+``pysqlite2`` (``pysqlite-2.x.x.win32-py2.5.exe``) をダウンロードしてインス
+トールすれば解決できます。 Python 2.6 には新たなバージョンの SQLite が付属
+する予定なので、この問題の影響を受けないはずです。
  
-This has a very low impact because 3.3.6 was released in April 2006, so most 
-current binary distributions for different platforms include newer version of 
-SQLite usable from Python through either the ``pysqlite2`` or the ``sqlite3`` 
-modules. 
- 
-However, in the case of Windows, the official binary distribution of the stable 
-release of Python 2.5 (2.5.2 as of now) includes SQLite 3.3.4 so the bug can 
-make itself evident in that platform. There are (as of Django 1.0) even three 
-tests in the Django test suite that will fail when run under this setup.  As 
-described above, this can be solved by downloading and installing a newer 
-version of ``pysqlite2`` (``pysqlite-2.x.x.win32-py2.5.exe``) that includes and 
-uses a newer version of SQLite. Python 2.6 will ship with a newer version of 
-SQLite and so will no be affected by this issue. 
- 
-If you are in such platform and find yourself in the need to update 
-``pysqlite``/SQLite, you will also need to manually modify the 
-``django/db/backends/sqlite3/base.py`` file in the Django source tree so it 
-attempts to import ``pysqlite2`` before that ``sqlite3`` and so it can take 
-advantage of the new ``pysqlite2``/SQLite versions.
+上記のプラットフォームを使っていて、 ``pysqlite`` や SQLite を更新する必要
+があるなら、Django のソースツリーの ``django/db/backends/sqlite3/base.py``
+ファイルを手で編集して、 ``sqlite3`` より ``pysqlite2`` が先に import され
+るように変更してください。
 
 .. _oracle-notes:
 .. _Oracle notes:

@@ -205,33 +205,29 @@
 カスタムマネジャとモデルの継承
 -------------------------------------
 
-.. TBD
+クラスの継承とモデルのマネジャの関係は、お互い完全にしっくりきているわけで
+はありません。マネジャはたいていあるクラス固有のものなので、サブクラスでマ
+ネジャを継承するのは必ずしもよいアイデアとはいえないからです。また、最初に
+宣言されたマネジャが*デフォルトマネジャ* になることから、デフォルトマネジャ
+の制御が重要になってきます。そこで、ここでは、 Django がカスタムマネジャと
+:ref:`モデル継承 <model-inheritance>` をどのように扱うか説明します:
 
-Class inheritance and model managers aren't quite a perfect match for each
-other. Managers are often specific to the classes they are defined on and
-inheriting them in subclasses isn't necessarily a good idea. Also, because the
-first manager declared is the *default manager*, it is important to allow that
-to be controlled. So here's how Django handles custom managers and
-:ref:`model inheritance <model-inheritance>`:
+    1. 抽象ベースクラスでないクラスで定義されたマネジャは、他のクラスに継承
+       *されません* 。非抽象ベースクラスのマネジャを再利用したければ、
+       子クラスで明示的に宣言してください。この種のマネジャは、たいていマネ
+       ジャを定義しているクラス固有のもので、(デフォルトマネジャとして) 継
+       承すると思わぬ結果を招くことがあるからです。そのため、子クラスに自動
+       的に継承されないのです。
 
-    1. Managers defined on non-abstract base classes are *not* inherited by
-       child classes. If you want to reuse a manager from a non-abstract base,
-       redeclare it explicitly on the child class. These sorts of managers are
-       likely to be fairly specific to the class they are defined on, so
-       inheriting them can often lead to unexpected results (particularly as
-       far as the default manager goes). Therefore, they aren't passed onto
-       child classes.
+    2. 抽象ベースクラスのマネジャは、通常の Python の名前解決規則 
+       (name resolution order, 子クラスの名前が他の名前をオーバライドする、
+       親クラスリストの最初の親クラスの名前から順に参照する、など) に基づい
+       て、常に子クラスに継承されます。抽象ベースクラスは、子クラスに共通し
+       て持たせたい情報やふるまいを保持するためのクラスだからです。共通のマ
+       ネジャの定義は、共通の情報として親クラスに置くのが適切です。
 
-    2. Managers from abstract base classes are always inherited by the child
-       class, using Python's normal name resolution order (names on the child
-       class override all others; then come names on the first parent class,
-       and so on). Abstract base classes are designed to capture information
-       and behaviour that is common to their child classes. Defining common
-       managers is an appropriate part of this common information.
-
-    3. The default manager on a class is either the first manager declared on
-       the class, if that exists, or the default manager of the first abstract
-       base class in the parent hierarchy, if that exists. If no default
-       manager is explicitly declared, Django's normal default manager is
-       used.
+    3. デフォルトマネジャは、そのクラスで最初に宣言されたマネジャクラスか、
+       最初に見付かった抽象ベースクラスのデフォルトマネジャです。明示的なデ
+       フォルトマネジャの設定がなければ、 Django の通常のデフォルトマネジャ
+       を使います。
 
