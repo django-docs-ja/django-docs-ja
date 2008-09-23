@@ -1,38 +1,36 @@
 .. _ref-signals:
 
-=========================
-Built-in signal reference
-=========================
+=============================
+組み込みシグナルリファレンス
+=============================
 
 :revision-up-to: 8961 (1.0)
 
-.. TBD
-
-A list of all the signals that Django sends.
+ここでは、 Django が送信する組み込みのシグナルについて解説します。
 
 .. seealso::
 
-    The :ref:`comment framework <ref-contrib-comments-index>` sends a :ref:`set
-    of comment-related signals <ref-contrib-comments-signals>`.
+    :ref:`コメントフレームワーク <ref-contrib-comments-index>` は、
+    :ref:`コメントに関するシグナル <ref-contrib-comments-signals>` を送信し
+    ます。
 
-Model signals
-=============
+モデル関連のシグナル
+=========================
 
 .. module:: django.db.models.signals
-   :synopsis: Signals sent by the model system.
+   :synopsis: モデルシステムから送信されるシグナル
 
-The :mod:`django.db.models.signals` module defines a set of signals sent by the
-module system.
+:mod:`django.db.models.signals` モジュールでは、モデルシステムから送信され
+るシグナルを定義しています。
 
 .. warning::
 
-    Many of these signals are sent by various model methods like
-    :meth:`~django.db.models.Model.__init__` or
-    :meth:`~django.db.models.Model.save` that you can overwrite in your own
-    code.
+    ここに挙げるシグナルの多くは、 :meth:`~django.db.models.Model.__init__`
+    や :meth:`~django.db.models.Model.save` といった、オーバライド可能な様々
+    なメソッドから送信されます。
 
-    If you override these methods on your model, you must call the parent class'
-    methods for this signals to be sent.
+    従って、これらのメソッドをオーバライドする場合、親クラスのメソッドを呼
+    び出して、シグナルが送信されるようにせねばなりません。
 
 pre_init
 --------
@@ -42,37 +40,38 @@ pre_init
 
 .. ^^^^^^^ this :module: hack keeps Sphinx from prepending the module.
 
-Whenever you instantiate a Django model,, this signal is sent at the beginning
-of the model's :meth:`~django.db.models.Model.__init__` method.
+Django モデルをインスタンス化するとき、モデルの
+:meth:`~django.db.models.Model.__init__` 処理の最初の段階で送信されます。
 
-Arguments sent with this signal:
+シグナルの引数は以下の通りです:
 
     ``sender``
-        The model class that just had an instance created.
+        インスタンスを作成したモデルクラスです。
 
     ``args``
-        A list of positional arguments passed to
-        :meth:`~django.db.models.Model.__init__`:
+        :meth:`~django.db.models.Model.__init__` に渡された固定引数のリスト
+        です。
 
     ``kwargs``
-        A dictionary of keyword arguments passed to
-        :meth:`~django.db.models.Model.__init__`:.
+        :meth:`~django.db.models.Model.__init__` に渡されたキーワード引数の
+        リストです。
 
-For example, the :ref:`tutorial <intro-tutorial01>` has this line:
+例えば、 :ref:`チュートリアル <intro-tutorial01>` には以下のような行があり
+ます:
 
 .. code-block:: python
 
     p = Poll(question="What's up?", pub_date=datetime.now())
 
-The arguments sent to a :data:`pre_init` handler would be:
+この行の中で送信されるシグナルを :data:`pre_init` ハンドラで受けたときの引
+数は以下の通りです:
 
     ==========  ===============================================================
-    Argument    Value
+    引数        値
     ==========  ===============================================================
-    ``sender``  ``Poll`` (the class itself)
+    ``sender``  ``Poll`` (クラス自体)
 
-    ``args``    ``[]`` (an empty list because there were no positional
-                arguments passed to ``__init__``.)
+    ``args``    ``[]`` (``__init__`` には固定引数がないので空)
 
     ``kwargs``  ``{'question': "What's up?", 'pub_date': datetime.now()}``
     ==========  ===============================================================
@@ -83,15 +82,16 @@ post_init
 .. data:: django.db.models.signals.post_init
    :module:
 
-Like pre_init, but this one is sent when the :meth:`~django.db.models.Model.__init__`: method finishes.
+``pre_init`` とほぼ同じですが、 :meth:`~django.db.models.Model.__init__`
+の処理が終る直前に送信されます。
 
-Arguments sent with this signal:
+引数は以下の通りです:
 
     ``sender``
-        As above: rhe model class that just had an instance created.
+        ``pre_init`` と同じ、インスタンスを生成したモデルクラスです。
 
     ``instance``
-        The actual instance of the model that's just been created.
+        実際に生成されたモデルインスタンスです。
 
 pre_save
 --------
@@ -99,16 +99,16 @@ pre_save
 .. data:: django.db.models.signals.pre_save
    :module:
    
-This is sent at the beginning of a model's :meth:`~django.db.models.Model.save`
-method.
+モデルインスタンスの :meth:`~django.db.models.Model.save` の処理の最初に呼
+び出されます。
 
-Arguments sent with this signal:
+引数は以下の通りです:
 
     ``sender``
-        The model class.
+        モデルクラスです。
 
     ``instance``
-        The actual instance being saved.
+        これから保存されるインスタンスです。
 
 post_save
 ---------
@@ -116,36 +116,36 @@ post_save
 .. data:: django.db.models.signals.post_save
    :module: 
    
-Like :data:`pre_save`, but sent at the end of the
-:meth:`~django.db.models.Model.save` method.
+:data:`pre_save` に似ていますが、 :meth:`~django.db.models.Model.save` メソッ
+ドの処理の最後に呼び出されます。
 
-Arguments sent with this signal:
+引数は以下の通りです
 
     ``sender``
-        The model class.
+        モデルクラスです。
 
     ``instance``
-        The actual instance being saved.
+        保存されたインスタンスです。
 
     ``created``
-        A boolean; ``True`` if a new record was create.
+        ブール値で、レコードが新たに作成されたときに ``True`` を返します。
 
 pre_delete
 ----------
 
 .. data:: django.db.models.signals.pre_delete
    :module:
-   
-Sent at the beginning of a model's :meth:`~django.db.models.Model.delete`
-method.
 
-Arguments sent with this signal:
+モデルインスタンスの :meth:`~django.db.models.Model.delete` メソッドの処理
+の先頭で呼出されます。
+
+引数は以下の通りです:
 
     ``sender``
-        The model class.
+        モデルクラスです。
 
     ``instance``
-        The actual instance being saved.
+        削除されるインスタンスです。
 
 post_delete
 -----------
@@ -153,39 +153,40 @@ post_delete
 .. data:: django.db.models.signals.post_delete
    :module: 
    
-Like :data:`pre_delete`, but sent at the end of the
-:meth:`~django.db.models.Model.delete` method.
+:data:`pre_delete` に似ていますが、 :meth:`~django.db.models.Model.delete`
+メソッドの処理の最後に呼び出されます。
 
-Arguments sent with this signal:
+引数は以下の通りです:
 
     ``sender``
-        The model class.
+        モデルクラスです。
 
     ``instance``
-        The actual instance being saved.
+        削除されたインスタンスです。
 
-        Note that the object will no longer be in the database, so be very
-        careful what you do with this instance
+        オブジェクトはもはやデータベース上に存在しないので、このインスタン
+	スの扱いには十分注意してください。
 
 class_prepared
 --------------
 
 .. data:: django.db.models.signals.class_prepared
    :module:
-   
-Sent whenever a model class has been "prepared" -- that is, once model has
-been defined and registered with Django's model system. Django uses this
-signal internally; it's not generally used in third-party applications.
 
-Arguments that are sent with this signal:
+モデルクラスの「準備が完了した」ときに呼び出されます。準備の完了とは、モデ
+ルの定義が読み込まれ、 Django のモデルシステムに組み込まれたことを示します。
+Django はこのシグナルを内部的に使っています。通常は、サードパーティ製のアプ
+リケーションでは使いません。
+
+引数は以下の通りです:
 
 ``sender``
-    The model class which was just prepared.
+    準備の完了したモデルクラスです。
 
-Management signals
-==================
+管理コマンド関連のシグナル
+=============================
 
-Signals sent by :ref:`django-admin <ref-django-admin>`.
+:ref:`django-admin <ref-django-admin>` の送信するシグナルです。
 
 post_syncdb
 -----------
@@ -193,120 +194,118 @@ post_syncdb
 .. data:: django.db.models.signals.post_syncdb
    :module:
 
-Sent by :djadmin:`syncdb` after it installs an application.
+:djadmin:`syncdb` でアプリケーションがインストールされると送信されます。
 
-Any handlers that listen to this signal need to be written in a particular
-place: a ``management`` module in one of your :setting:`INSTALLED_APPS`. If
-handlers are registered anywhere else they may not be loaded by
-:djadmin:`syncdb`.
+このシグナルを待ち受けるハンドラは、 :setting:`INSTALLED_APPS` に登録されて
+いるいずれかのアプリケーションの ``management`` モジュール内に定義せねばな
+りません。それ以外の場所にハンドラを定義しても、 :djadmin:`syncdb` はハンド
+ラをロードしません。
 
-Arguments sent with this signal:
+引数は以下の通りです:
 
     ``sender``
-        The ``models`` module that was just installed. That is, if
-        :djadmin:`syncdb` just installed an app called ``"foo.bar.myapp"``,
-        ``sender`` will be the ``foo.bar.myapp.models`` module.
+        インストールされた ``models`` モジュールです。つまり、
+        :djadmin:`syncdb` が ``"foo.bar.myapp"`` という名前のアプリケーショ
+        ンをインストールすると、 ``sender`` には ``foo.bar.myapp.models``
+        モジュールが入ります。
 
     ``app``
-        Same as ``sender``.
+        ``sender`` と同じです。
 
     ``created_models``
-        A list of the model classes from any app which :djadmin:`syncdb` has
-        created so far.
+        :djadmin:`syncdb` が生成した全てのモデルクラスからなるリストです。
 
     ``verbosity``
-        Indicates how much information manage.py is printing on screen. See
-        the :djadminopt:`--verbosity`` flag for details.
+        manage.py がどれくらいの情報をスクリーンに表示しているかを示す値で
+        す。詳しくは :djadminopt:`--verbosity`` フラグを参照してください。
 
-        Functions which listen for :data:`post_syncdb` should adjust what they
-        output to the screen based on the value of this argument.
+        :data:`post_syncdb` を待ち受けている関数は、この引数の値に従って、
+	スクリーンに表示するメッセージの量を調整してください。
 
     ``interactive``
-        If ``interactive`` is ``True``, it's safe to prompt the user to input
-        things on the command line. If ``interactive`` is ``False``, functions
-        which listen for this signal should not try to prompt for anything.
+        ``interactive`` が ``True`` の場合、ユーザにコマンドプロンプトを提
+        示してもかまいません。 ``interactive`` が ``False`` であれば、シグ
+        ナルを待ち受ける関数は、ユーザにプロンプトを表示してはなりません。
 
-        For example, the :mod:`django.contrib.auth` app only prompts to create a
-        superuser when ``interactive`` is ``True``.
-
-Request/response signals
-========================
+リクエスト／レスポンス関連のシグナル
+=======================================
 
 .. module:: django.core.signals
-   :synopsis: Core signals sent by the request/response system.
+   :synopsis: リクエスト／レスポンスシステムの送信するコアシグナルです。
 
-Signals sent by the core framework when processing a request.
+コアフレームワークがリクエストを処理する際に送信するシグナルです。
 
 request_started
 ---------------
 
 .. data:: django.core.signals.request_started
    :module: 
-   
-Sent when Django begins processing an HTTP request.
 
-Arguments sent with this signal:
+Djang が HTTP リクエストを送信する直前に送信されます。   
+
+引数は以下の通りです:
 
     ``sender``
-        The handler class -- i.e.
-        :class:`django.core.handlers.modpython.ModPythonHandler` or
-        :class:`django.core.handlers.wsgi.WsgiHandler` -- that handled
-        the request.
+        リクエストを処理するハンドラクラス、すなわち
+        :class:`django.core.handlers.modpython.ModPythonHandler` や
+        :class:`django.core.handlers.wsgi.WsgiHandler` です。
 
 request_finished
 ----------------
 
 .. data:: django.core.signals.request_finished
    :module:
-   
-Sent when Django finishes processing an HTTP request.
 
-Arguments sent with this signal:
+Django が HTTP リクエストの処理を終了した直後に呼び出されます。   
+
+引数は以下の通りです:
 
     ``sender``
-        The handler class, as above.
+        上と同じく、ハンドラクラスです。
 
 got_request_exception
 ---------------------
 
 .. data:: django.core.signals.got_request_exception
    :module:
-   
-This signal is sent whenever Django encounters an exception while processing an incoming HTTP request.
 
-Arguments sent with this signal:
+このシグナルは、 Django が HTTP リクエストの処理中に例外に遭遇したときに送
+信されます。
+
+引数は以下の通りです:
 
     ``sender``
-        The handler class, as above.
+        上と同じく、ハンドラクラスです。
 
     ``request``
-        The :class:`~django.http.HttpRequest` object.
+        :class:`~django.http.HttpRequest` オブジェクトです。
 
-Test signals
-============
+テスト関連のシグナル
+============================
 
 .. module:: django.test.signals
-   :synopsis: Signals sent during testing.
+   :synopsis: テスト中に送信されるシグナルです。
 
-Signals only sent when :ref:`running tests <topics-testing>`.
+:ref:`テストの実行中 <topics-testing>` にのみ送信されるシグナルです。
 
 template_rendered
 -----------------
 
 .. data:: django.test.signals.template_rendered
    :module:
-   
-Sent when the test system renders a template. This signal is not emitted during
-normal operation of a Django server -- it is only available during testing.
 
-Arguments sent with this signal:
+テストシステムがテンプレートをレンダするときに送信されます。このシグナルは、
+通常の Django サーバの操作では送信されず、テスト中しか使えません。
 
-    sender
-        The :class:`~django.template.Template` object which was rendered.
+引数は以下の通りです:
 
-    template
-        Same as sender
+    ``sender``
+        これからレンダされる :class:`~django.template.Template` テンプレー
+        トオブジェクトです。
 
-    context
-        The :class:`~django.template.Context` with which the template was
-        rendered.
+    ``template``
+        ``sender`` と同じ値です。
+
+    ``context``
+        テンプレートをレンダするときに渡される
+        :class:`~django.template.Context` です。

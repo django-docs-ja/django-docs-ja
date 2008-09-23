@@ -1,32 +1,31 @@
 .. _ref-models-relations:
 
 =====================================
-Related objects reference
+リレーションオブジェクトリファレンス
 =====================================
 
 :revision-up-to: 8961 (1.0)
 
-.. TBD
-
-Extra methods on managers when used in a ForeignKey context
-===========================================================
+ForeignKey を経由した場合にマネジャから利用できる追加のメソッド
+====================================================================
 
 .. currentmodule:: django.db.models
 
 .. method:: QuerySet.add(obj1, [obj2, ...])
 
-    Adds the specified model objects to the related object set.
+    指定したモデルオブジェクトを、披リレーションのセットに追加し (リレーショ
+    ン先のオブジェクトからリレーションを張り)ます。
 
-    Example::
+    使い方::
 
         >>> b = Blog.objects.get(id=1)
         >>> e = Entry.objects.get(id=234)
-        >>> b.entry_set.add(e) # Associates Entry e with Blog b.
+        >>> b.entry_set.add(e) # Entry e を Blog b に関連づけます。
 
 .. method:: QuerySet.create(**kwargs)`
 
-    Creates a new object, saves it and puts it in the related object set.
-    Returns the newly created object::
+    新たなオブジェクトを生成し、保存して、披リレーションのセットに追加しま
+    す。新たに生成されたオブジェクトを返します::
 
         >>> b = Blog.objects.get(id=1)
         >>> e = b.entry_set.create(
@@ -35,9 +34,9 @@ Extra methods on managers when used in a ForeignKey context
         ...     pub_date=datetime.date(2005, 1, 1)
         ... )
         
-        # No need to call e.save() at this point -- it's already been saved.
+        # e は自動的に保存されるので、 e.save() は呼ばなくてかまいません
 
-    This is equivalent to (but much simpler than)::
+    上の例は、下記と同じ処理を実現します::
 
         >>> b = Blog.objects.get(id=1)
         >>> e = Entry(
@@ -48,34 +47,37 @@ Extra methods on managers when used in a ForeignKey context
         .... )
         >>> e.save()
 
-    Note that there's no need to specify the keyword argument of the model that
-    defines the relationship. In the above example, we don't pass the parameter
-    ``blog`` to ``create()``. Django figures out that the new ``Entry`` object's
-    ``blog`` field should be set to ``b``.
+    リレーションを定義するためのキーワード引数を指定する必要はないので注意
+    してください。上の例では、 ``create()`` に ``blog`` パラメタを渡してい
+    ません。 Django は ``Entry`` オブジェクトの ``blog`` フィールドに自動的
+    に ``b`` をセットします。
 
 .. method:: QuerySet.remove(obj1, [obj2, ...])
 
-    Removes the specified model objects from the related object set::
+    指定したオブジェクトを披リレーションセットから除去します::
     
         >>> b = Blog.objects.get(id=1)
         >>> e = Entry.objects.get(id=234)
         >>> b.entry_set.remove(e) # Disassociates Entry e from Blog b.
 
-    In order to prevent database inconsistency, this method only exists on
-    ``ForeignKey`` objects where ``null=True``. If the related field can't be
-    set to ``None`` (``NULL``), then an object can't be removed from a relation
-    without being added to another. In the above example, removing ``e`` from
-    ``b.entry_set()`` is equivalent to doing ``e.blog = None``, and because the
-    ``blog`` ``ForeignKey`` doesn't have ``null=True``, this is invalid.
+    データベースの一貫性を保持するために、このメソッドは ``null=True`` の
+    ``ForeignKey`` オブジェクトがリレーションを張っている先のモデルでしか使
+    えません。リレーションフィールドの値を ``None`` (``NULL``) にできなけれ
+    ば、あるオブジェクトを披リレーションセットから除去したときに、何らかの
+    他のオブジェクトに対してリレーションを張り直さなければならないからです。
+    上の例で、 ``b.entry_set()`` からの ``e`` の除去は ``e.blog = None`` に
+    相当しますが、 ``blog`` の ``ForeignKey`` には ``null=True`` が設定され
+    ていないので、これは無効な操作です。
 
 .. method:: QuerySet.clear()
 
-    Removes all objects from the related object set::
+    披リレーションセットから、全てのオブジェクトを除去します::
 
         >>> b = Blog.objects.get(id=1)
         >>> b.entry_set.clear()
 
-    Note this doesn't delete the related objects -- it just disassociates them.
+    このメソッドは、リレーション元のオブジェクトを削除せず、ただ単にリレー
+    ションを解除するだけなので注意してください。
 
-    Just like ``remove()``, ``clear()`` is only available on ``ForeignKey``s
-    where ``null=True``.
+    ``remove()`` と同様、 ``clear()`` は ``null=True`` の ``ForeignKey``
+    でしか使えません。

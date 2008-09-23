@@ -1,37 +1,33 @@
 .. _howto-initial-data:
 
 =================================
-Providing initial data for models
+モデルに初期データを与える
 =================================
-
-.. TBD
 
 :revision-up-to: 8961 (1.0)
 
-It's sometimes useful to pre-populate your database with hard-coded data when
-you're first setting up an app. There's a couple of ways you can have Django
-automatically create this data: you can provide `initial data via fixtures`_, or
-you can provide `initial data as SQL`_.
+アプリケーションを最初にセットアップするときに、データベースにハードコード
+されたデータを投入できると便利なことがあります。 Django に自動的に初期デー
+タを投入させる方法は二つあります: ひとつは `フィクスチャによる初期データの
+投入 <providing-initial-data with-fixtures>`_ で、もう一つは `SQL による初
+期データの投入 <initial-sql>`_ です。
 
-In general, using a fixture is a cleaner method since it's database-agnostic,
-but initial SQL is also quite a bit more flexible.
+.. _providing-initial-data with-fixtures:
 
-.. _initial data as sql: `providing initial sql data`_
-.. _initial data via fixtures: `providing initial data with fixtures`_
-
-Providing initial data with fixtures
+フィクスチャによる初期データの投入
 ====================================
 
-A fixture is a collection of data that Django knows how to import into a
-database. The most straightforward way of creating a fixture if you've already
-got some data is to use the :djadmin:`manage.py dumpdata` command. Or, you can
-write fixtures by hand; fixtures can be written as XML, YAML, or JSON documents.
-The :ref:`serialization documentation <topics-serialization>` has more details
-about each of these supported :ref:`serialization formats
-<serialization-formats>`.
+フィクスチャ (fixture) とは、 Django のデータベースに投入できるよう準備済み
+のデータの集まりです。すでにデータの入ったデータベースを持っているなら、最
+も簡単にフィクスチャを生成する方法は :djadmin:`manage.py dumpdata
+<dumpdata>` コマンドです。フィクスチャは手でも書けます。フィクスチャは XML,
+YAML または JSON ドキュメントとして書けるからです。サポートされている
+:ref:`シリアライゼーションフォーマット <serialization-formats>` の詳細は
+:ref:`シリアライゼーションのドキュメント <topics-serialization>` を参照して
+ください。
 
-As an example, though, here's what a fixture for a simple ``Person`` model might
-look like in JSON:
+とはいえ、一例として、 JSON で書かれた ``Person`` モデルのフィクスチャを示
+しておきます:
 
 .. code-block:: js
 
@@ -53,8 +49,8 @@ look like in JSON:
         }
       },
     ]
-    
-And here's that same fixture as YAML:
+
+YAML で書くと以下のようになります:    
 
 .. code-block:: none
 
@@ -68,77 +64,80 @@ And here's that same fixture as YAML:
       fields:
         first_name: Paul
         last_name: McCartney
-        
-You'll store this data in a ``fixtures`` directory inside you app.
 
-Loading data is easy: just call :djadmin:`manage.py loaddata fixturename
-<loaddata>`, where *fixturename* is the name of the fixture file you've created.
-Every time you run :djadmin:`loaddata` the data will be read from the fixture
-and re-loaded into the database. Note that this means that if you change one of
-the rows created by a fixture and the run :djadmin:`loaddata` again you'll wipe
-out any changes you've made.
+フィクスチャデータはアプリケーションの ``fixture`` ディレクトリに保存します。
 
-Automatically loading initial data fixtures
--------------------------------------------
+データのロードは簡単で、単に :djadmin:`manage.py loaddata fixturename
+<loaddata>` を実行するだけです。 *fixturename* はフィクスチャファイルの名前
+です。 :djadmin:`loaddata` を実行するたびに、フィクスチャデータが読み出され、
+データベースにリロードされます。つまり、フィクスチャによって生成されたレコー
+ド行を変更して :djadmin:`loaddata` を再度実行すると、変更後のデータは消去さ
+れてしまうのです。注意してください。
 
-If you create a fixture named ``initial_data.[xml/yml/json]``, that fixture will
-be loaded every time you run :djadmin:`syncdb`. This is extremely convenient,
-but be careful: remember that the data will be refreshed *every time* you run
-:djadmin:`syncdb`. So don't use ``initial_data`` for data you'll want to edit.
+初期データフィクスチャの自動ロード
+-----------------------------------
+
+``initial_data.[xml/yml/json]`` という名前のフィクスチャを作成しておくと、
+:djadmin:`syncdb` を実行するたびに自動的にロードされます。この機能はとても
+便利なのですが、一つだけ注意が必要です。というのも、 :djadmin:`syncdb`
+を実行するたびに *毎回* データがリフレッシュされるからです。ですから、
+変更する予定のデータに ``initial_data`` を使ってはなりません。
 
 .. seealso::
 
-    Fixtures are also used by the :ref:`testing framework
-    <topics-testing-fixtures>` to help set up a consistent test environment.
+    フィクスチャは :ref:`テストフレームワーク <topics-testing-fixtures>` で
+    一貫したテスト環境を構築するためにも使われています。
 
 .. _initial-sql:
 
-Providing initial SQL data
+SQL による初期データの投入
 ==========================
 
-Django provides a hook for passing the database arbitrary SQL that's executed
-just after the CREATE TABLE statements when you run :djadmin:`syncdb`. You can
-use this hook to populate default records, or you could also create SQL
-functions, views, triggers, etc.
+Django には、データベースに任意の SQL を渡すためのフックがあります。 この
+SQL は、 :djadmin:`syncdb` を実行した時に CREATE TABLE 文の直後に実行されま
+す。このフックを使えば、自動的にデフォルトのレコードをテーブルに追加したり、
+SQL関数やビュー、トリガなどを作成したりできます。
 
-The hook is simple: Django just looks for a file called ``sql/<modelname>.sql``,
-in your app directory, where ``<modelname>`` is the model's name in lowercase.
+フックのからくりは単純です: Django はアプリケーション内の
+``sql/<modelname>.sql`` という名前のファイルを探し、実行するだけです。
+``<modelname>`` は、モデル名を小文字にした文字列です。
 
-So, if you had a ``Person`` model in an app called ``myapp``, you could add
-arbitrary SQL to the file ``sql/person.sql`` inside your ``myapp`` directory.
-Here's an example of what the file might contain:
+このドキュメントの冒頭にある ``Person`` の例で、モデルが ``myapp`` の下に置
+かれていたとすると、 ``myapp/sql/person.sql`` というファイルに任意の SQL 文を指定できます。例えば以下のような命令を入れられます:
 
 .. code-block:: sql
 
     INSERT INTO myapp_person (first_name, last_name) VALUES ('John', 'Lennon');
     INSERT INTO myapp_person (first_name, last_name) VALUES ('Paul', 'McCartney');
 
-Each SQL file, if given, is expected to contain valid SQL statements
-which will insert the desired data (e.g., properly-formatted
-``INSERT`` statements separated by semicolons).
+各 SQL ファイルには、必要なデータを ``INSERT`` するための有効な SQL 文を
+(すなわち、正しくフォーマットされた ``INSERT`` 文をセミコロンで区切って) 入
+れておかねばなりません。 
 
-The SQL files are read by the :djadmin:`sqlcustom`, :djadmin:`sqlreset`,
-:djadmin:`sqlall` and :djadmin:`reset` commands in :ref:`manage.py
-<ref-django-admin>`. Refer to the :ref:`manage.py documentation
-<ref-django-admin>` for more information.
+SQL ファイルは :ref:`manage.py <ref-django-admin>` の :djadmin:`sqlcustom`
+:djadmin:`sqlreset`, :djadmin:`sqlall` および :djadmin:`reset` コマンドの実
+行時に参照されます。詳しくは :ref:`manage.py のドキュメント
+<ref-django-admin>` を参照してください。
 
-Note that if you have multiple SQL data files, there's no guarantee of the order
-in which they're executed. The only thing you can assume is that, by the time
-your custom data files are executed, all the database tables already will have
-been created.
+複数の SQL データファイルがある場合、個々のファイルを実行する順番は保証され
+ていないので注意して下さい。仮定していてよいのは、カスタムの SQL データファ
+イルを実行する前に、必ずデータベーステーブルは作成されているということだけ
+です。
 
-Database-backend-specific SQL data
-----------------------------------
+データベースバックエンド特有の SQL データ
+-----------------------------------------
 
-There's also a hook for backend-specific SQL data. For example, you can have
-separate initial-data files for PostgreSQL and MySQL. For each app, Django
-looks for a file called ``<appname>/sql/<modelname>.<backend>.sql``, where
-``<appname>`` is your app directory, ``<modelname>`` is the model's name in
-lowercase and ``<backend>`` is the value of :setting:`DATABASE_ENGINE` in your
-settings file (e.g., ``postgresql``, ``mysql``).
+バックエンド特有の SQL データに対するフックもあります。例えば、 PostgreSQL
+と MySQL 向けに別々の初期データを用意できます。各アプリケーションごとに
+Django は ``<appname>/sql/<modelname>.<backend>.sql`` というファイルを探し
+ます。 ``<appname>`` はアプリケーションディレクトリの名前、 ``<modelname>``
+はモデル名を小文字にした文字列、 ``<backend>`` は設定ファイルの
+:setting:`DATABASE_ENGINE` に指定するバックエンドの名前 (``postgresql``,
+``mysql`` など) です。
 
-Backend-specific SQL data is executed before non-backend-specific SQL data. For
-example, if your app contains the files ``sql/person.sql`` and
-``sql/person.postgresql.sql`` and you're installing the app on PostgreSQL,
-Django will execute the contents of ``sql/person.postgresql.sql`` first, then
-``sql/person.sql``.
+バックエンド固有の SQL データは、バックエンド非固有の SQL データよりも前に
+実行されます。例えば、アプリケーション中に ``sql/person.sql`` および
+``sql/person.postgresql.sql`` が入っていて、 PostgreSQL をバックエンドにし
+てインストールを行った場合、 Django はまず ``sql/person.postgresql.sql`` の
+内容を実行してから ``sql/person.sql`` を実行します。
+

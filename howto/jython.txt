@@ -1,89 +1,89 @@
 .. _howto-jython:
 
-========================
-Running Django on Jython
-========================
-
-.. TBD
+============================
+Jython 上で Django を動かす
+============================
 
 :revision-up-to: 8961 (1.0)
 
 .. index:: Jython, Java, JVM
 
-Jython_ is an implementation of Python that runs on the Java platform (JVM).
-Django runs cleanly on Jython version 2.5 or later, which means you can deploy
-Django on any Java platform.
+Jython_ は Java プラットフォーム (JVM) 上で動作する Python 実装です。
+Django は バージョン 2.5 以降の Jython で問題なく動作します。つまり、 Java
+プラットフォームで Django をデプロイできるのです。
 
-This document will get you up and running with Django on top of Jython.
+このドキュメントでは、 Jython 上で Django をセットアップして動作させる方法
+を説明します。
 
 .. _jython: http://jython.org/
 
-Installing Jython
-=================
+Jython のインストール
+======================
 
-Django works with Jython versions 2.5 and higher. 
+Django を動かすにはバージョン 2.5 以降の Jython が必要です。
 
 .. warning::
 
-    As of the writing of this document, a version of Jython compatible with
-    Django has not yet been released. The forthcoming 2.5a2+ release will be be
-    the first in which Django will work out of the box. 
-    
-    In the meantime, you'll need to use the latest development version of Jython
-    obtained from Jython's SVN repository.
+    このドキュメントを書いている時点で、 Django と互換性のあるバージョンの
+    Jython はまだ正式リリースされていません。 まもなく登場する 2.5a2+ リリー
+    スが、そのままで Django をすぐ動かせる最初のバージョンになるでしょう。
 
-Download Jython at http://jython.org/.
+    Jython 2.5 が正式リリースされるまでは、 Jython の SVN リポジトリから開
+    発中の最新版の Jython を取り出して使ってください。
 
-Creating a servlet container
-============================
+Jython は http://jython.org/ からダウンロードします。
 
-If you just want to experiment with Django, skip ahead to the next section;
-Django includes a lightweight Web server you can use for testing, so you won't
-need to set up anything else until you're ready to deploy Django in production.
+サーブレットコンテナを作成する
+================================
 
-If you want to use Django on a production site, use a Java servlet container,
-such as `Apache Tomcat`_. Full JavaEE applications servers such as `GlassFish`_
-or `JBoss`_ are also OK, if you need the extra features they include.
+Django を試してみたいだけなら、この節は飛ばして次の節に進んでください。
+Django にはテスト用の軽量なウェブサーバが付属しているので、実運用環境でデプ
+ロイするまで、特にセットアップ作業は必要ないからです。
+
+Django を実運用環境で使いたければ、 `Apache Tomcat`_ のような Java のサーブ
+レットコンテナを使ってください。 `GlassFish`_ や `JBoss`_ のようなフル
+JavaEE アプリケーションサーバも OK で、組み込みの機能を使えます。
 
 .. _`Apache Tomcat`: http://tomcat.apache.org/
 .. _GlassFish: https://glassfish.dev.java.net/
 .. _JBoss: http://www.jboss.org/
 
-Installing Django
-=================
+Django のインストール
+======================
 
-The next step is to install Django itself. This is exactly the same as
-installing Django on standard Python, so see
-:ref:`removing-old-versions-of-django` and :ref:`install-django-code` for
-instructions.
+次は Django 自体をインストールしましょう。このステップは、 Python 環境への
+Django のインストールと全く同じなので、
+:ref:`removing-old-versions-of-django` や  :ref:`install-django-code` を参
+照してください。
 
-Installing Jython platform support libraries
-============================================
+Jython プラットフォームのサポートライブラリをインストールする
+===============================================================
 
-The `django-jython`_ project contains database backends and management commands
-for Django/Jython development. Note that the builtin Django backends won't work
-on top of Jython.
+`django-jython`_ プロジェクトには、データベースバックエンドと、
+Django/Jython 開発用の管理コマンドが入っています。 Django 組み込みのデータ
+ベースバックエンドは Jython では動かないので注意してください。
 
 .. _`django-jython`: http://code.google.com/p/django-jython/
 
-To install it, follow the `installation instructions`_ detailed on the project
-website. Also, read the `database backends`_ documentation there.
+プロジェクトのウェブサイトに書かれている `インストールの解説 <installation
+instructions>`_ を読んでインストールしてください。また、 
+`データベースバックエンド <database backends>`_ の説明も参照してください。
 
 .. _`installation instructions`: http://code.google.com/p/django-jython/wiki/Install
 .. _`database backends`: http://code.google.com/p/django-jython/wiki/DatabaseBackends
 
-Differences with Django on Jython
+CPython で動かすときとの違い
 =================================
 
 .. index:: JYTHONPATH
 
-At this point, Django on Jython should behave nearly identically to Django
-running on standard Python. However, are a few differences to keep in mind:
+今のところ、 Jython で動かした Django は標準の Python で動かした Django と
+ほとんど同じようにふるまいます。ただし、いくつか違いがあるので注意してくだ
+さい:
 
-    * Remember to use the ``jython`` command instead of ``python``. The
-      documentation uses ``python`` for consistancy, but if you're using Jython
-      you'll want to mentally replace ``python`` with ``jython`` every time it
-      occurs.
+    * ``python`` コマンドの代わりに ``jython`` を使ってください。 Django の
+      ドキュメントでは、一貫性のために ``python`` と表記していますが、実際
+      にコマンドラインを入力するときには ``jython`` に読み変えてください。
      
-    * Similarly, you'll need to use the ``JYTHONPATH`` environment variable
-      instead of ``PYTHONPATH``.
+    * 同様に、環境変数 ``PYTHONPATH`` の代わりに ``JYTHONPATH`` を使う必要
+      があります。

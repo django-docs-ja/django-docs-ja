@@ -1,38 +1,36 @@
 .. _ref-files-file:
 
-The ``File`` object
-===================
+``File`` オブジェクト
+======================
 
 :revision-up-to: 8961 (1.0)
-
-.. TBD
 
 .. currentmodule:: django.core.files
 
 .. class:: File(file_object)
 
-``File`` attributes and methods
--------------------------------
+属性とメソッド
+----------------
 
-Django's ``File`` has the following attributes and methods:
+Django の ``File`` 型は、以下の属性とメソッドを備えています:
 
 .. attribute:: File.name
 
-    The name of file including the relative path from :setting:`MEDIA_ROOT`.
+    :setting:`MEDIA_ROOT` からの相対パスを含む、ファイルの名前です。
 
 .. attribute:: File.path
 
-    The absolute path to the file's location on a local filesystem.
+    ローカルのファイルシステムにおけるファイルの絶対パスです。
 
-    :ref:`Custom file storage systems <howto-custom-file-storage>` may not store
-    files locally; files stored on these systems will have a ``path`` of
-    ``None``.
+    :ref:`カスタムのファイルストレージシステム <howto-custom-file-storage>`
+    の場合、必ずしもローカルにファイルを保存しません。ローカルにファイルを
+    保存しないシステムでは、 ``path`` は ``None`` です。
 
 .. attribute:: File.url
 
-    The URL where the file can be retrieved. This is often useful in
-    :ref:`templates <topics-templates>`; for example, a bit of a template for
-    displaying a ``Car`` (see above) might look like:
+    ファイルを取得できる URL です。 :ref:`templates <topics-templates>` で
+    使う場合に便利です。例えば、ファイル :ref:`topics-files` の ``Car``
+    の例で、車の写真を表示するテンプレートは以下のように書けます:
     
     .. code-block:: html+django
 
@@ -40,86 +38,88 @@ Django's ``File`` has the following attributes and methods:
 
 .. attribute:: File.size
 
-    The size of the file in bytes.
+    バイト単位のファイルサイズです。
 
 .. method:: File.open(mode=None)
 
-    Open or reopen the file (which by definition also does ``File.seek(0)``).
-    The ``mode`` argument allows the same values as Python's standard
-    ``open()``.
+    ファイルをオープンまたは再オープン (かつ ``File.seek(0)``) します。
+    ``mode`` 引数には、 Python の標準の関数 ``open()`` と同じ引数を指定でき
+    ます。
 
-    When reopening a file, ``mode`` will override whatever mode the file was
-    originally opened with; ``None`` means to reopen with the original mode.
+    ファイルを再オープンした場合、 ``mode`` は最初にオープンしたときのファ
+    イルモードをオーバライドします。 ``None`` を指定すると、最初のモードと
+    同じモードを使います。
 
 .. method:: File.read(num_bytes=None)
 
-    Read content from the file. The optional ``size`` is the number of bytes to
-    read; if not specified, the file will be read to the end.
+    ファイルからコンテンツを読み出します。オプションの ``num_bytes``
+    は読み出すデータの長さです。指定しなければ、末尾まで読み出します。
 
 .. method:: File.__iter__()
 
-    Iterate over the file yielding one line at a time.
+    ファイルを一度に一行づつ繰り返して読み出します。
 
 .. method:: File.chunks(chunk_size=None)
 
-    Iterate over the file yielding "chunks" of a given size. ``chunk_size``
-    defaults to 64 KB.
+    ファイルを ``chunk_size`` に指定したサイズのチャンク ("chunk") づつ繰り
+    返して読み出します。 ``chunk_size`` のデフォルトサイズは 64KB です。
 
-    This is especially useful with very large files since it allows them to be
-    streamed off disk and avoids storing the whole file in memory.
+    このメソッドは、ファイル全体をメモリに保存しなくても、ディスクからスト
+    リーム読み出しできるので、巨大なファイルを読むときに便利です。
 
 .. method:: File.multiple_chunks(chunk_size=None)
 
-    Returns ``True`` if the file is large enough to require multiple chunks to
-    access all of its content give some ``chunk_size``.
+    ファイルが大きくて、長さ ``chunk_size`` のチャンクに分けて複数回アクセ
+    スできる場合に ``True`` を返します。
 
 .. method:: File.write(content)
 
-    Writes the specified content string to the file. Depending on the storage
-    system behind the scenes, this content might not be fully committed until
-    ``close()`` is called on the file.
+    ``content`` に指定した文字列をファイルに書き込みます。背後にあるストレー
+    ジシステムによっては、 ``close()`` を呼ぶまで ``content`` がコミットさ
+    れない場合があります。
 
 .. method:: File.close()
 
-    Close the file.
+    ファイルを閉じます。
 
-Additional ``ImageField`` attributes
-------------------------------------
+``ImageField`` 固有の属性
+---------------------------
 
 .. attribute:: File.width
     
-    Width of the image.
+    画像の幅です。
 
 .. attribute:: File.height
 
-    Heigght of the image.
+    画像の高さです。
 
-Additional methods on files attached to objects
------------------------------------------------
+オブジェクトに結び付いているファイル特有のメソッド
+----------------------------------------------------
 
-.. highlight:: pycon
+.. highlight:: python
 
-Any :class:`File` that's associated with an object (as with ``Car.photo``,
-above) will also have a couple of extra methods:
+(``Car.photo`` のように) オブジェクトに結び付いてる :class:`File` には、
+以下の二つのメソッドがあります:
 
 .. method:: File.save(name, content, save=True)
 
-    Saves a new file with the file name and contents provided. This will not
-    replace the existing file, but will create a new file and update the object
-    to point to it. If ``save`` is ``True``, the model's ``save()`` method will
-    be called once the file is saved. That is, these two lines::
+    ファイル名 ``name`` とコンテンツ ``content`` を使って新たなファイルを生
+    成し、保存します。このメソッドは既存のファイルを置き換えるのではなく、
+    新たなファイルを作成して、オブジェクトがそのファイルを指すようにします。
+    ``save`` を ``True`` にすると、ファイルが保存されたときに ``save()`` メ
+    ソッドを呼び出します。すなわち、以下の 2 行::
     
         >>> car.photo.save('myphoto.jpg', contents, save=False)
         >>> car.save()
     
-    are the same as this one line::
+    は、以下の 1 行と同じです::
     
         >>> car.photo.save('myphoto.jpg', contents, save=True)
     
-    Note that the ``content`` argument must be an instance of
-    :class:`File` or of a subclass of :class:`File`.
+    ``content`` 引数は :class:`File` またはそのサブクラスのインスタンスでな
+    ければなりません。
 
 .. method:: File.delete(save=True)
 
-    Remove the file from the model instance and delete the underlying file. The
-    ``save`` argument works as above.
+    ファイルをモデルインスタンスから除去して、背後にあるファイルも削除しま
+    す。 ``save`` 引数は上のメソッドと同じです。

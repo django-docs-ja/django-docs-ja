@@ -1,58 +1,54 @@
 .. _ref-files-storage:
 
-File storage API
-================
+ファイルストレージ API
+==========================
 
 :revision-up-to: 8961 (1.0)
-
-.. TBD
 
 ``Storage.exists(name)``
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-``True`` if a file exists given some ``name``.
+``name`` に指定した名前のファイルが存在する場合に ``True`` を返します。
 
 ``Storage.path(name)``
 ~~~~~~~~~~~~~~~~~~~~~~
 
-The local filesystem path where the file can be opened using Python's standard
-``open()``. For storage systems that aren't accessible from the local
-filesystem, this will raise ``NotImplementedError`` instead.
+ローカルファイルシステム上のパスです。このパスは、 Python 標準の ``open()``
+で開けます。ストレージシステムにローカルファイルシステム経由でアクセスでき
+ない場合、この関数は ``NotImplementedError`` を送出します。
 
 ``Storage.size(name)``
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Returns the total size, in bytes, of the file referenced by ``name``.
+名前が ``name`` のファイルのサイズをバイト単位で返します。
 
 ``Storage.url(name)``
 ~~~~~~~~~~~~~~~~~~~~~
 
-Returns the URL where the contents of the file referenced by ``name`` can be
-accessed.
+名前が ``name`` のファイルのコンテンツにアクセスするための URL を返します。
 
 ``Storage.open(name, mode='rb')``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Opens the file given by ``name``. Note that although the returned file is
-guaranteed to be a ``File`` object, it might actually be some subclass. In the
-case of remote file storage this means that reading/writing could be quite slow,
-so be warned.
+名前が ``name`` のファイルを開きます。このメソッドが返すオブジェクトは必ず
+``File`` クラスまたはサブクラスであると保証されていますが、リモートのファイ
+ルストレージにアクセスするサブクラスの場合、読み書きが極めて遅くなるかもし
+れないので注意してください。
 
 ``Storage.save(name, content)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Saves a new file using the storage system, preferably with the name specified.
-If there already exists a file with this name ``name``, the storage system may
-modify the filename as necessary to get a unique name. The actual name of the
-stored file will be returned.
+ストレージシステムを使って ``name`` に指定した名前の新たなファイルを保存し
+ます。 ``name`` と同じ名前のファイルがすでに存在する場合、ストレージシステ
+ムはファイル名を変更して、一意な名前に付け変えます。実際に作成されたファイ
+ルの名前を返します。
 
-The ``content`` argument must be an instance of
-:class:`django.db.files.File` or of a subclass of
-:class:`~django.db.files.File`.
+``content`` 引数は、 :class:`django.db.files.File` クラスかサブクラスの
+インスタンスでなければなりません。
 
 ``Storage.delete(name)``
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Deletes the file referenced by ``name``. This method won't raise an exception if
-the file doesn't exist.
+名前が ``name`` のファイルを削除します。ファイルが存在しなくても、例外を送
+出しません。
 

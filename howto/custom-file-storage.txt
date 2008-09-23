@@ -11,18 +11,17 @@
 レージを作成したいときのために、カスタムストレージクラスを定義できます。
 カスタムストレージは、以下のステップに従って作成します:
 
-.. TBD
-
-#. Your custom storage system must be a subclass of
-   ``django.core.files.storage.Storage``::
+#. ストレージシステムは ``django.core.files.storage.Storage`` のサブクラス
+   でなければなりません:: 
 
         from django.core.files.storage import Storage
 
         class MyStorage(Storage):
             ...
 
-#. Django must be able to instantiate your storage system without any arguments.
-   This means that any settings should be taken from ``django.conf.settings``::
+#. Django はストレージシステムを引数なしでインスタンス化できねばなりません。
+   すなわち、ストレージシステムに関する設定は、全て
+   ``django.conf.settings`` から取り出さねばなりません::
 
         from django.conf import settings
         from django.core.files.storage import Storage
@@ -33,15 +32,17 @@
                     option = settings.CUSTOM_STORAGE_OPTIONS
                 ...
 
-#. Your storage class must implement the ``_open()`` and ``_save()`` methods,
-   along with any other methods appropriate to your storage class. See below for
-   more on these methods.
+#. ストレージクラスは、 ``_open()`` および ``_save()`` メソッドを実装せねば
+   なりません。また、実現したいストレージクラスによってはその他にも適切なメ
+   ソッドを実装せねばなりません。これらのメソッドについては下記を参照してく
+   ださい。
 
-   In addition, if your class provides local file storage, it must override
-   the ``path()`` method.
+   さらに、ローカルのファイルを扱うストレージを提供する場合は、 ``path()``
+   メソッドを提供せねばなりません。
 
-Your custom storage system may override any of the storage methods explained in
-:ref:`ref-files-storage`, but you **must** implement the following methods:
+カスタムのストレージシステムでは、以下のストレージメソッドをオーバライドで
+きます。メソッドの詳細は :ref:`ref-files-storage` で解説していますが、少な
+くとも以下のメソッドは **実装せねばなりません** :
 
     * :meth:`Storage.delete`
     * :meth:`Storage.exists`
@@ -49,44 +50,45 @@ Your custom storage system may override any of the storage methods explained in
     * :meth:`Storage.size`
     * :meth:`Storage.url`
 
-You'all also usually want to use hooks specifically designed for custom storage
-objects. These are:
+また、カスタムのストレージオブジェクトを実装するために用意されている、以下
+のフックを使うことになるでしょう:
 
 ``_open(name, mode='rb')``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Required**.
+**必須のメソッドです**.
 
-Called by ``Storage.open()``, this is the actual mechanism the storage class
-uses to open the file. This must return a ``File`` object, though in most cases,
-you'll want to return some subclass here that implements logic specific to the
-backend storage system.
+``Storage.open()`` によって呼び出されます。このメソッドこそが、ストレージク
+ラスがファイルをオープンするときの実際のメカニズムです。このメソッドは
+``File`` クラスのオブジェクトを返さねばなりません。とはいえ、たいていのケー
+スでは、バックエンドストレージに固有のロジックを備えた ``File`` のサブクラ
+スを返すことでしょう。
 
 ``_save(name, content)``
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Called by ``Storage.save()``. The ``name`` will already have gone through
-``get_valid_name()`` and ``get_available_name()``, and the ``content`` will be a
-``File`` object itself. No return value is expected.
+``Storage.save()`` から呼び出されます。 ``name`` は ``get_valid_name()``
+や ``get_available_name()`` で処理済の名前で、 ``content`` は ``File`` オブ
+ジェクトです。このメソッドの戻り値はありません。
 
 ``get_valid_name(name)``
 ------------------------
 
-Returns a filename suitable for use with the underlying storage system. The
-``name`` argument passed to this method is the original filename sent to the
-server, after having any path information removed. Override this to customize
-how non-standard characters are converted to safe filenames.
+背後にあるストレージシステムで扱うのに適したファイル名を生成して返します。
+通常、このメソッドの ``name`` 引数は、サーバに送信されたもとのファイルパス
+ら、パス部分を取り除いたファイルの名前です。標準の方法とは違うやりかたで安
+全なファイル名への変換を行いたいなら、このメソッドをオーバライドしてくださ
+い。
 
-The code provided on ``Storage`` retains only alpha-numeric characters, periods
-and underscores from the original filename, removing everything else.
+``Storage`` の実装では、ファイル名から英数文字、ピリオド、アンダースコアを
+除く全ての文字を取り去ります。
 
 ``get_available_name(name)``
 ----------------------------
 
-Returns a filename that is available in the storage mechanism, possibly taking
-the provided filename into account. The ``name`` argument passed to this method
-will have already cleaned to a filename valid for the storage system, according
-to the ``get_valid_name()`` method described above.
+``name`` に指定された名前をもとに、ストレージ機構で扱えるファイル名を構築し
+て返します。通常、 ``name`` 引数は、上で述べた ``get_valid_name()`` メソッ
+ドによって、ストレージシステムで扱うのに適した名前に変換済みです。
 
-The code provided on ``Storage`` simply appends underscores to the filename
-until it finds one that's available in the destination directory.
+``Storage`` の実装では、対象ディレクトリ下でファイル名が重複しそうな場合、
+一意になるまでアンダースコアを付加したファイル名を作成して返します。
