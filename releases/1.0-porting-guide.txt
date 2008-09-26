@@ -106,7 +106,7 @@ admin の変更例
 
     from django.contrib import admin
     from models import Author
-    
+
     class AuthorAdmin(admin.ModelAdmin):
         list_display = ['first_name', 'last_name']
         prepopulated_fields = {
@@ -151,7 +151,7 @@ admin の定義は完全にモデル定義から脱カップリングされ、ad
 
     class Parent(models.Model):
         ...
-        
+
     class Child(models.Model):
         parent = models.ForeignKey(Parent, edit_inline=models.STACKED, num_in_admin=3)
 
@@ -161,11 +161,11 @@ admin の定義は完全にモデル定義から脱カップリングされ、ad
     class ChildInline(admin.StackedInline):
         model = Child
         extra = 3
-        
+
     class ParentAdmin(models.ModelAdmin):
         model = Parent
         inlines = [ChildInline]
-        
+
     admin.site.register(Parent, ParentAdmin)
     
 詳しくは :ref:`admin-inlines` を参照してください。
@@ -180,33 +180,32 @@ admin の定義は完全にモデル定義から脱カップリングされ、ad
 
     class ModelOne(models.Model):
         ...
-        
+
         class Admin:
             fields = (
                 (None, {'fields': ('foo','bar')}),
             )
-    
+
     class ModelTwo(models.Model):
         ...
-        
+
         class Admin:
             fields = (
                 ('group1', {'fields': ('foo','bar'),   'classes': 'collapse'}),
                 ('group2', {'fields': ('spam','eggs'), 'classes': 'collapse wide'}),
             )
-            
 
 新 (1.0)::
 
     class ModelOneAdmin(admin.ModelAdmin):
         fields = ('foo', 'bar')
-        
+
     class ModelTwoAdmin(admin.ModelAdmin):
         fieldsets = (
             ('group1', {'fields': ('foo','bar'),   'classes': 'collapse'}),
             ('group2', {'fields': ('spam','eggs'), 'classes': 'collapse wide'}),
         )
-        
+
 
 .. seealso::
 
@@ -261,11 +260,20 @@ admin サイトをルートの ``urls.py`` に組み込んでいるのなら、�
 は (0.96 で登場した) ``newforms`` モジュールを単に ``forms`` と呼びます。
 ``oldforms`` はなくなりました。
 
-すでに新しいフォームを使っているのなら、 import 文を変更するだけです。
-``from django import newforms as forms`` から ``from django import forms``
-に書き換えてください。
+すでに ``newforms`` ライブラリを使っているのなら、 import 文を変更するだけ
+です。 ``from django import newforms as forms`` から 
+``from django import forms`` に書き換えてください:
 
-古いフォームシステムを使っているのなら、フォームを書き直す必要があります。
+旧::
+
+    from django import newforms as forms
+
+新::
+
+    from django import forms
+
+古いフォームシステム (以前は ``django.forms`` と呼ばれていた
+``django.oldforms``)を使っているのなら、フォームを書き直す必要があります。
 まずは :ref:`forms のドキュメント <topics-forms-index>` を読むところから始
 めてください。
 
@@ -374,7 +382,7 @@ HTML タグ間のスペースを除去する :ttag:`spaceless` タグは、以�
 一つだけ残していましたが、 *全て* を除去するようになりました。
 
 ローカルフレーバ
----------------------
+-------------------
 
 US ローカルフレーバ
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -388,7 +396,7 @@ US ローカルフレーバ
 新たなセッションキーの取得
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``SeesionBase.get_new_session_key()`` は ``_get_new_session_key()`` にリネー
+``SessionBase.get_new_session_key()`` は ``_get_new_session_key()`` にリネー
 ムされました。 ``get_new_session_object()`` はもうありません。
 
 フィクスチャ
@@ -409,7 +417,7 @@ US ローカルフレーバ
 ~~~~~~~~~~~~~~~~~
 
 以前の :exc:`EnvironmentError` は :exc:`ImportError` と :exc:`RuntimeError` 
-に分割されました。 :exc:`ImportError` は、 Django が設定モジュールを見付け
+に分かれました。 :exc:`ImportError` は、 Django が設定モジュールを見付け
 られなかった場合などに、 :exc:`RuntimeError` はすでに設定をロードした後に設
 定を変更しようとした場合などに送出されます。
 
@@ -446,8 +454,8 @@ URL パターンでキャッチできるように、末尾にスラッシュの�
 ``get()`` の例外
 ~~~~~~~~~~~~~~~~~~
 
-モデルマネジャは :exc:`AssertionError` ではなく
-:exc:`MultipleObjectsReturned` 例外を返すようになりました。
+マネジャは :exc:`AssertionError` ではなく :exc:`MultipleObjectsReturned` 例
+外を返すようになりました。
 
 旧 (0.96)::
 
@@ -462,7 +470,7 @@ URL パターンでキャッチできるように、末尾にスラッシュの�
       Model.objects.get(...)
   except Model.MultipleObjectsReturned:
       handle_the_error()
-      
+
 ``LazyDate`` の除去
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -500,9 +508,9 @@ URL パターンでキャッチできるように、末尾にスラッシュの�
         field_name = models.DecimalField(max_digits=10, decimal_places=3)
         ...
 
-これらの変更に対応し忘れると、新たな ``FloatField`` には精度桁数に関する引
-数がないので、 ``FloatField`` の ``__init__`` には ``max_digits`` という属
-性がない、という旨のエラーを受け取ります。
+これらの変更に対応し忘れると、新たな ``FloatField`` に精度桁数に関する引数
+がないため、 ``FloatField`` の ``__init__`` には ``max_digits`` という属性
+がない、という旨のエラーを受け取ります。
 
 MySQL や PostgreSQL を使っている場合、これ以上の変更は必要ありません。
 ``DecimalField`` のデータベースカラム型は、旧来の ``FloatField`` と同じだか
@@ -521,8 +529,8 @@ Django をアップデートした後に行ってください。
   スの保存されているファイル (``settings.py`` の ``DATABASE_NAME`` に指定し
   ているファイル名) をコピーします。
 
-``DecimalField`` を使う全てのアプリケーションについて以下の作業を行ってくだ
-さい。 ``<app>`` はアプリケーションのなめに読み変えます:
+``DecimalField`` を使う全てのアプリケーションについて、 ``<app>`` はアプリ
+ケーションの名前に読み替えて以下の作業を行ってください:
 
 .. code-block:: bash
 
@@ -535,11 +543,11 @@ Django をアップデートした後に行ってください。
   1. 作業の最初のステップでは、必ずダンプ形式に XML を指定してください。と
      いうのも、このステップでは、 XML データダンプによって、 float データが
      SQLite で扱える decimal に変換されるという仕様を使っているからです。
-  
+
   2. 二つめのステップでは、アプリケーションのデータが失われてもよいか尋ねら
      れます。 yes と答えてください。もちろん、三つ目のステップでデータを復
      元しますからね。
-  
+
   3. ``DecimalField`` に関する仕様変更前からある Django 付属のアプリケーショ
      ンは、全て影響を受けません。したがって、標準の Django モデルに対してこ
      の操作を行う必要はありません。
@@ -563,10 +571,13 @@ Django をアップデートした後に行ってください。
 ``_()`` は組み込みでなくなりました
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-以前は、モンキーパッチによって ``_()`` を組み込み名前空間にいれていました。
-そのため、 ``_()`` が常に存在することを前提としてコードを書いている場合、
-``ugettext`` や ``ugettext_lazy`` のどちらか適切な方を明示的に import して、
-``_`` という別名をつけねばなりません::
+以前は、モンキーパッチによって ``_()`` (名前がアンダースコア一文字の呼び出
+し可能オブジェクト)を組み込み名前空間に入れていましたが、これをやめたため、
+``_()`` を魔法のように常に使えなくなりました。
+
+``_()`` の存在を前提としてコードを書いている場合、 ``ugettext`` や
+``ugettext_lazy`` のどちらか適切な方を明示的に import して、 ``_`` という別
+名をつけねばなりません::
 
     from django.utils.translation import ugettext as _
 
@@ -617,7 +628,7 @@ HTTP リクエスト／レスポンスオブジェクト
 管理コマンドをコードの中から呼び出す
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:mod:`django.core.management`` は大幅にリファクタされています。
+:mod:`django.core.management`` は大幅にリファクタされました。
 
 管理コマンドのサービスをコードから呼び出すには、 ``call_command`` を使う必
 要があります。例えば、 :djadmin:`flush`  や :djadmin:`load_data` を呼び出す
