@@ -836,9 +836,6 @@ Python 2.4 からは、デコレータ構文も使えます::
 ここでの違いは、 ``do_current_tume()`` がフォーマット文字列と変数名を取り、
 ``CurrentTimeNode3`` に渡すという点です。
 
-Parsing until another block tag
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 .. _Parsing until another block tag:
 
 他のブロックタグに到達するまでパージングする

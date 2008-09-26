@@ -602,18 +602,19 @@ clean() メソッドのオーバライド
     >>> formset = BookFormSet(instance=author)
 
 
-More than one foriegn key to the same model
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+同じモデルに対して複数の外部キーを張っている場合
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If your model contains more than one foreign key to the same model you will
-need to resolve the ambiguity manually using ``fk_name``. Given the following
-model::
+同じモデルに対する複数の外部キーを張っている場合、キー間のあいまいさを無く
+すために、 ``fk_name`` を手動で設定する必要があります。以下のモデルを例に考
+えてみましょう::
 
     class Friendship(models.Model):
         from_friend = models.ForeignKey(Friend)
         to_friend = models.ForeignKey(Friend)
         length_in_months = models.IntegerField()
 
-To resolve this you can simply use ``fk_name`` to ``inlineformset_factory``::
+このモデルの問題を解決するには、 ``fk_name`` を ``inlineformset_factory``
+に設定してください::
 
     >>> FrienshipFormSet = inlineformset_factory(Friend, Friendship, fk_name="from_friend")

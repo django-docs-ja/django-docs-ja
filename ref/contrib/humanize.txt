@@ -7,8 +7,7 @@ django.contrib.humanize
 :revision-up-to: 8961 (1.0)
 
 .. module:: django.contrib.humanize
-   :synopsis: A set of Django template filters useful for adding a "human
-              touch" to data.
+   :synopsis: データを「人間くさく」表示するためのテンプレートフィルタです。
 
 humanize は、データに「人間くささ (human touch)」を与えるための Django テン
 プレートフィルタです。

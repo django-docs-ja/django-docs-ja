@@ -69,7 +69,8 @@ API リファレンス
 
 .. class:: models.User
 
-    :class:`~django.contrib.auth.models.User` objects have the following fields:
+    :class:`~django.contrib.auth.models.User` オブジェクトには以下のフィー
+    ルドがあります:
 
     .. attribute:: models.User.username
 

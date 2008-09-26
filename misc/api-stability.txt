@@ -121,19 +121,22 @@ APIの安定性とは
 コントリビュートアプリケーション (``django.contrib``)
 ----------------------------------------------------------
 
-While we'll make every effort to keep these APIs stable -- and have no plans to
-break any contrib apps -- this is an area that will have more flux between
-releases. As the web evolves, Django must evolve with it.
+私達は API を安定に保とうとあらゆる努力を注いでおり、現状では contrib のア
+プリケーションを変更するつもりはありませんが、 contrib はリリース間で変更さ
+れやすい分野ではあります。ウェブが進化すれば、Django もそれに合わせて進化せ
+ねばならないからです。
 
-However, any changes to contrib apps will come with an important guarantee:
-we'll make sure it's always possible to use an older version of a contrib app if
-we need to make changes. Thus, if Django 1.5 ships with a backwards-incompatible
-``django.contrib.flatpages``, we'll make sure you can still use the Django 1.4
-version alongside Django 1.5. This will continue to allow for easy upgrades.
+とはいえ、 contrib のアプリケーションの変更について保証していることがありま
+す。まず、 contrib のアプリケーションに変更を行う必要があった場合、古いバー
+ジョンのアプリケーションも使えるようにします。すなわち、仮に Django 1.5 で
+以前のバージョンと互換性のない ``django.contrib.flatpages`` を出した場合、
+Django 1.4 版の ``django.contrib.flatpages`` も Django 1.5 で使えるようにし
+ます。この措置によって、アップグレードを容易にします。
 
-Historically, apps in ``django.contrib`` have been more stable than the core, so
-in practice we probably won't have to ever make this exception. However, it's
-worth noting if you're building apps that depend on ``django.contrib``.
+歴史的に、これまで ``django.contrib`` のアプリケーションはコア部分よりも安
+定でした。したがって、おそらく上記のような例外的なことは起きないでしょう。
+とはいえ、 ``django.contrib`` に依存してアプリケーションを開発しているなら、
+覚えておくにこしたことはありません。
 
 .. _APIs marked as internal:
 
