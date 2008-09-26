@@ -1,206 +1,215 @@
 .. _internals-documentation:
 
-How the Django documentation works
-==================================
+Django ドキュメントの仕組み
+============================
 
 :revision-up-to: 8961 (1.0)
 
-\... and how to contribute.
+\... と、ドキュメント作業への貢献方法
 
-Django's documentation uses the Sphinx__ documentation system, which in turn is
-based on docutils__. The basic idea is that lightly-formatted plain-text
-documentation is transformed into HTML, PDF, and any other output format.
+Django のドキュメントは Sphinx__ ドキュメンテーションシステムを使っています。
+Sphinx__ は docutils__ に基づいて作られています。 docutils は、簡単な書式の
+プレーンテキストを、 HTML や PDF その他の様々な出力形式で簡単に扱えるように
+することを念頭に置いて作られています。
 
 __ http://sphinx.pocoo.org/
 __ http://docutils.sf.net/
 
-To actually build the documentation locally, you'll currently need to install
-Sphinx -- ``easy_install Sphinx`` should do the trick.
+ドキュメントを実際に手元でビルドするには、現状では Sphinx をインストールす
+る必要があります。インストールは ``easy_install Sphinx`` でできます。
 
-Then, building the html is easy; just ``make html`` from the ``docs`` directory.
+さて、 html のビルドは簡単です。単に ``docs`` ディレクトリで ``make html``
+を実行するだけです。
 
-To get started contributing, you'll want to read the `ReStructuredText
-Primer`__. After that, you'll want to read about the `Sphinx-specific markup`__
-that's used to manage metadata, indexing, and cross-references.
+ドキュメント作業に貢献したいなら、まず `ReStructuredText Primer`__ を読みま
+しょう。その後 `Sphinx 固有のマークアップ`__ の説明を読んで、メタデータやイ
+ンデクス、相互参照の方法を学ぶとよいでしょう。
 
 __ http://sphinx.pocoo.org/rest.html
 __ http://sphinx.pocoo.org/markup/
 
-The main thing to keep in mind as you write and edit docs is that the more
-semantic markup you can add the better. So::
+ドキュメントを書いたり編集したりする上で覚えておかねばならないのは、よりセ
+マンティックなマークアップを使う方がよい、ということです。従って::
 
     Add ``django.contrib.auth`` to your ``INSTALLED_APPS``...
-    
-Isn't nearly as helpful as::
+
+とするよりも::
 
     Add :mod:`django.contrib.auth` to your :setting:`INSTALLED_APPS`...
-    
-This is because Sphinx will generate proper links for the later, which greatly
-helps readers. There's basically no limit to the amount of useful markup you can
-add.
 
-Django-specific markup
-----------------------
+と書いた方が便利なのです。なぜなら、後者のマークアップの場合、 Sphinx が適
+切なリンクを生成するため、ドキュメントの読み手にとって非常に助かるからです。
+制限はありません。可能な限り便利なマークアップを使ってください。
 
-Besides the `Sphinx built-in markup`__, Django's docs defines some extra description units:
+Django 固有のマークアップ
+--------------------------
+
+`Sphinx の組み込みマークアップ`__ の他に、Django ドキュメントではいくつか追
+加で表記単位 (description unit) を定義しています:
 
 __ http://sphinx.pocoo.org/markup/desc.html
 
-    * Settings::
+    * 設定::
     
             .. setting:: INSTALLED_APPS
                 
-      To link to a setting, use ``:setting:`INSTALLED_APPS```.
+      リンクするには、 ``:setting:`INSTALLED_APPS``` としてください。
       
-    * Template tags::
+    * テンプレートタグ::
    
             .. templatetag:: regroup
     
-      To link, use ``:ttag:`regroup```.
+      タグの説明にリンクするには ``:ttag:`regroup``` としてください。
      
-    * Template filters::
+    * テンプレートフィルタ::
    
             .. templatefilter:: linebreaksbr
        
-      To link, use ``:tfilter:`linebreaksbr```.
+      リンクするには ``:tfilter:`linebreaksbr``` としてください。
       
-    * Field lookups (i.e. ``Foo.objects.filter(bar__exact=whatever)``)::
+    * フィールド照合 (``Foo.objects.filter(bar__exact=whatever)`` など)::
     
             .. fieldlookup:: exact
             
-      To link, use ``:lookup:`exact```.
+      リンクするには ``:lookup:`exact``` としてください。
       
-    * ``django-admin`` commands::
+    * ``django-admin`` コマンド::
     
             .. django-admin:: syncdb
             
-      To link, use ``:djadmin:`syncdb```.
+      リンクするには ``:djadmin:`syncdb``` としてください。
       
-    * ``django-admin`` command-line options::
+    * ``django-admin`` コマンドラインオプション::
     
             .. django-admin-option:: --traceback
             
-      To link, use ``:djadminopt:`--traceback```.
+      リンクするには ``:djadminopt:`--traceback``` としてください。
 
-An example
-----------
+例
+----
 
-For a quick example of how it all fits together, check this out:
+マークアップの簡単な例を以下にまとめました:
 
-    * First, the ``ref/settings.txt`` document starts out like this::
+    * まず、 ``ref/settings.txt`` ドキュメントを見てみましょう。このドキュ
+      メントは以下のような内容から始まっています::
     
         .. _ref-settings:
 
-        Available settings
-        ==================
+        settings に設定できる値
+        ==========================
         
         ...
         
-    * Next, if you look at the ``topics/settings.txt`` document, you can see how
-      a link to ``ref/settings`` works::
+    * ``topics/settings.txt`` ドキュメントを見ると、 ``ref/settings`` への
+      リンクがどのように書かれているか分かります::
      
-        Available settings
-        ==================
+        利用可能な設定
+        ==============
 
-        For a full list of available settings, see the :ref:`settings reference
-        <ref-settings>`.
+        利用可能な設定は :ref:`setting リファレンス <ref-settings>` を参照
+        してください。
         
-    * Next, notice how the settings (right now just the top few) are annotated::
+    * 設定項目をどのように表記しているかを見てみましょう::
    
         .. setting:: ADMIN_FOR
 
         ADMIN_FOR
-        ---------
-
-        Default: ``()`` (Empty tuple)
-
-        Used for admin-site settings modules, this should be a tuple of settings
-        modules (in the format ``'foo.bar.baz'``) for which this site is an
-        admin.
+	---------
         
-        The admin site uses this in its automatically-introspected
-        documentation of models, views and template tags.
+        デフォルト値: ``()`` (空のタプル)	
+        admin 用サイトの設定モジュールで設定します。このサイトの admin を他
+        のサイトの admin にする場合、設定モジュールを (``'foo.bar.baz'`` の
+        形式のタプルで) 指定します。
         
-      This marks up the following header as the "canonical" target for the
-      setting ``ADMIN_FOR`` This means any time I talk about ``ADMIN_FOR``, I
-      can reference it using ``:setting:`ADMIN_FOR```.
-     
-That's basically how everything fits together.
+        admin サイトはこの変数を使って、モデルやビュー、テンプレートタグの
+        ドキュメントに対するイントロスペクションを自動的に行います。
+
+      この ``.. settings::`` の部分で、 ``ADMIN_FOR`` の「正しい」ターゲッ
+      トとしてを定義しています。これで、 ``ADMIN_FOR`` について説明するとき
+      に、 ``:setting:`ADMIN_FOR``` を使って参照できます。
+
+このようにして、お互いの参照を解決します。
 
 TODO
 ----
 
-The work is mostly done, but here's what's left, in rough order of priority.
+ドキュメントの整備はほぼ終っていますが、まだ、ほぼ以降に挙げる順番にやらね
+ばならないことが残っています。
 
-    * Fix up generic view docs: adapt Chapter 9 of the Django Book (consider
-      this TODO item my permission and license) into
-      ``topics/generic-views.txt``; remove the intro material from
-      ``ref/generic-views.txt`` and just leave the function reference.
+    * 汎用ビューの部分を修正します。 Django Book の 9 章を
+      ``topics/generic-views.txt`` にもってきて (この項目をもって、著者の許
+      可とライセンス許諾に代えます)、 ``ref/generic-views.txt`` の導入部分
+      を削除し、関数のリファレンスだけにします。
     
-    * Change the "Added/changed in development version" callouts to proper
-      Sphinx ``.. versionadded::`` or ``.. versionchanged::`` directives.
+    * 「開発版で追加／変更された機能」の部分を、全て Sphinx の 
+      ``.. versionadded::`` および ``.. versionchanged::`` ディレクティブに
+      置き換えます。
     
-    * Check for and fix malformed links. Do this by running ``make linkcheck``
-      and fix all of the 300+ errors/warnings.
+    * おかしなリンクをチェックして修正します。 ``make linkcheck`` を実行し
+      て、 300 個以上出るエラーや警告メッセージを全て修正します。
       
-      In particular, look at all the relative links; these need to be 
-      changed to proper references.
+      特に、相対リンクを全て調べる必要があります。これらは正しい参照に変更
+      せねばなりません。
       
-    * Most of the various ``index.txt`` documents have *very* short or even
-      non-existent intro text. Each of those documents needs a good short intro
-      the content below that point.
+    * ほとんどの ``index.txt`` ドキュメントに、肝心の説明文が *とても* わず
+      かしかないか、まったくありません。それぞれに、各階層下に収められてい
+      るコンテンツのよい説明文が必要です。
 
-    * The glossary is very perfunctory. It needs to be filled out.
+    * 用語集がいい加減すぎます。もっと内容を濃くする必要があります。
     
-    * Add more metadata targets: there's lots of places that look like::
+    * メタデータターゲットをもっと増やします。まだ::
     
             ``File.close()``
             ~~~~~~~~~~~~~~~~
         
-      \... these should be::
+      のような部分がたくさんあり、以下のように書き直さねばなりません::
       
             .. method:: File.close()
             
-      That is, use metadata instead of titles.
+      つまり、タイトルではなくメタデータを使わねばなりません。
       
-    * Add more links -- nearly everything that's an inline code literal
-      right now can probably be turned into a xref. 
+    * リンクを追加します。現状のインラインコードリテラルは、ほぼ全て相互参
+      照に変更できます。
       
-      See the ``literals_to_xrefs.py`` file in ``_ext`` -- it's a shell script
-      to help do this work.
+      ``_ext`` 以下にある ``literals_to_xrefs.py`` ファイルを参照してくださ
+      い。このシェルスクリプトを使えば、作業が楽になります。
 
-      This will probably be a continuing, never-ending project.
+      おそらく終らない、地道な作業になるでしょう。
 
-    * Add `info field lists`__ where appropriate.
+    * 適切な `info フィールドリスト`__ を追加する必要があります。
     
       __ http://sphinx.pocoo.org/markup/desc.html#info-field-lists
       
-    * Add ``.. code-block:: <lang>`` to literal blocks so that they get
-      highlighted.
+    * 色づけ表示の必要なリテラルブロックに ``.. code-block:: <lang>`` を付
+      加する必要があります。
 
-Hints
------
+ヒント
+-------
 
-Some hints for making things look/read better:
+読みやすいドキュメントにするためのヒントをいくつか紹介しましょう:
 
-    * Whenever possible, use links. So, use ``:setting:`ADMIN_FOR``` instead of
-      ````ADMIN_FOR````.
+    * 可能なかぎり、リンクを使いましょう。例えば、 ````ADMIN_FOR```` は
+      ``:setting:`ADMIN_FOR``` にしましょう。
 
-    * Some directives (``.. setting::``, for one) are prefix-style directives;
-      they go *before* the unit they're describing. These are known as
-      "crossref" directives. Others (``.. class::``, e.g.) generate their own
-      markup; these should go inside the section they're describing. These are
-      called "description units".
+    * ディレクティブの中には、プレフィクススタイルのもの (``.. setting::``
+      など)あります。プレフィクススタイルのディレクティブは、記述対象のブロッ
+      クの *前* に置かねばなりません。その他 (``.. class::`` など) は独自の
+      マークアップを生成します。その他のディレクティブは、記述対象のセクショ
+      ンの中に置かねばなりません。こうしたディレクティブは「記述単位
+      (description unit)」と呼びます。
       
-      You can tell which are which by looking at in :file:`_ext/djangodocs.py`;
-      it registers roles as one of the other.
+      どのディレクティブがどちらのタイプは、 :file:`_ext/djangodocs.py` を
+      参照してください。このファイルの中で、それぞれのロールを登録していま
+      す。
       
-    * When referring to classes/functions/modules, etc., you'll want to use the
-      fully-qualified name of the target
-      (``:class:`django.contrib.contenttypes.models.ContentType```). 
+    * クラスや関数、モジュールなどを参照するときは、完全指定の名前
+      (``:class:`django.contrib.contenttypes.models.ContentType```)を使うと
+      よいでしょう。
       
-      Since this doesn't look all that awesome in the output -- it shows the
-      entire path to the object -- you can prefix the target with a ``~``
-      (that's a tilde) to get just the "last bit" of that path. So
-      ``:class:`~django.contrib.contenttypes.models.ContentType``` will just
-      display a link with the title "ContentType".
+      完全指定の名前を使っただけでは、出力はさほどきれいにならないでしょう。
+      というのも、オブジェクトの全てのパスが表示されてしまうからです。
+      ターゲットの先頭にチルダ (``~``) を付けると、パスの「最後の部分」だけ
+      が表示されます。従って、
+      ``:class:`~django.contrib.contenttypes.models.ContentType``` とすると、
+      単に "ContentType" と書かれたリンクを生成します。
+
