@@ -5,10 +5,10 @@ Django のデプロイ
 
 :revision-up-to: 8961 (1.0)
 
-Django's chock-full of shortcuts to make web developer's lives easier, but all
-those tools are of no use if you can't easily deploy your sites. Since Django's
-inception, ease of deployment has been a major goal. There's a number of good
-ways to easily deploy Django:
+Django には、ウェブ開発者の負担を軽くするショートカットがぎっしりつまってい
+ますが、作ったサイトをデプロイできなければ元も子もありません。 Django プロ
+ジェクトの開始当時から、簡単なデプロイは大きな目標の一つでした。Django を簡
+単にデプロイするいい方法はいくつもあります:
 
 .. toctree::
    :maxdepth: 1
@@ -16,19 +16,19 @@ ways to easily deploy Django:
    modpython
    fastcgi
    
-:ref:`Deploying under mod_python <howto-deployment-modpython>` is the
-recommended deployment method; start there if you're not sure which path you'd
-like to go down.
+デプロイの方法としては、 :ref:`mod_python を使う方法
+<howto-deployment-modpython>` をお勧めします。どの方法を選んでよいのか分か
+らない場合は、 mod_python を使いましょう。
 
 .. seealso::
 
-    * `Chapter 20 of The Django Book`_ discusses deployment and especially
-      scaling in more detail.
+    * `Django Book の 20 章 <chaper 20 of the django book>`_ では、デプロイ
+      方法と、とりわけデプロイ時のスケーリングについて詳しく解説しています。
       
-    * `mod_wsgi`_ is a newcomer to the Python deployment world, but it's rapidly
-      gaining traction. Currently there's a few hoops you have to jump through to
-      `use mod_wsgi with Django`_, but mod_wsgi tends to get rave reviews from
-      those who use it.
+    * `mod_wsgi`_ はまだ新参のデプロイ手段ですが、急速に人々を惹き付けつつ
+      あります。今のところ、 
+      `mod_wsgi で Django を動かす <use mod_wsgi with django>`_ には、いく
+      つかステップが必要ですが、ユーザの評判は上々のようです。
 
 .. _chapter 20 of the django book: http://djangobook.com/en/1.0/chapter20/
 .. _mod_wsgi: http://code.google.com/p/modwsgi/
