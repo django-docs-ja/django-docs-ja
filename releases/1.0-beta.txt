@@ -1,159 +1,144 @@
 .. _releases-1.0-beta:
 
-===============================
-Django 1.0 beta 1 release notes
-===============================
+=================================
+Django 1.0 beta 1 リリースノート
+=================================
 
 :revision-up-to: 8961 (1.0)
 
-.. TBD
+Django 1.0 beta 1 にようこそ!
 
-Welcome to Django 1.0 beta 1!
+このリリースは、来るべき Django 1.0 リリースにつながる 3 番目のプレビュー／
+開発者向けリリースです。1.0 のリリースは 9 月初頭を予定しています。このリリー
+スでは、主に Django のコードベースをテストしたい開発者や、 1.0 の最終リリー
+スに向けてバグ修正を手伝う開発者をターゲットにしています。
 
-This is the third in a series of preview/development releases leading
-up to the eventual release of Django 1.0, currently scheduled to take
-place in early September 2008. This releases is primarily targeted at
-developers who are interested in testing the Django codebase and
-helping to identify and resolve bugs prior to the final 1.0 release.
+従って、このリリースは実運用向きでは *ありません* 。くれぐれも実運用の目的
+では使わないでください。
 
-As such, this release is *not* intended for production use, and any
-such use is discouraged.
+Django 1.0 beta 1 で新たに登場した機能
+=========================================
 
-What's new in Django 1.0 beta 1
-===============================
+ここ数年、我々は Django の trunk ソースツリーでほぼずっと活発に開発を続け、
+0.96 リリース以降、大きな機能をいくつも投入してきました。 Django 1.0 alpha
+1 で新たに登場した機能は、 :ref:`1.0 alpha 1 リリースノート
+<releases-1.0-alpha-1>` を参照してください。 Django 1.0 alpha 2 で新たに登
+場した機能は、 :ref:`1.0 alpha 2 リリースノート <releases-1.0-alpha-2>` を
+参照してください。 
 
-Django's development trunk has been the site of nearly constant activity over
-the past year, with several major new features landing since the 0.96 release.
-For features which were new as of Django 1.0 alpha 1, see :ref:`the 1.0 alpha 1
-release notes <releases-1.0-alpha-1>`. For features which were new as of Django
-1.0 alpha 2, see :ref:`the 1.0 alpha 2 release notes <releases-1.0-alpha-2>`.
+この beta リリースでは主要な新機能は追加していませんが、変更点や改良点がい
+くつかあります:
 
-This beta release does not contain any major new features, but does
-include several smaller updates and improvements to Django:
+forms と admin への一般化リレーションの組み込み
+    一般化リレーションのクラスを ``django.contrib.contenttypes`` に移し、
+    admin インタフェースやエンドユーザのフォームでもサポートしました。
+    詳しくは :ref:`一般化リレーションのドキュメント <generic-relations>`
+    を参照してください。
 
-Generic relations in forms and admin
-    Classes are now included in ``django.contrib.contenttypes`` which
-    can be used to support generic relations in both the admin
-    interface and in end-user forms. See :ref:`the documentation for
-    generic relations <generic-relations>` for details.
+admin のフレキシビリティ向上
+    1.0 alpha で行った Django の admin インタフェース
+    (``django.contrib.admin``) のリファクタリングに続いて、2 つのフックを追
+    加し、admin でモデルインスタンスを操作するときに pre-svave および
+    post-save 処理をカスタマイズできるようにしました。詳しくは 
+    :ref:`admin のドキュメント <ref-contrib-admin>` を参照してください。
 
-Improved flexibility in the admin
-    Following up on the refactoring of Django's administrative
-    interface (``django.contrib.admin``), introduced in Django 1.0
-    alpha 1, two new hooks have been added to allow customized pre-
-    and post-save handling of model instances in the admin. Full
-    details are in :ref:`the admin documentation <ref-contrib-admin>`.
+``INSERT``/``UPDATE`` の使い分け
+    Django で ``save()`` メソッドを呼び出したとき、SQL レベルで ``INSERT``
+    と ``UPDATE`` のどちらを使うかの区別は、ほとんどの場合デフォルトの挙動
+    で問題ありませんが、たまにどちらかを強制的に用いたほうがよい場合があり
+    ます。そこで、モデルの ``save()`` にパラメタを追加して、実行する SQL を
+    強制できるようにしました。詳細と、パラメタを使うときの重要な注意点を、
+    データベース API のドキュメントに記載してあります。
 
-``INSERT``/``UPDATE`` distinction
-    Although Django's default behavior of having a model's ``save()``
-    method automatically determine whether to perform an ``INSERT`` or
-    an ``UPDATE`` at the SQL level is suitable for the majority of
-    cases, there are occasional situations where forcing one or the
-    other is useful. As a result, models can now support an additional
-    parameter to ``save()`` which can force a specific
-    operation. Consult the database API documentation for details
-    and important notes about appropriate use of this parameter.
+``CacheMiddleware`` の分割
+    Django の ``CacheMiddleware`` を 3 つのクラスに分割しました。
+    ``CacheMiddleware`` 自体はまだあり、以前の機能をそのまま残していますが、
+    実際には二つの別々のミドルウェア (キャッシュにデータを入れるミドルウェ
+    アと、キャッシュからデータを取り出すミドルウェア) からなっていて、一つ
+    のミドルウェアにまとまっていると起きる問題を回避できます。正しい使い方
+    などの詳細は:ref:`キャッシュのドキュメント <topics-cache>` に記載してい
+    ます。
 
-Split ``CacheMiddleware``
-   Django's ``CacheMiddleware`` has been split into three classes:
-   ``CacheMiddleware`` itself still exists and retains all of its
-   previous functionality, but it is now built from two separate
-   middleware classes which handle the two parts of caching (inserting
-   into and reading from the cache) separately, offering additional
-   flexibility for situations where combining these functions into a
-   single middleware posed problems. Full details, including updated
-   notes on appropriate use, are in 
-   :ref:`the caching documentation <topics-cache>`.
+撤廃された機能の除去
+    以前のバージョンで撤廃した機能としてマークしていた機能や、 1.0 のリリー
+    スに先だって除去を予定していた機能を Django から取り去りました。除去し
+    た機能には、import パス ``django.newforms`` (``django.forms`` で import
+    できます) や ``form_for_model``, ``form_for_instance`` といったヘルパ関
+    数 (``ModelForm`` に置き換わりました)、そしてディスパッチャやファイルアッ
+    プロード、ファイルストレージリファクタリングなどで置き換えられた機能な
+    どがあります。詳しいリストや、その他互換性のない変更は `Django の wiki
+    <the Django wiki>`_ にあります。
 
-Removal of deprecated features
-    A number of features and methods which had previously been marked
-    as deprecated, and which were scheduled for removal prior to the
-    1.0 release, are no longer present in Django. These include
-    imports of the form library from ``django.newforms`` (now located
-    simply at ``django.forms``), the ``form_for_model`` and
-    ``form_for_instance`` helper functions (which have been replaced
-    by ``ModelForm``) and a number of deprecated features which were
-    replaced by the dispatcher, file-uploading and file-storage
-    refactorings introduced in the Django 1.0 alpha releases. A full
-    list of these and all other backwards-incompatible changes is
-    available on `the Django wiki`_.
-
-A number of other improvements and bugfixes have also been included:
-some tricky cases involving case-sensitivity in differing MySQL
-collations have been resolved, Windows packaging and installation has
-been improved and the method by which Django generates unique session
-identifiers has been made much more robust.
+その他にも、 MySQL のコレーションを変更したときの大小文字の区別のようなトリッ
+キーなケースの解決や、 Windows のパッケージやインストールに関する改善、
+Django に一意なセッション識別子を生成させるメソッドの頑健化など、たくさんの
+改良やバグフィクスが入っています。
 
 .. _the documentation for generic relations: ../contenttypes/#generic-relations
 .. _the Django wiki: http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges#Removedseveralmoredeprecatedfeaturesfor1.0
 
 
-The Django 1.0 roadmap
-======================
+Django 1.0 のロードマップ
+==========================
 
-One of the primary goals of this beta release is to focus attention on
-the remaining features to be implemented for Django 1.0, and on the
-bugs that need to be resolved before the final release. Following this
-release, we'll be conducting a series of development sprints building
-up to the release-candidate stage, followed soon after by Django
-1.0. The timeline is projected to be:
+この beta リリースの主要な目的の一つは、 Django 1.0 に実装する予定の機能
+のうち、まだ終っていないものや、最終リリースまでに修正しておかねばならない
+バグを見極めることです。このリリースの後、ベータリリースとリリース候補版に
+向けて一連のスプリントを実施し、すぐに Django 1.0 をリリースします。タイム
+ラインは以下のように計画しています:
 
-* August 15, 2008: Sprint (based in Austin, Texas, USA, and online).
+* 2008 年 8 月 15 日: スプリント (米国 Texas 州 Austin とオンラインで)
 
-* August 17, 2008: Sprint (based in Tel Aviv, Israel, and online).
+* 2008 年 8 月 17 日: Sprint (イスラエル Tel Aviv とオンラインで)
 
-* **August 21, 2008: Django 1.0 release candidate 1.** At this point,
-  all strings marked for translation within Django's codebase will be
-  frozen, to provide contributors time to check and finalize all of
-  Django's bundled translation files prior to the final 1.0 release.
+* **2008 年 8 月 21 日: Django 1.0 release candidate 1.** この時点で、
+  Django のコードベース内で翻訳対象にマークしている文字列全てをフリーズし、
+  翻訳作業の貢献者が 1.0 の最終リリースにバンドルする翻訳ファイルをチェック
+  して修正できるようにします。
 
-* August 22, 2008: Sprint (based in Portland, Oregon, USA, and online).
+* 2008 年 8 月 22 日: Sprint (米国 Oregon 州 Portland とオンラインで)
 
-* **August 26, 2008: Django 1.0 release candidate 2.**
+* 2008 年 8 月 22 日: Sprint (米国 Oregon 州 Portland とオンラインで)
 
-* August 30, 2008: Sprint (based in London, England, UK, and online).
+* **2008 年 8 月 26 日: Django 1.0 release candidate 2.**
 
-* **September 2, 2008: Django 1.0 final release.** The official Django
-  1.0 release party will take place during the first-ever DjangoCon,
-  to be held in Mountain View, California, USA, September 6-7.
+* 2008 年 8 月 30 日: Sprint (英国 England, London とオンラインで)
 
-Of course, like any estimated timeline, this is subject to change as
-requirements dictate. The latest information will always be available
-on the Django project wiki:
+* **2008 年 9 月 2 日: Django 1.0 final リリース。**  9 月 6,7 にマウンテン
+  ビューで開催される DjangoCon で、 Django 1.0 リリースパーティ。
+
+もちろん、予定のタイムラインなので、状況によって変更する可能性もあります。
+最新情報は Django プロジェクトの wiki に掲載します:
 
     http://code.djangoproject.com/wiki/VersionOneRoadmap
 
 
-What you can do to help
-=======================
+リリース作業で手伝えること
+============================
 
-In order to provide a high-quality 1.0 release, we need your
-help. Although this beta release is, again, *not* intended for
-production use, you can help the Django team by trying out the beta
-codebase in a safe test environment and reporting any bugs or issues
-you encounter. The Django ticket tracker is the central place to
-search for open issues:
+高い品質の 1.0 リリースを提供するために、皆さんの手助けが必要です。先にも述
+べたように、この beta リリースは実運用向けでは *ありません* 。安全なテスト
+環境で使ってみて、バグや問題を見付けたら Django の開発チームに報告してくだ
+さい。自分の発見した問題がすでに明らかでないか、 Django のチケットトラッカ
+を使って探してください:
 
     http://code.djangoproject.com/timeline
 
-Please open new tickets if no existing ticket corresponds to a problem
-you're running into.
+発見した問題に対応するチケットが見付からなければ、新たなチケットをオープン
+してください。
 
-Additionally, discussion of Django development, including progress
-toward the 1.0 release, takes place daily on the django-developers
-mailing list:
+また、 1.0 リリースに向けての進捗を含め、 Django の開発に関する議論は、
+django-developers メーリングリスト:
 
     http://groups.google.com/group/django-developers
 
-...and in the ``#django-dev`` IRC channel on ``irc.freenode.net``. If
-you're interested in helping out with Django's development, feel free
-to join the discussions there.
+と、IRC サーバ ``irc.freenode.net`` の ``#django-dev`` チャネルで常時行って
+います。 Django の開発を手伝いたいのなら、ぜひ参加して、議論に加わってくだ
+さい。
 
-Django's online documentation also includes pointers on how to
-contribute to Django:
+Django プロジェクトへの貢献方法は、オンラインドキュメントにも記載しています:
 
     :ref:`contributing to Django <internals-contributing>`
 
-Contributions on any level -- developing code, writing
-documentation or simply triaging tickets and helping to test proposed
-bugfixes -- are always welcome and appreciated.
+コードの開発、ドキュメントの作成、そしてチケットのトリアージや、誰かの提出
+したバグフィクスのテストなど、どんなレベルの貢献でも歓迎します。

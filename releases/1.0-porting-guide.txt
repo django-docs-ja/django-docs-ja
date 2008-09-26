@@ -1,80 +1,85 @@
-=========================================
-Porting your apps from Django 0.96 to 1.0
-=========================================
+===================================================
+アプリケーションを Django 0.96 から 1.0 に移行する
+===================================================
 
 :revision-up-to: 8961 (1.0)
 
-.. TBD
-
 .. highlight:: python
 
-Django 1.0 breaks compatibility with 0.96 in some areas. 
+Django 1.0 は、いくつかの点で 0.96 との互換性を失っています。
 
-This guide will help you port 0.96 projects and apps to 1.0. The first part of
-this document includes the common changes needed to run with 1.0. If after going
-through the first part your code still breaks, check the section `Less-common
-Changes`_ for a list of a bunch of less-common compatibility issues.
+このガイドは、 0.96 のプロジェクトやアプリケーションを 1.0 に移行する手助け
+として書かれています。ドキュメントの最初の部分には、 1.0 で動作させるために
+必要な変更のうち、よくあるものを説明しています。この部分の説明に従って移行
+しても、まだ動作しないようなら、 `ややマイナーな変更
+<less-common-changes>`_ を参照して、細かな変更に基づく互換性の問題について
+調べてください。
 
 .. seealso::
 
-    The :ref:`1.0 release notes <releases-1.0>`. That document explains the new
-    features in 1.0 more deeply; the porting guide is more concerned with
-    helping you quickly update your code.
+    このポーティングガイドでは、コードを手早く移行することに焦点を絞ってい
+    ますが、 :ref:`1.0 リリースノート <releases-1.0>` では、 1.0 で登場した
+    新しい機能をより詳しく解説しています。
 
-Common changes
+一般的な変更
 ==============
 
-This section describes the changes between 0.96 and 1.0 that most users will
-need to make.
+この節では、 0.96 から 1.0 への移行の際に大半のユーザが行わねばならない変更
+を解説しています。
 
-Use Unicode
------------
+.. _use-unicode:
 
-Change string literals (``'foo'``) into Unicode literals (``u'foo'``). Django
-now uses Unicode strings throughout. In most places, raw strings will continue
-to work, but updating to use Unicode literals will prevent some obscure
-problems.
+Unicode を使う
+----------------
 
-See :ref:`ref-unicode` for full details.
+文字列リテラル (``'foo'``) を Unicode リテラル (``u'foo'``) に変更してくだ
+さい。 Django は全体で一貫して Unicode を使うようになりました。ほとんどの場
+所で、通常の文字列はそのまま使えますが、 Unicode リテラルを明示的に使ってお
+けば、ややこしい問題が発生するのを防げます。
 
-Models
+詳しくは :ref:`ref-unicode` を参照してください。
+
+.. _models-chagnes:
+
+モデル
 ------
 
-Common changes to your models file:
+モデルファイルにおける大きな変更は、以下の通りです:
 
-Rename ``maxlength`` to ``max_length``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``maxlength`` を ``max_length`` に変更する
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Rename your ``maxlength`` argument to ``max_length`` (this was changed to be
-consistant with form fields):
+``maxlength`` 引数を ``max_length`` に変更してください (フォームフィールド
+との一貫性のための変更です)。
 
-Replace ``__str__`` with ``__unicode__``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``__str__`` を ``__unicode__`` に置き換える
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Replace your model's ``__str__`` function with a ``__unicode__`` method, and
-make sure you `use Unicode`_ (``u'foo'``) in that method.
+モデルの ``__str__`` を ``__unicode__`` メソッドに置き換え、メソッドから
+`Unicode を返す <use-unicode>`_ (``u'foo'``) ようにしてください。
 
-Remove ``prepopulated_from``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``prepopulated_from`` をなくす
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Remove the ``prepopulated_from`` argument on model fields. It's no longer valid
-and has been moved to the ``AdminModel`` class in ``admin.py``. See `the
-admin`_, below, for more details about changes to the admin.
+モデルフィールドから ``prepopulated_from`` 引数をなくしてください。この引数
+はもう有効でなく、 ``AdminModel`` クラスの ``admin.py`` に移されました。
+admin に関する詳しい変更内容は、後述の `admin の変更 <the-admin>`_ を参照し
+てください。
 
-Replace ``class Admin:`` with ``admin.py``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``class Admin:`` を ``admin.py`` と置き換える
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Remove all your inner ``class Admin`` declarations from your models. They won't
-break anything if you leave them, but they also won't do anything. To register
-apps with the admin you'll move those declarations to an ``admin.py`` file;
-see `the admin`_ below for more details.
+モデルから ``class Admin`` 宣言を除去してください。モデル内にそのまま残って
+いても影響はありませんが、何の効果もありません。アプリケーションを admin に
+登録するには、 ``admin.py`` ファイルに宣言を移す必要があります。詳しくは
+`admin の変更 <the-admin>`_ を参照してください。
 
-Example
-~~~~~~~
+admin の変更例
+~~~~~~~~~~~~~~~~~
 
-Below is an example ``models.py`` file with all the changes you'll need to make:
+``models.py`` ファイルに対する変更を以下に示しましょう:
 
-Old (0.96) ``models.py``::
+旧 (0.96 ) ``models.py``::
 
     class Author(models.Model):
         first_name = models.CharField(maxlength=30)
@@ -87,7 +92,7 @@ Old (0.96) ``models.py``::
         def __str__(self):
             return '%s %s' % (self.first_name, self.last_name)
 
-New (1.0) ``models.py``::
+新 (1.0 ) ``models.py``::
 
     class Author(models.Model):
         first_name = models.CharField(max_length=30)
@@ -97,7 +102,7 @@ New (1.0) ``models.py``::
         def __unicode__(self):
             return u'%s %s' % (self.first_name, self.last_name)
 
-New (1.0) ``admin.py``::
+新しい (1.0 の) ``admin.py``::
 
     from django.contrib import admin
     from models import Author
@@ -110,36 +115,39 @@ New (1.0) ``admin.py``::
 
     admin.site.register(Author, AuthorAdmin)
 
-The Admin
----------
+.. _the-admin:
 
-One of the biggest changes in 1.0 is the new admin. The Django administrative
-interface (``django.contrib.admin``) has been completely refactored; admin
-definitions are now completely decoupled from model definitions, the framework
-as been rewritten to use Django's new form-handling library and redesigned with
-extensibility and customization in mind.
+admin の変更
+-------------
 
-Practically, this means you'll need to rewrite all of your ``class Admin``
-declarations. You've already seen in `models`_ above how to replace your ``class
-Admin`` with a ``admin.site.register()`` call in an ``admin.py`` file. Below are
-some more details on how to rewrite that ``Admin`` declaration into the new
-syntax.
+1.0 で追加された大きな変更の一つに、新しい admin API があります。 Django の
+管理インタフェース (``django.contrib.admin``) は完全にリファクタされました。
+admin の定義は完全にモデル定義から脱カップリングされ、admin のフレームワー
+クは Django の新たなフォーム処理ライブラリを使うよう書き直されました。また、
+思い通りに拡張したりカスタマイズしたりできるようになりました。
+
+この変更により、 ``class Admin`` 宣言を全て書き直す必要があります。 
+``class Admin`` から ``admin.py`` ファイルの ``admin.site.register()`` 呼び
+出しへの変更方法は、 `モデルの変更 <models-changes>`_ ですでに触れました。
+以下では、 ``Admin`` 宣言を新たな書式に書き換える上で必要な細かい点について
+説明します。
 
 .. seealso::
 
-    A contributor to djangosnippets__ has written a script that'll `scan your
-    models.py and generate a corresponding admin.py`__.
+    djangosnippets__ のコントリビュータの一人が、 
+    `models.py をスキャンして admin.py を生成するスクリプト`__ を書いていま
+    す。
 
     __ http://www.djangosnippets.org/
     __ http://www.djangosnippets.org/snippets/603/
 
-Use new inline syntax
+インラインの宣言方法
 ~~~~~~~~~~~~~~~~~~~~~
 
-The new ``edit_inline`` options have all been moved to ``admin.py``. Here's an
-example:
+``edit_inline`` オプションは ``admin.py`` に移されました。例を以下に示しま
+す:
 
-Old (0.96)::
+旧 (0.96)::
 
     class Parent(models.Model):
         ...
@@ -148,7 +156,7 @@ Old (0.96)::
         parent = models.ForeignKey(Parent, edit_inline=models.STACKED, num_in_admin=3)
 
 
-New (1.0)::
+新 (1.0)::
 
     class ChildInline(admin.StackedInline):
         model = Child
@@ -160,15 +168,15 @@ New (1.0)::
         
     admin.site.register(Parent, ParentAdmin)
     
-See :ref:`admin-inlines` for more details.
+詳しくは :ref:`admin-inlines` を参照してください。
 
-Simplify ``fields``, or use ``fieldsets``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``fields`` を簡単にする、または ``fieldsets`` を使う
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The old ``fields`` syntax was quite confusing, and has been simplified. The old
-syntax still works, but you'll need to use ``fieldsets`` instead.
+旧来の ``fields`` はややこしい書式でしたが、簡単になりました。旧来の記法は
+まだ使えますが、 ``fieldsets`` を使う方がよいでしょう。
 
-Old (0.96)::    
+旧 (0.96)::    
 
     class ModelOne(models.Model):
         ...
@@ -188,7 +196,7 @@ Old (0.96)::
             )
             
 
-New (1.0)::
+新 (1.0)::
 
     class ModelOneAdmin(admin.ModelAdmin):
         fields = ('foo', 'bar')
@@ -202,23 +210,24 @@ New (1.0)::
 
 .. seealso::
 
-    * More detailed information about the changes and the reasons behind them
-      can be found on the `NewformsAdminBranch wiki page`__
+    * 変更の詳しい内容やその理由は `NewformsAdminBranch の wiki ページ`__
+      で説明しています。
 
-    * The new admin comes with a ton of new features; you can read about them in
-      the :ref:`admin documentation <ref-contrib-admin>`.
+    * 新しい admin には、他にもたくさんの機能があります。詳しくは
+      :ref:`admin のドキュメント <ref-contrib-admin>` を参照してください。
 
     __ http://code.djangoproject.com/wiki/NewformsAdminBranch
 
 URLs
 ----
 
-Update your root ``urls.py``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ルート ``urls.py`` を修正する
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you are using the admin site you need to update your root ``urls.py``.
+admin サイトをルートの ``urls.py`` に組み込んでいるのなら、以下のように変更
+してください。
 
-Old (0.96) ``urls.py``::
+旧 (0.96) ``urls.py``::
 
     from django.conf.urls.defaults import *
 
@@ -228,7 +237,7 @@ Old (0.96) ``urls.py``::
         # ... the rest of your URLs here ...
     )
 
-New (1.0) ``urls.py``::
+新 (1.0) ``urls.py``::
 
     from django.conf.urls.defaults import *
 
@@ -242,65 +251,68 @@ New (1.0) ``urls.py``::
         # ... the rest of your URLs here ...
     )
 
-Views
------
+ビュー
+---------
 
-Use ``django.forms`` instead of ``newforms``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``newforms`` の代わりに ``django.forms`` を使う
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Replace ``django.newforms`` with ``django.forms`` -- Django 1.0 renamed the
-``newforms`` module (introduced in 0.96) to plain old ``forms``. The
-``oldforms`` module was also removed removed.
+``django.newforms`` を ``django.forms`` に置き換えてください。 Django 1.0
+は (0.96 で登場した) ``newforms`` モジュールを単に ``forms`` と呼びます。
+``oldforms`` はなくなりました。
 
-If you are already using new forms all you have to do is change your import
-statement. Instead of ``from django import newforms as forms``, use ``from
-django import forms``.
+すでに新しいフォームを使っているのなら、 import 文を変更するだけです。
+``from django import newforms as forms`` から ``from django import forms``
+に書き換えてください。
 
-If you are using the old forms system, you will have to rewrite your forms. A
-good place to start is the :ref:`forms documentation <topics-forms-index>`
+古いフォームシステムを使っているのなら、フォームを書き直す必要があります。
+まずは :ref:`forms のドキュメント <topics-forms-index>` を読むところから始
+めてください。
 
-Handle uploaded files using the new API
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+アップロードファイルの処理に新しい API を使う
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Replace use of uploaded files -- that is, entries in ``request.FILES`` -- as
-simple dictionaries with the new :class:`~django.core.files.UploadedFile`. The
-old dictionary syntax no longer works.
+アップロードファイルを扱うコードを書き換えてください。すなわち、これまでの
+コードでは ``request.FILES`` のエントリを単なる辞書として扱っていましたが、
+:class:`~django.core.files.UploadedFile` のインスタンスとして扱ってください。
+旧来の辞書としての書式はもう使えません。
 
-Thus, in a view like::
+従って、以下のような書き方のビュー::
 
       def my_view(request):
           f = request.FILES['file_field_name']
           ...
 
-You'd need to make the following changes:
+には、以下の点に注意して変更を施す必要があります:
 
-===================== =====================
-Old (0.96)            New (1.0)
-===================== =====================
-``f['content']``      ``f.read()``
-``f['filename']``     ``f.name``
-``f['content-type']`` ``f.content_type``
-===================== =====================
+====================== =====================
+旧 (0.96)              新 (1.0)
+====================== =====================
+``f['content']``       ``f.read()``
+``f['filename']``      ``f.name``
+``f['content-type']``  ``f.content_type``
+====================== =====================
 
-Templates
----------
+テンプレート
+--------------
 
-Learn to love autoescaping
+オートエスケープを使う
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-By default, the templating system now automatically HTML-escapes the output of
-every variable. To learn more, see :ref:`automatic-html-escaping`.
+テンプレートシステムは、デフォルトで変数の出力に自動 HTML エスケープを施す
+ようになりました。詳しくは :ref:`automatic-html-escaping` を参照してくださ
+い。
 
-To disable auto-escaping for an individual variable, use the :tfilter:`safe`
-filter:
+個々の変数に対する自動エスケープを無効化するには、 :tfilter:`safe` フィルタ
+を使ってください:
 
 .. code-block:: html+django
 
-      This will be escaped: {{ data }}
-      This will not be escaped: {{ data|safe }}
+      エスケープされるよ: {{ data }}
+      エスケープされないよ: {{ data|safe }}
 
-To disable auto-escaping for an entire template, wrap the template (or just a
-particular section of the template) in the :ttag:`autoescape` tag:
+テンプレート全体で自動エスケープを無効にするには、テンプレート (や、テンプ
+レートの特定の部分) を :ttag:`autoescape` タグで囲います:
 
 .. code-block:: html+django
 
@@ -308,33 +320,35 @@ particular section of the template) in the :ttag:`autoescape` tag:
          ... unescaped template content here ...
       {% endautoescape %}
 
-Less-common changes
+.. _less-common-changes:
+
+よりマイナーな変更
 ===================
 
-The following changes are smaller, more localized changes. They should only
-affect more advanced users, but it's probably worth reading through the list and
-checking your code for these things.
+以下の変更は、些細で特殊なものです。これらの変更によって影響を受けるのは、
+ごく一部の高度な使い方をしているユーザだけでしょう。とはいえ、この節を一読
+して、自分のコードに当てはまる部分がないかチェックする価値はあるでしょう。
 
-Signals
--------
+シグナル
+---------
 
-* Add ``**kwargs`` to any registered signal handlers.
+* シグナルハンドラには全て ``**kwargs`` を追加してください。
 
-* Connect, disconnect, and send signals via methods on the
-  :class:`~django.dispatch.Signal` object instead of through module methods in
-  ``django.dispatch.dispatcher``.
+* シグナルハンドラの接続と解除、シグナルの送信は、
+  ``django.dispatch.dispatcher`` のモジュールメソッドではなく、
+  :class:`~django.dispatch.Signal` オブジェクトのメソッドを使ってください。
 
-* Remove any use of the ``Anonymous`` and ``Any`` sender options; they no longer
-  exist. You can still receive signals sent by any sender by using
-  ``sender=None``
+* ``sender`` オプションの指定から、 ``Anonymous`` および ``Any`` を外してく
+  ださい。これらのシンボルはもうありません。全てのセンダからシグナルを受け
+  取りたければ、 ``sender=None`` としてください。
 
-* Make any custom signals you've declared into instances of
-  :class:`django.dispatch.Signal`` instead of anonymous objects.
+* カスタムシグナルを定義するときは、無名オブジェクトでなく、
+  :class:`django.dispatch.Signal`` を使ってください。
 
-Here's quick summary of the code changes you'll need to make:
+必要な変更点を手短にまとめた表を以下に示します:
 
 =================================================  ======================================
-Old (0.96)                                         New (1.0)
+旧 (0.96)                                          新 (1.0)
 =================================================  ======================================
 ``def callback(sender)``                           ``def callback(sender, **kwargs)``
 ``sig = object()``                                 ``sig = django.dispatch.Signal()``
@@ -343,126 +357,127 @@ Old (0.96)                                         New (1.0)
 ``dispatcher.connect(callback, sig, sender=Any)``  ``sig.connect(callback, sender=None)``
 =================================================  ======================================
 
-Comments
+コメント
 --------
 
-If you were using Django 0.96's ``django.contrib.comments`` app, you'll need to
-upgrade to the new comments app introduced in 1.0. See
-:ref:`ref-contrib-comments-upgrade` for details.
+Django 0.96 の  ``django.contrib.comments`` アプリケーションを使っているの
+なら、 1.0 で登場した新たなコメントアプリケーションに移行してください。詳し
+くは :ref:`ref-contrib-comments-upgrade` で解説しています。
 
-Template tags
--------------
+テンプレートタグ
+-------------------
 
-:ttag:`spaceless` tag
-~~~~~~~~~~~~~~~~~~~~~
+:ttag:`spaceless` タグ
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-The spaceless template tag removes *all* spaces between HTML tags instead of
-preserving a single space.
+HTML タグ間のスペースを除去する :ttag:`spaceless` タグは、以前はスペースを
+一つだけ残していましたが、 *全て* を除去するようになりました。
 
-Localflavor
------------
+ローカルフレーバ
+---------------------
 
-US localflavor
-~~~~~~~~~~~~~~
-
-``django.contrib.localflavor.usa`` has been renamed
-:mod:`django.contribg.localflavor.us`. This change was made to match the naming
-scheme of other local flavors.
-
-Sessions
---------
-
-Getting a new session key
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-``SeesionBase.get_new_session_key()`` has been renamed to
-``_get_new_session_key()``; ``get_new_session_object()`` no longer exists.
-
-Fixtures
---------
-
-Loading a row no longer calls ``save()``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Previously, loading a row automatically ran the model's ``save()`` method. This
-is no longer the case, so any fields (for example: timestamps) that were
-auto-populated by a ``save()`` now need explicit values in any fixture.
-
-Settings
---------
-
-Better exceptions
-~~~~~~~~~~~~~~~~~
-
-The old :exc:`EnvironmentError` was split into an :exc:`ImportError` raised when
-Django fails to find the settings module and a :exc:`RuntimeError` when you try
-to reconfigure settings after having already used them
-
-``LOGIN_URL`` has moved
+US ローカルフレーバ
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``LOGIN_URL`` constant moved from ``django.contrib.auth`` into the
-``settings`` module. Instead of using ``from django.contrib.auth import
-LOGIN_URL`` refer to :setting:`settings.LOGIN_URL <LOGIN_URL>`.
+``django.contrib.localflavor.usa`` は :mod:`django.contrib.localflavor.us`
+に変更されました。他のローカルフレーバと命名方法を統一するためです。
 
-:setting:`APPEND_SLASH` behaviour has been updated
+セッション
+-------------
+
+新たなセッションキーの取得
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``SeesionBase.get_new_session_key()`` は ``_get_new_session_key()`` にリネー
+ムされました。 ``get_new_session_object()`` はもうありません。
+
+フィクスチャ
+---------------
+
+行レコードのロード時に ``save()`` が呼ばれなくなる
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+以前は、レコード行を読むたびに、自動的にモデルの ``save()`` メソッドが呼び
+出されていました。この仕様は変更され、呼び出されなくなりました。そのため、
+(タイムスタンプなどの) ``save()`` 時に自動的に値が入るフィールドがある場合、
+フィクスチャ側に値を持たせる必要があります。
+
+設定
+--------
+
+例外の改善
+~~~~~~~~~~~~~~~~~
+
+以前の :exc:`EnvironmentError` は :exc:`ImportError` と :exc:`RuntimeError` 
+に分割されました。 :exc:`ImportError` は、 Django が設定モジュールを見付け
+られなかった場合などに、 :exc:`RuntimeError` はすでに設定をロードした後に設
+定を変更しようとした場合などに送出されます。
+
+``LOGIN_URL`` の移動
+~~~~~~~~~~~~~~~~~~~~~~~
+
+``LOGIN_URL`` 定数が、 ``django.contrib.auth`` から ``settings`` モジュール
+に移動しました。 ``from django.contrib.auth import LOGIN_URL`` を使うのでは
+なく、 :setting:`settings.LOGIN_URL <LOGIN_URL>` を参照してください。
+
+:setting:`APPEND_SLASH` の動作が変更されました
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In 0.96, if a URL didn't end in a slash or have a period in the final
-component of it's path, and ``APPEND_SLASH`` was True, Django would redirect
-to the same URL, but with a slash appended to the end. Now, Django checks to
-see if the pattern without the trailing slash would be matched by something in
-your URL patterns. If so, no redirection takes place, because it is assumed
-you deliberately wanted to catch that pattern.
+0.96 では、 URL がスラッシュで終っておらず、パスの最後の部分にピリオドもな
+い場合、 ``APPEND_SLASH`` が ``True`` だと、末尾にスラッシュを付加した URL
+にリダイレクトしていました。 1.0 では、明示的にスラッシュのないパターンを
+URL パターンでキャッチできるように、末尾にスラッシュのない URL に対して、
+まず URL パターン中に一致するエントリがないか調べ、あればリダイレクトしなく
+なりました。
 
-For most people, this won't require any changes. Some people, though, have URL
-patterns that look like this::
+ほとんどのユーザはこの仕様変更の影響を受けませんが、以下のような URL パター
+ンを書いている一部のユーザは影響を受けます::
 
     r'/some_prefix/(.*)$'
 
-Previously, those patterns would have been redirected to have a trailing
-slash. If you always want a slash on such URLs, rewrite the pattern as::
+以前は、こうしたパターンを書いている場合、まず末尾にスラッシュのある URL に
+リダイレクトしていました。 URL の末尾に必ずスラッシュが入っているようなパターンを書きたいなら、以下のようにパターンを書き換えてください::
 
     r'/some_prefix/(.*/)$'
 
-Samller model changes
----------------------
+モデルに関する細かい変更
+----------------------------
 
-Different exception from ``get()``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``get()`` の例外
+~~~~~~~~~~~~~~~~~~
 
-The models manager now returns a :exc:`MultipleObjectsReturned` exception
-instead of :exc:`AssertionError`:
+モデルマネジャは :exc:`AssertionError` ではなく
+:exc:`MultipleObjectsReturned` 例外を返すようになりました。
 
-Old (0.96)::
+旧 (0.96)::
 
     try:
         Model.objects.get(...)
     except AssertionError:
         handle_the_error()
 
-New (1.0)::
+新 (1.0)::
 
   try:
       Model.objects.get(...)
   except Model.MultipleObjectsReturned:
       handle_the_error()
       
-``LazyDate`` has been fired
+``LazyDate`` の除去
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``LazyDate`` helper class no longer exists.
+ヘルパクラス ``LazyDate`` はなくなりました。
 
-Default field values and query arguments can both be callable objects, so
-instances of ``LazyDate`` can be replaced with a reference to ``datetime.datetime.now``:
+フィールド値やクエリ引数に呼び出し可能オブジェクトを指定できるようになった
+ので、 ``LazyDate`` は ``datetime.datetime.now`` に置き換えられます:
 
-Old (0.96)::
+旧 (0.96)::
 
     class Article(models.Model):
         title = models.CharField(maxlength=100)
         published = models.DateField(default=LazyDate())
 
-New (1.0)::
+新 (1.0)::
 
     import datetime
 
@@ -470,44 +485,44 @@ New (1.0)::
         title = models.CharField(maxlength=100)
         published = models.DateField(default=datetime.datetime.now)
 
-``DecimalField`` is new, and ``FloatField`` is now a proper float
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``DecimalField`` が追加され ``FloatField`` が適切に浮動小数を扱うようになる
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Old (0.96)::
+旧 (0.96)::
 
     class MyModel(models.Model):
         field_name = models.FloatField(max_digits=10, decimal_places=3)
         ...
 
-New (1.0)::
+新 (1.0)::
 
     class MyModel(models.Model):
         field_name = models.DecimalField(max_digits=10, decimal_places=3)
         ...
 
-If you forget to make this change, you will see errors about ``FloatField``
-not taking a ``max_digits`` attribute in ``__init__``, since the new
-``FloatField`` takes no precision-related arguments.
+これらの変更に対応し忘れると、新たな ``FloatField`` には精度桁数に関する引
+数がないので、 ``FloatField`` の ``__init__`` には ``max_digits`` という属
+性がない、という旨のエラーを受け取ります。
 
-If you are using MySQL or PostgreSQL, there are no further changes needed. The
-database column types for ``DecimalField`` are the same as for the old
-``FloatField``.
+MySQL や PostgreSQL を使っている場合、これ以上の変更は必要ありません。
+``DecimalField`` のデータベースカラム型は、旧来の ``FloatField`` と同じだか
+らです。
 
-If you are using SQLite, you need to force the database to view the
-appropriate columns as decimal types, rather than floats. To do this, you'll
-need to reload your data. Do this after you have made the change to using
-``DecimalField`` in your code and updated the Django code.
+SQLite を使っている場合、データベースに対して、データを decimal 型でなく
+float 型として扱うよう教え直す必要があります。そのために、データをリロード
+してください。データのリロードは、 ``DecimalField`` への変更を終えて、
+Django をアップデートした後に行ってください。
 
 .. warning::
 
-  **Back up your database first!** 
-  
-  For SQLite, this means making a copy of the single file that stores the
-  database (the name of that file is the ``DATABASE_NAME`` in your settings.py
-  file).
+  **データベースを先にバックアップしてください!** 
 
-To upgrade each application to use a ``DecimalField``, do the following,
-replacing ``<app>`` in the code below with each app's name:
+  SQLite を使っている場合、データベースのバックアップするには、単にデータベー
+  スの保存されているファイル (``settings.py`` の ``DATABASE_NAME`` に指定し
+  ているファイル名) をコピーします。
+
+``DecimalField`` を使う全てのアプリケーションについて以下の作業を行ってくだ
+さい。 ``<app>`` はアプリケーションのなめに読み変えます:
 
 .. code-block:: bash
 
@@ -515,164 +530,173 @@ replacing ``<app>`` in the code below with each app's name:
       $ ./manage.py reset <app>
       $ ./manage.py loaddata data-dump.xml
 
-Notes:
+注意:
 
-  1. It is important that you remember to use XML format in the first step of
-     this process. We are exploiting a feature of the XML data dumps that makes
-     porting floats to decimals with SQLite possible.
+  1. 作業の最初のステップでは、必ずダンプ形式に XML を指定してください。と
+     いうのも、このステップでは、 XML データダンプによって、 float データが
+     SQLite で扱える decimal に変換されるという仕様を使っているからです。
   
-  2. In the second step you will be asked to confirm that you are prepared to
-     lose the data for the application(s) in question. Say yes; we'll restore
-     this data in the third step, of course.
+  2. 二つめのステップでは、アプリケーションのデータが失われてもよいか尋ねら
+     れます。 yes と答えてください。もちろん、三つ目のステップでデータを復
+     元しますからね。
   
-  3. ``DecimalField`` is not used in any of the apps shipped with Django prior 
-     to this change being made, so you do not need to worry about performing
-     this procedure for any of the standard Django models.
+  3. ``DecimalField`` に関する仕様変更前からある Django 付属のアプリケーショ
+     ンは、全て影響を受けません。したがって、標準の Django モデルに対してこ
+     の操作を行う必要はありません。
 
-If something goes wrong in the above process, just copy your backed up
-database file over the top of the original file and start again.
+上のプロセスでうまく行かないようなら、バックアップしておいたデータベースファ
+イルをデータベースファイルに上書きして、Django を再起動してください。
 
-Internationalization
---------------------
+国際化
+-------
 
-:func:`django.views.i18n.set_language` now requires a POST request
+:func:`django.views.i18n.set_language` には POST リクエストが必要
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Previously, a GET request was used. The old behavior meant that state (the
-locale used to display the site) could be changed by a GET request, which is
-against the HTTP specification's recommendations. Code calling this view must
-ensure that a POST request is now made, instead of a GET. This means you can
-no longer use a link to access the view, but must use a form submission of
-some kind (e.g. a button).
+以前は、 GET リクエストが使われていました。この動作は、サーバの状態 (サイト
+を表示する際のロケール) を GET リクエストで変更できることになり、 HTTP 仕様
+の勧告に違反しています。 1.0 からは、このビューを呼び出すときには、GET では
+なく POST リクエストを使わねばならなくなりました。そのため、このビューは
+リンクを使ってアクセスできず、ボタンなどを使ってフォームを提出せねばならな
+くなりました。
 
-``_()`` is no longer in builtins
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``_()`` は組み込みでなくなりました
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``_()`` is no longer monkeypatched into builtins. If you were previously
-relying on ``_()`` always being present, you should now explicitly import
-``ugettext`` or ``ugettext_lazy``, if appropriate, and alias it to ``_``
-yourself::
+以前は、モンキーパッチによって ``_()`` を組み込み名前空間にいれていました。
+そのため、 ``_()`` が常に存在することを前提としてコードを書いている場合、
+``ugettext`` や ``ugettext_lazy`` のどちらか適切な方を明示的に import して、
+``_`` という別名をつけねばなりません::
 
     from django.utils.translation import ugettext as _
 
-HTTP request/response objects
------------------------------
+HTTP リクエスト／レスポンスオブジェクト
+------------------------------------------
 
-Accessing ``HTTPResponse`` headers
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``HTTPResponse`` ヘッダへのアクセス
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``django.http.HttpResponse.headers`` has been renamed to ``_headers`` and
-:class:`HttpResponse`` now supports containment checking directly. So use
-``if header in response:`` instead of ``if header in response.headers:``.
+``django.http.HttpResponse.headers`` は ``_headers`` にリネームされ、
+:class:`HttpResponse`` はヘッダの包含チェックを直接サポートするようになりま
+した。従って、 ``if header in response.headers:`` ではなく
+``if header in response:`` と書いてください。
 
-Generic relations
------------------
+一般化リレーション
+-------------------
 
-Generic relations have been moved out of core
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+一般化リレーションはコアパッケージから移動しました
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The generic relation classes -- ``GenericForeignKey`` and ``GenericRelation``
--- have moved into the :mod:`django.contrib.contenttypes` module.
+一般化リレーションのクラス、 ``GenericForeignKey`` および
+``GenericRelation`` は、 :mod:`django.contrib.contenttypes` モジュールに移
+動しました。
 
-Testing
+
+テスト
 -------
 
-:meth:`django.test.Client.login` has changed
+:meth:`django.test.Client.login` の変更
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Old (0.96)::
+``login`` の引数が以下のように変更されました。
+
+旧 (0.96)::
 
     from django.test import Client
     c = Client()
     c.login('/path/to/login','myuser','mypassword')
 
-New (1.0)::
+新 (1.0)::
 
     # ... same as above, but then:
     c.login(username='myuser', password='mypassword')
 
-Management commands
--------------------
+管理コマンド
+-------------
 
-Running management commands from your code
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+管理コマンドをコードの中から呼び出す
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:mod:`django.core.management`` has been greately refactored.
+:mod:`django.core.management`` は大幅にリファクタされています。
 
-Calls to management services in your code will now need to use
-``call_command``. For example, if you have some test code that calls flush and
-load_data::
+管理コマンドのサービスをコードから呼び出すには、 ``call_command`` を使う必
+要があります。例えば、 :djadmin:`flush`  や :djadmin:`load_data` を呼び出す
+テストコードを以下のように書いていたとしましょう::
+
 
       from django.core import management
       management.flush(verbosity=0, interactive=False)
       management.load_data(['test_data'], verbosity=0)
 
-You will need to change this code to read::
+このコードは、例えば以下のように変更してください::
 
       from django.core import management
       management.call_command('flush', verbosity=0, interactive=False)
       management.call_command('loaddata', 'test_data', verbosity=0)
 
-Subcommands must now preceed options
+サブコマンドはオプションの前に置く
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``django-admin.py`` and ``manage.py`` now require subcommands to precede
-options. So:
+``django-admin.py`` と ``manage.py`` に引数を指定するとき、サブコマンドはオ
+プションよりも前に置かねばならなくなりました。従って:
 
 .. code-block:: bash
 
       $ django-admin.py --settings=foo.bar runserver
 
-no longer works, and must be changed to:
+はもう使えず、以下のように変更せねばなりません:
 
 .. code-block:: bash
 
       $ django-admin.py runserver --settings=foo.bar
 
-Syndication
------------
-
-``Feed.__init__`` has changed
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The ``__init__()`` parameters in in syndication framework's ``Feed`` class now
-take an ``HttpRequest`` object as its second parameter, instead of the feed's
-URL. This allows the syndication framework to work without requiring the sites
-framework. This only affects code that subclass ``Feed`` and overrides the
-``__init__()`` method, and code that calls ``Feed.__init__()`` directly.
-
-Data structures
+配信フィード
 ---------------
 
-``SortedDictFromList`` is gone
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``Feed.__init__`` の変更
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`django.newforms.forms.SortedDictFromList`` was removed.
-:class:`django.utils.datastructures.SortedDict`` can now be instantiated with
-a sequence of tuples.
+配信フィードフレームワークの ``Feed`` クラスの ``__init__()`` パラメタは、
+第二引数にフィードの URL ではなく ``HttpRequest`` オブジェクトを取るように
+なりました。この変更によって、配信フィードフレームワークは sites フレームワー
+クがなくても動作するようになりました。 ``Feed`` をサブクラス化して、
+``__init__()`` をオーバライドするコードや、 ``Feed.__init__()`` を直接呼び
+出しているコードが影響を受けます。
 
-To update your code:
+データ構造
+---------------
 
-     1. Use :class:`django.utils.datastructures.SortedDict` wherever you were
-        using ``django.newforms.forms.SortedDictFromList``.
+``SortedDictFromList`` の撤廃
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-     2. Since :meth:`django.utils.datastructures.SortedDict.copy` return a
-        deepcopy as ``SortedDictFromList`` method did, you will need to update
-        your code if you were relying on a deepcopy. Do this by using
-        ``copy.deepcopy`` directly.
+`django.newforms.forms.SortedDictFromList`` はなくなりました。その代わり、
+タプルのシーケンスを使って :class:`django.utils.datastructures.SortedDict``
+をインスタンス化できるようになりました。
 
-Database backend functions
---------------------------
+コードを変更するには、以下のように書き換えてください:
 
-Database backend functions have been renamed
+     1. ``django.newforms.forms.SortedDictFromList`` を使っている部分を
+        :class:`django.utils.datastructures.SortedDict` に書き換えてくださ
+        い。
+
+     2. :meth:`django.utils.datastructures.SortedDict.copy` は
+        ``SortedDictFromList`` メソッドのように、深いコピーを返すので、
+	コードを deepcopy に対応して書き換える必要があります。深いコピーを
+        作成するには、 ``copy.deepcopy`` を直接呼び出します。
+
+データベースバックエンドの関数
+---------------------------------
+
+データベースバックエンドの関数名の変更
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Almost *all* of the database backend-level functions have been renamed and/or
-relocated. None of these were documented, but you'll need to change your code
-if you're using any of these functions, all of which are in :mod:`django.db`:
+データベースバックエンドレベルの関数の名前は、ほとんど *すべて* 変更され、
+場所が変わっているものもあります。この変更はドキュメントで一切説明されてい
+ませんが、自分のコードでこれらの関数を使っていたのなら、名前を変更する必要
+があるでしょう。関数は全て :mod:`django.db` パッケージ下にあります:
 
 =======================================  ===================================================
-Old (0.96)                               New (1.0)
+旧 (0.96)                                新 (1.0)
 =======================================  ===================================================
 ``backend.get_autoinc_sql``              ``connection.ops.autoinc_sql``
 ``backend.get_date_extract_sql``         ``connection.ops.date_extract_sql``

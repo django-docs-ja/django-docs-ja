@@ -1,234 +1,230 @@
 .. _releases-1.0:
 
-========================
-Django 1.0 release notes
-========================
+==========================
+Django 1.0 リリースノート
+==========================
 
 :revision-up-to: 8961 (1.0)
 
-.. TBD
+Django 1.0 にようこそ!
 
-Welcome to Django 1.0!
+3 年もの間、私達が待ち望んで来た瞬間が、ついにやってきました。 Django 1.0
+はこれまでの Django の歴史において最も大きなマイルストーンであり、完全主義
+者たちが自信を持ってお送りするウェブフレームワークの決定版です。
 
-We've been looking forward to this moment for over three years, and it's finally
-here. Django 1.0 represents a the largest milestone in Django's development to
-date: a web framework that a group of perfectionists can truly be proud of.
+Django 1.0 は、オープンソースプロジェクトとして、コミュニティによって 3 年
+にわたり重ねられてきた開発活動の結晶です。数百もの開発者が Django のコード
+に貢献し、カタログは 50 もの言語に翻訳されました。そして、今や世界中のあら
+ゆる分野の開発者が Django を様々な仕事に使っています。
 
-Django 1.0 represents over three years of community development as an Open
-Source project. Django's received contributions from hundreds of developers,
-been translated into fifty languages, and today is used by developers on every
-continent and in every kind of job.
+ところで、今日深い話があります。 Django を 2005 年に最初にリリースしたとき、
+そのソースを取り出した内部リポジトリのバージョンは 8825 でした。一方、
+公開のリポジトリ内で Django 1.0 のリビジョンは 8961 です。Django 1.0 は、
+コミュニティの貢献の積み重ねが、プライベートな開発の工数を上回ったまさにそ
+のときにリリースされたのです。
 
-An interesting historical note: when Django was first released in July 2005, the
-initial released version of Django came from an internal repository at revision
-number 8825. Django 1.0 represents revision 88XX of our public repository. It
-seems fitting that our 1.0 release comes at the moment where community
-contributions overtake those made privately.
+安定性と互換性の保証
+=====================
 
-Stability and forwards-compatibility
-====================================
+:ref:`Django 1.0 のリリース <releases-1.0>` から、 API の安定性と将来の互
+換性を保証します。簡単にいえば、 Django 1.0 向けに開発したコードは、何も変
+更せずに 1.1 で動作し、その後の 1.X リリースでもちょっとした変更しか必要な
+いのです。
 
-:ref:`The release of Django 1.0 <releases-1.0>` comes with a promise of API
-stability and forwards-compatibility. In a nutshell, this means that code you
-develop against Django 1.0 will continue to work against 1.1 unchanged, and you
-should need to make only minor changes for any 1.X release.
+詳細は :ref:`API の安定性に関するガイド <misc-api-stability>` を参照してく
+ださい。
 
-See the :ref:`API stability guide <misc-api-stability>` for full details.
+以前のバージョンと互換性のない変更
+===================================
 
-Backwards-incompatible changes
-==============================
-
-Django 1.0 has a number of backwards-incompatible changes from Django 0.96. If
-you have apps written against Django 0.96 that you need to port, see our
-detailed porting guide:
+Django 1.0 には、 Django 0.96 と互換性のない変更が数多くあります。 0.96 向
+けに書かれたアプリケーションを移植したいなら、以下の詳しい移植ガイドを参照
+してください:
 
 .. toctree::
    :maxdepth: 1
 
    1.0-porting-guide
-   
-A complete list of backwards-incompatible changes can be found at
-http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges.
 
-What's new in Django 1.0
+以前のバージョンと互換性のない変更の詳しいリストは
+http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
+にあります。
+
+Django 1.0 の新しい機能
 ========================
 
-A *lot*!
+*たくさん！*
 
-Since Django 0.96, we've made over 4,000 code commits, fixed more than 2,000
-bugs, and edited, added, or removed around 350,000 lines of code. We've also
-added 40,000 lines of new documentation, and greatly improved what was already
-there.
+Django 0.96 以降、 4000 ものコミットを行ない、 2000 個のバグを修正しました。
+また、編集／追加／削除したコードは 35 万行にも及びます。また、4 万行もの新
+たなドキュメントを追加し、既存の機能も格段に改善しました。
 
-In fact, new documentation is one of our favorite features of Django 1.0, so we
-might as well start there. First, there's a new documentation site:
+実際、新しくなったドキュメントは、 Django の機能の中でもお気に入りの部分の
+一つなので、ここから紹介していきましょう。まず、新しいドキュメントのサイト
+には、下記の URL からアクセスできます:
 
     http://docs.djangoproject.com/
-    
-The documentation has been greatly improved, cleaned up, and generally made
-awesome. There's now dedicated search, indexes, and more. 
 
-We can't possibly document everything that's new in 1.0, but the documentation
-will be your definitive guide. Anywhere you see something like:
+ドキュメントは大幅な改善と整理の結果、すばらしく生まれ変わりました。専用の
+検索機能やインデクスなどもあります。
+
+このドキュメントはまだ 1.0 で登場した全ての機能を網羅しきれていませんが、
+ガイドブックの決定版として使えることでしょう。ドキュメントのそこかしこに:
 
 .. versionadded:: 1.0
-   This feature is new in Django 1.0
+   この機能は Django 1.0 で新たに登場しました。
 
-You'll know that you're looking at something new or changed.
+と書かれていて、どの機能を新たに追加したり変更したりしたのか分かるはずです。
 
-The other major highlights of Django 1.0 are:
+それでは、 1.0 で登場したその他の主要な機能を紹介してゆきましょう:
 
-Re-factored admin application
------------------------------
+admin アプリケーションのリファクタ
+------------------------------------
 
-The Django administrative interface (``django.contrib.admin``) has been
-completely refactored; admin definitions are now completely decoupled from model
-definitions (no more ``class Admin`` declaration in models!), rewritten to use
-Django's new form-handling library (introduced in the 0.96 release as
-``django.newforms``, and now available as simply ``django.forms``) and
-redesigned with extensibility and customization in mind. Full documentation for
-the admin application is available online in the official Django documentation:
+Django の管理インタフェース (``django.contrib.admin``) を完全にリファクタし
+ました。admin の定義を完全にモデル定義から脱カップリングし (モデルから
+``class Admin`` をなくしました!)、Django の新たなフォーム処理ライブラリ
+(0.96 から登場した ``django.newforms`` で、今後は単に ``django.forms``) を
+使うよう、 admin のフレームワークを 書き直しました。また、思い通りに拡張し
+たりカスタマイズしたりできるようになりました。admin アプリケーションのドキュ
+メントは、 :ref:`admin インタフェース <ref-contrib-admin>` にあります。
 
-See the :ref:`admin reference <ref-contrib-admin>` for details
-
-Improved Unicode handling
+Unicode 処理の改善
 -------------------------
 
-Django's internals have been refactored to use Unicode throughout; this
-drastically simplifies the task of dealing with non-Western-European content and
-data in Django. Additionally, utility functions have been provided to ease
-interoperability with third-party libraries and systems which may or may not
-handle Unicode gracefully. Details are available in Django's Unicode-handling
-documentation.
+Django の内部処理を、一貫して Unicode を使うようリファクタしました。これに
+より、非西欧圏のコンテンツやデータの扱い劇的に単純化しました。また、サード
+パーティライブラリや、Unicode を行儀よく扱えないことのあるシステムとの相互
+運用を楽にするためのユーティリティも提供しました。
 
-See :ref:`ref-unicode`.
+:ref:`Unicode リファレンス <ref-unicode>` を参照してください。
 
-An improved ORM
----------------
+Django ORM の改善
+------------------
 
-Django's object-relational mapper -- the component which provides the mapping
-between Django model classes and your database, and which mediates your database
-queries -- has been dramatically improved by a massive refactoring. For most
-users of Django this is backwards-compatible; the public-facing API for database
-querying underwent a few minor changes, but most of the updates took place in
-the ORM's internals. A guide to the changes, including backwards-incompatible
-modifications and mentions of new features opened up by this refactoring, is
-`available on the Django wiki`__.
+Django のオブジェクト-リレーショナルマッパ、つまり Django のモデルクラスと
+データベースを対応づけ、クエリの発行を仲立ちするためのコンポーネントを、徹
+底的なリファクタによって劇的に改善しました。ほとんどの Django ユーザにとっ
+て、この変更による互換性の問題はありません。データベースを操作している公開
+の API に細かい変更がありましたが、ほとんどの変更は ORM の内部コードに対し
+て施されています。このリファクタのもたらす、以前のバージョンと互換性のない
+変更や新たな機能は、 `Django の wiki ページ`__ に掲載しています。
 
 __ http://code.djangoproject.com/wiki/QuerysetRefactorBranch
 
-Automatic escaping of template variables
-----------------------------------------
+テンプレート変数の自動エスケープ
+----------------------------------
 
-To provide improved security against cross-site scripting (XSS) vulnerabilities,
-Django's template system now automatically escapes the output of variables. This
-behavior is configurable, and allows both variables and larger template
-constructs to be marked as safe (requiring no escaping) or unsafe (requiring
-escaping). A full guide to this feature is in the documentation for the
-:ttag:`autoescape` tag.
+クロスサイトスクリプティング (XSS) 脆弱性に対する安全性をより高めるために、
+Django のテンプレートシステムが全ての変数出力を自動的に HTML エスケープする
+よう変更しました。この挙動はもちろん変更でき、変数やテンプレートの一部を
+「安全:safe」(エスケープ不要) や「安全でない:unsafe」(エスケープが必要) に
+マークできます。この機能の詳しい説明は、 :ttag:`autoescape` タグのドキュメ
+ントにあります。
 
 ``django.contrib.gis`` (GeoDjango)
 ----------------------------------
 
-A project over a year in the making, this adds world-class GIS (`Geographic
-Information Systems`_) support to Django, in the form of a ``contrib``
-application. Its documentation is currently being maintained externally, and
-will be merged into the main Django documentation shortly. Huge thanks go to
-Justin Bronn, Jeremy Dunck, Brett Hoerner and Travis Pinney for their efforts in
-creating and completing this feature.
+1 年にわたる開発を経て、ワールドクラスの GIS (`地理情報システム`_: 
+`Geographic Information Systems`_) のサポートを ``contrib`` アプリケーショ
+ンの形で Django に追加しました。 GIS のドキュメントはまだプロジェクトの外で
+メンテナンス中で、まもなく Django のメインドキュメントにマージする予定です。
+この機能を作り上げ、完成までこぎつけた Justin Bronn, Jeremy Dunck, Brett
+Hoerner そして Travis Pinney に深く感謝します。
 
-See http://geodjango.org/ for details.
+詳しくは http://geodjango.org/ を参照してください。
 
 .. _Geographic Information Systems: http://en.wikipedia.org/wiki/Geographic_information_system
+.. _`地理情報システム`: http://ja.wikipedia.org/wiki/地理情報システム
 
-Pluggable file storage
-----------------------
+プラガブルなファイルストレージ機構
+-----------------------------------
 
-Django's built-in ``FileField`` and ``ImageField`` now can take advantage of
-pluggable file-storage backends, allowing extensive customization of where and
-how uploaded files get stored by Django. For details, see :ref:`the files
-documentation <topics-files>`; big thanks go to Marty Alchin for putting in the
-hard work to get this completed.
+Django 組み込みの ``FileField`` と ``ImageField`` が、プラガブルなファイル
+ストレージバックエンドを使えるようになりました。ストレージバックエンドによっ
+て、アップロードファイルを Django に保存する方法を徹底的にカスタマイズでき
+ます。詳しくは、 :ref:`ファイルのドキュメント <topics-files>` を参照してく
+ださい。この困難な仕事を達成した Marty Alchin に深く感謝します。
 
-Jython compatibility
+Jython との互換性
 --------------------
 
-Thanks to a lot of work from Leo Soto during a Google Summer of Code project,
-Django's codebase has been refactored to remove incompatibilities with
-`Jython`_, an implementation of Python written in Java, which runs Python code
-on the Java Virtual Machine. Django is now compatible with the forthcoming
-Jython 2.5 release.
+Google Summer of Code プロジェクトを通じて多大な貢献をもたらした Leo Soto
+に感謝します。彼は Django のコードベースをリファクタし、これまで `Jython`_
+との互換性を妨げていた部分を除去しました。 Jython はJava で書かれた Python
+実装で、 Java 仮想マシンで Python コードを実行できます。 Django はまもなく
+登場する Jython 2.5 リリースで動作します。
 
-See :ref:`howto-jython`.
+詳しくは :ref:`howto-jython` を参照してください。
 
 .. _Jython: http://www.jython.org/
 
-Generic relations in forms and admin
-------------------------------------
+forms と admin への一般化リレーションの組み込み
+-------------------------------------------------
 
-Classes are now included in ``django.contrib.contenttypes`` which can be used to
-support generic relations in both the admin interface and in end-user forms. See
-:ref:`the documentation for generic relations <generic-relations>` for details.
+一般化リレーションのクラスを ``django.contrib.contenttypes`` に移し、 admin
+インタフェースやエンドユーザのフォームでもサポートしました。詳しくは
+:ref:`一般化リレーションのドキュメント <generic-relations>` を参照してくだ
+さい。
 
-``INSERT``/``UPDATE`` distinction
+``INSERT``/``UPDATE`` の使い分け
 ---------------------------------
 
-Although Django's default behavior of having a model's ``save()`` method
-automatically determine whether to perform an ``INSERT`` or an ``UPDATE`` at the
-SQL level is suitable for the majority of cases, there are occasional situations
-where forcing one or the other is useful. As a result, models can now support an
-additional parameter to ``save()`` which can force a specific operation.
+Django で ``save()`` メソッドを呼び出したとき、SQL レベルで ``INSERT`` と
+``UPDATE`` のどちらを使うかの区別は、ほとんどの場合デフォルトの挙動で問題あ
+りませんが、たまにどちらかを強制的に用いたほうがよい場合があります。そこで、
+モデルの ``save()`` にパラメタを追加して、実行する SQL を強制できるようにし
+ました。詳細と、パラメタを使うときの重要な注意点を、データベース API のドキュ
+メントに記載してあります。
 
-See :ref:`ref-models-force-insert` for details.
+詳しくは :ref:`ref-models-force-insert` を参照してください。
 
-Split ``CacheMiddleware``
--------------------------
+``CacheMiddleware`` の分割
+----------------------------
 
-Django's ``CacheMiddleware`` has been split into three classes:
-``CacheMiddleware`` itself still exists and retains all of its previous
-functionality, but it is now built from two separate middleware classes which
-handle the two parts of caching (inserting into and reading from the cache)
-separately, offering additional flexibility for situations where combining these
-functions into a single middleware posed problems.
+Django の ``CacheMiddleware`` を 3 つのクラスに分割しました。
+``CacheMiddleware`` 自体はまだあり、以前の機能をそのまま残していますが、実
+際には二つの別々のミドルウェア (キャッシュにデータを入れるミドルウェアと、
+キャッシュからデータを取り出すミドルウェア) からなっていて、一つのミドルウェ
+アにまとまっていると起きる問題を回避できます。
 
-Full details, including updated notes on appropriate use, are in :ref:`the
-caching documentation <topics-cache>`.
+正しい使い方など、詳細は :ref:`キャッシュのドキュメント <topics-cache>` に
+記載しています。
 
-Refactored ``django.contrib.comments``
---------------------------------------
+``django.contrib.comments`` のリファクタ
+-----------------------------------------
 
-As part of a Google Summer of Code project, Thejaswi Puthraya carried out a
-major rewrite and refactoring of Django's bundled comment system, greatly
-increasing its flexibility and customizability. :ref:`Full documentation
-<ref-contrib-comments-index>` is available, as well as :ref:`an upgrade guide
-<ref-contrib-comments-upgrade>` if you were using the previous incarnation of
-the comments application.
+Google Summer of Code プロジェクトの一環として、 Thejaswi Puthraya が
+Django にバンドルされているコメントシステムを大幅にリライト／リファクタし、
+フレキシビリティとカスタマイズ性をすばらしく向上させました。 :ref:`詳細なド
+キュメント <ref-contrib-comments-index>` と、以前のコメントアプリケーション
+を使っていた人のための :ref:`アップグレードガイド
+<ref-contrib-comments-upgrade>` も読めるようになりました。
 
-Removal of deprecated features
-------------------------------
+撤廃した機能の除去
+--------------------
 
-A number of features and methods which had previously been marked as deprecated,
-and which were scheduled for removal prior to the 1.0 release, are no longer
-present in Django. These include imports of the form library from
-``django.newforms`` (now located simply at ``django.forms``), the
-``form_for_model`` and ``form_for_instance`` helper functions (which have been
-replaced by ``ModelForm``) and a number of deprecated features which were
-replaced by the dispatcher, file-uploading and file-storage refactorings
-introduced in the Django 1.0 alpha releases.
+以前のバージョンで撤廃した機能としてマークしていた機能や、 1.0 のリリースに
+先だって除去を予定していた機能を Django から取り去りました。除去した機能に
+は、import パス ``django.newforms`` (``django.forms`` で import できます)
+や ``form_for_model``, ``form_for_instance`` といったヘルパ関数
+(``ModelForm`` に置き換わりました)、そしてディスパッチャやファイルアップロー
+ド、ファイルストレージリファクタリングなどで置き換えられた機能な
+どがあります。
 
-Known issues
+既知の問題
 ============
 
-We've done our best to make Django 1.0 as solid as possible, but unfortunately
-there are a couple of issues that we know about in the release.
+私達は、 Django 1.0 を可能な限り安定させるべくベストを尽くしましたが、残念
+ながら、このリリースには既知の問題が二つあります。
 
-Multi-table model inheritance with ``to_field``
------------------------------------------------
+``to_field`` 指定を含むマルチテーブルモデル継承での問題
+---------------------------------------------------------
 
-If you're using :ref:`multiple table model inheritance
-<multi-table-inheritance>`, be aware of this caveat: child models using a custom
-``parent_link`` and ``to_field`` will cause database integrity errors. A set of
-models like the following are **not valid**::
+:ref:`マルチテーブルモデル継承 <multi-table-inheritance>` を使う場合、子の
+モデルで ``permanent_link`` と ``to_field`` をカスタマイズすると、データベー
+スの一貫性に関するエラーを引き起こすという問題があるので注意してください。
+以下のようなモデルを定義すると、 **うまく動きません** ::
 
     class Parent(models.Model):
         name = models.CharField(max_length=10)
@@ -238,13 +234,16 @@ models like the following are **not valid**::
         father = models.OneToOneField(Parent, primary_key=True, to_field="other_value", parent_link=True)
         value = models.IntegerField()
 
-This bug will be fixed in the next release of Django.
+このバグは、次の Django のリリースで修正する予定です。
 
-Caveats with support of certain databases
+特定のデータベースに関する注意点
 -----------------------------------------
 
-Django attempts to support as many features as possible on all database
-backends. However, not all database backends are alike, and in particular many of the supported database differ greatly from version to version. It's a good idea to checkout our :ref:`notes on supported database <ref-databases>`:
+Django は全てのデータベースバックエンドの可能な限り多くの機能をサポートしよ
+うと試みています。しかしながら、全てのデータベースシステムがまったく同じ機
+能を持っているわけではなく、とりわけ Django のサポートしているデータベース
+の多くはバージョン毎に大きく変化しています。ですから、 :ref:`サポートしてい
+るデータベースに関する注意 <ref-databases>` を参照しておくとよいでしょう:
 
     - :ref:`mysql-notes`
     - :ref:`sqlite-notes`

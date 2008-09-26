@@ -1,38 +1,36 @@
 .. _ref-contrib-comments-settings:
 
-================
-Comment settings
-================
+================================
+コメントフレームワークの設定
+================================
 
 :revision-up-to: 8961 (1.0)
 
-.. TBD
-
-These settings configure the behavior of the comments framework:
+以下の設定を使うと、コメントフレームワークのふるまいを制御できます:
 
 .. setting:: COMMENTS_HIDE_REMOVED
 
 COMMENTS_HIDE_REMOVED
 ---------------------
 
-If ``True`` (default), removed comments will be excluded from comment
-lists/counts (as taken from template tags). Otherwise, the template author is
-responsible for some sort of a "this comment has been removed by the site staff"
-message.
+``True`` (デフォルト値) の場合、コメントを削除すると (テンプレートタグで取
+得できる) コメントリストやコメント数の対象から外れます。この値を ``False``
+にする場合、「このコメントはサイト管理者によって削除されました」といったメッ
+セージを出すなどの処理を実装せねばなりません。
 
 .. setting:: COMMENT_MAX_LENGTH
 
 COMMENT_MAX_LENGTH
 ------------------
 
-The maximum length of the comment field, in characters. Comments longer than
-this will be rejected. Defaults to 3000.
+文字数で数えたコメントフィールドの最大長です。指定値より長いコメントの投稿
+は拒否されます。デフォルト値は 3000 です。
 
 .. setting:: COMMENTS_APP
 
 COMMENTS_APP
 ------------
 
-The app (i.e. entry in ``INSTALLED_APPS``) responsible for all "business logic."
-You can change this to provide custom comment models and forms, though this is
-currently undocumented.
+コメントの「ビジネスロジック」が実装されているアプリケーションの名前
+(``INSTALLED_APPS`` での名前) です。この値を変更すればカスタムのコメントモ
+デルやフォームを扱えますが、詳細はまだドキュメント化されていません。

@@ -1,20 +1,18 @@
 .. _ref-contrib-comments-signals:
 
-================================
-Signals sent by the comments app
-================================
+===================================
+コメントアプリケーションのシグナル
+===================================
 
 :revision-up-to: 8961 (1.0)
 
-.. TBD
-
 .. module:: django.contrib.comments.signals
-   :synopsis: Signals sent by the comment module.
+   :synopsis: コメントモジュールから送信されるシグナル
 
-The comment app sends a series of :ref:`signals <topics-signals>` to allow for
-comment moderation and similar activities. See :ref:`the introduction to signals
-<topics-signals>` for information about how to register for and receive these
-signals.
+コメントアプリケーションは、コメントのモデレーションやそれに類する処理を行
+えるよう、 :ref:`シグナル <topics-signals>` をいくつか定義しています。シグ
+ナルハンドラの登録方法や受信方法は :ref:`シグナルの解説 <topics-signals>`
+を参照してください。
 
 comment_will_be_posted
 ======================
@@ -22,49 +20,50 @@ comment_will_be_posted
 .. data:: django.contrib.comments.signals.comment_will_be_posted
    :module:
 
-Sent just before a comment will be saved, after it's been sanity checked and
-submitted. This can be used to modify the comment (in place) with posting
-details or other such actions.
+コメントフォームデータのチェックが済み、フォームが提出されて、コメントが保
+存される直前に送信されます。このシグナルを使うと、入力されたコメントデータ
+をポストされた情報やその他のアクションに基づいて (置き換えで) 変更できます。
 
-If any receiver returns ``False`` the comment will be discarded and a 403 (not
-allowed) response will be returned.
+シグナルレシーバのいずれかが ``False`` を返すと、コメントの入力は無視され、
+403 (not allowed) レスポンスを返します。
 
-This signal is sent at more or less the same time (just before, actually) as the
-``Comment`` object's :data:`~django.db.models.signals.pre_save` signal.
+シグナルは ``Comment`` オブジェクトの
+:data:`~django.db.models.signals.pre_save` に前後して (実際には直前に) 送信
+されます。
 
-Arguments sent with this signal:
+シグナルは以下の引数を伴います:
     
     ``sender``
-        The comment model.
+        コメントモデルです。
         
     ``comment``
-        The comment instance about to be posted. Note that it won't have been
-        saved into the database yet, so it won't have a primary key, and any
-        relations might not work correctly yet.
+        投稿処理中のコメントインスタンスです。まだデータベースには保存され
+        ていないので、プライマリキーはなく、リレーションも正しく動作しない
+        可能性があります。
         
     ``request``
-        The :class:`~django.http.HttpRequest` that posted the comment.
+        コメントの投稿に使われた :class:`~django.http.HttpRequest` です。
         
 comment_was_posted
 ==================
 
 .. data:: django.contrib.comments.signals.comment_was_posted
    :module:
-   
-Sent just after the comment is saved.
 
-Arguments sent with this signal:
+コメントの保存直後に送信されるシグナルです。   
+
+シグナルは以下の引数を伴います:
     
     ``sender``
-        The comment model.
+        コメントモデルです。
         
     ``comment``
-        The comment instance that was posted. Note that it will have already
-        been saved, so if you modify it you'll need to call
-        :meth:`~django.db.models.Model.save` again.
+        投稿されたコメントインスタンスです。すでにデータベースに保存され
+        ているので、このオブジェクトを変更した場合、再度
+	:meth:`~django.db.models.Model.save` を呼び出す必要があります。
         
     ``request``
-        The :class:`~django.http.HttpRequest` that posted the comment.
+        コメントの投稿に使われた :class:`~django.http.HttpRequest` です。
 
 comment_was_flagged
 ===================
@@ -72,26 +71,28 @@ comment_was_flagged
 .. data:: django.contrib.comments.signals.comment_was_flagged
    :module:
 
-Sent after a comment was "flagged" in some way. Check the flag to see if this
-was a user requesting removal of a comment, a moderator approving/removing a
-comment, or some other custom user flag.
+コメントが何らかの形で「フラグされた」直後に送信されます。フラグをチェック
+すれば、ユーザがコメントの削除を要求しているのか、モデレータによるコメント
+の承認／削除があったのか、その他カスタムのユーザフラグの変化などがわかりま
+す。
 
-Arguments sent with this signal:
+シグナルは以下の引数を伴います:
     
     ``sender``
-        The comment model.
+        コメントモデルです。
         
     ``comment``
-        The comment instance that was posted. Note that it will have already
-        been saved, so if you modify it you'll need to call
-        :meth:`~django.db.models.Model.save` again.
+        投稿されたコメントインスタンスです。すでにデータベースに保存され
+        ているので、このオブジェクトを変更した場合、再度
+	:meth:`~django.db.models.Model.save` を呼び出す必要があります。
         
     ``flag``
-        The :class:`~django.contrib.comments.models.CommentFlag` that's been
-        attached to the comment.
+        コメントに結びつけられた
+        :class:`~django.contrib.comments.models.CommentFlag` です。
         
     ``created``
-        ``True`` if this is a new flag; ``False`` if it's a duplicate flag.
+        フラグが新たに結びつけられた場合は ``True``, 他のフラグと重複する場
+        合には ``False`` です。
         
     ``request``
-        The :class:`~django.http.HttpRequest` that posted the comment.
+        コメントの投稿に使われた :class:`~django.http.HttpRequest` です。

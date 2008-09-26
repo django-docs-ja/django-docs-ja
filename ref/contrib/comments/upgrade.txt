@@ -1,47 +1,47 @@
 .. _ref-contrib-comments-upgrade:
 
 ===============================================
-Upgrading from Django's previous comment system
+Django の以前のコメントシステムからの移行
 ===============================================
 
 :revision-up-to: 8961 (1.0)
 
-.. TBD
+Django の以前のバージョンには、もう撤廃された、ドキュメント化されていないコ
+メントシステムがありました。このフレームワークをリバースエンジニアリングし
+て使っていたユーザは、新たなコメントシステムに移行する必要があります。この
+ガイドでは、コメントシステムの移行方法を解説しています。
 
-Prior versions of Django included an outdated, undocumented comment system. Users who reverse-engineered this framework will need to upgrade to use the
-new comment system; this guide explains how.
+まず、新旧のコメントシステムの違いを示します:
 
-The main changes from the old system are:
-
-    * This new system is documented.
+    * 新しいシステムにはドキュメントがあります。
     
-    * It uses modern Django features like :ref:`forms <topics-forms-index>` and
-      :ref:`modelforms <topics-forms-modelforms>`.
+    * 新しいシステムは、 :ref:`forms <topics-forms-index>` や
+      :ref:`modelforms <topics-forms-modelforms>` のような新しく Django に
+      登場した機能を使っています。
 
-    * It has a single ``Comment`` model instead of separate ``FreeComment`` and
-      ``Comment`` models.
+    * コメントモデルは以前は ``FreeComment`` と ``Comment`` モデルに分かれ
+      ていましたが、 ``Comment`` に統合されました。
 
-    * Comments have "email" and "URL" fields.
+    * コメントに "email" および "URL" フィールドが追加されました。
 
-    * No ratings, photos and karma. This should only effect World Online.
+    * レーティング (rating)、写真 (photo)、カルマ (karma) といった機能がな
+      くなりました。これらは World Online でしか使っていなかったからです。
 
-    * The ``{% comment_form %}`` tag no longer exists. Instead, there's now two
-      functions: ``{% get_comment_form %}``, which returns a form for posting a
-      new comment, and ``{% render_comment_form %}``, which renders said form
-      using the ``comments/form.html`` template.
+    * ``{% comment_form %}`` タグがなくなりました。その代り、新たなコメント
+      のポストに使うフォームを返す ``{% get_comment_form %}`` と、
+      ``comments/form.html`` テンプレートを使ってフォームをレンダする
+      ``{% render_comment_form %}`` の二つのタグが追加されました。
 
-Upgrading data
+データの移行
 --------------
 
-The data models for Django's comment system have changed, as have the
-table names. Before you transfer your existing data into the new comments
-system, make sure that you have installed the new comments system as
-explained in the
-:ref:`quick start guide <ref-contrib-comments-index>`.
-This will ensure that the new tables have been properly created.
+コメントシステムのデータモデルは、新しいモデルで変更され、テーブルの名前も
+代わりました。既存のデータを新たなコメントシステムに移す前に、
+:ref:`クイックスタートガイド <ref-contrib-comments-index>` に従って新たなコ
+メントシステムをインストールし、適切なテーブルを生成しておいてください。
 
-To transfer your data into the new comments system, you'll need to directly
-run the following SQL:
+データを新たなコメントシステムに移行するには、以下のような SQL を直接実行し
+てください:
 
 .. code-block:: sql
 

@@ -1,37 +1,38 @@
 .. _ref-contrib-comments-index:
 
 ===========================
-Django's comments framework
+コメントフレームワーク
 ===========================
 
 :revision-up-to: 8961 (1.0)
 
-.. TBD
-
 .. module:: django.contrib.comments
-   :synopsis: Django's comment framework
+   :synopsis: Django のコメントフレームワークです。
 
-Django includes a simple, yet customizable comments framework. The built-in
-comments framework can be used to attach comments to any model, so you can use
-it for comments on blog entries, photos, book chapters, or anything else.
+Django には単純ながらカスタマイズ可能なコメントフレームワークが付属していま
+す。この組み込みのコメントフレームワークを使えば、任意のモデルにコメントを
+付加できます。つまり、ブログエントリや写真、本、本の各章、その他あらゆるも
+のにコメントを付けられるのです。
 
 .. note::
 
-    If you used to use Django's older (undocumented) comments framework, you'll
-    need to upgrade. See the :ref:`upgrade guide <ref-contrib-comments-upgrade>`
-    for instructions.
+    Django の古い (ドキュメント化されなかった) コメントフレームワークを使っ
+    ていたのなら、アップグレードが必要です。 :ref:`アップグレードガイド
+    <ref-contrib-comments-upgrade>` を参照してください。
 
-Quick start guide
-=================
+クイックスタートガイド
+==========================
 
-To get started using the ``comments`` app, follow these steps:
+``comments`` を使うには、以下のステップに従います:
 
-    #. Install the comments framework by adding ``'django.contrib.comments'`` to    
-       :setting:`INSTALLED_APPS`.
+    #. :setting:`INSTALLED_APPS` に ``'django.contrib.comments'`` を
+       インストールします。
 
-    #. Run ``manage.py syncdb`` so that Django will create the comment tables.
+    #. ``manage.py syncdb`` を実行して、コメントフレームワークのテーブルを
+       生成します。
 
-    #. Add the comment app's URLs to your project's ``urls.py``:
+    #. コメントアプリケーションの URL をプロジェクトの ``urls.py`` にマップ
+       します:
    
        .. code-block:: python
 
@@ -41,61 +42,70 @@ To get started using the ``comments`` app, follow these steps:
                 ...
             )
 
-    #. Use the `comment template tags`_ below to embed comments in your
-       templates.
-    
-You might also want to examine the :ref:`ref-contrib-comments-settings`
-    
-Comment template tags
-=====================
+    #. :ref:`コメントテンプレートタグ <comment-template-tags>` を使って、
+       コメント機能をテンプレートに埋め込みます。
 
-You'll primarily interact with the comment system through a series of template
-tags that let you embed comments and generate forms for your users to post them.
+:ref:`ref-contrib-comments-settings` も調べておきましょう。
+    
+.. _comment-template-tags:
 
-Like all custom template tag libraries, you'll need to :ref:`load the custom
-tags <loading-custom-template-libraries>` before you can use them::
+コメントテンプレートタグ
+==========================
+
+コメントシステムは、主にテンプレートタグを使って操作します。テンプレートタ
+グを使えば、コメントをポストするためのフォームや、ポストされたコメントを埋
+め込めます。
+
+他のカスタムテンプレートタグライブラリと同様、使うには
+:ref:`カスタムタグライブラリをロード <loading-custom-template-libraries>` 
+しておかねばなりません::
 
     {% load comments %}
 
-Once loaded you can use the template tags below.
+タグライブラリをロードすれば、後で解説するテンプレートタグを使えるようにな
+ります。
 
-Specifying which object comments are attached to
+どのオブジェクトにコメントを結びつけるか指定する
 ------------------------------------------------
 
-Django's comments are all "attached" to some parent object. This can be any
-instance of a Django model. Each of the tags below gives you a couple of
-different ways you can specify which object to attach to:
+Django のコメントは、全て何らかのオブジェクトに「結びついて (attached)」い
+ます。コメントは、任意の Django モデルのインスタンスに結びつけられます。
+以下のタグを使うと、 2 種類の方法で、コメントを結びつけたいオブジェクトを指
+定できます:
 
-    #. Refer to the object directly -- the more common method. Most of the
-       time, you'll have some object in the template's context you want
-       to attach the comment to; you can simply use that object.
+    #. オブジェクトを直接参照する方法 -- より一般的な方法です。たいていの場
+       合、コメントを結びつけたいオブジェクトはテンプレートコンテキストの中
+       に入っているはずです。そのオブジェクトを使います。
        
-       For example, in a blog entry page that has a variable named ``entry``, 
-       you could use the following to load the number of comments::
+       例えば、あるブログのエントリ表示ページに ``entry`` という変数が入っ
+       ていて、エントリオブジェクトを表現しているなら、以下のようにして、
+       ``entry`` に結び付いたコメントの数を表示できます::
        
             {% get_comment_count for entry as comment_count %}.
             
-    #. Refer to the object by content-type and object id. You'd use this method
-       if you, for some reason, don't actually have direct access to the object.
-       
-       Following the above example, if you knew the object ID was ``14`` but
-       didn't have access to the actual object, you could do something like::
+    #. オブジェクトをコンテンツタイプとオブジェクト id で指定する方法。何ら
+       かの理由で、コメントを結び付ける対象のオブジェクトに直接アクセスでき
+       ない場合に使います。
+
+       上のような例で、オブジェクトの id が ``14`` だと分かっていて、かつ対
+       象のオブジェクトにアクセスできないなら、以下のようにします::
        
             {% get_comment_count for blog.entry 14 as comment_count %}
             
-       In the above, ``blog.entry`` is the app label and (lower-cased) model
-       name of the model class.
+       この例の ``blog.entry`` は、アプリケーションラベルと (小文字にした)
+       モデルクラス名をつなげたものです。
 
 .. templatetag:: get_comment_list
 
-Displaying comments
+コメントを表示する
 -------------------
 
-To get a the list of comments for some object, use :ttag:`get_comment_list`::
+オブジェクトに結びつけられたコメントを取得するには、
+:ttag:`get_comment_list` を使います::
 
     {% get_comment_list for [object] as [varname] %}
 
-For example::
+例を挙げましょう::
 
     {% get_comment_list for event as comment_list %}
     {% for comment in comment_list %}
@@ -104,55 +114,56 @@ For example::
 
 .. templatetag:: get_comment_count
 
-Counting comments
------------------
+コメントの数を数える
+----------------------
 
-To count comments attached to an object, use :ttag:`get_comment_count`::
+オブジェクトに結びつけられたコメントの数を取得するには、
+:ttag:`get_comment_count` を使います::
 
     {% get_comment_count for [object] as [varname]  %}
 
-For example::
+例を挙げましょう::
 
         {% get_comment_count for event as comment_count %}
         
         <p>This event has {{ comment_count }} comments.</p>
         
 
-Displaying the comment post form
+コメント投稿フォームを表示する
 --------------------------------
 
-To show the form that users will use to post a comment, you can use
-:ttag:`render_comment_form` or :ttag:`get_comment_form`
+ユーザがコメントを投稿できるようフォームを表示するには、
+:ttag:`render_comment_form` や :ttag:`get_comment_form` を使います。
 
 .. templatetag:: render_comment_form
 
-Quickly rendering the comment form
+コメントフォームを手軽に出力する
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The easiest way to display a comment form is by using
-:ttag:`render_comment_form`::
+コメントフォームを表示する最も簡単な方法は、
+:ttag:`render_comment_form` を使うやり方です::
 
     {% render_comment_form for [object] %}
 
-For example::
+例を挙げましょう::
 
     {% render_comment_form for event %}
 
-This will render comments using a template named ``comments/form.html``, a
-default version of which is included with Django.
+このコードによって、Django に付属のデフォルトの ``comments/form.html`` テン
+プレートを使ってコメントフォームがレンダされます。
 
 .. templatetag:: get_comment_form
 
-Rendering a custom comment form
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+カスタムのコメントフォームを出力する
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you want more control over the look and feel of the comment form, you use use
-:ttag:`get_comment_form` to get a :ref:`form object <topics-forms-index>` that
-you can use in the template::
+コメントフォームのルック&フィールを制御したければ、
+:ttag:`get_comment_form` を使って :ref:`フォームオブジェクト
+<topics-forms-index>` を取得し、テンプレート内で使います::
 
     {% get_comment_form for [object] as [varname] %}
-    
-A complete form might look like::
+
+これで、フォームは以下のように書けます::    
 
     {% get_comment_form for event as form %}
     <form action="{% comment_form_target %}" method="POST">
@@ -161,52 +172,59 @@ A complete form might look like::
         <input type="submit" name="submit" class="submit-post" value="Preview">
       </p>
     </form>
-    
-Be sure to read the `notes on the comment form`_, below, for some special
-considerations you'll need to make if you're using this aproach.
+
+このアプローチをとるときには、いくつか考慮すべき点があります。後述の
+`コメントフォームに関する注意 <notes-on-the-comment-form>`_ をよく読んでく
+ださい。
 
 .. templatetag:: comment_form_target
 
-Getting the comment form target
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+コメントフォームターゲットを取得する
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You may have noticed that the above example uses another template tag --
-:ttag:`comment_form_target` -- to actually get the ``action`` attribute of the
-form. This will always return the correct URL that comments should be posted to;
-you'll always want to use it like above::
+上の例では、 :ttag:`comment_form_target` というもう一つのタグを使って、フォー
+ムの ``action`` 属性を取得していたことに気づいたでしょうか。このタグは、常
+にコメントフォームのポスト先として正しい URL を返します。コメントフォームを
+使うときには、いつも以下のように書いてください::
 
     <form action="{% comment_form_target %}" method="POST">
 
-Notes on the comment form
--------------------------
+.. _notes-on-the-comment-form:
 
-The form used by the comment system has a few important anti-spam attributes you
-should know about:
+コメントフォームに関する注意
+--------------------------------
 
-    * It contains a number of hidden fields that contain timestamps, information
-      about the object the comment should be attached to, and a "security hash"
-      used to validate this information. If someone tampers with this data -- 
-      something comment spammers will try -- the comment submission will fail.
+コメントシステムの使っているフォームには、スパムを防ぐための重要な属性があ
+ります。これらの属性についてよく知っておきましょう:
+
+    * フォームには、タイムスタンプやコメントを結び付ける対象のオブジェクト、
+      これらの情報を検証するための「セキュリティハッシュ(security hash)」な
+      ど、いくつもの隠しフィールドが入っています。コメントスパム屋がよくや
+      るように、これらのフィールドの値を改ざんしようとすると、コメントの投
+      稿に失敗します。
       
-      If you're rendering a custom comment form, you'll need to make sure to
-      pass these values through unchanged.
+      自作のコメントフォームを出力するときには、この隠しフィールドの値を変
+      更せずに渡してください。
       
-    * The timestamp is used to ensure that "reply attacks" can't continue very
-      long. Users who wait too long between requesting the form and posting a
-      comment will have their submissions refused.
+    * タイムスタンプは、長時間再生攻撃が繰り返されるのを防ぐために使われま
+      す。フォームのリクエストからコメントのポストまで長時間経っている場合、
+      フォームの提出は拒否されます。
       
-    * The comment form includes a "honeypot_" field. It's a trap: if any data is
-      entered in that field, the comment will be considered spam (spammers often
-      automatically fill in all fields in an attempt to make valid submissions).
-      
-      The default form hides this field with a piece of CSS and further labels
-      it with a warning field; if you use the comment form with a custom
-      template you should be sure to do the same.
+    * コメントフォームには、「 `ハニーポット`_ (honeypot_)」フィールドがあ
+      ります。このフィールドはトラップです: このフィールドに何らかのデータ
+      が入力されると、そのコメントはスパムであると見なされます (スパムプロ
+      グラムは、有効なフォーム入力を偽装するために、全てのフィールドを自動
+      的に埋めようとするからです)。
+
+      デフォルトのフォームは、 CSS を使ってこのフォームを隠し、ラベルにも
+      警告の文字列を入れます。カスタムのテンプレートでコメントフォームを使
+      うときにも、同じようにしてください。
     
 .. _honeypot: http://en.wikipedia.org/wiki/Honeypot_(computing)
+.. _ハニーポット: http://ja.wikipedia.org/wiki/ハニーポット
 
-More information
-================
+その他の情報
+==============
 
 .. toctree::
    :maxdepth: 1
