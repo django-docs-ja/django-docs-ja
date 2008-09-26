@@ -1,7 +1,7 @@
 .. _ref-settings:
 
-Available settings
-==================
+settings に設定できる値
+==========================
 
 :revision-up-to: 8961 (1.0)
 
