@@ -4,7 +4,7 @@
 contenttypes フレームワーク
 ============================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 8973 (1.0)
 
 .. module:: django.contrib.contenttypes
    :synopsis: インストール済のモデルを扱うための汎用インタフェースを提供します。
@@ -317,7 +317,7 @@ API を実現できます。 ``TaggedItem`` はリレーションを張ってい
 
 逆方向のリレーションを張らなければ、手動で照合する必要があります::
 
-    >>> b = Bookmark.objects.get(url='http://www.djangoproject.com/)
+    >>> b = Bookmark.objects.get(url='http://www.djangoproject.com/')
     >>> bookmark_type = ContentType.objects.get_for_model(b)
     >>> TaggedItem.objects.filter(content_type__pk=bookmark_type.id,
     ...                           object_id=b.id)
