@@ -4,7 +4,7 @@
 Django のコミッタ
 =================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 8969 (1.0)
 
 オリジナルチーム
 =================
@@ -119,10 +119,19 @@ Joseph Kocherhans
 .. _charango: http://en.wikipedia.org/wiki/Charango
 
 `Luke Plant`_
+    Luke は大学で物理学と物性科学を学び、そこで出会った `Michael Meeks`_
+    の影響で、 Linux とオープンソースに触れ、プログラミングの楽しさを再発見
+    しました。その後、彼はいくつものオープンソースプロジェクトに参加し、プ
+    ロの開発者として活動しました。
+
     Luke はデータベースレベルの改善や、 CSRF ミドルウェア、ユニットテストな
     ど、様々な素晴らしい改善に貢献しています。
 
+    Luke は現在英国 Bradford の教会で働きながら、パートタイムでフリーランス
+    の開発の仕事をしています。
+
 .. _luke plant: http://lukeplant.me.uk/
+.. _michael meeks: http://en.wikipedia.org/wiki/Michael_Meeks_(software)
 
 `Brian Rosner`_
     Brian は現在、 Django の電子決済システムを開発している Web 開発者です。
