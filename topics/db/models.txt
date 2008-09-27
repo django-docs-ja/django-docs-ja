@@ -4,7 +4,7 @@
 モデルの作成
 ==============
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 8974 (1.0)
 
 .. module:: django.db.models
 
@@ -500,7 +500,7 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
 ルに必要な全ての情報が必要です。単に ``add`` や ``create`` を呼び出したり
 代入を行うだけでは、リレーション以外の情報を埋められません。その結果、中間
 モデルを使う場合は、 ``add`` や ``create`` は無効化されるのです。中間モデル
-を使った多対多のリレーションを定義するには、中間モデルのインスタンスを生成
+を使ってこの手のリレーションを定義するには、中間モデルのインスタンスを生成
 するしかない、ということを覚えておいてください。
 
 同じ理由で、 ``remove`` メソッドも無効化されています。ただし、 ``clear()``
@@ -517,8 +517,7 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
     >>> Groups.objects.filter(person__name__startswith='Paul')
     [<Group: The Beatles>]
 
-中間テーブルを使っているので、中間のモデルの属性を使ったクエリも実行できま
-す::
+中間テーブルを使っているので、属性を使ったクエリも実行できます::
 
     # 1961年1月1日以降に合流した Beatles のメンバを探す
     >>> Person.objects.filter(
@@ -556,8 +555,8 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
 :class:`~django.db.models.ForeignKey` と同様、
 :ref:`再帰的リレーション <recursive-relationships>` や
 :ref:`未定義のモデルに対するリレーション <lazy-relationships>` も定義できま
-す。詳しくは :class:`モデルフィールドのリファレンス
-<django.db.models.fields.OneToOneField>` を参照してください。
+す。詳しくは :ref:`モデルフィールドのリファレンス <ref-onetoone>` を参照し
+てください。
 
 .. seealso::
 
@@ -676,6 +675,7 @@ Meta オプション
 例えば、以下のモデル例にはいくつかカスタムメソッドがあります::
 
     from django.contrib.localflavor.us.models import USStateField
+
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
@@ -795,11 +795,11 @@ Meta オプション
         return row
 
 :class:`connection <django.db.backends.DatabaseWrapper>` や
-:class:`<django.db.backends.CursorWrapper>` は、 :pep:`249` で定義されてい
-る標準的な Python DB-API のほぼ全てに加えて、 Django の :ref:`トランザクショ
-ン処理 <topics-db-transactions>` を実装しています。 Python DB-API にあまり
-詳しくないのなら、パラメタつきの SQL を実行するときに、SQL 文にパラメタを直
-接指定して実行するのではなく、 :meth:`cursor.execute()
+:class:`cursor <django.db.backends.CursorWrapper>` は、 :pep:`249` で定義さ
+れている標準的な Python DB-API のほぼ全てに加えて、 Django の :ref:`トラン
+ザクション処理 <topics-db-transactions>` を実装しています。 Python DB-API
+にあまり詳しくないのなら、パラメタつきの SQL を実行するときに、SQL 文にパラ
+メタを直接指定して実行するのではなく、 :meth:`cursor.execute()
 <django.db.backends.CursorWrapper.execute>` の SQL 文内でプレースホルダ
 ``"%s"`` を使うことに注意してください。このテクニックを使えば、データベース
 ライブラリの中で自動的にクオート処理が行われます。 (また、 Django の使って
@@ -1010,7 +1010,7 @@ Django では、継承の各階層にいるクラスが抽象クラスでない�
 親クラスの属性を継承するというものです。
 
 親クラスで整列カラムが指定されていて、子クラス側で整列カラムを指定したくな
-い場合は、明示的に空の整列カラムを指定してください::
+い場合は、明示的設定を無効にしてください::
 
     class ChildModel(ParentModel):
         ...
@@ -1043,8 +1043,7 @@ Django では、継承の各階層にいるクラスが抽象クラスでない�
 
     class Supplier(Place):
         # Must specify related_name on all relations.
-        customers = models.ManyToManyField(Restaurant,
-                related_name='provider')
+        customers = models.ManyToManyField(Restaurant, related_name='provider')
 
 
 .. _Specifying the parent link field:
