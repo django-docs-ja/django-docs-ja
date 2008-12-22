@@ -6,7 +6,7 @@
 クエリを生成する
 =================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 9084 (1.0)
 
 .. currentmodule:: django.db.models
 
@@ -461,7 +461,7 @@ Django では、背後で自動的に SQL ``JOIN`` を処理し、照合の際�
 ``author`` が空の ``Blog`` も返してしまうのです。後者のオブジェクトを返して
 欲しくないのなら、以下のように書いてください::
 
-    Blog.objetcs.filter(entry__author__isnull=False,
+    Blog.objects.filter(entry__author__isnull=False,
             entry__author__name__isnull=True)
 
 .. _Spanning multi-valued relationships:
