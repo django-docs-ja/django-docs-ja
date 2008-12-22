@@ -5,7 +5,7 @@
 Django テンプレート言語
 ============================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 9084 (1.0)
 
 .. admonition:: このドキュメントについて
 
@@ -44,6 +44,9 @@ Smarty_ や CheetahTemplate_ のようなテキストベースのテンプレー
 
 テンプレート
 ============
+
+
+.. highlightlang:: html+django
 
 テンプレートは単なるテキストファイルでできています。 テンプレートはあらゆる
 テキストベースのデータ形式 (HTML, XML, CSV など) を生成できます。
@@ -236,7 +239,7 @@ Django にはたくさんの組み込みタグが付属しています。組み�
 
             {% ifnotequal athlete.name "Joe" %}
                 ...
-            {% endifequal %}
+            {% endifnotequal %}
 
     :ttag:`block` and :ttag:`extends`
         テンプレートで「定型文 ("boilerplate")」を切り出す強力な方法である、
