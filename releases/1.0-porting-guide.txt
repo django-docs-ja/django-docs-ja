@@ -2,7 +2,7 @@
 アプリケーションを Django 0.96 から 1.0 に移行する
 ===================================================
 
-:revision-up-to: 8966 (1.0)
+:revision-up-to: 9084 (1.0)
 
 .. highlight:: python
 
@@ -107,6 +107,7 @@ admin の変更例
     from django.contrib import admin
     from models import Author
 
+
     class AuthorAdmin(admin.ModelAdmin):
         list_display = ['first_name', 'last_name']
         prepopulated_fields = {
@@ -162,12 +163,12 @@ admin の定義は完全にモデル定義から脱カップリングされ、ad
         model = Child
         extra = 3
 
-    class ParentAdmin(models.ModelAdmin):
+    class ParentAdmin(admin.ModelAdmin):
         model = Parent
         inlines = [ChildInline]
 
     admin.site.register(Parent, ParentAdmin)
-    
+
 詳しくは :ref:`admin-inlines` を参照してください。
 
 ``fields`` を簡単にする、または ``fieldsets`` を使う
@@ -176,7 +177,7 @@ admin の定義は完全にモデル定義から脱カップリングされ、ad
 旧来の ``fields`` はややこしい書式でしたが、簡単になりました。旧来の記法は
 まだ使えますが、 ``fieldsets`` を使う方がよいでしょう。
 
-旧 (0.96)::    
+旧 (0.96)::
 
     class ModelOne(models.Model):
         ...
@@ -260,9 +261,10 @@ admin サイトをルートの ``urls.py`` に組み込んでいるのなら、�
 は (0.96 で登場した) ``newforms`` モジュールを単に ``forms`` と呼びます。
 ``oldforms`` はなくなりました。
 
-すでに ``newforms`` ライブラリを使っているのなら、 import 文を変更するだけ
-です。 ``from django import newforms as forms`` から 
-``from django import forms`` に書き換えてください:
+すでに ``newforms`` ライブラリを使っていて、 import 文を推奨の書き方で書い
+ているのなら、 import 文を変更するだけです。 
+``from django import newforms as forms`` から ``from django import forms``
+に書き換えてください:
 
 旧::
 
@@ -384,11 +386,12 @@ HTML タグ間のスペースを除去する :ttag:`spaceless` タグは、以�
 ローカルフレーバ
 -------------------
 
-US ローカルフレーバ
+U.S. ローカルフレーバ
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ``django.contrib.localflavor.usa`` は :mod:`django.contrib.localflavor.us`
 に変更されました。他のローカルフレーバと命名方法を統一するためです。
+コードを移植する際には import を書き換えてください。
 
 セッション
 -------------
@@ -490,7 +493,7 @@ URL パターンでキャッチできるように、末尾にスラッシュの�
     import datetime
 
     class Article(models.Model):
-        title = models.CharField(maxlength=100)
+        title = models.CharField(maxl_ength=100)
         published = models.DateField(default=datetime.datetime.now)
 
 ``DecimalField`` が追加され ``FloatField`` が適切に浮動小数を扱うようになる
@@ -529,8 +532,8 @@ Django をアップデートした後に行ってください。
   スの保存されているファイル (``settings.py`` の ``DATABASE_NAME`` に指定し
   ているファイル名) をコピーします。
 
-``DecimalField`` を使う全てのアプリケーションについて、 ``<app>`` はアプリ
-ケーションの名前に読み替えて以下の作業を行ってください:
+``DecimalField`` を使う全てのアプリケーションについて、 ``<app>`` をアプリ
+ケーションの名前に読み替えて以下の作業を行うとよいでしょう:
 
 .. code-block:: bash
 
@@ -628,9 +631,9 @@ HTTP リクエスト／レスポンスオブジェクト
 管理コマンドをコードの中から呼び出す
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:mod:`django.core.management`` は大幅にリファクタされました。
+:mod:`django.core.management` は大幅にリファクタされました。
 
-管理コマンドのサービスをコードから呼び出すには、 ``call_command`` を使う必
+管理コマンドのサービスをコードから呼び出す際に、 ``call_command`` を使う必
 要があります。例えば、 :djadmin:`flush`  や :djadmin:`load_data` を呼び出す
 テストコードを以下のように書いていたとしましょう::
 
@@ -680,8 +683,8 @@ HTTP リクエスト／レスポンスオブジェクト
 ``SortedDictFromList`` の撤廃
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`django.newforms.forms.SortedDictFromList`` はなくなりました。その代わり、
-タプルのシーケンスを使って :class:`django.utils.datastructures.SortedDict``
+``django.newforms.forms.SortedDictFromList`` はなくなりました。その代わり、
+タプルのシーケンスを使って :class:`django.utils.datastructures.SortedDict`
 をインスタンス化できるようになりました。
 
 コードを変更するには、以下のように書き換えてください:
@@ -691,7 +694,7 @@ HTTP リクエスト／レスポンスオブジェクト
         い。
 
      2. :meth:`django.utils.datastructures.SortedDict.copy` は
-        ``SortedDictFromList`` メソッドのように、深いコピーを返すので、
+        ``SortedDictFromList`` メソッドとは違って深いコピーを返さないので、
 	コードを deepcopy に対応して書き換える必要があります。深いコピーを
         作成するには、 ``copy.deepcopy`` を直接呼び出します。
 
