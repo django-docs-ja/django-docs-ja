@@ -4,7 +4,7 @@
 国際化
 ======
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 9084 (1.0)
 
 Django はコードとテンプレートの双方で国際化をフルサポートしています。このド
 キュメントでは国際化の仕組みについて説明します。
@@ -205,9 +205,10 @@ Python コード内での指定
         name = models.CharField(help_text=_('This is the help text'))
 
 :ref:`Django モデル <topics-db-models>` の中では、常に遅延翻訳を使うように
-してください。フィールド名やテーブル名に翻訳をつけておくのも良いアイデアで
-す。とはいえ、これは ``Meta`` クラスで明示的に ``verbose_name`` や
-``verbose_name_plural`` オプションを指定するという作業です::
+してください。フィールド名やテーブル名は翻訳マークをつけておきましょう。
+そうしないと、 admin インタフェース上で翻訳されません。フィールド名やテーブ
+ル名の翻訳マークは、 ``Meta`` クラス内で明示的に ``verbose_name`` や
+``verbose_name_plural`` オプションを指定して行います::
 
     from django.utils.translation import ugettext_lazy as _
 
