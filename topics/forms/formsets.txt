@@ -3,7 +3,7 @@
 フォームセット (formsets)
 =============================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 9084 (1.0)
 
 フォームセットとは、同じページで複数のフォームを扱うための抽象化レイヤで、
 いわばデータグリッドのようなものです。フォームセットを説明するために、まず
@@ -325,7 +325,9 @@
             formset = ArticleFormSet()
         return render_to_response('manage_articles.html', {'formset': formset})
 
-``manage_articles.html`` テンプレートは以下のようになります::
+``manage_articles.html`` テンプレートは以下のようになります:
+
+.. code-block:: html+django
 
     <form method="POST" action="">
         {{ formset.management_form }}
@@ -337,7 +339,9 @@
     </form>
 
 ただし、下記のようなショートカットを使えば、フォームセット自体に管理フォー
-ムを扱わせられます::
+ムを扱わせられます:
+
+.. code-block:: html+django
 
     <form method="POST" action="">
         <table>
