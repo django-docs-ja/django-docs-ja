@@ -4,7 +4,7 @@
 モデルからフォームを生成する
 ================================
 
-:revision-up-to: 8972 (1.0)
+:revision-up-to: 9084 (1.0)
 
 ``ModelForm``
 =============
@@ -443,8 +443,9 @@ clean() メソッドのオーバライド
     <tr><th><label for="id_form-0-birth_date">Birth date:</label></th><td><input type="text" name="form-0-birth_date" id="id_form-0-birth_date" /><input type="hidden" name="form-0-id" id="id_form-0-id" /></td></tr>
 
 .. note::
-    ちなみに、 ``modelformset_factory`` は ``formset_factory`` を使っていて、
-    デフォルトでは ``can_delete=True`` です。
+    ``modelformset_factory`` は ``formset_factory`` を使ってフォームセット
+    を生成します。つまり、モデルフォームセットは単に特定のモデルを扱えるよ
+    うに拡張したフォームセットにすぎないのです。
 
 .. _Changing the queryset:
 
@@ -560,7 +561,7 @@ clean() メソッドのオーバライド
 
     def manage_authors(request):
         AuthorFormSet = modelformset_factory(Author)
-        if request.POST == 'POST':
+        if request.method == 'POST':
             formset = AuthorFormSet(request.POST, request.FILES)
             if formset.is_valid():
                 formset.save()
@@ -601,6 +602,10 @@ clean() メソッドのオーバライド
     >>> author = Author.objects.get(name=u'Orson Scott Card')
     >>> formset = BookFormSet(instance=author)
 
+
+.. note::
+    ``inlineformset_factory`` は ``modelformset_factory`` を使っており、
+    ``can_delete=True`` がセットされています。
 
 同じモデルに対して複数の外部キーを張っている場合
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
