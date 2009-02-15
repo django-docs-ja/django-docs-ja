@@ -1049,7 +1049,7 @@ Django は、テストフレームワークを初期化する際、通常の
 
 .. currentmodule:: django.core.mail
 
-.. data:: django.core.mail.output
+.. data:: django.core.mail.outbox
 
 テストの実行中、 Django から送信されたメールは ``djnago.core.mail.outbox``
 に保存されます。 ``djnago.core.mail.outbox`` はその時点で送信された全ての
