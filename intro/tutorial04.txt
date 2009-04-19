@@ -293,8 +293,7 @@ Poll のリストを表示する ``index()`` ビューも同様です。
 しかしながら、汎用ビューはコンテキストに ``object`` や ``object_list`` とい
 う変数を提供するようになっているので、コンテキスト変数に合わせてテンプレー
 トを変更する必要があります。テンプレートを編集して、 ``latest_poll_list``
-を :func:`~django.views.generic.list_detail.object_list` に、 ``poll`` を
-``object`` に変更しておいてください。
+を ``object_list`` に、 ``poll`` を ``object`` に変更しておいてください。
 
 さて、 ``index()``, ``detail()`` および ``results()`` ビューのコードを
 ``polls/views.py`` から削除できるようになりました。これらのビュー関数は汎用
