@@ -25,7 +25,8 @@ Django ドキュメント
 
 困り事ですか？手を貸しましょう！
 
-* よくある質問への答えは、 :ref:`FAQ <faq-index>` にあります。
+* :ref:`FAQ <faq-index>` を探しましょう。よくある質問への答えなら、ここで見
+  つかります。
 
 * 特定のトピックについて情報を探しているなら、 :ref:`genindex` や
   :ref:`modindex` , :ref:`詳細目次 <contents>` を見てくだ
@@ -53,152 +54,180 @@ Django ドキュメント
 最初のステップ
 ===================
 
-:ref:`概要 (Overview) <intro-overview>`
-    Django でのデータベース駆動アプリケーションの作り方を理解しましょう。
+    * **何もないところから始めるなら:**
+      :ref:`概要 <intro-overview>` |
+      :ref:`インストール <intro-install>`
 
-:ref:`インストール (Installation) <intro-install>`
-    Django をインストールしましょう。
+    * **チュートリアルはこちら:**
+      :ref:`その 1 <intro-tutorial01>` |
+      :ref:`その 2 <intro-tutorial02>` |
+      :ref:`その 3 <intro-tutorial03>` |
+      :ref:`その 4 <intro-tutorial04>`
 
-チュートリアル: Django アプリケーションを書く
-===============================================
 
-:ref:`その 1 <intro-tutorial01>`
-    プロジェクトをセットアップし、モデルを作成して、データベース API をいじっ
-    てみましょう。
+モデル層
+=========
 
-:ref:`その 2 <intro-tutorial02>`
-    Django が自動生成する admin サイトを使ってみましょう。
+    * **モデルとは:**
+      :ref:`Model の定義方法 <topics-db-models>` |
+      :ref:`フィールド型 <ref-models-fields>` |
+      :ref:`Meta オプション <ref-models-options>`
 
-:ref:`その 3 <intro-tutorial03>`
-    公開用のインタフェースビューを作成しましょう。
+    * **クエリセット (QuerySet) とは:**
+      :ref:`クエリの実行 <topics-db-queries>` |
+      :ref:`QuerySet メソッドリファレンス <ref-models-querysets>`
 
-:ref:`その 4 <intro-tutorial04>`
-    フォームの処理方法を学びましょう。
+    * **モデルインスタンス詳説:**
+      :ref:`インスタンスメソッド解説 <ref-models-instances>` |
+      :ref:`リレーション先オブジェクトへのアクセス <ref-models-relations>`
 
-Django を使う
-===============
+    * **モデルの高度な話題:**
+      :ref:`マネジャ (Manager) <topics-db-managers>` |
+      :ref:`素の SQL を扱うには <topics-db-sql>` |
+      :ref:`トランザクション <topics-db-transactions>` |
+      :ref:`アグリゲーション <topics-db-aggregation>` |
+      :ref:`フィールド型を自作するには <howto-custom-model-fields>`
 
-:ref:`モデル (Models) <topics-db-index>`
-    データを記述する、ただ一つのデータソースであるモデルを設計しましょう。
+    * **その他:**
+      :ref:`データベースのサポート状況 <ref-databases>` |
+      :ref:`レガシーなデータベースを扱う <howto-legacy-databases>` |
+      :ref:`初期データを投入するには <howto-initial-data>`
 
-:ref:`リクエストの処理 (Handling web requests) <topics-http-index>`
-    リクエストを処理して、ビューに結びつけ、ページを生成して返しましょう。
-    
-:ref:`フォーム (Forms) <topics-forms-index>`
-    HTML フォームを作成して、操作しましょう。
-
-:ref:`テンプレート (Templates) <topics-templates>`
-    サイトの視覚的なデザインを開発しましょう。
-
-他にも:
----------
-
-    * :ref:`認証 <topics-auth>`
-    * :ref:`キャッシュ <topics-cache>`
-    * :ref:`電子メール <topics-email>`
-    * :ref:`ファイルアクセス API <topics-files>`
-    * :ref:`topics-i18n`
-    * :ref:`topics-pagination`
-    * :ref:`シリアライゼーション <topics-serialization>`
-    * :ref:`セッション <topics-http-sessions>`
-    * :ref:`設定 <topics-settings>`
-    * :ref:`topics-signals`
-    * :ref:`テスト <topics-testing>`
-
-アドオン (contrib) アプリケーション
-========================================
-
-:ref:`管理サイト (Django's automatic admin site) <ref-contrib-admin>`
-    手間をかけずに、データを操作するためのインタフェースを構築しましょう。
-
-:ref:`フォームツール (Form tools) <ref-contrib-formtools-index>`
-    複雑なフォームのワークフローを簡単に操作しましょう。
-
-:ref:`配信フィード (Syndication feeds) <ref-contrib-syndication>`
-    データから RSS や Atom フィードを生成しましょう。
-
-:ref:`ローカルフレーバ (Local flavor) <ref-contrib-localflavor>`
-    地域特有の機能をサイトに組み込みましょう。
-
-他にも:
----------
-
-    * :ref:`コメント <ref-contrib-comments-index>`
-    * :ref:`コンテンツタイプ <ref-contrib-contenttypes>`
-    * :ref:`CSRF 対策 <ref-contrib-csrf>`
-    * :ref:`databrowse <ref-contrib-databrowse>`
-    * :ref:`フラットページ <ref-contrib-flatpages>`
-    * :ref:`humanize <ref-contrib-humanize>`
-    * :ref:`リダイレクション <ref-contrib-redirects>`
-    * :ref:`サイトマップ <ref-contrib-sitemaps>`
-    * :ref:`Sites <ref-contrib-sites>`
-    * :ref:`ウェブデザインヘルパ <ref-contrib-webdesign>`
-
-特殊な問題を解決する
-=========================
-
-:ref:`デプロイ (Deployment) <howto-deployment-index>`
-    プロジェクトをリリースしましょう。
-
-:ref:`既存のデータベースからデータを取り込む (Importing data from legacy databases) <howto-legacy-databases>`
-    Django を既存のデータベースや他の Web 開発ツールと組み合わせて使いましょ
-    う。
-
-:ref:`テンプレートタグの自作 (Custom template tags) <howto-custom-template-tags>`
-    Django のテンプレート言語に独自の拡張を追加しましょう。
-
-:ref:`CSV の生成 (Generating CSV) <howto-outputting-csv>` & :ref:`PDF の生成 (Generating PDF) <howto-outputting-pdf>`
-    HTML 以外のコンテンツを Django で生成しましょう。
-
-他にも:
----------
-
-    * :ref:`Authenticating in Apache <howto-apache-auth>`
-    * :ref:`howto-custom-file-storage`
-    * :ref:`howto-custom-management-commands`
-    * :ref:`howto-custom-model-fields`
-    * :ref:`コードのエラーをメールで追いかける <howto-error-reporting>`
-    * :ref:`howto-initial-data`
-    * :ref:`howto-jython`
-    * :ref:`静的ファイルの提供 <howto-static-files>`
-
-リファレンス
+テンプレート層
 ==================
 
-:ref:`設定 (Settings) <ref-settings>`
-    Django の全ての設定とその働きを理解しましょう。
+    * **デザイナ向けの情報:**
+      :ref:`テンプレートの書き方 <topics-templates>` |
+      :ref:`組み込みタグとフィルタ <ref-templates-builtins>`
 
-:ref:`リクエストオブジェクトとレスポンスオブジェクト (Request & response objects) <ref-request-response>`
-    Django が HTTP のリクエストとレスポンスの表現に使っているクラスを理解し
-    ましょう。
+    * **プログラマ向けの情報:**
+      :ref:`テンプレート API <ref-templates-api>` |
+      :ref:`タグやフィルタを自作するには <howto-custom-template-tags>`
 
-:ref:`モデル API リファレンス <ref-models-index>`
-    Django のモデルシステムを骨の髄まであじわい尽くしましょう。
+ビュー層
+==============
 
-:ref:`フォーム API リファレンス <ref-forms-index>`
-    フォームやフィールド、ウィジェットの詳細について学びましょう。
+    * **ビューの基本:**
+      :ref:`URLconf とは <topics-http-urls>` |
+      :ref:`ビュー関数とは <topics-http-views>` |
+      :ref:`便利なショートカット <topics-http-shortcuts>`
 
-他にも:
----------
+    * **リファレンス:**  :ref:`リクエスト/レスポンスオブジェクト <ref-request-response>`
 
-    * :ref:`ref-databases`
-    * :ref:`ref-django-admin`
-    * :ref:`ref-files-index`
-    * :ref:`ref-generic-views`
-    * :ref:`ref-middleware`
-    * :ref:`ref-templates-index`
-    * :ref:`ref-unicode`
+    * **ファイルアップロードに対応するには:**
+      :ref:`ファイルアップロード対応の概要 <topics-http-file-uploads>` |
+      :ref:`File オブジェクトリファレンス <ref-files-file>` |
+      :ref:`ストレージ API <ref-files-storage>` |
+      :ref:`ファイルの管理 <topics-files>` |
+      :ref:`ストレージを自作するには <howto-custom-file-storage>`
 
-その他
-========
+    * **汎用ビュー:**
+      :ref:`汎用ビューとは <topics-generic-views>` |
+      :ref:`組み込みの汎用ビュー <ref-generic-views>`
 
-:ref:`仕組み (Internals) <internals-index>`
-    Django が背後でどのように動作しているかを学びましょう。また、プロジェク
-    トへの参加方法を学びましょう。
+    * **より高度なビューの話題:**
+      :ref:`CSV を出力するには <howto-outputting-csv>` |
+      :ref:`PDF を出力するには <howto-outputting-pdf>`
 
-:ref:`リリースノート (Release notes) <releases-index>`
-    それぞれのリリースで、何が新たに Django に登場したかを見ましょう。
+    * **ミドルウェア:**
+      :ref:`ミドルウェアとは <topics-http-middleware>` |
+      :ref:`組み込みのミドルウェアクラス <ref-middleware>`
 
-:ref:`雑多 (Miscellany) <misc-index>`
-    分類しようのないドキュメントの置き場です。はさみや電池やテープの入った
-    キッチンの引き出しのようなものです。
+フォーム
+==========
+
+    * **フォームの基礎:**
+      :ref:`フォーム機能の概要 <topics-forms-index>` |
+      :ref:`フォーム API <ref-forms-api>` |
+      :ref:`組み込みフォームフィールドリファレンス <ref-forms-fields>` |
+      :ref:`組み込みウィジェットリファレンス <ref-forms-widgets>`
+
+    * **高度な話題:**
+      :ref:`モデルに対応したフォームを生成するには <topics-forms-modelforms>` |
+      :ref:`メディアファイルを組み込むには <topics-forms-media>` |
+      :ref:`フォームセットを扱うには <topics-forms-formsets>` |
+      :ref:`バリデータを自作するには <ref-forms-validation>`
+
+    * **その他:**
+      :ref:`フォームプレビュー <ref-contrib-formtools-form-preview>` |
+      :ref:`フォームウィザード <ref-contrib-formtools-form-wizard>`
+
+アプリケーション開発のツール
+=============================
+
+    * **設定:**
+      :ref:`設定ファイルとは <topics-settings>` |
+      :ref:`設定項目リファレンス <ref-settings>`
+
+    * **django-admin.py と manage.py:**
+      :ref:`概要 <ref-django-admin>` |
+      :ref:`自作の管理コマンドを追加するには <howto-custom-management-commands>`
+
+    * **テスト:**  :ref:`テストを書くには <topics-testing>`
+
+    * **デプロイ:**
+      :ref:`デプロイの概要 <howto-deployment-index>` |
+      :ref:`Apache/mod_wsgi <howto-deployment-modwsgi>` |
+      :ref:`Apache/mod_python <howto-deployment-modpython>` |
+      :ref:`FastCGI/SCGI/AJP <howto-deployment-fastcgi>` |
+      :ref:`Apache の認証に Django を使うには <howto-apache-auth>` |
+      :ref:`静的ファイルの公開方法 <howto-static-files>` |
+      :ref:`エラーの発生をメールで追跡するには <howto-error-reporting>`
+
+その他の Django 付属の機能
+============================
+
+    * :ref:`管理サイト <ref-contrib-admin>` | 
+      :ref:`管理アクションを組み込むには <ref-contrib-admin-actions>`
+    * :ref:`認証 <topics-auth>`
+    * :ref:`キャッシュシステム <topics-cache>`
+    * :ref:`条件付きリクエストの処理 <topics-conditional-processing>`
+    * :ref:`コメントフレームワーク <ref-contrib-comments-index>` | 
+      :ref:`コメントのモデレーション機能 <ref-contrib-comments-moderation>` |
+      :ref:`コメント機能の自作 <ref-contrib-comments-custom>`
+    * :ref:`コンテンツタイプ <ref-contrib-contenttypes>`
+    * :ref:`CSRF 対策 <ref-contrib-csrf>`
+    * :ref:`databrowse: データの一覧表示 <ref-contrib-databrowse>`
+    * :ref:`電子メールの送信 <topics-email>`
+    * :ref:`flatpages: フラットページコンテンツの管理 <ref-contrib-flatpages>`
+    * :ref:`humanize: 人間にやさしい出力生成 <ref-contrib-humanize>`
+    * :ref:`国際化 <topics-i18n>`
+    * :ref:`Jython で動かす <howto-jython>`
+    * :ref:`「ローカルフレーバ（地域固有の機能）」 <ref-contrib-localflavor>`
+    * :ref:`ページ分割表示 <topics-pagination>`
+    * :ref:`リクエストのリダイレクト <ref-contrib-redirects>`
+    * :ref:`データのシリアライズ <topics-serialization>`
+    * :ref:`セッションデータの操作 <topics-http-sessions>`
+    * :ref:`イベントシグナル <topics-signals>`
+    * :ref:`サイトマップ <ref-contrib-sitemaps>`
+    * :ref:`サイト <ref-contrib-sites>`
+    * :ref:`配信フィード (RSS/Atom) <ref-contrib-syndication>`
+    * :ref:`Unicode の扱い方 <ref-unicode>`
+    * :ref:`Web デザイナーのためのヘルパ <ref-contrib-webdesign>`
+
+オープンソースプロジェクトとしての Django 
+===========================================
+
+    * **開発コミュニティ:**
+      :ref:`開発に参加するには <internals-contributing>` |
+      :ref:`リリースプロセス <internals-release-process>` |
+      :ref:`コミッタ紹介 <internals-committers>`
+
+    * **設計哲学:**
+      :ref:`概要 <misc-design-philosophies>`
+
+    * **ドキュメントの仕組み:**
+      :ref:`ドキュメントの仕組みと書き方 <internals-documentation>`
+
+    * **サードパーティが配布している Django:**
+      :ref:`概要と、ディストリビュータへのお願い <misc-distributions>`
+
+    * **Django と長く付き合うために:**
+      :ref:`どの API が安定なのか <misc-api-stability>` |
+      :ref:`リリースノート一覧 <releases-index>` | `互換性のない変更`_ |
+      :ref:`不要な機能の撤廃・削除スケジュール <internals-deprecation>`
+
+.. _`互換性のない変更`: `Backwards-incompatible changes`_
+.. _Backwards-incompatible changes: http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
+
+
