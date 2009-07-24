@@ -1,22 +1,18 @@
 .. _faq-general:
 
-.. FAQ: General
-
-FAQ: 全般
+全般的な FAQ
 ============
 
-:revision-up-to: 9084 (1.0)
-
-.. Why does this project exist?
+:revision-up-to: 11321 (1.1)
 
 なぜこんなプロジェクトがあるのですか？
 --------------------------------------
 
 Django は極めて実践的な要請のもとで成長してきました。 Web 新聞を発行している
 WorldOnline では、効果的な Web アプリケーションを、ジャーナリズムとして成立
-する締め切りに間に合うように構築せねばなりません。変転の激しいニュースルー
-ムにおいて、 WorldOnline は複雑な Web アプリケーションをコンセプトから立ち
-上げ公開にもっていくまでの時間を唯一の課題としているのです。
+する締め切りに間に合うように構築せねばなりません。刻一刻と状況が変化するニュー
+スルームにあって、WorldOnline には、複雑な Web アプリケーションをコンセプト
+から立ち上げ公開にもっていくまで数時間の猶予しかないのです。
 
 同時に、 WorldOnline の Web 開発者たちは、こと Web 開発の王道に関しては一貫
 して完璧主義者です。
@@ -39,8 +35,6 @@ WorldOnline では、効果的な Web アプリケーションを、ジャーナ
 .. _Python: http://www.python.org/
 .. _PostgreSQL: http://www.postgresql.org/
 
-.. What does "Django" mean, and how do you pronounce it?
-
 "Django" とはどういう意味で、どのように発音するのですか？
 ---------------------------------------------------------
 
@@ -61,8 +55,6 @@ Django は **JANG**-oh ('a' は伸ばす) と発音します。韻は FANG-oh �
 .. _`ジャンゴ・ラインハルト`: http://ja.wikipedia.org/wiki/%E3%82%B8%E3%83%A3%E3%83%B3%E3%82%B4%E3%83%BB%E3%83%A9%E3%82%A4%E3%83%B3%E3%83%8F%E3%83%AB%E3%83%88
 .. _`正しい発音の音声ファイル`: `audio clip of the pronunciation`_
 
-.. Is Django stable?
-
 Django は安定していますか？
 ---------------------------
 
@@ -70,8 +62,6 @@ Django は安定していますか？
 Django で構築したサイトは、これまでに 100 万ヒット／時を超えるトラフィック
 スパイクに見舞われたことがあり、何度もスラッシュドット効果を喰らっています。
 そうですね。きわめて安定です。
-
-.. Does Django scale?
 
 Django はスケールしますか？
 ---------------------------
@@ -84,21 +74,16 @@ Django は「レイヤ間で何も共有しない (shared-nothing)」アーキ�
 データベースサーバ、キャッシュサーバ、 Web/アプリケーションサーバのどのレベ
 ルにハードウェアを追加してもかまいません。
 
-Django はアプリケーションレイヤからのデータベースレイヤを分離し、シン
-プルながら強力な  :ref:`キャッシュフレームワーク <topics-cache>` を備えてい
-ます。
-
-.. Who's behind this?
+Django はアプリケーションレイヤからのデータベースレイヤを分離し、シンプルな
+がら強力な  :ref:`キャッシュフレームワーク <topics-cache>` を備えています。
 
 Django の舞台裏には誰がいるのですか？
 ---------------------------------------
 
-Django は米国カンザス州ローレンス (Lawrence, Kansas, USA) のとある新聞の
-Web 部門である World Online で開発されました。今では、 Django は国際的な
-ボランティアのチームによって開発されています。 開発者たちの人となりは
+Django はもともと、World Online という、米国カンザス州ローレンス (Lawrence,
+Kansas, USA) のとある新聞の Web 部門で開発されました。今では、 Django は国
+際的なボランティアのチームによって開発されています。 開発者たちの人となりは
 :ref:`コミッタ一覧 <internals-committers>` で読めます。
-
-.. Which sites use Django?
 
 どんなサイトが Django を使っているのですか？
 --------------------------------------------
@@ -109,9 +94,6 @@ Django wiki には `Django で作られたサイト一覧`_ という特集ペ�
 .. _list of Django-powered sites: http://code.djangoproject.com/wiki/DjangoPoweredSites
 .. _`Django で作られたサイト一覧`: `list of Django-powered sites`_
 
-
-
-.. Django appears to be a MVC framework, but you call the Controller the "view", and the View the "template". How come you don't use the standard names?
 .. _mtv:
 
 Django は MVC フレームワークのようですが、コントローラ (Controller) を「ビュー (view)」と呼び、ビュー (View) を「テンプレート (template)」と呼んでいます。どうして標準的な呼び方をしないのですか？
@@ -121,8 +103,8 @@ Django は MVC フレームワークのようですが、コントローラ (Con
 
 我々の MVC の解釈では、「ビュー」とはユーザに提示されるデータのことをいいま
 す。つまり、データが *どのように見えるか* ということではなく、むしろ *どの
-データを提示するか* です。ビューは *どのデータを見せるか* であり、
-*どう見せるか* ではありません。この二つは明らかに違います。
+データを提示するか* です。ビューには *データがどのように見えるか* ではなく
+*どのデータが表示されるか* が定義されています。この二つは明らかに違います。
 
 というわけで、我々のケースでは、「ビュー」は特定の URL に対する Python コー
 ルバック関数になります。なぜなら、コールバック関数はどのデータを提示するか
@@ -143,30 +125,25 @@ Django は MVC フレームワークのようですが、コントローラ (Con
 最後に、結局重要なのは問題を解決することです。そして、呼び方は何であれ、
 Django はわれわれにとって最も理にかなった方法で問題を解決しているのです。
 
-
-.. <Framework X> does <feature Y> -- why doesn't Django?
-
-<フレームワーク X> には <機能 Y> があります -- どうして Django にないのですか？
+<フレームワーク X> には <機能 Y> がありますが、なぜ Django にはないのですか？
 -------------------------------------------------------------------------------
 
 世の中には他にも素晴らしい Web フレームワークがあるのは良く知っていますし、
 必要であればそこからアイデアを借りるのにやぶさかではありません。とはいえ、
-Django はまさに私達が旧態然の Web フレームワークに不満だったからこそ開発さ
-れたのであって、「<Framework X> だとできるから」という理由は Django に機能
-を追加する十分な理由にはならないということに注意して下さい。
-
-.. Why did you write all of Django from scratch, instead of using other Python libraries?
+私たちが Django を開発した動機は、旧態然たる Web フレームワークに不満だった
+からこそなので、「<Framework X> でできるから」といって、同じ機能を Django
+に機能を追加する理由にはならないのです。
 
 なぜ既存の Python ライブラリを使わずスクラッチで Django を作ったのですか？
 --------------------------------------------------------------------------
 
-Django を書き始めた約 2 年前、 Adrian と Simon は少し時間を取って当時利用で
-きた様々な Python ウェブフレームワークを試してみました。
+Django を書き始めた約 2 年前、 Adrian と Simon は少し時間を取って、当時利用
+できた様々な Python ウェブフレームワークを試してみました。
 
 その結果、十分な出来具合のものは一つもないという結論に達したのです。
 
-私達は好みにうるさいのです。(締め切りを守る) 完璧主義者と呼んでもいいでしょ
-う。
+私達は好みにうるさいのです。(締め切りに追われる) 完璧主義者と呼んでもいいで
+しょう。
 
 これまでずっと、私達は自分たちがすでに実装済みの機能を実現するオープンソー
 スライブラリに出会ってきました。そうしたライブラリに、他の人達が同じ問題を
@@ -183,8 +160,6 @@ Django を書き始めた約 2 年前、 Adrian と Simon は少し時間を取�
 
 私達の設計哲学は :ref:`設計哲学のページ <misc-design-philosophies>` に詳し
 く書いてあります。
-
-.. Is Django a content-management-system (CMS)?
 
 Django はコンテンツ管理システム (CMS) なのでしょうか?
 -----------------------------------------------------
@@ -205,8 +180,6 @@ Django はコンテンツ管理システム (CMS) なのでしょうか?
 
 .. _Drupal: http://drupal.org/
 
-.. How can I download the Django documentation to read it offline?:
-
 どうやれば Django のドキュメントをダウンロードしてオフラインで読めますか？
 --------------------------------------------------------------------------
 
@@ -223,9 +196,6 @@ Django リリースのドキュメントよりも多くの情報を提供して�
 
 .. _`バージョン管理システム下にある`: http://code.djangoproject.com/browser/django/trunk/docs
 .. _stored in revision control: http://code.djangoproject.com/browser/django/trunk/docs
-
-
-.. Where can I find Django developers for hire?
 
 Django 開発者はどこで雇えますか？
 ---------------------------------
