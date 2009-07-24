@@ -4,7 +4,7 @@
 フォームウィザード (Form wizard)
 =================================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 9084 (1.0)
 
 .. module:: django.contrib.formtools.wizard
     :synopsis: フォームを複数のページに分割します。
@@ -196,7 +196,9 @@ Django には、 :ref:`フォーム <topics-forms-index>` を複数のページ�
       :attr:`~django.contrib.formtools.wizard.FormWizard.extra_context` を
       渡します。
 
-テンプレート例の全体像は以下のようになります::
+テンプレート例の全体像は以下のようになります:
+
+.. code-block:: html+django
 
     {% extends "base.html" %}
 

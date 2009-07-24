@@ -4,7 +4,7 @@
 モデルの作成
 ==============
 
-:revision-up-to: 8974 (1.0)
+:revision-up-to: 9084 (1.0)
 
 .. module:: django.db.models
 
@@ -393,6 +393,8 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
 ファレンス <foreign-key-arguments>` で解説しています。引数は全てオプション
 です。
 
+.. _intermediary-manytomany:
+
 多対多を定義するためのエクストラフィールド
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -514,7 +516,7 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
 モデルの属性を使ってクエリを実行します::
 
     # 'Paul' で始まる名前の人がメンバにいるグループを探す
-    >>> Groups.objects.filter(person__name__startswith='Paul')
+    >>> Groups.objects.filter(members__name__startswith='Paul')
     [<Group: The Beatles>]
 
 中間テーブルを使っているので、属性を使ったクエリも実行できます::

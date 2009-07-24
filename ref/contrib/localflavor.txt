@@ -4,7 +4,7 @@
 localflavor アドオン
 ==========================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 9084 (1.0)
 
 .. module:: django.contrib.localflavor
     :synopsis: 特定の国や文化で有用な Django コードのコレクションです。
@@ -389,7 +389,7 @@ Italy: イタリア (``it``)
     入力が正しいイタリア社会保障番号 (`codice fiscale`_) であるか検証する
     フォームフィールドです。
 
-.. _codice fiscale: http://www.agenziaentrate.it/ilwwcm/connect/Nsi/Servizi/Codice+fiscale+-+tessera+sanitaria/Codice+fiscale/NSI+Informazioni+sulla+codificazione+delle+persone+fisiche
+.. _codice fiscale: http://www.agenziaentrate.it/ilwwcm/connect/Nsi/Servizi/Codice+fiscale+-+tessera+sanitaria/NSI+Informazioni+sulla+codificazione+delle+persone+fisiche
 
 .. class:: it.forms.ITVatNumberField
 

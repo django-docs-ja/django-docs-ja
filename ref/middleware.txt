@@ -4,7 +4,7 @@
 組み込みミドルウェアリファレンス
 =====================================
 
-:revision-up-to: 8964 (1.0)
+:revision-up-to: 9084 (1.0)
 
 .. module:: django.middleware
    :synopsis: Django の組み込みミドルウェアクラスです。

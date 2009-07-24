@@ -338,13 +338,17 @@ sitemap フレームワークには、個々のサイトマップファイルを
 
 上の例にならうと、URLconf は以下のようになります::
 
-    (r'^sitemap.xml$', 'django.contrib.sitemaps.views.index', {'sitemaps': sitemaps})
-    (r'^sitemap-(?P<section>.+)\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
+   (r'^sitemap.xml$', 'django.contrib.sitemaps.views.index', {'sitemaps': sitemaps}),
+   (r'^sitemap-(?P<section>.+)\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps}),
 
 この設定では、 :file:`sitemap-flatpages.xml` と :file:`sitemap-blog.xml` へ
 の参照が入った :file:`sitemap.xml` が自動生成されます。 
 :class:`~django.contrib.sitemaps.Sitemap` クラスと :data:`sitemaps` 辞書に
 手を加える必要はありません。
+
+50,000 以上の URL を含むサイトマップの場合、インデクスファイルを生成せねば
+なりませんが、 Django は自動的にサイトマップをページ分割し、インデクスにそ
+の内容を反映します。
 
 .. _Pinging Google:
 

@@ -5,7 +5,7 @@
 モデルフィールドリファレンス
 ==============================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 9084 (1.0)
 
 .. module:: django.db.models.fields
    :synopsis: 組み込みフィールド型です。
@@ -920,6 +920,15 @@ Django は、リレーションを表現するためのフィールドも定義�
     により、 Django に逆参照用のデスクリプタを追加させて、
     :class:`ManyToManyField` を非対称にできます。
     
+.. attribute:: ManyToManyFields.through
+
+    Django は多対多を管理するテーブルを自動的に作成しますが、中間テーブルを
+    独自に定義したいなら、 :attr:`~ManyToManyField.through` オプションを使っ
+    て、中間テーブルの表現に使いたいモデルを指定してください。
+    
+    通常、このオプションを使うのは、 :ref:`多対多の関係に追加のデータを持た
+    せたいとき <intermediary-manytomany>` です。
+
 .. attribute:: ManyToManyField.db_table
 
     多対多のリレーション情報を保存するために作成されるテーブルの名前です。

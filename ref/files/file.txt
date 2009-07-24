@@ -3,7 +3,7 @@
 ``File`` オブジェクト
 ======================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 9084 (1.0)
 
 .. currentmodule:: django.core.files
 

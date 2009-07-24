@@ -5,7 +5,7 @@
 FAQ: 全般
 ============
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 9084 (1.0)
 
 .. Why does this project exist?
 
@@ -184,15 +184,6 @@ Django を書き始めた約 2 年前、 Adrian と Simon は少し時間を取�
 私達の設計哲学は :ref:`設計哲学のページ <misc-design-philosophies>` に詳し
 く書いてあります。
 
-かっこいい「スクリーンキャスト」か何かがありますか？
-----------------------------------------------------
-
-現在進行中だということだけは断言できます。がしかし、私達はまだ Django を改
-良している真最中なので、現状ではなく、 Django 1.0 になったときの最終的な状態
-を反映させたいと思っています。言い方を変えれば、 Django API はまだ変化する
-かもしれないので、それまではスクリーンキャストにまださほどエネルギーを使い
-たくないということです。
-
 .. Is Django a content-management-system (CMS)?
 
 Django はコンテンツ管理システム (CMS) なのでしょうか?
@@ -213,18 +204,6 @@ Django はコンテンツ管理システム (CMS) なのでしょうか?
 ンの開発に向いていない、なんてことにつながったりはしないのです。
 
 .. _Drupal: http://drupal.org/
-
-.. When will you release Django 1.0?
-
-いつになったら Django 1.0 をリリースするのですか？
---------------------------------------------------
-
-`バージョン 1 へのロードマップ`_ を見てください。2008 年 9 月 2 を目標にし
-ています。
-
-.. _version one roadmap: http://code.djangoproject.com/wiki/VersionOneRoadmap
-.. _`バージョン 1 へのロードマップ`: `version one roadmap`_
-
 
 .. How can I download the Django documentation to read it offline?:
 

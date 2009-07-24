@@ -4,7 +4,7 @@
 はじめての Django アプリ作成、その 4
 =====================================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 9084 (1.0)
 
 このチュートリアルは :ref:`チュートリアルその 3 <intro-tutorial03>` の続き
 です。ここでは、引続き Web 投票アプリケーションの開発を例にして、簡単なフォー
@@ -123,7 +123,7 @@
       :func:`~django.core.urlresolvers.reverse` にはビューの名前を渡し、同
       時に URL パターンからビューにマップするときに取り出される変数を指定し
       ます。上の例では、 :func:`~django.core.urlresolvers.reverse` は
-      :ref:`チュートリアルその 3 <intro-tutorial03>` で設定した URLConfに従っ
+      :ref:`チュートリアルその 3 <intro-tutorial03>` で設定した URLconfに従っ
       て::
 
         '/polls/3/results/'

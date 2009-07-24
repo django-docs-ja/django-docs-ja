@@ -4,7 +4,7 @@
 リクエストオブジェクトとレスポンスオブジェクト
 ==============================================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 9084 (1.0)
 
 .. module:: django.http
    :synopsis: HTTP のリクエストとレスポンスを扱うためのクラスです。
@@ -109,18 +109,6 @@ HttpRequest オブジェクト
 
 .. attribute:: HttpRequest.FILES 
     
-    .. admonition:: 開発版の Django で変更された仕様
-        
-        以前のバージョンの Django では、 ``request.FILES`` に通常の辞書が入っ
-        ていて、その辞書がアップロードされたファイルを表していました。この
-        仕様は変更され、ファイルは後述の ``UploadedFile`` オブジェクトで表
-        現されるようになりました。
-        
-        ``UploadedFile`` オブジェクトは、以前の辞書インタフェースをエミュレー
-        トしていますが、これは撤廃されたインタフェースであり、次の Django
-        のリリースでは除去される予定です。
-        
-
     アップロードされた全てのファイルが入っている辞書ライクオブジェクトです。
     ``FILES`` の各キーは ``<input type="file" name="" />`` の ``name`` 
     に対応しています。 ``FILES`` の各値は ``UploadedFile`` オブジェクトで、
@@ -140,6 +128,17 @@ HttpRequest オブジェクト
     ストをポストした ``<form>`` に ``enctype="multipart/form-data`` がある
     場合だけです。それ以外の場合、 ``FILES`` は空の辞書ライクオブジェクトに
     なります。
+
+    .. versionchanged:: 1.0
+        
+    以前のバージョンの Django では、 ``request.FILES`` に通常の辞書が入って
+    いて、その辞書がアップロードされたファイルを表していました。この仕様は
+    変更され、ファイルは後述の ``UploadedFile`` オブジェクトで表現されるよ
+    うになりました。
+    
+    ``UploadedFile`` オブジェクトは、以前の辞書インタフェースをエミュレート
+    していますが、これは撤廃されたインタフェースであり、次の Django のリリー
+    スでは除去される予定です。
 
 .. attribute:: HttpRequest.META
 
@@ -330,8 +329,8 @@ QueryDict オブジェクト
 
 .. method:: QueryDict.items()
 
-    標準の辞書型の ``items()`` メソッドと同じですが、 ``__getitem()__`` と
-    同じ、最後の値を返すロジックを使います。例えば::
+    標準の辞書型の :meth:`items()`` メソッドと同じですが、 
+    ``__getitem()__`` と同じ、最後の値を返すロジックを使います。例えば::
 
            >>> q = QueryDict('a=1&a=2&a=3')
            >>> q.items()
@@ -374,7 +373,7 @@ QueryDict オブジェクト
     す。
 
 .. method:: QueryDict.lists()
-    ``items()`` に似ていますが、全ての値をリストで返します。例えば::
+    :meth:`items()` に似ていますが、全ての値をリストで返します。例えば::
 
            >>> q = QueryDict('a=1&a=2&a=3')
            >>> q.lists()
@@ -480,6 +479,14 @@ Django によって自動生成される :class:`~django.http.HttpRequest` オ�
 ``Content-Disposition`` ヘッダの利用は Django 固有の仕様ではありませんが、
 記法を忘れやすいのでここに示しておきます。
 
+属性
+------
+
+.. attribute:: HttpResponse.content
+
+    コンテンツを表現する通常の Python 文字列表現です。必要に応じて
+    Unicode オブジェクトからエンコードされます。
+
 メソッド
 --------
 
@@ -551,12 +558,6 @@ Django によって自動生成される :class:`~django.http.HttpRequest` オ�
 
     cookie の動作原理上、 ``path`` と ``domain`` を ``set_cookie()`` に指定
     した値と同じにしないと、クッキーを削除できなくなります。
-
-.. method:: HttpResponse.content()
-
-    Python 文字列の内容を返します。必要ならば Unicode オブジェクトにエンコー
-    ドします。メソッドではなくプロパティなので、 ``r.content()`` ではなく 
-    ``r.content`` になることに注意して下さい。
 
 .. method:: HttpResponse.write(content)
 

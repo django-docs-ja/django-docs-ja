@@ -6,7 +6,7 @@
 
 .. contents::
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 9084 (1.0)
 
 さあ、例を交えながら学んでゆきましょう。
 
@@ -166,14 +166,21 @@ Django の設定を表現する通常の Python モジュールです。設定�
     * :setting:`DATABASE_ENGINE` -- 'postgresql_psycopg2', 'mysql' または
       'sqlite3'のいずれかです。他にも :setting:`いくつか <DATABASE_ENGINE>`
       あります。
+
     * :setting:`DATABASE_NAME`` -- データベースの名前です。 SQLite を使っ
       ている場合にはデータベースファイルのフルパス (絶対パス) にします。
       指定したパスのファイルが存在しなければ、 Django は最初にデータベース
       の同期を実行したときにファイルを生成します (後で解説します)。
+
+      パスを指定するときには、 Windows 環境でも必ずスラッシュ (``/``) を区
+      切り文字に使ってください (例: ``C:/homes/user/mysite/sqlite3.db``)
+
     * :setting:`DATABASE_USER` -- データベースのユーザ名です (SQLite では
       使いません)。
+
     * :setting:`DATABASE_PASSWORD` -- データベースのパスワードです。
       (SQLite では使いません)。
+
     * :setting:`DATABASE_HOST` -- データベースのあるホストです。データベー
       スサーバが物理的に同じマシン上にあるのなら空文字列にしておきます。
       (SQLite では使いません)。

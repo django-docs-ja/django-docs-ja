@@ -4,10 +4,12 @@
 コメントフレームワーク
 ===========================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 9084 (1.0)
 
 .. module:: django.contrib.comments
    :synopsis: Django のコメントフレームワークです。
+
+.. highlightlang:: html+django
 
 Django には単純ながらカスタマイズ可能なコメントフレームワークが付属していま
 す。この組み込みのコメントフレームワークを使えば、任意のモデルにコメントを

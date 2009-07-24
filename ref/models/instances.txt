@@ -1,47 +1,47 @@
 .. _ref-models-instances:
 
-========================
-Model instance reference
-========================
+===============================
+モデルインスタンスリファレンス
+===============================
 
 :revision-up-to: 8961 (1.0)
 
 .. currentmodule:: django.db.models
-   
-This document describes the details of the ``Model`` API. It builds on the
-material presented in the :ref:`model <topics-db-models>` and `database query
-<topics-db-queries>` guides, so you'll probably want to read and understand
-those documents before reading this one.
 
-Throughout this reference we'll use the :ref:`example weblog models
-<queryset-model-example>` presented in the :ref:`database query guide
-<topics-db-queries>`.
+このドキュメントでは、モデル API の詳細を解説します。このドキュメントは、
+:ref:`モデル <topics-db-models>` や `データベースクエリ
+<topics-db-queries>` といったガイドを前提にしているので、このドキュメントを
+読む前に、予め読んで理解しておくとよいでしょう。
 
-Creating objects
-================
+このリファレンスでは、 :ref:`データベースクエリガイド <topics-db-queries>`
+の :ref:`Weblog のモデル例 <queryset-model-example>` を使います。
 
-To create a new instance of a model, just instantiate it like any other Python class:
+オブジェクトの生成
+===================
+
+モデルの新たなインスタンスは、通常の Python のクラスと同じ方法で生成します:
 
 .. class:: Model(**kwargs)
 
-The keyword arguments to are simply the names of the fields you've defined on
-your model. Note that instantiating a model in no way touches your database; for
-that, you need to ``save()``.
+キーワード引数に指定できる名前は、モデルで定義したフィールドの名前です。
+モデルのインスタンスを生成しても、 ``save()`` を呼び出すまでデータベースは
+操作されません。
 
-Saving objects
-==============
+オブジェクトの保存
+======================
 
-To save an object back to the database, call ``save()``:
+オブジェクトをデータベースに書き戻すには、 ``save()`` を使います:
 
 .. method:: Model.save([force_insert=False, force_update=False])
 
-Of course, there are some subtleties; see the sections below.
+もちろん、 データベースへの保存には、以下に説明するような細かい注意点があり
+ます。
 
 .. versionadded:: 1.0
 
-The signature of the ``save()`` method has changed from earlier versions
-(``force_insert`` and ``force_update`` have been added). If you are overriding
-these methods, be sure to use the correct signature.
+``save()`` メソッドのシグネチャが変更されました (``force_insert`` と
+``force_update`` が追加されました) メソッドをオーバライドするときには、正し
+いシグネチャを使ってください。
 
 .. _Auto-incrementing primary keys:
 
@@ -180,22 +180,22 @@ Django データベースオブジェクトがオブジェクトの作成と変�
 
 .. _ref-models-force-insert:
 
-Forcing an INSERT or UPDATE
+INSERT や UPDATE を強制する
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. versionadded:: 1.0
 
-In some rare circumstances, it's necessary to be able to force the ``save()``
-method to perform an SQL ``INSERT`` and not fall back to doing an ``UPDATE``.
-Or vice-versa: update, if possible, but not insert a new row. In these cases
-you can pass the ``force_insert=True`` or ``force_update=True`` parameters to
-the ``save()`` method. Passing both parameters is an error, since you cannot
-both insert *and* update at the same time.
+ごく稀に、 ``save()`` メソッドに ``INSERT`` だけを実行させ、 ``UPDATE`` に
+フォールバックさせたくない、あるいはその逆、すなわち ``UPDATE`` が可能なら
+実行するが、新たなレコードの ``INSERT`` はさせたくないような場合があります。
+そんなときには、 ``force_insert=True`` や ``force_update=True`` パラメタを
+``save()`` メソッドに渡してください。 ``INSERT`` と ``UPDATE`` は同時に行え
+ないので、両方のパラメタを同時に渡すとエラーを引き起こします。
 
-It should be very rare that you'll need to use these parameters. Django will
-almost always do the right thing and trying to override that will lead to
-errors that are difficult to track down. This feature is for advanced use
-only.
+このパラメタが必要なケースは本当にごく稀な場合だけです。たいていは、 Django
+は正しい SQL で保存を行いますし、パラメタをオーバライドすると、追跡の困難な
+エラーにつながる恐れがあります。特殊な用途でだけ、このパラメタを使ってくだ
+さい。
 
 .. _model-instance-methods:
 .. _Other model instance methods:

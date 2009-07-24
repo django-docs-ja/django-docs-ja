@@ -3,7 +3,7 @@
 settings に設定できる値
 ==========================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 9084 (1.0)
 
 このドキュメントでは、利用可能な全ての設定のリストを示します。リストはアル
 ファベット順で、デフォルト値も示します。
@@ -199,7 +199,8 @@ DATABASE_NAME
 デフォルト値: ``''`` (空文字列)
 
 データベースの名前です。 SQLite の場合は、データベースファイルへのフルパス
-です。
+です。パスを指定するときは、 Windows 環境でも必ずスラッシュ (``/``) を区
+切り文字に使ってください (例: ``C:/homes/user/mysite/sqlite3.db``)。
 
 .. setting:: DATABASE_OPTIONS
 
@@ -276,7 +277,7 @@ DEBUG
 
 デバッグモードのオンオフを切替えるブール値です。
 
-settings に自作の設定項目を追加する場合、django/views/debug.py の
+settings に自作の設定項目を追加する場合、 `django/views/debug.py`_ の
 ``HIDDEN_SETTINGS`` に注意してください。この変数は正規表現になっていて、デ
 フォルトでは ``'SECRET'``, ``'PASSWORD'``, ``'PROFANITIES'`` といった文字列
 を含む全ての設定の DEBUG ビューへの表示を抑制して、信頼されていないユーザが
@@ -292,6 +293,8 @@ settings に自作の設定項目を追加する場合、django/views/debug.py �
 便利ですが、運用時に使うとあっという間にメモリを消費してしまうでしょう。
 
 決して ``DEBUG`` をオンにしたままサーバを運用しないでください。
+
+.. _django/views/debug.py: http://code.djangoproject.com/browser/django/trunk/django/views/debug.py
 
 DEBUG_PROPAGATE_EXCEPTIONS
 --------------------------
@@ -820,7 +823,9 @@ PROFANITIES_LIST
 呼び出された際に、エラーを引き起こす単語のリストに使われます。
 
 デフォルト値はここでは示しません。不道徳な言葉が入っているからです。デフォ
-ルト値を見たければ、 ``django/conf/global_settings.py`` を参照してください。
+ルト値を見たければ、 `django/conf/global_settings.py`_ を参照してください。
+
+.. _django/conf/global_settings.py: http://code.djangoproject.com/browser/django/trunk/django/conf/global_settings.py
 
 .. setting:: ROOT_URLCONF
 

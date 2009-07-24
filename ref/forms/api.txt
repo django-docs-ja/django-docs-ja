@@ -1,12 +1,10 @@
 .. _ref-forms-api:
 
-.. _The Forms API:
-
 =============
 フォーム API
 =============
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 9084 (1.0)
 
 .. currentmodule:: django.forms
 
@@ -108,7 +106,7 @@
     >>> f = ContactForm(data)
     >>> f.is_valid()
     False
-    
+
 .. attribute:: Form.errors
 
 :attr:`~Form.errors` という属性にアクセスすると、エラーメッセージの入った辞
@@ -567,6 +565,16 @@
     '<input id="id_subject" type="text" name="subject" maxlength="100" />'
     >>> unicode(f['subject'])
     u'<input id="id_subject" type="text" name="subject" maxlength="100" />'
+
+フォームオブジェクトには独自の ``__iter__()`` メソッドが定義されており、
+各々のフィールドにわたってループ処理できます::
+
+    >>> f = ContactForm()
+    >>> for field in f: print field
+    <input id="id_subject" type="text" name="subject" maxlength="100" />
+    <input type="text" name="message" id="id_message" />
+    <input type="text" name="sender" id="id_sender" />
+    <input type="checkbox" name="cc_myself" id="id_cc_myself" />
 
 フィールド固有の出力を行った場合でも、フォームオブジェクトの ``auto_id`` 設
 定は有効です::

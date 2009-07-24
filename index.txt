@@ -4,7 +4,7 @@
 Django ドキュメント
 ====================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 9084 (1.0)
 
 .. rubric:: Django を使いこなすための全てがここにあります。
 
@@ -55,102 +55,101 @@ Django ドキュメント
 
 :ref:`概要 (Overview) <intro-overview>`
     Django でのデータベース駆動アプリケーションの作り方を理解しましょう。
-    
+
 :ref:`インストール (Installation) <intro-install>`
     Django をインストールしましょう。
-    
+
 チュートリアル: Django アプリケーションを書く
 ===============================================
 
 :ref:`その 1 <intro-tutorial01>`
     プロジェクトをセットアップし、モデルを作成して、データベース API をいじっ
     てみましょう。
-    
+
 :ref:`その 2 <intro-tutorial02>`
     Django が自動生成する admin サイトを使ってみましょう。
-    
+
 :ref:`その 3 <intro-tutorial03>`
     公開用のインタフェースビューを作成しましょう。
 
 :ref:`その 4 <intro-tutorial04>`
     フォームの処理方法を学びましょう。
-        
+
 Django を使う
 ===============
 
 :ref:`モデル (Models) <topics-db-index>`
     データを記述する、ただ一つのデータソースであるモデルを設計しましょう。
-    
+
 :ref:`リクエストの処理 (Handling web requests) <topics-http-index>`
     リクエストを処理して、ビューに結びつけ、ページを生成して返しましょう。
     
 :ref:`フォーム (Forms) <topics-forms-index>`
     HTML フォームを作成して、操作しましょう。
-    
+
 :ref:`テンプレート (Templates) <topics-templates>`
     サイトの視覚的なデザインを開発しましょう。
-    
+
 他にも:
 ---------
 
-    * :ref:`topics-auth`
-    * :ref:`topics-cache`
-    * :ref:`topics-email`
-    * :ref:`topics-files`
+    * :ref:`認証 <topics-auth>`
+    * :ref:`キャッシュ <topics-cache>`
+    * :ref:`電子メール <topics-email>`
+    * :ref:`ファイルアクセス API <topics-files>`
     * :ref:`topics-i18n`
-    * :ref:`topics-install`
     * :ref:`topics-pagination`
-    * :ref:`topics-serialization`
-    * :ref:`topics-settings`
+    * :ref:`シリアライゼーション <topics-serialization>`
+    * :ref:`セッション <topics-http-sessions>`
+    * :ref:`設定 <topics-settings>`
     * :ref:`topics-signals`
-    * :ref:`topics-testing`
-    * :ref:`topics-http-sessions`
-    
+    * :ref:`テスト <topics-testing>`
+
 アドオン (contrib) アプリケーション
 ========================================
 
 :ref:`管理サイト (Django's automatic admin site) <ref-contrib-admin>`
     手間をかけずに、データを操作するためのインタフェースを構築しましょう。
-    
+
 :ref:`フォームツール (Form tools) <ref-contrib-formtools-index>`
     複雑なフォームのワークフローを簡単に操作しましょう。
-    
+
 :ref:`配信フィード (Syndication feeds) <ref-contrib-syndication>`
     データから RSS や Atom フィードを生成しましょう。
-    
+
 :ref:`ローカルフレーバ (Local flavor) <ref-contrib-localflavor>`
     地域特有の機能をサイトに組み込みましょう。
-    
+
 他にも:
 ---------
 
-    * :ref:`ref-contrib-comments-index`
-    * :ref:`ref-contrib-contenttypes`
-    * :ref:`ref-contrib-csrf`
-    * :ref:`ref-contrib-databrowse`
-    * :ref:`ref-contrib-flatpages`
-    * :ref:`ref-contrib-humanize`
-    * :ref:`ref-contrib-redirects`
-    * :ref:`ref-contrib-sitemaps`
-    * :ref:`ref-contrib-sites`
-    * :ref:`ref-contrib-webdesign`
+    * :ref:`コメント <ref-contrib-comments-index>`
+    * :ref:`コンテンツタイプ <ref-contrib-contenttypes>`
+    * :ref:`CSRF 対策 <ref-contrib-csrf>`
+    * :ref:`databrowse <ref-contrib-databrowse>`
+    * :ref:`フラットページ <ref-contrib-flatpages>`
+    * :ref:`humanize <ref-contrib-humanize>`
+    * :ref:`リダイレクション <ref-contrib-redirects>`
+    * :ref:`サイトマップ <ref-contrib-sitemaps>`
+    * :ref:`Sites <ref-contrib-sites>`
+    * :ref:`ウェブデザインヘルパ <ref-contrib-webdesign>`
 
 特殊な問題を解決する
 =========================
 
 :ref:`デプロイ (Deployment) <howto-deployment-index>`
     プロジェクトをリリースしましょう。
-    
+
 :ref:`既存のデータベースからデータを取り込む (Importing data from legacy databases) <howto-legacy-databases>`
     Django を既存のデータベースや他の Web 開発ツールと組み合わせて使いましょ
     う。
 
 :ref:`テンプレートタグの自作 (Custom template tags) <howto-custom-template-tags>`
     Django のテンプレート言語に独自の拡張を追加しましょう。
-    
+
 :ref:`CSV の生成 (Generating CSV) <howto-outputting-csv>` & :ref:`PDF の生成 (Generating PDF) <howto-outputting-pdf>`
     HTML 以外のコンテンツを Django で生成しましょう。
-    
+
 他にも:
 ---------
 
@@ -158,27 +157,27 @@ Django を使う
     * :ref:`howto-custom-file-storage`
     * :ref:`howto-custom-management-commands`
     * :ref:`howto-custom-model-fields`
-    * :ref:`howto-error-reporting`
+    * :ref:`コードのエラーをメールで追いかける <howto-error-reporting>`
     * :ref:`howto-initial-data`
     * :ref:`howto-jython`
-    * :ref:`howto-static-files`
+    * :ref:`静的ファイルの提供 <howto-static-files>`
 
 リファレンス
 ==================
 
 :ref:`設定 (Settings) <ref-settings>`
     Django の全ての設定とその働きを理解しましょう。
-    
+
 :ref:`リクエストオブジェクトとレスポンスオブジェクト (Request & response objects) <ref-request-response>`
     Django が HTTP のリクエストとレスポンスの表現に使っているクラスを理解し
     ましょう。
 
 :ref:`モデル API リファレンス <ref-models-index>`
     Django のモデルシステムを骨の髄まであじわい尽くしましょう。
-        
+
 :ref:`フォーム API リファレンス <ref-forms-index>`
     フォームやフィールド、ウィジェットの詳細について学びましょう。
-    
+
 他にも:
 ---------
 
@@ -189,7 +188,7 @@ Django を使う
     * :ref:`ref-middleware`
     * :ref:`ref-templates-index`
     * :ref:`ref-unicode`
-    
+
 その他
 ========
 

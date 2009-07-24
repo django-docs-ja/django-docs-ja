@@ -7,10 +7,47 @@ import docutils.nodes
 import docutils.transforms
 import sphinx
 import sphinx.addnodes
-import sphinx.builder
+try:
+    from sphinx.builders.html import ENV_PICKLE_FILENAME, LAST_BUILD_FILENAME, PickleHTMLBuilder
+except ImportError:
+    # for old versions (<0.6) of sphinx
+    from sphinx.builder import ENV_PICKLE_FILENAME, LAST_BUILD_FILENAME, PickleHTMLBuilder
 import sphinx.directives
+try:
+    sphinx.directives.parse_option_desc
+except AttributeError:
+    # for old versions (<0.6) of sphinx
+    import re
+    option_desc_re = re.compile(
+        r'((?:/|-|--)[-_a-zA-Z0-9]+)(\s*.*?)(?=,\s+(?:/|-|--)|$)')
+    def parse_option_desc(signode, sig):
+        """Transform an option description into RST nodes."""
+        count = 0
+        firstname = ''
+        for m in option_desc_re.finditer(sig):
+            optname, args = m.groups()
+            if count:
+                signode += sphinx.addnodes.desc_addname(', ', ', ')
+            signode += sphinx.addnodes.desc_name(optname, optname)
+            signode += sphinx.addnodes.desc_addname(args, args)
+            if not count:
+                firstname = optname
+            count += 1
+        if not firstname:
+            raise ValueError
+        return firstname
+    sphinx.directives.parse_option_desc = parse_option_desc
+
+                    
 import sphinx.environment
-import sphinx.htmlwriter
+try:
+    import sphinx.writers.html
+    sphinx.htmlwriter = sphinx.writers.html
+except ImportError:
+    # for old versions (<0.6) of sphinx
+    import sphinx.htmlwriter
+
+
 
 def populate_index_to_rebuilds(app, doctree):
     app.builder.env.files_to_rebuild['index'] = set([])
@@ -188,12 +225,12 @@ def monkeypatch_pickle_builder():
 
         # copy the environment file from the doctree dir to the output dir
         # as needed by the web app
-        shutil.copyfile(path.join(self.doctreedir, sphinx.builder.ENV_PICKLE_FILENAME),
-                        path.join(self.outdir, sphinx.builder.ENV_PICKLE_FILENAME))
+        shutil.copyfile(path.join(self.doctreedir, ENV_PICKLE_FILENAME),
+                        path.join(self.outdir, ENV_PICKLE_FILENAME))
 
         # touch 'last build' file, used by the web application to determine
         # when to reload its environment and clear the cache
-        open(path.join(self.outdir, sphinx.builder.LAST_BUILD_FILENAME), 'w').close()
+        open(path.join(self.outdir, LAST_BUILD_FILENAME), 'w').close()
 
-    sphinx.builder.PickleHTMLBuilder.handle_finish = handle_finish
+    PickleHTMLBuilder.handle_finish = handle_finish
     

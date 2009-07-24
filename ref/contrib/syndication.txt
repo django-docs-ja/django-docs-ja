@@ -4,7 +4,7 @@
 配信フィードフレームワーク
 ==========================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 9084 (1.0)
 
 .. module:: django.contrib.syndication
    :synopsis: RSS や Atom 形式の配信フィードを簡単に生成するためのフレーム
@@ -153,7 +153,7 @@ Feed クラス
 
     * ``<title>`` や ``<description>`` の中身を指定するには、
       :file:`feeds/latest_title.html` または 
-      :file::`feeds/latest_description.html` という名前の :ref:`Django テン
+      :file:`feeds/latest_description.html` という名前の :ref:`Django テン
       プレート <topics-templates>` を作成します。 :attr:`latest` は URLconf
       中に指定しておいた、フィードの :attr:`slug` です。  ``.html`` 拡張子
       が必要なことに注意して下さい。 RSS システムはこれらのテンプレートを各

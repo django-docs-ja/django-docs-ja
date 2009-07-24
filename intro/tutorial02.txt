@@ -4,7 +4,7 @@
 はじめての Django アプリ作成、その 2
 =====================================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 9084 (1.0)
 
 このチュートリアルは :ref:`チュートリアルその 1 <intro-tutorial01>` の続き
 です。ここでは、引続き Web 投票アプリケーションの開発を例にして、Django が
@@ -16,7 +16,6 @@
     コンテンツの追加や変更、削除を行うためのスタッフや顧客向けの管理サイト
     構築は、創造性の欠けた退屈なものです。そこで、 Django ではモデルを管
     理するための admin インタフェースを完全に自動化しています。
-
 
     Django はニュースルーム環境で開発されました。ニュースルーム環境では、
     「コンテンツの作成者 (content publisher)用」と「公開用 (public) 」サイ
@@ -49,9 +48,9 @@ admin サイトの有効化
       ます。今はただ、この設定が URL をアプリケーションに対応づけていること
       だけを覚えておきましょう。最終的に、 ``urls.py`` は以下のようになるは
       ずです:
-      
+
       .. parsed-literal::
-      
+
           from django.conf.urls.defaults import *
 
           # Uncomment the next two lines to enable the admin:
@@ -69,7 +68,7 @@ admin サイトの有効化
               # Uncomment the next line to enable the admin:
               **(r'^admin/(.*)', admin.site.root),**
           )
-          
+
       (太字の行はコメントを外した部分です)
 
 開発サーバの起動
@@ -116,14 +115,15 @@ Poll モデルを admin 上で編集できるようにする
 クスページを見ても表示されていませんね。
 
 実は、まだ一つやるべきことが残っていました。  admin に ``Poll`` モデルがイ
-ンタフェースを持つことを教える必要があるのです。 ``mysite/polls/models.py``
-ファイルを編集して、末尾に以下のような一文を加えてください::
+ンタフェースを持つことを教える必要があるのです。 ``polls`` ディレクトリの
+``admin.py`` ファイルを編集して、末尾に以下のような一文を加えてください::
 
+    from mysite.polls.models import Poll
     from django.contrib import admin
-    
+
     admin.site.register(Poll)
 
-admin のページをリロードして、どんな変化が起きたか見てみましょう。
+admin のページをリロードして、どんな変化が起きたか見てみましょう。通常、
 開発サーバはプロジェクトを自動的にリロードしてくれるので、コードに加えた変
 更はただちにブラウザで確認できます。
 
@@ -204,7 +204,7 @@ Django はオブジェクトの表示方法を「推測」し、 admin でモデ
 
     class PollAdmin(admin.ModelAdmin):
         fields = ['pub_date', 'question']
-        
+
     admin.site.register(Poll, PollAdmin)
 
 このように、 admin のオプションを変更したいときには、モデルごとに admin 
@@ -213,7 +213,6 @@ Django はオブジェクトの表示方法を「推測」し、 admin でモデ
 
 上の例では、「Publication date」フィールドの表示位置を「Question」フィール
 ドよりも前に変更しています。
-
 
 .. image:: _images/admin07.png
    :alt: Fields have been reordered
@@ -230,7 +229,7 @@ admin フォームで何ダースものフィールドを操作するような�
             (None,               {'fields': ['question']}),
             ('Date information', {'fields': ['pub_date']}),
         ]
-        
+
     admin.site.register(Poll, PollAdmin)
 
 ``fieldsets`` の各タプルの先頭の要素はフィールドセットのタイトルです。
@@ -298,7 +297,7 @@ Choice モデルに対する ``register()`` を削除して、 ``Poll`` を登�
     class ChoiceInline(admin.StackedInline):
         model = Choice
         extra = 3
-        
+
     class PollAdmin(admin.ModelAdmin):
         fieldsets = [
             (None,               {'fields': ['question']}),

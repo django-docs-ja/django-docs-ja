@@ -4,7 +4,7 @@
 django-admin.py と manage.py
 ============================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 9084 (1.0)
 
 ``django-admin.py`` は Django の管理タスクを行うためのコマンドライン
 ユーティリティです。このドキュメントでは ``django-admin.py`` の全ての
@@ -408,7 +408,7 @@ makemessages
 ------------
 
 .. versionadded:: 1.0
-   1.0 より前のバージョンでは、 "bin/make-messages.py" コマンドでした。
+   1.0 より前のバージョンでは、 ``bin/make-messages.py`` コマンドでした。
 
 現在のディレクトリ以下にあるソースツリー全体を走査して、翻訳対象にマークさ
 れている文字列全てを取り出します。django のソースツリー上で行った場合には

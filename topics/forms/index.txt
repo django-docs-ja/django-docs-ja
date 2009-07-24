@@ -13,6 +13,8 @@
     利用できるフィールドタイプのドキュメントは :ref:`ref-forms-fields`
     を参照してください。
 
+.. highlightlang:: html+django
+
 ``django.forms`` は、 Django のフォーム処理ライブラリです。
 
 フォームによって提出 (submit) されたデータの処理は、Django の
@@ -69,7 +71,9 @@ Django のデータベースモデルによく似た方法でフォームのフ�
 成します。
 
 一例として、個人のウェブサイトでコンタクトフォームの機能を実装するときに使
-うフォームを考えてみましょう::
+うフォームを考えてみましょう:
+
+.. code-block:: python
 
     from django import forms
 
@@ -94,7 +98,9 @@ Django のモデルを直接追加したり編集したりしたいときに、�
 ビュー内でフォームを使う
 -----------------------------
 
-フォームをビュー内で処理するときの標準的なパターンを以下に示します::
+フォームをビュー内で処理するときの標準的なパターンを以下に示します:
+
+.. code-block:: python
 
    def contact(request):
        if request.method == 'POST': # If the form has been submitted...
@@ -149,18 +155,20 @@ Django のモデルを直接追加したり編集したりしたいときに、�
 型の値に変換されています。同様に、 ``IntegerField`` や ``FloatField`` は、
 それぞれ Python の整数型や浮動小数型の値に変換されています。
 
-上の例を拡張すると、フォームデータの処理は以下のように書けます::
+上の例を拡張すると、フォームデータの処理は以下のように書けます:
+
+.. code-block:: python
 
     if form.is_valid():
         subject = form.cleaned_data['subject']
         message = form.cleaned_data['message']
         sender = form.cleaned_data['sender']
         cc_myself = form.cleaned_data['cc_myself']
-    
+
         recipients = ['info@example.com']
         if cc_myself:
             recipients.append(sender)
-    
+
         from django.core.mail import send_mail
         send_mail(subject, message, sender, recipients)
         return HttpResponseRedirect('/thanks/') # Redirect after POST
@@ -179,7 +187,7 @@ Django のモデルを直接追加したり編集したりしたいときに、�
 
     <form action="/contact/" method="POST">
     {{ form.as_p }}
-    <input type="submit" value="Submit">
+    <input type="submit" value="Submit" />
     </form>
 
 フォームインスタンスはフィールドのマークアップだけを出力します。前後の
@@ -197,7 +205,7 @@ Django のモデルを直接追加したり編集したりしたいときに、�
        <input type="text" name="sender" id="id_sender" /></p>
    <p><label for="id_cc_myself">Cc myself:</label>
        <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>
-   <input type="submit" value="Submit">
+   <input type="submit" value="Submit" />
    </form>
 
 各フォームフィールドには、 ``id_<field-name>`` の形式で id 属性が付加されて
@@ -238,7 +246,7 @@ Django のモデルを直接追加したり編集したりしたいときに、�
             <label for="id_cc_myself">CC yourself?</label>
             {{ form.cc_myself }}
         </div>
-        <p><input type="submit" value="Send message"></p>
+        <p><input type="submit" value="Send message" /></p>
     </form>
 
 各フォームフィールドは、その名前に従って、 ``{{ form.name_of_field }}``

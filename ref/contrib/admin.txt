@@ -6,7 +6,10 @@
 Django admin サイト
 ====================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 9084 (1.0)
+
+.. module:: django.contrib.admin
+   :synopsis: Django の admin サイトです。
 
 Django の最も強力な機能の一つに、自動生成される admin インタフェースがあり
 ます。 admin はモデルのメタデータを読み込んで、強力で実運用に耐えるインタ
@@ -59,6 +62,22 @@ Django admin サイトは、以下の 5 つのステップを通して有効化�
         pass
     admin.site.register(Author, AuthorAdmin)
 
+.. TBD
+
+.. admonition:: Do you need a ``ModelAdmin`` object at all?
+
+    In the preceding example, the ``ModelAdmin`` class doesn't define any
+    custom values (yet). As a result, the default admin interface will be
+    provided. If you are happy with the default admin interface, you don't
+    need to define a ``ModelAdmin`` object at all -- you can register the
+    model class without providing a ``ModelAdmin`` description. The
+    preceding example could be simplified to::
+
+        from django.contrib import admin
+        from myproject.myapp.models import Author
+    
+        admin.site.register(Author)
+    
 .. _`ModelAdmin Options`:
 
 ``ModelAdmin`` のオプション
@@ -959,7 +978,9 @@ admin テンプレートはモジュラー構造で設計されているので�
 ルの隣に新しくリンクを追加したいとします。 ``change_from.html`` を眺めたあ
 と、オーバライドする必要があるのは ``object-tools`` ブロックだけだと分かっ
 たとしましょう。その場合、新たな ``change_form.html`` は以下のように書けま
-す::
+す:
+
+.. code-block:: html+django
 
     {% extends "admin/change_form.html" %}
     {% load i18n %}

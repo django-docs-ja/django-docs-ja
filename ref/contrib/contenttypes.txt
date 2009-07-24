@@ -4,7 +4,7 @@
 contenttypes フレームワーク
 ============================
 
-:revision-up-to: 8973 (1.0)
+:revision-up-to: 9084 (1.0)
 
 .. module:: django.contrib.contenttypes
    :synopsis: インストール済のモデルを扱うための汎用インタフェースを提供します。
@@ -14,7 +14,6 @@ Django には、 :mod:`contenttypes` アプリケーションが付属してい�
 てのモデルを追跡できます。また、 ``contenttypes`` では、モデルを扱うための
 高水準かつ汎用的なインタフェースを提供しています。
 
-.. Overview:
 
 概要
 =====

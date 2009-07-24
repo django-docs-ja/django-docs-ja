@@ -4,7 +4,7 @@
 Django プロジェクトに協力するために
 ===================================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 9084 (1.0)
 
 Django を *使う* のを楽しいと思ってもらえたなら、 *使い続ける* 前にすこし待っ
 てください。私達は多大な情熱をかけて、ユーザがコミュニティのメンバに貢献で
@@ -198,6 +198,8 @@ Django の内部に関する知識、時間的な余裕から) 必要な修正�
       ドよりも英語で変更点を説明した方がはるかに分かりやすい場合は例外です。
       例えばインデントはよくある例です。というのも、コードの違いがインデン
       トでしかない場合、パッチを読むのはとても大変だからです。
+
+      ``git diff`` 形式のパッチでもかまいません。
 
     * パッチを作るときには、 常に ``trunk`` ディレクトリの最上位の階層、
       すなわち、 ``django``, ``docs``, ``tests``, ``AUTHORS`` などがある場
@@ -426,6 +428,7 @@ admin サイトやバリデータのエラーメッセージなど、Django は�
 や、まだ翻訳存在しない言語に新たな翻訳を追加したい場合は以下のようにします:
 
     * `Django i18n メーリングリスト`_ に参加して自己紹介してください。
+
     * :ref:`i18n のドキュメント <topics-i18n>` に従って翻訳を作成してくださ
       い。カタログの生成には ``django-admin.py makemessages`` ツールを使い
       ます。 Django 全体のカタログを生成する場合、 Django のソースツリーの
@@ -444,9 +447,9 @@ admin サイトやバリデータのエラーメッセージなど、Django は�
     * 上の二つのステップを、 ``djangojs`` ドメインに対しても実行してくださ
       い。 (``django-admin.py`` のコマンドラインに  ``-d djangojs`` オプショ
       ンを付加して実行します)
-    
+
     * 最新の Subversion trunk に対して、 ``.po`` ファイルの差分を作成してください。
-    
+
     * Django のチケットシステムで新しいチケットを作成し、 ``Component`` フィー
       ルドを ``Translations`` に設定して、パッチを添付して提出してください。
 
@@ -745,6 +748,11 @@ Django の Subversion リポジトリにコードをコミットする場合に�
       コミットして、次に X を別にコミットしてください。これだけで、 Django
       のコア開発者全員が変更を追うための *大きな* 助けになります。
 
+    * バグフィクスと機能の改善とを分離してください。
+
+      バグフィクスは現在のバグフィクスブランチ (``1.0.X`` ブランチなど) と、
+      現在の trunk の両方に施す必要があるからです。
+
     * コミットによって Django `チケットトラッカ`_ の何らかのチケットをクロー
       ズする場合、コミットメッセージの先頭に "Fixed #abc" というメッセージ
       を入れて下さい。 "abc" はコミットによって修正されるチケットの番号です。
@@ -914,13 +922,45 @@ URL をマップする必要があるのなら、 ``tests/urls.py`` を入れて
 ブランチの管理ポリシ
 ====================
 
-一般に、ほとんどの開発は trunk で行われており、 trunk は安定に保たれていま
-す。 trunk のコードは、いついかなるときでも実運用サイトを動作させられなけれ
-ばなりません。
+一般に、 trunk は安定に保たれています。そのため、いつ trunk から取り出した
+Django でも、運用サイトを走らせられるはずです。さらに、 trunk への変更は、
+可能なかぎり atomic にすべきであり、より細かい単位の変更がベターです。従っ
+て、大掛かりな変更、すなわち一つのパッチに収まらないくらい大きな変更を伴う
+場合や、多くの人が関わる必要のある変更の場合には、専用のブランチを作成しま
+す。
 
-このため、大規模なアーキテクチャ上の変更、一つのパッチに収まらないくらい大
-きな変更を伴う場合や、多くの人が関わる必要のある変更の場合には、専用のブラ
-ンチを作成します。例えば `i18n ブランチ`_ を見てください。この手の変更を行
+つまり、一つのパッチで済まないような大きな機能や、大掛かりなリファクタリ
+ングは機能ブランチ (feature branch) で行わねばならないのです。私たちの開発
+プロセスです、機能ブランチのありかたに、二つの選択肢をもたせています:
+
+.. TBD
+
+    1. Git_ や Mercurial_, Bazaar_ といった分散リビジョンコントロールシステ
+        ムを使った機能ブランチ。
+       
+       If you're familiar with one of these tools, this is probably your best 
+       option since it doesn't require any support or buy-in from the Django
+       core developers.
+       
+       However, do keep in mind that Django will continue to use Subversion for
+       the foreseeable future, and this will naturally limit the recognition of
+       your branch. Further, if your branch becomes eligible for merging to
+       trunk you'll need to find a core developer familiar with your DVCS of
+       choice who'll actually perform the merge.
+       
+       If you do decided to start a distributed branch of Django and choose to make it
+       public, please add the branch to the `Django branches`_ wiki page.
+       
+    2. Feature branches using SVN have a higher bar. If you want a branch in SVN
+       itself, you'll need a "mentor" among the :ref:`core committers
+       <internals-committers>`. This person is responsible for actually creating
+       the branch, monitoring your process (see below), and ultimately merging
+       the branch into trunk.
+       
+       If you want a feature branch in SVN, you'll need to ask in
+       `django-developers`_ for a mentor. 
+
+例えば `i18n ブランチ`_ を見てください。この手の変更を行
 いたいと考えていて、作業をしたい場合には、 `django-developers`_ でブランチ
 を作成してもらうよう問い合わせて下さい。変更を試すのに必要な文だけのブラン
 チを作成します。

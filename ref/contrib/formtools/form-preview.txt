@@ -4,7 +4,7 @@
 フォームプレビュー
 ==================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 9084 (1.0)
 
 .. module:: django.contrib.formtools
     :synopsis: HTML フォームを表示し、必ずプレビューを行ってから入力内容を
