@@ -1,13 +1,9 @@
 .. _faq-help:
 
-.. _`FAQ: Getting Help`:
-
 FAQ: 助けを求める
 =================
 
-:revision-up-to: 8961 (1.0)
-
-.. _`How do I do X? Why doesn't Y work? Where can I go to get help?`:
+:revision-up-to: 11321 (1.1)
 
 何かをしたいとき、うまくいかないときは、どこで助けを求めればよいですか？
 -------------------------------------------------------------------------
@@ -25,8 +21,6 @@ IRC の方がよいなら、 freenode IRC ネットワークの `#django IRC チ
 .. _`#django IRC channel`: irc://irc.freenode.net/django
 .. _`#django IRC チャネル`: `#django IRC channel`_
 
-.. _`Why hasn't my message appeared on django-users?`:
-
 メッセージを django-users に送ったのに表示されないのはなぜですか？
 --------------------------------------------------------------------
 
@@ -40,8 +34,6 @@ django-users_ にはたくさんの読者がいます。質問に答えてくれ
 な思いをさせてごめんなさい。
 
 .. _django-users: http://groups.google.com/group/django-users
-
-.. _`Nobody on django-users answered my question! What should I do?`:
 
 django-users で質問したのに誰も答えてくれません。どうすればよいですか？
 -------------------------------------------------------------------------
@@ -61,8 +53,6 @@ django-developers は Django 自体の開発に関する議論のためのメー
 うからです。
 
 .. _django-developers: http://groups.google.com/group/django-developers
-
-.. _`I think I've found a bug! What should I do?`:
 
 バグを見つけたように思います。どうすればよいですか？
 ------------------------------------------------------

@@ -1,24 +1,20 @@
 .. _faq-usage:
 
-.. FAQ: Using Django
-
 FAQ: Django を使う
 ====================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1)
 
-.. _Why do I get an error about importing DJANGO_SETTINGS_MODULE?:
-
-なぜ、 DJANGO_SETTINGS_MODULE を import できないというエラーが出るのですか？
-----------------------------------------------------------------------------
+DJANGO_SETTINGS_MODULE の import にまつわるエラーが出るのですが、なぜですか？
+-----------------------------------------------------------------------------
 
 以下の点を確認してください:
 
     * 環境変数 DJANGO_SETTINGS_MODULE が完全指定の Python モジュール名になっ
       ていますか (たとえば "mysite.settings")。
 
-    * 設定モジュールは ``sys.path`` の上にありますか (``import
-      mysite.settings`` はうまくいきますか)。
+    * 設定モジュールは ``sys.path`` の上にありますか 
+      (``import mysite.settings`` はうまくいきますか)。
 
     * (言うまでもなく) モジュールに構文エラーはありませんか。
 
@@ -31,17 +27,13 @@ FAQ: Django を使う
 
       (``req`` は mod_python のリクエストオブジェクトです)。
 
-.. _I can't stand your template language. Do I have to use it?:
-
 テンプレート言語を好きになれません。どうしても使わないとだめですか？
 --------------------------------------------------------------------
 
-私達はこのテンプレートエンジンを chunky bacon 以来の傑作だと思っているんで
+私達はこのテンプレートエンジンをchunky bacon 以来の傑作だと思っているんで
 すが、テンプレート言語の選択というものは宗教に近いものがあるということは認
 識しています。 Django では、テンプレート言語に対する制限はなんらありません。
 ですから、 ZPT や Cheetah などを使いたいのなら、それは自由です。
-
-.. _Do I have to use your model/database layer?:
 
 付属のモデル／データベースレイヤを使わねばならないのですか？
 ------------------------------------------------------------
@@ -52,9 +44,6 @@ FAQ: Django を使う
 唯一の例外: 別のデータベースライブラリを使った場合には、 Django の自動生成
 admin サイトを利用できなくなります。 admin だけは Django のデータベースレイ
 ヤとカップリングしています。
-
-
-.. _How do I use image and file fields?:
 
 画像やファイルのフィールドはどう使うのですか？
 -----------------------------------------------
@@ -76,10 +65,19 @@ admin サイトを利用できなくなります。 admin だけは Django の�
        :setting:`MEDIA_ROOT` のどのサブディレクトリにファイルをアップロード
        させるのかを Django に教えます。
 
-    #. データベースにい保存されるのは、ファイルの (:setting:`MEDIA_ROOT` か
-       らの相対で表した) パスだけです。 Django の提供している属性
-       :attr:`~django.core.files.File.url` を使うことになるでしょう。例えば、
-       ``mug_shot`` という名前の :class:`~django.db.models.ImageField` があ
-       るとすると、テンプレートで画像の URL を指定するには ``{{
-       object.mug_shot.url }}`` のようにします。
+    #. データベースに保存されるのは、ファイルの (:setting:`MEDIA_ROOT` か
+       らの相対で表した) パスだけです。  URL を調べるには、 Django の提供し
+       ている属性 :attr:`~django.core.files.File.url` を使うことになるでしょ
+       う。例えば、 ``mug_shot`` という名前の
+       :class:`~django.db.models.ImageField` を作ったなら、テンプレートで画
+       像の URL を指定するには ``{{ object.mug_shot.url }}`` と書きます。
 
+どうやったら、全てのテンプレートで使えるような変数を定義できますか？
+----------------------------------------------------------------------
+
+どのテンプレートでも同じデータを扱うことがたまにあります。よくあるのは、メ
+ニューを動的に生成して出す場合です。この手の例では、どのテンプレートでも使
+データの入った辞書をテンプレートコンテキストに入れておくのが合理的ですね。
+
+``RequestContext`` を使うのが正解です。詳しくは
+:ref:`subclassing-context-requestcontext` を参照してください。
