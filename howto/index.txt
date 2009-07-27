@@ -3,18 +3,19 @@
 HOWTO ガイド
 ===============
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1)
 
-このセクションでは、「〜するにはどうしたら？」という種の質問に対する回答を
-扱っています。 HOWTO ガイドでは、それぞれの問題をあまり深く掘り下げて説明し
-ません。詳しい話題は、 :ref:`topics-index` や :ref:`ref-index` で扱っていま
-す。とはいえ、ここにあるガイドを読めば、よくある作業を簡単に実現できるはず
-です。
+このセクションでは、「〜するにはどうしたらいいですか？」という種の質問に対
+する回答を扱っています。 HOWTO ガイドでは、それぞれの問題をあまり深く掘り下
+げて説明しません。詳しい話題は、 :ref:`topics-index` や :ref:`ref-index` で
+扱っています。とはいえ、ここにあるガイドを読めば、よくある作業を簡単に実現
+できるはずです。
 
 .. toctree::
    :maxdepth: 1
    
    apache-auth
+   auth-remote-user
    custom-management-commands
    custom-model-fields
    custom-template-tags
@@ -30,9 +31,9 @@ HOWTO ガイド
 
 .. seealso::
 
-    `Django のコミュニティアグリゲータ <Django community aggregator>`_ では、
-    世界中の Django コミュニティから寄せられたコンテンツを収集しています。
-    アグリゲータに登録されている著者の多くが、このての HOWTO 文書を書いてい
+    `Django のコミュニティアグリゲータ <Django community aggregator>`_ には、
+    世界中の Django コミュニティから寄せられたコンテンツが収集されています。
+    アグリゲータに登録されている著者の多くが、この手の HOWTO 文書を書いてい
     ます。
     
     .. _django community aggregator: http://www.djangoproject.com/community/

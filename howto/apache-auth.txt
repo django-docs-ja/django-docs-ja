@@ -4,12 +4,11 @@
 Apache での認証に Django のユーザデータベースを使う
 ===================================================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 Apache を使っていると、同期を保ちながら複数の認証データベースを維持するとい
-う問題によくぶつかります。そこで、 Django の 
-:ref:`認証システム <topics-auth>` に対して直接 Apache から認証をかけるよう
-設定できます。例えば以下のような処理を実現できます:
+う問題によくぶつかります。 Apache の認証を Django の 
+:ref:`認証システム <topics-auth>` で行えば、以下のような処理を実現できます:
 
     * 認証ユーザだけを対象に、静的ファイル／メディアファイルを Apache から
       直接提供できます。
@@ -21,8 +20,6 @@ Apache を使っていると、同期を保ちながら複数の認証データ�
 
 .. _Subversion: http://subversion.tigris.org/
 .. _mod_dav: http://httpd.apache.org/docs/2.0/mod/mod_dav.html
-
-.. _Configuring Apache:
 
 Apache の設定
 =============
@@ -52,7 +49,7 @@ mod_python の標準の ``Auth*`` および ``Require`` ディレクティブと
     末尾に例があります) 。
 
     また、 Apache が他の認証用モジュールを使おうとしないように、設定のため
-    のディレクティブを挿入しておき、``AuthUserFile`` を ``/dev/null`` に指
+    のディレクティブを挿入しておき、 ``AuthUserFile`` を ``/dev/null`` に指
     定しておく必要があります。ロードした認証モジュールによって、以下のいず
     れか、または複数のディレクティブが必要です:
 
@@ -98,13 +95,13 @@ mod_python の標準の ``Auth*`` および ``Require`` ディレクティブと
                                       (``is_staff`` フラグの立っているユーザ)
                                       だけにアクセスを許可します。
 
-                                      デフォルトは ``on`` です。
+                                      デフォルトの設定値は ``on`` です。
 
     ``DjangoRequireSuperuserStatus``  ``on`` に設定すると、スーパユーザ
                                       (``is_superuser`` フラグの立っている
                                       ユーザ) だけにアクセスを許可します。
 
-                                      デフォルトは ``off`` です。
+                                      デフォルトの設定値は ``off`` です。
 
     ``DjangoPermissionName``          アクセスに必要なパーミッションの名前
                                       です。詳しくは 
@@ -112,15 +109,14 @@ mod_python の標準の ``Auth*`` および ``Require`` ディレクティブと
                                       <custom-permissions>` を参照
                                       してください。
 
-                                      デフォルトでは特定のパーミッションを
-                                      必要としません。
+                                      デフォルトの設定では、
+                                      特定のパーミッションを必要としません。
     ================================  =========================================
 
-場合によって、 ``SetEnv`` が mod_python の設定としてうまく働かない場合があ
-ります。この原因はよくわかっていません。 mod_python が
-``DJANGO_SETTINGS_MODULE`` をうまく認識できない場合、 ``SetEnv`` の代りに
-``PythonOption`` を使ってみて下さい。以下の二つのディレクティブは同じ意味で
-す::
+場合によって、 ``SetEnv`` が mod_python の設定としてうまく働きません。
+この原因はよくわかっていません。 mod_python が ``DJANGO_SETTINGS_MODULE``
+をうまく認識できない場合、 ``SetEnv`` の代りに ``PythonOption`` を使ってみ
+て下さい。以下の二つのディレクティブは同じ意味です::
 
     SetEnv DJANGO_SETTINGS_MODULE mysite.settings
     PythonOption DJANGO_SETTINGS_MODULE mysite.settings
