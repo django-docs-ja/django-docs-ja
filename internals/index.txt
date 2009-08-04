@@ -3,7 +3,7 @@
 Django の内部
 ================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1)
 
 ここにあるのは、 Django 自体をハックする人達のためのドキュメントです。
 Django の改善を手伝ったり、 Django が舞台裏でやっていることを学んだりしたけ
@@ -23,3 +23,5 @@ Django の改善を手伝ったり、 Django が舞台裏でやっているこ�
    contributing
    documentation
    committers
+   release-process
+   deprecation

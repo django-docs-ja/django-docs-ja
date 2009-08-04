@@ -4,7 +4,7 @@
 古いデータベースを Django に組み込む
 =====================================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1)
 
 Django が最も得意とするのは新たなアプリケーションですが、古いデータベースの
 組み込みも可能です。 Django には組み込み作業を可能な限り自動化するための二
@@ -12,8 +12,6 @@ Django が最も得意とするのは新たなアプリケーションですが�
 
 このドキュメントでは、読者は :ref:`公式チュートリアル <intro-tutorial01>`
 のカバーしている Django の基礎を良く知っているものと仮定しています。
-
-.. _Give Django your database parameters:
 
 Django にデータベースパラメタを指定する
 =======================================
@@ -29,23 +27,19 @@ Django にデータベースパラメタを指定する
     * :setting:`DATABASE_HOST`
     * :setting:`DATABASE_PORT`
 
-.. _Auto-generate the models:
-
 モデルの自動生成
 ================
 
+.. highlight:: bash
+
 Django には、既存のデータベースにイントロスペクションを行ってモデルを生成で
 きるコマンド、 :djadmin:`inspectdb` が付属しています。出力を見るには以下の
-コマンドを実行します:
-
-.. code-block:: bash
+コマンドを実行します::
 
     python manage.py inspectdb
 
 標準の Unix 出力リダイレクションを使って、この内容をファイルに保存しておき
-ます:
-
-.. code-block:: bash
+ます::
 
     python manage.py inspectdb > appname.py
 
@@ -53,11 +47,9 @@ Django には、既存のデータベースにイントロスペクションを�
 せん。詳しくは :djadmin:`django-admin.py のドキュメント <inspectdb>` を参照
 してください。
 
-モデルを削除し終えたら、モジュールをアプリケーションの ``models.py`` 
-に入れ、アプリケーションを収めているパッケージ内に配置し、
+モデルを削除し終えたら、モジュールをアプリケーションの ``models.py`` に入れ、
+アプリケーションを収めているパッケージ内に配置して、
 :setting:`INSTALLED_APPS` 設定にアプリケーションを追加しておきます。
-
-.. _Install the core Django tables:
 
 Django のコアデータテーブルのインストール
 =========================================
@@ -65,12 +57,7 @@ Django のコアデータテーブルのインストール
 次に、 :djadmin:`syncdb` コマンドを実行して、 Django のコアデータテーブルを
 データベースにインストールします:
 
-.. code-block:: bash
-
     python manage.py syncdb
-
-
-.. _Test and tweak:
 
 テストと確認
 =============

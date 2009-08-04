@@ -4,14 +4,12 @@
 API の安定性
 ============
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1)
 
 :ref:`Django 1.0 のリリース <releases-1.0>` によって、 API の安定性と互換性
 に一定の保証が与えられました。これはつまり、 Django 1.0 用に書いたコードは
 何も変更せずに 1.1 でも動作し、以後の 1.X リリースではほんのわずかな変更し
 か必要ないということです。
-
-.. _What "stable" means:
 
 APIの安定性とは
 ===============
@@ -37,8 +35,6 @@ APIの安定性とは
    - 深刻なバグやセキュリティホールによってやむを得ない場合に限り、これらの
      API に対して互換性のない変更を行います。
 
-.. _Stable APIs:
-
 安定な API
 ==========
 
@@ -54,7 +50,7 @@ APIの安定性とは
     
     - :ref:`e-mail の送信 <topics-email>`.
     
-    - :ref:`アップロードファイルの操作と保存 <topics-files>`
+    - :ref:`ファイル操作とストレージ <topics-files>`
     
     - :ref:`フォーム <topics-forms-index>`
     
@@ -89,9 +85,9 @@ APIの安定性とは
     - :ref:`リクエスト／レスポンスオブジェクト <ref-request-response>`.
     
     - :ref:`設定ファイル <ref-settings>` 。ただし、現在の
-      :ref:`組み込みの設定 <ref-settings>` はほぼ完璧だとは考えていますが、
-      将来新たな設定を登場させるかもしれません。これはまさに「安定」だけれ
-      ども「完璧」ではない例ですね。
+      :ref:`組み込みの設定一覧 <ref-settings>` はほぼ完成版だとは考えていま
+      すが、将来新たな設定を登場させるかもしれません。これはまさに「安定」
+      だけれども「完璧」ではない例ですね。
       
     - :ref:`組み込みシグナル <ref-signals>` 設定と同様、将来新たなシグナル
       を登場させるかもしれませんが、既存のシグナルをなくすことはないでしょ
@@ -101,14 +97,26 @@ APIの安定性とは
         
     - :ref:`HOWTO ガイド <howto-index>` に書かれている内容。
 
-.. _Exceptions:
+``django.utils``
+----------------
 
+``django.utils`` 以下のモジュールの大半は内部使用向けに設計されています。以
+下のモジュールのみが、安定とされています:
+
+    - ``django.utils.cache``
+    - ``django.utils.datastructures.SortedDict`` -- ``SortedDict`` クラスの
+      み。モジュールの他の部分は内部使用向けです。
+    - ``django.utils.encoding``
+    - ``django.utils.feedgenerator``
+    - ``django.utils.http``
+    - ``django.utils.safestring``
+    - ``django.utils.translation``
+    - ``django.utils.tzinfo``
+    
 例外
 =====
 
 安定性や互換性の維持には、いくつか例外を設けています。
-
-.. _Security fixes:
 
 セキュリティ上の問題の修正
 ----------------------------
@@ -137,8 +145,6 @@ Django 1.4 版の ``django.contrib.flatpages`` も Django 1.5 で使えるよう
 定でした。したがって、おそらく上記のような例外的なことは起きないでしょう。
 とはいえ、 ``django.contrib`` に依存してアプリケーションを開発しているなら、
 覚えておくにこしたことはありません。
-
-.. _APIs marked as internal:
 
 内部 API
 ----------

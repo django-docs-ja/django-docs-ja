@@ -4,7 +4,7 @@
 はじめての Django アプリ作成、その 2
 =====================================
 
-:revision-up-to: 9084 (1.0)
+:revision-up-to: 11321 (1.1)
 
 このチュートリアルは :ref:`チュートリアルその 1 <intro-tutorial01>` の続き
 です。ここでは、引続き Web 投票アプリケーションの開発を例にして、Django が
@@ -15,7 +15,7 @@
 
     コンテンツの追加や変更、削除を行うためのスタッフや顧客向けの管理サイト
     構築は、創造性の欠けた退屈なものです。そこで、 Django ではモデルを管
-    理するための admin インタフェースを完全に自動化しています。
+    理するためのインタフェース生成を完全に自動化しています。
 
     Django はニュースルーム環境で開発されました。ニュースルーム環境では、
     「コンテンツの作成者 (content publisher)用」と「公開用 (public) 」サイ
@@ -27,9 +27,7 @@
     admin は一般のサイトを訪問者に使ってもらうためのものではなく、サイト管
     理者のためのものなのです。
 
-.. _Activate the admin site:
-
-admin サイトの有効化
+管理サイトの有効化
 ====================
 
 デフォルトでは、 Django の管理サイトは無効化されていて、自分で選択して有効
@@ -49,6 +47,10 @@ admin サイトの有効化
       だけを覚えておきましょう。最終的に、 ``urls.py`` は以下のようになるは
       ずです:
 
+    .. versionchanged:: 1.1
+        バージョン 1.1 で、管理サイトの URL を URLConf に追加する方法が変更されました。
+
+
       .. parsed-literal::
 
           from django.conf.urls.defaults import *
@@ -66,7 +68,7 @@ admin サイトの有効化
               # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
               # Uncomment the next line to enable the admin:
-              **(r'^admin/(.*)', admin.site.root),**
+              **(r'^admin/', include(admin.site.urls)),**
           )
 
       (太字の行はコメントを外した部分です)
@@ -88,9 +90,7 @@ http://127.0.0.1:8000/admin/ にアクセスします。以下のような admin
 ン画面が表示されるはずです:
 
 .. image:: _images/admin01.png
-   :alt: Django admin login screen
-
-.. _Enter the admin site:
+   :alt: Django 管理サイトのログイン画面
 
 管理サイトに入る
 ==================
@@ -100,13 +100,11 @@ http://127.0.0.1:8000/admin/ にアクセスします。以下のような admin
 クスページが表示されるはずです:
 
 .. image:: _images/admin02t.png
-   :alt: Django admin index page
+   :alt: Django 管理サイトのインデクスページ
 
 他にも、「グループ (Groups)」や「ユーザ (Users)」、「サイト (Sites)」といっ
 た編集可能なコンテンツが表示されるはずです。これらはデフォルトで Django
 に付属しているコアの機能です。
-
-.. _Make the poll app modifiable in the admin:
 
 Poll モデルを admin 上で編集できるようにする
 ==============================================
@@ -127,8 +125,6 @@ admin のページをリロードして、どんな変化が起きたか見て�
 開発サーバはプロジェクトを自動的にリロードしてくれるので、コードに加えた変
 更はただちにブラウザで確認できます。
 
-.. _Explore the free admin functionality:
-
 admin の機能を探究してみる
 ================================
 
@@ -136,20 +132,20 @@ admin の機能を探究してみる
 うになりました:
 
 .. image:: _images/admin03t.png
-   :alt: Django admin index page, now with polls displayed
+   :alt: Django 管理サイトに Poll が表示されるようになった
 
-「Polls」 をクリックしてみてください。 変更リスト (change list) のページ
-に入ります。このページはデータベース上の全ての ``Poll`` オブジェクトを表示
-し、オブジェクトを選択して変更できるようになっています。前のチュートリアル
-で作成した 「What's up」という ``Poll`` オブジェクトがありますね。
+「Polls」 をクリックしてみてください。 チェンジリスト (change list) のペー
+ジに入ります。このページはデータベース上の全ての ``Poll`` オブジェクトを表
+示していて、変更したいオブジェクトを選択できます。前のチュートリアルで作成
+した 「What's up」という ``Poll`` オブジェクトがありますね。
 
 .. image:: _images/admin04t.png
-   :alt: Polls change list page
+   :alt: Poll のチェンジリストページ
 
 「What's up?」をクリックして編集してみましょう:
 
 .. image:: _images/admin05t.png
-   :alt: Editing form for poll object
+   :alt: Poll オブジェクトの編集
 
 以下の点に注意してください:
 
@@ -181,22 +177,20 @@ admin の機能を探究してみる
 
 「今日」や「現在」ショートカットをクリックして、「Date published」を変更し
 てみましょう。変更したら、「保存して編集を続ける」を押します。次に、右上に
-ある「履歴 (History)」をクリックしてみましょう。ユーザが admin 上でこのオブ
+ある「履歴 (History)」をクリックしてみましょう。ユーザが管理サイト上でオブ
 ジェクトに対して行った全ての変更履歴を、変更時刻と変更を行ったユーザの名前
 つきでリストにしたページを表示します:
 
 .. image:: _images/admin06t.png
-   :alt: History page for poll object
-
-.. _Customize the admin form:
+   :alt: Poll オブジェクトの変更履歴
 
 管理サイトフォームのカスタマイズ
 ===================================
 
 しばらく操作してみましょう。これだけの機能をコードを書かずに実現したこ
 とに驚くはずです。 ``admin.site.register(Poll)`` の呼び出しによって、
-Django はオブジェクトの表示方法を「推測」し、 admin でモデルの編集を行え
-るようにします。 admin の表示や挙動を少し変えたい場合には、モデルを登録
+Django はオブジェクトの表示方法を「推測」し、管理サイトでモデルの編集を行え
+るようにします。管理サイトの表示や挙動を少し変えたい場合には、モデルを登録
 するときにオプションを指定します。
 
 試しに、編集フォームでのフィールドの並び順を並べ替えてみましょう。
@@ -215,7 +209,7 @@ Django はオブジェクトの表示方法を「推測」し、 admin でモデ
 ドよりも前に変更しています。
 
 .. image:: _images/admin07.png
-   :alt: Fields have been reordered
+   :alt: フィールドの並び順を変えた場合
 
 二つしかフィールドがないので、あまりぱっとした変化ではありませんね。しかし
 admin フォームで何ダースものフィールドを操作するような場合には、直感的なフィー
@@ -236,7 +230,7 @@ admin フォームで何ダースものフィールドを操作するような�
 フォームは以下のように表示されます:
 
 .. image:: _images/admin08t.png
-   :alt: Form has fieldsets now
+   :alt: フィールドセットでフォームを表示
 
 各フィールドセットには任意の HTML クラスを指定できます。 Django では
 ``"collapse"`` というクラスを提供していますが、このクラスを指定すると、フィー
@@ -250,30 +244,28 @@ admin フォームで何ダースものフィールドを操作するような�
             ]
 
 .. image:: _images/admin09.png
-   :alt: Fieldset is initially collapsed
-
-.. _Adding related objects:
+   :alt: フィールドセットが最初は折畳みで表示されている
 
 リレーションを張ったオブジェクトの追加
 ======================================
 
-OK、 Poll の admin ページはできました。しかし ``Poll`` は複数の ``Choice``
-を持つのに、 admin ページには表示されていませんね。
+OK、 Poll の管理サイトページはできました。しかし ``Poll`` は複数の ``Choice``
+を持つのに、管理サイトページには表示されていませんね。
 
 今のところは。
 
 この問題の解決法は二つあります。一つ目は、 ``Poll`` と同様、以下のようにし
- て ``Choice`` モデルを admin に登録するというものです::
+ て ``Choice`` モデルを管理サイトに登録するというものです::
 
     from mysite.polls.models import Choice
 
     admin.site.register(Choice)
 
-これで、 Django admin 上で「Choice」 を選べます。「Choice の追加」フォーム
+これで、 Django の管理サイト上で「Choice」 を選べます。「Choice の追加」フォーム
 は以下のようになります:
 
 .. image:: _images/admin10.png
-   :alt: Choice admin page
+   :alt: 管理サイトでの Choice の表示
 
 このフォームでは「Poll」フィールドは選択ボックスで、データベース上の全ての
 Poll オブジェクトを選ます。 Django は :class:`~django.db.models.ForeignKey`
@@ -307,15 +299,14 @@ Choice モデルに対する ``register()`` を削除して、 ``Poll`` を登�
 
     admin.site.register(Poll, PollAdmin)
 
-この行は Django に対して、「Choice オブジェクトは Poll の admin ページから
-編集する。デフォルトでは、 3 つの Choice を表示するのに十分なフィールドを用
-意すること」と指示しています。
+この行は Django に対して、「Choice オブジェクトは Poll の管理ページから編集
+する。デフォルトでは、 3 つの Choice を表示するのに十分なフィールドを用意す
+ること」と指示しています。
 
 「Poll を追加」ページをロードして、どんな表示になったか見てみましょう:
 
 .. image:: _images/admin11t.png
-   :alt: Add poll page now has choices on it
-
+   :alt: 「Poll を追加」ページに選択肢が表示された
 
 変わった点をみてみましょう。リレーション相手である Choice を表示するために
 3 つのスロットがあります (``extra`` に指定した数ですね)。また、作成済みのオ
@@ -335,21 +326,19 @@ Choice モデルに対する ``register()`` を削除して、 ``Poll`` を登�
 リレーション相手のオブジェクトはよりコンパクトなテーブル形式で表示されます:
 
 .. image:: _images/admin12.png
-   :alt: Add poll page now has more compact choices
+   :alt: 「Poll を追加」ページの選択肢がコンパクトになった
 
-.. _Customize the admin change list:
+管理サイトのチェンジリストページをカスタマイズする
+====================================================
 
-admin の変更リストページをカスタマイズする
-===========================================
+さあ、これで Poll の管理ページはだいぶよくなってきました。今度は「チェンジ
+リスト」ページをすこしいじりましょう。チェンジリストは、システム上の全ての
+Poll を表示するページです。
 
-さあ、これで Poll の admin ページはだいぶよくなってきました。今度は「変更リ
-スト」ページをすこしいじりましょう。このページはシステム上の全ての Poll を
-表示します。
-
-作業前の change list ページは以下のようになっています:
+作業前のチェンジリストのページは以下のように表示されています:
 
 .. image:: _images/admin04t.png
-   :alt: Polls change list page
+   :alt: Poll のチェンジリストページ
 
 デフォルトでは、 Django はオブジェクトの ``str()`` を表示しますが、各フィー
 ルドの値も表示されていると便利でしょう。表示させるには ``list_display`` オ
@@ -367,10 +356,10 @@ admin の変更リストページをカスタマイズする
         # ...
         list_display = ('question', 'pub_date', 'was_published_today')
 
-これで、 Poll の変更リストのページは以下のようになります:
+これで、 Poll のチェンジリストのページは以下のようになります:
 
 .. image:: _images/admin13t.png
-   :alt: Polls change list page, updated
+   :alt: カスタムメソッドのカラムを追加した Poll のチェンジリスト
 
 カラムのヘッダをクリックすると、カラムの値に応じてエントリを並べ換えできま
 す。ただし ``was_published_today`` ヘッダは例外で、これはメソッドの戻り値を
@@ -384,16 +373,16 @@ admin の変更リストページをカスタマイズする
     was_published_today.short_description = 'Published today?'
 
 
-もう一点、 Poll の変更リストを改良して、フィルタをを加えましょう。 
+もう一点、 Poll のチェンジリストを改良して、フィルタをを加えましょう。 
 以下の行を ``PollAdmin`` の中に入れます::
 
     list_filter = ['pub_date']
 
-これで、「フィルタ (Filter)」サイドバーができ、変更リストを ``pub_date``
+これで、「フィルタ (Filter)」サイドバーができ、チェンジリストを ``pub_date``
 フィールドの値に従ってフィルタできるようになります:
 
 .. image:: _images/admin14t.png
-   :alt: Polls change list page, updated
+   :alt: Poll のチェンジリストをさらに改良
 
 表示されるフィルタのタイプは、フィルタに使うフィールドのタイプによって変わ
 ります。 ``pub_date`` は ``DateTimeField`` なので、 Django はデフォルトの
@@ -401,7 +390,7 @@ admin の変更リストページをカスタマイズする
 日間 (Past 7 days)」、「今月 (This month)」そして「今年 (This year)」である
 と考えます。
 
-細工は隆々ですね。検索機能を追加してみましょう::
+細工は隆々ですね。こんどは検索機能を追加してみましょう::
 
     search_fields = ['question']
 
@@ -425,17 +414,15 @@ admin の変更リストページをカスタマイズする
 ヘッダを使った並べ換えといった変更リストの機能は、すべてが協調して思いのま
 まに動作するのです。
 
-.. _Customize the admin look and feel:
+管理サイトのルック & フィールをカスタマイズする
+================================================
 
-admin のルック & フィールをカスタマイズする
-===========================================
-
-admin ページの上部には「Django 管理 (Django adminstration)」と表示されてい
-ますが、これはいささか滑稽ですね。ただし、これは単なるプレースホルダテキス
-トにすぎません。
+管理サイトの上部には「Django 管理 (Django adminstration)」と表示されてい
+ますが、これはいささか滑稽ですね。これは単なるプレースホルダテキストにすぎ
+ません。
 
 変更するのは簡単で、 Django のテンプレートシステムを使います。 Django の
-admin サイトは、それ自身 Django で作られているので、インタフェースは Django
+管理サイトは、それ自身 Django で作られているので、インタフェースは Django
 のテンプレートシステムを使っているのです (なんてメタな！)
 
 設定ファイル (``mysite/settings.py`` でしたよね) を開いて、
@@ -451,7 +438,7 @@ admin サイトは、それ自身 Django で作られているので、インタ
         "/home/my_username/mytemplates", # 自分の環境に合わせて変更してください。
     )
 
-デフォルトの Django admin 用のテンプレート置場
+admin アプリケーションのデフォルトのテンプレート置場
 (``django/contrib/admin/templates``) から、 ``admin/base_site.html`` という
 テンプレートをコピーして、 :setting:`TEMPLATE_DIRS` 上の ``admin`` というディ
 レクトリ下に置きます。例えば、 :setting:`TEMPLATE_DIRS` に
@@ -463,10 +450,10 @@ admin サイトは、それ自身 Django で作られているので、インタ
 ファイルを編集して、 Django と書かれた部分を自分のサイトに合わせて変更して
 ください。
 
-Django のデフォルトの admin テンプレートはどれもオーバライド可能です。テン
-プレートをオーバライドするには、 ``base_site.html`` と同じ、つまりデフォル
-トのディレクトリからカスタムディレクトリにコピーして編集するという手順をとっ
-てください。
+admin アプリケーションのデフォルトのテンプレートはどれもオーバライド可能で
+す。テンプレートをオーバライドするには、 ``base_site.html`` と同じ、つまり
+デフォルトのディレクトリからカスタムディレクトリにコピーして編集するという
+手順をとってください。
 
 賢明な読者はこう疑問に思うでしょう:「 :setting:`TEMPLATE_DIRS` はデフォルト
 で何も指定していないのに、 Django はどうしてデフォルトのテンプレートを捜し
@@ -475,11 +462,8 @@ Django のデフォルトの admin テンプレートはどれもオーバライ
 ディレクトリ下を探すようフォールバックるようになっている」です。詳しくは
 :ref:`テンプレートローダタイプの解説 <template-loaders>` を参照してください。
 
-
-.. _Customize the admin index page:
-
-admin インデクスページのカスタマイズ
-====================================
+管理サイトインデクスページのカスタマイズ
+=========================================
 
 もしかすると、同じようにして Django admin サイトのインデクスページのルック
 & フィールをカスタマイズしたくなるかもしれませんね。

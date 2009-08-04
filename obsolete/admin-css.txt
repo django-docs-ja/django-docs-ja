@@ -4,7 +4,7 @@
 Django 管理インタフェースのカスタマイズ
 =======================================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1)
 
  .. warning::
  
@@ -22,8 +22,6 @@ admin ページの根底にある形式は Django で構築されていますが
 このドキュメントでは、 Django の admin の CSS で使われている主要なスタイル
 とクラスについてざっと紹介します。
 
-.. _Modules:
-
 モジュール
 ==========
 
@@ -35,8 +33,6 @@ admin 上ではコンテンツをグループ化する基本の構成要素と�
 
 .. image:: _images/module.gif
    :alt: Example use of module class on admin homepage
-
-.. _Column Types:
 
 カラムタイプ
 ============
@@ -74,13 +70,8 @@ colSM
 
     {% block coltype %}colMS{% endblock %}
 
-
-.. _Text Styles:
-
 テキストのスタイル
 ==================
-
-.. _Font Sizes:
 
 フォントサイズ
 --------------
@@ -97,8 +88,6 @@ tiny
 
 mini
     9px (控え目に使ってください)
-
-.. _Font Styles and Alignment:
 
 フォントスタイルと字揃え
 ------------------------
@@ -119,13 +108,10 @@ mini
     テキストを左揃えにします。インラインエレメントの入ったブロックエレメン
     トでしか使えません。
 .align-right
-    テキストを右揃えにします。インラインエレメントの入ったブロックエレメン
-    トでしか使えません。
+    こんなの気にしませんよね？
 .nowrap
     テキストとインラインオブジェクトがラップされないようにします。
     テーブルヘッダなどを一行に収めたい場合に便利です。
-
-.. _Floats and Clears:
 
 float 指定とクリア
 ------------------
@@ -137,8 +123,6 @@ float-right
 clear
     float 指定を全てクリアします。
 
-.. _Object Tools:
-
 オブジェクトツール
 ==================
 
@@ -147,7 +131,6 @@ clear
 の右側に表示されます。 ツールは ``object-tools`` クラスの ``ul`` でラップ
 されています。ツールには二つのカスタムのタイプがあり、ツール内で ``a`` タグ
 に指定して使うようになっています。 ``.addlink`` と ``.viewsitelink`` です。
-
 
 チェンジリストページではこのようになります:
 
@@ -172,12 +155,8 @@ clear
 .. image:: _images/objecttools_02.gif
    :alt: Object tools on a form page
 
-.. _Form Styles:
-
 フォームのスタイル
 ==================
-
-.. _Fieldsets:
 
 フィールドセット
 ----------------
@@ -196,8 +175,6 @@ admin のフォームは ``fieldset`` エレメントでグループごとに分
 .wide
     ``.aligned`` と組み合わせて、ラベルの使えるスペースを広くします。
 
-.. _Form Rows:
-
 フォーム行
 ----------
 
@@ -207,8 +184,6 @@ admin のフォームは ``fieldset`` エレメントでグループごとに分
 
 .. image:: _images/formrow.gif
    :alt: Example use of form-row class
-
-.. _Labels:
 
 ラベル
 ------

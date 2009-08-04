@@ -3,7 +3,7 @@
 settings に設定できる値
 ==========================
 
-:revision-up-to: 9084 (1.0)
+:revision-up-to: 11321 (1.1)
 
 このドキュメントでは、利用可能な全ての設定のリストを示します。リストはアル
 ファベット順で、デフォルト値も示します。
@@ -161,13 +161,14 @@ DATABASE_ENGINE
 クエンドは、 ``'postgresql_psycopg2'``, ``'postgresql'``, ``'mysql'``,
 ``'sqlite3'``, ``'oracle'`` です。
 
+Django に組み込まれていないデータベースバックエンドを組み込むために、
+``DATABASE_ENGINE`` にバックエンドモジュールの完全指定パス (例えば
+``mypackage.backends.whatever``) を指定できます。全く新しいデータベースバッ
+クエンドの作成は、読者の皆さんに委ねます。他のバックエンドの例を参照してく
+ださい。
 .. versionchanged:: 1.0
 
-    Django 1.0 から、 Django に組み込まれていないデータベースバックエンドを
-    組み込むために、 ``DATABASE_ENGINE`` にバックエンドモジュールの完全指定
-    パス (例えば ``mypackage.backends.whatever``) を指定できます。全く新し
-    いデータベースバックエンドの作成は、読者の皆さんに委ねます。他のバック
-    エンドの例を参照してください。
+    1.0 で、外部のデータベースバックエンドをサポートしました。
 
 .. setting:: DATABASE_HOST
 
@@ -284,9 +285,9 @@ settings に自作の設定項目を追加する場合、 `django/views/debug.py
 バックトレースから重要な (あるいは攻撃的な) 設定項目を見なくてすむようにし
 ているからです。
 
-また、デバッグ出力の様々な情報は、いついかなる状況でも衆目に晒すべきもので
-はないということを心得ておきましょう。ファイルパス、各設定項目などは、攻撃
-者に対してサーバの様々な情報を与えてしまいます。
+とはいえ、デバッグ出力の様々な情報は、いついかなる状況でも衆目に晒すべきも
+のではないということを心得ておきましょう。ファイルパス、各設定項目などは、
+攻撃者に対してサーバの様々な情報を与えてしまいます。
 
 また、 ``DEBUG`` をオンにして Django を起動すると、Django は実行した SQL ク
 エリを全て記憶してしまうことも忘れないでください。この機能はデバッグ時には
@@ -604,18 +605,6 @@ INTERNAL_IPS
     * ``XViewMiddleware`` がインストールされている場合、X ヘッダを受信しま
       す。(:ref:`topics-http-middleware` も参照してください。)
 
-.. setting:: JING_PATH
-
-JING_PATH
----------
-
-デフォルト値: ``'/usr/bin/jing'``
-
-"Jing" 実行形式へのパスです。 Jung は RELAX NG バリデータで、 Django はモデ
-ルの ``XMLField`` のバリデーションに "Jing" を使います。
-
-http://www.thaiopensource.com/relaxng/jing.html を参照してください。
-
 .. setting:: LANGUAGE_CODE
 
 LANGUAGE_CODE
@@ -775,10 +764,9 @@ MIDDLEWARE_CLASSES
 
 デフォルト値::
 
-    ("django.contrib.sessions.middleware.SessionMiddleware",
-     "django.contrib.auth.middleware.AuthenticationMiddleware",
-     "django.middleware.common.CommonMiddleware",
-     "django.middleware.doc.XViewMiddleware")
+    ('django.middleware.common.CommonMiddleware',
+     'django.contrib.sessions.middleware.SessionMiddleware',
+     'django.contrib.auth.middleware.AuthenticationMiddleware',)
 
 利用するミドルウェアクラスの Python パス名からなるタプルです。
 :ref:`topics-http-middleware` も参照してください。.
@@ -1156,7 +1144,6 @@ TIME_FORMAT
 
 Django の admin サイトの変更履歴ページ (や、システムの他の部分で) 時刻フィー
 ルドの表示に使うデフォルトのフォーマットです。 
-
 :ttag:`利用可能な日付フォーマット文字 <now>` を参照してください。
 
 ``DATE_FORMAT`` , ``DATETIMETIME_FORMAT`` , ``YEAR_MONTH_FORMAT`` および
@@ -1174,14 +1161,17 @@ TIME_ZONE
 の選択肢をリストしていることに注意してください。あるタイムゾーンを表すには
 いずれか一つを選ぶことになります。例えば、ある行に ``'Europe/London GB
 GB-Eire'`` と書かれている場合、 ``TIME_ZONE`` の設定には、最初の部分である
-``'Europe/London'`` だけを使います)この値は Django が全ての日付/時刻の変換
-に使うタイムゾーンであり、かならずしもサーバのタイムゾーンとは一致しないこ
-とに注意して下さい。例えば、一つのサーバで複数の Django サイトを運営し、個々
-に別々のタイムゾーン設定を持たせてもかまいません。
+``'Europe/London'`` だけを使います)。
+
+この値は Django が全ての日付/時刻の変換に使うタイムゾーンであり、かならずし
+もサーバのタイムゾーンとは一致しないことに注意して下さい。例えば、一つのサー
+バで複数の Django サイトを運営し、個々に別々のタイムゾーン設定を持たせても
+かまいません。
 
 通常、 Django は ``TIME_ZONE`` の設定に従って ``os.environ['TZ']`` 変数を設
 定します。そのため、ビューやモデルは自動的に正しいタイムゾーンを扱えるよう
-になります。しかしながら、後述の手動設定オプションを使っている場合 (下参照)、
+になります。しかしながら、
+:ref:`手動で設定する <settings-without-django-settings-module>` 場合には、
 Django は ``TZ`` 環境変数を *操作しない* ので、ユーザは自分の責任でプロセス
 を正しい環境の下で動作させねばなりません。
 

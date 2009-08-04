@@ -3,22 +3,23 @@
 インストールガイド
 =====================
 
-:revision-up-to: 9084 (1.0pre SVN)
+:revision-up-to: 11321 (1.1)
 
 Django を動かすには、まずインストールせねばなりません。ここでは、 Django を
 学んでみるにあたって必要な、簡単で最小限のインストール方法を示します。
 色々なインストール方法をカバーしている
 :ref:`詳細なインストールガイド <topics-install>` も用意してあります。
 
-.. _Install Python:
-
 Python のインストール
 ---------------------
 
 Django は Python の Web フレームワークなので Python が必要です。 Django は
-バージョン 2.3 以上の Python で動作しますが、 2.5 以降がお勧めです。という
-のも、 Python 2.5 からは、 SQLite_ という軽量なデータベースが付属するからで
-す。
+バージョン 2.3 から 2.6 までの Python で動作します (Python 3.0 には以前のバー
+ジョンと互換性のない変更が加わっているので、 Django は現在のところ Python
+3.0 で動作しません。サポートされている Python のバージョンと、 3.0 への移行
+に関する情報は :ref:`FAQ <faq-install>` を参照してください)。お勧めは 2.5
+以降です。というのも、 Python 2.5 からは、 SQLite_ という軽量なデータベース
+が付属するからです。
 
 .. _sqlite: http://sqlite.org/
 
@@ -31,7 +32,7 @@ http://www.python.org から Python を取ってきましょう。 Linux や Mac
     にもいくつかステップを踏む必要があります。詳しくは :ref:`howto-jython`
     を参照してください。
 
-.. _jython: http://jython.org/
+.. _jython: http://www.jython.org/
 
 インストールされている Python のバージョンを調べるには、シェル上で
 ``python`` と入力します。出力は以下のようになるでしょう::
@@ -41,8 +42,6 @@ http://www.python.org から Python を取ってきましょう。 Linux や Mac
     Type "help", "copyright", "credits" or "license" for more information.
     >>>
      
-.. _Set up a database:
-
 データベースをセットアップする
 ----------------------------------
 
@@ -54,16 +53,12 @@ Oracle といった、SQLite 以外の「大掛かりな」データベースエ
 れば、 :ref:`データベースのインストールに関する情報 <database-installation>`
 を参照してください。
  
-.. _Remove any old versions of Django:
-
 旧バージョンの Django の除去
 -----------------------------
 
 以前のバージョンからアップグレードする形で Django をインストールする場合、
 :ref:`新しいバージョンをインストールする前に、まず旧バージョンをアンインス
 トールしておく <removing-old-versions-of-django>` 必要があります。
-
-.. _Install Django:
 
 Django のインストール
 --------------------------------

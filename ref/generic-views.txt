@@ -4,76 +4,25 @@
 汎用ビュー
 ==========
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 Web アプリケーションの作成は、同じパターンを何度も何度も繰り返し書くことに
-なるため、退屈なものです。 Django では、そんなパターンに共通する部分のほと
-んどを「汎用ビュー (generic view) 」という形で抽象化し、オブジェクトに対し
-てよく定義されるビューを、 Python コードを一切書かずに作成できるようにして
-います。
+なるため、退屈なものです。 Django では、そんなパターンの中でもっとも共通す
+る部分を「汎用ビュー (generic view) 」という形で抽象化しています。汎用ビュー
+を使えば、オブジェクトを操作するためによく使うビューを、 Python コードを一
+切書かずに作成できます。
 
-Django の汎用ビューには以下のようなものがあります:
+汎用ビューの全般的な解説は、 :ref:`汎用ビューの概要 <topic-generic-views>`
+にあります。
 
-    * list/detail インタフェースを実現するビューのセット。
+This reference contains details of Django's built-in generic views, along with
+a list of all keyword arguments that a generic view expects. Remember that
+arguments may either come from the URL pattern or from the ``extra_context``
+additional-information dictionary.
 
-    * アーカイブに入っているページ群に対する年/月/日のビューと、各ページの
-      詳細、そして「新着 (latest)」のページ (例えば Django weblog の year_,
-      month_, day_, detail_, latest_ といったページ)。
-
-    * オブジェクトの生成、編集、削除を行うためのビュー。
-
-.. _year: http://www.djangoproject.com/weblog/2005/
-.. _month: http://www.djangoproject.com/weblog/2005/jul/
-.. _day: http://www.djangoproject.com/weblog/2005/jul/20/
-.. _detail: http://www.djangoproject.com/weblog/2005/jul/20/autoreload/
-.. _latest: http://www.djangoproject.com/weblog/
-
-これらのビューは全て、URLconf ファイルに設定の入った辞書を作成し、 URLconf
-で URL パターンを記述しているタプルの 3 つめのメンバにその辞書を渡すことで
-使えるようになります。例えば、djangoproject.com の blog を駆動している簡単
-な weblog アプリのための URLconf を以下に示しましょう::
-
-    from django.conf.urls.defaults import *
-    from django_website.apps.blog.models import Entry
-
-    info_dict = {'queryset': Entry.objects.all(),
-                 'date_field': 'pub_date'}
-
-    urlpatterns = patterns('django.views.generic.date_based',
-       (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\w{1,2})/(?P<slug>[-\w]+)/$', 
-       'object_detail', info_dict),
-       (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\w{1,2})/$',
-       'archive_day', info_dict),
-       (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/$',
-       'archive_month', info_dict),
-       (r'^(?P<year>\d{4})/$', 'archive_year',  info_dict),
-       (r'^$', 'archive_index', info_dict),
-    )
-
-御覧のように、 URLconf では、 ``info_dict`` にいくつかのオプションを定義し
-ています。 ``queryset`` は汎用ビューに渡すオブジェクトに対する ``QuerySet``
-(上の場合には ``Entry`` オブジェクト全て) です。また、追加の情報 (どのモデ
-ルを使っているのかをビューに教えるための情報) も定義しています。
-
-以下では、各汎用ビューのドキュメントと、汎用ビューで使われる全てのキーワー
-ド引数について説明します。上の例では、引数は URL パターンの中にあるもの
-(``month``, ``day``, ``year``, など) も、辞書に入っているもの
-(``queryset``, ``date_field`` など) もあることに注意してください。
-
-ほとんどの汎用ビューで ``queryset`` キーが必要です。この値は ``QuerySet``
-インスタンスです。 ``QuerySet`` オブジェクトの詳細は
-:ref:`topics-db-queries` を参照してください。
-
-ほとんどのビューは、 ``extra_context`` というオプションの引数を取れます。こ
-の引数の値は辞書で、ビューに渡したい任意の外部の情報を渡すためのものです。
-``extra_context`` 辞書の値は関数 (や呼び出し可能オブジェクト) でも、それ以
-外のオブジェクトでもかまいません。関数はテンプレートに渡される直前に評価さ
-れます。ただし、 QuerySet は最初に評価した時点でデータを取得してキャッシュ
-に入れるので、 ``extra_context`` を使ってクエリセットを渡し、なおかつ
-QuerySet を常に最新の状態にしておきたい場合には、関数やラムダ表記を使って
-QuerySet を返させるようにせねばなりません。
-
-.. _"Simple" generic views:
+Most generic views require the ``queryset`` key, which is a ``QuerySet``
+instance; see :ref:`topics-db-queries` for more information about ``QuerySet``
+objects.
 
 「簡単な」汎用ビュー
 ====================
@@ -127,7 +76,10 @@ QuerySet を返させるようにせねばなりません。
 指定の URL へリダイレクトします。
 
 URL を指定する文字列には、辞書スタイルの文字列フォーマットを含めてもよく、
-その場合、 URL 中の該当パラメタで補完されます。
+その場合、 URL 中の該当パラメタで補完されます。Because keyword
+interpolation is *always* done (even if no arguments are passed in), any ``"%"``
+characters in the URL must be written as ``"%%"`` so that Python will convert
+them to a single percent sign on output.
 
 URL に ``None`` を指定すると、 ``HttpResponseGone`` (410) を発行します。
 
@@ -136,12 +88,30 @@ URL に ``None`` を指定すると、 ``HttpResponseGone`` (410) を発行し�
     * ``url``: リダイレクト先の URL を表す文字列です。 ``None`` にすると
       HTTP 410 エラー (Gone) を送出します。
 
+**Optional arguments:**
+
+    * ``permanent``: Whether the redirect should be permanent. The only
+      difference here is the HTTP status code returned. If ``True``, then the
+      redirect will use status code 301. If ``False``, then the redirect will
+      use status code 302. By default, ``permanent`` is ``True``.
+
+.. versionadded:: 1.1
+    The ``permanent`` keyword argument is new in Django 1.1.
+
 **例題:**
 
-以下の例では、 ``/foo/<id>/`` を ``/bar/<id>/`` にリダイレクトします::
+以下の例では、 ``/foo/<id>/`` を ``/bar/<id>/`` にパーマネントリダイレクト
+(HTTP 状態コード301) します::
 
     urlpatterns = patterns('django.views.generic.simple',
         ('^foo/(?P<id>\d+)/$', 'redirect_to', {'url' : '/bar/%(id)s/'}),
+    )
+
+This example issues a non-permanent redirect (HTTP status code 302) from
+``/foo/<id>/`` to ``/bar/<id>/``::
+
+    urlpatterns = patterns('django.views.generic.simple',
+        ('^foo/(?P<id>\d+)/$', 'redirect_to', {'url': '/bar/%(id)s/', 'permanent': False}),
     )
 
 以下の例では、 ``/bar/`` へのリクエストに対して HTTP 410 エラーを返します::
@@ -150,8 +120,13 @@ URL に ``None`` を指定すると、 ``HttpResponseGone`` (410) を発行し�
         ('^bar/$', 'redirect_to', {'url': None}),
     )
 
+This example shows how ``"%"`` characters must be written in the URL in order
+to avoid confusion with Python's string formatting markers. If the redirect
+string is written as ``"%7Ejacob/"`` (with only a single ``%``), an exception would be raised::
 
-.. _Date-based generic views:
+    urlpatterns = patterns('django.views.generic.simple',
+        ('^bar/$', 'redirect_to', {'url': '%%7Ejacob.'}),
+    )
 
 日付ベースの汎用ビュー
 ======================
@@ -677,11 +652,6 @@ URL に ``None`` を指定すると、 ``HttpResponseGone`` (410) を発行し�
       可能オブジェクトの場合、汎用ビューはテンプレートのレンダリング直前に
       そのオブジェクトを呼び出します。
 
-    * ``allow_empty``: オブジェクトがない場合にページを表示するかどうかを示
-      すブール値です。 ``False`` の場合、表示するべきオブジェクトが存在しな
-      ければ、空のインデクスページを表示する代わりに 404 エラーを送出します。
-      デフォルトは ``False`` です。
-
     * ``context_processors``: ビューのテンプレートに適用するテンプレートコ
       ンテキストプロセッサのリストです。 
 
@@ -697,7 +667,6 @@ URL に ``None`` を指定すると、 ``HttpResponseGone`` (410) を発行し�
       指定したフィールドの値が現在の日／時よりも大きいようなオブジェクトで
       す。デフォルトでは ``False`` です。
 
-
 **テンプレート名:**
 
 ``template_name`` を指定しない場合、ビューはデフォルトのテンプレートである
@@ -712,8 +681,6 @@ URL に ``None`` を指定すると、 ``HttpResponseGone`` (410) を発行し�
       ``template_object_name`` パラメタの値に依存し、そのデフォルト値は
       ``'object'`` です。 ``template_object_name`` が ``'foo'`` の場合、変
       数名は ``foo`` になります。
-
-.. _List/detail generic views:
 
 リスト／詳細形式の汎用ビュー
 ============================
@@ -801,16 +768,15 @@ URL に ``None`` を指定すると、 ``HttpResponseGone`` (410) を発行し�
 ます:
 
     * ``paginator``: ``django.core.paginator.Paginator`` のインスタンスです。
+
     * ``page_obj``: ``django.core.paginator.Page`` のインスタンスです。
 
 
-.. _Notes on pagination:
+ペジネーションに関する注意
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-pagination に関する注意
-~~~~~~~~~~~~~~~~~~~~~~~
-
-``paginate_by`` を指定した場合、 Django は結果をページ分割 (peginate) しま
-す。 URL でページ番号を指定するには二つの方法があります:
+``paginate_by`` を指定した場合、 Django は結果をページ分割 (ペジネーション)
+します。 URL でページ番号を指定するには二つの方法があります:
 
     * URLconf で ``page`` パラメタをキャプチャします。例えば、 URLconf は以
       下のようになるでしょう::
@@ -918,9 +884,6 @@ pagination に関する注意
       ``'object'`` です。 ``template_object_name`` が ``'foo'`` の場合、変
       数名は ``foo`` になります。
 
-
-.. _Create/update/delete generic views:
-
 作成/更新/削除の汎用ビュー
 ==========================
 
@@ -933,7 +896,6 @@ pagination に関する注意
 ``django.views.generic.create_update.update_object`` は、 
 :ref:`forms ライブラリ <topics-forms-index>` を使ってフォームを生成・表示す
 るようになりました。
-
 
 ``django.views.generic.create_update.create_object``
 ----------------------------------------------------
@@ -1079,7 +1041,6 @@ pagination に関する注意
     * ``template_object_name``: テンプレートコンテキスト内で使うテンプレー
       ト変数名を示します。デフォルトでは ``'object'`` になっています。
 
-
 **テンプレート名:**
 
 ``template_name`` を指定しない場合、ビューはデフォルトのテンプレートである
@@ -1167,7 +1128,6 @@ POST を行うような確認ページを表示します。
 
     * ``template_object_name``: テンプレートコンテキスト内で使うテンプレー
       ト変数名を示します。デフォルトでは ``'object'`` になっています。
-
 
 **テンプレート名:**
 

@@ -4,26 +4,29 @@
 静的なファイルの提供方法
 ========================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 .. module:: django.views.static
    :synopsis: 開発時に静的なファイルを提供するためのモジュールです。
  
-Django 自体では、画像やスタイルシート、ビデオといった静的な (メディア) ファ
-イルを提供しません。通常、 Django はメディアファイルの提供を使っている Web
-サーバの仕事として残しておきます。なぜなら、 Apache_ や lighttpd_ のような
-標準的な Web サーバは Web アプリケーションフレームワークよりもはるかに高
-性能な静的ファイル提供機能を備えているからです。 
+Django には、基本的に画像やスタイルシート、ビデオといった静的な (メディア)
+ファイルの提供を行わず、Web に任せます。なぜなら、 Apache_ や lighttpd_ 、
+Cherokee_ のような標準的な Web サーバには、 Web アプリケーションフレームワー
+クよりもはるかに高性能な静的ファイル提供機能があるからです。
 
 というわけで、 Django が静的ファイルをサポートするのは **開発中だけ** です。
-メディアファイルの提供には :func:`django.views.static.serve` ビューを使って
-下さい。
+どうしてもメディアファイルを提供したければ
+:func:`django.views.static.serve` ビューを使って下さい。
 
 .. _Apache: http://httpd.apache.org/
 .. _lighttpd: http://www.lighttpd.net/
+.. _Cherokee: http://www.cherokee-project.com/
 
+.. seealso::
 
-.. _The big, fat disclaimer:
+    管理サイト用のメディアファイルを特定の場所に置いて提供したいだけなら、
+    :djadmin:`runserver` の :djadminopt:`--adminmedia` パラメタを使ってくだ
+    さい。
 
 大事な、大事な注意書き
 ======================
@@ -31,16 +34,14 @@ Django 自体では、画像やスタイルシート、ビデオといった静�
 この方法は **非効率的** かつ **安全ではありません** 。運用環境では使わず、
 開発環境だけで使って下さい。
 
-運用環境における静的ファイルの提供方法は、 
+運用環境で静的ファイルを提供する方法を知りたければ、 
 :ref:`Django mod_python ドキュメント <serving-media-files>` を参照してくだ
 さい。
 
-.. _How to do it:
+使い方
+========
 
-方法
-====
-
-:func:`~django.views.static.serve` ビューの定義を以下に示します。
+:func:`~django.views.static.serve` ビューの定義は以下のようになっています。
 
 .. function:: def serve(request, path, document_root, show_indexes=False):
 
@@ -69,7 +70,23 @@ Django 自体では、画像やスタイルシート、ビデオといった静�
     * ``/path/bar.jpg`` というファイルはドキュメントルート下にないのでアク
       セスできません。
 
-.. _Directory listings:
+Of course, it's not compulsory to use a fixed string for the
+``'document_root'`` value. You might wish to make that an entry in your
+settings file and use the setting value there. That will allow you and
+other developers working on the code to easily change the value as
+required. For example, if we have a line in ``settings.py`` that says::
+
+    STATIC_DOC_ROOT = '/path/to/media'
+
+...we could write the above :ref:`URLconf <topics-http-urls>` entry as::
+
+    from django.conf import settings
+    ...
+    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve',
+            {'document_root': settings.STATIC_DOC_ROOT}),
+
+Be careful not to use the same path as your :setting:`ADMIN_MEDIA_PREFIX` (which defaults
+to ``/media/``) as this will overwrite your URLconf entry.
 
 ディレクトリのリスト表示
 ========================
@@ -79,7 +96,7 @@ Django 自体では、画像やスタイルシート、ビデオといった静�
 ``False`` です。 ``True`` にすると、Django はディレクトリに対して内容リスト
 を表示します。
 
-例::
+設定例を以下に示します::
 
     (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', 
      {'document_root': '/path/to/media', 'show_indexes': True}),
@@ -114,8 +131,6 @@ Django 自体では、画像やスタイルシート、ビデオといった静�
     </body>
     </html>
 
-.. _Limiting use to DEBUG=True:
-
 DEBUG=True の時だけに制限する
 =============================
 
@@ -133,16 +148,13 @@ URLconf は単なる Python モジュールに過ぎないので、静的メデ�
     urlpatterns = patterns('',
         (r'^articles/2003/$', 'news.views.special_case_2003'),
         (r'^articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
-        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 
-         'news.views.month_archive'),
-        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 
-         'news.views.article_detail'),
+        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'news.views.month_archive'),
+        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'news.views.article_detail'),
     )
 
     if settings.DEBUG:
         urlpatterns += patterns('',
-            (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', 
-             {'document_root': '/path/to/media'}),
+            (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/path/to/media'}),
         )
 
 コードは一目瞭然で、設定を import して、 :setting:`DEBUG` の値をチェックし

@@ -4,9 +4,7 @@
 はじめての Django アプリ作成、その 1 
 =====================================
 
-.. contents::
-
-:revision-up-to: 9084 (1.0)
+:revision-up-to: 11321 (1.1)
 
 さあ、例を交えながら学んでゆきましょう。
 
@@ -18,12 +16,12 @@ Poll アプリケーションは、
     * ユーザが投票したり結果を表示したりできる公開用サイト
     * 投票項目の追加、変更、削除を行うための管理 (admin) サイト
 
-の二つの部分に分かれているものとします。 
-:ref:`Django は既にインストール済み <intro-install>` ですよね？ では始めま
-しょう。 Django がインストールされているかどうかは、Python 対話シェルを起動
-して ``import django`` を実行してみればわかります。エラーなく import できる
-なら、 Django はインストールされています。
+の二つの部分に分かれています。
 
+:ref:`Django は既にインストール済み <intro-install>` として、説明を進めます。
+Django がインストールされているかどうかは、Python 対話シェルを起動して
+``import django`` を実行してみればわかります。エラーなく import できるなら、
+Django はインストールされています。
 
 .. admonition:: 困ったときは:
 
@@ -32,9 +30,6 @@ Poll アプリケーションは、
     ``irc.freenode.net`` の 
     `#djangoチャネル <irc://irc.freenode.net/django>`__ で誰か助けてくれそ
     うな人と話してみてください。
-
-
-.. _Creating a project:
 
 プロジェクトの作成
 ==================
@@ -64,8 +59,8 @@ Django の :term:`プロジェクト` (:term:`project`) を構成するコード
     
     プロジェクトの名前を付けるとき、組み込みの Python モジュールや Django
     のコンポーネントの名前を使わないようにしてください。とりわけ、 
-    ``django`` (Django 自体と被ってしまいます) や ``test`` (組み込みの
-    Python パッケージ名と被ります) を使わないようにしましょう。
+    ``django`` (Django 自体と名前が衝突します) や ``test`` (組み込みの
+    Python パッケージ名と名前が衝突します) を使わないようにしましょう。
 
 ``python setup.py`` ユーティリティで Django をインストールしたのなら、
 :file:`django-admin.py` はシステムパスのどこかにあるはずです。パス上になけ
@@ -110,8 +105,6 @@ Python インストールディレクトリの中にあります。パス上の�
 .. _`パッケージの詳しい説明`: http://www.python.jp/doc/release/tut/node8.html#packages
 .. _more on packages: http://docs.python.org/tut/node8.html#packages
 
-.. _The development server:
-
 開発用サーバ
 ------------
 
@@ -131,13 +124,13 @@ Python インストールディレクトリの中にあります。パス上の�
 た状態になるまで Apache のような運用サーバの設定をいじらなくても良いように
 するためのものです。
 
-ここで注意しておいたほうがよいでしょう: このサーバは開発中の利用だけを考え
-て作られているため、絶対に運用環境では使わないようにしてください (筆者たち
-の専門は Web フレームワークであって、 Web サーバではありません)。
+ここでちょっと注意しておきましょう。このサーバは開発中の利用だけを考えて作
+られているため、絶対に運用環境では使わないようにしてください (筆者たちの専
+門は Web フレームワークであって、 Web サーバではありません)。
 
 さあ、これでサーバが起動したので、ブラウザで http://127.0.0.1:8000/ にアク
-セスしてみてください。 "Welcome to Django" と表示された、愉快げなパステル調
-のライトブルーのページが出るはずです。やったね！
+セスしてみてください。 "Welcome to Django" と表示された、明るいパステル調の
+ライトブルーのページが出るはずです。やったね！
 
 .. admonition:: ポート番号の変更
 
@@ -149,6 +142,14 @@ Python インストールディレクトリの中にあります。パス上の�
     .. code-block:: bash
 
         python manage.py runserver 8080
+
+    サーバの IP を指定するときには、ポート番号も一緒に指定します。従って、
+    全ての IP からのリクエストを受け付ける (サーバを他のコンピュータから可
+    視にする) には、以下のようにします:
+
+    .. code-block:: bash
+
+        python manage.py runserver 0.0.0.0:8000
 
     開発サーバの詳細な説明は :djadmin:`runserver` のリファレンスを参照して
     ください。
@@ -185,6 +186,12 @@ Django の設定を表現する通常の Python モジュールです。設定�
       スサーバが物理的に同じマシン上にあるのなら空文字列にしておきます。
       (SQLite では使いません)。
 
+
+データベースをあまり扱ったことがないのなら、 SQLite をお勧めします (
+:setting:`DATABASE_ENGINE` には ``'sqlite3'`` を指定します)。 SQLite はバー
+ジョン 2.5 以降の Python に組み込まれているので、特にインストールする必要が
+ありません。
+
 .. note::
 
     PostgreSQL や MySQL を使っている場合、この時点でデータベースを作成して
@@ -203,17 +210,20 @@ Django インスタンスで有効な全ての Django アプリケーション�
 います。これらのアプリケーションはいずれも Django に付属のものです:
 
     * :mod:`django.contrib.auth` -- 認証システムです。
+
     * :mod:`django.contrib.contenttypes` -- コンテンツタイプフレームワーク
       です。
+
     * :mod:`django.contrib.sessions` -- セッションフレームワークです。
+
     * :mod:`django.contrib.sites` -- 一つの Django で複数のサイトを管理する
       ためのフレームワークです。
 
-これらは、よくある状況で便利なのでデフォルトで付属しています。
+これらの機能はよく使われるのでデフォルトで付属しています。
 
-これらのアプリケーションは必ず少なくとも一つのデータベーステーブルを使いま
-す。そこで、アプリケーションを使う前にテーブルを作成しておく必要があります。
-テーブルを作成するには以下のコマンドを使います:
+上に挙げたアプリケーションは、必ず少なくとも一つのデータベーステーブルを使
+います。そこで、アプリケーションを使う前にテーブルを作成しておく必要があり
+ます。テーブルを作成するには以下のコマンドを使います:
 
 .. code-block:: bash
 
@@ -294,13 +304,13 @@ Django でデータベース Web アプリケーションを書くための最�
     ソースです。モデルには自分が格納したいデータにとって必要不可欠なフィー
     ルドと、そのデータの挙動を収めます。 Django は :ref:`DRY 則 <dry>` に従っ
     ています。Django のモデルの目的は、ただ一つの場所でデータモデルを定義し、
-    そこから自動的にデータを取り出せるようにすることにあります。
+    そこから自動的にデータを取り出すことにあります。
 
 これから開発する簡単な poll アプリケーションでは、投票項目 (poll) と選択肢
 (choice) の二つのモデルを作成します。 poll には質問事項 (question) と公開日
 (publication date) の情報があります。 choice には選択肢のテキストと投票数
 (vote) という二つのフィールドがあります。各 choice は一つの poll に関連づけ
-られることになります。
+られています。
 
 Django では、こうした概念を簡単な Python クラスで表現できます。
 :file:`polls/models.py` ファイルを以下のように編集してください::
@@ -318,17 +328,20 @@ Django では、こうした概念を簡単な Python クラスで表現でき�
 
 .. admonition:: \  :attr:`~django.db.models.Field.max_length` にまつわるエラー
 
-   Django が :attr:`~django.db.models.Field.max_length` が正しい引数でない
-   というエラーを出す場合、古いバージョンの Django を使っているはずです。
-   (チュートリアルのこのバージョンは、最新の開発版 Django に準拠しています)
-   Subversion を使って開発版の Django をチェックアウトしている場合 (詳しい
-   方法は :ref:`インストール方法 <topics-install>` を参照してください) 、エ
-   ラーは起きないはずです。
+   Django が「 :attr:`~django.db.models.Field.max_length` は正しい引数で
+   ない」というエラーを出す場合、古いバージョンの Django を使っているはずで
+   す。(チュートリアルのこのバージョンは、最新の開発版 Django に準拠してい
+   ます) Subversion を使って開発版の Django をチェックアウトしている場合
+   (詳しい方法は :ref:`インストール方法 <topics-install>` を参照してくださ
+   い) 、エラーは起きないはずです。
 
    古いバージョンの Django を使わねばならない場合、 
    `バージョン 0.96 用のチュートリアル`_ を参照するよう勧めます。というのも、
    このチュートリアルのカバーしている機能には、開発版の Django にしかないも
    のがあるからです。
+
+.. _the Django 0.96 tutorial: http://www.djangoproject.com/documentation/0.96/tutorial01/
+.. _`バージョン 0.96 用のチュートリアル`: `the Django 0.96 tutorial`_
 
 コードは単純明解ですね。各モデルは一つのクラスで表現され、いずれも
 :class:`django.db.models.Model` のサブクラスです。各モデルには複数のクラス
@@ -368,8 +381,6 @@ Python コードの中で使いますし、データベースではカラム名�
 .. _`Python パス`: http://www.python.jp/doc/release/tut/node8.html#SECTION008110000000000000000
 .. _`Python path`: http://docs.python.org/tut/node8.html#SECTION008110000000000000000
 
-.. _Activating models:
-
 モデルを有効にする
 ==================
 
@@ -387,7 +398,7 @@ Python コードの中で使いますし、データベースではカラム名�
 .. admonition:: 設計哲学
     :class: admonition-philosophy
 
-    Django アプリケーションは「プラグ可能 (pluggable)」です。アプリケーショ
+    Django アプリケーションは「プラガブル (pluggable)」です。アプリケーショ
     ンは特定の Django インストールに結び付いていないので、アプリケーション
     を複数のプロジェクトで使ったり、単体で配布したりできます。
 
@@ -501,8 +512,6 @@ Python コードの中で使いますし、データベースではカラム名�
 ``manage.py`` ユーティリティでできることについては
 :ref:`django-admin.py のドキュメント <ref-django-admin>` を読んで下さい。
 
-.. _Playing with the API:
-
 API で遊んでみる
 ================
 
@@ -608,9 +617,6 @@ polls 関係のモデルを少し修正して、 ``Poll`` と ``Choice`` に
    このチュートリアルでは、開発版の Django にしかない機能をカバーしているか
    らです。
 
-.. _the Django 0.96 tutorial: http://www.djangoproject.com/documentation/0.96/tutorial01/
-.. _`バージョン 0.96 用のチュートリアル`: `the Django 0.96 tutorial`_
-
 :meth:`~django.db.models.Model.__unicode__` をモデルに追加しておく重要性は、
 対話プロンプトで扱うときに精神的によいだけでなく、Django が自動生成する管理
 インタフェースのいたるところでオブジェクトの表現 (representation) が使われ
@@ -628,7 +634,7 @@ polls 関係のモデルを少し修正して、 ``Poll`` と ``Choice`` に
 
     Django のモデルは、デフォルトで
     :meth:`~django.db.models.Model.__str__` メソッドを実装していて、中で
-    :meth:`~~django.db.models.Model.__unicode__` を呼び出して、得た結果を
+    :meth:`~django.db.models.Model.__unicode__` を呼び出して、得た結果を
     UTF-8 のバイト文字列に変換しています。従って、 ``unicode(p)`` は
     Unicode 文字列を返し、 ``str(p)`` は UTF-8 でエンコードされた通常の文字
     列を返します。この仕様がよくわからなければ、とにかく 
@@ -690,7 +696,6 @@ polls 関係のモデルを少し修正して、 ``Poll`` と ``Choice`` に
     # Choice オブジェクトを生成し、 INSERT 文を実行し、 Poll からアクセス可
     # 能な Choice オブジェクトの集合に追加して、新たに作成された Choice オ
     # ブジェクトを返します。
-
     >>> p = Poll.objects.get(pk=1)
     >>> p.choice_set.create(choice='Not much', votes=0)
     <Choice: Not much>
@@ -723,6 +728,7 @@ polls 関係のモデルを少し修正して、 ``Poll`` と ``Choice`` に
 
 データベース API の詳細は、 
 :ref:`データベース API リファレンス <topics-db-queries>` を参照してください。
+
 API を使いこなせるようになったら、 
 :ref:`チュートリアル第 2 部 <intro-tutorial02>` に進んで、Django が自動生成
 する管理インタフェースを動かしてみましょう。

@@ -4,10 +4,10 @@
 Django のコミッタ
 =================
 
-:revision-up-to: 9084 (1.0)
+:revision-up-to: 11321 (1.1)
 
-オリジナルチーム
-=================
+当初の開発者たち
+==================
 
 Django プロジェクトは、米国ローレンス州カンザスにある `Lawrence
 Journal-World`_ 社の Web 開発部門、 World Online で生まれました。
@@ -15,7 +15,7 @@ Journal-World`_ 社の Web 開発部門、 World Online で生まれました。
 `Adrian Holovaty`_
     Adrian はジャーナリズムのバックグラウンドを持った Web 開発者です。ジャー
     ナリズムの世界では、「計算機ジャーナリズム」のパイオニアとして、テクノ
-    ロジーの世界では「Djangoを作った男」として知られています。
+    ロジーの世界では「Django を作った男」として知られています。
 
     Adrian は 2 年半の間 World Online のリードプログラマを勤め、その間に
     Django を開発して World Online サイトを実装しました。現在彼は「地域に根
@@ -24,7 +24,7 @@ Journal-World`_ 社の Web 開発部門、 World Online で生まれました。
     シカゴ在住です。
 
 `Simon Willison`_
-    Simon はイングランドから来た尊敬すべき Web 開発者です。彼は World
+    Simon はイングランドから来た有名な Web 開発者です。彼は World
     Online で 1 年間のインターンシップを過ごし、その間に Adrian とともに
     Djang をスクラッチから開発しました。彼はまれに見る情熱家の英国人で、
     Web 開発の王道について確固たる信念を持っており、多くの読者を擁する
@@ -33,19 +33,19 @@ Journal-World`_ 社の Web 開発部門、 World Online で生まれました。
     イングランドのブライトン在住です。
 
 `Jacob Kaplan-Moss`_
-    Jacob は最新の Web 1.0 企業の一つ、 `Whiskey Media`_ のソフトウェアアー
-    キテクトです。 Jacob の仕事時間の大半は、 Django に関する仕事に割り当て
-    られています。Jacob はかつて Lawrence Journal-World で働いていましたが、
-    当時はメディア企業向けの商用パブリッシングプラットフォームである
-    Ellington のリードデベロッパでした。
+    Jacob は Django や関連のオープンソーステクノロジに関するサポートサービ
+    スを行う `Revolution Systems`_ のパートナーです。 Jacob の仕事時間の大
+    半は Django に関する仕事に割り当てられています。Jacob はかつて Django
+    の開発された WorldOnline に勤務しており、当時はメディア企業向けの商用パ
+    ブリッシングプラットフォームである Ellington のリードデベロッパでした。
     
     ローレンス州カンザス在住です。
     
 `Wilson Miner`_
     Django をかっこよく見せているのは Wilson のデザインの力です。今あなたが
-    見ている Django サイトも、 Django の admin インタフェースも、 Wilson が
-    デザインしたものです。 Wilson は EveryBlock_ のデザイナとして働いていま
-    す。
+    見ている Django サイトも、 Django の管理サイトのインタフェースも
+    Wilson がデザインしたものです。 Wilson は EveryBlock_ のデザイナとして
+    働いています。
     
     サンフランシスコ在住です。
 
@@ -56,7 +56,7 @@ Journal-World`_ 社の Web 開発部門、 World Online で生まれました。
 .. _web-development blog: `simon willison`_
 .. _`Web 開発についての blog`: `web-development blog`_
 .. _jacob kaplan-moss: http://jacobian.org/
-.. _whiskey media: http://whiskeymedia.com/
+.. _revolution systems: http://revsys.com/
 .. _wilson miner: http://wilsonminer.com/
 
 現在の開発者
@@ -92,7 +92,7 @@ Adrian と Jacob は、共に Django の `慈悲深き終身独裁者
 
 .. _malcolm tredinnick: http://www.pointy-stick.com/
 
-Russell Keith-Magee
+`Russell Keith-Magee`_
     Russell は学部で物理学を学び、 PhD でニューラルネットワークを研究しまし
     た。彼の最初の仕事は、シミュレーションフレームワークを開発する防衛関係
     の企業の立ち上げでした。その後、 Django を扱ううちに、より Web 開発に深
@@ -104,6 +104,8 @@ Russell Keith-Magee
     Russell は世界でもっとも隔絶された首都 -- オーストラリアのパースに住ん
     でいます。
     
+.. _russell keith-magee: http://cecinestpasun.com/
+
 Joseph Kocherhans
     Joseph は現在 EveryBlock_ の開発者です。以前、 Lawrence Journal-World
     で働いていたときに、 Marketplace サイトのバックエンドの大半を構築しまし
@@ -148,10 +150,42 @@ Joseph Kocherhans
 .. _brian rosner: http://oebfare.com/
 .. _this week in django: http://thisweekindjango.com/
 
-Gary Wilson
-    Gary は 2007 年の始めごろから、コードのクリーンアップやおかしな部分の修
-    正で数多く貢献しています。その後、コードベース全体にわたって必要な整頓
-    をしてくれています。
+`Gary Wilson`_
+    Gary は 2006 年ごろから、 `テキサス大学`_ (UT) の Web アプリケーション
+    を開発するかたわら Django にパッチを提供していました。当時から、電子メー
+    ル機能やフォーム機能に貢献しており、その他にも数々の機能とコードベース
+    全体にわたるクリーンアップを手伝っています。
+
+    テキサス州オースティン在住です。
+
+.. _Gary Wilson: http://gdub.wordpress.com/
+.. _The University of Texas: http://www.utexas.edu/
+.. _`テキサス大学`: `The University of Texas`_
+
+Justin Bronn
+    Justin Bronn は計算機科学者であり、知的財産や地理空間情報の利用に関する
+    法律 (spatial law) を専門とする弁護士でもあります。
+
+    2007 年から、 Justin はいわゆる GeoDjango_ ブランチで
+    ``django.contrib.gis`` の開発を始めました。その後、 GeoDjango は Django
+    1.0 でマージされました。 GeoDjango の開発のかたわら、 Justin は ORM や
+    管理サイト、 Oracle のサポートなど、 Django の内部に関する深い知識を得
+    ています。
+
+    テキサス州ヒューストン在住です。
+
+.. _GeoDjango: http://geodjango.org/
+
+Karen Tracey
+    Karen のバックグラウンドは分散オペレーティングシステム (大学院) から情
+    報通信関連のソフトウェア技術 (企業)、そしてクロスワードパズルの作成 (フ
+    リーランス) にわたります。2006 年、自分のクロスワードパズルデータベース
+    にフロントエンドをつけようとしたのが、こ彼女が Django に関わったきっか
+    けでした。その後、彼女はコミュニティに寄せられる質問への回答や、デバッ
+    グにずっと関わっています。コーディングパズルを解くのは、クロスワードパ
+    ズルと同じくらい楽しいから、という理由で。
+
+    ニューカレドニア州エーペックス在住です。
     
 専門家たち
 -----------
@@ -177,15 +211,6 @@ Ian Kelly
 Matt Boersma
     Matto も Django の Oracle サポートに携わっています。
     
-Justin Bronn
-    Justin Bronn はコンピュータサイエンティストでもあり、知的財産と spatial
-    law に関連した法学を学ぶヒューストン大学法学部の 3 年生でもあります。
-    
-    Justin は ``django.contrib.gis`` 、いわゆる GeoDjango_ 開発の第一人者で
-    す。
-    
-.. _GeoDjango: http://geodjango.org/
-
 Jeremy Dunck
     Jeremy はテキサス州ダラスの 個人向けローカルサイトである Pegasus News
     のリードデベロッパです。 Greasemonkey と Django の初期からのコントリビュー

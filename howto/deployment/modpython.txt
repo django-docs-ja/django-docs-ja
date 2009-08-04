@@ -6,10 +6,12 @@ Apache と mod_python で Django を動かす
 
 .. highlight:: apache
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1)
 
-Django をプロダクションサーバ上で動かす設定として、現状では Apache_ と
-`mod_python`_ の組み合わせを推奨しています。
+Apache_ の `mod_python`_ モジュールを使えば、本番環境で Django をデプロイで
+きます。ただし、この方法は、よりシンプルな
+:ref:`mod_wsgi による運用 <howto-deployment-modwsgi` を使う方法に取って代わ
+られつつあります。
 
 mod_python は `mod_perl`_ とよく似ていて (影響を受けていて)、 Apache の中に
 Python を埋め込み、サーバ起動時に Python のコードをメモリ上に読み込みます。
@@ -20,16 +22,23 @@ Django を mod_python で動かす場合、 Apache 2.x と mod_python 3.x が必
 また、 Apache を使う場合、 `worker MPM`_ ではなく `prefork MPM`_ を使うよう
 勧めます。
 
-興味があれば `FastCGI, SCGI, AJP で Django を動かす <howto-deplyment-fastcgi>`
-もどうぞ (SCGI と AJP もカバーしています)。
+.. seealso::
+
+    * Apache は大規模で複雑な代物です。このドキュメントは、 Apache でできる
+      ことのほんの表面的なことしか解説していません。もっと詳しい情報を知り
+      たければ、 `Apache の公式ドキュメント`_ がなによりの情報源です。
+
+    * 興味があれば
+      `FastCGI, SCGI, AJP で Django を動かす <howto-deplyment-fastcgi>`
+      もどうぞ。
 
 .. _Apache: http://httpd.apache.org/
 .. _mod_python: http://www.modpython.org/
 .. _mod_perl: http://perl.apache.org/
 .. _prefork MPM: http://httpd.apache.org/docs/2.2/mod/prefork.html
 .. _worker MPM: http://httpd.apache.org/docs/2.2/mod/worker.html
-
-.. _Basic configuration:
+.. _apache's own official documentation: http://httpd.apache.org/docs/
+.. _`Apache の公式ドキュメント`: `apache's own official documentation`_
 
 基本的な設定
 ============
@@ -94,9 +103,6 @@ Django はリクエストの URL から ``django.root`` に設定されたプレ
         **PythonPath "['/path/to/project'] + sys.path"**
     </Location>
 
-
-    PythonPath "['/path/to/project'] + sys.path"
-
 ``PythonPath`` には、アプリケーションから import したいモジュールの各々の
 親ディレクトリを入れなければなりません。また、 :ref:`DJANGO_SETTINGS_MODULE
 <django-settings-module>` の親ディレクトリも入れねばなりません。対話シェル
@@ -104,20 +110,25 @@ Django はリクエストの URL から ``django.root`` に設定されたプレ
 る際には、Python は必ず ``sys.path`` の各ディレクトリを順に調べ、その下から
 該当モジュールを import しようと試み、 import に成功するまで探索を続けます。
 
-分かりやすくするために例を挙げましょう。アプリケーションを
+ところで、Python のソースファイルのパーミッションが、 Apache のプロセスを駆
+動しているユーザ (たいていのシステムでは ``apache`` とか ``httpd`` というユー
+ザ名がついている) から読み出せるように設定されているか確かめておいてください。
+
+さて、分かりやすくするために例を挙げましょう。アプリケーションを
 ``/usr/local/django-apps/`` の下に配置しているとします (例えば、
-``/usr/local/django-apps/weblog/`` のようにです) 。そして、 ``mysite`` プロ
-ジェクトが ``/var/www/`` 下にあるとしましょう。上の例のように
-:ref:`DJANGO_SETTINGS_MODULE <django-settings-module>` を設定している場合に
-は、 ``PythonPath`` を以下のように書かねばなりません::
+``/usr/local/django-apps/weblog/`` のようにです) 。そして、設定ファイルが
+``/var/www/mysite/settings.py`` だったとします。上の例のように
+:ref:`DJANGO_SETTINGS_MODULE <django-settings-module>` を設定しているなら、
+``PythonPath`` は以下のように書かねばなりません::
 
     PythonPath "['/usr/local/django-apps/', '/var/www'] + sys.path"
 
-これで、 ``import weblog`` や ``import mysite.settings`` が正しく動作します。
-コード中で ``import blogroll`` していて、 ``blogroll`` が ``weblog/`` ディ
-レクトリの下にあるようなら、 ``/usr/local/django-apps/weblog/`` も
-``PythonPath`` に加えねばなりません。 import したいモジュールの 
-**親ディレクトリ** を Python パスに入れねばならないことに注意してください。
+これで、 ``import weblog`` と ``import mysite.settings`` は両方とも正しく実
+行できます。コード中で ``import blogroll`` していて、 ``blogroll`` が
+``weblog/`` ディレクトリの下にあるのなら、
+``/usr/local/django-apps/weblog/`` も ``PythonPath`` に加えねばなりません。
+import したいモジュールの **親ディレクトリ** を Python パスに入れねばならな
+いことに注意してください。
 
 .. note::
 
@@ -136,7 +147,7 @@ Django はリクエストの URL から ``django.root`` に設定されたプレ
 マンスを向上させられます。使えるオプションのリストは
 `mod_python のドキュメント`_ を参照してください。
 
-注意しなければならないのは、プロダクションサーバでは、  ``PythonDebug Off``
+注意しなければならないのは、実運用のためのサーバでは、  ``PythonDebug Off``
 を設定すべきであるということです。 ``PythonDebug`` が ``On`` に設定されたま
 まだと、 mod_python に不具合が生じたときに、恰好の悪い (そして赤裸々な)
 Python トレースバックを表示してしまいます。
@@ -147,8 +158,6 @@ Django によって提供されているはずです。 Django の URLconf は `
 
 Django で作られたサイトを mod_python 上で運営している場合、 Python コードに
 対して変更を加える度に Apache を再起動する必要があります。
-
-.. _Multiple Django installations on the same Apache:
 
 ひとつの Apache に複数の Django をインストールする
 ==================================================
@@ -172,8 +181,8 @@ Django で作られたサイトを mod_python 上で運営している場合、 
 
 一つの ``VirtualHost`` 設定の中に複数の Django をインストールしたい場合、
 mod_python のキャッシュが Django の動作を台無しにしないように特に気を配る必
-要があります。 ``PythonInterpreter`` ディレクティブを使って、
-``<Location>`` ディレクティブごとに別のインタプリタを使うようにしてください::
+要があります。 ``PythonInterpreter`` ディレクティブで、 ``<Location>`` ディ
+レクティブごとに別のインタプリタが使われるよう設定してください::
 
     <VirtualHost *>
         ServerName www.example.com
@@ -195,11 +204,11 @@ mod_python のキャッシュが Django の動作を台無しにしないよう�
 mod_python 上で開発用サーバを動かす
 ===================================
 
-開発用サーバに mod_python を使う場合、コードを変更する度にサーバを再起動す
-るようなやんちゃは避けられます。 ``MaxRequestsPerChild 1`` をアパッチの
+開発用サーバに mod_python をえば、コードを変更する度にサーバを再起動するよ
+うなやんちゃは避けられます。 ``MaxRequestsPerChild 1`` を Apache の
 ``httpd.conf`` ファイルに指定し、Apache にリクエストごとに全てをリロードさ
-せてください。とはいえ、これをプロダクションサーバでやらないでください。さ
-もないと、 Django の恩恵が失われてしまいます。
+せてください。とはいえ、これを実運用のサーバでやらないでください。さもない
+と、 Django ならではの恩恵が失われてしまいます。
 
 あなたが ``print`` 文を散りばめてデバッグするタイプのプログラマなら、
 ``print`` 文は mod_python では何の効果も及ぼさないということに注意しましょ
@@ -208,14 +217,13 @@ mod_python を使った設定でデバッグ情報を出力したいのなら::
 
     assert False, the_value_i_want_to_see
 
-のようにするか、ページのテンプレートにデバッグ情報を追加してください。
+と書いておくか、ページのテンプレートにデバッグ情報を追加してください。
 
 .. _mod_python のドキュメント: 
     http://www.python.jp/doc/contrib/modpython/directives.html
 .. _mod_python documentation: http://modpython.org/live/current/doc-html/directives.html
 
 .. _serving-media-files:
-.. _Serving media files:
 
 メディアファイルの提供
 ========================
@@ -227,8 +235,10 @@ Django は、自分ではメディアファイルの提供を行わず、ユー�
 バを使うよう勧めます。お勧めはいくつかあります:
 
     * lighttpd_
+    * Nginx_
     * TUX_
     * Apache_ の軽量化 (stripped-down) 版
+    * Cherokee_
 
 とはいえ、Django を動作させているのと同じ Apache の ``VirtualHost`` でメディ
 アファイルを提供せざるを得ない場合には、以下のようにして特定の場所でだけ
@@ -262,22 +272,23 @@ mod_python を切ります::
 
 
 .. _lighttpd: http://www.lighttpd.net/
+.. _Nginx: http://wiki.codemongers.com/Main
 .. _TUX: http://en.wikipedia.org/wiki/TUX_web_server
 .. _Apache: http://httpd.apache.org/
+.. _Cherokee: http://www.cherokee-project.com/
 
 .. _howto-deployment-modpython-serving-the-admin-files:
 .. _serving-the-admin-files:
-.. _Serving the admin files:
 
-admin ファイルの提供
-====================
+管理サイト用メディアファイルの提供
+==================================
 
-Django の開発サーバは自動的に admin メディアファイルを提供しますが、それ以
-外の設定ではこれはあてはまりません。admin ファイルを提供するには、 Apache
+Django の開発サーバは自動的に管理サイトのメディアファイルを提供しますが、他
+の構成では提供しません。管理サイトのメディアファイルを提供するには、 Apache
 なりその他のメディアサーバなりで設定を行う必要があります。
 
-admin ファイルは Django 配布物の (:file:`django/contrib/admin/media`) ディ
-レクトリ下にあります。
+管理サイトのメディアファイルは Django 配布物の
+(:file:`django/contrib/admin/media`) ディレクトリ下に入っています。
 
 お勧めのアプローチは二つあります:
 
@@ -288,8 +299,6 @@ admin ファイルは Django 配布物の (:file:`django/contrib/admin/media`) �
 
     2. または、 admin メディアファイルをコピーして Apache のドキュメントルー
        トに入れます。
-
-.. Using eggs with mod_python
 
 mod_python 上で "egg" パッケージを使う
 =======================================
@@ -304,8 +313,8 @@ Django を Python egg_ でインストールしたり、 Django から egg 化�
     os.environ['PYTHON_EGG_CACHE'] = '/some/directory'
 
 ``/some/directory`` は Apache httpd を動作させているプロセスが読み書き可能
-なディレクトリにします。このディレクトリは、 egg がコードの展開を必要とする
-場合に使われます。
+なディレクトリにします。このディレクトリは、 egg のコードを展開する必要があ
+るときに使われます。
 
 次に、 mod_python の PythonImport_ ディレクティブを使って、 mod_python が一
 番最初にこのファイルを import するよう指定します。まず、前述の
@@ -330,8 +339,6 @@ Python パスを変更する操作がまだ完了していないからです。
 .. _`mod_python マニュアル`: `mod_python manual`_
 .. _`ひとつの Apache で複数の Django を使う`: `Multiple Django installations on the same Apache`_
 
-.. _Error handling:
-
 エラー処理
 ==========
 
@@ -345,10 +352,8 @@ Apache/mod_python を使っている場合、エラーは Django によって捕
 は複数のログエントリ行に展開されます (これは見苦しくて読みづらいのですが、
 mod_python のやり方なので仕方ありません)。
 
-.. _If you get a segmentation fault:
-
-セグメンテーション違反になる場合
-================================
+セグメンテーション違反を起こす場合
+===================================
 
 Apache がセグメンテーション違反 (segumentation fault) を引き起こす場合、 2
 種類の原因が考えられます。いずれも Django 自体とは関係のない原因です。
@@ -380,3 +385,23 @@ Django コードの import が問題の原因だということになります�
 .. _Expat Causing Apache Crash: http://www.dscpl.com.au/articles/modpython-006.html
 .. _mod_python FAQ entry: http://modpython.org/FAQ/faqw.py?req=show&file=faq02.013.htp
 .. _Getting mod_python Working: http://www.dscpl.com.au/articles/modpython-001.html
+
+UnicodeEncodeError が出る場合
+===============================
+
+Django の国際化機能 (:ref:`topics-i18n` 参照) を使っていて、ユーザにファイ
+ルアップロードをさせたいなら、 Apache が非 ASCII のファイルを受け入れるよ
+うに、 Apache を起動する環境変数をしかるべく設定してください。環境変数が正
+しく設定されていないと、非 ASCII のファイル名を ``os.path()`` に渡したとき
+に ``UnicodeEncodeError`` 例外を引き起こすからです。
+
+``UnicodeEncodeError`` の問題を回避するには、 Apache を起動するときの環境変
+数に、以下のような設定を入れておきます::
+
+    export LANG='en_US.UTF-8'
+    export LC_ALL='en_US.UTF-8'
+
+正しい環境変数の設定方法や設定場所は、オペレーティングシステムごとのドキュ
+メントを参照してください。 Unix プラットフォームでは、
+``/etc/apache2/envvars`` を使うのが一般的です。設定を行ったら、 Apache を再
+起動してください。

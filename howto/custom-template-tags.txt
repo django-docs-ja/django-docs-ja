@@ -4,14 +4,14 @@
 テンプレートタグやフィルタを自作する
 ======================================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1)
 
 はじめに
 ============
 
-Django テンプレートシステムには、広範な :ref:`組み込みタグとフィルタ
+Django テンプレートシステムには、いろいろな :ref:`組み込みタグとフィルタ
 <ref-templates-builtins>` が付属していて、アプリケーションのプレゼンテーショ
-ンロジックに纏わる問題を解決できます。とはいえ、コアのテンプレートタグ
+ンロジックにまつわる問題を解決できます。とはいえ、コアのテンプレートタグ
 プリミティブだけでは、要求を満たせない場合もあります。そういう場合のために、
 テンプレートエンジンを拡張できます。Python で自作のタグやフィルタを書き、
 テンプレート上で ``{% load %}`` タグを使って使えるのです。
@@ -52,9 +52,9 @@ Django テンプレートシステムには、広範な :ref:`組み込みタグ
 
 あるアプリケーションのカスタムタグを ``{% load %}`` で呼び出せるようにする
 には、そのアプリケーションを :setting:`INSTALLED_APPS` にいれておかねばなり
-ません。これはセキュリティ上の制約です: こうすることで、一つのコンピュータ
-にたくさんのテンプレートライブラリのコードを置きながら、個々の Django イン
-ストールがライブラリに安全にアクセスできるようにします。
+ません。これは、一つのホストに複数の Django アプリケーションを置いたときに、
+Django アプリケーション同士が勝手に他のテンプレートライブラリにアクセスしな
+いようにするためのセキュリティ機能です。
 
 ``templatetags`` パッケージには、いくつでもモジュールを入れられます。
 ``{% load %}`` 文はアプリケーションの名前ではなく、 Python モジュール名
@@ -75,16 +75,14 @@ Django テンプレートシステムには、広範な :ref:`組み込みタグ
     :class: admonition-behind-the-scenes
 
     Django のデフォルトのフィルタやタグのソースコードには大量のサンプルが
-    収められています。ソースコードはそれぞれ
+    収まっています。ソースコードはそれぞれ
     ``django/template/defaultfilters.py`` や
     ``django/template/defaulttags.py`` にあります。
-
-.. _Writing custom template filters:
 
 カスタムのテンプレートフィルタ
 -------------------------------
 
-カスタムフィルタは単なる Python の関数で、一つまたは二つの引数をとります:
+カスタムフィルタは単なる Python の関数で、一つまたは二つの引数:
 
     * テンプレート変数 (入力) の値。文字列とは限りません。
     * 引数の値。デフォルトを持たせたり、無視させたりできます。
@@ -115,8 +113,6 @@ Django テンプレートシステムには、広範な :ref:`組み込みタグ
     def lower(value): # Only one argument.
         "入力をすべて小文字にする"
         return value.lower()
-
-.. _Template filters that expect strings:
 
 テンプレートフィルタに文字列だけを処理させる
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -166,8 +162,6 @@ Django テンプレートシステムには、広範な :ref:`組み込みタグ
 上の例の下の定義のようにして ``name`` 引数を省略すると、 Django は関数名を
 そのままフィルタ名として使います。
 
-.. _Filters and auto-escaping:
-
 フィルタと自動エスケープ
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -194,7 +188,7 @@ Django テンプレートシステムには、広範な :ref:`組み込みタグ
               # "safe" 文字列を扱う処理をここに
 
     * **"エスケープが必要" であるとマークされている文字列** は、
-      ``autoescape`` ブロックの指定に関係なく、必ずエスケープされます。
+      ``autoescape`` ブロックの指定に関係なく、 *必ず* エスケープされます。
       マークされている文字列は、自動エスケープの設定に関係なく、一度だけエ
       スケープ処理を受けます。
 
@@ -220,11 +214,11 @@ Django テンプレートシステムには、広範な :ref:`組み込みタグ
        必要に応じて自動的にエスケープします。
 
        ``is_safe`` は、「このフィルタは安全 (safe) であり、安全でない HTML
-       を生成する危険性がない」という意味だと考えてください。
+       を生成するおそれがない」という意味だと考えてください。
 
        ``is_safe`` が必要なのは、通常の文字列操作で、 ``SafeData`` オブジェ
        クトを  ``str`` や ``unicode`` オブジェクトに変換するものが数多くあ
-       るためです。全てを try と catch で拾うのは難しいので、 Django はフィ
+       るからです。全てを try と catch で拾うのは難しいので、 Django はフィ
        ルタ処理が完了した時点でダメージを回復する戦略を取っています。
 
        例えば、入力の末尾に ``xx`` を追加するようなフィルタを書くとします。
@@ -261,7 +255,7 @@ Django テンプレートシステムには、広範な :ref:`組み込みタグ
        safe にする必要があるので、入力は自分で扱わねばなりません。
 
        出力を safe 文字列としてマークするには、
-       :func:`~django.utils.safestring.mark_safe` を使います。
+       :func:`django.utils.safestring.mark_safe` を使います。
 
        ただし、注意してください。出力を safe であるとマークするだけでは十分
        ではありません。出力が本当に safe *である* ことを保証せねばならず、
@@ -312,14 +306,11 @@ Django テンプレートシステムには、広範な :ref:`組み込みタグ
        て、 safe 文字列を返している場合、 ``is_safe`` 属性は何ら影響をもた
        ないのです。
 
-.. _Writing custom template tags:
-
 カスタムテンプレートタグを書く
 ------------------------------
 
-タグはフィルタよりもやや複雑です。というのも、タグは何でもできるからです。
-
-.. _A quick overview:
+タグはフィルタよりもやや複雑です。というのも、タグを使えば何でもできるから
+です。
 
 テンプレートタグの概要
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -335,20 +326,18 @@ Django テンプレートシステムには、広範な :ref:`組み込みタグ
 る ``Node`` オブジェクトの集まりに過ぎません。コンパイル済みのテンプレート
 オブジェクトに対して ``render()`` を呼び出すと、テンプレートは指定されたコ
 ンテキストを使ってノードリストの各 ``Node`` に対して ``render()`` を呼び出
-します。戻り値は全て連結され、テンプレートからの出力になります。
+します。戻り値は全て連結され、テンプレートのレンダリング結果になります。
 
 従って、カスタムテンプレートタグを定義するには、元のテンプレートタグをどう
 やって ``Node`` (コンパイル関数: compilation function) に変換し、個々のノー
 ドの ``render()`` メソッドが何をするかを指定する必要があります。
-
-.. _Writing the compilation function:
 
 コンパイル関数を書く
 ~~~~~~~~~~~~~~~~~~~~
 
 テンプレートタグに到達するたびに、テンプレートパーザはタグの内容とパーザオ
 ブジェクト自体を引数にしてある Python 関数を呼び出します。この関数はタグの
-内容に応じて ``Node`` インスタンスを返すようになっています。
+内容に応じて ``Node`` インスタンスを返す役割を担っています。
 
 例えば、 ``{% current_time %}`` というタグを書いてみましょう。このタグは現
 在の日付／時刻を表示し、そのフォーマットはタグの引数に指定した
@@ -408,8 +397,6 @@ Django テンプレートシステムには、広範な :ref:`組み込みタグ
       エンジンをひどく低速にしてしまいました。というわけで、低水準にしてい
       るのは、それが最も高速だからです。
 
-.. _Writing the renderer:
-
 レンダラを書く
 ~~~~~~~~~~~~~~
 
@@ -443,16 +430,14 @@ Django テンプレートシステムには、広範な :ref:`組み込みタグ
 レンダリングすることがあるので、このようなコンパイルとレンダリングの脱カッ
 プリングは究極的には効率的なテンプレートシステムを実現します。
 
-.. _Auto-escaping considerations:
-
-自動エスケープについての注意点
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+自動エスケープの注意点
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. versionadded:: 1.0
 
-テンプレートタグの出力は、自動エスケープフィルタで自動的に処理され
-*ません* 。とはいえ、テンプレートタグを書くときには、二つのことを心に留めて
-置く必要があります。
+テンプレートタグの出力は、自動エスケープフィルタで自動的に処理
+*されません* 。とはいえ、テンプレートタグを書くときには、二つのことを心に留
+めて置く必要があります。
 
 まず、テンプレートタグの ``render()`` が結果をコンテキスト変数に保存する場
 合 (文字列でそのまま返さない場合) には、必要なら ``mark_safe()`` を呼び出し
@@ -482,8 +467,6 @@ Django テンプレートシステムには、広範な :ref:`組み込みタグ
 ``{% autoescape off %}`` ブロック内で使った場合の出力が期待とは違うものになっ
 てしまいます。
 
-.. _Registering the tag:
-
 タグの登録
 ~~~~~~~~~~
 
@@ -511,8 +494,6 @@ Django テンプレートシステムには、広範な :ref:`組み込みタグ
 
 上の例の下の定義のようにして ``name`` 引数を省略すると、 Django は関数名を
 そのままフィルタ名として使います。
-
-.. _Passing template variables to the tag:
 
 テンプレート変数をタグに渡す
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -550,61 +531,29 @@ Django テンプレートシステムには、広範な :ref:`組み込みタグ
             raise template.TemplateSyntaxError, "%r tag's argument should be in quotes" % tag_name
         return FormatTimeNode(date_to_be_formatted, format_string[1:-1])
 
+.. versionchanged:: 1.0
+    Django 1.0 から変数の解決方法が変更され、
+    ``template.resolve_variable()`` は撤廃されて ``template.Variable`` クラ
+    スを使うようになりました。
+
 レンダラの方も変更して、 ``blog_entry`` オブジェクトの ``date_updated`` プ
 ロパティの実際の中身を取り出せるようにせねばなりません。これは
-``django.template`` の ``resolve_varialbe()`` で実現します。
-``resolve_variable()`` には、変数名と ``render`` メソッドを介して渡される現
-在のコンテキストを指定します::
+``django.template`` の ``Varialbe()`` クラスで実現します。従って::
 
-    from django import template
-    from django.template import resolve_variable
-    import datetime
     class FormatTimeNode(template.Node):
         def __init__(self, date_to_be_formatted, format_string):
-            self.date_to_be_formatted = date_to_be_formatted
+            self.date_to_be_formatted = template.Variable(date_to_be_formatted)
             self.format_string = format_string
 
         def render(self, context):
             try:
-                actual_date = resolve_variable(self.date_to_be_formatted, context)
+                actual_date = self.date_to_be_formatted.resolve(context)
                 return actual_date.strftime(self.format_string)
             except template.VariableDoesNotExist:
                 return ''
 
-これで、 ``resolve_variable`` は ``blog_entry.date_updated`` の値を解決して、
-その値にしたがってフォーマット処理を行います。
-
-.. versionadded:: 1.0
-
-    バージョン 1.0 の Django から、変数の解決方法が変更されました。
-    ``template.resolve_variable()`` はまだ使えますが、撤廃され、
-    ``template.Variable`` に取って代わられました。たいていは、このクラスを
-    使った方が、 ``template.resolve_variable`` より高速です。
-
-    ``Variable`` クラスを使うには、解決したい名前を指定してインスタンスを生
-    成し、 ``variable.resolve(context)`` を呼び出します。つまり、開発版では、
-    上の例を以下のように書き換える必要があります::
-
-    .. parsed-literal::
-
-        class FormatTimeNode(template.Node):
-            def __init__(self, date_to_be_formatted, format_string):
-                self.date_to_be_formatted = **Variable(date_to_be_formatted)**
-                self.format_string = format_string
-
-            def render(self, context):
-                try:
-                    actual_date = **self.date_to_be_formatted.resolve(context)**
-                    return actual_date.strftime(self.format_string)
-                except template.VariableDoesNotExist:
-                    return ''
-
-    変更点は太字で示してあります。
-
 現在のページのコンテキストに、 ``Variable`` に渡した名前がなかった場合、
 名前解決の際に ``VariableDoesNotExist`` 例外が送出されます。
-
-.. _Shortcut for simple tags:
 
 簡単なタグへのショートカット
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -646,7 +595,7 @@ Python 2.4 からは、デコレータ構文も使えます::
 入力値を引数に取るような関数を定義し、 ``simple_tag`` ヘルパ関数を使うのが
 一番簡単です。
 
-.. _Inclusion tags:
+.. _howto-custom-template-tags-inclusion-tags:
 
 埋め込みタグ
 ~~~~~~~~~~~~
@@ -716,7 +665,6 @@ Python 2.4 からは、デコレータ構文も使えます::
     def show_results(poll):
         ...
 
-
 時として、埋め込みタグが大量の引数を取るようになっていて、テンプレートの作
 者が全ての引数やその順番を管理しきれなくなるような場合があります。この問題
 を解決するために、 Django では埋め込みタグに対して ``takes_context`` オプショ
@@ -735,7 +683,7 @@ Python 2.4 からは、デコレータ構文も使えます::
             'link': context['home_link'],
             'title': context['home_title'],
         }
-    # Register the custom tag as an inclusion tag with takes_context=True.
+    # 定義したカスタムタグを takes_context=True の埋め込みタグとして登録する
     register.inclusion_tag('link.html', takes_context=True)(jump_link)
 
 (関数の最初のパラメタは *必ず* ``context`` という名前に *せねばならない* の
@@ -762,8 +710,6 @@ Python 2.4 からは、デコレータ構文も使えます::
 ``takes_context`` パラメタはデフォルトでは ``False`` です。この値を *True*
 に設定すると、タグの引数にはコンテキストオブジェクトが渡されます。この点だ
 けは前述の ``inclusion_tag`` の例と異なります。
-
-.. _Setting a variable in the context:
 
 コンテキスト中の変数を設定する
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -793,7 +739,7 @@ Python 2.4 からは、デコレータ構文も使えます::
 
 .. code-block:: html+django
 
-    {% current_time "%Y-%M-%d %I:%M %p" %}<p>The time is {{ current_time }}.</p>
+    {% current_time "%Y-%M-%d %I:%M %p" %}<p>時刻は {{ current_time }} です。</p>
 
 ところで、 ``CurrentTimeNode2`` には問題があります: 変数名 ``current_time``
 がハードコードされているのです。これはすなわち、テンプレートの他の部分で
@@ -804,7 +750,7 @@ Python 2.4 からは、デコレータ構文も使えます::
 .. code-block:: html+django
 
     {% get_current_time "%Y-%M-%d %I:%M %p" as my_current_time %}
-    <p>The current time is {{ my_current_time }}.</p>
+    <p>時刻は {{ my_current_time }} です。</p>
 
 この機能を実現するには、コンパイル関数と ``Node`` の両方をリファクタして、
 以下のようにせねばなりません::
@@ -819,7 +765,7 @@ Python 2.4 からは、デコレータ構文も使えます::
 
     import re
     def do_current_time(parser, token):
-        # This version uses a regular expression to parse tag contents.
+        # このバージョンはタグのコンテンツを解析するのに正規表現を使っています
         try:
             # Splitting by None == splitting by spaces.
             tag_name, arg = token.contents.split(None, 1)
@@ -835,8 +781,6 @@ Python 2.4 からは、デコレータ構文も使えます::
 
 ここでの違いは、 ``do_current_tume()`` がフォーマット文字列と変数名を取り、
 ``CurrentTimeNode3`` に渡すという点です。
-
-.. _Parsing until another block tag:
 
 他のブロックタグに到達するまでパージングする
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -874,8 +818,6 @@ Python 2.4 からは、デコレータ構文も使えます::
 
 ``CommentNode.render()`` は単に空文字列を返します。その結果、 
 ``{% comment %}`` と ``{% endcomment %}`` の間の内容は全て無視されます。
-
-.. _`Parsing until another block tag, and saving contents`:
 
 次のブロックタグまでパージングして、内容を保存する
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

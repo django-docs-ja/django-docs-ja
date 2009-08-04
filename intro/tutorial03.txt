@@ -4,7 +4,7 @@
 はじめての Django アプリ作成、その 3
 =====================================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1)
 
 このチュートリアルは :ref:`チュートリアルその 2 <intro-tutorial02>` の続き
 です。ここでは、引続きWeb 投票アプリケーションの開発を例にして、公開用のイ
@@ -45,8 +45,6 @@ Poll アプリケーションの場合には、以下の 4 つのビューを作
     * 投票ページ -- ある調査項目のある選択肢に対する投票を受け付けます。
 
 Django では、各ビューは簡単な Python の関数として表現されます。
-
-.. Design your URLs:
 
 URL スキームの設計
 ==================
@@ -89,22 +87,25 @@ Django は先頭のタプルから順に、リクエストされた URL とタ�
 
     from django.conf.urls.defaults import *
 
+    from django.contrib import admin
+    admin.autodiscover()
+
     urlpatterns = patterns('',
         (r'^polls/$', 'mysite.polls.views.index'),
         (r'^polls/(?P<poll_id>\d+)/$', 'mysite.polls.views.detail'),
         (r'^polls/(?P<poll_id>\d+)/results/$', 'mysite.polls.views.results'),
         (r'^polls/(?P<poll_id>\d+)/vote/$', 'mysite.polls.views.vote'),
+        (r'^admin/', include(admin.site.urls)),
     )
 
-復習しておきましょう。だれかが Web サイトのあるページ、例えば "/polls/23"
-をリクエストすると、 Django は ``ROOT_URLCONF`` に書かれているこの Python
-モジュールをロードします。Django はモジュール内に ``urlpatterns`` という変
-数をみつけ、正規表現を順に検査してゆきます。マッチする正規表現が見つかった
-(``r'^polls/(?P<poll_id>\d+)/$'`` ですね) ところで、 Django はこの正規表現
-に関連づけられている Python パッケージ／モジュールである
-``mysite.polls.views.detail`` をロードします。これは
-``mysite.polls.views.py`` ファイルに定義されている ``detail()`` という関数
-に対応します。最後に、 Django は以下のような引数で ``detail()`` を呼び出し
+復習しておいたほうがよいですね。だれかが Web サイトのあるページ、例えば
+"/polls/23" をリクエストすると、 Django は ``ROOT_URLCONF`` に書かれている
+この Pythonモジュールをロードします。Django はモジュール内の
+``urlpatterns`` という変数を探し、その中に入っている正規表現を順に検査して
+ゆきます。マッチする正規表現が見つかった (``r'^polls/(?P<poll_id>\d+)/$'``
+ですね) ところで、 Django はこの正規表現に関連づけられている Python パッケー
+ジ／モジュールである ``detail()`` を ``mysite.polls.views.py`` からロードし
+ます。これは最後に、 Django は以下のような引数で ``detail()`` を呼び出し
 ます::
 
     detail(request=<HttpRequest object>, poll_id='23')
@@ -142,10 +143,6 @@ URL パターンは正規表現なので、正規表現で実現できる限り�
 .. _`Python のドキュメント`: http://www.python.jp/doc/release/lib/module-re.html
 .. _Wikipedia's entry: http://en.wikipedia.org/wiki/Regular_expression
 .. _Python documentation: http://www.python.org/doc/current/lib/module-re.html
-.. _request and response documentation: ../request_response/
-.. _URLconf documentation: ../url_dispatch/
-
-.. _Write your first view:
 
 はじめてのビュー作成
 =====================
@@ -155,7 +152,7 @@ URL パターンは正規表現なので、正規表現で実現できる限り�
 
 Django 開発サーバを起動してください:
 
-    .. codebock
+.. code-block:: bash
 
     python manage.py runserver
 
@@ -193,8 +190,6 @@ Web ブラウザで "http://localhost:8000/polls/" に行ってみましょう�
 
 ブラウザを使って "/polls/34/" を見てください。このビューは URL に指定した
 ID を表示します。
-
-.. _Write views that actually do something:
 
 実際に動くビューを作成する
 ==========================
@@ -284,8 +279,6 @@ Django に教えます。チュートリアルその 2 の「admin サイトの�
 ブラウザでページをロードすると、チュートリアル 1 で作った "What's up" とい
 う投票項目の入ったブリットリストを表示します。
 
-.. _A shortcut: render_to_response():
-
 ショートカット: render_to_response()
 ------------------------------------
 
@@ -314,8 +307,6 @@ import する必要はなくなりました。
 ストでレンダリングし、 :class:`~django.http.HttpResponse` オブジェクトにし
 て返します。
 
-.. _Raising 404:
-
 404 の送出
 ===========
 
@@ -334,7 +325,12 @@ import する必要はなくなりました。
 新しい概念がでて来ました。このビューはリクエストした ID を持つ Poll が存在
 しないときに :exc:`~django.http.Http404` を送出します。
 
-.. _`A shortcut: get_object_or_404()`:
+``polls/detail.html`` テンプレートに何を書けばよいかは後で解説しますが、さ
+しあたって上の例題を動かしたければ、単に::
+
+    {{ poll }}
+
+と書いておいてください。
 
 ショートカット: get_object_or_404()
 -----------------------------------
@@ -373,8 +369,6 @@ import する必要はなくなりました。
 :meth:`~django.db.models.QuerySet.filter` を使います。リストが空の場合は
 :exc:`~django.http.Http404` を送出します。
 
-.. _Write a 404 (page not found) view:
-
 404 応答 (ページを見つけられません) 用のビューを作る
 =====================================================
 
@@ -394,7 +388,11 @@ URLconf の設定の一番上には以下のような行があるはずです::
 フォルト値は :func:`django.views.defaults.page_not_found` に設定されていま
 す。
 
-404 ビューには、あと 3 つ注意すべき点があります:
+404 ビューには、注意すべき点があと 4 つあります:
+
+    * (設定モジュールで) :setting:`DEBUG` を ``True`` に設定している場合、
+      Django は 404 ビューを使わず、トレースバックを表示します
+      (``404.html`` も使われません)。
 
     * 404 ビューは、 Django が URLconf の全ての正規表現をチェックして、一致
       するものがなかった場合にも呼び出されます。
@@ -405,10 +403,9 @@ URLconf の設定の一番上には以下のような行があるはずです::
       ばなりません。デフォルトの 404 ビューは、このテンプレートを全ての 404
       エラー表示に使います。
 
-    * (設定モジュールで) :setting:`DEBUG` を ``True`` に設定している場合、
-      Django は 404 ビューを使わず、トレースバックを表示します。
-
-.. _Write a 500 (server error) view:
+    * (設定モジュールで) :setting:`DEBUG` を ``False`` に設定していて、なお
+      かつ ``404.html`` を作成していないと、 ``Http500`` が生成されていまい
+      ます。ですから、必ず  ``404.html`` を作成してください。
 
 500 応答 (サーバエラー) 用のビューを作る
 ========================================
@@ -416,8 +413,6 @@ URLconf の設定の一番上には以下のような行があるはずです::
 404 と同じように、 URLconf で ``handler500`` を定義できます。
 ``handler500`` はサーバエラーが生じたときに呼び出されるビューを指します。サー
 バエラーになるのは、ビューコードに実行時エラーが生じた場合です。
-
-.. _Use the template system:
 
 テンプレートシステムを使う
 ==========================
@@ -450,8 +445,6 @@ Django は poll オブジェクトの ``question()`` というメソッドを呼
 参照してください。
 
 
-.. _Simplifying the URLconfs:
-
 URLconf の単純化
 ================
 
@@ -481,8 +474,6 @@ URLconf の単純化
 
 機能的には前の形式と全く同じです。でもとてもすっきりしましたね。
 
-.. _Decoupling the URLconfs:
-
 URLconf の脱カップリング
 ========================
 
@@ -505,7 +496,10 @@ URLconf です。
 次に ``mysite/urls.py`` から polls に関する URL 設定を全て削除し、以下の
 :func:`~django.conf.urls.defaults.include` を一つだけ書きます::
 
-    (r'^polls/', include('mysite.polls.urls')),
+    ...
+    urlpatterns = patterns('',
+        (r'^polls/', include('mysite.polls.urls')),
+        ...
 
 簡単に説明すると、 :func:`~django.conf.urls.defaults.include`` は別の
 URLconf への参照です。正規表現に ``$`` (文字列の末尾にマッチする) が付いて
@@ -517,7 +511,7 @@ URLconf への参照です。正規表現に ``$`` (文字列の末尾にマッ�
 従って、このシステムでユーザが "/polls/34/" にアクセスすると、次のように処
 理されます:
 
-  * Django が ``'^polls/'`` にマッチすることを発見します。
+  * Django は ``'^polls/'`` へのマッチを検出します。
 
   * Django はマッチ部分のテキスト (``"polls/"``) を取り去り、残りのテキスト
     である ``"34/"`` を 'mysite.polls.urls' という URLconf に送り、処理させ

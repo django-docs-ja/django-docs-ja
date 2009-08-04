@@ -4,7 +4,7 @@
 データベースのサポート状況
 ==========================
 
-:revision-up-to: 9084 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 Django は可能な限り全てのデータベースバックエンドをサポートしようとしていま
 すが、残念ながら全てのサーバが全く同じ仕様というわけではないので、どの機能
@@ -16,8 +16,74 @@ Django は可能な限り全てのデータベースバックエンドをサポ�
 スサーバ向けのドキュメントとして書かれたものではなく、リファレンスマニュア
 ルでもありません。
 
+.. _postgresql-notes:
+
+PostgreSQL notes
+================
+
+PostgreSQL 8.2 to 8.2.4
+-----------------------
+
+The implementation of the population statistics aggregates ``STDDEV_POP`` and
+``VAR_POP`` that shipped with PostgreSQL 8.2 to 8.2.4 are `known to be
+faulty`_. Users of these releases of PostgreSQL are advised to upgrade to
+`Release 8.2.5`_ or later. Django will raise a ``NotImplementedError`` if you
+attempt to use the ``StdDev(sample=False)`` or ``Variance(sample=False)``
+aggregate with a database backend that falls within the affected release range.
+
+.. _known to be faulty: http://archives.postgresql.org/pgsql-bugs/2007-07/msg00046.php
+.. _Release 8.2.5: http://developer.postgresql.org/pgdocs/postgres/release-8-2-5.html
+
+Transaction handling
+---------------------
+
+:ref:`By default <topics-db-transactions>`, Django starts a transaction when a
+database connection is first used and commits the result at the end of the
+request/response handling. The PostgreSQL backends normally operate the same
+as any other Django backend in this respect.
+
+Autocommit mode
+~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.1
+
+If your application is particularly read-heavy and doesn't make many database
+writes, the overhead of a constantly open transaction can sometimes be
+noticeable. For those situations, if you're using the ``postgresql_psycopg2``
+backend, you can configure Django to use *"autocommit"* behavior for the
+connection, meaning that each database operation will normally be in its own
+transaction, rather than having the transaction extend over multiple
+operations. In this case, you can still manually start a transaction if you're
+doing something that requires consistency across multiple database operations.
+The autocommit behavior is enabled by setting the ``autocommit`` key in the
+:setting:`DATABASE_OPTIONS` setting::
+
+    DATABASE_OPTIONS = {
+        "autocommit": True,
+    }
+
+In this configuration, Django still ensures that :ref:`delete()
+<topics-db-queries-delete>` and :ref:`update() <topics-db-queries-update>`
+queries run inside a single transaction, so that either all the affected
+objects are changed or none of them are.
+
+.. admonition:: This is database-level autocommit
+
+    This functionality is not the same as the
+    :ref:`topics-db-transactions-autocommit` decorator. That decorator is a
+    Django-level implementation that commits automatically after data changing
+    operations. The feature enabled using the :setting:`DATABASE_OPTIONS`
+    settings provides autocommit behavior at the database adapter level. It
+    commits after *every* operation.
+
+If you are using this feature and performing an operation akin to delete or
+updating that requires multiple operations, you are strongly recommended to
+wrap you operations in manual transaction handling to ensure data consistency.
+You should also audit your existing code for any instances of this behavior
+before enabling this feature. It's faster, but it provides less automatic
+protection for multi-call operations.
+
 .. _mysql-notes:
-.. _MySQL Notes:
 
 MySQL に関する注意
 ==================
@@ -52,20 +118,17 @@ MySQL 5.0
 .. _`MySQL 4.1`: http://dev.mysql.com/doc/refman/4.1/en/index.html
 .. _`MySQL 5.0`: http://dev.mysql.com/doc/refman/5.0/en/index.html
 
-.. _Storage Engines:
-
 ストレージエンジン
 ------------------
 
-MySQL は複数の 
-`ストレージエンジン`_
-(以前はテーブルタイプ: table type と呼ばれていたもの) を選択できます。
-デフォルトのストレージエンジンはサーバ設定で変更できます。
+MySQL は複数の `ストレージエンジン`_ (以前はテーブルタイプ: table type と呼
+ばれていたもの) を選択できます。デフォルトのストレージエンジンはサーバ設定
+で変更できます。
 
-デフォルトのストレージエンジンは MyISAM_ です。 MyISAM の短所は、現状ではト
-ランザクションや外部キーをサポートしていないという点です。一方、 MyISAM は、
-現状で、全文インデクスの生成や全文検索をサポートしている唯一のストレージエ
-ンジンです。
+デフォルトのストレージエンジンは MyISAM_ [#]_ です。 MyISAM の短所は、現状
+ではトランザクションや外部キーをサポートしていないという点です。一方、
+MyISAM は、現状で、全文インデクスの生成や全文検索をサポートしている唯一のス
+トレージエンジンでもあります。
 
 InnoDB_ エンジンは完全なトランザクション機能と外部キー参照をサポートしてい
 ます。
@@ -86,6 +149,10 @@ SolidDB_ や Falcon_ といった `その他のストレージエンジン`_
 .. _Falcon: http://dev.mysql.com/doc/falcon/en/index.html
 .. _その他のストレージエンジン: `Other storage engines`_
 
+.. [#] お使いの MySQL パッケージでデフォルトが変更されていない場合。
+   Windows Community Server 向けのインストーラは、デフォルトのストレージエ
+   ンジンを InnoDB にしているという報告があります。
+
 MySQLdb
 -------
 
@@ -103,8 +170,6 @@ Django から利用できる MySQL の全ての機能を使うには、 バー�
     ``sets.py`` が入っていれば除去してください。
 
 .. _MySQLdb: http://sourceforge.net/projects/mysql-python
-
-.. _Creating your database:
 
 データベースを作成する
 ----------------------
@@ -173,11 +238,9 @@ MySQLdb 1.2.1p2 で ``utf8_bin`` コレーションの設定されたテーブ�
 (通常は ``django_admin_log``) のコレーションに
 ``utf8_collation_ci_swedish`` (デフォルトのコレーション) を使わねばなりませ
 ん。これらは標準の Django のテーブルのうち、内部的に
-:class:`~django.db.model.TextField` を使っているものだからです。
+:class:`~django.db.model.TextField` を使っているからです。
 
 .. _fixed in MySQLdb 1.2.2: http://sourceforge.net/tracker/index.php?func=detail&aid=1495765&group_id=22307&atid=374932
-
-.. _Connecting to the database:
 
 データベースに接続する
 ----------------------
@@ -199,18 +262,18 @@ MySQLdb 1.2.1p2 で ``utf8_bin`` コレーションの設定されたテーブ�
 
 MySQL のオプション設定ファイルを使う例を以下に示します::
 
-  # settings.py
-  DATABASE_ENGINE = "mysql"
-  DATABASE_OPTIONS = {
-      'read_default_file': '/path/to/my.cnf',
-      }
-      
-  # my.cnf
-  [client]
-  database = DATABASE_NAME
-  user = DATABASE_USER
-  password = DATABASE_PASSWORD
-  default-character-set = utf8
+    # settings.py
+    DATABASE_ENGINE = "mysql"
+    DATABASE_OPTIONS = {
+        'read_default_file': '/path/to/my.cnf',
+    }
+
+    # my.cnf
+    [client]
+    database = DATABASE_NAME
+    user = DATABASE_USER
+    password = DATABASE_PASSWORD
+    default-character-set = utf8
 
 この他にも、MySQLdb の接続オプションには、 ``ssl``, ``use_unicode``,
 ``init_command``, ``sql_mode`` といった便利なものがあります。詳しくは
@@ -220,8 +283,6 @@ MySQL のオプション設定ファイルを使う例を以下に示します::
 .. _MySQLdb documentation: http://mysql-python.sourceforge.net/
 .. _`MySQL のオプション設定ファイル`: `MySQL option file`_
 .. _`MySQLdb のドキュメント`: `MySQLdb documentation`_
-
-.. _Creating your tables:
 
 テーブルを作成する
 ------------------
@@ -245,11 +306,9 @@ Django はスキーマを作成する際にストレージエンジンを指定�
   * あるいは、テーブルを作成する前に、 MySQLdb の ``init_command`` オプショ
     ンを使います::
 
-      DATABASE_OPTIONS = {
-        ...
-        "init_command": "SET storage_engine=INNODB",
-        ...
-        }
+          DATABASE_OPTIONS = {
+             "init_command": "SET storage_engine=INNODB",
+          }
 
     このように設定しておくと、接続時にデフォルトのストレージエンジンが変更
     されます。ただし、テーブルが全て作成され、運用環境で動き始めたら、この
@@ -260,8 +319,11 @@ Django はスキーマを作成する際にストレージエンジンを指定�
 
 .. _AlterModelOnSyncDB: http://code.djangoproject.com/wiki/AlterModelOnSyncDB
 
-``BooleanField`` に関する注意
--------------------------------
+フィールドタイプごとの注意
+---------------------------
+
+``BooleanField`` 
+~~~~~~~~~~~~~~~~~~~
 
 MySQL には直接的な ``BOOLEAN`` カラム型がないので、 Django は
 :class:`~django.db.models.BooleanField` の値を ``TINYINT`` カラムを使って 0
@@ -269,41 +331,156 @@ MySQL には直接的な ``BOOLEAN`` カラム型がないので、 Django は
 さい。ただし、フィールドの値を出力したり、値が ``True`` や ``False`` でなけ
 ればならないような場合を除いて、特に問題はありません。
 
+Character fields
+~~~~~~~~~~~~~~~~
+
+Any fields that are stored with ``VARCHAR`` column types have their
+``max_length`` restricted to 255 characters if you are using ``unique=True``
+for the field. This affects :class:`~django.db.models.CharField`,
+:class:`~django.db.models.SlugField` and
+:class:`~django.db.models.CommaSeparatedIntegerField`.
+
+Furthermore, if you are using a version of MySQL prior to 5.0.3, all of those
+column types have a maximum length restriction of 255 characters, regardless
+of whether ``unique=True`` is specified or not.
+
 .. _sqlite-notes:
 
 SQLite に関する注意
 =====================
  
-バージョン 3.3.5 以前の SQLite には、 ``ORDER_BY`` パラメタの扱いかたに
-`バグがあります <contain a bug>`_ 。そのため、クエリセットメソッド
-``extra()`` を使って ``select`` のパラメタを指定しようとすると問題を引き起
-こします。このバグは、
-``OperationalError: ORDER BY terms must not be non-integer constants`` とい
-うメッセージを出力します。 SQLite のバージョンを 3.3.6 に上げ、
-``pysqlite2`` モジュールを更新すれば、問題を解決できます。
- 
-.. _contain a bug: http://www.sqlite.org/cvstrac/tktview?tn=1768 
+SQLite_ provides an excellent development alternative for applications that
+are predominantly read-only or require a smaller installation footprint. As
+with all database servers, though, there are some differences that are
+specific to SQLite that you should be aware of.
 
-バージョン 3.3.6 は 2006 年の 4 月にリリースされており、現在手に入る各プラッ
-トフォームのほとんどのバイナリ配布物で、Python から ``pysqlite2`` や
-``sqlite3`` を介して使える SQLite は新しいバージョンなので、あまり大きなイ
-ンパクトはありません。
+.. _SQLite: http://www.sqlite.org/
 
-ただし、 Windows の場合、 Python 2.5 の公式の安定版リリースのバイナリ配布物
-には (今のところ 2.5.2 も)、 SQLite 3.3.4 が組み込まれているため、バグが確
-認されています。このため (Django 1.0 で) 3 つのテストスイートが失敗します。
-この問題は、上で述べたように、 新しいバージョン SQLite が組み込まれた
-``pysqlite2`` (``pysqlite-2.x.x.win32-py2.5.exe``) をダウンロードしてインス
-トールすれば解決できます。 Python 2.6 には新たなバージョンの SQLite が付属
-する予定なので、この問題の影響を受けないはずです。
- 
-上記のプラットフォームを使っていて、 ``pysqlite`` や SQLite を更新する必要
-があるなら、Django のソースツリーの ``django/db/backends/sqlite3/base.py``
-ファイルを手で編集して、 ``sqlite3`` より ``pysqlite2`` が先に import され
-るように変更してください。
+.. _sqlite-string-matching:
+
+String matching for non-ASCII strings
+--------------------------------------
+
+SQLite doesn't support case-insensitive matching for non-ASCII strings. Some
+possible workarounds for this are `documented at sqlite.org`_, but they are
+not utilised by the default SQLite backend in Django. Therefore, if you are
+using the ``iexact`` lookup type in your queryset filters, be aware that it
+will not work as expected for non-ASCII strings.
+
+.. _documented at sqlite.org: http://www.sqlite.org/faq.html#q18
+
+SQLite 3.3.6 or newer strongly recommended
+------------------------------------------
+
+Versions of SQLite 3.3.5 and older contains the following bugs:
+
+ * A bug when `handling`_ ``ORDER BY`` parameters. This can cause problems when
+   you use the ``select`` parameter for the ``extra()`` QuerySet method. The bug
+   can be identified by the error message ``OperationalError: ORDER BY terms
+   must not be non-integer constants``.
+
+ * A bug when handling `aggregation`_ together with DateFields and
+   DecimalFields.
+
+.. _handling: http://www.sqlite.org/cvstrac/tktview?tn=1768
+.. _aggregation: http://code.djangoproject.com/ticket/10031
+
+SQLite 3.3.6 was released in April 2006, so most current binary distributions
+for different platforms include newer version of SQLite usable from Python
+through either the ``pysqlite2`` or the ``sqlite3`` modules.
+
+However, some platform/Python version combinations include older versions of
+SQLite (e.g. the official binary distribution of Python 2.5 for Windows, 2.5.4
+as of this writing, includes SQLite 3.3.4). There are (as of Django 1.1) even
+some tests in the Django test suite that will fail when run under this setup.
+
+As described :ref:`below<using-newer-versions-of-pysqlite>`, this can be solved
+by downloading and installing a newer version of ``pysqlite2``
+(``pysqlite-2.x.x.win32-py2.5.exe`` in the described case) that includes and
+uses a newer version of SQLite. Python 2.6 for Windows ships with a version of
+SQLite that is not affected by these issues.
+
+Version 3.5.9
+-------------
+
+The Ubuntu "Intrepid Ibex" (8.10) SQLite 3.5.9-3 package contains a bug that
+causes problems with the evaluation of query expressions. If you are using
+Ubuntu "Intrepid Ibex", you will need to update the package to version
+3.5.9-3ubuntu1 or newer (recommended) or find an alternate source for SQLite
+packages, or install SQLite from source.
+
+At one time, Debian Lenny shipped with the same malfunctioning SQLite 3.5.9-3
+package. However the Debian project has subsequently issued updated versions
+of the SQLite package that correct these bugs. If you find you are getting
+unexpected results under Debian, ensure you have updated your SQLite package
+to 3.5.9-5 or later.
+
+The problem does not appear to exist with other versions of SQLite packaged
+with other operating systems.
+
+Version 3.6.2
+--------------
+
+SQLite version 3.6.2 (released August 30, 2008) introduced a bug into ``SELECT
+DISTINCT`` handling that is triggered by, amongst other things, Django's
+``DateQuerySet`` (returned by the ``dates()`` method on a queryset).
+
+You should avoid using this version of SQLite with Django. Either upgrade to
+3.6.3 (released September 22, 2008) or later, or downgrade to an earlier
+version of SQLite.
+
+.. _using-newer-versions-of-pysqlite:
+
+Using newer versions of the SQLite DB-API 2.0 driver
+----------------------------------------------------
+
+.. versionadded:: 1.1
+
+For versions of Python 2.5 or newer that include ``sqlite3`` in the standard
+library Django will now use a ``pysqlite2`` interface in preference to
+``sqlite3`` if it finds one is available.
+
+This provides the ability to upgrade both the DB-API 2.0 interface or SQLite 3
+itself to versions newer than the ones included with your particular Python
+binary distribution, if needed.
+
+"Database is locked" errors
+-----------------------------------------------
+
+SQLite is meant to be a lightweight database, and thus can't support a high
+level of concurrency. ``OperationalError: database is locked`` errors indicate
+that your application is experiencing more concurrency than ``sqlite`` can
+handle in default configuration. This error means that one thread or process has
+an exclusive lock on the database connection and another thread timed out
+waiting for the lock the be released.
+
+Python's SQLite wrapper has
+a default timeout value that determines how long the second thread is allowed to
+wait on the lock before it times out and raises the ``OperationalError: database
+is locked`` error.
+
+If you're getting this error, you can solve it by:
+
+    * Switching to another database backend. At a certain point SQLite becomes
+      too "lite" for real-world applications, and these sorts of concurrency
+      errors indicate you've reached that point.
+
+    * Rewriting your code to reduce concurrency and ensure that database
+      transactions are short-lived.
+
+    * Increase the default timeout value by setting the ``timeout`` database
+      option option::
+
+          DATABASE_OPTIONS = {
+              # ...
+             "timeout": 20,
+              # ...
+          }
+
+      This will simply make SQLite wait a bit longer before throwing "database
+      is locked" errors; it won't really do anything to solve them.
 
 .. _oracle-notes:
-.. _Oracle notes:
 
 Oracle に関する注意
 ====================
@@ -312,6 +489,11 @@ Django はバージョン 9i 以降の `Oracle データベースサーバ`_ を
 ます。 Django の ``regex`` および ``iregex`` クエリオペレータを使うには、
 バージョン 10g 以降の Oracle を使う必要があります。
 バージョン 4.3.1 以降の `cx_Oracle`_ ドライバが必要です。
+
+Note that due to a Unicode-corruption bug in ``cx_Oracle`` 5.0, that
+version of the driver should **not** be used with Django;
+``cx_Oracle`` 5.0.1 resolved this issue, so if you'd like to use a
+more recent ``cx_Oracle``, use version 5.0.1.
 
 .. _`Oracle Database Server`: http://www.oracle.com/
 .. _`cx_Oracle`: http://cx-oracle.sourceforge.net/
@@ -331,8 +513,8 @@ Django のテストスイートを実行させるには、 *さらに* 以下の
     * DROP USER
     * CREATE TABLESPACE
     * DROP TABLESPACE
-
-.. _Connecting to the Oracle database:
+    * CONNECT WITH ADMIN OPTION
+    * RESOURCE WITH ADMIN OPTION
 
 データベースへの接続
 --------------------------
@@ -359,8 +541,6 @@ Oracle を使う場合、 Django の settings.py は以下のように設定し�
 
 :setting:`DATABASE_HOST` と :setting:`DATABASE_PORT` は、両方とも指定するか、
 両方とも空にするかどちらかにしてください。
-
-.. _Tablespace options:
 
 テーブルスペース
 ------------------
@@ -411,16 +591,12 @@ Django 自体にはテーブルスペースを作成する機能はありませ�
 .. _`Oracle's documentation`: http://download.oracle.com/docs/cd/B19306_01/server.102/b14200/statements_7003.htm#SQLRF01403
 .. _`Oracle のドキュメント`: `Oracle's documentation`_
 
-.. _Naming issues:
-
 名前に関する制約
 -----------------
 
 Oracle は名前の長さを 30 文字以下に制限しています。この制限に合わせるために、
 バックエンドは識別子名を切り詰めて、最後の 4 文字を MD5 のハッシュ値で置き
 換えます。
-
-.. _NULL and empty strings:
 
 NULL 値よび空文字列
 ----------------------
@@ -431,8 +607,6 @@ Django は通常、 NULL ではなく空文字列を使うようにしていま�
 強制的に付加します。データベースから値を取り出すとき、フィールドの値が NULL
 であれば、そのフィールドの値は実際には空文字列であるとみなし、値も暗黙のう
 ちに空文字列に変換されます。
-
-.. _TextField limitations:
 
 ``TextField`` への制限
 -------------------------
@@ -450,3 +624,28 @@ Oracle は、一般に LOB カラムに以下の制約を課しています:
     るには、 ``distinct()`` クエリの対象モデルから ``TextField`` を除去し、
     ``TextField`` を持つ他のモデルを定義しておいてリレーションを張ってくだ
     さい。
+
+.. _third-party-notes:
+
+Using a 3rd-party database backend
+==================================
+
+In addition to the officially supported databases, there are backends provided
+by 3rd parties that allow you to use other databases with Django:
+
+* `Sybase SQL Anywhere`_
+* `IBM DB2`_
+* `Microsoft SQL Server 2005`_
+* Firebird_
+* ODBC_
+
+The Django versions and ORM features supported by these unofficial backends
+vary considerably. Queries regarding the specific capabilities of these
+unofficial backends, along with any support queries, should be directed to
+the support channels provided by each 3rd party project.
+
+.. _Sybase SQL Anywhere: http://code.google.com/p/sqlany-django/
+.. _IBM DB2: http://code.google.com/p/ibm-db/
+.. _Microsoft SQL Server 2005: http://code.google.com/p/django-mssql/
+.. _Firebird: http://code.google.com/p/django-firebird/
+.. _ODBC: http://code.google.com/p/django-pyodbc/

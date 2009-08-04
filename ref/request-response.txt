@@ -4,12 +4,10 @@
 リクエストオブジェクトとレスポンスオブジェクト
 ==============================================
 
-:revision-up-to: 9084 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 .. module:: django.http
    :synopsis: HTTP のリクエストとレスポンスを扱うためのクラスです。
-
-.. _`Quick overview`:
 
 簡単な概要
 ==========
@@ -27,14 +25,10 @@ Django は、システム全体にわたって、リクエストとレスポン�
 このドキュメントでは  :class:`~django.http.HttpRequest` および
 :class:`~django.http.HttpResponse` オブジェクトの API について説明します。
 
-.. _HttpRequest objects:
-
 HttpRequest オブジェクト
 ========================
 
 .. class:: HttpRequest
-
-.. _Attributes:
 
 属性
 ----
@@ -162,6 +156,13 @@ HttpRequest オブジェクト
         * ``SERVER_NAME`` -- サーバのホスト名です。
         * ``SERVER_PORT`` -- サーバのポート番号です。
 
+    With the exception of ``CONTENT_LENGTH`` and ``CONTENT_TYPE``, as given
+    above, any HTTP headers in the request are converted to ``META`` keys by
+    converting all characters to uppercase, replacing any hyphens with
+    underscores and adding an ``HTTP_`` prefix to the name. So, for example, a
+    header called ``X-Bender`` would be mapped to the ``META`` key
+    ``HTTP_X_BENDER``.
+
 .. attribute:: HttpRequest.user
 
     現在ログインしているユーザを表す ``django.models.auth.models.User`` オブ
@@ -177,7 +178,6 @@ HttpRequest オブジェクト
     ``user`` を利用できるのは、 インストールした Django で
     ``AuthenticationMiddleware`` を有効にした場合だけです。詳しくは
     :ref:`topics-auth` を参照してください。
-
 
 .. attribute:: HttpRequest.session
 
@@ -198,7 +198,6 @@ HttpRequest オブジェクト
     ど）でこの属性を設定した場合、Djangoはその値を ``ROOT_URLCONF`` の代わ
     りにルート URLconf モジュール名として使います。
     詳しくは 「 :ref:`how-django-processes-a-request` 」を参照してください。
-
 
 メソッド
 --------
@@ -260,8 +259,6 @@ HttpRequest オブジェクト
    ``is_ajax()`` を正しく機能させたいなら、 ``HTTP_X_REQUESTED_WITH`` ヘッ
    ダを適切に設定してください。
 
-.. _QueryDict objects:
-
 QueryDict オブジェクト
 ----------------------
 
@@ -275,7 +272,6 @@ QueryDict オブジェクト
 :class:`~django.http.QueryDict` インスタンスは、 ``copy()`` を作らないかぎ
 り変更できません。これは、 ``request.POST`` や ``request.GET`` の属性を直接
 変更できないということです。
-
 
 メソッド
 ---------
@@ -336,6 +332,17 @@ QueryDict オブジェクト
            >>> q.items()
            [('a', '3')]
 
+.. method:: QueryDict.iteritems()
+
+    標準の辞書型の ``iteritems()`` によく似ています。
+    :meth:`QueryDict.items()` と同じく、
+    :meth:`QueryDict.__getitem()__` で最後の値を返します。
+
+.. method:: QueryDict.iterlists()
+
+    :meth:`QueryDict.iteritems()` に似ていますが、各辞書のメンバの値を全て
+    リストとして返します。
+
 .. method:: QueryDict.values()
 
     ``values()`` -- 標準の辞書型の ``values()`` メソッドと同じですが、
@@ -344,6 +351,10 @@ QueryDict オブジェクト
            >>> q = QueryDict('a=1&a=2&a=3')
            >>> q.values()
            ['3']
+
+.. method:: QueryDict.itervalues()
+
+    :meth:`QueryDict.values()` と同じですが、イテレータです。
 
 加えて、 :class:`~django.http.QueryDict` には以下のメソッドがあります:
 
@@ -383,18 +394,6 @@ QueryDict オブジェクト
 
     データをクエリ文字列形式にフォーマットした文字列を返します。例えば:
     ``"a=2&b=3&b=5"`` のようになります。
-
-
-
-実装に関する注意
-------------------
-
-``GET``, ``POST``, ``COOKIES``, ``FILES``, ``META``, ``REQUEST``,
-``raw_post_data`` および ``user`` といった属性はすべて遅延読み込み (lazily
-load) されます。すなわち、 Django はコード中で要求されるまで、これらの値を
-計算するためにリソースを消費しません。
-
-.. _HttpResponse objects:
 
 HttpResponse オブジェクト
 =========================
@@ -453,8 +452,6 @@ Django によって自動生成される :class:`~django.http.HttpRequest` オ�
       ファイルライクオブジェクトとして扱えず、ファイルライクオブジェクトと
       して操作すると ``Exception`` を送出します。
       
-.. _Setting headers:
-
 ヘッダ情報をセットする
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -463,7 +460,10 @@ Django によって自動生成される :class:`~django.http.HttpRequest` オ�
     >>> response = HttpResponse()
     >>> response['Pragma'] = 'no-cache'
 
-.. _Telling the browser to treat the response as a file attachment:
+.. versionadded:: 1.1
+
+HTTP ヘッダには改行を含めてはなりません。改行文字 (CR や LF) の入ったヘッダ
+をセットしようとすると、 ``BadHeaderError`` を送出します。
 
 レスポンスをブラウザにファイルアタッチメントとして扱わせる
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -577,7 +577,7 @@ Django によって自動生成される :class:`~django.http.HttpRequest` オ�
 .. _HTTP Status code: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10
 .. _`HTTP 状態コード`: `HTTP Status code`_
 
-.. _HttpResponse subclasses:
+.. _ref-httpresponse-subclasses:
 
 HttpResponse のサブクラス
 -------------------------
@@ -586,7 +586,6 @@ Django には、様々なタイプの HTTP レスポンスを扱うための
 :class:`~django.http.HttpResponse` のサブクラスがあります。これらのサブクラ
 スは :class:`~django.http.HttpResponse` と同じく :mod:`django.http` モジュー
 ルにあります。
-
 
 .. class:: HttpResponseRedirect
 
@@ -636,5 +635,4 @@ Django には、様々なタイプの HTTP レスポンスを扱うための
 .. class:: HttpResponseServerError
 
     :class:`~django.http.HttpResponse` と同じですが、状態コード 500 を使います。
-
 

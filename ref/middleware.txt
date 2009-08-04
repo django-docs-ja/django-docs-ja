@@ -4,7 +4,7 @@
 組み込みミドルウェアリファレンス
 =====================================
 
-:revision-up-to: 9084 (1.0)
+:revision-up-to: 11321 (1.1)
 
 .. module:: django.middleware
    :synopsis: Django の組み込みミドルウェアクラスです。
@@ -16,8 +16,6 @@
 
 利用できるミドルウェア
 ======================
-
-.. _Cache middleware:
 
 キャッシュミドルウェア
 ------------------------
@@ -33,9 +31,6 @@
 Django の管理下にあるページは :setting:`CACHE_MIDDLEWARE_SECONDS` 設定に定
 義した時間のキャッシュされます。
 :ref:`キャッシュのドキュメント <topics-cache>` を参照してください。
-
-
-.. _"Common" middleware:
 
 コモンミドルウェア
 -------------------
@@ -84,8 +79,6 @@ Django の管理下にあるページは :setting:`CACHE_MIDDLEWARE_SECONDS` 設
       ごとにページ内容の MD-5 ハッシュを計算して ETag にし、必要なら 
       ``Not Modified`` 応答を返します。
 
-.. _View metadata middleware:
-
 ビューメタデータミドルウェア
 --------------------------------
 
@@ -97,8 +90,6 @@ Django の管理下にあるページは :setting:`CACHE_MIDDLEWARE_SECONDS` 設
 :setting:`INTERNAL_IPS` 設定に定義されている IP アドレスから来た HEAD リク
 エストに対してカスタムの ``X-View`` HTTP ヘッダを送信します。このミドルウェ
 アはDjango の自動ドキュメントシステムで使われています。
-
-.. _GZIP middleware:
 
 GZIP ミドルウェア
 ---------------------
@@ -118,8 +109,6 @@ gzip 圧縮を受け付けるブラウザ (最近のほとんどのブラウザ�
 のコンテンツ、Javascript ファイル (IE との互換性のため)、
 ``Content-Encoding`` が指定されているレスポンスも圧縮しません。
 
-.. _Conditional GET middleware:
-
 条件付き GET ミドルウェア
 --------------------------
 
@@ -134,8 +123,6 @@ gzip 圧縮を受け付けるブラウザ (最近のほとんどのブラウザ�
 :class:`~django.http.HttpNotModified` に置き換えます。
 
 また、 ``Date`` および ``Content-Length`` ヘッダを設定します。
-
-.. _Reverse proxy middleware:
 
 リバースプロキシミドルウェア
 ------------------------------
@@ -155,9 +142,6 @@ gzip 圧縮を受け付けるブラウザ (最近のほとんどのブラウザ�
 が "偽の" IP アドレスを名乗れてしまうからです。このミドルウェアを使ってよい
 のは、 ``HTTP_X_FORWARDED_FOR`` の値を完全に信用できる場合だけです。
 
-
-.. _Locale middleware:
-
 ロケールミドルウェア
 ---------------------
 
@@ -170,8 +154,6 @@ gzip 圧縮を受け付けるブラウザ (最近のほとんどのブラウザ�
 提供するコンテンツをカスタマイズできます。 
 :ref:`国際化のドキュメント <topics-i18n>` を参照してください。
 
-.. _Session middleware:
-
 セッションミドルウェア
 -------------------------
 
@@ -183,10 +165,8 @@ gzip 圧縮を受け付けるブラウザ (最近のほとんどのブラウザ�
 セッションのサポートを有効にします。
 :ref:`セッションのドキュメント <topics-http-sessions>` も参照してください。
 
-.. _Authentication middleware:
-
 認証ミドルウェア
--------------------------
+------------------
 
 .. module:: django.contrib.auth.middleware
   :synopsis: 認証ミドルウェアです。
@@ -197,11 +177,8 @@ gzip 圧縮を受け付けるブラウザ (最近のほとんどのブラウザ�
 表す ``user`` 属性を追加します。 
 :ref:`Web リクエストの認証 <topics-auth>` を参照してください。
 
-
-.. _CSRF protection middleware:
-
 CSRF 対策ミドルウェア
---------------------------
+-----------------------
 
 .. module:: django.contrib.csrf.middleware
    :synopsis: クロスサイトリクエストフォージェリ (Cross Site Request
@@ -216,8 +193,6 @@ POST フォームに隠しフォームフィールドを追加し、リクエス
 (CSRF) を防ぎます。詳しくは
 :ref:`クロスサイトリクエストフォージェリからの保護 <ref-contrib-csrf>` を参
 照してください。
-
-.. _Transaction middleware:
 
 トランザクションミドルウェア
 -----------------------------

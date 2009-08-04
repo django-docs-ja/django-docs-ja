@@ -4,16 +4,15 @@
 FastCGI, SCGI, AJP で Django を使う
 ===================================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1)
 
 .. highlight:: bash
 
-Django を動作させる構成として現在推奨されているのは、 
-:ref:`Apache と mod_python <howto-deployment-modpython>` の組合せですが、多
-くの人々が共有ホスティングサービスを使っており、そこでは FastCGI や SCGI,
-AJP といったプロトコルしか選択肢がない場合もあります。また、構成によっては、
-FastCGI は mod_python よりも安全であり、パフォーマンスの点で mod_python を
-しのぐ場合もあります。
+Django を動作させる構成として現在推奨しているのは、 
+:ref:`Apache と mod_wsgi <howto-deployment-modwsgi>` の組合せですが、多くの
+人々が使っている共有ホスティングサービスには、 FastCGI や SCGI, AJP といっ
+たプロトコルしか選択肢がありません。また、構成によっては、これらのプロトコ
+ルの方が、 mod_wsgi_ よりも高いパフォーマンスを実現することがあります。
 
 .. admonition:: Note
 
@@ -22,17 +21,18 @@ FastCGI は mod_python よりも安全であり、パフォーマンスの点で
     います。 SCGI や AJP 固有の設定は、後述の 「 プロトコル_ 」の節を参照し
     てください。
 
-FastCGI の本質は、外部アプリケーションが効率的に Web サーバにページを提供で
-きるようにすることにあります。 Web サーバは (socket を介して) 受け取った
-Web リクエストの処理を FastCGI に肩代りさせます。 FastCGI はコードを実行し
-て、その応答を Web サーバに返します。 Web サーバはその内容をクライアントの
-Web ブラウザに返すというわけです。
+FastCGI は、いわば外部アプリケーションによって Web サーバにページを提供させ
+る方法の一つです。Web サーバは (socket を介して) 受け取った Web リクエスト
+の処理を FastCGI に肩代りさせます。 FastCGI はコードを実行して、その応答を
+Web サーバに返します。 Web サーバはその内容をクライアントのWeb ブラウザに返
+すというわけです。
 
-mod_python と同様、 FastCGI はコードをメモリ上に残して、起動時間なしでリク
-エストを処理できるようにします。 mod_python_ (や `mod_perl`_) と違うのは、
-FastCGI プロセスは Web サーバプロセスの中ではなく、別の永続的プロセスの中で
-実行されるということです。
+mod_python と同様、 FastCGI はコードをメモリ上に残すので、リクエストはスク
+リプトの起動時間を伴わずに処理されます。 mod_python_ (や `mod_perl`_) と違
+うのは、 FastCGI プロセスは Web サーバプロセスの中ではなく、別の永続的プロ
+セスの中で実行されるということです。
 
+.. _mod_wsgi: http://code.google.com/p/modwsgi/
 .. _mod_python: http://www.modpython.org/
 .. _mod_perl: http://perl.apache.org/
 
@@ -50,8 +50,6 @@ FastCGI プロセスは Web サーバプロセスの中ではなく、別の永�
     実行できます。この特徴は、自分のコードを他のユーザから守れるという点で、
     共有ホストにおいてセキュリティ上の利点になります。
 
-.. _`Prerequisite: flup`:
-
 必要なもの: flup
 ================
 
@@ -60,8 +58,6 @@ flup は FastCGI を使えるようにするための Python ライブラリで�
 バージョン0.5 以降の flup で動作します。
 
 .. _flup: http://www.saddi.com/software/flup/
-
-.. _Starting your FastCGI server:
 
 FastCGI サーバを起動する
 ========================
@@ -98,8 +94,6 @@ Unix ドメインソケット (Win32 システムにおける「名前付きパ�
 バを起動するときに使ったソケット名か、ホスト/ポート番号の組合せを指定せねば
 なりません。後述の `実行例`_ を参照してください。
 
-.. _Protocols:
-
 プロトコル
 ----------
 
@@ -117,8 +111,6 @@ SCGI_, `AJP1.3`_ (Apache JServ プロトコルバージョン 1.3) をサポー�
 .. _SCGI: http://python.ca/scgi/protocol.txt
 .. _AJP1.3: http://tomcat.apache.org/connectors-doc/ajp/ajpv13a.html
 
-.. _Examples:
-
 実行例
 ------
 
@@ -134,8 +126,6 @@ Unix ドメインソケットを使い、 prefork モードでサーバを起動
 に便利です)::
 
     ./manage.py runfcgi daemonize=false socket=/tmp/mysite.sock maxrequests=1
-
-.. _Stopping the FastCGI daemon:
 
 FastCGI デーモンを止める
 ------------------------
@@ -156,7 +146,7 @@ Unix 上で FastCGI デーモンを簡単に再起動させたいなら、以下
 
     #!/bin/bash
 
-    # Replace these three settings.
+    # 以下の 3 つの設定は自分の環境に合わせて置き換える
     PROJDIR="/home/user/myproject"
     PIDFILE="$PROJDIR/mysite.pid"
     SOCKET="$PROJDIR/mysite.sock"
@@ -171,14 +161,12 @@ Unix 上で FastCGI デーモンを簡単に再起動させたいなら、以下
       PYTHONPATH="../python:.." \
       ./manage.py runfcgi socket=$SOCKET pidfile=$PIDFILE
 
-.. _Apache setup:
+Apache の設定
+==============
 
-Apache での FastCGI 構成
-========================
-
-Django を Apache と FastCGI の構成で使うには、 Apache をインストールして、
-`mod_fastcgi`_ がインストールされ、有効になっているようにせねばなりません。
-詳しい手順は Apache のドキュメントを参照してください。
+Django を Apache と FastCGI の構成で使うには、 Apache をインストールし、さ
+らに `mod_fastcgi`_ をインストールして有効にせねばなりません。詳しい手順は
+Apache のドキュメントを参照してください。
 
 mod_fastcgi の構成が終ったら、 ``httpd.conf`` ファイルを編集して、 Apache
 に Django の FastCGI インスタンスを教えます。以下の二つの設定を行わねばなり
@@ -191,8 +179,6 @@ mod_fastcgi の構成が終ったら、 ``httpd.conf`` ファイルを編集し�
 
 .. _mod_fastcgi: http://www.fastcgi.com/mod_fastcgi/docs/mod_fastcgi.html
 
-.. _Specifying the location of the FastCGI server:
-
 FastCGI サーバの場所を指定する
 ------------------------------
 
@@ -203,10 +189,10 @@ FastCGI サーバの場所を指定する
 
 .. code-block:: apache
 
-    # Connect to FastCGI via a socket / named pipe.
+    # ソケットや名前付きパイプを経由して FastCGI に接続する場合
     FastCGIExternalServer /home/user/public_html/mysite.fcgi -socket /home/user/mysite.sock
 
-    # Connect to FastCGI via a TCP host/port.
+    # TCP でホスト名とポート番号を指定して接続する場合
     FastCGIExternalServer /home/user/public_html/mysite.fcgi -host 127.0.0.1:3033
 
 いずれのケースでも、 ``/home/user/public_html/mysite.fcgi`` は実際に存在し
@@ -216,8 +202,6 @@ FastCGI で処理すべきリクエストを URL で区別するための単な�
 
 .. _`FastCGIExternalServer のドキュメント`: http://www.fastcgi.com/mod_fastcgi/docs/mod_fastcgi.html#FastCgiExternalServer
 .. _FastCGIExternalServer docs: http://www.fastcgi.com/mod_fastcgi/docs/mod_fastcgi.html#FastCgiExternalServer
-
-.. _Using mod_rewrite to point URLs at FastCGI:
 
 mod_rewrite を使って URL が FastCGI を指すようにする
 ----------------------------------------------------
@@ -246,19 +230,17 @@ URL を ``mysite.fcgi`` (または ``FastCGIExternalServer`` ディレクティ�
 Django は、 ``{% url %}`` テンプレートタグ (や、同様のメソッド) で URL を構
 築する際、自動的にリライト前の URL を使います。
 
-.. _lighttpd setup:
-
 lighttpd での FastCGI 構成
 ==========================
 
 lighttpd_ は静的ファイルのサービスによく使われている軽量な Web サーバです。
-lighttpd_ はネイティブの FastCGI サポートを持っているので、 Apache の縛りが
-ない場合、動的ページと静的ページの両方をサービスするには良い選択肢といえま
-す。
+lighttpd はネイティブの FastCGI サポートを持っているので、 Apache の縛りが
+なくて、動的ページと静的ページの両方をサービスしたい場合には良い選択肢とい
+えます。
 
 .. _lighttpd: http://www.lighttpd.net/
 
-``mod_fastcgi`` がモジュールリストに入っているようにしてください。このとき、
+``mod_fastcgi`` がモジュールリストに入っているか確かめてください。このとき、
 ``mod_rewrite`` や ``mod_access`` よりも後ろにして、 ``mod_accesslog`` より
 も前にします。 admin メディアファイルを提供するなら、 ``mod_alias`` も必要
 になるでしょう。
@@ -271,7 +253,7 @@ lighttpd 設定ファイルに以下の設定を追加してください:
     fastcgi.server = (
         "/mysite.fcgi" => (
             "main" => (
-                # Use host / port instead of socket for TCP fastcgi
+                # TCP で fastcgi に接続する場合は host / port を指定する
                 # "host" => "127.0.0.1",
                 # "port" => 3033,
                 "socket" => "/home/user/mysite.sock",
@@ -288,8 +270,6 @@ lighttpd 設定ファイルに以下の設定を追加してください:
         "^/favicon\.ico$" => "/media/favicon.ico",
         "^(/.*)$" => "/mysite.fcgi$1",
     )
-
-.. _Running multiple Django sites on one lighttpd:
 
 lighttpd を使って複数の Django サイトを駆動する
 -----------------------------------------------
@@ -320,7 +300,20 @@ lighttpd には、ホストごとに設定をカスタマイズするための�
 Django を同じサイトでも駆動できます。各エントリごとに FastCGI ホストを追加
 してください。
 
-.. _Running Django on a shared-hosting provider with Apache:
+Cherokee を使う場合
+====================
+
+Cherokee はとても高速で柔軟性があり、簡単に設定できる Web サーバです。
+Cherokee は、FastCGI, SCGI, PHP, CGI, SSI, TLS や SSL による暗号化、バーチャ
+ルホスト、認証、動的エンコーディング、ロードバランシング、Apache 互換のログ
+ファイル、データベースのバランサ、リバース HTTP プロキシなどなど、最近の
+Webサーバがサポートしている様々な技術をサポートしています。
+
+Cherokee プロジェクトのページには、 `Cherokee で Django を運用する`_ ための
+ドキュメントがあります。
+
+.. _setting up Django: http://www.cherokee-project.com/doc/cookbook_django.html
+.. _`Cherokee で Django を運用する`: `setting up Django`_
 
 Apache を使っている共有ホスティングプロバイダ上で Django を使う
 ===============================================================
@@ -354,19 +347,17 @@ Web コンテンツのルートディレクトリ下に、以下のような内�
     #!/usr/bin/python
     import sys, os
 
-    # Add a custom Python path.
+    # Python のモジュール検索パスをカスタマイズする
     sys.path.insert(0, "/home/user/python")
 
-    # Switch to the directory of your project. (Optional.)
+    # カレントディレクトリをプロジェクトのディレクトリに移す (必要なら)
     # os.chdir("/home/user/myproject")
 
-    # Set the DJANGO_SETTINGS_MODULE environment variable.
+    # 環境変数 DJANGO_SETTINGS_MODULE を設定する
     os.environ['DJANGO_SETTINGS_MODULE'] = "myproject.settings"
 
     from django.core.servers.fastcgi import runfastcgi
     runfastcgi(method="threaded", daemonize="false")
-
-.. _Restarting the spawned server:
 
 起動中のサーバを再起動する
 --------------------------
@@ -383,18 +374,15 @@ Unix システムでコマンドラインシェルへのアクセスが許され
 
     touch mysite.fcgi
 
-
-.. _Serving admin media files:
-
 Admin メディアファイルの提供
 ============================
 
 サーバやその設定がどうあれ、何らかの形で admin メディアファイルを提供する方
 法を考えておかねばなりません。 :ref:`modpython <serving-the-admin-files>`
-での運用に関するドキュメントには、上記の構成でも使えるアドバイスがあります。
+のドキュメントには、上記の構成でも使えるアドバイスがあります。
 
 URL のプレフィクス部分を特定の値にする
-============================================
+========================================
 
 FastCGI を使った設置方法は、ほとんどが URL をリライトしてウェブサーバ内部の
 別の場所を指すようにしています。このとき、 Django から見えるパス情報には、
@@ -418,6 +406,3 @@ Django がプレフィクスを正しく見付けられない場合や、リラ�
 例えば、全てのコンテンツを ``'/'`` 以下の URL で提供するように Django を構
 成しているなら、設定ファイルには ``FORCE_SCRIPT_NAME = ''`` と指定してくだ
 さい。
-
-
-

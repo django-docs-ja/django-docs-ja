@@ -4,7 +4,7 @@
 組み込みシグナルリファレンス
 =============================
 
-:revision-up-to: 9084 (1.0)
+:revision-up-to: 11321 (1.0) unfinished
 
 ここでは、 Django が送信する組み込みのシグナルについて解説します。
 
@@ -15,7 +15,7 @@
     ます。
 
 モデル関連のシグナル
-=========================
+======================
 
 .. module:: django.db.models.signals
    :synopsis: モデルシステムから送信されるシグナル
@@ -31,6 +31,10 @@
 
     従って、これらのメソッドをオーバライドする場合、親クラスのメソッドを呼
     び出して、シグナルが送信されるようにせねばなりません。
+
+	Note also that Django stores signal handlers as weak references by default,
+	so if your handler is a local function, it may be garbage collected.  To
+	prevent this, pass ``weak=False`` when you call the signal's :meth:`~django.dispatch.Signal.connect`.
 
 pre_init
 --------
@@ -227,6 +231,9 @@ post_syncdb
         示してもかまいません。 ``interactive`` が ``False`` であれば、シグ
         ナルを待ち受ける関数は、ユーザにプロンプトを表示してはなりません。
 
+        たとえば、 :mod:`django.contrib.auth` アプリケーションは、
+	``interactive`` が ``True`` の時にしかスーパユーザを作成しません。
+
 リクエスト／レスポンス関連のシグナル
 =======================================
 
@@ -281,7 +288,7 @@ got_request_exception
         :class:`~django.http.HttpRequest` オブジェクトです。
 
 テスト関連のシグナル
-============================
+=====================
 
 .. module:: django.test.signals
    :synopsis: テスト中に送信されるシグナルです。

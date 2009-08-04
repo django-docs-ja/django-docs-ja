@@ -3,7 +3,7 @@
 Django のデプロイ
 ===================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1)
 
 Django には、ウェブ開発者の負担を軽くするショートカットがぎっしりつまってい
 ますが、作ったサイトをデプロイできなければ元も子もありません。 Django プロ
@@ -12,24 +12,20 @@ Django には、ウェブ開発者の負担を軽くするショートカット�
 
 .. toctree::
    :maxdepth: 1
-   
+
+   modwsgi      
    modpython
    fastcgi
    
-デプロイの方法としては、 :ref:`mod_python を使う方法
-<howto-deployment-modpython>` をお勧めします。どの方法を選んでよいのか分か
-らない場合は、 mod_python を使いましょう。
+はじめて Django や Python で作った Web アプリケーションをデプロイするのなら、
+まずは :ref:`mod_wsgi を使う方法 <howto-deployment-modpython>` をお勧めしま
+す。 mod_wsgi を使えば、ほとんどの場合もっとも簡単で、高速で、安定したデプ
+ロイを実現できます。
 
 .. seealso::
 
-    * `Django Book の 20 章 <chaper 20 of the django book>`_ では、デプロイ
-      方法と、とりわけデプロイ時のスケーリングについて詳しく解説しています。
+    * `Django Book の 12 章`_ では、デプロイ方法と、とりわけスケールアウト
+      について詳しく解説しています。
       
-    * `mod_wsgi`_ はまだ新参のデプロイ手段ですが、急速に人々を惹き付けつつ
-      あります。今のところ、 
-      `mod_wsgi で Django を動かす <use mod_wsgi with django>`_ には、いく
-      つかステップが必要ですが、ユーザの評判は上々のようです。
-
-.. _chapter 20 of the django book: http://djangobook.com/en/1.0/chapter20/
-.. _mod_wsgi: http://code.google.com/p/modwsgi/
-.. _use mod_wsgi with Django: http://code.google.com/p/modwsgi/wiki/IntegrationWithDjango
+.. _chapter 12 of the django book: http://djangobook.com/en/2.0/chapter12/
+.. _`Django Book の 12 章`: `chapter 12 of the django book`_

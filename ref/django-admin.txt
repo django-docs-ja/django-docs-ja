@@ -4,7 +4,7 @@
 django-admin.py と manage.py
 ============================
 
-:revision-up-to: 9084 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 ``django-admin.py`` は Django の管理タスクを行うためのコマンドライン
 ユーティリティです。このドキュメントでは ``django-admin.py`` の全ての
@@ -45,38 +45,29 @@ Windows を使っていて、シンボリックリンクを張れない場合に
 
 .. code-block:: bash
 
-   ``django-admin.py <subcommand> [options]``
-   ``manage.py <subcommand> [options]``
+   django-admin.py <subcommand> [options]
+   manage.py <subcommand> [options]
 
 ``subcommand`` には、このドキュメントで挙げているいずれかのサブコマンド
 を指定します。 ``options`` は省略可能で、このドキュメントで挙げている
 ゼロ個から複数個の利用可能なオプションをサブコマンドに与えます。
-
-.. _Getting runtime help:
 
 ランタイムヘルプを取得する
 --------------------------
 
 .. django-admin-option:: --help
 
-Django 0.96では、 ``django-admin.py --help`` を実行すると、利用できる全ての
-サブコマンドとオプションの詳細なリストの入ったヘルプメッセージを出力します。
-
-開発版のDjangoでは、 ``django-admin.py --help`` を実行すると、利用できる全ての
-サブコマンドを出力します。 ``django-admin.py help <subcommand>`` を実行すると
-与えられたサブコマンドで利用できるオプションの詳細なリストを出力します。
-
-.. _App names:
+``django-admin.py help`` を実行すると、利用できる全てのサブコマンドを出力し
+ます。 ``django-admin.py help <subcommand>`` を実行すると、指定のサブコマン
+ドで利用できるオプションの詳細なリストを出力します。
 
 アプリケーションの名前
 ----------------------
 
-ほとんどのサブコマンドは ``appname`` のリストを引数にとります。 ``appname``
+多くのサブコマンドが ``appname`` のリストを引数にとります。 ``appname``
 はモデルの入ったパッケージの名前です。例えば ``INSTALLED_APPS`` に
 ``mysite.blog`` を追加している場合、このアプリケーションの ``appname``
 は ``blog`` です。
-
-.. _Determining the version:
 
 バージョンを表示する
 --------------------
@@ -92,8 +83,6 @@ Django 0.96では、 ``django-admin.py --help`` を実行すると、利用で�
     0.97-pre-SVN-6069
 
 
-.. _Displaying debug output:
-
 デバッグ出力を表示する
 -----------------------
 
@@ -106,8 +95,6 @@ Django 0.96では、 ``django-admin.py --help`` を実行すると、利用で�
     * ``1`` だと、通常の出力 (デフォルト) です。
     * ``2`` だと、詳細に出力します。
 
-
-.. _Available subcommands:
 
 利用可能なサブコマンド
 ======================
@@ -211,7 +198,7 @@ diffsettings
 dumpdata
 --------
 
-.. django-admin:: dumpdata <appname appname ...>
+.. django-admin:: dumpdata <appname appname appname.Model ...>
 
 
 指定したアプリケーション (複数指定可) に関係した全てのデータをデータベース
@@ -256,6 +243,14 @@ dumpdata
     人間にとって読みやすくありません。出力を整形するためのインデント幅のス
     ペース数の指定に ``--indent`` オプションを使えます。
 
+.. versionadded:: 1.1
+
+In addition to specifying application names, you can provide a list of
+individual models, in the form of ``appname.Model``. If you specify a model
+name to ``dumpdata``, the dumped output will be restricted to that model,
+rather than the entire application. You can also mix application names and
+model names.
+
 flush
 -----
 
@@ -264,14 +259,6 @@ flush
 データベースを syncdb 直後の状態に戻します。全てのデータがデータベースから
 除去され、同期直後に呼び出される全てのハンドラが再度実行されます。また、
 ``initial_data`` フィクスチャも再インストールされます。
-
-.. versionchanged:: 1.0
-
-以前は、このコマンドはデータベース上のテーブルを (``INSTALLED_APPS`` に登録
-されているモデルに関係しているかどうかに関わらず)  *全て* 消去していました。
-
-1.0 からは、 ``INSTALLED_APPS`` で有効化しているモデルのテーブルだけを消去
-します。
 
 .. django-admin-option:: --noinput
 
@@ -325,9 +312,12 @@ PostgreSQL や MySQL を使っている場合、イントロスペクション�
 loaddata <fixture fixture ...>
 ------------------------------
 
-名前付きのフィクスチャを探し、その中身をデータベースにロードします。
+名前付きのフィクスチャ (fixture) を探し、その中身をデータベースにロードします。
 
-*フィクスチャ* (fixture) とは、データベースに入れるデータをシリアライズして
+フィクスチャとは
+~~~~~~~~~~~~~~~~~
+
+*フィクスチャ* とは、データベースに入れるデータをシリアライズして
 格納したファイル群を指します。各フィクスチャファイルには固有の名前を付けら
 れますが、ある名前のフィクスチャを複数のディレクトリに入れても構いませんし、
 複数のアプリケーション内に配置してもかまいません。
@@ -347,8 +337,9 @@ Django は上記の場所に見つかった全てのフィクスチャファイ�
     django-admin.py loaddata mydata.json
 
 のようにすると、 ``mydata`` という名前の JSON フィクスチャだけがロードされ
-ます。フィクスチャの拡張子は、 (``json`` や ``xml`` のように) シリアライザ
-の登録名に対応していなければなりません。
+ます。フィクスチャの拡張子は、 (``json`` や ``xml`` のように)
+:ref:`シリアライザ <serialization-formats>` の登録名に対応していなければな
+りません。
 
 拡張子を省略すると、 Django は全ての形式にフィクスチャを対象にフィクスチャ
 ファイルを検索します。例えば::
@@ -357,10 +348,7 @@ Django は上記の場所に見つかった全てのフィクスチャファイ�
 
 のようにすると、 ``mydata`` という名前の全てのフィクスチャを探します。フィ
 クスチャディレクトリに ``mudata.json`` という名前のファイルがあれば、 JSON
-形式のフィクスチャとしてロードされます。同じ名前で別のフィクスチャ形式のも
-のが見つかった場合 (例えば、 ``mydata.json`` と ``mydata.xml`` が同じディレ
-クトリ下にあった場合)、フィクスチャのインストールは中止され、それまでに
-``loaddata`` によってロードされたデータは全てデータベースから削除されます。
+形式のフィクスチャとしてロードされます。
 
 フィクスチャの名前にはディレクトリ名を入れても構いません。ディレクトリ部分
 を指定すると、各検索パスに追加されます。例えば::
@@ -372,6 +360,10 @@ Django は上記の場所に見つかった全てのフィクスチャファイ�
 の各ディレクトリ ``<dirname>`` について ``<dirname>/foo/bar/mydata.json``
 を、そして相対パス ``foo/bar/mydata.json`` を探します。
 
+フィクスチャファイルを処理する際、データはデータベースにそのまま保存され、
+モデルごとに定義した ``save`` メソッドや ``pre_save`` シグナルは呼び出され
+ません。
+
 フィクスチャファイルの処理順は決まっていませんが、全てのフィクスチャのイン
 ストールは単一のトランザクションで行われるため、あるフィクスチャが別のフィ
 クスチャに対する参照を持っていてもかまいません。データベースバックエンドが
@@ -379,6 +371,22 @@ Django は上記の場所に見つかった全てのフィクスチャファイ�
 ンザクションの最後にチェックされます。
 
 ``dumpdata`` コマンドを使うと、 ``loaddata`` の入力データを生成できます。
+
+Compressed fixtures
+~~~~~~~~~~~~~~~~~~~
+
+Fixtures may be compressed in ``zip``, ``gz``, or ``bz2`` format. For example::
+
+    django-admin.py loaddata mydata.json
+
+would look for any of ``mydata.json``, ``mydata.json.zip``,
+``mydata.json.gz``, or ``mydata.json.bz2``.  The first file contained within a
+zip-compressed archive is used.
+
+同じ名前で別のフィクスチャ形式のものが見つかった場合 (例えば、
+``mydata.json`` と ``mydata.xml.gz`` が同じディレクトリ下にあった場合)、フィ
+クスチャのインストールは中止され、それまでに ``loaddata`` によってロードさ
+れたデータは全てデータベースから削除されます。
 
 .. admonition:: MySQL とフィクスチャ
 
@@ -389,20 +397,6 @@ Django は上記の場所に見つかった全てのフィクスチャファイ�
     を使っている場合、データファイル間で前方参照を行えません。 MySQL は行制
     約のチェックをトランザクションコミット直前まで遅延するためのメカニズム
     を備えていないからです。
-
---verbosity
-~~~~~~~~~~~
-
-``django-admin.py`` のメッセージの通知やデバッグ情報のコンソールへの出力量を
-指定するには ``--verbosity`` を使います。
-
-  * ``0`` だと、何も出力しません。
-  * ``1`` だと、通常の出力 (デフォルト) です。
-  * ``2`` だと、詳細に出力します。
-
-使用例::
-
-    django-admin.py loaddata --verbosity=2
 
 makemessages
 ------------
@@ -465,19 +459,7 @@ makemessages
 	* ``django``: ``*.py`` ファイルと ``*.html`` ファイル (デフォルト)
 	* ``djangojs``: ``*.js`` ファイル
 
---verbosity
-~~~~~~~~~~~
-
-``django-admin.py`` の通知情報やデバッグ情報のコンソールへの出力量を指定する
-には ``--verbosity`` または ``-v`` を使います。
-
-  * ``0`` だと、何も出力しません。
-  * ``1`` だと、通常の出力 (デフォルト) です。
-  * ``2`` だと、詳細に出力します。
-
-使い方::
-
-    django-admin.py makemessages --verbosity=2
+.. _django-admin-reset:
 
 reset <appname appname ...>
 ---------------------------
@@ -501,8 +483,10 @@ FastCGI プロトコルをサポートする Web サーバ向けの一連の Fas
 
 .. _flup: http://www.saddi.com/software/flup/
 
-runserver [optional port number, or ipaddr:port]
-------------------------------------------------
+runserver
+---------
+
+.. django-admin:: runserver [port or ipaddr:port]
 
 ローカルマシン上に軽量な開発用ウェブサーバを立ち上げます。デフォルトでは、
 サーバは IP アドレス 127.0.0.1、ポート番号 8000 で動作します。 IP アドレス
@@ -534,8 +518,7 @@ runserver [optional port number, or ipaddr:port]
 るには、サーバホスト固有の IP アドレス (例えば ``192.168.2.1``) または
 ``0.0.0.0`` を使って下さい。
 
---adminmedia
-~~~~~~~~~~~~
+.. django-admin-option:: --adminmedia
 
 Django 管理インタフェース用の CSS や JavaScript ファイルを探す場所を Django に
 教えるには ``--adminmedia`` オプションを使います。通常、これらのファイルは
@@ -547,8 +530,7 @@ Django のソースツリーから探索されて配信されるようになっ�
 
     django-admin.py runserver --adminmedia=/tmp/new-admin-style/
 
---noreload
-~~~~~~~~~~
+.. django-admin-option:: --noreload
 
 自動リロード機能の使用を無効にするには ``--noreload`` オプションを使います。
 これが意味するところは、サーバの稼働中にいかなる Python コードの変更も検知
@@ -557,8 +539,6 @@ Django のソースツリーから探索されて配信されるようになっ�
 使用例::
 
     django-admin.py runserver --noreload
-
-.. _Examples of using different ports and addresses:
 
 異なる IP アドレスとポート番号を使用する例
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -579,8 +559,6 @@ IP アドレス 1.2.3.4、ポート番号 7000::
 
     django-admin.py runserver 1.2.3.4:7000
 
-.. _Serving static files with the development server:
-
 開発用サーバで静的なファイルを提供する
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -588,18 +566,6 @@ IP アドレス 1.2.3.4、ポート番号 7000::
 ``MEDIA_URL`` 下のファイルなど) を全く提供しません。 Django に静的メディ
 アを提供させたければ、 :ref:`静的なファイルの提供方法 <howto-static-files>`
 を参照してください。
-
-
-.. _Turning off auto-reload:
-
-auto-reload を切る
-~~~~~~~~~~~~~~~~~~~~~~~
- 
-開発サーバの起動中にコードのオートリロードが起きるのを止めたければ、以下の
-ように ``--noreload`` オプションを使ってください::
-
-    django-admin.py runserver --noreload
-
 
 shell
 -----
@@ -649,6 +615,8 @@ sqlcustom <appname appname ...>
 されます。テーブルに対して変更を加えたり、 SQL 関数をデータベースに組み込む
 には、この SQL フックを使ってください。
 
+SQL ファイルの処理順には決まりがありません。
+
 sqlflush
 --------
 
@@ -670,8 +638,11 @@ sqlsequencereset <appname appname ...>
 
 指定した appname のシークエンスをリセットするためのSQL 文を出力します。
 
-詳しくは http://simon.incutio.com/archive/2004/04/21/postgres を参照し
-てください。
+Sequences are indexes used by some database engines to track the next available
+number for automatically incremented fields.
+
+Use this command to generate SQL which will fix cases where a sequence is out
+of sync with its automatically incremented field data.
 
 startapp <appname>
 ------------------
@@ -689,6 +660,8 @@ startproject <projectname>
 環境変数 ``DJANGO_SETTINGS_MODULE`` が指定されていると、このコマンドを使え
 ません。 ``startproject`` を使いたければ、 ``--settings`` オプションを外し、
 ``DJANGO_SETTINGS_MODULE`` を unset してください。
+
+.. _django-admin-syncdb:
 
 syncdb
 ------
@@ -723,20 +696,6 @@ syncdb
 や ``xml`` など) のフィクスチャを探してインストールします。フィクスチャデー
 タファイルの詳細は ``loaddata`` のドキュメントを参照してください。
 
---verbosity
-~~~~~~~~~~~
-
-``django-admin.py`` の通知情報やデバッグ情報のコンソールへの出力量を指定する
-には ``--verbosity`` を使います。
-
-  * ``0`` だと、何も出力しません。
-  * ``1`` だと、通常の出力 (デフォルト) です。
-  * ``2`` だと、詳細に出力します。
-
-使用例::
-
-    django-admin.py syncdb --verbosity=2
-
 --noinput
 ~~~~~~~~~
 
@@ -757,20 +716,6 @@ test
 ユーザプロンプトでの "Are you sure?" のような確認メッセージの出力の抑制には
 ``--noinput`` オプションを使います。対話を必要とせずに ``django-admin.py``
 を実行する自動化されたスクリプトで役に立ちます。
-
---verbosity
-~~~~~~~~~~~
-
-``django-admin.py`` の通知情報やデバッグ情報のコンソールへの出力量を指定する
-には ``--verbosity`` を使います。
-
-  * ``0`` だと、何も出力しません。
-  * ``1`` だと、通常の出力 (デフォルト) です。
-  * ``2`` だと、詳細に出力します。
-
-使用例::
-
-    django-admin.py test --verbosity=2
 
 testserver <fixture fixture ...>
 --------------------------------
@@ -830,28 +775,11 @@ IP アドレスやポート番号を 127.0.0.1:8000 から変更するには、 
 
     django-admin.py testserver --addrport 1.2.3.4:7000 test
 
---verbosity
-~~~~~~~~~~~
-
-``django-admin.py`` の通知情報やデバッグ情報のコンソールへの出力量を指定する
-には ``--verbosity`` を使います。
-
-  * ``0`` だと、何も出力しません。
-  * ``1`` だと、通常の出力 (デフォルト) です。
-  * ``2`` だと、詳細に出力します。
-
-使用例::
-
-    django-admin.py testserver --verbosity=2
-
 validate
 --------
 
 インストールされている (``INSTALLED_APPS`` に登録されている) 全てのモ
 デルを検証 (validate) し、エラーがあれば標準出力に出力します。
-
-
-.. _Default options:
 
 デフォルトのオプション
 ======================
@@ -901,6 +829,22 @@ validate
 セージを表示します。 ``--traceback`` を指定すると ``django-admin.py`` は
 例外が送出された際に完全なスタックトレースを出力します。
 
+.. _django-admin-verbosity:
+
+--verbosity
+~~~~~~~~~~~
+
+``django-admin.py`` のメッセージの通知やデバッグ情報のコンソールへの出力量を
+指定するには ``--verbosity`` を使います。
+
+  * ``0`` だと、何も出力しません。
+  * ``1`` だと、通常の出力 (デフォルト) です。
+  * ``2`` だと、詳細に出力します。
+
+使用例::
+
+    django-admin.py loaddata --verbosity=2
+
 .. _Extra niceties:
 
 その他のからくり
@@ -926,9 +870,6 @@ bash シェルを使っているのなら、 Django の bash 補完スクリプ�
     * [TAB] を押すと、利用可能な全てのオプションを表示します。
     * ``sql`` とタイプして [TAB] を押すと、 ``sql`` で始まる全てのオプショ
       ンを表示します。
-
-アクションの自作
------------------
 
 アクションを自作するには、 :ref:`howto-custom-management-commands` を参照し
 てください。

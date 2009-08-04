@@ -4,7 +4,7 @@
 次のステップへ
 =================
 
-:revision-up-to: 9084 (1.0)
+:revision-up-to: 11321 (1.1)
 
 さあ、ここにきたあなたは、 :ref:`入門編 <intro-index>` をあらかた読み終えて、
 Django を使い続ける決心をしたことだと思います。入門編では、 Django のほんの
@@ -38,7 +38,7 @@ Django には、いまや 200,000 語を越す *たくさん* のドキュメン
 ドキュメントの構成
 ====================
 
-Django のドキュメントは、用途に応じていくつかの塊に分けられています:
+Django のドキュメントは、用途に応じていくつかの部に分かれています:
 
     * :ref:`入門編 <intro-index>` は、 Django や、ウェブ開発全般の初心者を
       対象に作られています。あまり詳細な解説はありませんが、高い視点で
@@ -78,8 +78,6 @@ Django のドキュメントは、用途に応じていくつかの塊に分け�
       ト <misc-index>` があります。
       
 
-.. _How documentation is updated:
-
 ドキュメント更新の方針
 ======================
 
@@ -105,18 +103,14 @@ Subversion リポジトリの `django/trunk/docs`_ ディレクトリ以下に�
 
 .. _django/trunk/docs: http://code.djangoproject.com/browser/django/trunk/docs
 
-.. _Where to get it:
-
 ドキュメントの入手
 ==================
 
 Django のドキュメントを入手するにはいくつか方法があります。おすすめの順に以
 下に示します:
 
-.. _On the Web:
-
-Web から
---------
+Web 版
+-------
 
 Django ドキュメントの最新版は http://docs.djangoproject.com/en/dev/
 にあります。ここにある HTML ページは、ソースコード管理システム上のテキスト
@@ -143,10 +137,8 @@ Django ドキュメントの最新版は http://docs.djangoproject.com/en/dev/
 .. _`django-users メーリングリスト`: `django-users mailing list`_
 .. _`IRC の #django チャネル`: `#django IRC channel`_
 
-.. _In plain text:
-
-プレーンテキスト
-----------------
+プレーンテキスト版
+--------------------
 
 オフラインで読みたい人や手早く読みたい人のために、Django ドキュメントはプレー
 ンテキスト形式で読めます。
@@ -207,13 +199,9 @@ Python コードの更新と同様、 ``svn update`` を実行してください
     この節を書いている時点では、 Django はリリース前の Sphinx を使っていま
     す。そのため、ソースコードから Sphinx をインストールせねばなりません。
     この問題はすぐに修正する予定です。
-
-    (訳注: バージョン 0.4.1 または trunk の Sphinx を使ってください。)
     
 __ http://sphinx.pocoo.org/
 __ http://www.gnu.org/software/make/
-
-.. _Differences between versions:
 
 バージョン間の相違点
 ====================

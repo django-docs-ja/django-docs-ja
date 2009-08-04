@@ -4,7 +4,7 @@
 Django プロジェクトに協力するために
 ===================================
 
-:revision-up-to: 9084 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 Django を *使う* のを楽しいと思ってもらえたなら、 *使い続ける* 前にすこし待っ
 てください。私達は多大な情熱をかけて、ユーザがコミュニティのメンバに貢献で
@@ -36,14 +36,12 @@ Django 開発コミュニティに参加するのに必要な知識はこれだ�
 
 .. _reporting-bugs:
 
-.. _Reporting bugs:
-
 バグの報告
 ==============
 
-上手に書かれたバグ報告は *信じられないくらい* 助けになります。とはいえ、バ
-グ追跡システムでの作業はかなりのオーバヘッドを要するので、チケットトラッカ
-をできるだけ有意義に使うよう協力していただけると助かります。特に:
+上手に書かれたバグ報告は *信じられないくらい* 役立ちます。とはいえ、バグ追
+跡システムでの作業はかなりのオーバヘッドを要するので、チケットトラッカをで
+きるだけ有意義に使うよう協力してもらえると助かります。特に:
 
     * **必ず** :ref:`FAQ <faq-index>` を読んで、自分の抱えている問題が既知
       のものでないか探して下さい。 
@@ -59,22 +57,22 @@ Django 開発コミュニティに参加するのに必要な知識はこれだ�
       対する詳細かつ明瞭な説明と、問題を再現するための手順を含めてください。
       小さなテストケースでバグを再現できれば最良のバグ報告になります。
 
-    * **決して** サポート質問にチケットシステムを **使わないで下さい。** 質
-      問は `django-users`_ リストや `#django`_ IRC チャネルでお願いします。
+    * サポート質問にチケットシステムを **絶対に使わないで下さい。** 質問は
+      `django-users`_ リストや `#django`_ IRC チャネルでお願いします。
 
-    * **決して** スケールの大きな機能の提案にチケットシステムを 
-      **使わないで下さい。** Django のコアに関わる大きな変更は、
+    * スケールの大きな機能の提案にチケットシステムを
+      **絶対に使わないで下さい。** Django のコアに関わる大きな変更は、
       取り掛かる前に必ず `django-developers`_ リストで議論します。
 
-    * **決して** "wontfix" にマークされた問題を
-      **開き直さないで下さい。** "wontfix" マークは決定事項であり、この問題
-      についてはこれ以上修正できないか、修正する予定はないのです。納得でき
-      なければ、 `django-developers`_ で質問してください。
+    * "wontfix" にマークされた問題を **絶対に開き直さないで下さい。**
+      "wontfix" マークは決定事項であり、この問題についてはこれ以上修正でき
+      ないか、修正する予定はないのです。納得できなければ、
+      `django-developers`_ で質問してください。
 
-    * **決して** 長い議論をチケットシステムで **行わないで下さい。** チケッ
-      トシステムでは議論内容がじきに失われてしまうからです。チケットの内容
-      について議論になりそうなときは `django-developers`_ に場所を移して下
-      さい。
+    * 長い議論をチケットシステムで **絶対に行わないで下さい。** チケットシ
+      ステムでは議論のポイントがすぐに失われてしまうからです。チケットの内
+      容について議論になりそうなときは `django-developers`_ に場所を移して
+      下さい。
 
     * バグ報告をチケットに登録したこと **だけ** を django-developers にポス
       ト **しない** でください。チケットを登録すると、別のメーリングリスト
@@ -85,7 +83,6 @@ Django 開発コミュニティに参加するのに必要な知識はこれだ�
 .. _django-updates: http://groups.google.com/group/django-updates
 
 .. _reporting-security-issues:
-.. _Reporting security issues:
 
 セキュリティ問題の報告
 =========================
@@ -117,8 +114,6 @@ Django に脆弱性が発見された場合、私達は以下のように行動�
     * あらかじめ決めておいた日取りに基づいて、脆弱性と修正版を公開し、アナ
       ウンスします。通常は新たなバージョンの Django リリースを意味しますが、
       場合によっては現在のリリースに対する単なるパッチになります。
-
-.. _Submitting patches:
 
 パッチの提出
 ==================
@@ -158,8 +153,6 @@ Django の内部に関する知識、時間的な余裕から) 必要な修正�
 .. _Create an account: http://www.djangoproject.com/accounts/register/
 .. _`アカウントを作成`: http://www.djangoproject.com/accounts/register/
 
-.. _`Ticket claimers' responsibility`:
-
 チケットをクレームしたら
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -177,8 +170,6 @@ Django の内部に関する知識、時間的な余裕から) 必要な修正�
 なく、進捗レポートの要求に対する返事もない場合、チケットを無効にする場合も
 あります。まずは連絡第一です!
 
-.. _`Which tickets should be claimed?`:
-
 どのチケットをクレームすべきか
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -186,8 +177,6 @@ Django の内部に関する知識、時間的な余裕から) 必要な修正�
 ントのタイプミスや、ほんの数分あれば修正できるような小さなバグの場合には、
 チケットのクレームまでする必要はありません。単にパッチを投稿して、そのまま
 にしておいてください。
-
-.. _Patch style:
 
 パッチ形式
 -----------
@@ -226,19 +215,15 @@ Django の内部に関する知識、時間的な余裕から) 必要な修正�
     * パッチ中のコードが新たな機能や既存の機能に対する変更をもたらす場合、
       パッチにはドキュメントも含めてください。
 
-.. _Non-trivial patches:
+要注意パッチ
+-------------
 
-重要パッチ
-----------
-
-「重要 (non-trivial)」パッチとは、単なるバグフィクスに留まらず、Django に
+「要注意 (non-trivial)」パッチとは、単なるバグフィクスに留まらず、Django に
 新たな機能をもたらし、何らかの設計上の判断を迫るようなパッチです。
 
-重要パッチを提出する場合には、その問題について `django-developers`_ で議論
-済みであるという証明を含めてください。自分のパッチが重要パッチかどうか判断
-しかねる場合には問い合わせてください。
-
-.. _Ticket triage:
+要注意パッチを提出する場合には、その問題について `django-developers`_ で議
+論済みであるという証明を含めてください。自分のパッチが要注意パッチかどうか
+判断しかねる場合には問い合わせてください。
 
 チケットのトリアージ
 ====================
@@ -363,8 +348,6 @@ stage)」というフィールドに関わる作業です。このステージ�
 .. _patch: `Submitting patches`_
 .. _パッチ: `Patch style`_
 
-.. _Triage by the general community:
-
 一般コミュニティメンバによるトリアージ
 ----------------------------------------
 
@@ -413,7 +396,6 @@ stage)」というフィールドに関わる作業です。このステージ�
 
 
 .. _contributing-translations:
-.. _Submitting and maintaining translations:
 
 翻訳の提出と維持
 ================
@@ -457,9 +439,7 @@ admin サイトやバリデータのエラーメッセージなど、Django は�
 .. _Django i18n mailing list: http://groups.google.com/group/django-i18n/
 .. _`Django i18n メーリングリスト`: `Django i18n mailing list`_
 
-.. _Coding style:
-
-コーディングスタイル
+コードの書き方
 ====================
 
 コードを書いて Django に取り込みたいなら、以下のコーディング標準に従って下
@@ -505,49 +485,43 @@ admin サイトやバリデータのエラーメッセージなど、Django は�
       ほんのちょっとした変更でないかぎり、ご自分のパッチに ``AUTHORS`` への
       変更を加えて頂いてもかまいません。
 
-.. _Template style:
-
-テンプレートのスタイル
+テンプレートの書き方
 ----------------------
 
     * Django テンプレートコード内では、波括弧とタグコンテンツの間に 1 個 (1
       個だけ) スペースをいれて下さい。
 
-      [正]:
+      [正しい]:
 
       .. code-block:: html+django
 
           {{ foo }}
 
-      [誤]:
+      [誤り]:
 
       .. code-block:: html+django
 
           {{foo}}
 
 
-.. _View style:
-
-ビューのスタイル
+ビューの書き方
 ----------------
 
 
     * Django のビューを書くときには、最初のパラメタは必ず ``request`` とい
       う名前にしてください。
 
-      [正]::
+      [正しい]::
 
           def my_view(request, foo):
               # ...
 
-      [誤]::
+      [誤り]::
 
           def my_view(req, foo):
               # ...
 
-.. _Model style:
-
-モデルのスタイル
+モデルの書き方
 ----------------
 
     * フィールド名は全て小文字で、キャメルケース (camelCase のような書き方)
@@ -598,6 +572,7 @@ admin サイトやバリデータのエラーメッセージなど、Django は�
       どれも必須ではないので省略してもかまいません):
 
         * 全てのデータベースフィールド
+        * カスタムマネジャのアトリビュート
         * ``class Meta``
         * ``def __unicode__()``
         * ``def __str__()``
@@ -615,18 +590,14 @@ admin サイトやバリデータのエラーメッセージなど、Django は�
               ('F', 'Female'),
           )
 
-.. _Documentation style:
-
-ドキュメントの形式
-===================
+ドキュメントの書き方
+====================
 
 私達は、ドキュメントの一貫性と読みやすさをとても重視しています (なんといっ
 ても、 Django はジャーナリズムの中で生まれましたからね！)
 
-_How to document new features:
-
-新たな機能のドキュメント化
-----------------------------
+新たな機能のドキュメントを書くには
+-----------------------------------
 
 私達は、ドキュメントをコードと同じように扱います。すなわち、可能な限り改善
 を重ねたいと思っているのです。この節では、ドキュメントの書き手に、有意義で
@@ -653,7 +624,9 @@ _How to document new features:
 一般的な改善や API の変更は、 ".. versionchanged:: X.Y" ディレクティブで強
 調します（フォーマットは ``versionadded`` と同じです）。
 
-.. _Guidelines for ReST files:
+:ref:`Django のドキュメントシステム <internal-documentation>` のページには、
+詳しい情報が書かれています。ドキュメントを書き始めるまえに、必ず一読してく
+ださい。
 
 ReST ファイル作成のガイドライン
 -------------------------------
@@ -667,8 +640,6 @@ ReST ファイル作成のガイドライン
     複数行に分けると著しく読みにくくなる場合や、その他妥当な理由がある場合
     は例外です。
 
-.. _Commonly used terms:
-
 よく使う用語
 ------------
 
@@ -677,7 +648,7 @@ ReST ファイル作成のガイドライン
   * **Django** -- フレームワークそのものを指す場合には、頭文字を大文字にし
     ます。 Python コード中や djangoproject.com のロゴでは小文字です。
 
-  * **e-mail** -- ハイフンを入れます。(和訳では「メール」と書いています)
+  * **e-mail** -- ハイフンを入れます。
 
   * **MySQL**
 
@@ -686,7 +657,7 @@ ReST ファイル作成のガイドライン
   * **Python** -- 言語そのものを指す場合には頭文字を大文字にします。
 
   * **realize**, **customize**, **initialize**, etc. -- "-ise" ではなく、ア
-    メリカ語表記です。
+    メリカ語表記の "-ize" です。
 
   * **SQLite**
 
@@ -697,8 +668,6 @@ ReST ファイル作成のガイドライン
     場合には、常に Web の W は大文字です。
 
     * **Web site** -- Web を大文字にして、二つの単語を繋げません。
-
-.. _Django-specific terminology:
 
 Django 固有の用語
 -----------------
@@ -711,11 +680,8 @@ Django 固有の用語
 
   * **view** -- 頭文字は小文字です。
 
-
-.. _Committing code:
-
-コードの commit
-===============
+コードのコミット
+================
 
 Django の Subversion リポジトリにコードをコミットする場合には以下のガイドラ
 インに従って下さい:
@@ -733,9 +699,9 @@ Django の Subversion リポジトリにコードをコミットする場合に�
     * 詳しいコミットメッセージを過去形で書いて下さい。現在形を使ってはなり
       ません。
 
-          * 良い例: "Fixed Unicode bug in RSS API."
-          * 悪い例: "Fixes Unicode bug in RSS API."
-          * 悪い例: "Fixing Unicode bug in RSS API."
+          * 良い: "Fixed Unicode bug in RSS API."
+          * 悪い: "Fixes Unicode bug in RSS API."
+          * 悪い: "Fixing Unicode bug in RSS API."
 
     * ブランチにコミットする場合、コミットメッセージの先頭にブランチ名を付
       けて下さい。例えば "magic-removal: Added support for mind reading."
@@ -778,10 +744,8 @@ Django の Subversion リポジトリにコードをコミットする場合に�
       て commit した場合、関連するチケットに完全なコミットメッセージをコメ
       ントとして追加します。 
 
-.. _Unit tests:
-
 単体テストの作成
-====================
+=================
 
 Django には独自のテストスイートが付属しています。テストは tarball 内の
 ``test`` ディレクトリ下にあります。ポリシとして、常に全てのテストがパスする
@@ -800,10 +764,8 @@ Django のテストは全て、 Django に付属のアプリケーションテ�
 ています。テストの書き方の詳細は 
 :ref:`Django アプリケーションのテスト <topics-testing>` を参照してください。
 
-.. _Running the unit tests:
-
-単体テストの実行
-----------------------
+ユニットテストの実行
+--------------------
 
 テストを実行するには、 ``tests/`` ディレクトリ下に移って以下のように入力し
 ます:
@@ -812,10 +774,8 @@ Django のテストは全て、 Django に付属のアプリケーションテ�
 
     ./runtests.py --settings=path.to.django.settings
 
-そうです。テストには設定モジュールが必要です。とはいえ、必要なのは
-:setting:`DATABASE_ENGINE` を含むデータベース接続に関する情報です。また、全
-てのテストをパスするには、 :setting:`ROOT_URLCONF` 設定 (この値は単にあれば
-よいだけで、内容は無視されます) を指定しておかねばなりません。
+そう、テストには設定モジュールが必要です。とはいえ、必要なのは
+データベース接続に関する情報 :setting:`DATABASE_ENGINE` だけです。
 
 ``sqlite3`` バックエンドを使っているなら、設定はこれだけで十分です。一時デー
 タベースはテスト実行時にメモリ上に生成されます。
@@ -845,8 +805,13 @@ Django のテストは全て、 Django に付属のアプリケーションテ�
     *  Textile_
     *  Docutils_
     *  setuptools_
+    *  memcached_ と、Python バインディングの python-memcached_ か cmemcached_
 
-これらの依存モジュールはなくても構いませんが、インストールされていなければ、
+memcached キャッシュバックエンドをテストしたければ、
+:setting:`CACHE_BACKEND` 設定に memcached インスタンスを定義しておかねばな
+りません。
+
+上記の依存モジュールはなくても構いません。インストールされていなければ、
 関連するテストは飛ばして実行されます。
 
 .. _PyYAML: http://pyyaml.org/wiki/PyYAML
@@ -854,6 +819,9 @@ Django のテストは全て、 Django に付属のアプリケーションテ�
 .. _Textile: http://pypi.python.org/pypi/textile
 .. _docutils: http://pypi.python.org/pypi/docutils/0.4
 .. _setuptools: http://pypi.python.org/pypi/setuptools/
+.. _memcached: http://www.danga.com/memcached/
+.. _python-memcached: http://pypi.python.org/pypi/python-memcached/
+.. _cmemcached: http://pypi.python.org/pypi/cmemcache
 
 ユニットテストの一部（サブセット）を実行したい場合は、 ``runtest.py`` コマ
 ンドラインの後にテストモジュールの名前を追加してください。モジュール名は、
@@ -869,8 +837,6 @@ Django のテストは全て、 Django に付属のアプリケーションテ�
     PYTHONPATH=..
     ./runtests.py --settings=settings generic_relations i18n
 
-.. _Contrib apps:
-
 contrib アプリケーション
 --------------------------
 
@@ -884,16 +850,12 @@ contrib アプリケーション
 URL をマップする必要があるのなら、 ``tests/urls.py`` を入れてください。
 
 特定の contrib アプリケーション (例えば ``markup``) だけをテストするには、
-上で述べたのと同じ方法を使います:
-
-.. code-block:: bash
+上で述べたのと同じ方法を使います::
 
     ./runtests.py --settings=settings markup
 
-.. _Requesting features:
-
-機能に関する要望
-===================
+機能追加の要望を出す
+=====================
 
 私達は常に Django を改良しようと努めています。その中で、皆さんから寄せられ
 る要望は一つの鍵になっています。効果的に要望を出すコツをいくつか紹介してお
@@ -917,70 +879,91 @@ URL をマップする必要があるのなら、 ``tests/urls.py`` を入れて
 能で、複数の開発者が必要になりそうなら、いつでも喜んで実験用ブランチをリポ
 ジトリに作成します。詳しくは次節を参照してください。
 
-.. _Branch policy:
-
 ブランチの管理ポリシ
 ====================
 
-一般に、 trunk は安定に保たれています。そのため、いつ trunk から取り出した
-Django でも、運用サイトを走らせられるはずです。さらに、 trunk への変更は、
-可能なかぎり atomic にすべきであり、より細かい単位の変更がベターです。従っ
-て、大掛かりな変更、すなわち一つのパッチに収まらないくらい大きな変更を伴う
-場合や、多くの人が関わる必要のある変更の場合には、専用のブランチを作成しま
-す。
+一般的に、Django の trunk は安定に保たれています。誰がいつ trunk から取り出
+したDjango でも、実運用のサイトを走らせられるはずです。さらに、私たちは、
+trunk への変更は可能なかぎりアトミックに行われるべきで、より細かい単位の変
+更がベターだと考えています。従って、大掛かりな変更、すなわち一つのパッチに
+収まらないくらい大きな変更を伴う合や、多くの人が関わる必要のある変更の場合
+には、専用のブランチを作成します。
 
 つまり、一つのパッチで済まないような大きな機能や、大掛かりなリファクタリ
 ングは機能ブランチ (feature branch) で行わねばならないのです。私たちの開発
 プロセスです、機能ブランチのありかたに、二つの選択肢をもたせています:
 
-.. TBD
-
     1. Git_ や Mercurial_, Bazaar_ といった分散リビジョンコントロールシステ
         ムを使った機能ブランチ。
        
-       If you're familiar with one of these tools, this is probably your best 
+       If you're familiar with one of these tools, this is probably your best
        option since it doesn't require any support or buy-in from the Django
        core developers.
-       
+
        However, do keep in mind that Django will continue to use Subversion for
        the foreseeable future, and this will naturally limit the recognition of
        your branch. Further, if your branch becomes eligible for merging to
        trunk you'll need to find a core developer familiar with your DVCS of
        choice who'll actually perform the merge.
-       
+
        If you do decided to start a distributed branch of Django and choose to make it
        public, please add the branch to the `Django branches`_ wiki page.
-       
+
     2. Feature branches using SVN have a higher bar. If you want a branch in SVN
        itself, you'll need a "mentor" among the :ref:`core committers
        <internals-committers>`. This person is responsible for actually creating
        the branch, monitoring your process (see below), and ultimately merging
        the branch into trunk.
-       
+
        If you want a feature branch in SVN, you'll need to ask in
-       `django-developers`_ for a mentor. 
+       `django-developers`_ for a mentor.
 
-例えば `i18n ブランチ`_ を見てください。この手の変更を行
-いたいと考えていて、作業をしたい場合には、 `django-developers`_ でブランチ
-を作成してもらうよう問い合わせて下さい。変更を試すのに必要な文だけのブラン
-チを作成します。
+.. _git: http://git.or.cz/
+.. _mercurial: http://www.selenic.com/mercurial/
+.. _bazaar: http://bazaar-vcs.org/
+.. _django branches: http://code.djangoproject.com/wiki/DjangoBranches
 
-ツリーの一部にしか作業しない場合でも、常に Django ツリー全体のブランチを作
-成します。これはブランチへのスイッチ作業を苦痛なく行えるようにするためです。
 
-ブランチで作業している開発者は、 trunk の変更を定期的にブランチにマージせね
-ばなりません。少なくとも週に一度はマージしてください。 trunk からマージを行
-う度に、マージとリビジョン番号を commit メッセージに記載してください。
+Branch rules
+------------
 
-ブランチが安定していて、 trunk へのマージ準備が完了したら、
-`django-developers`_ にアラートを投稿します。
+We've got a few rules for branches born out of experience with what makes a
+successful Django branch.
+
+DVCS branches are obviously not under central control, so we have no way of
+enforcing these rules. However, if you're using a DVCS, following these rules
+will give you the best chance of having a successful branch (read: merged back to
+trunk).
+
+Developers with branches in SVN, however, **must** follow these rules. The
+branch mentor will keep on eye on the branch and **will delete it** if these
+rules are broken.
+
+    * Only branch entire copies of the Django tree, even if work is only
+      happening on part of that tree. This makes it painless to switch to a
+      branch.
+
+    * Merge changes from trunk no less than once a week, and preferably every
+      couple-three days.
+
+      In our experience, doing regular trunk merges is often the difference
+      between a successful branch and one that fizzles and dies.
+
+      If you're working on an SVN branch, you should be using `svnmerge.py`_
+      to track merges from trunk.
+
+    * Keep tests passing and documentation up-to-date. As with patches,
+      we'll only merge a branch that comes with tests and documentation.
+
+.. _svnmerge.py: http://www.orcaware.com/svn/wiki/Svnmerge.py
+
+Once the branch is stable and ready to be merged into the trunk, alert
+`django-developers`_.
 
 あるブランチがマージされると、そのブランチは「死んだ」ものとみなされます。
 死んだブランチには書き込めなくなり、古いブランチは定期的に「刈り取られ」
 ます。 SVN への世話焼きを最小限にするため、ブランチから trunk へのマージは
 一度しか行いません。
-
-.. _Using branches:
 
 ブランチを使う
 --------------
@@ -989,11 +972,8 @@ Django でも、運用サイトを走らせられるはずです。さらに、 
 
     * 該当するブランチのコードを Subversion から取得します。
 
-    * Python の site-package ディレクトリが、該当ブランチの ``django``
+    * Python の ``site-package`` ディレクトリが、該当ブランチの ``django``
       を含むように設定します。
-
-
-.. _Getting the code from Subversion:
 
 Subversion からコードを取り出す
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1028,8 +1008,6 @@ Subversion からコードを取り出す
 
 .. _list of branch names: http://code.djangoproject.com/browser/django/branches
 
-.. _Pointing Python at the new Django version:
-
 Python に別のバージョンの Django を使わせる
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1040,9 +1018,9 @@ Python に別のバージョンの Django を使わせる
 ``/usr/local/lib/python2.4/site-packages``, ``C:\Python\site-packages``
 などにあります。)
 
-もっとも簡単な方法は、元の ``django`` ディレクトリを ``django.OLD`` のよう
-な別の名前に変えて、 trunk などから取り出したバージョンのコードをコピーし、
-名前を ``django`` に変更します。
+元の ``django`` ディレクトリを ``django.OLD`` のような別の名前に変えて、
+trunk などから取り出したバージョンのコードをコピーし、名前を ``django`` に
+変更するのが簡単です。
 
 別の方法として、 ``django`` と言う名前のシンボリックリンクを作成して、特定
 のブランチの ``django`` パッケージの場所を指すという方法もあります。元に戻
@@ -1085,50 +1063,6 @@ Django 0.95 やそれ以前のバージョンをインストールしていて�
 
 .. _path file: http://docs.python.org/lib/module-site.html
 
-.. _official-releases:
-.. _Official releases:
-
-公式リリース
-============
-
-Django のリリース番号は以下のようにして付けられます:
-
-    * バージョンは ``A.B`` または ``A.B.C`` という形式でつけられます。
-
-    * ``A`` はメジャーバージョン番号で、増えるのは Django に重大な変更が加
-      えられ、変更が必ずしも以前のバージョンと互換でない場合だけです。従っ
-      て、 Django 6.0 で動いたコードは Django 7.0 では動かなくなるかもしれ
-      ません。
-
-    * ``B`` はマイナーバージョン番号で、比較的大きいながらも後方互換性を保っ
-      た変更の際に増えます。 Django 6.4 向けに書かれたコードは Django 6.5
-      でも動作するでしょう。
-
-      マイナーリリースでは、以前のリリースの特定の機能を撤廃することがあり
-      ます。バージョン ``A.B`` の機能が撤廃された場合、撤廃された機能は
-      ``A.B+1`` では動作します。 ``A.B+2`` では
-      ``PendingDeprecationWarning`` 警告を送出しますが動作します。
-      ``A.B+3`` では完全に機能を削除します。メジャーポイントリリースでは撤
-      廃済みの仕様を全て削除します。
-
-    * ``C`` はマイクロバージョンで、バグやセキュリティ修正の度に増えます。
-      マイクロバージョンは以前のマイクロバージョンと 100% 後方互換性を保ち
-      ます。
-
-    * 場合によってはリリース候補 (release candidate) を作成します。リリース
-      候補のバージョン番号は  ``A.BrcN`` の形式で、 ``A.B`` の ``N`` 番目の
-      リリース候補であることを表します。
-
-以上のバージョン番号スキームの例外として、1.0 以前の Django のコード
-があります。 1.0 リリース以前のコードでは、後方互換性を全く保証していません。
-
-Subversion 上では、 Django の各リリースは `tags/releases_` でタグづけされて
-います。trunk 由来ではないバグフィクスリリースやセキュリティ修正リリースを
-出す必要画ある場合、該当リリースは  ``branches/releases`` にコピーされ、
-バグフィクスリリースになります。
-
-.. _Deciding on features:
-
 仕様に関する決定
 ================
 
@@ -1149,7 +1083,7 @@ Subversion 上では、 Django の各リリースは `tags/releases_` でタグ�
     * -0: "あまりわくわくしないが、反対もしない (I'm not thrilled, but I
       won't stand in the way.)"
 
-    * -1: "強く反対。このアイデアが実現したらとても嫌 (I strongly disagree
+    * -1: "強く反対。このアイデアは実現してほしくない (I strongly disagree
       and would be very unhappy to see the idea turn into reality.)"
 
 django-developers での投票は正式なものではありませんが、その結果は真摯に受
@@ -1158,11 +1092,9 @@ django-developers での投票は正式なものではありませんが、そ�
 
 とはいえ、つねに合意を形成できるわけではありません。その場合、完全コミッタ
 全員の中で十分に議論を重ねた後、最終判断を慈悲深き終身独裁者 (Benevolent
-Dictators for Life) である Adrian と Jacob に委ねることとします。
+Dictators for Life) である Adrian と Jacob に委ねます。
 
-.. _Commit access:
-
-commit 権限
+コミット権限
 =============
 
 Django プロジェクトには二種類のコミッタがいます:

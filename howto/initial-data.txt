@@ -1,27 +1,27 @@
 .. _howto-initial-data:
 
 =================================
-モデルに初期データを与える
+モデルに初期データを投入する
 =================================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1)
 
 アプリケーションを最初にセットアップするときに、データベースにハードコード
 されたデータを投入できると便利なことがあります。 Django に自動的に初期デー
 タを投入させる方法は二つあります: ひとつは `フィクスチャによる初期データの
-投入 <providing-initial-data with-fixtures>`_ で、もう一つは `SQL による初
-期データの投入 <initial-sql>`_ です。
+投入 <providing-initial-data-with-fixtures>`_ で、もう一つは `SQL による初
+期データの投入 <providing-initial-initial-sql-data>`_ です。
 
-.. _providing-initial-data with-fixtures:
+.. _providing-initial-data-with-fixtures:
 
 フィクスチャによる初期データの投入
 ====================================
 
 フィクスチャ (fixture) とは、 Django のデータベースに投入できるよう準備済み
-のデータの集まりです。すでにデータの入ったデータベースを持っているなら、最
-も簡単にフィクスチャを生成する方法は :djadmin:`manage.py dumpdata
-<dumpdata>` コマンドです。フィクスチャは手でも書けます。フィクスチャは XML,
-YAML または JSON ドキュメントとして書けるからです。サポートされている
+のデータの集まりです。すでにデータの入ったデータベースを持っているなら、フィ
+クスチャの生成には :djadmin:`manage.py dumpdata` コマンドを使うのが一番簡単
+です。フィクスチャは手でも書けます。フィクスチャは XML, YAML または JSON ド
+キュメント形式で書けます。サポートされている
 :ref:`シリアライゼーションフォーマット <serialization-formats>` の詳細は
 :ref:`シリアライゼーションのドキュメント <topics-serialization>` を参照して
 ください。
@@ -88,6 +88,7 @@ YAML で書くと以下のようになります:
     フィクスチャは :ref:`テストフレームワーク <topics-testing-fixtures>` で
     一貫したテスト環境を構築するためにも使われています。
 
+.. _providing-initial-sql-data:
 .. _initial-sql:
 
 SQL による初期データの投入

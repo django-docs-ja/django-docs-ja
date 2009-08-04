@@ -4,7 +4,7 @@
 Django の概要
 =============
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1)
 
 Django は変転の激しいニュースルーム環境で開発された経緯から、よくある
 Web 開発タスクを迅速かつ簡単化するように設計されました。ここでは Django に
@@ -17,8 +17,6 @@ Web 開発タスクを迅速かつ簡単化するように設計されました�
 :ref:`チュートリアルをはじめる <intro-tutorial01>` か、 
 :ref:`より詳細なドキュメントに読み進んで <topics-index>` みてください。
 
-.. _Design your model:
-
 モデルの設計
 ============
 
@@ -27,8 +25,9 @@ Django はデータベースなしでも使えます。とはいえ、 Django �
 ト記述できるようになっています。
 
 Django の :ref:`データ-モデルシンタクス <topics-db-models>` はモデルを表現
-するための色々な方法を提供しています。この API には、この 2 年データベース
-スキーマ問題を解決してきた実績があります。簡単な例を示しましょう::
+するための色々な方法を提供しています。この API には、 2 年間にわたって様々
+なデータベーススキーマの問題を解決してきた実績があります。簡単な例を示しま
+しょう::
 
     class Reporter(models.Model):
         full_name = models.CharField(max_length=70)
@@ -45,9 +44,6 @@ Django の :ref:`データ-モデルシンタクス <topics-db-models>` はモ�
         def __unicode__(self):
             return self.headline
 
-
-.. _Install it:
-
 モデルのインストール
 ====================
 
@@ -56,13 +52,10 @@ Django の :ref:`データ-モデルシンタクス <topics-db-models>` はモ�
 
 .. code-block:: bash
 
-    django-admin.py syncdb
+    manage.py syncdb
 
 :djadmin:`syncdb` コマンドは利用可能な全てのモデルを探し、まだ作成されてい
 ないテーブルがあれば作成します。
-
-
-.. _Enjoy the free API:
 
 自動生成される API で楽しむ
 ===========================
@@ -141,10 +134,8 @@ Django の :ref:`データ-モデルシンタクス <topics-db-models>` はモ�
     # delete() でオブジェクトを削除できます。
     >>> r.delete()
 
-.. _`A dynamic admin interface: It's not just scaffolding -- it's the whole house`:
-
-動的な管理インタフェース: 足場 (scaffold) ではなく完成品 (whole house) 
-=========================================================================
+作業場 (scaffold) ではなく完成品 (whole house) の、動的な管理インタフェース
+============================================================================
 
 モデルを定義したら、 Django は玄人向きの実運用に耐える
 :ref:`管理インタフェース <ref-contrib-admin>` (admin interface) を自動的に
@@ -152,7 +143,7 @@ Django の :ref:`データ-モデルシンタクス <topics-db-models>` はモ�
 加、変更、削除できる Web サイトです。管理インタフェースの作成は簡単で、モデ
 ルクラスを admin に追加するだけです::
 
-    # In models.py...
+    # models.py には以下のように書きます
 
     from django.db import models
 
@@ -163,7 +154,7 @@ Django の :ref:`データ-モデルシンタクス <topics-db-models>` はモ�
         reporter = models.ForeignKey(Reporter)
         
 
-    # In admin.py in the same directory...
+    # 同じディレクトリの admin.py には以下のように書きます
     
     import models
     from django.contrib import admin
@@ -179,14 +170,12 @@ Django の :ref:`データ-モデルシンタクス <topics-db-models>` はモ�
 (や顧客) がデータを投入できるようにしておいてから、データを公開するための方
 法を開発してゆくというものです。
 
-.. Design your URLs:
-
 自由な URL 設計
 ===============
 
 すっきりとして洗練された URL スキームは、高品質な Web アプリケーションを実
 現する上で重要な要素です。 Django は美しい URL の設計を助け、 ``.php`` や
-``.asp`` のようなお粗末な制約を URL に課しません。
+``.asp`` のようなお粗末なゴミを URL に入れさせません。
 
 特定のアプリケーション用の URL を設計するには、 
 :ref:`URLconf <topics-http-urls>` と呼ばれる Python モジュールを一つ作成し
@@ -224,8 +213,8 @@ Django は ``mysite.news.views.article_detail(request, '2005', '05',
 ============
 
 各ビュー (view) には二つの役割があります: 一つはリクエストされたページのコ
-ンテンツを含む  :class:`django.http.HttpResponse` オブジェクトを返すこと、
-もう一つは :class:`django.http.Http404` のような例外の送出です。それ以外の
+ンテンツを含む  :class:`~django.http.HttpResponse` オブジェクトを返すこと、
+もう一つは :class:`~django.http.Http404` のような例外の送出です。それ以外の
 処理はユーザ次第です。
 
 一般的に、ビューはパラメタに従ってデータベースからデータを取り出し、テンプ
@@ -259,15 +248,15 @@ Django にはテンプレート検索パスという概念があり、テンプ�
 
     {% extends "base.html" %}
 
-    {% block title %}Articles for {{ year }}{% endblock %}
+    {% block title %}{{ year }}年の記事{% endblock %}
 
     {% block content %}
-    <h1>Articles for {{ year }}</h1>
+    <h1>{{ year }}年の記事</h1>
 
     {% for article in article_list %}
     <p>{{ article.headline }}</p>
     <p>By {{ article.reporter.full_name }}</p>
-    <p>Published {{ article.pub_date|date:"F j, Y" }}</p>
+    <p>作成日: {{ article.pub_date|date:"F j, Y" }}</p>
     {{ article.article }}
     {% endfor %}
     {% endblock %}
@@ -311,9 +300,9 @@ Django にはテンプレート検索パスという概念があり、テンプ�
     </html>
 
 このテンプレートはサイトのルック & フィール (とサイトのロゴ) を定義するだけ
-の極度に単純化されています。また、子テンプレートで埋めるための「穴」を提供
-しています。これによって、ベーステンプレート一つを変更するだけでサイト全体
-のデザインを簡単に変更できるようになります。
+にまで、極度に単純化されています。また、子テンプレートで埋めるための「穴」
+を提供しています。これによって、ベーステンプレート一つを変更するだけでサイ
+ト全体のデザインを簡単に変更できます。
 
 また、子テンプレートを変えずにベーステンプレートだけを変えた複数バージョン
 のサイトも作成できます。 Django の作者たちはこのテクニックを使い、新しい
@@ -328,8 +317,6 @@ API を使う必然性もありません。別のデータベース抽象化レ�
 せんし、 XML ファイルやディスク上のファイルを読み込んでも構いません。何でも
 やりたいことをできるのです。Django の構成要素 -- モデル、ビュー、テンプレー
 ト -- は、互いに切り離して利用できるのです。
-
-.. _This is just the surface:
 
 これらはほんの一部にすぎません
 ==============================

@@ -1,13 +1,14 @@
 .. _ref-index:
 
 API リファレンス
-===================
+=================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1)
 
 .. toctree::
    :maxdepth: 1
    
+   authbackends
    contrib/index
    databases
    django-admin
@@ -21,4 +22,4 @@ API リファレンス
    signals
    templates/index
    unicode
-   
+

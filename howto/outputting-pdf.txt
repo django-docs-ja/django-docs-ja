@@ -4,14 +4,14 @@
 Django で PDF を出力する
 ===========================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1)
 
 このドキュメントでは、 Django のビューを使って動的に PDF ファイルを生成する
-方法について説明します。 PDF の生成は、優れたオープンソースの Python 用 PDF
-ライブラリである ReportLab_ を使うことで可能になります。
+方法について説明します。 PDF を生成するには、優れたオープンソースの Python
+用 PDF ライブラリである ReportLab_ を使います。
 
-動的な PDF ファイル生成の利点は、様々な目的向けにカスタマイズされた PDF 、
-例えばユーザごとに違ったコンテンツの入った PDF を生成できることにあります。
+動的に PDF ファイルを生成できると、ユーザごとに違ったコンテンツの PDF を生
+成するといった具合に、目的ごとに PDF 生成をカスタマイズできます。
 
 例えば、 kusports.com_ では、March Madness contest の参加者向けに、 Django
 を使ってカスタマイズ可能な印刷むきの NCAA トーナメント試合表を PDF で生成し
@@ -105,8 +105,6 @@ Django を使った PDF 動的生成の鍵は、ファイル ReportLab の API �
     * 最後に必ず ``showPage()`` を呼び出し、 PDF ファイルを ``save()`` して
       ください。
 
-.. _Complex PDFs:
-
 複雑な PDF の生成
 =================
 
@@ -148,8 +146,6 @@ cStringIO_ ライブラリを使ってください。 cStringIO ライブラリ�
 
 .. _cStringIO: http://www.python.jp/doc/release/lib/module-cStringIO.html
 .. cStringIO: http://www.python.org/doc/current/lib/module-cStringIO.html
-
-.. _Further resources:
 
 その他のリソース
 =================
