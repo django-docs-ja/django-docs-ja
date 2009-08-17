@@ -3,7 +3,7 @@
 ファイル操作 API リファレンス
 ================================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1)
 
 .. module:: django.core.files
    :synopsis: ファイル操作とストレージの API です。
