@@ -4,6 +4,8 @@
 Customizing the comments framework
 ==================================
 
+:revision-up-to: 11321 (1.1) unfinished
+
 .. currentmodule:: django.contrib.comments
 
 If the built-in comment framework doesn't quite fit your needs, you can extend

@@ -4,7 +4,7 @@
 フォームウィザード (Form wizard)
 =================================
 
-:revision-up-to: 9084 (1.0)
+:revision-up-to: 11321 (1.1)
 
 .. module:: django.contrib.formtools.wizard
     :synopsis: フォームを複数のページに分割します。
@@ -25,14 +25,11 @@ Django には、 :ref:`フォーム <topics-forms-index>` を複数のページ�
 「ウィザード (wizard)」という用語の意味は、 
 `Wikipedia で解説されています`_ 。
 
-
 .. _explained on Wikipedia: http://en.wikipedia.org/wiki/Wizard_%28software%29
 .. _`Wikipedia で解説されています`: http://ja.wikipedia.org/wiki/ウィザード_%28ソフトウェア%29
 
-.. How it works:
-
 フォームウィザードの仕組み
-====================================
+============================
 
 ユーザがウィザードを使うときの基本的なワークフローは、以下の通りです:
 
@@ -50,8 +47,6 @@ Django には、 :ref:`フォーム <topics-forms-index>` を複数のページ�
     4. ユーザが全てのフォームを提出し、提出されたデータが全て有効であった場
        合、ウィザードはデータを処理します。すなわち、データベースへの保存や
        電子メールの送信といった、アプリケーションで必要な処理を実施します。
-
-.. _Usage:
 
 使い方
 ========
@@ -72,8 +67,6 @@ Django には、 :ref:`フォーム <topics-forms-index>` を複数のページ�
 
     4. URLconf が :class:`~django.contrib.formtools.wizard.FormWizard` クラ
        スを指すように設定します。
-
-.. _Defining Form classes:
 
 フォームクラスを定義する
 =========================
@@ -103,8 +96,6 @@ Django には、 :ref:`フォーム <topics-forms-index>` を複数のページ�
 ウィザードは、ページ間のデータの受け渡しに HTML の隠しフィールドを使うため、
 最後のページに表示するフォーム以外では
 :class:`~django.forms.fields.FileField` を使えません。
-
-.. _Creating a FormWizard class:
 
 フォームウィザードクラスを作成する
 ===================================
@@ -152,8 +143,6 @@ Django には、 :ref:`フォーム <topics-forms-index>` を複数のページ�
 フォームウィザードの提供しているフックを詳しく知りたければ、後の
 `フォームウィザードの特殊なメソッド`_ を参照してください。
 
-.. _Creating templates for the forms:
-
 フォームのテンプレートを作成する
 ================================
 
@@ -167,16 +156,11 @@ Django には、 :ref:`フォーム <topics-forms-index>` を複数のページ�
 
     * ``step_field`` -- ウィザードのステップ情報を格納している隠しフィール
       ドの名前です。
-
     * ``step0`` -- 現在のステップ (ゼロから始まる数です)。
-
     * ``step`` -- 現在のステップ (1 から始まる数です)。
-
     * ``step_count`` -- 全ステップ数です。
-
     * ``form`` -- 現在のステップのフォームインスタンスです (空の場合と、エ
       ラーつきの場合がありえます)。
-
     * ``previous_fields`` -- 現在のステップよりも前のデータフィールドと、検
       証済みフォームのハッシュ値の入ったフィールドを表現する文字列です。こ
       れらのフィールドは全て隠しフィールドです。フィールドの内容は生の HTML
@@ -217,8 +201,6 @@ Django には、 :ref:`フォーム <topics-forms-index>` を複数のページ�
 ウィザードを正しく動作させるには、 ``previous_fields``, ``step_field`` およ
 び ``step0`` を全て表示せねばなりません。
 
-.. _Hooking the wizard into a URLconf:
-
 ウィザードを URLconf に組み込む
 =================================
 
@@ -231,8 +213,6 @@ Django には、 :ref:`フォーム <topics-forms-index>` を複数のページ�
     urlpatterns = patterns('',
         (r'^contact/$', ContactWizard([ContactForm1, ContactForm2])),
     )
-
-.. _Advanced FormWizard methods:
 
 フォームウィザードの特殊なメソッド
 ===================================

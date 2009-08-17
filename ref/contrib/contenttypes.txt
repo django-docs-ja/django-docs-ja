@@ -4,7 +4,7 @@
 contenttypes フレームワーク
 ============================
 
-:revision-up-to: 9084 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 .. module:: django.contrib.contenttypes
    :synopsis: インストール済のモデルを扱うための汎用インタフェースを提供します。
@@ -13,7 +13,6 @@ Django には、 :mod:`contenttypes` アプリケーションが付属してい�
 このアプリケーションを使うと、 Django で作成したプロジェクト中に存在する全
 てのモデルを追跡できます。また、 ``contenttypes`` では、モデルを扱うための
 高水準かつ汎用的なインタフェースを提供しています。
-
 
 概要
 =====
@@ -38,8 +37,6 @@ Django には、 :mod:`contenttypes` アプリケーションが付属してい�
 リレーションを張れば、そのモデルからインストール済みの任意のモデルのインス
 タンスとの間に、「一般化リレーション(generic relation)」を張れます。
 
-.. _Installing the contenttypes framework:
-
 ``contenttypes`` フレームワークのインストール
 ================================================
 
@@ -63,8 +60,6 @@ Django には、 :mod:`contenttypes` アプリケーションが付属してい�
     * Django のコメントシステム (:mod:`django.contrib.comments`) は、インス
       トールされている任意のモデルに対してコメントを付けられる機能を
       ``contenttypes`` で実現しています。
-
-.. _The ContentType model:
 
 ``ContentType``  モデル
 ========================
@@ -111,8 +106,6 @@ Django には、 :mod:`contenttypes` アプリケーションが付属してい�
 
 .. _the verbose_name attribute: ../model-api/#verbose-name
 .. _`verbose_name 属性`: `the verbose_name attribute`_
-
-.. _Methods on ContentType instances:
 
 ``ContentType``  インスタンスのメソッド
 =======================================
@@ -179,8 +172,6 @@ Django にバンドルされているアプリケーションには、後者の�
 :class:`~django.contrib.auth.models.Permission`  は「ブログにエントリを追加」
 や「ニュースストーリーを削除」といった権限を表現できます。
 
-.. _The ContentTypeManager:
-
 ``ContentTypeManager`` カスタムマネジャ
 -----------------------------------------
 
@@ -217,7 +208,6 @@ Django にバンドルされているアプリケーションには、後者の�
     <ContentType: user>
 
 .. _generic-relations:
-.. _Generic relations:
 
 一般化リレーション
 ===================
@@ -288,7 +278,15 @@ API を実現できます。 ``TaggedItem`` はリレーションを張ってい
     >>> t.content_object
     <User: Guido>
 
-.. _Reverse generic relations:
+Due to the way :class:`~django.contrib.contenttypes.generic.GenericForeignKey`
+is implemented, you cannot use such fields directly with filters (``filter()``
+and ``exclude()``, for example) via the database API. They aren't normal field
+objects. These examples will *not* work::
+
+    # This will fail
+    >>> TaggedItem.objects.filter(content_object=guido)
+    # This will also fail
+    >>> TaggedItem.objects.get(content_object=guido)
 
 逆方向の一般化リレーション
 ----------------------------
@@ -314,6 +312,18 @@ API を実現できます。 ``TaggedItem`` はリレーションを張ってい
     >>> b.tags.all()
     [<TaggedItem: django>, <TaggedItem: python>]
 
+Just as :class:`django.contrib.contenttypes.generic.GenericForeignKey`
+accepts the names of the content-type and object-ID fields as
+arguments, so too does ``GenericRelation``; if the model which has the
+generic foreign key is using non-default names for those fields, you
+must pass the names of the fields when setting up a
+``GenericRelation`` to it. For example, if the ``TaggedItem`` model
+referred to above used fields named ``content_type_fk`` and
+``object_primary_key`` to create its generic foreign key, then a
+``GenericRelation`` back to it would need to be defined like so::
+
+    tags = generic.GenericRelation(TaggedItem, content_type_field='content_type_fk', object_id_field='object_primary_key')
+
 逆方向のリレーションを張らなければ、手動で照合する必要があります::
 
     >>> b = Bookmark.objects.get(url='http://www.djangoproject.com/')
@@ -321,6 +331,14 @@ API を実現できます。 ``TaggedItem`` はリレーションを張ってい
     >>> TaggedItem.objects.filter(content_type__pk=bookmark_type.id,
     ...                           object_id=b.id)
     [<TaggedItem: django>, <TaggedItem: python>]
+
+Note that if the model with a :class:`~django.contrib.contenttypes.generic.GenericForeignKey`
+that you're referring to uses a non-default value for ``ct_field`` or ``fk_field``
+(e.g. the :mod:`django.contrib.comments` app uses ``ct_field="object_pk"``),
+you'll need to pass ``content_type_field`` and ``object_id_field`` to
+:class:`~django.contrib.contenttypes.generic.GenericRelation`.::
+
+	comments = generic.GenericRelation(Comment, content_type_field="content_type", object_id_field="object_pk")
 
 :class:`~django.contrib.contenttypes.generic.GenericRelation`` を持つオブジェ
 クトを削除すると、このオブジェクトに
@@ -330,7 +348,20 @@ API を実現できます。 ``TaggedItem`` はリレーションを張ってい
 ンを張っている ``t1`` や ``t2`` といった ``TaggedItem``  も同時に削除される
 のです。
 
-.. _Generic relations in forms and admin:
+Generic relations and aggregation
+---------------------------------
+
+:ref:`Django's database aggregation API <topics-db-aggregation`
+doesn't work with a
+:class:`~django.contrib.contenttypes.generic.GenericRelation`. For example, you
+might be tempted to try something like::
+
+    Bookmark.objects.aggregate(Count('tags'))
+
+This will not work correctly, however. The generic relation adds extra filters
+to the queryset to ensure the correct content type, but the ``aggregate`` method
+doesn't take them into account. For now, if you need aggregates on generic
+relations, you'll need to calculate them without using the aggregation API.
 
 フォームや admin で一般化リレーションを扱う
 ---------------------------------------------

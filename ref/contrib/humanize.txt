@@ -4,13 +4,13 @@
 django.contrib.humanize
 ========================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1)
 
 .. module:: django.contrib.humanize
-   :synopsis: データを「人間くさく」表示するためのテンプレートフィルタです。
+   :synopsis: データを「人にやさしく」表示するためのテンプレートフィルタです。
 
-humanize は、データに「人間くささ (human touch)」を与えるための Django テン
-プレートフィルタです。
+humanize は、データを「人にやさしく (human touched) 」表示するための Django
+テンプレートフィルタです。
 
 これらのフィルタを有効にするには、 :setting:`INSTALLED_APPS` 設定に
 ``'django.contrib.humanize'`` を加えます。インストール後、テンプレート上で
@@ -57,8 +57,8 @@ intword
     * ``1200000`` は ``'1.2 million'``  になります。
     * ``1200000000`` は ``'1.2 billion'``  になります。
 
-Values up to 1000000000000000 (one quadrillion) are supported.
-
+1000000000000000 (1 quadrillion) までサポートしています。
+                             
 渡す値は整数でも、整数を文字列で表したものでもかまいません。
 
 ordinal
@@ -78,9 +78,6 @@ naturalday
 ----------
 
 .. versionadded:: 1.0
-
-naturalday
-----------
 
 日付が今日、明日、昨日のいずれかに該当する場合、それぞれ「今日 ("today")」、
 「明日 ("tomorrow") 」、「昨日 ("yesterday")」を返します。それ以外の日付の

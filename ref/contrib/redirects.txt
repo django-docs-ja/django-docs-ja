@@ -4,7 +4,7 @@
 redirects アプリケーション
 ==========================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1)
 
 .. module:: django.contrib.redirects
    :synopsis: リダイレクションを管理するためのフレームワークです。
@@ -12,8 +12,6 @@ redirects アプリケーション
 Django にはオプションとして redirects アプリケーションがついてきます。この
 アプリケーションを使うと、リダイレクト先をデータベースに保存し、適切なリダ
 イレクト処理をおこなってくれます。
-
-.. Installation:
 
 インストール
 ============
@@ -27,8 +25,6 @@ redirects アプリケーションをインストールするには、以下の 
        ``"django.contrib.redirects.middleware.RedirectFallbackMiddleware"``
        を追加します。
     3. :djadmin:`manage.py syncdb <syncdb>` を実行します。
-
-.. How it works:
 
 動作の仕組み
 ============
@@ -58,12 +54,8 @@ redirects データベースにリクエスト URL がないか調べます。�
 ミドルウェアについての詳しい情報は 
 `ミドルウェアのドキュメント <topics-http-middleware>` を参照してください。
 
-.. _How to add, change and delete redirects:
-
 リダイレクトの追加、変更、削除
 ==============================
-
-.. _Via the admin interface:
 
 admin インタフェースから
 ------------------------
@@ -71,8 +63,6 @@ admin インタフェースから
 Django の自動 admin インタフェースを有効にしていれば、 "Redirects" という名
 前のセクションが admin のインデクスページに表示されているはずです。Django
 の他のオブジェクトと同じように編集してください。
-
-.. Via the Python API:
 
 Python API から
 ---------------

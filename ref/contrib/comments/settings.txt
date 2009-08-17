@@ -4,7 +4,7 @@
 コメントフレームワークの設定
 ================================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 以下の設定を使うと、コメントフレームワークのふるまいを制御できます:
 
@@ -31,6 +31,7 @@ COMMENT_MAX_LENGTH
 COMMENTS_APP
 ------------
 
-コメントの「ビジネスロジック」が実装されているアプリケーションの名前
-(``INSTALLED_APPS`` での名前) です。この値を変更すればカスタムのコメントモ
-デルやフォームを扱えますが、詳細はまだドキュメント化されていません。
+An app which provides :ref:`customization of the comments framework
+<ref-contrib-comments-custom>`.  Use the same dotted-string notation
+as in :setting:`INSTALLED_APPS`.  Your custom :setting:`COMMENTS_APP`
+must also be listed in :setting:`INSTALLED_APPS`.

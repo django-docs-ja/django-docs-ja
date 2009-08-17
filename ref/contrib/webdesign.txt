@@ -4,7 +4,7 @@
 django.contrib.webdesign
 ========================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1)
 
 .. module:: django.contrib.webdesign
    :synopsis: Web *開発者* ではなく Web *デザイナ* のためのヘルパとユーティ
@@ -17,8 +17,6 @@ django.contrib.webdesign
 現時点では、このパッケージにたテンプレートタグが一つ入っているだけです。
 Django に取り込みたい Web デザイナフレンドリな機能のアイデアがあるなら、
 ぜひ :ref:`開発チームに提案 <internals-contributing>` してください。
-
-.. _Template tags:
 
 テンプレートタグ
 ================

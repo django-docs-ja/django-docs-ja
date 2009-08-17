@@ -4,11 +4,10 @@
 クロスサイトリクエストフォージェリ (CSRF) 対策
 ==============================================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 .. module:: django.contrib.csrf
    :synopsis: サイトをクロスサイトリクエストフォージェリから守ります。
-
 
 CsrfMiddleware クラスは、簡単に使える `クロスサイトリクエストフォージェリ`_ 
 対策を提供しています。このタイプの攻撃は、悪意あるウェブサイトが、あなたの
@@ -25,8 +24,6 @@ CSRF 攻撃に対する第一の防御は、 GET リクエストから副作用�
     http://www.squarefree.com/securitytips/web-developers.html#CSRF
 .. _`クロスサイトリクエストフォージェリ`: `Cross Site Request Forgeries`_
 
-.. _How to use it:
-
 使い方
 ======
 
@@ -36,7 +33,41 @@ SessionMiddleware よりも後にレスポンスを処理せねばならない�
 SessionMiddleware よりも前に配置します。また、圧縮のような操作が入る前のレ
 スポンスを処理せねばならないので、 GZipMiddleware よりも後に配置します。
 
-.. _How it works:
+The ``CsrfMiddleware`` class is actually composed of two middleware:
+``CsrfViewMiddleware`` which performs the checks on incoming requests,
+and ``CsrfResponseMiddleware`` which performs post-processing of the
+result.  This allows the individual components to be used and/or
+replaced instead of using ``CsrfMiddleware``.
+
+.. versionchanged:: 1.1
+    (previous versions of Django did not provide these two components
+    of ``CsrfMiddleware`` as described above)
+
+Exceptions
+----------
+
+.. versionadded:: 1.1
+
+To manually exclude a view function from being handled by the
+CsrfMiddleware, you can use the ``csrf_exempt`` decorator, found in
+the ``django.contrib.csrf.middleware`` module. For example::
+
+    from django.contrib.csrf.middleware import csrf_exempt
+
+    def my_view(request):
+        return HttpResponse('Hello world')
+    my_view = csrf_exempt(my_view)
+
+Like the middleware itself, the ``csrf_exempt`` decorator is composed
+of two parts: a ``csrf_view_exempt`` decorator and a
+``csrf_response_exempt`` decorator, found in the same module.  These
+disable the view protection mechanism (``CsrfViewMiddleware``) and the
+response post-processing (``CsrfResponseMiddleware``) respectively.
+They can be used individually if required.
+
+You don't have to worry about doing this for most AJAX views. Any
+request sent with "X-Requested-With: XMLHttpRequest" is automatically
+exempt. (See the next section.)
 
 仕組み
 ======
@@ -49,10 +80,12 @@ CsrfMiddleware は以下のような処理を行います:
    ものになります。セッション ID が設定されていない場合、レスポンスに対する
    変更は行いません。このため、セッションをともなわないリクエストに対しては
    非常にわずかなパフォーマンスペナルティしかもたらしません。
+   (実際には ``CsrfResponseMiddleware`` がこの処理を担当します。)
 
 2. セッションクッキーのセットされた全ての POST リクエストに対し、
    'csrfmiddlewaretoken' がセットされていて、かつ正しい値になっているか調べ
    ます。正しい値でなければ、 403 エラーを返します。
+   (実際には ``CsrfViewMiddleware`` がこの処理を担当します。)
 
 これらの処理により、あなたのウェブサイト由来のフォームだけが POST を送り返
 せるようになります。
@@ -69,10 +102,16 @@ GET リクエストを使った CSRF 攻撃は威力を持たないのです。
 CsrfMiddleware はレスポンスを変更する前に Content-Type をチェックし、
 'text/html' または 'application/xml+xhtml' のページだけを変更します。
 
+The middleware tries to be smart about requests that come in via AJAX. Many
+JavaScript toolkits send an "X-Requested-With: XMLHttpRequest" HTTP header;
+these requests are detected and automatically *not* handled by this middleware.
+We can do this safely because, in the context of a browser, the header can only
+be added by using ``XMLHttpRequest``, and browsers already implement a
+same-domain policy for ``XMLHttpRequest``. (Note that this is not secure if you
+don't trust content within the same domain or subdomains.)
+
 .. _9.1.1 Safe Methods, HTTP 1.1, RFC 2616: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
 .. _`RFC 2616: HTTP 1.1 の 9.1.1 節、「安全なメソッド」`: `9.1.1 Safe Methods, HTTP 1.1, RFC 2616`_
-
-.. _Limitations:
 
 制限
 ====

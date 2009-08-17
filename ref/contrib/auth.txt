@@ -3,4 +3,6 @@
 ``django.contrib.auth``
 =======================
 
-See :ref:`topics-auth`.
+:revision-up-to: 11321 (1.1)
+
+:ref:`topics-auth` を参照してください。

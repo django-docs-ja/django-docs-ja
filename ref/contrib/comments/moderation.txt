@@ -4,6 +4,8 @@
 Generic comment moderation
 ==========================
 
+:revision-up-to: 11321 (1.1) unfinished
+
 .. module:: django.contrib.comments.moderation
    :synopsis: Support for automatic comment moderation.
 

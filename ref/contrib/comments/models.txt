@@ -4,6 +4,8 @@
 The built-in comment models
 ===========================
 
+:revision-up-to: 11321 (1.1) unfinished
+
 .. module:: django.contrib.comments.models
    :synopsis: The built-in comment models
   

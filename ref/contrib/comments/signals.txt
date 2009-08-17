@@ -4,7 +4,7 @@
 コメントアプリケーションのシグナル
 ===================================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1)
 
 .. module:: django.contrib.comments.signals
    :synopsis: コメントモジュールから送信されるシグナル

@@ -4,7 +4,7 @@
 配信フィードフレームワーク
 ==========================
 
-:revision-up-to: 9084 (1.0)
+:revision-up-to: 11321 (1.1)
 
 .. module:: django.contrib.syndication
    :synopsis: RSS や Atom 形式の配信フィードを簡単に生成するためのフレーム
@@ -14,15 +14,14 @@ Django には高水準の配信フィード (syndication feed) 生成フレー�
 てきます。このフレームワークを使えば、 RSS_ 形式や Atom_ 形式のフィードを簡
 単に生成できます。
 
-ちょっとした Python クラスを書くだけで配信フィードを作成できます。フィード
-は好きな数だけ生成できます。
+配信フィードの作成は、ちょっとした Python クラスを書くだけでできます。フィー
+ドは好きな数だけ生成できます。
 
 Django には低水準のフィード生成 API もついてきます。 Web コンテキストの外で
 フィードを作成したい場合や、低水準での操作が必要な場合に使ってください。
 
 .. _RSS: http://www.whatisrss.com/
 .. _Atom: http://www.atomenabled.org/
-
 
 高水準フレームワーク
 ====================
@@ -37,16 +36,8 @@ Django には低水準のフィード生成 API もついてきます。 Web コ
 フィードを生成するには、 :class:`~django.contrib.syndication.feeds.Feed` ク
 ラスを書き、 :ref:`URLConf <topics-http-urls>` 内で指定します。
 
-.. Initialization:
-
 初期化
 --------------
-
-最新の開発版の Django を使っていないのなら、 sites フレームワークがインストー
-ルされていて、データベースのテーブルが生成されているか確認してください。
-(詳しくは :mod:`sites フレームワークのドキュメント <django.contrib.sites>`
-を参照してください)。 sites への依存性は開発版の Django で変更され、現在で
-は配信フィードフレームワークは sites フレームワークに依存していません。
 
 Django サイトで配信フィードを使うには、 :ref:`URLConf <topics-http-urls>`
 に以下のような行を追加します::
@@ -94,7 +85,6 @@ Django サイトで配信フィードを使うには、 :ref:`URLConf <topics-ht
 セットアップしたら、あとは :class:`~django.contrib.syndication.feeds.Feed`
 クラス自体を定義するだけです。
 
-
 Feed クラス
 ------------
 
@@ -108,7 +98,7 @@ Feed クラス
 ん。クラスはコードベースのどこにでも置けます。
 
 簡単な例
-----------------
+----------
 
 以下の例は `chicagocrime.org`_ で使っているもので、最新の 5 件のニュース項
 目を記述するようになっています::
@@ -142,9 +132,8 @@ Feed クラス
 
 * RSS フィードの代わりに Atom フィードを生成する場合、 :attr:`description`
   属性の代わりに :attr:`subtitle` 属性を設定してください。詳しくは
-  `Atom フィードと RSS フィードを並行出力する`_ を参照してください。
-
-.. _`Atom フィードと RSS フィードを並行出力する`: `Publishing Atom and RSS feeds in tandem`_
+  :ref:`Atom フィードと RSS フィードを並行出力する <publishing-atom-and-rss-feeds-in-tandem>` 
+  を参照してください。
 
 まだやるべきことが残っています。 RSS フィード中では、 ``<item>`` には
 ``<title>``, ``<link>``, ``<description>`` といったエレメントがあります。
@@ -208,13 +197,10 @@ Feed クラス
 
 .. _chicagocrime.org: http://www.chicagocrime.org/
 
-.. _A complex example:
-
 複雑な例
------------------
+---------
 
-配信フレームワークでは、パラメタを使ったより複雑なフィードをサポートしてい
-ます。
+配信フレームワークは、パラメタを使ったより複雑なフィードをサポートしています。
 
 例えば、 `chicagocrime.org`_ では、シカゴ市内の全ての警官の巡回区域 (beat)
 ごとに最新の犯罪情報のフィードを提供しています。全ての巡回区域毎に
@@ -239,7 +225,8 @@ bit にどのような意味を与え、フィード公開する項目の選択�
 ドは以下のようになります::
 
     from django.contrib.syndication.feeds import FeedDoesNotExist
- 
+    from django.core.exceptions import ObjectDoesNotExist
+
     class BeatFeed(Feed):
         def get_object(self, bits):
             # In case of "/rss/beats/0613/foo/bar/baz/", or other such clutter,
@@ -247,34 +234,34 @@ bit にどのような意味を与え、フィード公開する項目の選択�
             if len(bits) != 1:
                 raise ObjectDoesNotExist
             return Beat.objects.get(beat__exact=bits[0])
-    
+
         def title(self, obj):
             return "Chicagocrime.org: Crimes for beat %s" % obj.beat
-    
+
         def link(self, obj):
             if not obj:
                 raise FeedDoesNotExist
             return obj.get_absolute_url()
-    
+
         def description(self, obj):
             return "Crimes recently reported in police beat %s" % obj.beat
-    
+
         def items(self, obj):
-            return Crime.objects.filter(beat__id__exact=obj.id).order_by('-crime_date')[:30]
+           return Crime.objects.filter(beat__id__exact=obj.id).order_by('-crime_date')[:30]
 
 このクラスに URL :file:`/rss/beats/0613/` でアクセスしたときの、 RSS フレー
 ムワークの基本的なアルゴリズムは以下の通りです:
 
     * フレームワークに URL :file:`/rss/beats/0613/` が渡されます。フレーム
-      ワークは slug 以後に追加の URL bit があることに気づき、 slug 以後の文
-      字列をスラッシュ (``"/"``) で分割して、
+      ワークは slug 以後の URL 部分を検出し、 slug 以後の文字列をスラッシュ
+      (``"/"``) で分割して、
       :class:`~django.contrib.syndication.feeds.Feed` クラスの
-      :meth:`get_object()` メソッドの引数に渡して呼び出します。上の例では、
-      bit は ``['0613']`` になります。リクエストが 
-      :file:`/rss/beats/0613/foo/bar/` であれば bit は
+      :meth:`get_object()` メソッドの引数 ``bits`` に渡して呼び出します。上
+      の例では ``bits`` は ``['0613']`` になります。リクエストが 
+      :file:`/rss/beats/0613/foo/bar/` であれば ``bits`` は
       ``['0613', 'foo', 'bar']`` です。
 
-    * :meth:`get_object()` は指定された ``bit`` を使って適切な巡回区域を選
+    * :meth:`get_object()` は指定された ``bits`` を使って適切な巡回区域を選
       択する役割を担っています。上の場合では、 Django のデータベース API を
       使って巡回区域を決定しています。 無効なパラメタが指定された場合、
       :meth:`get_object()` は
@@ -326,8 +313,6 @@ bit にどのような意味を与え、フィード公開する項目の選択�
 :class:`~django.contrib.syndication.feeds.Feed` クラスの全てのメソッドと属
 性についてのドキュメントが書かれています。
 
-.. _Specifying the type of feed:
-
 フィードの形式を指定する
 ---------------------------
 
@@ -347,9 +332,10 @@ bit にどのような意味を与え、フィード公開する項目の選択�
 
 現在利用可能なフィードの型は以下の 3 つです:
 
-    * :class:`django.utils.feedgenerator.Rss201rev2Feed` (RSS 2.01. Default.)
-    * :class:`django.utils.feedgenerator.RssUserland091Feed` (RSS 0.91.)
-    * :class:`django.utils.feedgenerator.Atom1Feed` (Atom 1.0.)
+    * :class:`django.utils.feedgenerator.Rss201rev2Feed` (RSS 2.01、デフォ
+      ルトの形式。)
+    * :class:`django.utils.feedgenerator.RssUserland091Feed` (RSS 0.91 形式。)
+    * :class:`django.utils.feedgenerator.Atom1Feed` (Atom 1.0 形式。)
 
 エンクロージャ
 ---------------
@@ -379,13 +365,13 @@ Atom フィードにはフィードの現在の場所を定義する ``<link rel
 要です。配信フレームワークは現在の SITE_ID の設定に従ってドメインから取り出
 した値を自動的に入れるようになっています。
 
-.. _`Publishing Atom and RSS feeds in tandem`:
+.. _publishing-atom-and-rss-feeds-in-tandem:
 
 Atom フィードと RSS フィードを並行出力する
 ---------------------------------------------
 
-開発者によっては、 Atom と RSS の *両方の* バージョンを利用できるようにした
-いと望むことでしょう。 Django でこれを実現するのは簡単です: 自作の
+Atom と RSS の *両方の* バージョンを利用したい開発者もいることでしょう。
+Django を使えば簡単に実現できます。自作の
 :class:`~django.contrib.syndication.feeds.Feed` クラスをサブクラス化して、
 :attr:`feed_type` を変更し、 URLconf を更新して、他のバージョン向けのエント
 リを追加するだけです。
@@ -409,19 +395,20 @@ Atom フィードと RSS フィードを並行出力する
 	subtitle = RssSiteNewsFeed.description
 
 .. Note::
-  上の例では、RSS フィードは :attr:`description` を使っています。一方、Atom
-  フィードでは :attr:`subtitle` を使っています。Atom フィードはフィードレベ
-  ルの :attr:`description` を持たず、 :attr:`subtitle` を持っているからです。
+    上の例では、RSS フィードは :attr:`description` を使っています。一方、
+    Atom フィードでは :attr:`subtitle` を使っています。Atom フィードはフィー
+    ドレベルの :attr:`description` を持たず、 :attr:`subtitle` を持っている
+    からです。
 
-  :class:`~django.contrib.syndication.feeds.Feed` クラスに
-  :attr:`description` を定義しておいても、Django は :attr:`description` の
-  値を自動的に :attr:`subtitle` エレメントに入れたりはしません。
-  :attr:`subtitle` と :attr:`description` は必ずしも同じものを指さないから
-  です。その代わり、適切な説明の入った文字列をモデルの :attr:`subtitle` 属
-  性として指定せねばなりません。
+    :class:`~django.contrib.syndication.feeds.Feed` クラスに
+    :attr:`description` を定義しておいても、Django は :attr:`description`
+    の値を自動的に :attr:`subtitle` エレメントに入れたりはしません。
+    :attr:`subtitle` と :attr:`description` は必ずしも同じものを指さないか
+    らです。その代わり、適切な説明の入った文字列をモデルの :attr:`subtitle`
+    属性として指定せねばなりません。
 
-  上の例では、たまたま RSS フィードの :attr:`description` は十分短いので、その
-  まま使っています。
+    上の例では、たまたま RSS フィードの :attr:`description` は十分短いので、
+    そのまま使っています。
 
 対応する URLconf は以下のようにします::
 
@@ -861,8 +848,6 @@ Feed クラスリファレンス
 また、フィードジェネレータのサブクラスを作成すれば、 ``Feed`` の
 ``feed_type`` オプションに指定して使えます。
 
-.. _SyndicationFeed classes:
-
 ``SyndicationFeed`` クラス
 ---------------------------
 
@@ -971,8 +956,6 @@ Feed クラスリファレンス
 .. _django/utils/feedgenerator.py: http://code.djangoproject.com/browser/django/trunk/django/utils/feedgenerator.py
 .. _Python datetime object: http://www.python.org/doc/current/lib/module-datetime.html
 .. _`Python datetime 型オブジェクト`: `Python datetime object`_
-
-.. _Custom feed generators:
 
 カスタムのフィードジェネレータ
 ---------------------------------

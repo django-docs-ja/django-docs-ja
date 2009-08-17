@@ -4,7 +4,7 @@
 sitemaps フレームワーク
 =======================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1)
 
 .. module:: django.contrib.sitemaps
    :synopsis: Google サイトマップ XML ファイルを生成するためのフレームワー
@@ -15,8 +15,6 @@ Django には、 `サイトマップ`_ XML ファイルを簡単に生成でき�
 
 .. _sitemap: http://www.sitemaps.org/
 .. _`サイトマップ`: `sitemap`_
-
-.. Overview:
 
 概要
 ====
@@ -30,10 +28,9 @@ Django のサイトマップフレームワークを使うと、この XML フ�
 Python コードで表現でき、ファイルの生成を自動化できます。
 
 sitemaps は Django の :ref:`配信フレームワーク <ref-contrib-syndication>`
-によく似ています。サイトマップの生成は簡単で、ただ ``Sitemap`` クラスを書い
-て、 :ref:`URLconf <topics-http-urls>` に指定するだけです。
-
-.. Installation:
+によく似ています。サイトマップの生成は簡単で、ただ 
+:class:`~django.contrib.sitemaps.Sitemap` クラスを書いて、 
+:ref:`URLconf <topics-http-urls>` に指定するだけです。
 
 インストール
 ============
@@ -54,9 +51,6 @@ sitemaps アプリケーションは以下の手順でインストールしま�
 いのは、
 :func:`~django.template.loaders.app_directories.load_template_source` テン
 プレートローダがデフォルトのテンプレートを捜し出せるようにするためです。)
-
-
-.. _Initialization:
 
 初期化
 ======
@@ -84,8 +78,6 @@ sitemaps アプリケーションは以下の手順でインストールしま�
 :class:`~django.contrib.sitemaps.Sitemap` クラスの *インスタンス* (例えば
 ``BlogSitemap(some_bar)``) でもかまいません。
 
-.. _Sitemap classes:
-
 Sitemap クラス
 ==============
 
@@ -104,8 +96,6 @@ Sitemap クラス
 :class:`~django.contrib.sitemaps.Sitemap` クラスは
 ``django.contrib.sitemaps.Sitemap`` のサブクラスでなければなりません。クラ
 スはコードベースのどこに置いてもかまいません。
-
-.. _A simple example:
 
 簡単な例
 ========
@@ -144,8 +134,6 @@ Sitemap クラス
       ソッドを定義して、オブジェクトの URL を指定してもかまいません。デフォ
       ルトでは、 :meth:`~Sitemap.location()` は各オブジェクトに対して
       ``get_absolute_url()`` を呼び出し、その結果を返します。
-
-.. _Sitemap class reference:
 
 Sitemap クラスリファレンス
 ==========================
@@ -239,8 +227,6 @@ Sitemap クラスリファレンス
 .. _sitemaps.org documentation: http://www.sitemaps.org/protocol.html#prioritydef
 .. _`sitemaps.org のドキュメント`: `sitemaps.org documentation`_
 
-.. _Shortcuts:
-
 ショートカット
 ==============
 
@@ -259,17 +245,6 @@ sitemaps フレームワークでは、よく使われる状況向けに、二�
 
 .. class:: GenericSitemap
 
-    The :class:`django.contrib.sitemaps.GenericSitemap` class works with any
-    :ref:`generic views <ref-generic-views>` you already have.
-    To use it, create an instance, passing in the same :data:`info_dict` you pass to
-    the generic views. The only requirement is that the dictionary have a
-    :data:`queryset` entry. It may also have a :data:`date_field` entry that specifies a
-    date field for objects retrieved from the :data:`queryset`. This will be used for
-    the :attr:`~Sitemap.lastmod` attribute in the generated sitemap. You may
-    also pass :attr:`~Sitemap.priority` and :attr:`~Sitemap.changefreq`
-    keyword arguments to the :class:`~django.contrib.sitemaps.GenericSitemap`
-    constructor to specify these attributes for all URLs.
-
     :class:`django.contrib.sitemaps.GenericSitemap` クラスは任意の 
     `汎用ビュー <ref-generic-views>` と組み合わせて使えます。
     :class:`~django.contrib.sitemaps.GenericSitemap` を使うには、汎用ビュー
@@ -283,8 +258,6 @@ sitemaps フレームワークでは、よく使われる状況向けに、二�
     ンストラクタには、 :attr:`~Sitemap.priority` や
     :attr:`~Sitemap.changefreq` といったキーワード引数も指定できます。
     これらの引数の値は、全ての URL に共通の属性になります。
-
-.. _Example:
 
 例
 ----
@@ -318,8 +291,6 @@ sitemaps フレームワークでは、よく使われる状況向けに、二�
 
 .. URLconf: ../url_dispatch/
 
-.. _Creating a sitemap index:
-
 サイトマップインデクスを生成する
 ================================
 
@@ -332,7 +303,6 @@ sitemap フレームワークには、個々のサイトマップファイルを
     * URLconf に、 :func:`django.contrib.sitemaps.views.index` と
       :func:`django.contrib.sitemaps.views.sitemap` という二つのビューを使
       います。
-
     * :func:`django.contrib.sitemaps.views.sitemap` にキーワード引数
       :data:`section` を指定します。
 
@@ -349,8 +319,6 @@ sitemap フレームワークには、個々のサイトマップファイルを
 50,000 以上の URL を含むサイトマップの場合、インデクスファイルを生成せねば
 なりませんが、 Django は自動的にサイトマップをページ分割し、インデクスにそ
 の内容を反映します。
-
-.. _Pinging Google:
 
 Google に ping を打つ
 =====================
@@ -370,10 +338,15 @@ Google に ping を打つ
     サイトマップの URL を捜し出せなかった場合、 :func:`ping_google()`
     は :exc:`django.contrib.sitemaps.SitemapNotFound` 例外を送出します。
 
+.. admonition:: Google に登録しておきましょう!
+
+    :func:`ping_google` が動作するのはは、 `Google Webmaster Tools`_ でサイ
+    トを登録してある場合だけです。
+        
+.. _`Google Webmaster Tools`: http://www.google.com/webmasters/tools/
+
 :func:`ping_google()` の用法として有用なのは、モデルの ``save()`` メソッド
 で呼び出すというものです::
-
-    from django.contrib.sitemaps import ping_google
 
    from django.contrib.sitemaps import ping_google
   
@@ -393,8 +366,6 @@ Google に ping を打つ
 もっと効率的にやりたければ、 cron 化されたスクリプトなど、一定の時点で実行
 するようスケジュールしたタスクの中で :func:`ping_google()` を呼び出すとよい
 でしょう。
-
-.. _Pinging Google via manage.py:
 
 ``manage.py`` で Google に Ping を送信する
 ----------------------------------------------

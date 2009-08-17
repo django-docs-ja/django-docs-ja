@@ -4,7 +4,7 @@
 Django の以前のコメントシステムからの移行
 ===============================================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 Django の以前のバージョンには、もう撤廃された、ドキュメント化されていないコ
 メントシステムがありました。このフレームワークをリバースエンジニアリングし
@@ -32,6 +32,15 @@ Django の以前のバージョンには、もう撤廃された、ドキュメ�
       ``comments/form.html`` テンプレートを使ってフォームをレンダする
       ``{% render_comment_form %}`` の二つのタグが追加されました。
 
+    * The way comments are include in your URLconf have changed; you'll need to
+      replace::
+    
+            (r'^comments/', include('django.contrib.comments.urls.comments')),
+      
+      with::
+
+            (r'^comments/', include('django.contrib.comments.urls')),
+
 データの移行
 --------------
 
@@ -52,7 +61,7 @@ Django の以前のバージョンには、もう撤廃された、ドキュメ�
         comment, submit_date, ip_address, is_public, is_removed)
     SELECT
         content_type_id, object_id, site_id, person_name, '', '', comment,
-        submit_date, ip_address, is_public, approved
+        submit_date, ip_address, is_public, not approved
     FROM comments_freecomment;
 
     INSERT INTO django_comments 

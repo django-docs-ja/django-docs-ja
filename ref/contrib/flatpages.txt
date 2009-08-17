@@ -4,7 +4,7 @@
 flatpages アプリケーション
 ===========================
 
-:revision-up-to: 8961 (1.0pre SVN)
+:revision-up-to: 11321 (1.1) unfinished
 
 .. module:: django.contrib.flatpages
    :synopsis: ?フラットな? HTML コンテンツをデータベース上で管理するための
@@ -35,8 +35,6 @@ Django で構築されたサイトの中にも、 flatpages を使っている�
     * http://www.everyblock.com/about/
     * http://www.lawrence.com/about/contact/
 
-.. _Installation:
-
 インストール
 ============
 
@@ -46,6 +44,11 @@ flatpages アプリケーションをインストールするには、以下の�
        追加されていなければ追加し、 :mod:`sites フレームワーク
        <django.contrib.sites>` をインストールします。
 
+       Also make sure you've correctly set :setting:`SITE_ID` to the ID of the
+       site the settings file represents. This will usually be ``1`` (i.e.
+       ``SITE_ID = 1``, but if you're not using the sites framework to manage
+       multiple sites, it could be the ID of a different site.
+
     2. ``'django.contrib.flatpages'`` を  :setting:`INSTALLED_APPS` に加え
        ます。
 
@@ -53,9 +56,6 @@ flatpages アプリケーションをインストールするには、以下の�
        を :setting:`MIDDLEWARE_CLASSES` に加えます。
 
     4. :djadmin:`python manage.py syncdb <syncdb>` を実行します。
-
-
-.. How it works:
 
 flatpages の仕組み
 ==================
@@ -111,14 +111,6 @@ HTTP 状態コードでは有効になりません。
     :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
     はフラットページを提供しようとしません
 
-.. _`SITE_ID 設定`: ../settings/#site-id
-.. _SITE_ID: ../settings/#site-id
-.. _`RequestContext オブジェクト`: 
-    ../templates_python/#subclassing-context-requestcontext
-.. _RequestContext: ../templates_python/#subclassing-context-djangocontext
-.. _`ミドルウェアのドキュメント`: ../middleware/
-.. _middleware docs: ../middleware/
-
 flatpage の追加、変更、削除
 ===========================
 
@@ -128,8 +120,6 @@ admin インタフェースからの操作
 Django 自動管理インタフェースを有効にしていれば、 "Flatpages" セクションが
 admin インデクスページに表示されます。他のオブジェクトと同じように
 flatpages を編集してください。 
-
-.. _Via the Python API:
 
 Python API からの操作
 ---------------------
@@ -142,8 +132,6 @@ Python API からの操作
     <topics-db-queries>`  を介してアクセスできます。
 
 .. _django/contrib/flatpages/models.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/flatpages/models.py
-
-.. _Flatpage templates:
 
 flatpage のテンプレート
 =======================

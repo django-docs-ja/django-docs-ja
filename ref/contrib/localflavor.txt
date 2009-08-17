@@ -1,10 +1,10 @@
 .. _ref-contrib-localflavor:
 
-==========================
+=====================
 localflavor アドオン
-==========================
+=====================
 
-:revision-up-to: 9084 (1.0)
+:revision-up-to: 11321 (1.1)
 
 .. module:: django.contrib.localflavor
     :synopsis: 特定の国や文化で有用な Django コードのコレクションです。
@@ -36,10 +36,8 @@ Python の「バッテリ入り (batteries included)」哲学に従って、 Dja
     class MyForm(forms.Form):
         my_french_phone_no = FRPhoneNumberField()
 
-.. _Supported countries:
-
-localflavor でサポートされている国
-===================================
+localflavor のサポートする地域
+================================
 
 :mod:`~django.contrib.localflavor` がサポートしている国や文化圏は、以下の通
 りです:
@@ -51,15 +49,16 @@ localflavor でサポートされている国
     * ブラジル (Brazil_)
     * カナダ (Canada_)
     * チリ (Chile_)
+    * チェコ (Czech_)
     * フィンランド (Finland_)
     * フランス (France_)
     * ドイツ (Germany_)
-    * オランダ (Holland_)
     * アイスランド (Iceland_)
     * インド (India_)
     * イタリア (Italy_)
     * 日本 (Japan_)
     * メキシコ (Mexico_)
+    * オランダ (`The Netherlands`_)
     * ノルウェー (Norway_)
     * ペルー (Peru_)
     * ポーランド (Poland_)
@@ -91,10 +90,11 @@ localflavor でサポートされている国
 .. _Brazil: `Brazil (br)`_
 .. _Canada: `Canada (ca)`_
 .. _Chile: `Chile (cl)`_
+.. _Czech: `Czech (cz)`_
 .. _Finland: `Finland (fi)`_
 .. _France: `France (fr)`_
 .. _Germany: `Germany (de)`_
-.. _Holland: `Holland (nl)`_
+.. _The Netherlands: `The Netherlands (nl)`_
 .. _Iceland: `Iceland (is\_)`_
 .. _India: `India (in\_)`_
 .. _Italy: `Italy (it)`_
@@ -111,8 +111,6 @@ localflavor でサポートされている国
 .. _United Kingdom: `United Kingdom (uk)`_
 .. _United States of America: `United States of America (us)`_
 
-.. _`Adding flavors`:
-
 新たなローカルフレーバを追加する
 ====================================
 
@@ -124,6 +122,7 @@ localflavor でサポートされている国
 
 .. _create a ticket: http://code.djangoproject.com/simpleticket
 .. _`チケットを作成`: http://code.djangoproject.com/simpleticket
+
 
 .. _`Argentina (ar)`:
 
@@ -151,6 +150,7 @@ Argentina: アルゼンチン (``ar``)
 
     アルゼンチンの州および自治領を選べる ``Select`` ウィジェットです。
 
+
 .. _`Australia (au)`:
 
 Australia: オーストラリア (``au``)
@@ -170,8 +170,8 @@ Australia: オーストラリア (``au``)
 
     オーストラリアの州や領を選べる ``Select`` ウィジェットです。
 
-.. _`Austria (at)`:
 
+.. _`Austria (at)`:
 
 Austria: オーストリア(``at``)
 =============================
@@ -190,6 +190,7 @@ Austria: オーストリア(``at``)
 
     入力が正しいオーストリアの社会保障番号であるか検証するフォームフィール
     ドです。
+
 
 .. _`Brazil (br)`:
 
@@ -235,13 +236,14 @@ Canada: カナダ (``ca``)
 
     入力が正しいカナダ社会保障番号 (SIN) であるか検証するフォームフィールド
     です。正しい SIN は、XXX-XXX-XXX の形式で、 `Luhn mod-10 checksum`_ 
-    検証をパスします。
+    検証を通ります。
 
 .. _Luhn mod-10 checksum: http://en.wikipedia.org/wiki/Luhn_algorithm
 
 .. class:: ca.forms.CAProvinceSelect
 
     カナダの州や領を選べる ``Select`` ウィジェットです。
+
 
 .. _`Chile (cl)`:
 
@@ -256,6 +258,32 @@ Chile: チリ (``cl``)
 .. class:: cl.forms.CLRegionSelect
 
     チリの地域 (Regiones) を選べる ``Select`` ウィジェットです。
+
+
+.. _`Czech (cz)`:
+
+Czech: チェコ (``cz``)
+=======================
+
+.. class:: cz.forms.CZPostalCodeField
+
+    入力が正しいチェコの郵便番号であるか検証するフォームフィールドです。
+    正しい形式は XXXXX または XXX XX で、各桁の文字は数字です。
+
+.. class:: cz.forms.CZBirthNumberField
+
+    入力が正しいチェコの戸籍登録番号 (Czech Birth Number) であるか検証する
+    フォームフィールドです。
+    正しい形式は XXXXXX/XXXX (スラッシュは省略可) です。
+
+.. class:: cz.forms.CZICNumberField
+
+    入力が正しい Czech IC 番号か検証するフィールドです。
+
+.. class:: cz.forms.CZRegionSelect
+
+    チェコの地域を選べる ``Select`` ウィジェットです。
+
 
 .. _`Finland (fi)`:
 
@@ -296,6 +324,7 @@ France: フランス (``fr``)
 
     フランスの県名 (department) を選べる ``Select`` ウィジェットです。
 
+
 .. _`Germany (de)`:
 
 Germany: ドイツ (``de``)
@@ -318,10 +347,11 @@ Germany: ドイツ (``de``)
 
     ドイツの州を選べる ``Select`` ウィジェットです。
 
-.. _`Holland (nl)`:
 
-Holland: オランダ (``nl``)
-===========================
+.. _`The Netherlands (nl)`:
+
+The Netherlands: オランダ (``nl``)
+====================================
 
 .. class:: nl.forms.NLPhoneNumberField
 
@@ -339,6 +369,7 @@ Holland: オランダ (``nl``)
 .. class:: nl.forms.NLProvinceSelect
 
     オランダの県 (province) を選べる ``Select`` ウィジェットです。
+
 
 .. _`Iceland (is_)`:
 
@@ -359,6 +390,7 @@ Iceland: アイスランド (``is_``)
 
     アイスランドの郵便番号を選べる ``Select`` ウィジェットです。
 
+
 .. _`India (in_)`:
 
 India: インド (``in_``)
@@ -378,6 +410,7 @@ India: インド (``in_``)
 .. class:: in.forms.INStateSelect
 
     インドの州や領を選べる ``Select`` ウィジェットです。
+
 
 .. _`Italy (it)`:
 
@@ -409,6 +442,7 @@ Italy: イタリア (``it``)
 
     イタリアの地域名 (region) を選べる ``Select`` ウィジェットです。
 
+
 .. _`Japan (jp)`:
 
 Japan: 日本 (``jp``)
@@ -423,6 +457,7 @@ Japan: 日本 (``jp``)
 
     日本の県を選べる ``Select`` ウィジェットです。
 
+
 .. _`Mexico (mx)`:
 
 Mexico: メキシコ (``mx``)
@@ -431,6 +466,7 @@ Mexico: メキシコ (``mx``)
 .. class:: mx.forms.MXStateSelect
 
     メキシコの州を選べる ``Select`` ウィジェットです。
+
 
 .. _`Norway (no)`:
 
@@ -454,6 +490,7 @@ Norway: ノルウェー (``no``)
     ノルウェーの市名 (municipality, fylker) を選べる ``Select`` ウィジェッ
     トです。
 
+
 .. _`Peru (pe)`:
 
 Peru: ペルー (``pe``)
@@ -472,6 +509,7 @@ Peru: ペルー (``pe``)
 .. class:: pe.forms.PEDepartmentSelect
 
     ペルーの県 (department) を選べる ``Select`` ウィジェットです。
+
 
 .. _`Poland (pl)`:
 
@@ -516,6 +554,7 @@ Poland: ポーランド (``pl``)
     ポーランドの郡 (voivodeship, 行政州) を選べる ``Select`` ウィジェットで
     す。
 
+
 .. _Romania (ro):
 
 Romania: ルーマニア (``ro``)
@@ -558,10 +597,11 @@ Romania: ルーマニア (``ro``)
 
     入力が正しいルーマニアの郵便番号であるか検証するフォームフィールドです。
 
+
 .. _`Slovakia (sk)`:
 
-Slovakia (``sk``)
-==================
+Slovakia: スロバキア (``sk``)
+===============================
 
 .. class:: sk.forms.SKPostalCodeField
 
@@ -576,10 +616,11 @@ Slovakia (``sk``)
 
     スロバキアの地域 (region) を選べる ``Select`` ウィジェットです。
 
+
 .. _`South Africa (za)`:
 
-South Africa (``za``)
-================================================
+South Africa: 南アフリカ (``za``)
+==================================
 
 .. class:: za.forms.ZAIDField
 
@@ -592,10 +633,11 @@ South Africa (``za``)
     入力が正しい南アフリカの郵便番号であるか検証するフォームフィールドです。
     正しい郵便番号は 4 桁からなります。
 
+
 .. _`Spain (es)`:
 
-Spain (``es``)
-================
+Spain: スペイン (``es``)
+==========================
 
 .. class:: es.forms.ESIdentityCardNumberField
 
@@ -630,10 +672,11 @@ Spain (``es``)
 
     スペインの領名を選べる ``Select`` ウィジェットです。
 
+
 .. _`Switzerland (ch)`:
 
-Switzerland (``ch``)
-======================
+Switzerland: スイス (``ch``)
+===============================
 
 .. class:: ch.forms.CHIdentityCardNumberField
 
@@ -657,10 +700,11 @@ Switzerland (``ch``)
 
     スイスの州名を選べる ``Select`` ウィジェットです。
 
+
 .. _`United Kingdom (uk)`:
 
-United Kingdom (``uk``)
-========================
+United Kingdom: イギリス (``uk``)
+===================================
 
 .. class:: uk.forms.UKPostcodeField
 
@@ -680,8 +724,8 @@ United Kingdom (``uk``)
 
 .. _`United States of America (us)`:
 
-United States of America (``us``)
-================================== 
+United States of America: アメリカ合衆国 (``us``)
+===================================================
 
 .. class:: us.forms.USPhoneNumberField
 

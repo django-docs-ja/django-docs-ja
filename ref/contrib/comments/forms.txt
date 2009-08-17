@@ -4,6 +4,8 @@
 Comment form classes
 ====================
 
+:revision-up-to: 11321 (1.1) unfinished
+
 .. module:: django.contrib.comments.forms
    :synopsis: Forms for dealing with the built-in comment model.
 

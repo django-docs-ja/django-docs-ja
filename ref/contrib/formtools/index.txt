@@ -3,7 +3,7 @@
 django.contrib.formtools
 ========================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1)
 
 Django のフォーム (:mod:`django.forms`) を扱うための高水準の抽象 API です。
 

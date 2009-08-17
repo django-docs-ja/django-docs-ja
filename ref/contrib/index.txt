@@ -4,7 +4,7 @@
 "django.contrib" 下のアドオン
 =============================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1)
 
 Django は Python の `"batteries included" 哲学`_ を目指しています。 Django
 には Web 開発における課題を解くための様々な外部オプションツールがついてきま
@@ -26,7 +26,7 @@ Django は Python の `"batteries included" 哲学`_ を目指しています。
 .. toctree::
    :maxdepth: 1
 
-   admin
+   admin/index
    auth
    comments/index
    contenttypes
@@ -122,11 +122,6 @@ humanize
 データに「人間くささ (human touch)」を与えるための Django テンプレートフィ
 ルタです。
 
-これらのフィルタを有効にするには、 :setting:`INSTALLED_APPS` 設定に
-``'django.contrib.humanize'`` を加えます。インストール後、テンプレート上で
-``{% load humanize %}`` を呼び出せば、以下のフィルタを利用できるようになり
-ます:
-
 :ref:`humanize のドキュメント <ref-contrib-humanize>` を参照してください。
 
 localflavor
@@ -211,7 +206,6 @@ webdesign
 Web の *開発者* ではなく *デザイナ* のためのヘルパやユーティリティです。
 
 :ref:`webdesign のドキュメント <ref-contrib-webdesign>` を参照してください。
-
 
 その他のアドオン
 =================
