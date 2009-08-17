@@ -4,7 +4,7 @@
 コメントフレームワーク
 ===========================
 
-:revision-up-to: 9084 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 .. module:: django.contrib.comments
    :synopsis: Django のコメントフレームワークです。
@@ -114,6 +114,10 @@ Django のコメントは、全て何らかのオブジェクトに「結びつ�
         ...
     {% endfor %}
 
+This returns a list of :class:`~django.contrib.comments.models.Comment` objects;
+see :ref:`the comment model documentation <ref-contrib-comments-models>` for
+details.
+
 .. templatetag:: get_comment_count
 
 コメントの数を数える
@@ -170,9 +174,10 @@ Django のコメントは、全て何らかのオブジェクトに「結びつ�
     {% get_comment_form for event as form %}
     <form action="{% comment_form_target %}" method="POST">
       {{ form }}
-      <p class="submit">
-        <input type="submit" name="submit" class="submit-post" value="Preview">
-      </p>
+      <tr>
+        <td></td>
+        <td><input type="submit" name="preview" class="submit-post" value="Preview"></td>
+      </tr>
     </form>
 
 このアプローチをとるときには、いくつか考慮すべき点があります。後述の
@@ -190,6 +195,14 @@ Django のコメントは、全て何らかのオブジェクトに「結びつ�
 使うときには、いつも以下のように書いてください::
 
     <form action="{% comment_form_target %}" method="POST">
+
+Redirecting after the comment post
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To specify the URL you want to redirect to after the comment has been posted,
+you can include a hidden form input called ``next`` in your comment form. For example::
+ 
+    <input type="hidden" name="next" value="{% url my_comment_was_posted %}" />
 
 .. _notes-on-the-comment-form:
 
@@ -231,7 +244,10 @@ Django のコメントは、全て何らかのオブジェクトに「結びつ�
 .. toctree::
    :maxdepth: 1
 
+   models
    settings
    signals
    upgrade
-
+   custom
+   forms
+   moderation
