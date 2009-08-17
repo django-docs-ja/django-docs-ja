@@ -4,6 +4,8 @@
 Admin actions
 =============
 
+:revision-up-to: 11321 (1.1) unfinished
+
 .. versionadded:: 1.1
 
 .. currentmodule:: django.contrib.admin
