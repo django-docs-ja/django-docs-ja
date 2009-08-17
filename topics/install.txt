@@ -4,18 +4,19 @@
 Django のインストール
 =====================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 このドキュメントを読めば Django を動かせるようになります。
-
-.. Install Python:
 
 Python のインストール
 =====================
 
-Django は Python の Web フレームワークなので Python が必要です。
+Django は Python の Web フレームワークなので、当然 Python が必要です。
 
-Django はバージョン 2.3 以上の Python で動作します。
+It works with any Python version from 2.3 to 2.6 (due to backwards
+incompatibilities in Python 3.0, Django does not currently work with
+Python 3.0; see :ref:`the Django FAQ <faq-install>` for more
+information on supported Python versions and the 3.0 transition).
 
 http://www.python.org から Python を取ってきましょう。 Linux や Mac OSX を
 動かしているのなら、おそらくインストール済みのはずです。
@@ -28,30 +29,29 @@ http://www.python.org から Python を取ってきましょう。 Linux や Mac
 
 .. _jython: http://jython.org/
 
-
-.. _Install Apache and mod_python:
-
-Apache と mod_python のインストール
+Apache と mod_wsgi のインストール
 ===================================
 
 単に Django を試してみたいだけなら、この節は読み飛ばして次の節を読んでくだ
 さい。Djangoにはテスト用の軽量なWebサーバが付属しているので、運用環境での動
 作が必要になるまでApacheをセットアップする必要はないのです。
 
-Django を実運用のサイトで使いたい場合、 Apache と `mod_python`_ を使って下
-さい。 mod_python は mod_perl のようなもので、 Python を Apache の中に埋め
+Django を実運用のサイトで使いたい場合、 Apache と `mod_wsgi`_ を使って下
+さい。 mod_wsgi は mod_perl のようなもので、 Python を Apache の中に埋め
 込み、サーバの起動時に Python コードをメモリにロードします。コードは Apache
 プロセスが生きている間ずっとメモリ上に存在するので、他のサーバ構成よりも明
-らかに高いパフォーマンスを実現します。 Django の動作には Apache 2.x および
-mod_python 3.x が必要です。
+らかに高いパフォーマンスを実現します。 Django は mod_wsgi をサポートする全
+てのバージョンの Apache で動作します。
 
-mod_python をインストールしたら、設定に関する情報は 
-:ref:`mod_python で Django を動かす <howto-deployment-modpython>` を参照し
-てください。
+mod_wsgi をインストールした後の設定方法は
+:ref:`mod_wsgi で Django を動かす <howto-deployment-modwsgi>` を参照してく
+ださい。
 
-何らかの理由で mod_python を使えない場合でも心配はいりません: Django は
-WSGI_ 仕様に従っているので、様々なサーバプラットフォームで動作させられます。
-個々のプラットフォームにおけるインストール方法の説明は 
+何らかの理由で mod_wsgi を使えない場合でも心配はいりません: Django を運用す
+る方法は他にもあります。お勧めの第二選択肢は、
+mod_wsgi の前身、 :ref:`mod_python <howto-deployment-modpython>` です。
+Django は WSGI_ 仕様に従っているので、他にも様々なサーバプラットフォームで
+動作させられます。個々のプラットフォームにおけるインストール方法の説明は
 `サーバ構成に関する wiki ページ`_ を参照してください。
 
 .. _Apache: http://httpd.apache.org/
@@ -61,7 +61,6 @@ WSGI_ 仕様に従っているので、様々なサーバプラットフォー�
 .. _server-arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
 
 .. _database-installation:
-.. _Get your database running:
 
 データベースを動かす
 ====================
@@ -70,14 +69,30 @@ Django のデータベース API 機能を使うのなら、データベース�
 があります。 Django は PostgreSQL_, MySQL_, Oracle_ および SQLite_ で動作し
 ます (SQLite はサーバを動かさなくても使えます)。
 
+In addition to the officially supported databases, there are backends provided
+by 3rd parties that allow you to use other databases with Django:
+
+* `Sybase SQL Anywhere`_
+* `IBM DB2`_
+* `Microsoft SQL Server 2005`_
+* Firebird_
+* ODBC_
+
+The Django versions and ORM features supported by these unofficial backends
+vary considerably. Queries regarding the specific capabilities of these
+unofficial backends, along with any support queries, should be directed to the
+support channels provided by each 3rd party project.
+
 さらに、各データベースの Python バインディングをインストールしておく必要が
 あります。
 
 * PostgreSQL を使う場合、 psycopg_ パッケージが必要です。 Django はバージョ
   ン 1 および 2 の psycopg をサポートしています (Django のデータベース設定
   で、 ``postgresql`` [バージョン 1 の場合] か、 ``postgresql_psycopg2``
-  [バージョン 2 の場合] を選んでください。Windows 環境なら、 
-  非公式の `Windows むけコンパイル済みパッケージ`_ を使って下さい。
+  [バージョン 2 の場合] を選んでください。
+
+  Windows 環境なら、非公式の `Windows むけコンパイル済みパッケージ`_ を使っ
+  て下さい。
 
 * MySQL を使う場合は、バージョン 1.2.1p2 以降の MySQLdb_ が必要です。
   :ref:`MySQL バックエンド <ref-databases>` にまつわるデータベース固有の説
@@ -91,6 +106,9 @@ Django のデータベース API 機能を使うのなら、データベース�
 * Oracle を使っているなら、 cx_Oracle_ が必要です。バージョン 4.3.1 以上を
   使ってください。 :ref:`Oracle バックエンド <oracle-notes>` 固有の注意事項
   も参照してください。
+
+* If you're using an unofficial 3rd party backend, please consult the
+  documentation provided for any additional requirements.
 
 Django の ``manage.py syncdb`` を使って、モデルに対応するテーブルを自動生成
 するつもりなら、Django に対して、データベース上でテーブルの生成や ALTER を
@@ -114,6 +132,11 @@ Django の ``manage.py syncdb`` を使って、モデルに対応するテーブ
 .. _pysqlite: http://initd.org/tracker/pysqlite
 .. _cx_Oracle: http://cx-oracle.sourceforge.net/
 .. _Oracle: http://www.oracle.com/
+.. _Sybase SQL Anywhere: http://code.google.com/p/sqlany-django/
+.. _IBM DB2: http://code.google.com/p/ibm-db/
+.. _Microsoft SQL Server 2005: http://code.google.com/p/django-mssql/
+.. _Firebird: http://code.google.com/p/django-firebird/
+.. _ODBC: http://code.google.com/p/django-pyodbc/
 
 .. _removing-old-versions-of-django:
 
@@ -148,7 +171,6 @@ Python egg を使って Django をインストールした場合、Django の ``
 
 
 .. _install-django-code:
-.. _Install the Django code:
 
 Django コードのインストール
 ===========================
@@ -159,9 +181,6 @@ Django コードのインストール
 
 どの方法を選ぶにしても、そんなに難しくはないので安心してください。
 
-
-.. _Installing a distribution-specific package:
-
 OS ごとのインストールパッケージによるインストール
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
@@ -170,7 +189,6 @@ OS ごとのインストールパッケージによるインストール
 トーラが提供されていないか調べます。ディストリビューション固有の配布パッケー
 ジは、たいてい依存関係のあるパッケージを自動的にインストールしてくれたり、パ
 スの更新を行ってくれたりします。
- 
 
 .. _installing-official-release:
 
@@ -198,9 +216,7 @@ OS ごとのインストールパッケージによるインストール
 .. _bsdtar: http://gnuwin32.sourceforge.net/packages/bsdtar.htm
 .. _7-zip: http://www.7-zip.org/
 
-
 .. _installing-development-version:
-.. _Installing the development version:
 
 開発バージョンのインストール
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -218,7 +234,6 @@ OS ごとのインストールパッケージによるインストール
 .. _`開発の進行状況`: `the development timeline`_
 .. _the list of backwards-incompatible changes: http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
 .. _`以前のバージョンと互換性のない変更`: `the list of backwards-incompatible changes`_
-
 
 Django のコードを更新して最新のバグフィクスや改良を適用したいのなら、以下の
 説明に従って開発バージョンをインストールしてください。
@@ -243,7 +258,7 @@ Django のコードを更新して最新のバグフィクスや改良を適用�
       ln -s `pwd`/django-trunk/django SITE-PACKAGES-DIR/django
 
    (上の作業では、使っているプラットフォームの ``site-packages``  ディレク
-   トリに合わせて SITE-PACKAGES-DIR を書き換えてください。 
+   トリに合わせて ``SITE-PACKAGES-DIR`` を書き換えてください。 
    ``site-packages`` の場所の探し方は、「 ``site-packages`` はどこにあるの？」
    を参照してください)
 
@@ -262,7 +277,6 @@ Django のコードを更新して最新のバグフィクスや改良を適用�
      ありません。 
      :ref:`mod_python で Django を動かす <howto-deployment-modpython>` も参
      照してください。
-
 
 4. ``django_src/django/bin/django-admin.py`` を実行できるようにします。
    Unix系のシステムでは、例えば以下のようにして、 ``/usr/local/bin`` のよう

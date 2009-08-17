@@ -5,7 +5,7 @@
 Django テンプレート言語
 ============================
 
-:revision-up-to: 9084 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 .. admonition:: このドキュメントについて
 
@@ -29,8 +29,8 @@ Smarty_ や CheetahTemplate_ のようなテキストベースのテンプレー
     いのです。
 
     Django のテンプレートシステムは、プログラムの構成部品に似たタグ、例えば
-    ブールテストのための ``{% if %}`` タグやループ処理のための 
-    ``{% for %}`` タグを備えています。しかし、これらのタグは単に同じ意味の
+    ブールテストのための :ttag:`if` タグやループ処理のための :ttag:`for`
+    タグを備えています。しかし、これらのタグは単に同じ意味の
     Python コードとして実行されるのではなく、テンプレートシステムは Python
     の式を解釈実行したりはしません。テンプレートシステムがサポートしている
     のは、以下で定義されているデフォルトのタグ、フィルタおよびその構文だけ
@@ -40,11 +40,8 @@ Smarty_ や CheetahTemplate_ のようなテキストベースのテンプレー
 .. _Smarty: http://smarty.php.net/
 .. _CheetahTemplate: http://www.cheetahtemplate.org/
 
-.. Templates:
-
 テンプレート
 ============
-
 
 .. highlightlang:: html+django
 
@@ -88,8 +85,6 @@ Smarty_ や CheetahTemplate_ のようなテキストベースのテンプレー
     そう、もう一つあります: 人間に XML を編集させるなんて、サディスティック
     でしかありません！
 
-.. _Variables:
-
 変数
 ====
 
@@ -118,8 +113,6 @@ Smarty_ や CheetahTemplate_ のようなテキストベースのテンプレー
 後述の「 `組み込みのリファレンスドキュメント`_ 」を読めば、テンプレートで使
 える変数名を調べる手がかりになります。
 
-.. _Filters:
-
 フィルタ
 ========
 
@@ -144,7 +137,6 @@ name }}`` の値は ``lower`` フィルタ、すなわち文字を小文字に�
 
 :ref:`組み込みフィルタリファレンス<ref-templates-builtins-filters>` では、
 全ての組み込みフィルタについて説明しています。
-
 組み込みフィルタでできることを知ってもらうために、よく使うテンプレートフィ
 ルタをいくつか挙げましょう:
 
@@ -185,8 +177,6 @@ name }}`` の値は ``lower`` フィルタ、すなわち文字を小文字に�
 
 テンプレートフィルタは自作できます。 :ref:`howto-custom-template-tags`
 を参照してください。
-
-.. _Tags:
 
 タグ
 ====
@@ -252,8 +242,6 @@ Django にはたくさんの組み込みタグが付属しています。組み�
 テンプレートタグは自作できます。 :ref:`howto-custom-template-tags`
 を参照してください。
 
-.. _Comments:
-
 コメント
 ========
 
@@ -274,7 +262,6 @@ Django にはたくさんの組み込みタグが付属しています。組み�
 :ttag:`comment` タグを使ってください。
 
 .. _template-inheritance:
-.. _`Template inheritance`:
 
 テンプレートの継承
 ==================
@@ -432,9 +419,7 @@ Django のテンプレートエンジンにおいて、テンプレートの継�
 ``{% block %}`` 設定で置き換えればよいのか分からなくなってしまいます。 
 
 .. _next section: #automatic-html-escaping
-
 .. _automatic-html-escaping:
-.. _Automatic HTML escaping:
 
 HTML の自動エスケープ
 =======================
@@ -499,8 +484,6 @@ HTML の自動エスケープ
 .. _Cross Site Scripting: http://en.wikipedia.org/wiki/Cross-site_scripting
 .. _`クロスサイトスクリプティング`: http://ja.wikipedia.org/wiki/クロスサイトスクリプティング
 
-.. _How to turn it off:
-
 自動エスケープを切るには
 ---------------------------
 
@@ -513,8 +496,6 @@ HTML の自動エスケープ
 データベースに HTML を保存していて、テンプレートに直接埋め込みたい場合を考
 えてみましょう。また、 Django のテンプレートシステムを使って、 HTML *以外*
 のデータ、例えば電子メールメッセージなどを生成したい場合がそうです。
-
-.. _For individual variables:
 
 変数単位の制御
 ~~~~~~~~~~~~~~~~
@@ -530,8 +511,6 @@ HTML の自動エスケープ
 
     エスケープされる: &lt;b&gt;
     エスケープされない: <b>
-
-.. _For template blocks:
 
 テンプレートブロック単位の制御
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -584,8 +563,6 @@ HTML の自動エスケープ
     <h1>This & that</h1>
     <b>Hello!</b>
 
-.. _Notes:
-
 注意点
 -------
 
@@ -599,8 +576,6 @@ HTML の自動エスケープ
 追加してください。自動エスケープがオンの場合、 ``escape`` フィルタがデータ
 を *二重にエスケープする* ような危険性はありません。 ``escape`` フィルタは
 変数の自動エスケープには影響しないのです。
-
-.. _String literals and automatic escaping:
 
 文字列リテラルと自動エスケープ
 -------------------------------
@@ -627,7 +602,6 @@ HTML の自動エスケープ
 変数はテンプレート作者の制御の範囲外にあり、自動的にエスケープされます。
 
 .. _template-built-in-reference:
-.. _`Using the built-in reference`:
 
 組み込みのリファレンスドキュメント
 ==================================
@@ -664,7 +638,6 @@ Django で作成したサイトは通常、データベースオブジェクト�
 る変数やオブジェクトが分かります。
 
 .. _loading-custom-template-libraries:
-.. _Custom tag and filter libraries:
 
 カスタムタグとカスタムフィルタのライブラリ
 ==========================================
@@ -689,8 +662,6 @@ admin でドキュメント置場を参照してください。
     
 カスタムのテンプレートライブラリを作成する方法は
 :ref:`howto-custom-template-tags` を参照してください。
-
-.. _Custom libraries and template inheritance:
 
 カスタムのライブラリとテンプレートの継承
 ----------------------------------------

@@ -4,12 +4,10 @@
 国際化
 ======
 
-:revision-up-to: 9084 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 Django はコードとテンプレートの双方で国際化をフルサポートしています。このド
 キュメントでは国際化の仕組みについて説明します。
-
-.. Overview:
 
 概要
 ====
@@ -33,8 +31,6 @@ Django が行っているのは、本質的には以下の二つの作業です:
     * 指定したフックを使って、特定のユーザの言語設定に従って Web アプリケー
       ションを翻訳します。
 
-.. _If you don't need internationalization in your app:
-
 国際化が必要ない場合
 ====================
 
@@ -46,8 +42,6 @@ Django の国際化フックはデフォルトで有効になっているので�
 
 この場合、 :setting:`TEMPLATE_CONTEXT_PROCESSORS` からも
 ``'django.core.context_processors.i18n'`` を外すことになるでしょう。
-
-.. _`If you do need internationalization: three steps`:
 
 国際化が必要な場合: 3 つのステップ
 ===================================
@@ -62,9 +56,6 @@ Django の国際化フックはデフォルトで有効になっているので�
     Django の翻訳機構は、 Python に付属の ``gettext`` モジュールを使ってい
     ます。
 
-
-.. _`1. How to specify translation strings`:
-
 1. 翻訳文字列の指定方法
 ========================
 
@@ -73,12 +64,8 @@ Django の国際化フックはデフォルトで有効になっているので�
 訳可能な文字列をマークしておくのは作者の役割であり、翻訳システムはマークさ
 れた文字列しか翻訳対象にしません。
 
-.. _In Python code:
-
 Python コード内での指定
 -----------------------
-
-.. _Standard translation:
 
 標準的な翻訳
 ~~~~~~~~~~~~
@@ -118,6 +105,7 @@ Python コード内での指定
 の例と全く同じになります::
 
     from django.utils.translation import ugettext
+
     def my_view(request):
         output = ugettext("Welcome to my site.")
         return HttpResponse(output)
@@ -142,7 +130,6 @@ Python コード内での指定
 きないので注意しておきましょう。詳しくは後の ``makemessages`` の節で説明し
 ます。)
 
-
 ``_()`` や ``ugettext()`` に渡す文字列には、 Pyton の標準の名前付き補完構文
 によるプレースホルダを使えます。例えば::
 
@@ -159,9 +146,6 @@ Python コード内での指定
 ``%d``) ではなく、名前付きの補完 (``%(day)s``) を使ってください。固定引数
 による補完を使った場合、プレースホルダの順番によってうまく翻訳できない場合
 があります。
-
-
-.. _Marking strings as no-op:
 
 すぐには翻訳しない文字列をマークする
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -196,6 +180,24 @@ Python コード内での指定
 時、例えば admin サイトでテンプレートをレンダリングしたときに初めて実行され
 ます。
 
+The result of a ``ugettext_lazy()`` call can be used wherever you would use a
+unicode string (an object with type ``unicode``) in Python. If you try to use
+it where a bytestring (a ``str`` object) is expected, things will not work as
+expected, since a ``ugettext_lazy()`` object doesn't know how to convert
+itself to a bytestring.  You can't use a unicode string inside a bytestring,
+either, so this is consistent with normal Python behavior. For example::
+
+    # This is fine: putting a unicode proxy into a unicode string.
+    u"Hello %s" % ugettext_lazy("people")
+
+    # This will not work, since you cannot insert a unicode object
+    # into a bytestring (nor can you insert our unicode proxy there)
+    "Hello %s" % ugettext_lazy("people")
+
+If you ever see output that looks like ``"hello
+<django.utils.functional...>"``, you have tried to insert the result of
+``ugettext_lazy()`` into a bytestring. That's a bug in your code.
+
 ``ugettext_lazy`` という名前が冗長で嫌なら、以下のようにして ``_`` (アンダー
 スコア) にエイリアスできます::
 
@@ -218,13 +220,24 @@ Python コード内での指定
             verbose_name = _('my thing')
             verbose_name_plural = _('mythings')
 
-.. _Pluralization:
-
 複数形化
-~~~~~~~~~~~~~
+~~~~~~~~~
 
 複数形のメッセージを指定するには ``django.utils.translation.ungettext()`` を
-使います。例えば::
+使います。
+
+``ungettext`` takes three arguments: the singular translation string, the plural
+translation string and the number of objects.
+
+This function is useful when your need you Django application to be localizable
+to languages where the number and complexity of `plural forms
+<http://www.gnu.org/software/gettext/manual/gettext.html#Plural-forms>`_ is
+greater than the two forms used in English ('object' for the singular and
+'objects' for all the cases where ``count`` is different from zero, irrespective
+of its value.)
+
+
+例えば::
 
     from django.utils.translation import ungettext
     def hello_world(request, count):
@@ -233,11 +246,61 @@ Python コード内での指定
         }
         return HttpResponse(page)
 
-``ungettext`` は、単数形の翻訳文字列、複数形の翻訳文字列、そしてオブジェクト
-の数 (翻訳言語に ``count`` という変数で渡されます) という 3 つの引数をとり
-ます。
+In this example the number of objects is passed to the translation languages as
+the ``count`` variable.
 
-.. _In template code:
+Lets see a slightly more complex usage example::
+
+    from django.utils.translation import ungettext
+
+    count = Report.objects.count()
+    if count == 1:
+        name = Report._meta.verbose_name
+    else:
+        name = Report._meta.verbose_name_plural
+
+    text = ungettext(
+            'There is %(count)d %(name)s available.',
+            'There are %(count)d %(name)s available.',
+            count
+    ) % {
+        'count': count,
+        'name': name
+    }
+
+Here we reuse localizable, hopefully already translated literals (contained in
+the ``verbose_name`` and ``verbose_name_plural`` model ``Meta`` options) for
+other parts of the sentence so all of it is consistently based on the
+cardinality of the elements at play.
+
+.. _pluralization-var-notes:
+
+.. note::
+
+    When using this technique, make sure you use a single name for every
+    extrapolated variable included in the literal. In the example above note how
+    we used the ``name`` Python variable in both translation strings. This
+    example would fail::
+
+        from django.utils.translation import ungettext
+        from myapp.models import Report
+
+        count = Report.objects.count()
+        d = {
+            'count': count,
+            'name': Report._meta.verbose_name
+            'plural_name': Report._meta.verbose_name_plural
+        }
+        text = ungettext(
+                'There is %(count)d %(name)s available.',
+                'There are %(count)d %(plural_name)s available.',
+                count
+        ) % d
+
+    You would get a ``a format specification for argument 'name', as in
+    'msgstr[0]', doesn't exist in 'msgid'`` error when running
+    ``django-admin.py compilemessages`` or a ``KeyError`` Python exception at
+    runtime.
 
 テンプレート内での翻訳
 ----------------------
@@ -256,9 +319,12 @@ Python コード内での指定
     <title>{% trans myvar %}</title>
 
 ``noop`` オプションを指定すると、値の参照は行われますが、翻訳はしません。
-``noop`` は、将来翻訳が必要なコンテンツを「スタブ」するのに便利です。
+``noop`` は、将来翻訳が必要なコンテンツを「スタブ」するのに便利です::
 
     <title>{% trans "myvar" noop %}</title>
+
+
+内部的には、インラインの翻訳は ``ugettext`` を呼び出します。
 
 ``{% trans %}`` の中では定数文字列とテンプレート変数を同時に扱えません。翻
 訳中で変数 (プレースホルダ) を使いたい場合には、以下の例のように 
@@ -273,7 +339,6 @@ Python コード内での指定
     {% blocktrans with value|filter as myvar %}
     This will have {{ myvar }} inside.
     {% endblocktrans %}
-
 
 ``blocktrans`` タグの中で複数個の式を束縛したい場合には、 ``and`` を使って
 分割します::
@@ -292,8 +357,11 @@ Python コード内での指定
     There are {{ counter }} {{ name }} objects.
     {% endblocktrans %}
 
-内部的には、ブロックおよびインラインの翻訳は全て適切な ``ugettext`` /
-``ungettext`` 呼び出しを行います。
+When you use the pluralization feature and bind additional values to local
+variables apart from the counter value that selects the translated literal to be
+used, have in mind that the ``blocktrans`` construct is internally converted
+to an ``ungettext`` call. This means the same :ref:`notes regarding ungettext
+variables <pluralization-var-notes>` apply.
 
 ``RequestContext`` は 3 つの翻訳処理固有の変数にアクセスできます:
 
@@ -307,6 +375,7 @@ Python コード内での指定
       ならば、ヘブライ語やアラビア語のように右から左に記述する言語を示し、
       ``False`` なら英語、フランス語、ドイツ語のように左から右に記述する言
       語を指します。
+
 
 ``RequestContext`` 拡張を使わなければ、以下の 3 つのタグを使って値を取得でき
 ます::
@@ -335,9 +404,6 @@ Python コード内での指定
 .. _`Django テンプレート`: ../templates_python/
 .. _Django templates: ../templates_python/
 
-
-.. _Working with lazy translation objects:
-
 遅延翻訳オブジェクトを操作する
 --------------------------------
 
@@ -350,8 +416,6 @@ Python コード内での指定
 延翻訳オブジェクトの変換は (ロケールの影響下に入るように) できるだけ遅くせ
 ねばならないからです。遅延翻訳オブジェクトの変換を遅らせるために、以下の二
 つのヘルパ関数があります。
-
-.. _`Joining strings: string_concat()`:
 
 文字列の結合: string_concat()
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -371,8 +435,6 @@ Python コード内での指定
 上のケースでは、 ``result`` 中の遅延翻訳オブジェクトは、 ``result`` 自体を
 文字列中で使った場合 (テンプレートのレンダリング時など) にしか文字列に変換
 されません。
-
-.. _The allow_lazy() decorator:
 
 allow_lazy() デコレータ
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -412,7 +474,6 @@ Django はたくさんのユーティリティ関数を (とりわけ ``django.u
 
 
 .. _how-to-create-language-files:
-.. _`2. How to create language files`:
 
 2. 言語ファイルの作成
 ======================
@@ -432,8 +493,6 @@ Django はたくさんのユーティリティ関数を (とりわけ ``django.u
     てしまうでしょう。くわしくは 
     :ref:`LocaleMiddleware の注意事項 <locale-middleware-notes>` を参照して
     ください。
-
-.. _Message files:
 
 メッセージファイル
 ------------------
@@ -475,7 +534,6 @@ Django には ``django-admin.py makemessages`` というツールが付属して
 ``/locale/LANG/LC_MESSAGES`` 下にメッセージファイルを作成 (もしくは更新) し
 ます。 ``de`` の例では、ファイルは ``/locale/de/LC_MESSAGES/django.po`` で
 す。
-
 
 デフォルトの設定では、 ``django-admin.py makemessages`` は拡張子 ``.html``
 のファイルも検索します。デフォルトの設定をオーバライドしたければ、
@@ -553,8 +611,6 @@ Django には ``django-admin.py makemessages`` というツールが付属して
 語用にメッセージファイルを更新するには、以下のようにします::
 
     django-admin.py makemessages -a
-
-.. _Compiling message files:
 
 メッセージファイルのコンパイル
 ------------------------------
@@ -748,7 +804,6 @@ Django をネイティブの言語で動かしたいだけで、かつ自分の�
 .. _`リクエストオブジェクト`: `request object`_
 
 .. _translations-in-your-own-projects:
-.. _Using translations in your own projects:
 
 自作のプロジェクトで翻訳を使う
 ==============================
@@ -820,8 +875,6 @@ Django は以下のアルゴリズムに従って翻訳を探します:
 係する部分の文字列だけを翻訳し、別個に配布されたアプリケーションの文字列を
 対象にしなくなります。
 
-.. _The set_language redirect view:
-
 ``set_language`` リダイレクトビュー
 =====================================
 
@@ -866,8 +919,6 @@ Django は以下のアルゴリズムに従って翻訳を探します:
     <input type="submit" value="Go" />
     </form>
 
-.. _`Translations and JavaScript`:
-
 翻訳と JavaScript
 =================
 
@@ -883,8 +934,6 @@ JavaScript に翻訳を追加しようとすると、いくつかの問題に直
 Django では、これらの問題に対する解決策を組み込みで提供しています。この解決
 策は翻訳を JavaScript に渡して、 ``gettext`` などを JavaScript コード内で呼
 び出せるようにします。
-
-.. _`The javascript_catalog view`:
 
 ``javascript_catalog`` ビュー
 -------------------------------
@@ -924,15 +973,13 @@ URL パターンにパッケージ名を入れておけば、ビューを動的�
 ``django.conf`` か ``INSTALLED_APPS`` 設定に入っているアプリケーションだけ
 です。
 
-.. _Using the JavaScript translation catalog:
-
 JavaScript 翻訳カタログを使う
 -----------------------------
 
 カタログを使うには、単に以下のようにして動的に生成されたスクリプトをプルし
 ます::
 
-    <script type="text/javascript" src="/path/to/jsi18n/"></script>
+    <script type="text/javascript" src="{% url django.views.i18n.javascript_catalog %}"></script>
 
 これはまさに admin がサーバから翻訳を取り出しているのと同じ方法です。カタロ
 グをロードしたら、JavaScript から標準的な ``gettext`` インタフェースを使っ
@@ -949,11 +996,6 @@ JavaScript 翻訳カタログを使う
 文字列補完を行う関数もあります::
  
     function interpolate(fmt, obj, named);
-
-``interpolate`` 関数は、固定引数による補完と名前付き補完の両方をサポートし
-ています。従って、上のコードは以下のようにも書けます::
-
-    s = interpolate(ungettext('this is %s object', 'this are %s objects', 11), [11]);
 
 補完の構文は Python から借りたもので、固定引数と名前つきの文字列補完をサポー
 トしています:
@@ -986,8 +1028,6 @@ JavaScript で動いており、中では何度も正規表現置換を行って
 Python の文字列補完ほど高速ではないので、本当に必要な場合 (例えば
 ``ngettext`` を使って適切な複数形表現を実現したい場合) だけにしてください。
 
-.. _Creating JavaScript translation catalogs:
-
 JavaScript の翻訳カタログを作成する
 -----------------------------------
 
@@ -1000,8 +1040,6 @@ JavaScript の翻訳カタログの作成と更新方法、他の Django の翻�
 上の例では、ドイツ語向けの JavaScript の翻訳カタログを作成または更新してい
 ます。翻訳カタログを更新したら、通常の Django 翻訳カタログと同じように、
 ``django-admin.py compilemessages`` を実行してください。
-
-.. _Specialties of Django translation:
 
 Django 翻訳の特徴
 =================
@@ -1020,8 +1058,6 @@ Django 翻訳の特徴
       ``xgettext`` や ``msgfmt`` を Python ラッパ越しに使います。これは便宜
       上の理由によります。
 
-.. _gettext on Windows:
-
 Windows で ``gettext`` を使う
 ==============================
 
@@ -1031,15 +1067,22 @@ Windows で ``gettext`` を使う
 セージファイルをテストしたりコンパイルしたい場合には、以下のようにして
 ``gettext`` ユーティリティを入れる必要があります:
 
-    * 以下の ZIP ファイルを http://sourceforge.net/projects/gettext
-      から取得します:
+    * 以下の ZIP ファイルを GNOME のサーバ、
+      http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/ や
+      `ミラーサイト <mirrors>`_ からダウンロードします。
 
-      * ``gettext-runtime-X.bin.woe32.zip``
-      * ``gettext-tools-X.bin.woe32.zip``
-      * ``libiconv-X.bin.woe32.zip``
+      * ``gettext-runtime-X.zip``
+      * ``gettext-tools-X.zip``
+
+      ``X`` is the version number, we recomend using ``0.15`` or higher.
+ 
 
     * ダウンロードしたファイルを同じフォルダ (例えば
-      ``C:\ProgramFiles\gettext-utils``) に展開します。
+      ``C:\ProgramFiles\gettext-utils``) の ``bin\`` ディレクトリ以下に展開
+      します。
+
+    * Extract the contents of the ``bin\`` directories in both files to the
+      same folder on your system (i.e. ``C:\Program Files\gettext-utils``)
 
     * システム環境変数の PATH を変更します:
 
@@ -1049,3 +1092,12 @@ Windows で ``gettext`` を使う
         す。
       * ``変数値`` フィールドの値の末尾に
         ``;C:\Program Files\gettext-utils\bin`` を追加します。
+
+.. _mirrors: http://ftp.gnome.org/pub/GNOME/MIRRORS
+
+You may also use ``gettext`` binaries you have obtained elsewhere, so long as
+the ``xgettext --version`` command works properly. Some version 0.14.4 binaries
+have been found to not support this command. Do not attempt to use Django
+translation utilities with a ``gettext`` package if the command ``xgettext
+--version`` entered at a Windows command prompt causes a popup window saying
+"xgettext.exe has generated errors and will be closed by Windows".

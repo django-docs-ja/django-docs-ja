@@ -1,10 +1,10 @@
 .. _topics-signals:
 
-===========
+=========
 シグナル
-===========
+=========
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1)
 
 .. module:: django.dispatch
    :synopsis: Signal dispatch
@@ -139,8 +139,6 @@ Django はエラーを送出します。というのも、将来シグナルに�
 センダに入るオブジェクトは、シグナルによって異なります。個々のシグナルにつ
 いての情報は :ref:`組み込みシグナルのドキュメント <ref-signals>` を参照して
 ください。
-
-.. _defining and sending signals:
 
 シグナルの定義と送信
 =====================

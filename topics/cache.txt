@@ -4,7 +4,7 @@
 Django のキャッシュフレームワーク
 =================================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 動的な Web サイトの根本的なトレードオフ要因とは、まさに動的であるということ
 そのものです。ユーザがページをリクエストするたびに、サーバはデータベースへ
@@ -25,19 +25,13 @@ slashdot.org とは違って、小規模から中規模のサイトであり、�
 算する必要のないものの結果を保存することです。以下の疑似コードは、動的に生
 成されるWeb ページで、キャッシュがどのように動作するかを説明しています::
 
-    # ある URL に対し、キャッシュに該当するページがないか探す
-    given a URL, try finding that page in the cache
-    # キャッシュ内にページがある場合
-    if the page is in the cache:
-        # キャッシュされたページを返す
-        return the cached page
-    else:
-        # ページを生成する
-        generate the page
-        # 生成されたページを (次のリクエスト用に) キャッシュに保存
-        save the generated page in the cache (for next time)
-        # 生成されたページを返す。
-        return the generated page
+    ある URL に対し、キャッシュに該当するページがないか探す
+    キャッシュ内にページがある場合:
+        キャッシュされたページを返す
+    それ以外:
+        ページを生成する
+        生成されたページを (次のリクエスト用に) キャッシュに保存
+        生成されたページを返す。
 
 Django には堅牢なキャッシュシステムが付属しており、動的なページを保存して、
 リクエストの度に最計算しなくてもよいようになっています。利便性のため、
@@ -49,8 +43,6 @@ Django は Squid (http://www.squid-cache.org/) のような「上流の」キャ
 や、ブラウザベースのキャッシュともうまく協調できます。こうした類のキャッシュ
 は直接制御できませんが、サイトのどの部分をどのようにキャッシュすべきかを
 (HTTP ヘッダを介して) ヒントとして与えられます。
-
-.. _Setting up the cache:
 
 キャッシュを立ち上げる
 ======================
@@ -84,16 +76,18 @@ memcached 本体のインストールの他に、 memcached の Python バイン
 ンストールする必要があります。 memcached には二つのバージョンがあります。以
 下の *どちらかの* モジュールを選んでインストールしてください。
 
-  * 最も高速に memcached をドライブできる選択肢は、
-    http://gijsbert.org/cmemcache/ から入手できる ``cmemcache`` です。 (こ
-    のモジュールは、開発版の Django でしか使えません。 Django 0.96 とそれ以
-    前のバージョンは下の選択肢を使ってください)。
+  * 最も高速に memcached をドライブできるのは、
+    http://gijsbert.org/cmemcache/ で入手できる ``cmemcache`` です。
 
   * ``cmemcache`` を使えないなら、 ``python-memcached`` を使ってください。
     ftp://ftp.tummy.com/pub/python-memcached/ で入手できます。この URL が有
     効でなくなっていたら、 memcached のウェブサイト
     (http://www.danga.com/memcached/) に行って、 "Client API" セクションか
     らPython バインディングを入手してください。
+
+.. versionadded:: 1.0
+    The ``cmemcache`` option is new in 1.0. Previously, only
+    ``python-memcached`` was supported.
 
 Django を memcached と組み合わせて使うには、 :setting:`CACHE_BACKEND` を
 ``memcached://ip:port/`` に設定します。 ``ip`` は memcached デーモンを動か
@@ -106,22 +100,28 @@ Django を memcached と組み合わせて使うには、 :setting:`CACHE_BACKEN
 
 memcached の素晴らしい点の一つは、複数のサーバ間でキャッシュを共有できると
 いうことです。この機能を利用するには、全てのサーバアドレスをセミコロンで区
-切って :setting:`CACHE_BACKEND` に設定します。以下の例では、 IP アドレスが
-172.19.26.240 と 172.19.26.242 で、いずれもポート番号 11211 で動作している
-memcached インスタンスでキャッシュを共有しています::
+切って :setting:`CACHE_BACKEND` に設定します。
+
+以下の例では、 IP アドレスが 172.19.26.240 と 172.19.26.242 で、いずれもポー
+ト番号 11211 で動作している memcached インスタンスでキャッシュを共有してい
+ます::
 
     CACHE_BACKEND = 'memcached://172.19.26.240:11211;172.19.26.242:11211/'
+
+In the following example, the cache is shared over Memcached instances running
+on the IP addresses 172.19.26.240 (port 11211), 172.19.26.242 (port 11212), and
+172.19.26.244 (port 11213)::
+
+    CACHE_BACKEND = 'memcached://172.19.26.240:11211;172.19.26.242:11212;172.19.26.244:11213/'
 
 メモリベースのキャッシュには一つだけ短所があります: キャッシュデータはメモ
 リ上に保存されるので、サーバクラッシュ時に失われることがあります。いうまで
 もなく、メモリは永続的なデータ保存場所ではありません。ですから、データの保
 存場所を確保するのにメモリベースのキャッシュに依存してはなりません。実際に
-は、 Django のキャッシュバックエンドのいずれも永続的な記憶装置にはなりえま
-せん -- キャッシュバックエンドは記憶装置ではなく、あくまでもキャッシュ用で
-す -- ただ、メモリベースのキャッシュは特に一時性が高いため、ここで注意して
-おきます。
-
-.. _Database caching:
+は、 Django のキャッシュバックエンドは 
+*どれも、永続的な記憶装置にはなりえません* -- キャッシュバックエンドは記憶
+装置ではなく、あくまでもキャッシュ用です -- ただ、メモリベースのキャッシュ
+は特に一時性が高いため、ここで注意しておきます。
 
 データベースを使ったキャッシュ
 ------------------------------
@@ -142,10 +142,11 @@ memcached インスタンスでキャッシュを共有しています::
 
     CACHE_BACKEND = 'db://my_cache_table'
 
+The database caching backend uses the same database as specified in your
+settings file. You can't use a different database backend for your cache table.
+
 データベースのキャッシュがうまく働くのは、高速でインデクス構築のよくできた
 データベースサーバを使っている場合です。
-
-.. _Filesystem caching:
 
 ファイルシステムを使ったキャッシュ
 ----------------------------------
@@ -159,7 +160,10 @@ memcached インスタンスでキャッシュを共有しています::
 
 先頭にスラッシュが 3 つ連なっていることに注意して下さい。最初の 2 つのスラッ
 シュや ``file://`` の一部で、最後のスラッシュはディレクトリパス
-:file:`/var/tmp/django_cache` の最初の文字です。
+:file:`/var/tmp/django_cache` の最初の文字です。 Windows で使うなら、
+以下の例のように、 ``file://`` の直後にドライブレターを入れてください::
+
+    file://c:/foo/bar
 
 ディレクトリパスは常に絶対パス指定。すなわち、ファイルシステムのルートから
 始まるパス名を指定せねばなりません。パスの末尾にスラッシュを追加するかどう
@@ -170,7 +174,9 @@ memcached インスタンスでキャッシュを共有しています::
 というユーザで動かしている場合、 :file:`/var/tmp/django_cache` ディレクトリ
 が実在して、 ``apache`` によって読み書き可能かどうかをチェックしてください。
 
-.. _Local-memory caching:
+Each cache value will be stored as a separate file whose contents are the
+cache data saved in a serialized ("pickled") format, using Python's ``pickle``
+module. Each file's name is the cache key, escaped for safe filesystem use.
 
 ローカルメモリ上のキャッシュ
 ----------------------------
@@ -187,8 +193,6 @@ memcached インスタンスでキャッシュを共有しています::
 でキャッシュは共有されません。このことから、明らかに、ローカルメモリキャッ
 シュのメモリ効率は非常に悪いといえます。おそらく実運用環境向きとではないで
 しょう。
-
-.. _Dummy caching (for development):
 
 ダミーキャッシュ (開発用)
 -------------------------
@@ -226,45 +230,39 @@ Python の import パスを :setting:`CACHE_BACKEND` の URI のスキーム部�
 Django 組み込みのキャッシュバックエンドを使った方がよいでしょう。組み込みの
 バックエンドは良くテストされており、とても簡単に扱えます。
 
-.. _CACHE_BACKEND arguments:
-
 CACHE_BACKEND の引数
 --------------------
 
-これらのキャッシュは全て引数をとれます。引数はクエリ文字列の形式をとります。
-使える引数は以下の通りです:
+キャッシュバックエンドはどれも引数をとれます。引数はクエリ文字列の形式で指
+定します。使える引数は以下の通りです:
 
-    timeout
-        デフォルトのタイムアウトで、単位は秒です。デフォルト値は 5 分 (300
-        秒) に設定されています。
+    * ``timeout``: デフォルトのタイムアウトで、単位は秒です。デフォルト値は
+      5 分 (300 秒) に設定されています。
 
-    max_entries
-        simple および database バックエンド用の引数で、キャッシュの消去を
-	行わずに残しておけるエントリの最大数です。デフォルト値は 300 です。
+    * ``max_entries``: ``locmem``, ``filesystem``, および ``database`` バッ
+      クエンド用の引数で、キャッシュの消去を行わずに残しておけるエントリの
+      最大数です。デフォルト値は 300 です。
 
-    cull_percentage
-        キャッシュ内のエントリ数が max_entries を越えたときに淘汰されるエン
-        トリの割合です。実際の百分率は 1/cull_percentage で決定されます。従っ
-        て、キャッシュエントリ数が max_entries を越えたときに全体の 1/3 の
-        エントリを淘汰したければ、 ``cull_percentage=3`` と設定します。
+    * ``cull_percentage`` キャッシュ内のエントリ数が ``max_entries`` を越え
+      たときに淘汰されるエントリの割合です。実際の淘汰率は
+      `1/cull_percentage`` で決定されます。従って、キャッシュエントリ数が
+      ``max_entries`` を越えたときにエントリの半数を淘汰したければ、
+      ``cull_percentage=2`` と設定します。
 
-        cull_percentage に 0 を指定すると、キャッシュエントリ数が
-	max_entries に到達した時に全てのキャッシュエントリを廃棄します。
-	この設定は、キャッシュミスの増加と引き換えに、淘汰処理を *劇的に*
-	高速化します。
+      ``cull_percentage`` に ``0`` を指定すると、キャッシュエントリ数が
+      ``max_entries`` に到達した時に全てのキャッシュエントリを廃棄します。
+      の設定は、キャッシュミスの増加と引き換えに、淘汰処理を *劇的に*
+      高速化します。
 
-以下の例では、タイムアウトは ``60`` に設定されています::
+以下の例では、タイムアウトを ``60`` に設定しています::
 
     CACHE_BACKEND = "memcached://127.0.0.1:11211/?timeout=60"
 
-不正な引数や引数値は暗黙のうちに無視されます。
-
 In this example, ``timeout`` is ``30`` and ``max_entries`` is ``400``::
 
-    CACHE_BACKEND = "memcached://127.0.0.1:11211/?timeout=30&max_entries=400"
+    CACHE_BACKEND = "locmem:///?timeout=30&max_entries=400"
 
-
-.. _The per-site cache:
+不正な引数や引数値は暗黙のうちに無視されます。
 
 サイト単位のキャッシュ
 ======================
@@ -273,8 +271,8 @@ In this example, ``timeout`` is ``30`` and ``max_entries`` is ``400``::
     (previous versions of Django only provided a single ``CacheMiddleware`` instead
     of the two pieces described below).
 
-キャッシュの立ち上げ後、最も簡単なキャッシュの用法はサイト全体のキャッシュ
-です。設定は設定ファイルの :setting:`MIDDLEWARE_CLASSES` に
+キャッシュを立ち上げたら、サイト全体をキャッシュするのが最も簡単な使い方で
+す。設定は設定ファイルの :setting:`MIDDLEWARE_CLASSES` に
 ``'django.middleware.cache.UpdateCacheMiddleware'`` と
 ``'django.middleware.cache.FetchFromCacheMiddleware'`` を追加するだけです。
 例えば以下のようにします::
@@ -286,8 +284,7 @@ In this example, ``timeout`` is ``30`` and ``max_entries`` is ``400``::
     )
 
 .. note::
-
-    そう、ミドルウェアの順番は、これで間違っていません。 "Update" ミドルウェ
+    ミドルウェアの順番は、これで間違っていません。 "Update" ミドルウェ
     アがリストの先頭で、 "Fetch" ミドルウェアが末尾です。詳しいからくりは
     ちょっとややこしいのですが、後述の `MIDDLEWARE_CLASSES の順番`_ で説明
     しています。
@@ -315,12 +312,14 @@ In this example, ``timeout`` is ``30`` and ``max_entries`` is ``400``::
 加えて、キャッシュミドルウェアは自動的に以下のヘッダを ``HttpResponse`` に追
 加します:
 
-* 「新鮮な」(キャッシュされていない) ページをリクエストされた場合には、
-  ``Last-Modified`` ヘッダを現在の date/time に設定します。
-* ``Expires`` ヘッダを現在時刻と ``CACHE_MIDDLEWARE_SECONDS`` を加算した
-  値に設定します。
-* ``CACHE_MIDDLEWARE_SECONDS`` に基づき、 ``Cache-Control`` ヘッダにページ
-  の最長寿命を設定します。
+    * 「新鮮な」(キャッシュされていない) ページをリクエストされた場合には、
+      ``Last-Modified`` ヘッダを現在の date/time に設定します。
+
+    * ``Expires`` ヘッダを現在時刻と ``CACHE_MIDDLEWARE_SECONDS`` を加算した
+      値に設定します。
+
+    * ``CACHE_MIDDLEWARE_SECONDS`` に基づき、 ``Cache-Control`` ヘッダにページ
+      の最長寿命を設定します。
 
 ミドルウェアの詳細は :ref:`topics-http-middleware` を参照してください。
 
@@ -332,10 +331,9 @@ In this example, ``timeout`` is ``30`` and ``max_entries`` is ``400``::
 キャッシュされます。 ``django.views.decorators.cache`` モジュールのデコレー
 タを使えば、ビューの有効期限を設定  (``cache_control`` デコレータ) したり、
 ビューのキャッシュを抑制 (``never_cache`` デコレータ) できます。これらのデ
-コレータについては `Vary ヘッダ以外のヘッダを使ったキャッシュ制御`_ を参照
-してください。
-
-.. _The per-view cache:
+コレータについては 
+`Vary ヘッダ以外のヘッダを使ったキャッシュ制御 <controlling-cache-using-other-headers>`_ 
+を参照してください。
 
 ビュー単位のキャッシュ
 ======================
@@ -347,27 +345,68 @@ In this example, ``timeout`` is ``30`` and ``max_entries`` is ``400``::
 
     from django.views.decorators.cache import cache_page
 
-    def slashdot_this(request):
+    def my_view(request):
         ...
 
-    slashdot_this = cache_page(slashdot_this, 60 * 15)
+    my_view = cache_page(my_view, 60 * 15)
 
 Python 2.4 のデコレータ構文を使うと以下のようになります::
 
     @cache_page(60 * 15)
-    def slashdot_this(request):
+    def my_view(request):
         ...
 
 ``cache_page`` は単一の引数をとります。これはキャッシュのタイムアウトを秒で
-表したものです。上の例では、  ``slashdot_this()`` の出力結果は 15 分間キャッ
-シュされます。
+表したものです。上の例では、  ``my_view()`` の出力結果は 15 分間キャッシュ
+されます。(上の例では、可読性のために、 ``60 * 15`` と書いています。
+``60 * 15`` は ``900`` 、すなわち 60 秒を 15 回です)
 
-.. _Template fragment caching:
+The per-view cache, like the per-site cache, is keyed off of the URL. If
+multiple URLs point at the same view, each URL will be cached separately.
+Continuing the ``my_view`` example, if your URLconf looks like this::
+
+    urlpatterns = ('',
+        (r'^foo/(\d{1,2})/$', my_view),
+    )
+
+then requests to ``/foo/1/`` and ``/foo/23/`` will be cached separately, as
+you may expect. But once a particular URL (e.g., ``/foo/23/``) has been
+requested, subsequent requests to that URL will use the cache.
+
+Specifying per-view cache in the URLconf
+----------------------------------------
+
+The examples in the previous section have hard-coded the fact that the view is
+cached, because ``cache_page`` alters the ``my_view`` function in place. This
+approach couples your view to the cache system, which is not ideal for several
+reasons. For instance, you might want to reuse the view functions on another,
+cache-less site, or you might want to distribute the views to people who might
+want to use them without being cached. The solution to these problems is to
+specify the per-view cache in the URLconf rather than next to the view functions
+themselves.
+
+Doing so is easy: simply wrap the view function with ``cache_page`` when you
+refer to it in the URLconf. Here's the old URLconf from earlier::
+
+    urlpatterns = ('',
+        (r'^foo/(\d{1,2})/$', my_view),
+    )
+
+Here's the same thing, with ``my_view`` wrapped in ``cache_page``::
+
+    from django.views.decorators.cache import cache_page
+
+    urlpatterns = ('',
+        (r'^foo/(\d{1,2})/$', cache_page(my_view, 60 * 15)),
+    )
+
+If you take this approach, don't forget to import ``cache_page`` within your
+URLconf.
 
 テンプレートの部分的キャッシュ
 ================================
 
-**開発版の Django で新たに追加された機能です**
+.. versionadded:: 1.0
 
 ページのキャッシュをもっと細かく制御したいなら、 ``cache`` テンプレートタグ
 を使って、テンプレートの一部分だけをキャッシュできます。 ``cache`` タグをテ
@@ -408,19 +447,29 @@ Python 2.4 のデコレータ構文を使うと以下のようになります::
 この機能を使えば、テンプレートで何度もタイムアウトを編集しなくても、一箇所
 で変数を宣言しておいて再利用できるので便利です。
 
-.. _The low-level cache API:
-
 低水準のキャッシュ API
 ======================
 
-ときに、レンダリングされたページ全体のキャッシュが十分でないことがあります。
-例えば、集約的なデータベースのクエリだけをキャッシュすればよいと考えるかも
-しれません。このような場合のために、低水準のキャッシュ API を使って、オブジェ
-クトを好きな粒度でキャッシュに保存できます。
+ページ全体のキャッシュがあまり有効でなく、ともするとやりすぎでかえって不便
+な場合があります。
 
-キャッシュ API は簡単なものです。キャッシュを表現するモジュールである
-``django.core.cache`` は ``CACHE_BACKEND`` 設定に基づいて生成された
-``cache`` オブジェクトを公開しています::
+Perhaps, for instance, your site includes a view whose results depend on 
+several expensive queries, the results of which change at different intervals.
+In this case, it would not be ideal to use the full-page caching that the 
+per-site or per-view cache strategies offer, because you wouldn't want to 
+cache the entire result (since some of the data changes often), but you'd still 
+want to cache the results that rarely change.
+
+For cases like this, Django exposes a simple, low-level cache API. You can use
+this API to store objects in the cache with any level of granularity you like.
+You can cache any Python object that can be pickled safely: strings,
+dictionaries, lists of model objects, and so forth. (Most common Python objects
+can be pickled; refer to the Python documentation for more information about
+pickling.)
+
+キャッシュを表現するモジュールである ``django.core.cache`` は
+``CACHE_BACKEND`` 設定に基づいて生成された ``cache`` オブジェクトを公開して
+います::
 
     >>> from django.core.cache import cache
 
@@ -437,15 +486,17 @@ Python 2.4 のデコレータ構文を使うと以下のようになります::
 オブジェクトがキャッシュの中になければ、 ``cache.get()`` は ``None`` を返し
 ます::
 
-    >>> cache.get('some_other_key')
-    None
-
     # Wait 30 seconds for 'my_key' to expire...
 
     >>> cache.get('my_key')
     None
 
-get() には ``default`` 引数を指定できます::
+We advise against storing the literal value ``None`` in the cache, because you
+won't be able to distinguish between your stored ``None`` value and a cache
+miss signified by a return value of ``None``.
+
+``cache.get()`` には ``default`` 引数を指定できます。  ``default`` には、オ
+ブジェクトがキャッシュの中にないときに返す値を指定します::
 
     >>> cache.get('my_key', 'has_expired')
     'has_expired'
@@ -472,7 +523,6 @@ get() には ``default`` 引数を指定できます::
     >>> cache.set('a', 1)
     >>> cache.set('b', 2)
     >>> cache.set('c', 3)
-
     >>> cache.get_many(['a', 'b', 'c'])
     {'a': 1, 'b': 2, 'c': 3}
 
@@ -481,11 +531,33 @@ get() には ``default`` 引数を指定できます::
 
     >>> cache.delete('a')
 
-これだけです。キャッシュにはほとんど制限がありません: 安全に pickle 化でき
-るオブジェクトならなんでもキャッシュできます。ただし、キーは文字列でなけれ
-ばなりません。
+.. versionadded:: 1.1
 
-.. _Upstream caches:
+You can also increment or decrement a key that already exists using the
+``incr()`` or ``decr()`` methods, respectively. By default, the existing cache
+value will incremented or decremented by 1. Other increment/decrement values
+can be specified by providing an argument to the increment/decrement call. A
+ValueError will be raised if you attempt to increment or decrement a
+nonexistent cache key.::
+
+    >>> cache.set('num', 1)
+    >>> cache.incr('num')
+    2
+    >>> cache.incr('num', 10)
+    12
+    >>> cache.decr('num')
+    11
+    >>> cache.decr('num', 5)
+    6
+
+.. note::
+
+    ``incr()``/``decr()`` methods are not guaranteed to be atomic. On those
+    backends that support atomic increment/decrement (most notably, the
+    memcached backend), increment and decrement operations will be atomic.
+    However, if the backend doesn't natively provide an increment/decrement
+    operation, it will be implemented using a two-step retrieve/update.
+
 
 上流キャッシュ
 ==============
@@ -498,9 +570,11 @@ get() には ``default`` 引数を指定できます::
 
 上流キャッシュの例をいくつか示します:
 
-    * ISP が特定のページをキャッシュしている場合、 somedomain.com のページ
-      をリクエストしても、 ISP はキャッシュページを返し、 somedomain.com に
-      アクセスしないかもしれません。
+    * Your ISP may cache certain pages, so if you requested a page from
+      http://example.com/, your ISP would send you the page without having to
+      access example.com directly. The maintainers of example.com have no
+      knowledge of this caching; the ISP sits between example.com and your Web
+      browser, handling all of the caching transparently.
 
     * ページをキャッシュしてパフォーマンスを向上させるために、 Django Web
       サイトを Squid Web プロキシ (http://www.squid-cache.org/) の背後に置
@@ -529,30 +603,23 @@ get() には ``default`` 引数を指定できます::
 キャッシュメカニズムが特定のページをキャッシュしないように指示したりする
 一連の HTTP ヘッダがあるのです。
 
-.. _Using Vary headers:
-
 Vary ヘッダを使う
 =================
 
-こうしたヘッダの一つに ``Vary`` があります。 ``Vary`` ヘッダは、キャッシュ
-機構がキャッシュキーを生成するときに、どのリクエストヘッダを考慮すべきかを
-定義しています。例えば、 Web ページのコンテンツが言語設定に依存している場合、
-ページは「言語によって変化 (vary)」します。
+``Vary`` ヘッダは、キャッシュ機構がキャッシュキーを生成するときに、どのリク
+エストヘッダを考慮すべきかを定義しています。例えば、 Web ページのコンテンツ
+が言語設定に依存している場合、ページは「言語によって変化 (vary)」します。
 
 デフォルトでは、 Django のキャッシュシステムはキャッシュキーをリクエストの
 パス部分、例えば ``"/stories/2005/jun/23/bank_robbed/"`` を使って生成します。
-これでは、クッキーや言語設定のようなユーザエージェント間の違いにかかわらず、
-同じ URL を指すリクエストは全て同じバージョンのキャッシュを使うことになって
-しまいます。
+この場合、クッキーや言語設定のようなユーザエージェント間の違いにかかわらず、
+同じ URL を指すリクエストは全て同じバージョンのキャッシュを使います。
+しかし、クッキーや言語、ユーザエージェントといったリクエストヘッダ上の違い
+に基づいて、違った内容を出力する場合、 ``Vary`` ヘッダを使って、ページ出力
+が何に依存しているかをキャッシュメカニズムに教える必要があります。
 
-そこで ``Vary`` が登場します。
-
-Django 下のページが、クッキーや言語、ユーザエージェントといったリクエストヘッ
-ダ上の違いに基づいて、違った内容を出力する場合、 ``Vary`` ヘッダを使って、
-ページ出力が何に依存しているかをキャッシュメカニズムに教える必要があります。
-
-Django でこれを行うには、以下のような便宜用のビュー関数デコレータ、
-``vary_on_headers`` を使います::
+Django で ``Vary`` ヘッダを設定するには、以下のような便宜用のビュー関数デコ
+レータ、 ``vary_on_headers`` を使います::
 
     from django.views.decorators.vary import vary_on_headers
 
@@ -578,7 +645,13 @@ Django でこれを行うには、以下のような便宜用のビュー関数�
 
     @vary_on_headers('User-Agent', 'Cookie')
     def my_view(request):
-        ...
+        # ...
+
+This tells upstream caches to vary on *both*, which means each combination of
+user-agent and cookie will get its own cache value. For example, a request with
+the user-agent ``Mozilla`` and the cookie value ``foo=bar`` will be considered
+different from a request with the user-agent ``Mozilla`` and the cookie value
+``foo=ham``.
 
 クッキーによるコンテンツの変更はよくあることなので、  ``vary_on_cookie``
 デコレータも用意されています。従って、以下の二つのビューは同じ振舞いをします::
@@ -594,11 +667,11 @@ Django でこれを行うには、以下のような便宜用のビュー関数�
 ``vary_on_headers`` に渡すヘッダは大小文字を区別しないので注意してください。
 ``"User-Agent"`` は ``"user-agent"`` と同じです。
 
-ヘルパー関数 ``django.utils.cache.patch_vary_headers()`` も直接使えます::
+ヘルパ関数 ``django.utils.cache.patch_vary_headers()`` も直接使えます::
 
     from django.utils.cache import patch_vary_headers
     def my_view(request):
-        ...
+        # ...
         response = render_to_response('template_name', context)
         patch_vary_headers(response, ['Cookie'])
         return response
@@ -610,8 +683,6 @@ Vary ヘッダの詳細は `公式の Vary の仕様`_ を参照してくださ�
 
 .. _`公式の Vary の仕様`: 
     http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.44
-
-.. _`Controlling cache: Using other headers`:
 
 Vary ヘッダ以外のヘッダを使ったキャッシュ制御
 =============================================
@@ -634,7 +705,7 @@ Django では、 ``cache_control`` ビューデコレータを使ってこれを
     from django.views.decorators.cache import cache_control
     @cache_control(private=True)
     def my_view(request):
-        ...
+        # ...
 
 このデコレータは、適切な HTTP ヘッダが送信されるように背後で気を配ります。
 
@@ -642,12 +713,12 @@ Django では、 ``cache_control`` ビューデコレータを使ってこれを
 使うアプリケーションは以下のような操作を行えます:
 
     * ページの最大キャッシュ回数を定義できます。
+
     * キャッシュされているコンテンツの新たなバージョンがないか常に調べ、変
       更がないときに限ってキャッシュを送信するように設定できます (キャッシュ
       によっては、サーバ上のページが変更されていても、単にキャッシュコピー
       の有効期限が切れていないという理由でキャッシュされた内容を配信するこ
       とがあります)。
-
 
 Django では、ビュー関数デコレータの ``cache_control`` を使って、キャッシュ
 パラメタを設定します。以下の例では、 ``cache_control`` を使って、アクセス
@@ -655,9 +726,10 @@ Django では、ビュー関数デコレータの ``cache_control`` を使って
 3600 秒に設定しています::
 
     from django.views.decorators.cache import cache_control
+
     @cache_control(must_revalidate=True, max_age=3600)
     def my_view(request):
-        ...
+        # ...
 
 有効な ``Cache-Control`` HTTP ディレクティブは全て ``cache_control()`` に
 使えます。利用できるディレクティブを示します:
@@ -685,15 +757,14 @@ Cache-Control HTTP ディレクティブの説明は `Cache-Control の仕様`_ 
 れないようにヘッダを追加します::
 
     from django.views.decorators.cache import never_cache
+
     @never_cache
     def myview(request):
-        ...
+        # ...
 
 .. _`Cache-Control spec`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
 .. _`Cache-Control の仕様`: 
     http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
-
-.. _Other optimizations:
 
 その他の最適化
 ==============
@@ -706,11 +777,8 @@ Django には、アプリケーションのパフォーマンスを最適化す�
       ヘッダを使えるようになります。
 
     * ``django.middleware.gzip.GZipMiddleware`` は gzip 圧縮を扱えるブラウ
-      ザ (最近のほとんどのブラウザがそうです) に対して、コンテンツを gzip
-      で圧縮します。
-
-
-.. _Order of MIDDLEWARE_CLASSES:
+      ザ (最近のほとんどのブラウザが対応しています) に対して、コンテンツを
+      gzip で圧縮します。
 
 MIDDLEWARE_CLASSES の順番
 =========================

@@ -3,7 +3,7 @@
 Django を使う
 ===============
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1)
 
 このセクションでは、Django を使う上での鍵となる要素について解説しています。
 
@@ -16,10 +16,12 @@ Django を使う
    forms/index
    forms/modelforms
    templates
+   generic-views
    files
    testing
    auth
    cache
+   conditional-view-processing
    email
    i18n
    pagination

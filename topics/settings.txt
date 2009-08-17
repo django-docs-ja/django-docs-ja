@@ -4,16 +4,14 @@
 Django の設定
 =============
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 Django の設定ファイルには、インストールした Django の使う全ての設定が入って
 います。このドキュメントでは、各設定の役割と、どのような設定を利用できるか
 について説明します。
 
-.. _The basics:
-
 基礎
-==========
+======
 
 設定ファイルはモジュールレベルの変数の入った単なる Python モジュールです。
 
@@ -33,7 +31,6 @@ Django の設定ファイルには、インストールした Django の使う�
     * 他の設定ファイルから値を import できます。
 
 .. _django-settings-module:
-.. _Designating the settings:
 
 設定ファイルの特定
 ==================
@@ -47,11 +44,6 @@ Django を使う場合、どの設定を使っているのかを Django に教�
 
 .. _import search path: http://diveintopython.org/getting_to_know_python/everything_is_an_object.html
 .. _`モジュール検索パス`: `import search path`_
-
-The django-admin.py utility
----------------------------
-
-.. _The django-admin.py utility:
 
 django-admin.py ユーティリティ
 ------------------------------
@@ -76,8 +68,6 @@ django-admin.py ユーティリティ
 
 .. _django-admin.py: ../django-admin/
 
-.. _On the server (mod_python):
-
 サーバ (mod_python) の設定
 --------------------------
 
@@ -93,8 +83,6 @@ django-admin.py ユーティリティ
 詳しくは :ref:`mod_python で Django を使うためのドキュメント
 <howto-deployment-modpython>` を参照してください。
 
-.. _Default settings:
-
 デフォルトの設定
 ================
 
@@ -108,10 +96,8 @@ Django が設定をコンパイルする際には、以下のようなアルゴ�
     * 指定の設定ファイルから設定を読み出し、グローバルな設定をオーバライド
       します。
 
-設定ファイルから ``global_setting`` を import するのは冗長であり、
-*やってはなりません* 。
-
-.. _Seeing which settings you've changed:
+設定ファイルから ``global_setting`` を import するのは無駄で、
+*必要ありません* 。
 
 変更結果を確かめる
 ------------------
@@ -121,8 +107,6 @@ Django が設定をコンパイルする際には、以下のようなアルゴ�
 ルト設定との違いを表示します。
 
 詳しくは :djadmin:`diffsettings` のドキュメントを参照してください。
-
-.. _`Using settings in Python code`:
 
 Python コード内で設定を参照する
 ===============================
@@ -146,8 +130,6 @@ Python コード内で設定を参照する
 もに、設定を使うコードとユーザの設定ファイルの置き場所とを脱カップリングし
 ています。
 
-.. _Altering settings at runtime:
-
 実行時に設定を変更する
 ======================
 
@@ -160,8 +142,6 @@ Python コード内で設定を参照する
 
 設定を書いてよいのは設定ファイルの中だけです。
 
-.. _Security:
-
 セキュリティ
 ============
 
@@ -171,15 +151,11 @@ Python コード内で設定を参照する
 きるように変更してください。共有ホスティング環境で運用するような場合、これ
 は極めて重要な事項です。
 
-.. _Available settings:
-
 利用可能な設定
 ==============
 
 利用可能な設定は :ref:`setting リファレンス <ref-settings>` を参照してくだ
 さい。
-
-.. _Creating your own settings:
 
 設定項目を自作する
 ==================
@@ -188,13 +164,9 @@ Python コード内で設定を参照する
 か取り決めがあるので従うようにして下さい:
 
     * 設定名は全て大文字にします。
-    * 設定値をシーケンス型にする場合、リストではなくタプルを使って下さい。
-      これは純粋にパフォーマンス上の要求です。
     * 既に存在する設定の再発明はやめましょう。
 
-
 .. _settings-without-django-settings-module:
-.. _Using settings without setting DJANGO_SETTINGS_MODULE:
 
 DJANGO_SETTINGS_MODULE を使わない設定方法
 =========================================
@@ -205,6 +177,8 @@ DJANGO_SETTINGS_MODULE を使わない設定方法
 
 こうした場合のために、 Django の設定は手動で行えるようになっています。手動
 の設定には ``django.conf.settings.configure()`` を呼び出します。
+
+.. function:: django.conf.settings.configure(default_settings, **settings)
 
 例えば::
 
@@ -226,8 +200,6 @@ Django はデフォルトの設定値を使います。
 何ら変更を加えません (理由は前述の ``TIME_ZONE`` の説明を参照してください。)
 これらのケースでは、ユーザがすでに環境変数を自由に制御できるものと仮定して
 います。
-
-.. _Custom default settings:
 
 カスタムのデフォルト設定
 ------------------------
@@ -256,8 +228,6 @@ Django は十分に扱いやすい設定値をデフォルト値にしていて�
 ルトを *完全に* 置き換えてしまうため、 import している側のコードで必要な全
 ての設定値を指定せねばならないので注意して下さい。設定の完全なリストは
 ``django.conf.global_settings`` にあります。
-
-.. _Either configure() or DJANGO_SETTINGS_MODULE is required:
 
 configure() または DJANGO_SETTINGS_MODULE のいずれかが必要です
 --------------------------------------------------------------

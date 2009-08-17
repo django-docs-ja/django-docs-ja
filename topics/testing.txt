@@ -4,7 +4,7 @@
 Djangoアプリケーションのテスト
 ==============================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 .. module:: django.test
    :synopsis: Django アプリケーション用のテストツールです。
@@ -29,8 +29,6 @@ Web アプリケーションは、 HTTP レベルのリクエスト処理、フ�
 
 このドキュメントは前後半の 2 つの節に別れています。前半では Django における
 テストの書き方を、後半ではテストの実行方法を説明します。
-
-.. _Writing tests:
 
 テストを書く
 ============
@@ -67,8 +65,6 @@ Django でテストを書く方法は主に 2 つあり、それぞれ Python �
 好みに応じて、どちらのテストを使ってもかまいませんし、両方のテストを組み合
 わせてもかまいません。また、後でほんの少しだけ説明しますが、他のテストフレー
 ムワークを使っても構いません。
-
-.. _Writing doctests:
 
 doctest を書く
 --------------
@@ -112,10 +108,6 @@ doctest は、Python の標準モジュール、 doctest_ によるテストで�
     * アプリケーションディレクトリ、すなわち ``models.py`` の入ったディレク
       トリ下に置かれた ``tests.py`` という名前のファイル。このファイルは、
       モデルに関係しないような doctest を書きたい場合のフックとして使えます。
-
-doctest の文字列は ``models.py`` の全てのオブジェクトに対して記述できますが、
-慣習的には、アプリケーションレベルの doctest はモジュールの docstring に、
-モデルレベルの doctest は各モデルの docstring に配置します。
 
 モデル定義で doctest を使った例を示します::
 
@@ -166,8 +158,6 @@ doctest の詳しい動作原理は、 `標準ドキュメントの doctest の�
 .. _doctest: http://python.jp/doc/release/lib/module-doctest.html
 .. _standard library documentation for doctest: doctest_
 .. _`標準ドキュメントの doctest の項`: doctest_
-
-.. _Writing unit tests:
 
 ユニットテストを書く
 --------------------
@@ -226,8 +216,6 @@ doctest と同様、 Django のテストランナは、以下の二つの場所�
 .. _`標準ライブラリドキュメントの unittest の項`: unittest_
 .. _`おすすめのテストスイート構築方法`: `suggested organization`_
 
-.. _Which should I use?:
-
 どちらのテストを使うべきか
 --------------------------
 
@@ -268,7 +256,6 @@ Django は標準的な Python テストフレームワークの両方をサポ�
 システムを使うことになるものです。
 
 .. _running-tests:
-.. _Running tests:
 
 テストを実行する
 ================
@@ -295,12 +282,10 @@ Django は標準的な Python テストフレームワークの両方をサポ�
 
     $ ./manage.py test animals.AnimalTestCase
 
-テストケース中の個別のテストメソッドを実行したければ、メソッド名を指定して
+テストケース中の *個別の* テストメソッドを実行したければ、メソッド名を指定して
 ください::
 
     $ ./manage.py test animals.AnimalTestCase.testFluffyAnimals
-
-.. _The test database:
 
 テストデータベース
 -------------------
@@ -312,31 +297,13 @@ Django は標準的な Python テストフレームワークの両方をサポ�
 テストがパスするか失敗するかに関わらず、テストデータベースは全てのテストを
 実行し終えると消去されます。
 
-デフォルトでは、
-.. _Understanding the test output:
-
-テストの出力を理解する
-----------------------
-
-テストを実行すると、まずテストランナ自身の初期化メッセージが表示されます::
-
-    Creating test database...
-    Creating table myapp_animal
-    Creating table myapp_mineral
-    Loading 'initial_data' fixtures...
-    No fixtures found.
-
-このメッセージは、テストランナがテストデータベースを作成したことを示してい
-ます。テストデータベースは、空の、何もない状態から作成したデータベースで、
-(モデルテストのような) データベースの必要なテストで使われます。
-
 デフォルトでは、テストデータベースの名前は、 :setting:`DATABASE_NAME` に指
 定したデータベース名の前に ``test_`` を付けたものです。 SQLite データベース
 エンジンを使っている場合、デフォルトではテストをメモリ上のデータベースで行
 います(すなわち、データベースをメモリ上に生成し、ファイルシステムを全く経由
 しません！) 。テストデータベースの名前をデフォルト意外の値にしたければ、
 :setting:`TEST_DATABASE_NAME` 設定を使って指定します。
- 
+
 テスト用に別のデータベースを使うことを除けば、テストランナは設定ファイルの
 データベースに関する他の設定、 :setting:`DATABASE_ENGINE`,
 :setting:`DATABASE_USER`, :setting:`DATABASE_HOST` などをそのまま使います。
@@ -352,16 +319,12 @@ Django は標準的な Python テストフレームワークの両方をサポ�
 レーション(collation) を指定できます。これらの設定については、 
 :ref:`settings ファイルのドキュメント<ref-settings>` を参照してください。
 
-.. Other test conditions
-
 その他のテスト条件
 ---------------------
 
 設定ファイル上の :setting:`DEBUG` の値にかかわらず、 Django は全てのテスト
 を :setting:`DEBUG=False` で動かします。これは、テストコードに実運用環境と
 同じ内容を出力させるためです。
-
-.. _Understanding the test output:
 
 テストプログラムの出力を理解する
 ---------------------------------
@@ -376,7 +339,8 @@ Django は標準的な Python テストフレームワークの両方をサポ�
     Loading 'initial_data' fixtures...
     No fixtures found.
 
-上のメッセージは、テストランナがデータベースをテストしたことを示します。
+前の節でも述べたように、このメッセージは、テストランナがテストデータベース
+を作成したことを示しています。
 
 テストデータベースが生成されると、 Django はテストを実行します。全てのテス
 トにパスすると、最後には以下のようなメッセージが表示されます::
@@ -421,14 +385,10 @@ Django は標準的な Python テストフレームワークの両方をサポ�
 トランナをシェルスクリプト上で動かしたり、テストが成功したかどうかをテスト
 ランナのレベルで調べたい場合に便利です。
 
-.. _Testing tools:
-
 テスト用のツール
 ================
 
 Django は、テストを書くときに便利なツールをいくつか提供しています。
-
-.. _The test client:
 
 テストクライアント
 ------------------
@@ -466,8 +426,6 @@ Python のクラスです。テストクライアントを使うと、ビュー�
 
 .. _Twill: http://twill.idyll.org/
 .. _Selenium: http://www.openqa.org/selenium/
-
-.. _Overview and a quick example:
 
 テストの概要と簡単な例
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -525,8 +483,6 @@ Python のクラスです。テストクライアントを使うと、ビュー�
 .. _urllib: http://docs.python.org/lib/module-urllib.html
 .. _urllib2: http://docs.python.org/lib/module-urllib2.html
 
-.. _Making requests:
-
 リクエスト生成
 ~~~~~~~~~~~~~~
 
@@ -537,7 +493,7 @@ Python のクラスです。テストクライアントを使うと、ビュー�
 
     ``Client`` のインスタンスからは、以下のメソッドを呼び出せます:
 
-    .. method:: Client.get(path, data={})
+    .. method:: Client.get(path, data={}, follow=False, **extra)
 
         ``path`` に対する GET リクエストを行い、 ``Response`` オブジェクト
         を返します。 ``Response`` オブジェクトについては後で説明します。
@@ -553,7 +509,42 @@ Python のクラスです。テストクライアントを使うと、ビュー�
 
             /customers/details/?name=fred&age=7
 
-    .. method:: Client.post(path, data={}, content_type=MULTIPART_CONTENT)
+        The ``extra`` keyword arguments parameter can be used to specify
+        headers to be sent in the request. For example::
+
+            >>> c = Client()
+            >>> c.get('/customers/details/', {'name': 'fred', 'age': 7},
+            ...       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        ...will send the HTTP header ``HTTP_X_REQUESTED_WITH`` to the
+        details	view, which is a good way to test code paths that use the
+        :meth:`django.http.HttpRequest.is_ajax()` method.
+
+        .. versionadded:: 1.1
+
+        If you already have the GET arguments in URL-encoded form, you can
+        use that encoding instead of using the data argument. For example,
+        the previous GET request could also be posed as::
+
+        >>> c = Client()
+        >>> c.get('/customers/details/?name=fred&age=7')
+
+        If you provide URL both an encoded GET data and a data argument,
+        the data argument will take precedence.
+
+        If you set ``follow`` to ``True`` the client will follow any redirects
+        and a ``redirect_chain`` attribute will be set in the response object
+        containing tuples of the intermediate urls and status codes.
+
+        If you had an url ``/redirect_me/`` that redirected to ``/next/``, that
+        redirected to ``/final/``, this is what you'd see::
+
+            >>> response = c.get('/redirect_me/', follow=True)
+            >>> response.redirect_chain
+            [(u'http://testserver/next/', 302), (u'http://testserver/final/', 302)]
+
+
+    .. method:: Client.post(path, data={}, content_type=MULTIPART_CONTENT, follow=False, **extra)
 
         ``path`` に対する POST リクエストを行い、 ``Response`` オブジェクト
         を返します。
@@ -588,7 +579,7 @@ Python のクラスです。テストクライアントを使うと、ビュー�
 	る値をリストやタプルにしてください。例えば、``choices`` という名前
 	のフィールドから 3 つの行を選択して提出したければ::
 
-            ``{'choices': ('a', 'b', 'd')}``
+            {'choices': ('a', 'b', 'd')}
 
         のようにします。
 
@@ -606,6 +597,74 @@ Python のクラスです。テストクライアントを使うと、ビュー�
 
         送信するファイルのハンドルは、 ``post()`` 後に手動で閉じねばならな
         いので注意してください。
+
+        The ``extra`` argument acts the same as for :meth:`Client.get`.
+
+        .. versionchanged:: 1.1
+
+        If the URL you request with a POST contains encoded parameters, these
+        parameters will be made available in the request.GET data. For example,
+        if you were to make the request::
+
+        >>> c.post('/login/?vistor=true', {'name': 'fred', 'passwd': 'secret'})
+
+        ... the view handling this request could interrogate request.POST
+        to retrieve the username and password, and could interrogate request.GET
+        to determine if the user was a visitor.
+
+        If you set ``follow`` to ``True`` the client will follow any redirects
+        and a ``redirect_chain`` attribute will be set in the response object
+        containing tuples of the intermediate urls and status codes.
+
+    .. method:: Client.head(path, data={}, follow=False, **extra)
+
+        .. versionadded:: 1.1
+
+        Makes a HEAD request on the provided ``path`` and returns a ``Response``
+        object. Useful for testing RESTful interfaces. Acts just like
+        :meth:`Client.get` except it does not return a message body.
+
+        If you set ``follow`` to ``True`` the client will follow any redirects
+        and a ``redirect_chain`` attribute will be set in the response object
+        containing tuples of the intermediate urls and status codes.
+
+    .. method:: Client.options(path, data={}, follow=False, **extra)
+
+        .. versionadded:: 1.1
+
+        Makes an OPTIONS request on the provided ``path`` and returns a
+        ``Response`` object. Useful for testing RESTful interfaces.
+
+        If you set ``follow`` to ``True`` the client will follow any redirects
+        and a ``redirect_chain`` attribute will be set in the response object
+        containing tuples of the intermediate urls and status codes.
+
+        The ``extra`` argument acts the same as for :meth:`Client.get`.
+
+    .. method:: Client.put(path, data={}, content_type=MULTIPART_CONTENT, follow=False, **extra)
+
+        .. versionadded:: 1.1
+
+        Makes an PUT request on the provided ``path`` and returns a
+        ``Response`` object. Useful for testing RESTful interfaces. Acts just
+        like :meth:`Client.post` except with the PUT request method.
+
+        If you set ``follow`` to ``True`` the client will follow any redirects
+        and a ``redirect_chain`` attribute will be set in the response object
+        containing tuples of the intermediate urls and status codes.
+
+    .. method:: Client.delete(path, follow=False, **extra)
+
+        .. versionadded:: 1.1
+
+        Makes an DELETE request on the provided ``path`` and returns a
+        ``Response`` object. Useful for testing RESTful interfaces.
+
+        If you set ``follow`` to ``True`` the client will follow any redirects
+        and a ``redirect_chain`` attribute will be set in the response object
+        containing tuples of the intermediate urls and status codes.
+
+        The ``extra`` argument acts the same as for :meth:`Client.get`.
 
     .. method:: Client.login(**credentials)
 
@@ -628,8 +687,8 @@ Python のクラスです。テストクライアントを使うと、ビュー�
 
             >>> c = Client()
             >>> c.login(username='fred', password='secret')
-            # これでログイン保護されたビューに入れるようになりました。
 
+            # これでログイン保護されたビューに入れるようになりました。
 
         認証バックエンドを変えた場合、このメソッドは違った認証情報を要求す
         るかもしれません。その場合、 ``login()`` は、認証バックエンドの
@@ -644,6 +703,13 @@ Python のクラスです。テストクライアントを使うと、ビュー�
         環境で使えるユーザはテスト環境では使えないのです。テストスイートの一
         環として、手動で (Django のモデル API を使って) ユーザを作成するか、
         フィクスチャでユーザを登録してください。
+	Remember that if you want your test user to have a password,
+        you can't set the user's password by setting the password attribute
+        directly -- you must use the
+        :meth:`~django.contrib.auth.models.User.set_password()` function to
+        store a correctly hashed password. Alternatively, you can use the
+        :meth:`~django.contrib.auth.models.UserManager.create_user` helper
+        method to create a new user with a correctly hashed password.
 
     .. method:: Client.logout()
 
@@ -655,8 +721,6 @@ Python のクラスです。テストクライアントを使うと、ビュー�
         データを全て消去して、デフォルトの状態に戻します。それ以降のリクエ
         ストは、ビューからは ``AnonymousUser`` から送信されたリクエストとみ
         なされます。
-
-.. _Testing Responses:
 
 レスポンスのテスト
 ~~~~~~~~~~~~~~~~~~
@@ -687,6 +751,16 @@ Python のクラスです。テストクライアントを使うと、ビュー�
         複数のテンプレートを使ってレンダリングを行った場合、 ``context`` は
         ``Context`` オブジェクトをレンダリングで使った順に並べたリストです。
  
+        .. versionadded:: 1.1
+
+        Regardless of the number of templates used during rendering, you can
+        retrieve context values using the ``[]`` operator. For example, the
+        context variable ``name`` could be retrieved using::
+
+            >>> response = client.get('/foo/')
+            >>> response.context['name']
+            'Arthur'
+
     .. attribute:: request
 
         レスポンスを得るために使用したリクエストデータです。
@@ -714,8 +788,6 @@ Python のクラスです。テストクライアントを使うと、ビュー�
 
 .. _RFC2616: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 
-.. Exceptions:
-
 例外
 ~~~~
 
@@ -728,8 +800,6 @@ Python のクラスです。テストクライアントを使うと、ビュー�
 テストケースからアクセスできません。 Django はこれらの例外を内部的に捕捉し
 て、対応する適切な HTTP 応答コードに変換してしまうからです。これらの例外に
 対しては、 ``response.status_code`` のチェックで対応してください。
-
-.. _Persistent state:
 
 セッションの永続性
 ~~~~~~~~~~~~~~~~~~
@@ -762,8 +832,6 @@ Python のクラスです。テストクライアントを使うと、ビュー�
 .. _Cookie module documentation: http://docs.python.org/lib/module-Cookie.html
 .. _`Cookie モジュールのドキュメント`: `Cookie module documentation`_
 
-.. Example:
-             
 ユニットテストの例
 ~~~~~~~~~~~~~~~~~~
 
@@ -788,20 +856,17 @@ Python のクラスです。テストクライアントを使うと、ビュー�
             # か確かます。
             self.failUnlessEqual(len(response.context['customers']), 5)
 
-
-.. _TestCase:
-
 TestCaseクラス
 --------------
 
 .. currentmodule:: django.test
 
-Django は拡張用に以下のベースクラスを提供しています:
+Normal Python unit test classes extend a base class of ``unittest.TestCase``.
+Django provides an extension of this base class:
 
 .. class:: TestCase()
 
-を提供しています。このクラスは、Web サイトのテスト時に便利な機能をいくつか
-追加しています。
+このクラスは、Web サイトのテスト時に便利な機能をいくつか追加しています。
 
 通常のユニットテストを ``unittest.TestCase`` から Django 独自の 
 ``TestCase`` に移行するのは簡単で、単にベースクラスを ``unittest.TestCase``
@@ -809,7 +874,50 @@ Django は拡張用に以下のベースクラスを提供しています:
 は、標準の Python ユニットテスト機能はそのままに、さらに便利な機能を提供し
 ています。
 
-.. _Default Test Client:
+.. versionadded:: 1.1
+
+.. class:: TransactionTestCase()
+
+Django ``TestCase`` classes make use of database transaction facilities, if
+available, to speed up the process of resetting the database to a known state
+at the beginning of each test. A consequence of this, however, is that the
+effects of transaction commit and rollback cannot be tested by a Django
+``TestCase`` class. If your test requires testing of such transactional
+behavior, you should use a Django ``TransactionTestCase``.
+
+``TransactionTestCase`` and ``TestCase`` are identical except for the manner
+in which the database is reset to a known state and the ability for test code
+to test the effects of commit and rollback. A ``TransactionTestCase`` resets
+the database before the test runs by truncating all tables and reloading
+initial data. A ``TransactionTestCase`` may call commit and rollback and
+observe the effects of these calls on the database.
+
+A ``TestCase``, on the other hand, does not truncate tables and reload initial
+data at the beginning of a test. Instead, it encloses the test code in a
+database transaction that is rolled back at the end of the test.  It also
+prevents the code under test from issuing any commit or rollback operations
+on the database, to ensure that the rollback at the end of the test restores
+the database to its initial state. In order to guarantee that all ``TestCase``
+code starts with a clean database, the Django test runner runs all ``TestCase``
+tests first, before any other tests (e.g. doctests) that may alter the
+database without restoring it to its original state.
+
+When running on a database that does not support rollback (e.g. MySQL with the
+MyISAM storage engine), ``TestCase`` falls back to initializing the database
+by truncating tables and reloading initial data.
+
+
+.. note::
+    The ``TestCase`` use of rollback to un-do the effects of the test code
+    may reveal previously-undetected errors in test code.  For example,
+    test code that assumes primary keys values will be assigned starting at
+    one may find that assumption no longer holds true when rollbacks instead
+    of table truncation are being used to reset the database.  Similarly,
+    the reordering of tests so that all ``TestCase`` classes run first may
+    reveal unexpected dependencies on test case ordering.  In such cases a
+    quick fix is to switch the ``TestCase`` to a ``TransactionTestCase``.
+    A better long-term fix, that allows the test to take advantage of the
+    speed benefit of ``TestCase``, is to fix the underlying test problem.
 
 デフォルトのテストクライアント
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -855,7 +963,6 @@ Django は拡張用に以下のベースクラスを提供しています:
             self.failUnlessEqual(response.status_code, 200)
 
 .. _topics-testing-fixtures:
-.. _Fixture loading:
 
 フィクスチャの読み込み
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -903,7 +1010,6 @@ Django は拡張用に以下のベースクラスを提供しています:
         def testFluffyAnimals(self):
             # フィクスチャを使うテスト
 
-
 ユニットテストは、以下のように動作します:
 
   * テストケースの開始時で、かつ ``setUp()`` の実行前に、 Django はデータベー
@@ -919,8 +1025,6 @@ Django は拡張用に以下のベースクラスを提供しています:
 このフラッシュ／ロードの作業はテストケースの実行毎に繰り返されるので、テス
 トの結果が他のテストや以前に実行したテストの影響を受けたり、テストの順番に
 左右されることはありません。
-
-.. _URLconf configuration:
 
 URLconf の設定
 ~~~~~~~~~~~~~~~~~~~~~
@@ -953,7 +1057,6 @@ URLconf の設定
 して使います。
 
 .. _emptying-test-outbox:
-.. _Emptying the test outbox:
 
 メール送信箱の内容抹消
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -964,8 +1067,6 @@ Django 独自の ``TestCase`` クラスを使うと、テストランナは各�
 始時にメールの送信箱に入っている内容を消去します。
 
 テスト中のメールサービスの詳細は `メールサービス`_ を参照してください。
-
-.. _Assertions:
 
 アサーション
 ~~~~~~~~~~~~
@@ -990,7 +1091,7 @@ Django 独自の ``TestCase`` クラスを使うと、テストランナは各�
     され、レスポンスのコンテンツ内に ``text`` が入っていないことを確認する
     アサーションです。
 
-.. method:: assertFormError(response, form, field, errors)
+.. method:: TestCase.assertFormError(response, form, field, errors)
 
     ``form`` に指定したフォーム上のフィールド ``field`` で、 ``errors`` に
     指定したエラーリストと同じエラーが送出されるかどうか調べるアサーション
@@ -1006,13 +1107,6 @@ Django 独自の ``TestCase`` クラスを使うと、テストランナは各�
     ``errors`` はエラー文字列か、エラー文字列のリストです。フォームの検証結
     果として返されるのと同じ形式です。
 
-.. method:: assertRedirects(response, expected_url, status_code=302, target_status_code=200)
-
-    レスポンスが ``status_code`` に指定したリダイレクト状態コードを持ち、か
-    つ ``expected_url`` へのリダイレクトを指示しており、さらにリダイレクト
-    先の内容を HTTP 状態コード ``target_status_code`` で取得できるかどうか
-    調べるアサーションです。
-
 .. method:: assertTemplateUsed(response, template_name)
 
     ``template_name`` に指定したテンプレートがレスポンスのレンダリングに使
@@ -1025,10 +1119,18 @@ Django 独自の ``TestCase`` クラスを使うと、テストランナは各�
     ``template_name`` に指定したテンプレートがレスポンスのレンダリングに使
     われて *いない* ことを確認するアサーションです。
 
-    ``template_name`` は ``'admin/index.html'`` のような文字列です。
+.. method:: assertRedirects(response, expected_url, status_code=302, target_status_code=200)
 
+    レスポンスが ``status_code`` に指定したリダイレクト状態コードを持ち、か
+    つ ``expected_url`` へのリダイレクトを指示しており、さらにリダイレクト
+    先の内容を HTTP 状態コード ``target_status_code`` で取得できるかどうか
+    調べるアサーションです。
 
-.. _E-mail services:
+    .. versionadded:: 1.1
+
+    If your request used the ``follow`` argument, the ``expected_url`` and
+    ``target_status_code`` will be the url and status code for the final
+    point of the redirect chain.
 
 メールサービス
 --------------
@@ -1059,6 +1161,11 @@ Django は、テストフレームワークを初期化する際、通常の
 ストが終了すると、通常の :class:`~django.core.mail.SMTPConnection` が復帰し、
 ダミー送信箱は削除されます。
 
+The ``outbox`` attribute is a special attribute that is created *only* when
+the tests are run. It doesn't normally exist as part of the
+:mod:`django.core.mail` module and you can't import it directly. The code
+below shows how to access this attribute correctly.
+
 ``django.core.mail.outbox`` を調べて、メール送信数やメールの内容をチェック
 するコード例を以下に示します::
 
@@ -1087,8 +1194,6 @@ TestCase 内の各テストケースの開始時点で抹消されます。手�
 
     # Empty the test outbox
     mail.outbox = []
-
-.. _Using a different testing framework:
 
 他のテストフレームワークを使う
 ==============================
@@ -1123,8 +1228,6 @@ TestCase 内の各テストケースの開始時点で抹消されます。手�
 指定しておき、 ``./manage.py test`` を実行すると、 Django はそのテストラン
 ナメソッドを実行します。これによって、 Python コードから任意のテストフレー
 ムワークを実行できます。
-
-.. _Defining a test runner:
 
 テストランナを定義する
 ----------------------
@@ -1166,9 +1269,6 @@ TestCase 内の各テストケースの開始時点で抹消されます。手�
     ``module_list`` から発見したテストに加えて、指定したテストを実行します。
     
     このメソッドは失敗したテストの数を返さねばなりません。
-
-
-.. _Testing utilities:
 
 テスト用のユーティリティ
 ------------------------

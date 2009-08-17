@@ -4,7 +4,7 @@
 電子メールの送信
 =================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 .. module:: django.core.mail
    :synopsis: 電子メールを簡単に送信するためのヘルパです。
@@ -17,9 +17,6 @@ Python の `smtplib ライブラリ`_ を使えば、比較的簡単に電子メ
 
 .. _`smtplib ライブラリ`: http://www.python.jp/doc/release/lib/module-smtplib.html
 .. _smtplib library: http://www.python.org/doc/current/lib/module-smtplib.html
-
-
-.. Quick example:
 
 お手軽な例
 ==========
@@ -94,8 +91,6 @@ send_mass_mail()
 ``send_mail()`` と同様、同じ ``recipient_list`` に入っている受信者は、他の
 受信者を "To:" フィールドで見られます。
 
-.. _`send_mass_mail() vs. send_mail()`:
-
 send_mass_mail() と send_mail()
 -------------------------------
 
@@ -103,8 +98,6 @@ send_mass_mail() と send_mail()
 は実行の度にメールサーバに接続するのに対し、 ``send_mass_mail()`` は全ての
 メッセージの送信に一つの接続を使う点です。このため、 ``send_mass_mail()`` 
 の方が少しだけ効率的です。
-
-.. _`mail_admins()`:
 
 mail_admins()
 =============
@@ -131,8 +124,6 @@ mail_managers()
 
     .. function:: mail_managers(subject, message, fail_silently=False)
 
-.. Examples:
-
 例
 ===
 
@@ -150,9 +141,6 @@ mail_managers()
         ('Subject', 'Message.', 'from@example.com', ['jane@example.com']),
     )
     send_mass_mail(datatuple)
-
-
-.. _Preventing header injection:
 
 ヘッダインジェクションの抑制
 ============================
@@ -198,8 +186,6 @@ mail_managers()
 
 .. _emailmessage-and-smtpconnection:
 
-.. _The EmailMessage and SMTPConnection classes:
-
 EmailMessage および SMTPConnection クラス
 =========================================
 
@@ -231,11 +217,10 @@ Django の ``send_mail()`` および ``send_mass_mail()`` 関数は、実際に�
 このことは、同じ接続 (``SMTPConnection`` インスタンス) を再利用すれば、複数
 のメッセージを一括送信できることを示しています。
 
-
-.. _EmailMessage Objects:
-
 EmailMessage オブジェクト
 --------------------------
+
+.. class:: EmailMessage
 
 ``EmailMessage`` クラスは以下のパラメタ (固定引数を使う場合には以下に示す順
 番に指定します) で初期化します。パラメタは全て省略可能で、 ``send()`` メソッ
@@ -324,8 +309,6 @@ EmailMessage オブジェクト
 
 .. _DEFAULT_FROM_EMAIL: ../settings/#default-from-email
 
-.. _Sending alternative content types:
-
 拡張コンテンツ形式のメールを送信する
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -362,9 +345,6 @@ EmailMessage オブジェクト
     msg.content_subtype = "html"  # Main content is now text/html
     msg.send()
 
-
-.. _SMTPConnection Objects:
-
 SMTPConnection オブジェクト
 ----------------------------
 
@@ -385,3 +365,29 @@ SMTPConnection オブジェクト
     connection = SMTPConnection()   # デフォルトの設定で接続を作成
     messages = get_notification_email()
     connection.send_messages(messages)
+
+Testing e-mail sending
+----------------------
+
+The are times when you do not want Django to send e-mails at all. For example,
+while developing a website, you probably don't want to send out thousands of
+e-mails -- but you may want to validate that e-mails will be sent to the right
+people under the right conditions, and that those e-mails will contain the
+correct content.
+
+The easiest way to test your project's use of e-mail is to use a "dumb" e-mail
+server that receives the e-mails locally and displays them to the terminal,
+but does not actually send anything. Python has a built-in way to accomplish
+this with a single command::
+
+    python -m smtpd -n -c DebuggingServer localhost:1025
+
+This command will start a simple SMTP server listening on port 1025 of
+localhost. This server simply prints to standard output all email headers and
+the email body. You then only need to set the :setting:`EMAIL_HOST` and
+:setting:`EMAIL_PORT` accordingly, and you are set.
+
+For more entailed testing and processing of e-mails locally, see the Python
+documentation on the `SMTP Server`_.
+
+.. _SMTP Server: http://docs.python.org/library/smtpd.html

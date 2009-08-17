@@ -4,14 +4,17 @@
 Django オブジェクトのシリアライズ
 =================================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
-Django の整列化フレームワークを使うと、 Django オブジェクトを他の形式に「翻
-訳」できます。通常、こうした形式はテキストベースで、 Django オブジェクトを
-ネットワーク越しに伝送するために使われますが、 Django のシリアライザは任意
-の形式 (テキストベースもそうでないものも) 扱えます。
+Django のシリアライズフレームワークを使うと、 Django オブジェクトを他の形式
+に「翻訳」できます。通常、こうした形式はテキストベースで、 Django オブジェ
+クトをネットワーク越しに伝送するために使われますが、 Django のシリアライザ
+は任意の形式 (テキストベースもそうでないものも) 扱えます。
 
-.. _Serializing data:
+.. seealso::
+
+    If you just want to get some data from your tables into a serialized
+    form, you could use the :djadmin:`dumpdata` management command.
 
 データのシリアライズ
 --------------------
@@ -41,8 +44,6 @@ Django の整列化フレームワークを使うと、 Django オブジェク�
     out = open("file.xml", "w")
     xml_serializer.serialize(SomeModel.objects.all(), stream=out)
 
-.. _Subset of fields:
-
 一部のフィールドだけをシリアライズする
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -60,8 +61,6 @@ Django の整列化フレームワークを使うと、 Django オブジェク�
     シリアライズできない場合があります。シリアライズ後のオブジェクトに、モ
     デル上で必須のフィールドがひとつでも抜け落ちていると、デシリアライザは
     デシリアライズ後のインスタンスを保存できないでしょう。
-
-.. _Inherited Models:
 
 継承を行っているモデルインスタンスのシリアライズ
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -94,8 +93,6 @@ Django の整列化フレームワークを使うと、 Django オブジェク�
 
     all_objects = list(Restaurant.objects.all()) + list(Place.objects.all())
     data = serializers.serialize('xml', all_objects)
-
-.. _Deserializing data:
 
 データのデシリアライズ
 ----------------------
@@ -134,12 +131,12 @@ Django オブジェクト自体に対するインスペクションは、
 ``deserialized_object.object`` で行えます。
 
 .. _serialization-formats:
-.. _Serialization formats:
 
 シリアライズの形式
 ------------------
 
-Django には各種形式のシリアライザが付属しています:
+Django supports a number of serialization formats, some of which require you
+to install third-party Python modules:
 
     ==========  ==============================================================
     名前        情報
@@ -159,10 +156,9 @@ Django には各種形式のシリアライザが付属しています:
     ==========  ==============================================================
 
 .. _json: http://json.org/
+.. _simplejson: http://undefined.org/python/#simplejson
 .. _PyYAML: http://www.pyyaml.org/
  
-.. _Notes For specific serialization formats:
-
 各シリアライズ形式についての注意
 --------------------------------
 
@@ -178,13 +174,19 @@ UTF-8 (や、非 ASCII エンコーディング) でエンコードされたデ�
     json_serializer = serializers.get_serializer("json")()
     json_serializer.serialize(queryset, ensure_ascii=False, stream=response)
 
-Django のソースコードには simplejson_ モジュールが付属しています。注意して
-ほしいのは、このモジュールを直接使ってシリアライズを実行すると、一部の
-Django オブジェクトは何らかの変更が加えられた上で simplejson に渡されてしま
-うということです。特に、 :ref:`遅延翻訳オブジェクト <lazy-translations>` を
-シリアライズする場合は、 `特殊なエンコーダ`_ が必要です。以下のように書くと、
-うまくいくでしょう::
+Django のソースコードには simplejson_ モジュールが付属しています。
+However, if you're
+using Python 2.6 (which includes a builtin version of the module), Django will
+use the builtin ``json`` module automatically. If you have a system installed
+version that includes the C-based speedup extension, or your system version is
+more recent than the version shipped with Django (currently, 2.0.7), the
+system version will be used instead of the version included with Django.
 
+注意してほしいのは、このモジュールを直接使ってシリアライズを実行すると、一
+部のDjango オブジェクトは何らかの変更が加えられた上で simplejson に渡されて
+しまうということです。特に、 :ref:`遅延翻訳オブジェクト
+<lazy-translations>` をシリアライズする場合は、 `特殊なエンコーダ`_ が必要
+です。以下のように書くと、うまくいくでしょう::
 
     from django.utils.functional import Promise
     from django.utils.encoding import force_unicode
