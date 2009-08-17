@@ -31,7 +31,7 @@ admin 上ではコンテンツをグループ化する基本の構成要素と�
 スタイルを適用します。例えば、 ``div.module`` 内の ``h2`` タグは、グループ
 全体のヘッダになるよう、 ``div`` の上に配置されます。
 
-.. image:: _images/module.gif
+.. image:: _images/module.png
    :alt: Example use of module class on admin homepage
 
 カラムタイプ
@@ -140,7 +140,7 @@ clear
       <li><a href="/stories/add/" class="addlink">Add redirect</a></li>
     </ul>
 
-.. image:: _images/objecttools_01.gif
+.. image:: _images/objecttools_01.png
    :alt: Object tools on a changelist page
 
 フォームページでは以下のようになっています:
@@ -152,7 +152,7 @@ clear
      <li><a href="/r/303/152383/" class="viewsitelink">View on site</a></li>
     </ul>
 
-.. image:: _images/objecttools_02.gif
+.. image:: _images/objecttools_02.png
    :alt: Object tools on a form page
 
 フォームのスタイル
@@ -182,7 +182,7 @@ admin のフォームは ``fieldset`` エレメントでグループごとに分
 ばなりません。行内に収めるフィールドが必須のフィールドの場合、
 ``div.form-row`` には ``required`` クラスを追加せねばなりません。
 
-.. image:: _images/formrow.gif
+.. image:: _images/formrow.png
    :alt: Example use of form-row class
 
 ラベル
