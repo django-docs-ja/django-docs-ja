@@ -1,17 +1,19 @@
 .. _ref-models-fields:
-.. _Model field reference:
 
 ==============================
 モデルフィールドリファレンス
 ==============================
 
-:revision-up-to: 9084 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 .. module:: django.db.models.fields
    :synopsis: 組み込みフィールド型です。
 
-このドキュメントは、 Django が提供している `フィールドのオプション <field
-options>`_ や `フィールド型 <field types>`_ の雑多で細かい解説です。
+.. currentmodule:: django.db.models
+
+このドキュメントは、 Django が提供している 
+`フィールドのオプション <common-model-field-options>`_ や
+`フィールド型 <model-field-types>`_ の雑多で細かい解説です。
 
 .. seealso:: 
 
@@ -27,7 +29,6 @@ options>`_ や `フィールド型 <field types>`_ の雑多で細かい解説�
     に参照します。
 
 .. _common-model-field-options:
-.. _Field options:
 
 フィールドオプション
 ======================
@@ -286,10 +287,19 @@ Django は必要に応じてカラム名やテーブル名をクオートしま�
 :attr:`~Field.unique_for_date` や :attr:`~Field.unique_for_month` と同じで
 す。
 
+``verbose_name``
+-------------------
+
+.. attribute:: Field.verbose_name
+
+A human-readable name for the field. If the verbose name isn't given, Django
+will automatically create it using the field's attribute name, converting
+underscores to spaces. See :ref:`Verbose field names <verbose-field-names>`.
+
 .. _model-field-types:
 
-Field types
-===========
+フィールド型
+=============
    
 .. currentmodule:: django.db.models
    
@@ -343,6 +353,13 @@ admin では ``<input type="text">`` (一行の入力フィールド) で表現�
 
     フィールドの (文字数で表した) 最大長です。 ``max_length`` への制約はデー
     タベースと Django 内の検証の両方のレベルで行われます。
+
+.. note::
+
+    If you are writing an application that must be portable to multiple
+    database backends, you should be aware that there are restrictions on
+    ``max_length`` for some backends. Refer to the :ref:`database backend
+    notes <ref-databases>` for details.
 
 .. admonition:: MySQL ユーザへの注意
 
@@ -430,17 +447,18 @@ admin では、 ``<input type="text">`` (一行のテキスト入力) で表現�
 
 値が有効な e-mail アドレスであるかチェックする :class:`CharField` です。
 
-Django 0.96 では、 :attr:`~CharField.max_length` を指定できません。
-:attr:`~CharField.max_length` は常に 75 にセットされるからです。
-バージョン 1.0 の Django では、 :attr:`~CharField.max_length` はデフォルト
-で 75 にセットされますが、デフォルト値を書き換えるよう指定できます。
-
 ``FileField``
 -------------
 
 .. class:: FileField(upload_to=None, [max_length=100, **options])
 
-ファイルアップロードのためのフィールドです。 **必須の** 引数を一つ持ちます:
+ファイルアップロードのためのフィールドです。
+
+.. note::
+    The ``primary_key`` and ``unique`` arguments are not supported, and will
+    raise a ``TypeError`` if used.
+
+**必須の** 引数を一つ持ちます:
 
 .. attribute:: FileField.upload_to
     
@@ -602,12 +620,6 @@ admin では、 ``<input type="file">`` (ファイルアップロードウィジ
 
 admin では、 ``<input type="text">`` (一行の入力フィールド) で表現されます。
 
-**NOTE:** Django 1.0 から、 ``FloatField`` の仕様が変更されています。
-以前の仕様は、 `Django 0.96 のドキュメント`_ を参照してください。
-
-.. _Django 0.96 documentation: http://www.djangoproject.com/documentation/0.96/model-api/#floatfield
-.. _`Django 0.96 のドキュメント`: `Django 0.96 documentation`_
-
 ``ImageField``
 --------------
 
@@ -692,9 +704,15 @@ IP アドレスを 文字列形式で表したもの (例: "192.0.2.30") です�
 はよく URL に使われます。
 
 :class:`CharField` と同様、 :attr:`~CharField.max_length` を指定できます。
-指定しなかった場合、Django はデフォルト値の 50 を使います。
+(:class:`CharField` のデータベース可搬性に関する注意と
+:attr:`~CharField.max_length` の解説を参照してください) 指定しなかった場合、
+Django はデフォルト値の 50 を使います。
 
 :attr:`Field.db_index` を ``True`` に設定します。
+
+It is often useful to automatically prepopulate a SlugField based on the value
+of some other value.  You can do this automatically in the admin using
+:attr:`~django.contrib.admin.ModelAdmin.prepopulated_fields`.
 
 ``SmallIntegerField``
 ---------------------
@@ -725,8 +743,10 @@ IP アドレスを 文字列形式で表したもの (例: "192.0.2.30") です�
 .. class:: TimeField([auto_now=False, auto_now_add=False, **options])
 
 時刻です。 :class:`DateField` や :class:`DateTimeField` と同じく、自動的に
-値を埋めるためのオプションを使えます。admin では、JavaScript のショートカッ
-トがついた ``<input type="text">`` で表現されます。
+値を埋めるためのオプションを使えます。
+
+admin では、JavaScript のショートカットがついた ``<input type="text">`` で
+表現されます。
 
 ``URLField``
 ------------
@@ -739,6 +759,9 @@ URL を表すための :class:`CharField` です。引数を一つとります:
 
     ``True`` (デフォルト値です) にすると、指定された URL が実在する (URL は
     実際にロードでき、かつ 404 応答を返さない) かどうか検証します。
+    シングルスレッドで動作する開発サーバを使っていると、同じサーバ上の URL
+    に対する検証をかけた瞬間にサーバがハングアップしてしまうので注意してく
+    ださい。マルチスレッドで動作するサーバでは問題は起きません。
 
 admin では、 ``<input type="text">`` (一行の入力フィールド) で表現されます。
 
@@ -760,8 +783,6 @@ admin では、 ``<input type="text">`` (一行の入力フィールド) で表�
     検証に使う RelaxNG_ スキーマを指すファイルシステム上のパス名です。
 
 .. _RelaxNG: http://www.relaxng.org/
-
-.. _Relationship fields:
 
 リレーションフィールド
 =========================
@@ -800,14 +821,7 @@ Django は、リレーションを表現するためのフィールドも定義�
     class Manufacturer(models.Model):
         # ...
 
-とはいえ、この指定方法を使えるのは、対象のモデルが同じ ``models.py`` ファイ
-ル内で定義されている場合だけです。他のアプリケーションで定義されているモデ
-ルや、どこかから import してきたモデルに対しては、文字列による指定はできま
-せん。
-
-.. versionchanged:: 1.0
-   他のアプリケーションで定義されているモデルを参照する場合には、アプリケー
-   ションラベルを入れなければならなくなりました。
+.. versionadded:: 1.0
 
 他のアプリケーションで定義されているモデルを参照したければ、アプリケーショ
 ンラベルを明示的に指定せねばなりません。例えば、上の例の ``Manufacturer``
@@ -817,6 +831,13 @@ Django は、リレーションを表現するためのフィールドも定義�
     class Car(models.Model):
         manufacturer = models.ForeignKey('production.Manufacturer')
 
+この参照方法は、二つのアプリケーション間で循環参照を行っている場合に便利で
+す。
+
+
+データベース上での表現
+~~~~~~~~~~~~~~~~~~~~~~~
+
 舞台裏では、 Django はフィールド名に ``"_id"`` をつけた名前でデータベースの
 カラム名を生成します。上の例では、 ``Car`` モデルのデータベーステーブルには
 ``manufacturer_id`` カラムが入ります (このカラム名は ``db_column`` を明示的
@@ -825,6 +846,9 @@ Django は、リレーションを表現するためのフィールドも定義�
 ラム名をコードで直接扱う必要はありません。
 
 .. _foreign-key-arguments:
+
+引数
+~~~~~
 
 :class:`ForeignKey` は、他にもいくつかオプションの引数をとります。これらの
 引数を使うと、リレーションの細かい動作を定義できます。
@@ -876,9 +900,12 @@ Django は、リレーションを表現するためのフィールドも定義�
 <lazy-relationships>` に関するオプションを含め、  :class:`ForeignKey` と
 全く同じです。
 
-背後では、 Django は中間の結合テーブル (join table) を生成して、多対多のリ
-レーションを表現します。デフォルトの設定では、テーブル名は結合対象の二つの
-テーブル名をつないで作ります。データベースによっては (例えば 32 文字といっ
+データベース上での表現
+~~~~~~~~~~~~~~~~~~~~~~~
+
+舞台裏では、 Django は中間の結合テーブル (join table) を生成して、多対多の
+リレーションを表現します。デフォルトの設定では、テーブル名は結合対象の二つ
+のテーブル名をつないで作ります。データベースによっては (例えば 32 文字といっ
 た) テーブル名の長さ制限があるので、テーブル名が 32 文字を越える場合には、
 長さを自動的に切り詰めて、一意な名前を付けます。そのため、
 ``author_books_9cdf4`` のような名前のテーブルが生成されることがあります。こ
@@ -886,6 +913,9 @@ Django は、リレーションを表現するためのフィールドも定義�
 :attr:`~ManyToManyField.db_table` オプションで手動指定できます。
 
 .. _manytomany-arguments:
+
+引数
+~~~~~~
 
 :class:`ManyToManyField` は、他にもいくつかオプションの引数をとります。これ
 らの引数を使うと、リレーションの細かい動作を定義できます。

@@ -1,11 +1,10 @@
 .. _ref-templates-api:
-.. _The Django template language For Python programmers:
 
 =======================================================
 Python プログラマのための Django テンプレート言語ガイド
 =======================================================
 
-:revision-up-to: 9084 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 このドキュメントでは、 Django のテンプレートシステムを技術的な側面、すなわ
 ちどのように動作し、どうやって拡張するかという観点から解説します。テンプレー
@@ -18,8 +17,6 @@ Django テンプレートシステムを他のアプリケーションの部品�
 
 .. _configuration: `configuring the template system in standalone mode`_
 .. _`設定`: configuration_
-
-.. _Basics:
 
 基礎
 ====
@@ -41,7 +38,6 @@ Django テンプレートシステムを他のアプリケーションの部品�
 
 .. code-block:: html+django
 
-
     {% if is_logged_in %}Thanks for logging in!{% else %}Please log in.{% endif %}
 
 **変数** はテンプレート中で何らかの値を出力する部分を表すシンボルです。
@@ -60,8 +56,6 @@ Django テンプレートシステムを他のアプリケーションの部品�
 テンプレートの **レンダリング (rendering)** では、コンテキストから値を取り
 出して変数という「穴」に埋め、全てのブロックタグを実行します。
 
-.. _Using the template system:
-
 テンプレートシステムの利用
 ==========================
 
@@ -71,8 +65,6 @@ Python でテンプレートを使うには、以下の 2 段階のプロセス�
       す。
     * コンテキストを指定して、 ``Template`` オブジェクトの ``render()`` メ
       ソッドを呼び出します。 
-
-.. _Compiling a string:
 
 文字列のコンパイル
 ------------------
@@ -96,17 +88,22 @@ Python でテンプレートを使うには、以下の 2 段階のプロセス�
     テンプレートコードの解析自体もきわめて高速です。解析のほとんどは短い正
     規表現を一つ呼び出すだけで終わります。
 
-.. _Rendering a context:
-
 コンテキストのレンダリング
 --------------------------
 
 コンパイル済みの ``Template`` オブジェクトを作成したら、オブジェクトを使っ
 てコンテキストをレンダリングできるようになります。 ``Context`` クラスは
 ``django.template.Context`` にあります。コンテキストクラスのコンストラクタ
-は単一の (省略可能な) 引数として、変数名を変数の値に対応づける辞書をとりま
-す。コンテキストの値でテンプレートを「埋める」には、 ``Template``  オブジェ
-クトの ``render()`` メソッドを使います::
+は二つの (省略可能な) 引数をとります:
+
+    * A dictionary mapping variable names to variable values.
+
+    * The name of the current application. This application name is used
+      to help :ref:`resolve namespaced URLs<topics-http-reversing-url-namespaces>`.
+      If you're not using namespaced URLs, you can ignore this argument.
+
+``Template``  オブジェクトの ``render()`` メソッドを呼び出すと、コンテキス
+トの値でテンプレートを「埋め」て出力します::
 
     >>> from django.template import Context, Template
     >>> t = Template("My name is {{ my_name }}.")
@@ -221,7 +218,6 @@ Python でテンプレートを使うには、以下の 2 段階のプロセス�
         sensitive_function.alters_data = True
 
 .. _invalid-template-variables:
-.. _How invalid variables are handled:
 
 無効な値の扱い
 ~~~~~~~~~~~~~~
@@ -256,8 +252,6 @@ Python でテンプレートを使うには、以下の 2 段階のプロセス�
     一般に、 :setting:`TEMPLATE_STRING_IF_INVALID` を有効にするのは特定のテ
     ンプレートに対する問題を解決したいときだけにして、デバッグが終わったら
     すぐに無効にしておくべきです。
-
-.. _Playing with Context objects:
 
 コンテキストオブジェクトの操作
 ------------------------------
@@ -302,7 +296,6 @@ Python でテンプレートを使うには、以下の 2 段階のプロセス�
 ことがあります。
 
 .. _subclassing-context-requestcontext:
-.. _`Subclassing Context: RequestContext`:
 
 コンテキストのサブクラス: RequestContext
 ----------------------------------------
@@ -314,7 +307,7 @@ Django には ``django.template.RequestContext`` という特別なコンテキ�
 
     c = RequestContext(request, {
         'foo': 'bar',
-    }
+    })
 
 第二に、 ``RequestContext`` は :setting:`TEMPLATE_CONTEXT_PROCESSORS` 設定
 に従っていくつかの値を自動的にコンテキストに入れます。
@@ -347,7 +340,7 @@ Django には ``django.template.RequestContext`` という特別なコンテキ�
         c = RequestContext(request, {
             'foo': 'bar',
         }, [ip_address_processor])
-        return t.render(c)
+        return HttpResponse(t.render(c))
 
 .. note::
     Django の ``render_to_response()`` ショートカットを使っていて、辞書オブ
@@ -430,9 +423,6 @@ django.core.context_processors.request
 :class:`~django.http.HttpRequest` を表現します。このプロセッサはデフォルト
 では有効でないので注意してください。利用したければ有効にせねばなりません。
 
-
-.. _Writing your own context processors:
-
 コンテキストプロセッサを自作する
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -445,8 +435,6 @@ django.core.context_processors.request
 Django 側からは、自作のコンテキストプロセッサを
 :setting:`TEMPLATE_CONTEXT_PROCESSORS` 設定で指定するようにしてください。
 
-.. _Loading templates:
-
 テンプレートのロード
 --------------------
 
@@ -458,8 +446,6 @@ Django 側からは、自作のコンテキストプロセッサを
 Django はテンプレートローダの設定 (「Loader 型」を参照してください)
 に従って、いくつものテンプレートディレクトリを検索しますが、最も基本的なテ
 ンプレートディレクトリ指定方法は :setting:`TEMPLATE_DIRS` を使う方法です。
-
-.. _The TEMPLATE_DIRS setting:
 
 TEMPLATE_DIRS 設定
 ~~~~~~~~~~~~~~~~~~
@@ -525,8 +511,6 @@ Django でファイルからテンプレートを読み出すには二通りの�
     ムのテンプレートがない記事に対してはフォールバックのテンプレートを用意
     できるというわけです。
 
-.. _Using subdirectories:
-
 サブディレクトリの使用
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -550,7 +534,6 @@ Django でファイルからテンプレートを読み出すには二通りの�
     * ``/home/html/templates/default/news/story_detail.html``
 
 .. _template-loaders:
-.. _Loader types:
 
 Loader 型
 ~~~~~~~~~
@@ -591,14 +574,16 @@ Loader 型
     :setting:`INSTALLED_APPS` パッケージリストの中で、 ``templates`` サブディ
     レクトリを持つものをキャッシュします。
 
+    このローダはデフォルトで有効化されています。
+
 ``django.template.loaders.eggs.load_template_source``
     ``app_directories`` と同じですが、ファイルシステムではなく Python eggs
     からテンプレートをロードします。
 
+    このローダはデフォルトで無効化されています。
+
 Django はテンプレートローダを :setting:`TEMPLATE_LOADERS` 設定の順番に従っ
 て試してゆき、マッチするテンプレートが見つかるまで探します。
-
-.. _`The render_to_string() shortcut`:
 
 ``render_to_string()`` ショートカット
 ======================================
@@ -628,8 +613,6 @@ Django はテンプレートローダを :setting:`TEMPLATE_LOADERS` 設定の�
 さい。このショートカットは、結果を ``HttpResponse`` に入れて、ビューからレ
 ンダ内容を直接返せるようにしています。
 
-.. _Configuring the template system in standalone mode:
-
 テンプレートシステムをスタンドアロンモードに設定する
 ====================================================
 
@@ -655,4 +638,4 @@ Django はテンプレートローダを :setting:`TEMPLATE_LOADERS` 設定の�
 :setting:`DEFAULT_CHARSET` (通常はデフォルトの ``utf-8`` で十分です), 
 :setting:`TEMPLATE_DEBUG` などを設定することになるでしょう。設定可能な変数
 は、 :ref:`設定ファイルのドキュメント <ref-settings>` に書かれています。関
-係のある変数は *TEMPLATE_* で始まっている設定です。
+係のある変数は ``TEMPLATE_`` で始まっている設定です。

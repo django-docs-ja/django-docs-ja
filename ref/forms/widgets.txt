@@ -1,11 +1,10 @@
 .. _ref-forms-widgets:
-.. _Widgets:
 
 ==============
 ウィジェット
 ==============
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 .. module:: django.forms.widgets
    :synopsis: Django の組み込みフォームウィジェットです。
@@ -39,12 +38,50 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
 
     ファイルアップロード: ``<input type='file' ...>`` です。
 
+.. class:: DateInput
+
+    .. versionadded:: 1.1
+
+    Date input as a simple text box: ``<input type='text' ...>``
+
+    Takes one optional argument:
+    
+    .. attribute:: DateInput.format
+
+        The format in which this field's initial value will be displayed.
+
+    If no ``format`` argument is provided, the default format is ``'%Y-%m-%d'``.
+
 .. class:: DateTimeInput
 
     .. versionadded:: 1.0
 
     単純なテキストボックスで表現された、日付／時刻用の入力ウィジェット:
     ``<input type='text' ...>`` です。
+
+    Takes one optional argument:
+    
+    .. attribute:: DateTimeInput.format
+    
+        The format in which this field's initial value will be displayed.
+    
+    If no ``format`` argument is provided, the default format is ``'%Y-%m-%d
+    %H:%M:%S'``.
+
+.. class:: TimeInput
+
+    Time input as a simple text box: ``<input type='text' ...>``
+
+    Takes one optional argument:
+    
+    .. attribute:: TimeInput.format
+    
+        The format in which this field's initial value will be displayed.
+    
+    If no ``format`` argument is provided, the default format is ``'%H:%M:%S'``.
+
+    .. versionchanged:: 1.1
+       The ``format`` argument was not supported in Django 1.0.
 
 .. class:: Textarea
 
@@ -58,6 +95,8 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
 
     セレクタ: ``<select><option ...>...</select>`` です。
 
+    Requires that your field provides :attr:`~Field.choices`.
+
 .. class:: NullBooleanSelect
 
     「不明」, 「はい」, 「いいえ」 を選択肢とするセレクタです。
@@ -66,6 +105,8 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
 
     複数選択の可能なセレクタ: ``<select multiple='multiple'>...</select>``
     です。 
+
+    Requires that your field provides :attr:`~Field.choices`.
 
 .. class:: RadioSelect
 
@@ -77,6 +118,8 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
           <li><input type='radio' ...></li>
           ...
         </ul>
+
+    Requires that your field provides :attr:`~Field.choices`.
 
 .. class:: CheckboxSelectMultiple
 
@@ -98,7 +141,11 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
     日付と時刻を表す二つの ``TextInput`` ウィジェットを組み合わせてラップし
     たものです。
 
-.. _Specifying widgets:
+    Takes two optional arguments, ``date_format`` and ``time_format``, which
+    work just like the ``format`` argument for ``DateInput`` and ``TimeInput``.
+    
+    .. versionchanged:: 1.1
+       The ``date_format`` and ``time_format`` arguments were not supported in Django 1.0.
 
 ウィジェットの指定
 ------------------
@@ -114,6 +161,8 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
 場合には、以下の例のように、フィールドを定義する際に ``widget`` 引数を指定
 します::
 
+    from django import forms
+
     class CommentForm(forms.Form):
         name = forms.CharField()
         url = forms.URLField()
@@ -121,8 +170,6 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
 
 上のコードでは、 comment フィールドにデフォルトの ``TextInput`` ウィジェッ
 トではなく、より大きな ``TextArea`` ウィジェットを使うように指定しています。
-
-.. _Customizing widget instances:
 
 ウィジェットインスタンスのカスタマイズ
 --------------------------------------

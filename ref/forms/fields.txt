@@ -1,11 +1,10 @@
 .. _ref-forms-fields:
-.. _Form fields:
 
 ======================
 フォームフィールド
 ======================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 .. module:: django.forms.fields
    :synopsis: Django の組み込みフォームフィールドです。
@@ -26,6 +25,7 @@
 ``django.newforms.ValidationError`` を送出するか、クリーニング済みの値を返
 します::
 
+    >>> from django import forms
     >>> f = forms.EmailField()
     >>> f.clean('foo@example.com')
     u'foo@example.com'
@@ -35,8 +35,6 @@
     Traceback (most recent call last):
     ...
     ValidationError: [u'Enter a valid e-mail address.']
-
-.. _Core field arguments:
 
 フィールドの主な引数
 --------------------
@@ -130,6 +128,9 @@
 ``initial`` 引数を使うと、非束縛フォーム内でフィールドをレンダするときの初
 期値を指定できます。
 
+初期値を動的に設定したいなら、 :attr:`Form.initial` パラメタの解説を参照し
+てください。
+
 この引数を使うケースは、例えば以下のように、「空の」フォームの各フィールド
 を特定の値で初期化して表示したい場合です::
 
@@ -177,6 +178,16 @@
     # フォームの値は初期値にフォールバック *しません。*
     >>> f.errors
     {'url': [u'This field is required.'], 'name': [u'This field is required.']}
+
+Instead of a constant, you can also pass any callable::
+
+    >>> import datetime
+    >>> class DateForm(forms.Form):
+    ...     day = forms.DateField(initial=datetime.date.today)
+    >>> print DateForm()
+    <tr><th>Day:</th><td><input type="text" name="day" value="12/23/2008" /><td></tr>
+
+The callable will be evaluated only when the unbound form is displayed, not when it is defined.
 
 ``widget``
 ~~~~~~~~~~
@@ -228,7 +239,6 @@
 
 .. attribute:: Field.error_messages
 
-
 ``error_messages`` 引数を使うと、フィールドが送出するデフォルトのメッセージ
 をオーバライドできます。オーバライドしたいメッセージに対応する文字列をキー
 とし、メッセージを値に持つ辞書を渡してください。例えば、デフォルトのメッセー
@@ -251,58 +261,6 @@
 各フィールドで定義されているエラーメッセージのキーは、後述の
 `組み込みフォームフィールドクラス`_ の節で定義しています。
 
-.. _Dynamic initial values:
-
-初期値を動的に決定する
-----------------------
-
-フィールドオブジェクトの ``initial`` 引数を使えばフィールドの初期値をハード
-コードできます。では、初期値を動的に決めたい場合はどうすればよいのでしょう。
-例えば、現在ログインしているユーザで ``username`` フィールドを埋めたいよう
-な場合です。
-
-動的に初期値を決めるには、フォームオブジェクトの ``initial`` 引数を使います。
-この引数はフィールド名と初期値を対応づけた辞書として指定します。全てのフィー
-ルドを含める必要はなく、初期値を設定したいフィールドだけでかまいません。例
-を示しましょう::
-
-    >>> class CommentForm(forms.Form):
-    ...     name = forms.CharField()
-    ...     url = forms.URLField()
-    ...     comment = forms.CharField()
-    >>> f = CommentForm(initial={'name': 'your username'}, auto_id=False)
-    >>> print f
-    <tr><th>Name:</th><td><input type="text" name="name" value="your username" /></td></tr>
-    <tr><th>Url:</th><td><input type="text" name="url" /></td></tr>
-    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
-    >>> f = CommentForm(initial={'name': 'another username'}, auto_id=False)
-    >>> print f
-    <tr><th>Name:</th><td><input type="text" name="name" value="another username" /></td></tr>
-    <tr><th>Url:</th><td><input type="text" name="url" /></td></tr>
-    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
-
-フィールドの ``initial`` パラメタと同じく、フォームの初期値が表示されるのは
-非束縛フォームだけであり、ユーザが特定のフィールドに値を入力しなかったとき
-のフォールバックとしては使われません。
-
-最後に、フィールドに ``initial`` が定義されていて、 *かつ* フォームの初期化
-時にも ``initial`` を指定した場合、後者の ``initial`` が優先されるので気を
-付けてください。例えば、以下のように、フィールドとフォームの両方に
-``initial`` を指定した場合、フォームの値の方が使われます::
-
-    >>> class CommentForm(forms.Form):
-    ...     name = forms.CharField(initial='class')
-    ...     url = forms.URLField()
-    ...     comment = forms.CharField()
-    >>> f = CommentForm(initial={'name': 'instance'}, auto_id=False)
-    >>> print f
-    <tr><th>Name:</th><td><input type="text" name="name" value="instance" /></td></tr>
-    <tr><th>Url:</th><td><input type="text" name="url" /></td></tr>
-    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
-
-
-.. _Built-in Field classes:
-
 組み込みフォームフィールドクラス
 --------------------------------
 
@@ -314,7 +272,6 @@
 のウィジェット型について説明しています。また、データが空の値だったとき
 (前述の ``requied`` の節を参照してください) に返される値についても定義して
 います。
-
 
 ``BooleanField``
 ~~~~~~~~~~~~~~~~
@@ -339,7 +296,6 @@
     場合とされない場合のあるチェックボックスをフォームに含めたい場合は、
     ``BooleanField`` を生成する際に ``required=False`` を忘れずに指定せねば
     なりません。
-
 
 ``CharField``
 ~~~~~~~~~~~~~
@@ -411,7 +367,7 @@
 
 .. class:: DateField(**kwargs)
 
-    * デフォルトのウィジェット: ``TextInput``
+    * デフォルトのウィジェット: ``DateInput``
     * 空のフォームデータに対する値: ``None``
     * Python データへの正規化: Python ``datetime.date`` オブジェクト
     * 入力値が ``datetime.date`` や ``datetime.datetime`` オブジェクト、ま
@@ -433,6 +389,10 @@
     '%d %b %Y', '%d %b, %Y',            # '25 Oct 2006', '25 Oct, 2006'
     '%B %d %Y', '%B %d, %Y',            # 'October 25 2006', 'October 25, 2006'
     '%d %B %Y', '%d %B, %Y',            # '25 October 2006', '25 October, 2006'
+
+.. versionchanged:: 1.1
+   The ``DateField`` previously used a ``TextInput`` widget by default. It now
+   uses a ``DateInput`` widget.
 
 ``DateTimeField``
 ~~~~~~~~~~~~~~~~~
@@ -532,12 +492,12 @@
     * エラーメッセージのキー: ``required``, ``invalid``, ``missing``, ``empty``
 
 ``UploadedFile`` オブジェクトの詳細は 
-:ref:`ファイルアップロードのドキュメント <topics-file-uploads>` を参照して
+:ref:`ファイルアップロードのドキュメント <topics-http-file-uploads>` を参照して
 ください。
 
 ``FileField`` をフォームで使う場合、
-:ref:`フォームにファイルデータを束縛する <topics-file-uploads>`
-のを忘れないようにしてください。
+:ref:`フォームにファイルデータを束縛する <binding-uploaded-files>` のを忘れ
+ないようにしてください。
 
 ``FilePathField``
 ~~~~~~~~~~~~~~~~~
@@ -605,7 +565,7 @@ ImageField を使いたい場合、 `Python Imaging Library`_ をインストー
 かねばなりません。
 
 ``ImageField`` をフォームで使う場合、
-:ref:`フォームにファイルデータを束縛する <topics-file-uploads>`
+:ref:`フォームにファイルデータを束縛する <binding-uploaded-files>`
 のを忘れないようにしてください。
 
 .. _Python Imaging Library: http://www.pythonware.com/products/pil/
@@ -744,8 +704,6 @@ ImageField を使いたい場合、 `Python Imaging Library`_ をインストー
     URL が存在するか確かめるときに使うユーザエージェントを表す文字列です。
     デフォルト値は ``URL_VALIDATOR_USER_AGENT`` 設定の値です。
 
-.. _Slightly complex built-in Field classes:
-
 やや複雑な組み込みフィールドクラス
 ----------------------------------
 
@@ -757,7 +715,35 @@ ImageField を使いたい場合、 `Python Imaging Library`_ をインストー
 
 .. class:: SplitDateTimeField(**kwargs)
 
-.. _Fields which handle relationships:
+    * Default widget: ``SplitDateTimeWidget``
+    * Empty value: ``None``
+    * Normalizes to: A Python ``datetime.datetime`` object.
+    * Validates that the given value is a ``datetime.datetime`` or string
+      formatted in a particular datetime format.
+    * Error message keys: ``required``, ``invalid``
+
+Takes two optional arguments:
+
+.. attribute:: SplitDateTimeField.input_date_formats
+
+    A list of formats used to attempt to convert a string to a valid
+    ``datetime.date`` object.
+
+If no ``input_date_formats`` argument is provided, the default input formats
+for ``DateField`` are used.
+
+.. attribute:: SplitDateTimeField.input_time_formats
+
+    A list of formats used to attempt to convert a string to a valid
+    ``datetime.time`` object.
+
+If no ``input_time_formats`` argument is provided, the default input formats
+for ``TimeField`` are used.
+
+.. versionchanged:: 1.1
+   The ``SplitDateTimeField`` previously used two ``TextInput`` widgets by
+   default. The ``input_date_formats`` and ``input_time_formats`` arguments
+   are also new.
 
 リレーションを扱うフィールド
 ---------------------------------
@@ -794,14 +780,30 @@ ImageField を使いたい場合、 `Python Imaging Library`_ をインストー
         def label_from_instance(self, obj):
             return "My Object #%i" % obj.id
 
+.. attribute:: ModelChoiceField.empty_label
+
+   By default the ``<select>`` widget used by ``ModelChoiceField`` will have a
+   an empty choice at the top of the list. You can change the text of this label
+   (which is ``"---------"`` by default) with the ``empty_label`` attribute, or
+   you can disable the empty label entirely by setting ``empty_label`` to
+   ``None``::
+
+        # A custom empty label
+        field1 = forms.ModelChoiceField(queryset=..., empty_label="(Nothing)")
+
+        # No empty label
+        field2 = forms.ModelChoiceField(queryset=..., empty_label=None)
+
+   Note that if a ``ModelChoiceField`` is required and has a default
+   initial value, no empty choice is created (regardless of the value
+   of ``empty_label``).
+
 ``ModelMultipleChoiceField``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 複数のモデルオブジェクトを選択できるフィールドです。多対多のリレーションを
 表現するのに向いています。 ``ModelChoiceField`` と同様、オブジェクトの表示
 を変更するには ``label_from_instance`` メソッドをオーバライドしてください。
-
-.. _Creating custom fields:
 
 カスタムフィールドの作成
 ------------------------

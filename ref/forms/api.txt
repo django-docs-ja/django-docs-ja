@@ -4,7 +4,7 @@
 フォーム API
 =============
 
-:revision-up-to: 9084 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 .. currentmodule:: django.forms
 
@@ -15,8 +15,6 @@
     ださい。
 
 .. _ref-forms-api-bound-unbound:
-
-.. _Bound and unbound forms:
 
 束縛フォームと非束縛フォーム
 -------------------------------
@@ -76,8 +74,6 @@
 データを変更する方法はありません。一度フォームインスタンスを生成したら、デー
 タの有無に関わらず、インスタンス内のデータは変更不能だと考えてください。
 
-.. _Using forms to validate data:
-
 フォームを使ってデータを検証する
 --------------------------------
 
@@ -127,8 +123,6 @@
 のルーチンはたった一度しか呼ばれません。別の見方をすれば、検証の処理には副
 作用があり、その副作用はたった一度しか呼び出されないということです。
 
-.. _Behavior of unbound forms:
-
 非束縛フォームの動作
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -141,7 +135,39 @@
     >>> f.errors
     {}
 
-.. _Accessing "clean" data:
+Dynamic initial values
+----------------------
+
+.. attribute:: Form.initial
+
+Use ``initial`` to declare the initial value of form fields at runtime. For
+example, you might want to fill in a ``username`` field with the username of the
+current session.
+
+To accomplish this, use the ``initial`` argument to a ``Form``. This argument,
+if given, should be a dictionary mapping field names to initial values. Only
+include the fields for which you're specifying an initial value; it's not
+necessary to include every field in your form. For example::
+
+    >>> f = ContactForm(initial={'subject': 'Hi there!'})
+
+These values are only displayed for unbound forms, and they're not used as
+fallback values if a particular value isn't provided.
+
+Note that if a ``Field`` defines ``initial`` *and* you include ``initial`` when
+instantiating the ``Form``, then the latter ``initial`` will have precedence. In
+this example, ``initial`` is provided both at the field level and at the form
+instance level, and the latter gets precedence::
+
+    >>> class CommentForm(forms.Form):
+    ...     name = forms.CharField(initial='class')
+    ...     url = forms.URLField()
+    ...     comment = forms.CharField()
+    >>> f = CommentForm(initial={'name': 'instance'}, auto_id=False)
+    >>> print f
+    <tr><th>Name:</th><td><input type="text" name="name" value="instance" /></td></tr>
+    <tr><th>Url:</th><td><input type="text" name="url" /></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
 「クリーニング済み」のデータにアクセスする
 ------------------------------------------
@@ -241,8 +267,6 @@
 個別のフォームフィールド (フィールド名ごと) やフォーム全体 (複数フィールド
 の組み合わせ) に対してバリデーションを実現するコードを書けます。詳しくは、
 :ref:`ref-forms-validation` を参照してください。
-
-.. _Outputting forms as HTML:
 
 フォームを HTML として出力する
 ------------------------------
@@ -358,7 +382,6 @@
     <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>
 
 .. _ref-forms-api-configuring-label:
-.. _`Configuring HTML <label> tags`:
 
 ``<label>`` タグの出力設定
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -466,8 +489,6 @@
 ラベルの付加は、ラベルの最後の文字が区切り文字 (``.``, ``!``, ``?``, ``:``
 のいずれか) でない場合にのみ行われます。
 
-.. _Notes on field ordering:
-
 フィールドの並び順について
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -476,8 +497,6 @@
 ``ContactForm`` の例では、フィールドの並び順は ``subject``, ``message``,
 ``sender``, ``cc_myself`` です。 HTML 出力の中でフィールドの並び順を変更し
 たければ、クラス定義内でのフィールドの並び順を変更してください。
-
-.. _How errors are displayed:
 
 エラーの出力方法
 ~~~~~~~~~~~~~~~~
@@ -511,8 +530,6 @@
     <p>Sender: <input type="text" name="sender" value="invalid e-mail address" /></p>
     <p>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></p>
 
-.. _Customizing the error list format:
-
 エラーリストの出力形式をカスタマイズする
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -535,8 +552,6 @@
     <div class="errorlist"><div class="error">Enter a valid e-mail address.</div></div>
     <p>Sender: <input type="text" name="sender" value="invalid e-mail address" /></p>
     <p>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></p>
-
-.. _More granular output:
 
 より細かな出力調整
 ~~~~~~~~~~~~~~~~~~
@@ -606,7 +621,6 @@
     ''
 
 .. _binding-uploaded-files:
-.. _Binding uploaded files to a form:
 
 アップロードされたファイルをフォームに結びつける
 -------------------------------------------------
@@ -647,10 +661,8 @@
 非束縛フォームの構築は通常通りで、フォームデータとファイルデータの *両方*
 を省略します::
 
-    # Unbound form with a image field
+    # ImageField の入った非束縛フォームを生成
     >>> f = ContactFormWithMugshot()
-
-.. _Testing for multipart forms:
 
 マルチパート形式のフォームをテストする
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -673,8 +685,6 @@
     {% endif %}
     {{ form }}
     </form>
-
-.. _Subclassing forms:
 
 フォームのサブクラス化
 ----------------------
@@ -721,7 +731,6 @@
     <li>Haircut type: <input type="text" name="haircut_type" /></li>
 
 .. _form-prefix:
-.. _Prefixes for forms:
 
 フォームのプレフィクス
 -----------------------

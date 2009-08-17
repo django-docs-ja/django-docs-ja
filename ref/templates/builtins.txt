@@ -1,11 +1,10 @@
 .. _ref-templates-builtins:
-.. _Built-in tag and filter reference:
 
 ====================================
 組み込みタグ／フィルタリファレンス
 ====================================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 このドキュメントでは、 Django の組み込みテンプレートタグおよびフィルタにつ
 いて解説しています。 また、 :ref:`自動生成ドキュメント
@@ -13,10 +12,11 @@
 とカスタムタグのドキュメントを読めるのでお勧めです。
 
 .. _ref-templates-builtins-tags:
-.. _Built-in tag reference:
 
 組み込みタグリファレンス
 ------------------------
+
+.. highlightlang:: html+django
 
 .. templatetag:: autoescape
 
@@ -67,24 +67,57 @@ cycle
         </tr>
     {% endfor %}
 
-ループの外側では、最初に一意な名前を与えておき、以後はその名前を使います。
-例えば::
+You can use variables, too. For example, if you have two template variables,
+``rowvalue1`` and ``rowvalue2``, you can cycle between their values like this::
 
-        <tr class="{% cycle 'row1' 'row2' rowvar as rowcolors %}">...</tr>
-        <tr class="{% cycle rowcolors %}">...</tr>
-        <tr class="{% cycle rowcolors %}">...</tr>
+    {% for o in some_list %}
+        <tr class="{% cycle rowvalue1 rowvalue2 %}">
+            ...
+        </tr>
+    {% endfor %}
 
-任意の個数の値を使えます。値はスペースで区切ります。値をクオート (``'``)
-または二重クオート (``"``) で囲むと、文字列リテラルとして扱います。
-クオートされていない値はコンテキスト変数への参照とみなされます。
- 
-値をカンマで区切った形式もつかえます::
+Yes, you can mix variables and strings::
+
+    {% for o in some_list %}
+        <tr class="{% cycle 'row1' rowvalue2 'row3' %}">
+            ...
+        </tr>
+    {% endfor %}
+
+In some cases you might want to refer to the next value of a cycle from
+outside of a loop. To do this, just give the ``{% cycle %}`` tag a name, using
+"as", like this::
+
+    {% cycle 'row1' 'row2' as rowcolors %}
+
+From then on, you can insert the current value of the cycle wherever you'd like
+in your template::
+
+    <tr class="{% cycle rowcolors %}">...</tr>
+    <tr class="{% cycle rowcolors %}">...</tr>
+
+You can use any number of values in a ``{% cycle %}`` tag, separated by spaces.
+Values enclosed in single (``'``) or double quotes (``"``) are treated as
+string literals, while values without quotes are treated as template variables.
+
+Note that the variables included in the cycle will not be escaped. This is
+because template tags do not escape their content. If you want to escape the
+variables in the cycle, you must do so explicitly::
+
+    {% filter force_escape %}
+        {% cycle var1 var2 var3 %}
+    {% endfilter %}
+
+For backwards compatibility, the ``{% cycle %}`` tag supports the much inferior
+old syntax from previous Django versions. You shouldn't use this in any new
+projects, but for the sake of the people who are still using it, here's what it
+looks like::
 
     {% cycle row1,row2,row3 %}
 
-ただし、この構文では、値は全てリテラルテキストとして扱われます。
-カンマを使った構文は以前のバージョンとの互換性のために残されています。
-新たなプロジェクトでは使わないようにしてください。
+In this syntax, each value gets interpreted as a literal string, and there's no
+way to specify variable values. Or literal commas. Or spaces. Did we mention
+you shouldn't use this syntax in any new projects?
 
 .. templatetag:: debug
 
@@ -155,6 +188,13 @@ firstof
 
     {% firstof var1 var2 var3 "fallback value" %}
 
+Note that the variables included in the firstof tag will not be escaped. This
+is because template tags do not escape their content. If you want to escape
+the variables in the firstof tag, you must do so explicitly::
+
+    {% filter force_escape %}
+        {% firstof var1 var2 var3 "fallback value" %}
+    {% endfilter %}
 
 .. templatetag:: for
 
@@ -169,7 +209,6 @@ for
         <li>{{ athlete.name }}</li>
     {% endfor %}
     </ul>
-
 
 ``{% for obj in list reversed %}`` のようにすると、リストに対して逆順のルー
 プを実行できます。
@@ -207,6 +246,35 @@ for ループは、ループの各回ごとに使える変数を設定します:
     ``forloop.last``            最後のループであれば True になります
     ``forloop.parentloop``      入れ子のループの場合、一つ上のループを表します
     ==========================  ================================================
+
+for ... empty
+^^^^^^^^^^^^^
+
+.. versionadded:: 1.1
+
+The ``for`` tag can take an optional ``{% empty %}`` clause that will be
+displayed if the given array is empty or could not be found::
+
+    <ul>
+    {% for athlete in athlete_list %}
+        <li>{{ athlete.name }}</li>
+    {% empty %}
+        <li>Sorry, no athlete in this list!</li>
+    {% endfor %}
+    <ul>
+
+The above is equivalent to -- but shorter, cleaner, and possibly faster
+than -- the following::
+
+    <ul>
+      {% if athlete_list %}
+        {% for athlete in athlete_list %}
+          <li>{{ athlete.name }}</li>
+        {% endfor %}
+      {% else %}
+        <li>Sorry, no athletes in this list.</li>
+      {% endif %}
+    </ul>
 
 .. templatetag:: if
 
@@ -308,6 +376,19 @@ ifchanged
             {% ifchanged date.hour date.date %}
                 {{ date.hour }}
             {% endifchanged %}
+        {% endfor %}
+
+The ``ifchanged`` tag can also take an optional ``{% else %}`` clause that
+will be displayed if the value has not changed::
+
+        {% for match in matches %}
+            <div style="background-color:
+                {% ifchanged match.ballot_id %}
+                    {% cycle "red" "blue" %}
+                {% else %}
+                    grey
+                {% endifchanged %}
+            ">{{ match }}</div>
         {% endfor %}
 
 .. templatetag:: ifequal
@@ -478,6 +559,8 @@ regroup
 ``last_name``, および ``gender`` といったキーを持つ辞書で表されているとしま
 しょう::
 
+.. code-block:: python
+
     people = [
         {'first_name': 'George', 'last_name': 'Bush', 'gender': 'Male'},
         {'first_name': 'Bill', 'last_name': 'Clinton', 'gender': 'Male'},
@@ -534,6 +617,8 @@ regroup
 も考えずに一つの性別のグループを複数つくってしまいます。例えば、 ``people``
 が以下のように (``'Male'`` がリスト内でまとまっていない状態に) なっていたと
 しましょう::
+ 
+.. code-block:: python
 
     people = [
         {'first_name': 'Bill', 'last_name': 'Clinton', 'gender': 'Male'},
@@ -662,10 +747,14 @@ DRY 則の侵犯を避けられます::
 を引数に取るとしましょう (``client()`` は ``app_views.py`` で定義されている
 メソッドです)。 URLconf は以下のようになるはずです::
 
+.. code-block:: python
+
     ('^client/(\d+)/$', 'app_views.client')
 
 あるアプリケーションの URLconf が、プロジェクトの URLconf に以下のような形
 で include されていたとします::
+
+.. code-block:: python
 
     ('^clients/', include('project_name.app_name.urls'))
 
@@ -688,8 +777,6 @@ DRY 則の侵犯を避けられます::
 
 URL を表示せず、取り出したいだけなら、以下のような形式で呼び出せます:
 
-.. code-block:: html+django
-
     {% url path.to.view arg, arg2 as the_url %}
     
     <a href="{{ the_url }}">I'm linking to {{ the_url }}</a>
@@ -697,12 +784,20 @@ URL を表示せず、取り出したいだけなら、以下のような形式�
 ``{% url ... as var %}`` の形式は、 URL からビューを解決できなくてもエラー
 を送出 *しません* 。従って、ビューへのリンクは以下のようにも書けます:
 
-.. code-block:: html+django
-
     {% url path.to.view as the_url %}
     {% if the_url %}
       <a href="{{ the_url }}">Link to optional stuff</a>
     {% endif %}
+
+.. versionadded:: 1.1
+
+If you'd like to retrieve a namespaced URL, specify the fully qualified name::
+
+    {% url myapp:view-name %}
+
+This will follow the normal :ref:`namespaced URL resolution strategy
+<topics-http-reversing-url-namespaces>`, including using any hints provided
+by the context as to the current application.
 
 .. templatetag:: widthratio
 
@@ -741,9 +836,7 @@ with
 値を組み込んだ変数 (上の例でいえば ``total``) は ``{% with %}`` と 
 ``{% endwith %}`` タグの間でだけ使えます。
 
-
 .. _ref-templates-builtins-filters:
-.. _`Built-in filter reference`:
 
 組み込みフィルタリファレンス
 -----------------------------
@@ -811,6 +904,13 @@ date
 ``value`` が ``datetime`` オブジェクト (例えば、 ``datetime.datetime.now()``
 の戻り値) ならば、 出力は文字列 ``'Wed 09 Jan 2008'`` になります。
 
+When used without a format string::
+
+    {{ value|date }}
+
+...the formatting string defined in the :setting:`DATE_FORMAT` setting will be
+used.
+
 .. templatefilter:: default
 
 default
@@ -855,6 +955,8 @@ dictsort
 
 ``value`` が以下のようだったとします::
 
+.. code-block:: python
+
     [
         {'name': 'zed', 'age': 19},
         {'name': 'amy', 'age': 22},
@@ -862,6 +964,8 @@ dictsort
     ]
 
 出力は以下のようになるでしょう。::
+
+.. code-block:: python
 
     [
         {'name': 'amy', 'age': 22},
@@ -895,10 +999,6 @@ divisibleby
 escape
 ~~~~~~
 
-.. versionchanged:: 1.0
-    自動エスケープの導入に伴って、このフィルタの挙動はバージョン 1.0 で少し
-    変更され、他の全てのフィルタの後に適用されるようになりました。
-
 入力文字中の HTML 特有の文字をエスケープします。具体的には、以下のような置
 換を行います:
 
@@ -918,9 +1018,10 @@ escape
 を呼び出しても問題はありません。意図的に複数回エスケープを施したければ、
 ``force_escape`` フィルタを使ってください。
 
-**開発版の Django で新たに登場した機能**: 自動エスケープの導入によって、
-このフィルタの挙動は少し変更されました。フィルタによる置き換えは、他の (前
-後のフィルタを含め)全てのフィルタを適用した後に一度だけ行われます。
+.. versionchanged:: 1.0
+    自動エスケープの導入によって、このフィルタの挙動は少し変更されました。
+    フィルタによる置き換えは、他の (前後のフィルタを含め)全てのフィルタを適
+    用した後に一度だけ行われます。
 
 .. templatefilter:: escapejs
 
@@ -1272,6 +1373,21 @@ safe
 文字列に対して、さらなるエスケープが必要でないことをマークするのに使います。
 autoescaping がオフの場合、このフィルタは何もしません。
 
+.. templatefilter:: safeseq
+
+safeseq
+~~~~~~~
+
+Applies the :tfilter:`safe` filter to each element of a sequence.  Useful in
+conjunction with other filters that operate on sequences, such as
+:tfilter:`join`.  For example::
+
+    {{ some_list|safeseq|join:", " }}
+
+You couldn't use the :tfilter:`safe` filter directly in this case, as it would
+first convert the variable into a string, rather than working with the
+individual elements of the sequence.
+
 .. templatefilter:: slice
 
 slice
@@ -1284,7 +1400,9 @@ Python におけるリストのスライスと同じ構文を使います。ス�
 http://diveintopython.org/native_data_types/lists.html#odbchelper.list.slice
 を読んで下さい。
 
-例: ``{{ some_list|slice:":2" }}``
+例:: 
+
+    {{ some_list|slice:":2" }}
 
 .. templatefilter:: slugify
 
@@ -1352,6 +1470,13 @@ time
 ``value`` が ``datetime.datetime.now()`` と同等な値なら、出力は文字列
 ``"01:23"`` なります。
 
+When used without a format string::
+
+    {{ value|time }}
+
+...the formatting string defined in the :setting:`TIME_FORMAT` setting will be
+used.
+
 .. templatefilter:: timesince
 
 timesince
@@ -1364,6 +1489,8 @@ timesince
 付オブジェクトで、 ``comment_date`` が ``08:00 on 1 June 2006`` を表す日時
 オブジェクトの場合、 ``{{ blog_date|timesince:comment_date }}`` は 
 "8 hours" を返します。
+
+Comparing offset-naive and offset-aware datetimes will return an empty string.
 
 最小の単位は分で、比較対象の時刻より以前の時刻に対しては
 "0 minutes" を返します。
@@ -1559,23 +1686,21 @@ yesno
                                     ない場合は False 扱いになります)
 ==========  ======================  ==================================
 
-.. _Other tags and filter libraries:
-
 その他のタグとフィルタライブラリ
-================================
+---------------------------------
 
 Django には他にも二つのテンプレートタグライブラリがついてきます。これらのラ
 イブラリは ``INSTALLED_APPS`` 設定で明示的に有効化した上で、 ``{% load %}``
 タグを使ってテンプレート上にロードせねばなりません。
 
 django.contrib.humanize
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 
 データを「ヒトにやさしい」表現にする上で便利な Django テンプレートフィルタ
 です。 :ref:`ref-contrib-humanize` を参照してください。
 
 django.contrib.markup
----------------------
+~~~~~~~~~~~~~~~~~~~~~
 
 以下のマークアップ言語を実装したテンプレートフィルタのコレクションです:
 
@@ -1585,9 +1710,8 @@ django.contrib.markup
 
 詳しくは :ref:`ref-contrib-markup` を参照してください。
 
-
 django.contrib.webdesign
-------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 「Lorem Ipsum...」のような例文を出力するタグなど、ウェブサイトをデザインす
 るときに役立つテンプレートタグを集めたものです。

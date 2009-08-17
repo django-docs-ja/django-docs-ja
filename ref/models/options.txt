@@ -1,15 +1,13 @@
 .. _ref-models-options:
-.. _`Model Meta options`:
 
 ===============================
 モデルの ``Meta`` オプション
 ===============================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 このドキュメントでは、モデルの内部クラス ``Meta`` に指定できる
 :ref:`メタデータオプション <meta-options>` について解説しています。
-
 
 ``Meta`` オプション
 ==========================
@@ -33,16 +31,16 @@
 
     db_table = 'music_album'
 
-
 .. _table-names:
 
 テーブル名
 ~~~~~~~~~~~
 
-手間を省くため、 Django はモデルクラスやアプリケーションの名前を元にデータ
-ベーステーブルの名前を導出します。モデルのデータベーステーブル名は、モデル
-の「アプリケーションラベル (app label)」、つまり ``manage.py startapp`` で
-指定した名前と、モデルのクラス名をアンダースコアで結んで生成します。
+ユーザの手間を省くため、 Django はモデルクラスやアプリケーションの名前を元
+にデータベーステーブルの名前を導出します。モデルのデータベーステーブル名は、
+モデルの「アプリケーションラベル (app label)」、つまり
+``manage.py startapp`` で指定した名前と、モデルのクラス名をアンダースコアで
+結んで生成します。
 
 例えば、 (``manage.py startapp bookstore`` で作成した) ``bookstore`` という
 アプリケーションの中に ``class Book`` で定義したモデルがあった場合そのデー
@@ -80,6 +78,47 @@ Python の変数名として扱えない文字を含んでいても問題あり�
     get_latest_by = "order_date"
 
 詳しくは :meth:`~django.db.models.QuerySet.latest` を参照してください。
+
+``managed``
+-----------------------
+
+.. attribute:: Options.managed
+
+.. versionadded:: 1.1
+
+Defaults to ``True``, meaning Django will create the appropriate database
+tables in :ref:`django-admin-syncdb` and remove them as part of a :ref:`reset
+<django-admin-reset>` management command. That is, Django *manages* the
+database tables' lifecycles.
+
+If ``False``, no database table creation or deletion operations will be
+performed for this model. This is useful if the model represents an existing
+table or a database view that has been created by some other means. This is
+the *only* difference when ``managed`` is ``False``. All other aspects of
+model handling are exactly the same as normal. This includes
+
+    1. Adding an automatic primary key field to the model if you don't declare
+       it.  To avoid confusion for later code readers, it's recommended to
+       specify all the columns from the database table you are modeling when
+       using unmanaged models.
+
+    2. If a model with ``managed=False`` contains a
+       :class:`~django.db.models.ManyToManyField` that points to another
+       unmanaged model, then the intermediate table for the many-to-many join
+       will also not be created. However, a the intermediary table between one
+       managed and one unmanaged model *will* be created.
+       
+       If you need to change this default behavior, create the intermediary
+       table as an explicit model (with ``managed`` set as needed) and use the
+       :attr:`ManyToManyField.through` attribute to make the relation use your
+       custom model.
+
+For tests involving models with ``managed=False``, it's up to you to ensure
+the correct tables are created as part of the test setup.
+
+If you're interested in changing the Python-level behavior of a model class,
+you *could* use ``managed=False`` and create a copy of an existing model.
+However, there's a better approach for that situation: :ref:`proxy-models`.
 
 ``order_with_respect_to``
 -------------------------
@@ -145,6 +184,16 @@ Python の変数名として扱えない文字を含んでいても問題あり�
 
 ``(permission_code, human_readable_permission_name)`` の形式をとる 2 要素の
 タプルからなるリストです。
+
+``proxy``
+---------
+
+.. attribute:: Options.proxy
+
+.. versionadded:: 1.1
+
+If set to ``True``, a model which subclasses another model will be treated as
+a :ref:`proxy model <proxy-models>`.
 
 ``unique_together``
 -------------------
