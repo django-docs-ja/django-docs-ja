@@ -384,7 +384,9 @@ QueryDict オブジェクト
     す。
 
 .. method:: QueryDict.lists()
-    :meth:`items()` に似ていますが、全ての値をリストで返します。例えば::
+
+    動作は :meth:`items()` に似ていますが、全ての値をリストで返します。例え
+    ば::
 
            >>> q = QueryDict('a=1&a=2&a=3')
            >>> q.lists()

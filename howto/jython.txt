@@ -55,12 +55,12 @@ Django/Jython 開発用の管理コマンドが入っています。 Django 組�
 
 .. _`django-jython`: http://code.google.com/p/django-jython/
 
-プロジェクトのウェブサイトに書かれている `インストールの解説 <installation
-instructions>`_ を読んでインストールしてください。また、 
-`データベースバックエンド <database backends>`_ の説明も参照してください。
-
-.. _`installation instructions`: http://code.google.com/p/django-jython/wiki/Install
-.. _`database backends`: http://code.google.com/p/django-jython/wiki/DatabaseBackends
+プロジェクトのウェブサイトに書かれている `インストールの解説 
+<http://code.google.com/p/django-jython/wiki/Install>`_ を読んでインストー
+ルしてください。また、 
+`データベースバックエンド
+<http://code.google.com/p/django-jython/wiki/DatabaseBackends>`_ の説明も参
+照してください。
 
 CPython で動かすときとの違い
 =================================

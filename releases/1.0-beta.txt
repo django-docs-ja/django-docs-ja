@@ -76,6 +76,7 @@ Django に一意なセッション識別子を生成させるメソッドの頑�
 
 .. _the documentation for generic relations: ../contenttypes/#generic-relations
 .. _the Django wiki: http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges#Removedseveralmoredeprecatedfeaturesfor1.0
+.. _`Django の wiki`: `the Django wiki`_
 
 
 Django 1.0 のロードマップ

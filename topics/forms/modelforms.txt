@@ -195,6 +195,8 @@
         name = forms.CharField(max_length=100)
         authors = forms.ModelMultipleChoiceField(queryset=Author.objects.all())
 
+.. _ref-forms-modelforms-save-method:
+
 ``save()`` メソッド
 ---------------------
 
@@ -348,11 +350,9 @@ Author モデルには ``'name'``, ``'title'``, ``'birth_date'`` の 3 つ
         author.title = 'Mr'
         author.save()
 
-    ``save(commit=False)`` については、 `「フォームの保存」`_ も参照してく
+    ``save(commit=False)`` については、 
+    `「フォームの保存」 <ref-forms-modelforms-save-method>`_ も参照してく
     ださい。
-
-.. _section on saving forms: `The save() method`_
-.. _`「フォームの保存」`: `section on saving forms`_
 
 デフォルトのフィールド型をオーバライドする
 --------------------------------------------

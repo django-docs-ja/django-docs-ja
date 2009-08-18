@@ -55,7 +55,7 @@ Django の組み込みフィールド型は、データベースのカラムと�
         # ... (他のメソッドはここでは省略) ...
 
 .. _Bridge: http://en.wikipedia.org/wiki/Contract_bridge
-.. _ブリッジ: http://ja.wikipedia.org/wiki/コントラクトブリッジ
+.. _ブリッジ: http://ja.wikipedia.org/wiki/%E3%82%B3%E3%83%B3%E3%83%88%E3%83%A9%E3%82%AF%E3%83%88%E3%83%96%E3%83%AA%E3%83%83%E3%82%B8
 
 ``Hand`` はただの普通の Python クラスで、 Django 固有の定義は一切ありません。
 このクラスを、モデルで扱えるようにしましょう (モデルの ``hand`` という属性

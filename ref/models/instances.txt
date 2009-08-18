@@ -168,8 +168,7 @@ Django データベースオブジェクトがオブジェクトの作成と変�
 証がないかぎり、主キーの値を明示的に指定しないよう注意してください。詳しく
 は上記の 
 :ref:`自動主キーの値を明示的に指定する <explicitly-specifying-auto-primary-key-values>`
- の節や、後述の :ref:`INSERT や UPDATE を強制する
- <ref-models-force-insert>` を参照してください。
+の節や、後述の :ref:`ref-models-force-insert` を参照してください。
 
 .. _ref-models-force-insert:
 

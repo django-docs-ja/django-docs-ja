@@ -42,11 +42,9 @@ Django は、自分自身の特定のアクションを通知するための :re
 組み込みシグナルの全容と各々の解説は、 :ref:`組み込みシグナルのドキュメント
 <ref-signals>` で解説しています。
 
-シグナルは `自分て定義したり送信したり 
-<define and send your own custom signals>`_ できます。詳しくは以下を参照し
+シグナルは `自分て定義したり送信したり
+<topics-signals-defining-and-sending>`_ できます。詳しくは以下を参照し
 てください。
-
-.. _define and send your own custom signals: `defining and sending signals`_
 
 シグナルを待ち受ける
 ====================
@@ -139,6 +137,8 @@ Django はエラーを送出します。というのも、将来シグナルに�
 センダに入るオブジェクトは、シグナルによって異なります。個々のシグナルにつ
 いての情報は :ref:`組み込みシグナルのドキュメント <ref-signals>` を参照して
 ください。
+
+.. _topics-signals-defining-and-sending:
 
 シグナルの定義と送信
 =====================

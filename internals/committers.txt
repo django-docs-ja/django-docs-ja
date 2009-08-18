@@ -68,10 +68,8 @@ BDFLs
 -----
 
 Adrian と Jacob は、共に Django の `慈悲深き終身独裁者
-<Benevolent Dictators for Life>`_ です。「大局的な合意と実際に動くコード」
+<http://en.wikipedia.org/wiki/Benevolent_Dictator_For_Life>`_ です。「大局的な合意と実際に動くコード」
 のポリシがうまく働かないときには、彼らが最終判断を下します。
-
-.. _Benevolent Dictators for Life: http://en.wikipedia.org/wiki/Benevolent_Dictator_For_Life
 
 コア開発者たち
 ---------------
@@ -190,20 +188,17 @@ Karen Tracey
 専門家たち
 -----------
 
-`James Bennett`_
+`James Bennett <http://b-list.org/>`_
     James は Django のリリースマネジャです。彼はドキュメントの作成で貢献
     しています。 
 
     James は、プログラマ達がよい賃金をもらう程に口論ばかりするようになると
     いう事実を発見して、哲学にもとづいた Web 開発者への道を選びました。
     彼はカンザス州ローレンス在住で、 Ellington を開発している Journal-World
-    に勤務しています。 `ブログを書き <keeps a blog>`_ 、 
-    `Django の本 <book on Django>`_ を著し、ポートワインと車語りを楽しんで
-    います。
-
-.. _james bennett: http://b-list.org/
-.. _keeps a blog: `james bennett`_
-.. _book on Django: http://www.amazon.com/dp/1590599969/?tag=djangoproject-20
+    に勤務しています。 `ブログを書き <http://b-list.org/>`_ 、 
+    `Django の本
+    <http://www.amazon.com/dp/1590599969/?tag=djangoproject-20>`_ を著し、
+    ポートワインと車語りを楽しんでいます。
 
 Ian Kelly
     Ian は Django の Oracle サポートに携わっています。

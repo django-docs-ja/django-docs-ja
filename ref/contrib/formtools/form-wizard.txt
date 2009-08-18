@@ -26,7 +26,7 @@ Django には、 :ref:`フォーム <topics-forms-index>` を複数のページ�
 `Wikipedia で解説されています`_ 。
 
 .. _explained on Wikipedia: http://en.wikipedia.org/wiki/Wizard_%28software%29
-.. _`Wikipedia で解説されています`: http://ja.wikipedia.org/wiki/ウィザード_%28ソフトウェア%29
+.. _`Wikipedia で解説されています`: http://ja.wikipedia.org/wiki/%E3%82%A6%E3%82%A3%E3%82%B6%E3%83%BC%E3%83%89_(%E3%82%BD%E3%83%95%E3%83%88%E3%82%A6%E3%82%A7%E3%82%A2)
 
 フォームウィザードの仕組み
 ============================

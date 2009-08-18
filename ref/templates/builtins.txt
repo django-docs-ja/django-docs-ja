@@ -557,7 +557,7 @@ regroup
 この難解なタグを説明するには、例を使うのが一番でしょう: 仮に、複数人の情報
 の入った ``people`` というリストがあり、各人の情報は ``first_name``,
 ``last_name``, および ``gender`` といったキーを持つ辞書で表されているとしま
-しょう::
+しょう:
 
 .. code-block:: python
 
@@ -616,7 +616,7 @@ regroup
 ます。 ``people`` が ``gender`` の順に並んで *いない* 場合、再グループは何
 も考えずに一つの性別のグループを複数つくってしまいます。例えば、 ``people``
 が以下のように (``'Male'`` がリスト内でまとまっていない状態に) なっていたと
-しましょう::
+しましょう:
  
 .. code-block:: python
 
@@ -775,14 +775,14 @@ DRY 則の侵犯を避けられます::
 
 .. versionadded:: 1.0
 
-URL を表示せず、取り出したいだけなら、以下のような形式で呼び出せます:
+URL を表示せず、取り出したいだけなら、以下のような形式で呼び出せます::
 
     {% url path.to.view arg, arg2 as the_url %}
     
     <a href="{{ the_url }}">I'm linking to {{ the_url }}</a>
     
 ``{% url ... as var %}`` の形式は、 URL からビューを解決できなくてもエラー
-を送出 *しません* 。従って、ビューへのリンクは以下のようにも書けます:
+を送出 *しません* 。従って、ビューへのリンクは以下のようにも書けます::
 
     {% url path.to.view as the_url %}
     {% if the_url %}
@@ -953,7 +953,7 @@ dictsort
 
     {{ value|dictsort:"name" }}
 
-``value`` が以下のようだったとします::
+``value`` が以下のようだったとします:
 
 .. code-block:: python
 
@@ -963,7 +963,7 @@ dictsort
         {'name': 'joe', 'age': 31},
     ]
 
-出力は以下のようになるでしょう。::
+出力は以下のようになるでしょう。:
 
 .. code-block:: python
 

@@ -546,11 +546,8 @@ Django には ``django-admin.py makemessages`` というツールが付属して
 
     django-admin.py makemessages -l=de -e=html,txt -e xml
 
-`JavaScript の翻訳カタログ`_ を生成したいのなら、 ``-e js`` **ではなく**
-'djangojs' ドメインを使ってください。
-
-.. _create a JavaScript translation catalog: `Creating JavaScript translation catalogs`_
-.. _`JavaScript の翻訳カタログ`: `create a JavaScript translation catalog`_
+`JavaScript の翻訳カタログ <topics-i18n-creating-javascript-catalog>`_ を生
+成したいのなら、 ``-e js`` **ではなく** 'djangojs' ドメインを使ってください。
 
 .. admonition:: gettext がなかったら?
 
@@ -563,7 +560,7 @@ Django には ``django-admin.py makemessages`` というツールが付属して
  
    Windows を使っていて、 ``django-admin compilemessages`` を動作させるため
    に GNU gettext ユーティリティをインストールたいのなら、
-   `gettext on Windows`_ を参照してください。
+   :ref:`topics-i18n-windows-gettext` を参照してください。
 
 ``.po`` ファイルは素直な形式で書かれています。 ``.po`` ファイルには翻訳メン
 テナのコンタクト情報のようなわずかなメタデータが入っています。それ以外の大
@@ -639,7 +636,7 @@ Django には ``django-admin.py makemessages`` というツールが付属して
  
    Windows を使っていて、 ``django-admin compilemessages`` を動作させるため
    に GNU gettext ユーティリティをインストールたいのなら、
-   `gettext on Windows`_ を参照してください。
+   :ref:`topics-i18n-windows-gettext` を参照してください。
 
 .. _`3. How Django discovers language preference`:
 
@@ -1028,6 +1025,8 @@ JavaScript で動いており、中では何度も正規表現置換を行って
 Python の文字列補完ほど高速ではないので、本当に必要な場合 (例えば
 ``ngettext`` を使って適切な複数形表現を実現したい場合) だけにしてください。
 
+.. _topics-i18n-creating-javascript-catalog:
+
 JavaScript の翻訳カタログを作成する
 -----------------------------------
 
@@ -1057,6 +1056,8 @@ Django 翻訳の特徴
     * Django は ``xgettext`` を単体では使いません。 Django では、
       ``xgettext`` や ``msgfmt`` を Python ラッパ越しに使います。これは便宜
       上の理由によります。
+
+.. _topics-i18n-windows-gettext:
 
 Windows で ``gettext`` を使う
 ==============================

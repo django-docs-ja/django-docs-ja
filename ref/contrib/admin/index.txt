@@ -679,7 +679,7 @@ actions_on_bottom = False``).
 
 Path to a custom template that will be used by the model objects "change list"
 view. Templates can override or extend base admin templates as described in
-`Overriding Admin Templates`_.
+`Overriding Admin Templates <#ref-contrib-admin-overriding-admin-templates>`_.
 
 If you don't specify this attribute, a default template shipped with Django
 that provides the standard appearance is used.
@@ -688,7 +688,7 @@ that provides the standard appearance is used.
 
 Path to a custom template that will be used by both the model object creation
 and change views. Templates can override or extend base admin templates as
-described in `Overriding Admin Templates`_.
+described in `Overriding Admin Templates <#ref-contrib-admin-overriding-admin-templates>`_.
 
 If you don't specify this attribute, a default template shipped with Django
 that provides the standard appearance is used.
@@ -697,7 +697,7 @@ that provides the standard appearance is used.
 
 Path to a custom template that will be used by the model object change history
 display view. Templates can override or extend base admin templates as
-described in `Overriding Admin Templates`_.
+described in `Overriding Admin Templates <#ref-contrib-admin-overriding-admin-templates>`_.
 
 If you don't specify this attribute, a default template shipped with Django
 that provides the standard appearance is used.
@@ -707,7 +707,7 @@ that provides the standard appearance is used.
 Path to a custom template that will be used by the view responsible of showing
 the confirmation page when the user decides to delete one or more model
 objects. Templates can override or extend base admin templates as described in
-`Overriding Admin Templates`_.
+`Overriding Admin Templates <#ref-contrib-admin-overriding-admin-templates>`_.
 
 If you don't specify this attribute, a default template shipped with Django
 that provides the standard appearance is used.
@@ -1154,6 +1154,8 @@ Django は、 ``InlineModelAdmin`` のサブクラスとして、以下の二つ
 同じです。詳しくは :ref:`contenttypes のドキュメント
 <ref-contrib-contenttypes>` を参照してください。
 
+.. _ref-contrib-admin-overriding-admin-templates:
+
 admin テンプレートのオーバライド
 ==================================
 
@@ -1290,13 +1292,14 @@ provided, a default instance name of ``admin`` will be used.
 
 Path to a custom template that will be used by the admin site main index view.
 Templates can override or extend base admin templates as described in
-`Overriding Admin Templates`_.
+`Overriding Admin Templates <#ref-contrib-admin-overriding-admin-templates>`_.
 
 .. attribute:: AdminSite.login_template
 
 Path to a custom template that will be used by the admin site login view.
 Templates can override or extend base admin templates as described in
-`Overriding Admin Templates`_.
+`Overriding Admin Templates <#ref-contrib-admin-overriding-admin-templates>`_.
+
 
 URLconf に ``AdminSite`` インスタンスをフックする
 ---------------------------------------------------

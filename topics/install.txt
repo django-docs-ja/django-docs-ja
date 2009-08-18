@@ -55,7 +55,7 @@ Django は WSGI_ 仕様に従っているので、他にも様々なサーバプ
 `サーバ構成に関する wiki ページ`_ を参照してください。
 
 .. _Apache: http://httpd.apache.org/
-.. _mod_python: http://www.modpython.org/
+.. _mod_wsgi: http://code.google.com/p/modwsgi/
 .. _WSGI: http://www.python.org/peps/pep-0333.html
 .. _`サーバ構成に関する wiki ページ`: http://code.djangoproject.com/wiki/ServerArrangements
 .. _server-arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements

@@ -13,10 +13,8 @@ Python プログラマのための Django テンプレート言語ガイド
 
 Django テンプレートシステムを他のアプリケーションの部品として使いたい場合、
 すなわち Django フレームワークの他の部分は必要ない場合、このドキュメントの
-後の方にある `設定`_ の節に必ず目を通して下さい。
-
-.. _configuration: `configuring the template system in standalone mode`_
-.. _`設定`: configuration_
+後の方にある `設定 <#ref-templates-configuring-standalone>`_ の節に必ず目を
+通して下さい。
 
 基礎
 ====
@@ -612,6 +610,8 @@ Django はテンプレートローダを :setting:`TEMPLATE_LOADERS` 設定の�
 :func:`~django.shortcuts.render_to_response()` ショートカットも参照してくだ
 さい。このショートカットは、結果を ``HttpResponse`` に入れて、ビューからレ
 ンダ内容を直接返せるようにしています。
+
+.. _ref-templates-configuring-standalone:
 
 テンプレートシステムをスタンドアロンモードに設定する
 ====================================================

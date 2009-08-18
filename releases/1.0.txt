@@ -135,7 +135,7 @@ Hoerner そして Travis Pinney に深く感謝します。
 詳しくは http://geodjango.org/ を参照してください。
 
 .. _Geographic Information Systems: http://en.wikipedia.org/wiki/Geographic_information_system
-.. _`地理情報システム`: http://ja.wikipedia.org/wiki/地理情報システム
+.. _`地理情報システム`: http://ja.wikipedia.org/wiki/%E5%9C%B0%E7%90%86%E6%83%85%E5%A0%B1%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0
 
 プラガブルなファイルストレージ機構
 -----------------------------------

@@ -182,9 +182,9 @@ Django 0.96 は 1000 以上の新規コミットと、 400 以上のバグフィ
 はやめて、新たなフォームから学び始めましょう。
 
 ``django.newforms`` の詳細は 
-`newforms のドキュメント <../newforms/>`_ を参照してください。
-
-.. _newforms documentation: http://www.djangoproject.com/documentation/0.96/newforms/
+`newforms のドキュメント
+<http://www.djangoproject.com/documentation/0.96/newforms/`_ を参照してくだ
+さい。
 
 .. _URLconf improvements:
 
@@ -244,16 +244,17 @@ URLconf のコールバックに呼出し可能オブジェクトを使えるよ
 ビューのテストもできます。
 
 また、「フィクスチャ」のサポートも追加されました。フィクスチャは Django の
-サポートする `シリアライゼーション形式 <../serialization/>`_ で保存された初
-期データで、テストの開始時に自動的にデータベースにロードされます。フィクス
-チャによって、実際のデータを使ったテストが一層簡単になります。
+サポートする `シリアライゼーション形式
+<http://www.djangoproject.com/documentation/0.96/serialization/>`_ で保存さ
+れた初期データで、テストの開始時に自動的にデータベースにロードされます。フィ
+クスチャによって、実際のデータを使ったテストが一層簡単になります。
 
-詳しくは `テストのドキュメント <../testing/>`_ を参照してください。
+詳しくは `テストのドキュメント
+<http://www.djangoproject.com/documentation/0.96/testing/>`_ を参照してくだ
+さい。
 
 .. _doctest: http://docs.python.org/lib/module-doctest.html
 .. _unittest: http://docs.python.org/lib/module-unittest.html
-.. _the testing documentation: http://www.djangoproject.com/documentation/0.96/testing/
-.. _serialization formats: http://www.djangoproject.com/documentation/0.96/serialization/
 
 .. _Improvements to the admin interface:
 

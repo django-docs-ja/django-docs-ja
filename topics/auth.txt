@@ -769,7 +769,7 @@ Django のビュー関数を対応づけておかねばなりません。例え�
         
     編集の雛型にできるような :file:`registration/login.html` テンプレートの
     例を以下に示します。このテンプレートは、 ``content`` ブロックの定義された
-    :file:`base.html` があるという前提で書かれています::
+    :file:`base.html` があるという前提で書かれています:
 
     .. code-block:: html
 
@@ -1231,7 +1231,7 @@ API リファレンス
 
 現在のログインユーザは、 :class:`~django.contrib.auth.models.User` インスタ
 ンスであっても :class:`~django.contrib.auth.models.AnonymousUser` インスタ
-ンスであっても、テンプレート変数 ``{{ user }}`` に入ります::
+ンスであっても、テンプレート変数 ``{{ user }}`` に入ります:
 
 .. code-block:: html
 
@@ -1267,7 +1267,7 @@ being used.
 
     {{ perms.foo.can_vote }}
 
-こうして、テンプレート内で ``{% if %}`` 文を使ってチェックを行えます::
+こうして、テンプレート内で ``{% if %}`` 文を使ってチェックを行えます:
 
 .. code-block:: html
 
@@ -1340,7 +1340,7 @@ being used.
 :class:`~django.template.context.RequestContext` を使うと、現在のログインユー
 ザとそのメッセージを :ref:`テンプレート変数 <ref-templates-api>` 
 ``{{ messages }}`` として使えます。メッセージを表示するためのテンプレートコー
-ド例を示します::
+ド例を示します:
 
 .. code-block:: html
 

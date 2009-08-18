@@ -4,7 +4,7 @@
 Django ドキュメント
 ====================
 
-:revision-up-to: 9084 (1.0)
+:revision-up-to: 11321 (1.1)
 
 .. rubric:: Django を使いこなすための全てがここにあります。
 
@@ -63,7 +63,6 @@ Django ドキュメント
       :ref:`その 2 <intro-tutorial02>` |
       :ref:`その 3 <intro-tutorial03>` |
       :ref:`その 4 <intro-tutorial04>`
-
 
 モデル層
 =========

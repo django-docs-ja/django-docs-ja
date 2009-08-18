@@ -888,8 +888,8 @@ Feed クラスリファレンス
     
     これ以外のキーワード引数を ``__init__`` に渡すと、 ``self.feed`` に保存
     されます。使い方は 
-    `カスタムのフィードジェネレータ <custom feed generators>`_ を参照してく
-    ださい。
+    `カスタムのフィードジェネレータ
+    <#ref-contrib-syndication-custom-feed-generator>`_ を参照してください。
 
     パラメタは全て Unicode オブジェクトで指定します。ただし、
     ``categories`` は Unicode オブジェクトのリストです。
@@ -918,8 +918,8 @@ Feed クラスリファレンス
         * ``ttl``
 
     それ以外のキーワード引数は
-    `カスタムのフィードジェネレータ <custom feed generators>`_ 用に保存され
-    ます。
+    `カスタムのフィードジェネレータ
+    <#ref-contrib-syndication-custom-feed-generator>`_ 用に保存されます。
 
     パラメタには Unicode オブジェクトを指定します。ただし:
 
@@ -957,6 +957,8 @@ Feed クラスリファレンス
 .. _Python datetime object: http://www.python.org/doc/current/lib/module-datetime.html
 .. _`Python datetime 型オブジェクト`: `Python datetime object`_
 
+.. _ref-contrib-syndication-custom-feed-generator:
+
 カスタムのフィードジェネレータ
 ---------------------------------
 
@@ -965,17 +967,16 @@ Feed クラスリファレンス
 完全に独自の形式のフィードなら、 ``SyndicationFeed`` をサブクラス化して、
 ``write()`` および ``writeString()`` メソッドを完全に書き直すとよいでしょう。
 
-しかし、 (GeoRSS_ や Apple の 
-`iTunes podcast フォーマット <iTunes podcast format>`_ )のように、既存のフィー
-ドフォーマットから派生したものであれば、もっといい選択肢があります。この手
-の派生フォーマットは、元のフォーマットにエレメントや属性を追加していて、
-``SyndicationFeed`` のメソッドには、こうした追加の属性を取得するためのもの
-があります。ですから、適切なフィードクラス (``Atom1Feed`` や
+しかし、 (GeoRSS_ や Apple の `iTunes podcast フォーマット
+<http://www.apple.com/itunes/store/podcaststechspecs.html>`_ )のように、既
+存のフィードフォーマットから派生したものであれば、もっといい選択肢がありま
+す。この手の派生フォーマットは、元のフォーマットにエレメントや属性を追加し
+ていて、 ``SyndicationFeed`` のメソッドには、こうした追加の属性を取得するた
+めのものがあります。ですから、適切なフィードクラス (``Atom1Feed`` や
 ``Rss201rev2Feed``) をサブクラス化して、コールバックを拡張すればよいのです。
 拡張用のメソッドを以下に示します:
-      
+
 .. _georss: http://georss.org/
-.. _itunes podcast format: http://www.apple.com/itunes/store/podcaststechspecs.html
 
 ``SyndicationFeed.root_attributes(self, )``
     フィードのルート要素 (``feed``/``channel``) に追加する属性の入った

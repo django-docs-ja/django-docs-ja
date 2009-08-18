@@ -9,8 +9,8 @@
 アプリケーションを最初にセットアップするときに、データベースにハードコード
 されたデータを投入できると便利なことがあります。 Django に自動的に初期デー
 タを投入させる方法は二つあります: ひとつは `フィクスチャによる初期データの
-投入 <providing-initial-data-with-fixtures>`_ で、もう一つは `SQL による初
-期データの投入 <providing-initial-initial-sql-data>`_ です。
+投入 <#providing-initial-data-with-fixtures>`_ で、もう一つは `SQL による初
+期データの投入 <#providing-initial-initial-sql-data>`_ です。
 
 .. _providing-initial-data-with-fixtures:
 

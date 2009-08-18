@@ -341,7 +341,7 @@ Lets create a formset with the ability to delete::
 
 ビュー内でのフォームセットの扱いは簡単で、普通の ``Form`` クラスと同じよう
 に使うだけです。気をつけておかねばならないのは、テンプレート内で
-``management_form`` を使うという点です。ビューの例を以下に示します::
+``management_form`` を使うという点です。ビューの例を以下に示します:
 
 .. code-block:: python
 
@@ -389,7 +389,7 @@ Lets create a formset with the ability to delete::
 フォームとほとんど同じく動作します。つまり、 ``prefix`` を使ってフォームセッ
 トのフォームフィールド名にプレフィクスをつければ、複数のフォームセットを
 一つのビューに入れても問題なく動作するのです。複数のフォームセットがどのよ
-うに動作するか、以下の例で示しましょう::
+うに動作するか、以下の例で示しましょう:
 
 .. code-block:: python
 

@@ -786,7 +786,8 @@ reverse()
 .. function:: reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None)
 
 ``viewname`` は関数名 (関数への参照か、関数名の文字列表記で、
-``urlpatterns`` 上で使っている形式) または  `URL パターン名`_ です。通常、
+``urlpatterns`` 上で使っている形式) または  
+`URL パターン名 <naming-url-patterns>`_ です。通常、
 ``urlconf`` パラメタについて考える必要はなく、以下のように、固定引数とキー
 ワード引数だけを指定して url マッチングを行います::
 
@@ -794,9 +795,6 @@ reverse()
 
     def myview(request):
         return HttpResponseRedirect(reverse('arch-summary', args=[1945]))
-
-.. _URL pattern name: `Naming URL patterns`_
-.. _`URL パターン名`: `URL pattern name`_
 
 ``reverse()`` 関数は大抵の正規表現パターンを URL に逆変換できますが、全てと
 は限りません。今のところ、パターン中に垂直バー (``"|"``) を含められません。

@@ -81,10 +81,8 @@ JavaScript ファイルを特定して、それらのファイル名のリスト
 出力媒体ごとの CSS ファイル要件を定義した辞書です。
 
 この辞書の値はメディアファイル名を列挙したタプルまたはリストです。メディア
-ファイルのパスを指定する方法は `メディアパスの節`_ を参照してください。
-
-.. _the section on media paths: `Paths in media definitions`_
-.. _`メディアパスの節`: `the section on media paths`_
+ファイルのパスを指定する方法は `メディアパスの節
+<ref-forms-paths-in-media-definitions>`_ を参照してください。
 
 キーは出力媒体の名前です。このキーは、 CSS ファイルのメディアタイプ宣言で使
 われるのと同じ、すなわち  'all', 'aural', 'braille', 'embossed',
@@ -195,6 +193,8 @@ CSS ファイルのリストを指定してください。以下の例では、�
 
 動的なメディアプロパティの戻り値を構築するための詳しい方法は、 
 `Media オブジェクト`_ の節を参照してください。
+
+.. _ref-forms-paths-in-media-definitions:
 
 メディア定義のパス
 --------------------

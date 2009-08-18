@@ -12,7 +12,7 @@ Web アプリケーションの作成は、同じパターンを何度も何度�
 を使えば、オブジェクトを操作するためによく使うビューを、 Python コードを一
 切書かずに作成できます。
 
-汎用ビューの全般的な解説は、 :ref:`汎用ビューの概要 <topic-generic-views>`
+汎用ビューの全般的な解説は、 :ref:`汎用ビューの概要 <topics-generic-views>`
 にあります。
 
 This reference contains details of Django's built-in generic views, along with
@@ -708,10 +708,11 @@ string is written as ``"%7Ejacob/"`` (with only a single ``%``), an exception wo
       ``paginate_by`` 個のオブジェクトに分割します。ビューは (``GET`` を介
       して渡される) クエリ文字列パラメタか、 URLconf で指定した変数
       ``page`` を引数にとります。詳しくは下記の
-      「 `pagination に関する注意`_ 」を参照してください。
+      「 `pagination に関する注意 <#ref-genericview-notes-on-paginateion>`_ 」を参照してください。
 
     * ``page``: 現在のページ番号を指定する 1 から始まる整数値か、文字列
-      ``'last'`` です。詳しくは下記の「 `pagination に関する注意`_ 」を参照
+      ``'last'`` です。詳しくは下記の「 `pagination に関する注意
+      <#ref-genericview-notes-on-paginateion>`_ 」を参照
       してください。
 
     * ``template_name``: ページのレンダリングに使うテンプレートの完全な名前
@@ -771,6 +772,7 @@ string is written as ``"%7Ejacob/"`` (with only a single ``%``), an exception wo
 
     * ``page_obj``: ``django.core.paginator.Page`` のインスタンスです。
 
+.. _ref-genericview-notes-on-paginateion:
 
 ペジネーションに関する注意
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -115,6 +115,8 @@ Django に脆弱性が発見された場合、私達は以下のように行動�
       ウンスします。通常は新たなバージョンの Django リリースを意味しますが、
       場合によっては現在のリリースに対する単なるパッチになります。
 
+.. _internals-contributing-submitting-patches:
+
 パッチの提出
 ==================
 
@@ -181,7 +183,9 @@ Django の内部に関する知識、時間的な余裕から) 必要な修正�
 パッチ形式
 -----------
 
-    * Django の `コーディングスタイル`_ に従っているか確認してください。
+    * Django の `コーディングスタイル
+      <#internals-contributing-coding-styles>`_ に従っているか確認してくださ
+      い。
 
     * ``svn diff`` コマンドの返す書式のパッチを提出してください。ただし、コー
       ドよりも英語で変更点を説明した方がはるかに分かりやすい場合は例外です。
@@ -290,7 +294,8 @@ stage)」というフィールドに関わる作業です。このステージ�
 かを示します:
 
     「パッチあり (has patch)」
-        チケットに `パッチ`_ が添付されていることを示します。
+        チケットに `パッチ <#internals-contributing-submitting-patches>`_ が
+        添付されていることを示します。
         このフラグのついたパッチはトリアージ担当者によってレビューされ、条
         件を満たした「よいパッチ」であるかどうか調べられます。
 
@@ -341,12 +346,6 @@ stage)」というフィールドに関わる作業です。このステージ�
 トリアージ作業でミスが起きている -- 場合には、そのチケットを再度開いて
 (reopen)、その理由を記載してください。また、コア開発者が "wontfix" にマーク
 したチケットを reopen しないでください。
-
-
-.. _required details: `Reporting bugs`_
-.. _good patch: `Patch style`_
-.. _patch: `Submitting patches`_
-.. _パッチ: `Patch style`_
 
 一般コミュニティメンバによるトリアージ
 ----------------------------------------
@@ -438,6 +437,8 @@ admin サイトやバリデータのエラーメッセージなど、Django は�
 
 .. _Django i18n mailing list: http://groups.google.com/group/django-i18n/
 .. _`Django i18n メーリングリスト`: `Django i18n mailing list`_
+
+.. _internals-contributing-coding-styles:
 
 コードの書き方
 ====================
@@ -624,7 +625,7 @@ admin サイトやバリデータのエラーメッセージなど、Django は�
 一般的な改善や API の変更は、 ".. versionchanged:: X.Y" ディレクティブで強
 調します（フォーマットは ``versionadded`` と同じです）。
 
-:ref:`Django のドキュメントシステム <internal-documentation>` のページには、
+:ref:`Django のドキュメントシステム <internals-documentation>` のページには、
 詳しい情報が書かれています。ドキュメントを書き始めるまえに、必ず一読してく
 ださい。
 

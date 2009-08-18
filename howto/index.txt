@@ -31,9 +31,9 @@ HOWTO ガイド
 
 .. seealso::
 
-    `Django のコミュニティアグリゲータ <Django community aggregator>`_ には、
+    `Django のコミュニティアグリゲータ
+    <http://www.djangoproject.com/community/>`_ には、
     世界中の Django コミュニティから寄せられたコンテンツが収集されています。
     アグリゲータに登録されている著者の多くが、この手の HOWTO 文書を書いてい
     ます。
     
-    .. _django community aggregator: http://www.djangoproject.com/community/

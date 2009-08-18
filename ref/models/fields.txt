@@ -12,8 +12,8 @@
 .. currentmodule:: django.db.models
 
 このドキュメントは、 Django が提供している 
-`フィールドのオプション <common-model-field-options>`_ や
-`フィールド型 <model-field-types>`_ の雑多で細かい解説です。
+`フィールドのオプション <#common-model-field-options>`_ や
+`フィールド型 <#model-field-types>`_ の雑多で細かい解説です。
 
 .. seealso:: 
 

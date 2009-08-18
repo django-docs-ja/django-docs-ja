@@ -63,8 +63,8 @@
       いずれかのフィールドではなく、(``__all__`` という名の) 特殊な「フィー
       ルド」に関連づけられます。エラーは ``non_field_errors()`` でアクセス
       できます。エラーをフォームの特定のフィールドに関連付けたいのなら、
-      `後で解説 <described later>`_ する、フォームの ``_errors`` 属性にアク
-      セスする必要があります。
+      `後で解説 <#ref-forms-form-subclass>`_ する、フォームの ``_errors``
+      属性にアクセスする必要があります。
 
 上に挙げたメソッドは、各フィールドごとに一度づつ、上に挙げた順に呼び出され
 ます。すなわち、フォームの各フィールドについて、 (フォーム定義で宣言した順
@@ -90,6 +90,7 @@ Examples of each of these methods are provided below.
 調べる必要があるということです。
 
 .. _described later:
+.. _ref-forms-form-subclass:
 
 Form subclasses and modifying field errors
 ------------------------------------------

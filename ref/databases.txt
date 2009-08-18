@@ -192,11 +192,10 @@ Django から利用できる MySQL の全ての機能を使うには、 バー�
 カラムのコレーション設定は、データの保存方法や、文字列の等価性の定義を制御
 しています。コレーションはデータベース全体でも、テーブル単位でも、カラム単
 位でも設定できます。コレーションの詳細は MySQL のドキュメントで 
-`詳しく解説されています <documented thoroughly>`_ 。いずれの場合でも、コレー
-ションの設定は直接データベーステーブルに対して行ってください。 Django はモ
-デル定義でコレーションを設定する方法を提供していません。
-
-.. _documented thoroughly: http://dev.mysql.com/doc/refman/5.0/en/charset.html
+`詳しく解説されています
+<http://dev.mysql.com/doc/refman/5.0/en/charset.html>`_ 。いずれの場合でも、
+コレーションの設定は直接データベーステーブルに対して行ってください。 Django
+はモデル定義でコレーションを設定する方法を提供していません。
 
 デフォルトの構成では、 MySQL は UTF-8 のデータベースに対して
 ``utf8_general_ci_swedish`` コレーションを使います。この設定では、全ての文
@@ -225,11 +224,11 @@ MySQLdb 1.2.1p2 を使っているなら、コレーションを ``utf8_bin`` �
 今度は :class:`~django.db.models.TextField` が (Python 標準モジュール
 ``array`` の) ``array.array`` を返します。データをデータベースから読み出す
 ときに、変換に必要な情報が手にはいらないので、 Django 側ではどうしようもあ
-りません。
-この問題は `MySQLdb 1.2.2 で解決済み <fixed in MySQLdb 1.2.2>`_ なので、
-``itf8_bin`` コレーションで :class:`~django.db.models.TextField` を使いたけ
-れば、バージョンを 1.2.2 に上げて、バイト文字列として扱うよう勧めます (それ
-ほど難しくはありません)。
+りません。この問題は `MySQLdb 1.2.2 で解決済み
+<http://sourceforge.net/tracker/index.php?func=detail&aid=1495765&group_id=22307&atid=374932>`_
+なので、 ``itf8_bin`` コレーションで :class:`~django.db.models.TextField`
+を使いたければ、バージョンを 1.2.2 に上げて、バイト文字列として扱うよう勧め
+ます (それほど難しくはありません)。
 
 MySQLdb 1.2.1p2 で ``utf8_bin`` コレーションの設定されたテーブルを使うのな
 ら、 :class:`django.contrib.sessions.models.Session` のテーブル

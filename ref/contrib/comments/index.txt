@@ -181,7 +181,7 @@ details.
     </form>
 
 このアプローチをとるときには、いくつか考慮すべき点があります。後述の
-`コメントフォームに関する注意 <notes-on-the-comment-form>`_ をよく読んでく
+`コメントフォームに関する注意 <#notes-on-the-comment-form>`_ をよく読んでく
 ださい。
 
 .. templatetag:: comment_form_target
@@ -236,7 +236,7 @@ you can include a hidden form input called ``next`` in your comment form. For ex
       うときにも、同じようにしてください。
     
 .. _honeypot: http://en.wikipedia.org/wiki/Honeypot_(computing)
-.. _ハニーポット: http://ja.wikipedia.org/wiki/ハニーポット
+.. _ハニーポット: http://ja.wikipedia.org/wiki/%E3%83%8F%E3%83%8B%E3%83%BC%E3%83%9D%E3%83%83%E3%83%88
 
 その他の情報
 ==============

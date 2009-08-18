@@ -159,6 +159,8 @@ Django によって提供されているはずです。 Django の URLconf は `
 Django で作られたサイトを mod_python 上で運営している場合、 Python コードに
 対して変更を加える度に Apache を再起動する必要があります。
 
+.. _multiple-django-installation-on-the-same-apache:
+
 ひとつの Apache に複数の Django をインストールする
 ==================================================
 
@@ -318,7 +320,7 @@ Django を Python egg_ でインストールしたり、 Django から egg 化�
 
 次に、 mod_python の PythonImport_ ディレクティブを使って、 mod_python が一
 番最初にこのファイルを import するよう指定します。まず、前述の
-「 `ひとつの Apache で複数の Django を使う`_ 」の節で説明した
+「 :ref:`multiple-django-installation-on-the-same-apache` 」の節で説明した
 ``PythonInterpreter`` ディレクティブを設定しておきます (複数の Django をイ
 ンストールしない場合でも必要です)。
 次に、メインのサーバ設定 (``Location`` や ``VirtualHost`` セクションの外)
@@ -337,7 +339,6 @@ Python パスを変更する操作がまだ完了していないからです。
 .. _PythonImport: http://www.python.jp/doc/contrib/modpython/dir-other-pimp.html
 .. _mod_python manual: PythonImport_
 .. _`mod_python マニュアル`: `mod_python manual`_
-.. _`ひとつの Apache で複数の Django を使う`: `Multiple Django installations on the same Apache`_
 
 エラー処理
 ==========
