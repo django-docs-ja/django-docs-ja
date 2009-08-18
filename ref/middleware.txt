@@ -129,18 +129,10 @@ gzip 圧縮を受け付けるブラウザ (最近のほとんどのブラウザ�
 
 .. class:: django.middleware.http.SetRemoteAddrFromForwardedFor
 
-``request.META['HTTP_X_FORWARDED_FOR']`` が設定されていた場合、その値に基づ
-いて ``request.META['REMOTE_ADDR']`` をセットします。サーバがリバースプロキ
-シの向こうにあるためにリクエストの ``REMOTE_ADDR`` が ``127.0.0.1`` にセッ
-トされてしまう場合に便利です。
+.. versionchanged: 1.1
 
-**注意事項:** このミドルウェアは ``HTTP_X_FORWARDED_FOR`` を検証 
-**しません** ``HTTP_X_FORWARDED_FOR`` を自動的に設定するリバースプロキシ
-を経由していない場合には、このミドルウェアを使ってはなりません。なぜなら、
-``HTTP_X_FORWARDED_FOR`` の値はだれでも簡単に偽装できるので、このミドルウェ
-アが ``REMOTE_ADDR`` に基づいて ``HTTP_X_FORWARDED_FOR`` を設定すると、誰も
-が "偽の" IP アドレスを名乗れてしまうからです。このミドルウェアを使ってよい
-のは、 ``HTTP_X_FORWARDED_FOR`` の値を完全に信用できる場合だけです。
+This middleware was removed in Django 1.1. See :ref:`the release notes
+<removed-setremoteaddrfromforwardedfor-middleware>` for details.
 
 ロケールミドルウェア
 ---------------------

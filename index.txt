@@ -1,8 +1,8 @@
 .. _index:
 
-====================
+===================
 Django ドキュメント
-====================
+===================
 
 :revision-up-to: 11321 (1.1)
 
@@ -10,49 +10,42 @@ Django ドキュメント
 
 .. admonition:: 和訳について
 
-    このドキュメントは、 `Django の標準ドキュメント`_ の和訳です。
-    現在、和訳は Yasushi Masuda によって進められており、 Takanao Endoh
-    をはじめとする日本 Django ユーザ会の有志の手でメンテナンスされています。
-    和訳に関する問い合わせは、 
-    **Django プロジェクトのトラッカではなく** 、 Yasushi Masuda
-    (whosaysni-at-gmail.com) または django-ja メーリングリストにお寄せくだ
-    さい。
+    このドキュメントは、 `Django の標準ドキュメント`_ の和訳です。現在、和
+    訳は Yasushi Masuda によって進められており、 Takanao Endoh をはじめとす
+    る日本 Django ユーザ会の有志の手でメンテナンスされています。和訳に関す
+    る問い合わせは、 **Django プロジェクトのトラッカではなく** 、 Yasushi
+    Masuda (whosaysni-at-gmail.com) または django-ja メーリングリストにお寄
+    せください。
 
     .. _`Django の標準ドキュメント`: http://docs.djangoproject.com/
 
 助けを求める
-==============
+============
 
 困り事ですか？手を貸しましょう！
 
 * :ref:`FAQ <faq-index>` を探しましょう。よくある質問への答えなら、ここで見
   つかります。
 
-* 特定のトピックについて情報を探しているなら、 :ref:`genindex` や
-  :ref:`modindex` , :ref:`詳細目次 <contents>` を見てくだ
-  さい。
+* 特定のトピックについて情報を探しているなら、 :ref:`genindex` や 
+  :ref:`modindex` 、 :ref:`contents` を見てください。
 
-* `django-users メーリングリスト`_ でアーカイブ を探したり、 
-  `質問をポスト`_ してみましょう。
+* `django-users メーリングリストのアーカイブ`_ を探したり、
+  `質問をポスト`_ したりしてみましょう。
   
-* `IRC の #django チャネル`_ で質問したり、 `IRC のログ`_ を探してみましょ
-  う。
+* `IRC の #django チャネル`_ で質問したり、 `IRC のログ`_ を探したりしてみ
+  ましょう。
 
 * Django のバグを見つけたら、 `チケットトラッカ`_ で報告してください。
 
-.. _archives of the django-users mailing list: http://groups.google.com/group/django-users/
-.. _`django-users メーリングリスト`: `archives of the django-users mailing list`_
-.. _post a question: http://groups.google.com/group/django-users/
-.. _`質問をポスト`: `post a question`_
-.. _#django IRC channel: irc://irc.freenode.net/django
-.. _`IRC の #django チャネル`: `#django IRC channel`_
-.. _IRC logs: http://oebfare.com/logger/django/
-.. _`IRC のログ`: `IRC logs`_
-.. _ticket tracker: http://code.djangoproject.com/
-.. _`チケットトラッカ`: `ticket tracker`_
+.. _`django-users メーリングリストのアーカイブ`: http://groups.google.com/group/django-users/
+.. _`質問をポスト`: http://groups.google.com/group/django-users/
+.. _`IRC の #django チャネル`: irc://irc.freenode.net/django
+.. _`IRC のログ`: http://oebfare.com/logger/django/
+.. _`チケットトラッカ`: http://code.djangoproject.com/
 
 最初のステップ
-===================
+==============
 
     * **何もないところから始めるなら:**
       :ref:`概要 <intro-overview>` |
@@ -65,7 +58,7 @@ Django ドキュメント
       :ref:`その 4 <intro-tutorial04>`
 
 モデル層
-=========
+========
 
     * **モデルとは:**
       :ref:`Model の定義方法 <topics-db-models>` |
@@ -93,7 +86,7 @@ Django ドキュメント
       :ref:`初期データを投入するには <howto-initial-data>`
 
 テンプレート層
-==================
+==============
 
     * **デザイナ向けの情報:**
       :ref:`テンプレートの書き方 <topics-templates>` |
@@ -104,7 +97,7 @@ Django ドキュメント
       :ref:`タグやフィルタを自作するには <howto-custom-template-tags>`
 
 ビュー層
-==============
+========
 
     * **ビューの基本:**
       :ref:`URLconf とは <topics-http-urls>` |
@@ -133,7 +126,7 @@ Django ドキュメント
       :ref:`組み込みのミドルウェアクラス <ref-middleware>`
 
 フォーム
-==========
+========
 
     * **フォームの基礎:**
       :ref:`フォーム機能の概要 <topics-forms-index>` |
@@ -152,7 +145,7 @@ Django ドキュメント
       :ref:`フォームウィザード <ref-contrib-formtools-form-wizard>`
 
 アプリケーション開発のツール
-=============================
+============================
 
     * **設定:**
       :ref:`設定ファイルとは <topics-settings>` |
@@ -174,7 +167,7 @@ Django ドキュメント
       :ref:`エラーの発生をメールで追跡するには <howto-error-reporting>`
 
 その他の Django 付属の機能
-============================
+==========================
 
     * :ref:`管理サイト <ref-contrib-admin>` | 
       :ref:`管理アクションを組み込むには <ref-contrib-admin-actions>`
@@ -205,7 +198,7 @@ Django ドキュメント
     * :ref:`Web デザイナーのためのヘルパ <ref-contrib-webdesign>`
 
 オープンソースプロジェクトとしての Django 
-===========================================
+=========================================
 
     * **開発コミュニティ:**
       :ref:`開発に参加するには <internals-contributing>` |
@@ -226,7 +219,6 @@ Django ドキュメント
       :ref:`リリースノート一覧 <releases-index>` | `互換性のない変更`_ |
       :ref:`不要な機能の撤廃・削除スケジュール <internals-deprecation>`
 
-.. _`互換性のない変更`: `Backwards-incompatible changes`_
-.. _Backwards-incompatible changes: http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
+.. _`互換性のない変更`: http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
 
 

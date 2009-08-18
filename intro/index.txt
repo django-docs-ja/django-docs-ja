@@ -1,12 +1,12 @@
 .. _intro-index:
 
 さあ始めましょう
-==================
+================
 
 :revision-up-to: 11321 (1.1)
 
-Django は初めてですか？ Web 開発全般も？なら、ここに来て正解ですね。
-ここにあるドキュメントを読んで、行動に移してみましょう。
+Django は初めてですか？ Web 開発全般も？なら、ここに来て正解ですね。ここに
+あるドキュメントを読んで、行動に移してみましょう。
 
 .. toctree::
    :maxdepth: 1
@@ -41,14 +41,11 @@ Django は初めてですか？ Web 開発全般も？なら、ここに来て�
 	を訪れてみてください。
 
         日本語で書かれた Python の書籍を探しているなら、	
-	http://wiki.python.org/moin/JapanesePythonBooks をチェックしてみて
-	もよいでしょう。
+	http://wiki.python.org/moin/JapanesePythonBooks もチェックしてみて
+	ください。
     
     .. _python: http://python.org/
-    .. _list of Python resources for non-programmers: http://wiki.python.org/moin/BeginnersGuide/NonProgrammers
-    .. _`非プログラマのための Python リソース一覧`: `list of Python resources for non-programmers`_
+    .. _`非プログラマのための Python リソース一覧`: http://wiki.python.org/moin/BeginnersGuide/NonProgrammers
     .. _dive into python: http://diveintopython.org/
-    .. _dead-tree version: http://www.amazon.com/exec/obidos/ASIN/1590593561/ref=nosim/jacobian20
-    .. _`木を伐って作ったヤツ`: `dead-tree version`_
-    .. _books about Python: http://wiki.python.org/moin/PythonBooks
-    .. _`Python の本`: `books about Python`_
+    .. _`木を伐って作ったヤツ`: http://www.amazon.com/exec/obidos/ASIN/1590593561/ref=nosim/jacobian20
+    .. _`Python の本`: http://wiki.python.org/moin/PythonBooks
