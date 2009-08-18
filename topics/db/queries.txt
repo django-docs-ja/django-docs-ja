@@ -1,12 +1,10 @@
 .. _topics-db-queries:
 
-.. _Making queries:
-
 =================
 クエリを生成する
 =================
 
-:revision-up-to: 9084 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 .. currentmodule:: django.db.models
 
@@ -43,11 +41,12 @@
         body_text = models.TextField()
         pub_date = models.DateTimeField()
         authors = models.ManyToManyField(Author)
+        n_comments = models.IntegerField()
+        n_pingbacks = models.IntegerField()
+        rating = models.IntegerField()
 
         def __unicode__(self):
             return self.headline
-
-.. _Creating objects:
 
 オブジェクトの生成
 ==================
@@ -82,8 +81,6 @@ Django では、データベーステーブル上のデータを Python オブ�
 
     ワンステップでオブジェクトを生成して保存するには ``create`` メソッドを
 
-.. _Saving changes to objects:
-
 オブジェクトへの変更を保存する
 ==============================
 
@@ -98,8 +95,6 @@ Django では、データベーステーブル上のデータを Python オブ�
 
 この例では、背後で ``UPDATE`` SQL 文が実行されています。 Django は明示的に
 ``save()`` を呼び出すまでデータベースを操作しません。
-
-.. _Saving ForeignKey and ManyToManyField fields:
 
 ``ForeignKey`` や ``ManyToManyField`` の保存
 ---------------------------------------------
@@ -120,8 +115,6 @@ Django では、データベーステーブル上のデータを Python オブ�
 
 間違った型のオブジェクトを外部キーに代入したり ``add()`` したりすると
 Django はエラーを出します。
-
-.. _Retrieving objects:
 
 オブジェクトの取得
 ==================
@@ -158,8 +151,6 @@ Django はエラーを出します。
 のように振舞います。例えば、初期クエリセットである ``Blog.objects`` には、
 データベース上の全ての ``Blog`` オブジェクトが入っています。
 
-.. _Retrieving all objects:
-
 全てのオブジェクトの取得
 ------------------------
 
@@ -176,8 +167,6 @@ Django はエラーを出します。
 ``Entry.objects`` と書かないのでしょうか？それは、ルートのクエリセットであ
 る ``Entry.objects`` が特別扱いされていて、値評価できないようになっているか
 らです。 ``all()`` メソッドは、値評価 *できる* クエリセットを返します。
-
-.. _Retrieving specific objects with filters:
 
 フィルタを使ってオブジェクトを取り出す
 ----------------------------------------
@@ -211,7 +200,6 @@ Django はエラーを出します。
 したい場合だけです。)
 
 .. _chaining-filters:
-.. _Chaining filters:
 
 フィルタの連鎖
 ~~~~~~~~~~~~~~
@@ -233,7 +221,6 @@ Django はエラーを出します。
 インのうち、 January 1, 2005 から今日までの間に公開されたエントリです。
 
 .. _filtered-querysets-are-unique:
-.. _Filtered QuerySets are unique:
 
 フィルタしたクエリセットは一意なオブジェクトである
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -258,7 +245,6 @@ Django はエラーを出します。
 ません。
 
 .. _querysets-are-lazy:
-.. _QuerySets are lazy:
 
 クエリセットは遅延評価される
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -289,7 +275,6 @@ Django はエラーを出します。
 ください。
 
 .. _limiting-querysets:
-.. _Limiting QuerySets:
 
 クエリセットに制約を課す
 ------------------------
@@ -305,6 +290,8 @@ Django はエラーを出します。
 (``OFFSET 5 LIMIT 5`` に相当します)::
 
     >>> Entry.objects.all()[5:10]
+
+Negative indexing (i.e. ``Entry.objects.all()[-1]``) is not supported.
 
 一般に、クエリセットをスライスしてもクエリセットを新たに生成して返すだけで、
 クエリの評価は行いません。例外はスライス表記に「ステップ (step)」パラメタを
@@ -329,7 +316,6 @@ Django はエラーを出します。
 照してください。
 
 .. _field-lookups-intro:
-.. _Field lookups:
 
 フィールドの照合
 ----------------
@@ -416,8 +402,6 @@ Django はエラーを出します。
 :ref:`フィールド照合タイプのリファレンス <field-lookups>` を参照してくださ
 い。
 
-.. _Lookups that span relationships:
-
 リレーションをまたいだ照合
 ---------------------------
 
@@ -463,8 +447,6 @@ Django では、背後で自動的に SQL ``JOIN`` を処理し、照合の際�
 
     Blog.objects.filter(entry__author__isnull=False,
             entry__author__name__isnull=True)
-
-.. _Spanning multi-valued relationships:
 
 多値のリレーションをスパンする
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -522,7 +504,48 @@ Django では、背後で自動的に SQL ``JOIN`` を処理し、照合の際�
 ``filter()`` や ``exclude()`` を連続して呼び出すと、毎回違うリンク先集合を
 使ってフィルタを行ってしまう可能性があるのです。
 
-.. _The pk lookup shortcut:
+.. _query-expressions:
+
+Filters can reference fields on the model
+-----------------------------------------
+
+.. versionadded:: 1.1
+
+In the examples given so far, we have constructed filters that compare
+the value of a model field with a constant. But what if you want to compare
+the value of a model field with another field on the same model?
+
+Django provides the ``F()`` object to allow such comparisons. Instances
+of ``F()`` act as a reference to a model field within a query. These
+references can then be used in query filters to compare the values of two
+different fields on the same model instance.
+
+For example, to find a list of all blog entries that have had more comments
+than pingbacks, we construct an ``F()`` object to reference the comment count,
+and use that ``F()`` object in the query::
+
+    >>> from django.db.models import F
+    >>> Entry.objects.filter(n_pingbacks__lt=F('n_comments'))
+
+Django supports the use of addition, subtraction, multiplication,
+division and modulo arithmetic with ``F()`` objects, both with constants
+and with other ``F()`` objects. To find all the blog entries with *twice* as
+many comments as pingbacks, we modify the query::
+
+    >>> Entry.objects.filter(n_pingbacks__lt=F('n_comments') * 2)
+
+To find all the entries where the sum of the pingback count and comment count
+is greater than the rating of the entry, we would issue the query::
+
+    >>> Entry.objects.filter(rating__lt=F('n_comments') + F('n_pingbacks'))
+
+You can also use the double underscore notation to span relationships in
+an ``F()`` object. An ``F()`` object with a double underscore will introduce
+any joins needed to access the related object. For example, to retrieve all
+the entries where the author's name is the same as the blog name, we could
+issue the query:
+
+    >>> Entry.objects.filter(author__name=F('blog__name'))
 
 pk 照合ショートカット
 ---------------------
@@ -555,8 +578,6 @@ pk 照合ショートカット
     >>> Entry.objects.filter(blog__id=3)        # 暗黙で __exact を表す
     >>> Entry.objects.filter(blog__pk=3)        # __pk は暗黙で __id__exact を表す
 
-.. _Escaping percent signs and underscores in LIKE statements:
-
 LIKE 文におけるパーセント記号とアンダースコアのエスケープ
 -----------------------------------------------------------
 
@@ -584,7 +605,6 @@ Django はクオートの処理に気を配ってくれます。 SQL は以下�
 ンダースコアはいずれも透過的に処理されます。
 
 .. _caching-and-querysets:
-.. _Caching and QuerySets:
 
 キャッシュとクエリセット
 ------------------------
@@ -619,8 +639,6 @@ Django はクエリ結果をクエリセットオブジェクト内のキャッ�
     >>> print [p.headline for p in queryset] # クエリセットを評価します。
     >>> print [p.pub_date for p in queryset] # キャッシュの値を再利用します。
 
-.. _Complex lookups with Q objects:
-
 Q オブジェクトを使った複雑な照合
 ================================
 
@@ -652,7 +670,11 @@ Q オブジェクトを使った複雑な照合
     WHERE question LIKE 'Who%' OR question LIKE 'What%'
 
 ``Q`` オブジェクトを ``&`` と ``|`` で組み合わせれば、好きなだけ複雑なクエ
-リ文を作成できます。丸括弧を使ったグルーピングも可能です。
+リ文を作成できます。丸括弧を使ったグルーピングも可能です。また、 ``~`` 演算
+子を使えば ``Q`` オブジェクトの「否 (nagate)」を取れるので、例えば以下のよ
+うに、通常のクエリと否のクエリの積をとれます::
+
+    Q(question__startswith='Who') | ~Q(pub_date__year=2005)
 
 キーワード引数をとる照合関数 (``filter()``, ``exclude()``, ``get()`` など)
 には、複数の ``Q`` を固定引数として (名前なしの引数として) 渡せます。複数の
@@ -694,8 +716,6 @@ Q オブジェクトを使った複雑な照合
 
     .. _OR lookups examples: http://code.djangoproject.com/browser/django/trunk/tests/modeltests/or_lookups/models.py
 
-.. _Comparing objects:
-
 オブジェクトの比較
 ==================
 
@@ -715,7 +735,7 @@ Q オブジェクトを使った複雑な照合
     >>> some_obj == other_obj
     >>> some_obj.name == other_obj.name
 
-.. _Deleting objects:
+.. _topics-db-queries-delete:
 
 オブジェクトの削除
 ==================
@@ -757,7 +777,7 @@ Django は、オブジェクトを削除する際に、SQLでいう ``ON DELETE 
 
     Entry.objects.all().delete()
 
-.. _Updating multiple objects at once:
+.. _topics-db-queries-update:
 
 複数のオブジェクトを一度に更新する
 ===================================
@@ -774,10 +794,8 @@ Django は、オブジェクトを削除する際に、SQLでいう ``ON DELETE 
 この操作を行えるのは、リレーションフィールドでないフィールドか、
 ``ForeignKey`` のフィールドのみです。また、フィールドに指定する値はハードコー
 ドされた Python の値でなければなりません (つまり、その時の何らかのフィール
-ド値は直接セットできません)。
-
-``ForeignKey`` のフィールドを更新するには、以下のように、新たなモデルインス
-タンスを作成して渡します::
+ド値は直接セットできません)。 ``ForeignKey`` のフィールドを更新するには、以
+下のように、新たなモデルインスタンスを作成して渡します::
 
     >>> b = Blog.objects.get(pk=1)
     
@@ -800,7 +818,22 @@ Django は、オブジェクトを削除する際に、SQLでいう ``ON DELETE 
     for item in my_queryset:
         item.save()
 
-.. _Related objects:
+.. versionadded:: 1.1
+
+Calls to update can also use :ref:`F() objects <query-expressions>` to update
+one field based on the value of another field in the model. This is especially
+useful for incrementing counters based upon their current value. For example, to
+increment the pingback count for every entry in the blog::
+
+    >>> Entry.objects.all().update(n_pingbacks=F('n_pingbacks') + 1)
+
+However, unlike ``F()`` objects in filter and exclude clauses, you can't
+introduce joins when you use ``F()`` objects in an update -- you can only
+reference fields local to the model being updated. If you attempt to introduce
+a join with an ``F()`` object, a ``FieldError`` will be raised::
+
+    # THIS WILL RAISE A FieldError
+    >>> Entry.objects.update(headline=F('blog__name'))
 
 リレーション
 ============
@@ -829,12 +862,8 @@ Django はまた、リレーションの「相手側」へのアクセス API、
 .. _descriptors: http://users.rcn.com/python/download/Descriptor.htm
 .. _`デスクリプタ`: descriptors_
 
-.. _One-to-many relationships:
-
 一対多のリレーション
 --------------------
-
-.. _Forward:
 
 順方向
 ~~~~~~
@@ -890,7 +919,6 @@ Django はまた、リレーションの「相手側」へのアクセス API、
 のデフォルト値は ``FOO_set`` です。このマネジャはクエリセットを返します。ク
 エリセットには前述の「オブジェクトの取得」の節で説明したフィルタや操作を行
 えます。
-
 
 例を示しましょう::
 
@@ -948,6 +976,9 @@ Django はまた、リレーションの「相手側」へのアクセス API、
     b = Blog.objects.get(id=1)
     b.entry_set = [e1, e2]
 
+In this example, ``e1`` and ``e2`` can be full Entry instances, or integer
+primary key values.
+
 ``clear()`` メソッドを利用できる場合に代入を行うと、まず ``entry_set`` から
 全てのオブジェクトを除去しておき、その後で右辺の iterable (上の例ではリスト)
 のオブジェクト追加します。 ``clear()`` メソッドを使えない場合は、
@@ -957,8 +988,6 @@ Django はまた、リレーションの「相手側」へのアクセス API、
 この節で説明した「逆方向の」操作は、いずれもデータベースを即時変更します。
 操作結果は追加、新規作成、削除といった操作を行う度に即座に自動的にデータベー
 スに保存されます。
-
-.. Many-to-many relationships:
 
 多対多のリレーション
 --------------------
@@ -986,8 +1015,6 @@ Django はまた、リレーションの「相手側」へのアクセス API、
 を指定できます。 上の例で、 ``Entry`` の ``ManyToManyField`` に
 ``related_name='entries'`` を指定していた場合、 ``Author`` インスタンスは
 ``entry_set`` ではなく ``entries`` という属性を持つようになります。
-
-.. One-to-one relationships:
 
 一対一のリレーション
 ------------------------
@@ -1022,8 +1049,6 @@ Django はまた、リレーションの「相手側」へのアクセス API、
 
     e.entrydetail = ed
 
-.. _How are the backward relationships possible?:
-
 リレーションの後方参照はどうやって実現されているのか
 ----------------------------------------------------
 
@@ -1040,8 +1065,6 @@ Django はまた、リレーションの「相手側」へのアクセス API、
 じて後方参照をメモリ中に作成します。 :setting:`INSTALLED_APPS` の本質的な機
 能の一つは、 Django にモデルドメインの全体像を知らせることなのです。
 
-.. _Queries over related objects:
-
 リレーション先オブジェクトを使ったクエリ
 ----------------------------------------
 
@@ -1056,8 +1079,6 @@ Django はまた、リレーションの「相手側」へのアクセス API、
     Entry.objects.filter(blog=b) # オブジェクトインスタンスを使ったクエリ
     Entry.objects.filter(blog=b.id) # インスタンスの id を使ったクエリ
     Entry.objects.filter(blog=5) # id を直接使ったクエリ
-
-.. _Falling back to raw SQL:
 
 生 SQL へのフォールバック
 =========================

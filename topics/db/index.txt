@@ -3,7 +3,7 @@
 モデルとデータベース
 ====================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 モデルとは、サイトを構成するデータの、ただ一つかつ最終的なデータソースを指
 します。モデルには、保存したいデータに不可欠なデータフィールドと、その振舞
@@ -15,6 +15,7 @@
 
    models
    queries
+   aggregation
    managers
    sql
    transactions

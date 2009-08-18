@@ -4,19 +4,25 @@
 ショートカット関数
 ===================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
+
+.. module:: django.shortcuts
+   :synopsis:
+       Convience shortcuts that spam multiple levels of Django's MVC stack.
 
 ``django.shotcuts`` パッケージでは、MVC の複数のレベルを「橋渡し」するため
 のヘルパ関数やクラスを定義しています。言い換えると、これらの関数やクラスは、
 利便性を実現するために、きちんと制御された形でのカップリングを行えるように
 しているのです。
 
-``render_to_response()``
+``render_to_response``
 ========================
 
-``django.shortcuts.render_to_response`` は、引数指定したテンプレートとコン
-テキストを使ってテンプレートをレンダし、レンダ結果のテキストの入った
-``HttpResponse`` オブジェクトを返します。
+.. function:: render_to_response(template[, dictionary][, context_instance][, mimetype])
+
+  引数に指定したテンプレートとコンテキストを使ってテンプレートをレンダし、
+  レンダ結果のテキストの入った  :class:`~django.http.HttpResponse` オブジェ
+  クトを返します。
 
 必須の引数
 -----------
@@ -45,7 +51,6 @@
                                   context_instance=RequestContext(request))
 
 ``mimetype``
-
     .. versionadded:: 1.0
 
     レンダ結果のドキュメントに対して指定する MIME タイプです。デフォルトの
@@ -57,11 +62,8 @@
 使用例
 -------
 
-使用例
--------
-
 以下の例では、 ``myapp/index.html`` を MIME タイプ
-``application/xhtml+xml`` でレンダしてます::::
+``application/xhtml+xml`` でレンダしています::::
 
     from django.shortcuts import render_to_response
 
@@ -82,13 +84,79 @@
         r = HttpResponse(t.render(c),
             mimetype="application/xhtml+xml")
 
+``redirect``
+============
+
+.. function:: redirect(to[, permanent=False], *args, **kwargs)
+
+   .. versionadded:: 1.1
+
+   Returns an HttpResponseRedirect to the apropriate URL for the arguments
+   passed.
+
+   The arguments could be:
+
+       * A model: the model's `get_absolute_url()` function will be called.
+
+       * A view name, possibly with arguments: `urlresolvers.reverse()` will
+         be used to reverse-resolve the name.
+
+       * A URL, which will be used as-is for the redirect location.
+
+   By default issues a temporary redirect; pass permanent=True to issue a
+   permanent redirect
+
+Examples
+--------
+
+You can use the :func:`redirect` function in a number of ways.
+
+    1. By passing some object; that object's
+       :meth:`~django.db.models.Model.get_absolute_url` method will be called
+       to figure out the redirect URL::
+
+            def my_view(request):
+                ...
+                object = MyModel.objects.get(...)
+                return redirect(object)
+
+    2. By passing the name of a view and optionally some positional or
+       keyword arguments; the URL will be reverse resolved using the
+       :func:`~django.core.urlresolvers.reverse` method::
+
+            def my_view(request):
+                ...
+                return redirect('some-view-name', foo='bar')
+
+    3. By passing a hardcoded URL to redirect to::
+
+            def my_view(request):
+                ...
+                return redirect('/some/url/')
+
+       This also works with full URLs::
+
+            def my_view(request):
+                ...
+                return redirect('http://example.com/')
+
+By default, :func:`redirect` returns a temporary redirect. All of the above
+forms accept a ``permanent`` argument; if set to ``True`` a permanent redirect
+will be returned::
+
+    def my_view(request):
+        ...
+        object = MyModel.objects.get(...)
+        return redirect(object, permanent=True)
+
 ``get_object_or_404``
 =====================
 
-``django.shortcuts.get_object_or_404`` は、指定したモデルマネジャに対して
-:meth:`~django.db.models.QuerySet.get` を呼出します。ただし、マネジャがモデ
-ルの ``DoesNotExist`` を送出した場合には、 ``django.http.Http404`` を送出し
-ます。
+.. function:: get_object_or_404(object, *args, **kwargs)
+
+   指定したモデルマネジャに対して :meth:`~django.db.models.QuerySet.get` を
+   呼出します。ただし、マネジャがモデルの ``DoesNotExist`` を送出した場合に
+   は、 ``django.http.Http404`` を送出します。
 
 必須の引数
 -----------
@@ -126,9 +194,11 @@
 ``get_list_or_404``
 ===================
 
-``django.shortcuts.get_list_or_404`` は指定したモデルマネジャに対して
-:meth:`~django.db.models.QuerySet.filter` を呼び出した結果を返します。戻り
-値のリストが空なら、 ``django.http.Http404`` を送出します。
+.. function:: get_list_or_404(klass, *args, **kwargs)
+
+   指定したモデルマネジャに対して :meth:`~django.db.models.QuerySet.filter`
+   を呼び出した結果を返します。戻り値のリストが空なら、
+   ``django.http.Http404`` を送出します。
 
 必須の引数
 -----------
@@ -139,7 +209,6 @@
 
 ``**kwargs``
     検索パラメタです。 ``get()`` や  ``filter()`` と同じ引数を使えます。
-
 
 使用例
 -------
@@ -160,4 +229,3 @@
         my_objects = MyModel.objects.filter(published=True)
         if not my_objects:
             raise Http404
-

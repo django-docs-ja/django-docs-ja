@@ -3,7 +3,7 @@
 Form Media
 ==========
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 魅力的で使いやすい Web フォームをレンダしたいなら、 HTML だけでは能力不足で
 しょう。CSS スタイルシートが必要でしょうし、ファンシーな "Web2.0" 的ウィジェッ
@@ -41,8 +41,6 @@ JavaScript ファイルを特定して、それらのファイル名のリスト
     に設計されています。どのツールキットにも、お互いに長所や短所があります。
     自分にとって使いやすいツールキットを使ってください。 Django はどんな
     JavaScript ツールキットでも組み込めます。
-
-.. _Media as a static definition:
 
 メディア定義を静的に行う
 ---------------------------
@@ -198,10 +196,8 @@ CSS ファイルのリストを指定してください。以下の例では、�
 動的なメディアプロパティの戻り値を構築するための詳しい方法は、 
 `Media オブジェクト`_ の節を参照してください。
 
-.. _Paths in media definitions:
-
 メディア定義のパス
---------------------------
+--------------------
 
 メディアファイルの場所を指定するためのパスは、相対でも絶対でもかまいません。
 パスが ``'/'``, ``'http://'``, ``'https://'`` のいずれかで開始していれば、
@@ -224,10 +220,8 @@ CSS ファイルのリストを指定してください。以下の例では、�
     <script type="text/javascript" src="http://media.example.com/animations.js"></script>
     <script type="text/javascript" src="http://othersite.com/actions.js"></script>
 
-.. _Media objects:
-
 ``Media`` オブジェクト
----------------------------
+------------------------
 
 ウィジェットやフォームの media 属性を調べると、 ``forms.Media`` オブジェク
 トが返されます。すでに解説した通り、 ``Media`` オブジェクトの文字列表現は、
@@ -236,8 +230,6 @@ HTML コードです。
 
 とはいえ、 ``Media`` オブジェクトには他にもいくつか興味深いプロパティがあり
 ます。
-
-.. _Media subsets:
 
 ``Media`` サブセット
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -256,8 +248,6 @@ HTML コードです。
 
 添え字表記を使ってアクセスすると、新たな ``Media`` オブジェクトが返されます。
 ただし、このオブジェクトには指定したメディアしか入っていません。
-
-.. _Combining media objects:
 
 ``Media`` オブジェクトを組み合わせる
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -283,9 +273,6 @@ HTML コードです。
     <script type="text/javascript" src="http://media.example.com/animations.js"></script>
     <script type="text/javascript" src="http://media.example.com/actions.js"></script>
     <script type="text/javascript" src="http://media.example.com/whizbang.js"></script>
-
-    
-.. _Media on Forms:
 
 フォームのメディア
 ---------------------

@@ -4,7 +4,7 @@
 ビューを書く
 =============
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 ビュー関数、あるいは単に *ビュー* とは、簡単にいえばウェブリクエストを引数
 にとり、ウェブレスポンスを返す関数です。レスポンスはウェブページを表す HTML
@@ -63,8 +63,6 @@ URL をビューにマップする
 何らかの URL でこのビューを表示したければ、 *URLconf* を作成する必要があり
 ます。 :ref:`topics-http-urls` の説明を読んでください。
 
-.. _Returning errors:
-
 エラーを返す
 ============
 
@@ -81,10 +79,20 @@ Django では、簡単に HTTP エラーコードを返せます。エラー応�
         else:
             return HttpResponse('<h1>Page was found</h1>')
 
+There isn't a specialized subclass for every possible HTTP response code,
+since many of them aren't going to be that common. However, as documented in
+the :class:`~django.http.HttpResponse` documentation, you can also pass the
+HTTP status code into the constructor for :class:`~django.http.HttpResponse`
+to create a return class for any status code you like. For example::
+
+    def my_view(request):
+        # ...
+
+        # Return a "created" (201) response code.
+        return HttpResponse(status=201)
+
 ただし、 404 エラーは他の HTTP エラーよりはるかに良く使われるエラーなので、
 もっと簡単に扱う方法を提供しています。
-
-.. _The Http404 exception:
 
 Http404 例外
 ------------
@@ -114,12 +122,8 @@ Http404 例外
 成しておかねばなりません。このテンプレートの名前は ``404.html`` で、テンプ
 レートツリーの一番上に配置せねばなりません。
 
-.. _Customizing error views:
-
 エラービューのカスタマイズ
 ==========================
-
-.. _The 404 (page not found) view:
 
 404 (ページが見つかりません) ビュー
 ------------------------------------
@@ -169,8 +173,6 @@ Http404 例外
 
     * (settings モジュールで) ``DEBUG`` を ``True`` にすると、 404 ビューは
       呼び出されず、代わりにトレースバックが表示されます。
-
-.. _The 500 (server error) view:
 
 500 (サーバエラー) ビュー
 ---------------------------

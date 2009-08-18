@@ -4,6 +4,6 @@
 汎用ビュー (Generic views)
 ============================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1)
 
 :ref:`ref-generic-views` を参照してください。

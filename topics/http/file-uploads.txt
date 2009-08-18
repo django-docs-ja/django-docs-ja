@@ -4,7 +4,7 @@
 ファイルアップロード
 ========================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 .. currentmodule:: django.core.files
 
@@ -17,8 +17,6 @@ Django がアップロードされたファイルを扱うとき、ファイル�
 ントを参照してください)。このドキュメントでは、ファイルがどのようにしてディ
 スクやメモリ上に保存されるかを説明し、そのデフォルトの動作をカスタマイズす
 る方法について説明します。
-
-.. _Basic file uploads:
 
 ファイルアップロードの基本
 ============================
@@ -36,6 +34,10 @@ Django がアップロードされたファイルを扱うとき、ファイル�
 はフォームクラス中の ``FileField`` (または ``ImageField`` や ``FileField``
 のサブクラス) の名前です。従って、上の例では、 ``request.FILES['file']`` で
 ファイルデータにアクセスできます。
+
+Note that ``request.FILES`` will only contain data if the request method was 
+``POST`` and the ``<form>`` that posted the request has the attribute
+``enctype="multipart/form-data"``. Otherwise, ``request.FILES`` will be empty.
 
 ほとんどの場合は、「 :ref:`binding-uploaded-files` 」の節で説明した方法に従っ
 て、 ``request`` からデータを取り出してフォームに渡すだけでアップロードファ
@@ -61,8 +63,6 @@ Django がアップロードされたファイルを扱うとき、ファイル�
 注意してください。これはフォームにファイルデータを結びつけるために必要な手
 順です。
 
-.. _Handling uploaded files:
-
 アップロードファイルの処理
 ----------------------------
 
@@ -85,7 +85,7 @@ Django がアップロードされたファイルを扱うとき、ファイル�
         イルに対して ``True`` を返します。サイズの閾値は設定でき、後で説明
         します。
     
-    ``UploadedFile.chunk()``
+    ``UploadedFile.chunks()``
         ファイルのチャンクを返すジェネレータです。 ``multiple_chunks()`` が
 	``True`` の場合には、 ``read()`` ではなくこのメソッドを使ってくださ
         い。
@@ -108,11 +108,10 @@ Django がアップロードされたファイルを扱うとき、ファイル�
         destination = open('some/file/name.txt', 'wb+')
         for chunk in f.chunks():
             destination.write(chunk)
+        destination.close()
 
 上の例では、巨大なファイルを ``read()`` してシステムの容量を超えないように、
 ``UploadedFile.chunks()`` を使っています。
-
-.. _Where uploaded data is stored:
 
 アップロードされたファイルの保存先
 ----------------------------------------
@@ -135,8 +134,6 @@ Django がアップロードされたファイルを扱うとき、ファイル�
 2.5 Mbytes や ``/tmp`` といった仕様は、単に「妥当なデフォルト値」にすぎませ
 ん。アップロード時の挙動をカスタマイズしたり完全に置き換えたりしたければ、
 この後の詳細説明に進んでください。
-
-.. _Changing upload handler behavior:
 
 アップロードファイルハンドラの挙動を変更する
 ----------------------------------------------
@@ -162,9 +159,6 @@ Django がアップロードされたファイルを扱うとき、ファイル�
         (例: ``0644``) します。ファイルモードの意味は
 	`os.chmod のドキュメント`_ を参照してください。
 
-	.. _documentation for os.chmod: http://docs.python.org/lib/os-file-dir.html 
-	.. _`os.chmod のドキュメント`: `documentation for os.chmod`_
-        
         この値を設定しないか、 ``None`` にすると、アップロードされたファイ
 	ルのモードはオペレーティングシステムに依存します。ほとんどのプラッ
 	トフォームでは、一時ファイルのファイルモードは ``0600`` で、メモリ
@@ -195,10 +189,11 @@ Django がアップロードされたファイルを扱うとき、ファイル�
         保存しようと試み、その後ファイルへの保存を試みます。
 
 
-.. _UploadedFile objects:
-
+.. _documentation for os.chmod: http://docs.python.org/lib/os-file-dir.html 
+.. _`os.chmod のドキュメント`: `documentation for os.chmod`_
+        
 ``UploadedFile`` オブジェクト
-=================================
+===============================
 
 .. class:: UploadedFile
 
@@ -237,8 +232,6 @@ Django がアップロードされたファイルを扱うとき、ファイル�
     外の改行で終端されたアップロードファイルを処理する必要があるのなら、ビュー
     内で適切に処理する必要があります。
 
-.. _Upload Handlers:
-
 アップロードハンドラ
 =====================
 
@@ -259,8 +252,6 @@ Django がアップロードされたファイルを扱うとき、ファイル�
 ば、カスタムハンドラによってユーザレベルで容量制限を課したり、データをオン
 ザフライで圧縮したり、プログレスバーを描画したり、受け取ったデータをローカ
 ルに保存せず、直接別のストレージに送ったりできます。
-
-.. _Modifying upload handlers on the fly:
 
 アップロードハンドラをオンザフライで変更する
 ----------------------------------------------
@@ -300,16 +291,12 @@ Django がアップロードされたファイルを扱うとき、ファイル�
     従って、アップロードハンドラチェインはビュー処理の出来るだけ早い段階で
     変更しておくことになるでしょう。
 
-.. _Writing custom upload handlers:
-
 カスタムのアップロードハンドラを書く
 ---------------------------------------
 
 ファイルアップロードハンドラは、全て
 ``django.core.files.uploadhandler.FileUploadHandler`` のサブクラスでなけれ
 ばなりません。アップロードハンドラはどこに記述してもかまいません。
-
-.. _Required methods:
 
 必須のメソッド
 ~~~~~~~~~~~~~~~~
@@ -344,8 +331,6 @@ Django がアップロードされたファイルを扱うとき、ファイル�
         このハンドラは ``request.FILES`` に入れるための ``UploadedFile`` オ
         ブジェクトを返さねばなりません。後続のアップロードハンドラに
         ``UploadedFile`` を返させたい場合は ``None`` を返してください。
-
-.. _Optional methods:
 
 オプションのメソッド
 ~~~~~~~~~~~~~~~~~~~~~~

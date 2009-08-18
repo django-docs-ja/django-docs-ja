@@ -4,7 +4,7 @@
 モデルからフォームを生成する
 ================================
 
-:revision-up-to: 9084 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 ``ModelForm``
 =============
@@ -34,8 +34,6 @@
     >>> article = Article.objects.get(pk=1)
     >>> form = ArticleForm(instance=article)
 
-.. Field types:
-
 フィールド型
 -------------
 
@@ -50,42 +48,67 @@
     モデルフィールド型               フォームフィールド型
     ===============================  ========================================
     ``AutoField``                    フォーム上では表現されていません
+
     ``BooleanField``                 ``BooleanField``
+
     ``CharField``                    ``CharField`` 。 ``max_length`` にはモ
                                      デルフィールドの ``max_length`` 値が設
                                      定されます。
+
     ``CommaSeparatedIntegerField``   ``CharField``
+
     ``DateField``                    ``DateField``
+
     ``DateTimeField``                ``DateTimeField``
+
     ``DecimalField``                 ``DecimalField``
+
     ``EmailField``                   ``EmailField``
+
     ``FileField``                    ``FileField``
+
     ``FilePathField``                ``CharField``
+
     ``FloatField``                   ``FloatField``
+
     ``ForeignKey``                   ``ModelChoiceField`` (下記参照)
+
     ``ImageField``                   ``ImageField``
+
     ``IntegerField``                 ``IntegerField``
+
     ``IPAddressField``               ``IPAddressField``
+
     ``ManyToManyField``              ``ModelMultipleChoiceField`` (下記参照)
+
     ``NullBooleanField``             ``CharField``
+
     ``PhoneNumberField``             ``USPhoneNumberField``
                                      (``django.contrib.localflavor.us``)
+
     ``PositiveIntegerField``         ``IntegerField``
+
     ``PositiveSmallIntegerField``    ``IntegerField``
+
     ``SlugField``                    ``SlugField``
+
     ``SmallIntegerField``            ``IntegerField``
+
     ``TextField``                    ``widget=Textarea`` の ``CharField``
+
     ``TimeField``                    ``TimeField``
+
     ``URLField``                     ``URLField`` 。 ``verify_exists`` には
                                      モデルフィールドの ``verify_exists``
                                      値が設定されます。
+
     ``XMLField``                     ``widget=Textarea`` の ``CharField``
     ===============================  ========================================
 
 
-.. note::
+.. versionadded:: 1.0
     ``FloatField`` および ``DecimalField`` は、モデルフィールド、フォーム
-    フィールドともに開発版の Django で新たに定義されました。
+    フィールドともに Django 1.0 で新たに定義されました。
 
 お気付きかもしれませんが、 ``ForeignKey`` や ``ManyToManyField`` といったモ
 デルフィールドは特別扱いされています:
@@ -120,12 +143,9 @@
       ``default`` 値が明に設定されている場合、空の選択肢は表示されません
       (``default`` の値が選択された状態で表示されます)。
 
-
 あるモデルからフォームを作成する場合、モデルのフォームフィールドに対応する
 フォームフィールドをオーバライドできます。後述の
 `デフォルトのフィールド型をオーバライドする`_ を参照してください。
-
-.. _A full example:
 
 詳細な例
 ---------
@@ -175,8 +195,6 @@
         name = forms.CharField(max_length=100)
         authors = forms.ModelMultipleChoiceField(queryset=Author.objects.all())
 
-.. _The save() method:
-
 ``save()`` メソッド
 ---------------------
 
@@ -214,8 +232,9 @@
 ``commit=False`` で呼び出すと、データベースに保存する前のモデルオブジェクト
 を返します。返されたオブジェクトに対して、最終的に ``save()`` を呼び出すか
 どうかは自由です。この機能は、オブジェクトを実際に保存する前に何らかの処理
-を行いたい場合に便利です。 ``commit`` はデフォルトでは  ``True`` に設定され
-ています。
+を行いたい場合や、特殊なオプション付きで 
+:ref:`モデルオブジェクトを保存したい <ref-models-force-insert>` 場合に便利
+です。 ``commit`` はデフォルトでは  ``True`` に設定されています。
 
 モデルが他のモデルに対する多対多のリレーションをはっている場合、
 ``commit=False`` を使うともう一つの副作用があります。多対多のリレーションを
@@ -261,9 +280,7 @@
 データの検証は ``is_valid()`` で行えますし、 ``is_multipart()``
 メソッドを使えばフォームがマルチパートのファイルアップロードを要求している
 かどうか (そして ``request.FILES`` をフォームに渡さなければならないかどうか)判
-別できます。詳しくは、 :ref:`topics-forms-index` を参照してください。
-
-.. _Using a subset of fields on the form:
+別できます。詳しくは、 :ref:`binding-uploaded-files` を参照してください。
 
 モデルの一部のフィールドだけからフォームを生成する
 ---------------------------------------------------
@@ -279,6 +296,11 @@
 2. ``ModelForm`` サブクラスで、内部クラス ``Meta`` の ``fields`` 属性を
    設定します。この属性にはフィールド名からなるリストを設定します。設定
    すると、指定されたフィールドだけを含むフォームを生成します。
+
+   .. versionchanged:: 1.1
+
+   The form will render the fields in the same order they are specified in the
+   ``fields`` attribute.
 
 3. ``ModelForm`` サブクラスで、内部クラス ``Meta`` の ``exclude`` 属性を
    設定します。この属性にはフィールド名からなるリストを設定します。設定
@@ -312,25 +334,25 @@ Author モデルには ``'name'``, ``'title'``, ``'birth_date'`` の 3 つ
     ていない場合、モデルインスタンスが不完全なために Django がオブジェクト
     の保存を抑止し、 ``save()`` は失敗します。これを避けるには、フォームの
     インスタンスを生成するときに、不足しているフィールドでかつ必須のフィー
-    ルドに対する初期値を指定してやるか、 ``save(commit=False)`` を使って、
-    必須のフィールドの値を手動で設定してください::
+    ルドに対する初期値を指定してください::
 
-        instance = Instance(required_field='value')
-        form = InstanceForm(request.POST, instance=instance)
-        new_instance = form.save()
+        author = Author(title='Mr')
+        form = PartialAuthorForm(request.POST, instance=author)
+        form.save()
 
-        instance = form.save(commit=False)
-        instance.required_field = 'new value'
-        new_instance = instance.save()
+    あるいは、 ``save(commit=False)`` を使って、必須のフィールドの値を手動
+    で設定してください::
+
+        form = PartialAuthorForm(request.POST)
+        author = form.save(commit=False)
+        author.title = 'Mr'
+        author.save()
 
     ``save(commit=False)`` については、 `「フォームの保存」`_ も参照してく
     ださい。
 
-
 .. _section on saving forms: `The save() method`_
 .. _`「フォームの保存」`: `section on saving forms`_
-
-.. _Overriding the default field types:
 
 デフォルトのフィールド型をオーバライドする
 --------------------------------------------
@@ -362,17 +384,52 @@ Author モデルには ``'name'``, ``'title'``, ``'birth_date'`` の 3 つ
    ...     class Meta:
    ...         model = Article
 
+Changing the order of fields
+----------------------------
+
+.. versionadded:: 1.1
+
+By default, a ``ModelForm`` will render fields in the same order that they are
+defined on the model, with ``ManyToManyField`` instances appearing last. If
+you want to change the order in which fields are rendered, you can use the
+``fields`` attribute on the ``Meta`` class.
+
+The ``fields`` attribute defines the subset of model fields that will be
+rendered, and the order in which they will be rendered. For example given this
+model::
+
+    class Book(models.Model):
+        author = models.ForeignKey(Author)
+        title = models.CharField(max_length=100)
+
+the ``author`` field would be rendered first. If we wanted the title field
+to be rendered first, we could specify the following ``ModelForm``::
+
+    >>> class BookForm(ModelForm):
+    ...     class Meta:
+    ...         model = Book
+    ...         fields = ['title', 'author']
+
+.. _overriding-modelform-clean-method:
+
 clean() メソッドのオーバライド
 -------------------------------
 
 バリデーションの動作を追加するために、モデルフォームの ``clean()`` メソッド
-を通常のフォームと同じ方法でオーバライドできます。しかし、デフォルトの
-``clean()`` メソッドは、モデルの ``unique`` や ``unique_together`` に指定し
-た内容に従って、オブジェクトの一意性をチェックします。従って、 ``clean()``
-をオーバライドして、なおかつデフォルトのバリデーションも行いたいときは、
-親クラスの ``clean()`` メソッドを必ず呼び出してください。
+を通常のフォームと同じ方法でオーバライドできます。
 
-.. _Form inheritance:
+In this regard, model forms have two specific characteristics when compared to
+forms:
+
+デフォルトの``clean()`` メソッドは、モデルの ``unique`` や
+``unique_together`` に指定した内容に従って、オブジェクトの一意性をチェック
+します。従って、 ``clean()`` をオーバライドして、なおかつデフォルトのバリデー
+ションも行いたいときは、親クラスの ``clean()`` メソッドを必ず呼び出してくだ
+さい。
+
+Also, a model form instance bound to a model object will contain a
+``self.instance`` attribute that gives model form methods access to that
+specific model instance.
 
 フォームクラスの継承
 ---------------------
@@ -412,9 +469,7 @@ clean() メソッドのオーバライド
 これらの注意点は、サブクラスを作成する際に何かトリッキーなことをしない限り
 は当てはまらないはずです。
 
-
 .. _model-formsets:
-.. _Model Formsets:
 
 モデルフォームセット
 =======================
@@ -447,8 +502,6 @@ clean() メソッドのオーバライド
     を生成します。つまり、モデルフォームセットは単に特定のモデルを扱えるよ
     うに拡張したフォームセットにすぎないのです。
 
-.. _Changing the queryset:
-
 クエリセットを変更する
 ------------------------
 
@@ -458,13 +511,15 @@ clean() メソッドのオーバライド
 
     >>> formset = AuthorFormSet(queryset=Author.objects.filter(name__startswith='O'))
 
-サブクラスを使ったアプローチでも指定できます::
+サブクラスを作って、 ``__init__`` の中で ``self.queryset`` を設定する方法で
+も変更できます。::
 
     from django.forms.models import BaseModelFormSet
-    
+
     class BaseAuthorFormSet(BaseModelFormSet):
-        def get_queryset(self):
-            return super(BaseAuthorFormSet, self).get_queryset().filter(name__startswith='O')
+        def __init__(self, *args, **kwargs):
+            self.queryset = Author.objects.filter(name__startswith='O')
+            super(BaseAuthorFormSet, self).__init__(*args, **kwargs)
 
 ファクトリ関数を呼ぶときに、 ``BaseAuthorFormSet`` を渡してベースクラスにし
 てください::
@@ -489,7 +544,6 @@ clean() メソッドのオーバライド
 外できます。
 
 .. _saving-objects-in-the-formset:
-.. _Saving objects in the formset:
 
 フォームセット内のオブジェクトを保存する
 -------------------------------------------
@@ -523,7 +577,6 @@ clean() メソッドのオーバライド
 しく保存させる必要があるでしょう。
 
 .. _model-formsets-max-num:
-.. _Limiting the number of objects editable:
 
 編集可能なオブジェクトの数を制限する
 ---------------------------------------
@@ -577,15 +630,112 @@ clean() メソッドのオーバライド
 していることくらいです。 ``formset.save()`` は、
 :ref:`saving-objects-in-the-formset` で解説しています。
 
-.. _`Using inlineformset_factory`:
+Overiding ``clean()`` on a ``model_formset``
+--------------------------------------------
 
-``inlineformset_factory`` を使う
-----------------------------------
+Just like with ``ModelForms``, by default the ``clean()`` method of a
+``model_formset`` will validate that none of the items in the formset violate
+the unique constraints on your model (either ``unique``, ``unique_together`` or
+``unique_for_date|month|year``).  If you want to overide the ``clean()`` method
+on a ``model_formset`` and maintain this validation, you must call the parent
+class's ``clean`` method::
 
-``inlineformset_factory`` は外部キーのリレーション先オブジェクトを扱うとき
-によく使われるパターンを簡単に実行するためのヘルパです。このヘルパは、
-``modelformset_factory`` と同じオプションをとります。例えば、以下のように
-``Author`` と ``Book`` という二つのモデルがあるとしましょう::
+    class MyModelFormSet(BaseModelFormSet):
+        def clean(self):
+            super(MyModelFormSet, self).clean()
+            # example custom validation across forms in the formset:
+            for form in self.forms:
+                # your custom formset validation
+
+Using a custom queryset
+-----------------------
+
+As stated earlier, you can override the default queryset used by the model
+formset::
+
+    def manage_authors(request):
+        AuthorFormSet = modelformset_factory(Author)
+        if request.method == "POST":
+            formset = AuthorFormSet(request.POST, request.FILES,
+                                    queryset=Author.objects.filter(name__startswith='O'))
+            if formset.is_valid():
+                formset.save()
+                # Do something.
+        else:
+            formset = AuthorFormSet(queryset=Author.objects.filter(name__startswith='O'))
+        return render_to_response("manage_authors.html", {
+            "formset": formset,
+        })
+
+Note that we pass the ``queryset`` argument in both the ``POST`` and ``GET``
+cases in this example.
+
+Using the formset in the template
+---------------------------------
+
+.. highlight:: html+django
+
+There are three ways to render a formset in a Django template.
+
+First, you can let the formset do most of the work::
+
+    <form method="POST" action="">
+        {{ formset }}
+    </form>
+
+Second, you can manually render the formset, but let the form deal with
+itself::
+
+    <form method="POST" action="">
+        {{ formset.management_form }}
+        {% for form in formset.forms %}
+            {{ form }}
+        {% endfor %}
+    </form>
+
+When you manually render the forms yourself, be sure to render the management
+form as shown above. See the :ref:`management form documentation
+<understanding-the-managementform>`.
+
+Third, you can manually render each field::
+
+    <form method="POST" action="">
+        {{ formset.management_form }}
+        {% for form in formset.forms %}
+            {% for field in form %}
+                {{ field.label_tag }}: {{ field }}
+            {% endfor %}
+        {% endfor %}
+    </form>
+
+If you opt to use this third method and you don't iterate over the fields with
+a ``{% for %}`` loop, you'll need to render the primary key field. For example,
+if you were rendering the ``name`` and ``age`` fields of a model::
+
+    <form method="POST" action="">
+        {{ formset.management_form }}
+        {% for form in formset.forms %}
+            {{ form.id }}
+            <ul>
+                <li>{{ form.name }}</li>
+                <li>{{ form.age }}</li>
+            </ul>
+        {% endfor %}
+    </form>
+
+Notice how we need to explicitly render ``{{ form.id }}``. This ensures that
+the model formset, in the ``POST`` case, will work correctly. (This example
+assumes a primary key named ``id``. If you've explicitly defined your own
+primary key that isn't called ``id``, make sure it gets rendered.)
+
+.. highlight:: python
+
+Inline formsets
+===============
+
+Inline formsets is a small abstraction layer on top of model formsets. These
+simplify the case of working with related objects via a foreign key. Suppose
+you have these two models::
 
     class Author(models.Model):
         name = models.CharField(max_length=100)
@@ -599,7 +749,7 @@ clean() メソッドのオーバライド
 
     >>> from django.forms.models import inlineformset_factory
     >>> BookFormSet = inlineformset_factory(Author, Book)
-    >>> author = Author.objects.get(name=u'Orson Scott Card')
+    >>> author = Author.objects.get(name=u'Mike Royko')
     >>> formset = BookFormSet(instance=author)
 
 
@@ -608,7 +758,7 @@ clean() メソッドのオーバライド
     ``can_delete=True`` がセットされています。
 
 同じモデルに対して複数の外部キーを張っている場合
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------
 
 同じモデルに対する複数の外部キーを張っている場合、キー間のあいまいさを無く
 すために、 ``fk_name`` を手動で設定する必要があります。以下のモデルを例に考
@@ -623,3 +773,25 @@ clean() メソッドのオーバライド
 に設定してください::
 
     >>> FrienshipFormSet = inlineformset_factory(Friend, Friendship, fk_name="from_friend")
+
+Using an inline formset in a view
+---------------------------------
+
+You may want to provide a view that allows a user to edit the related objects
+of a model. Here's how you can do that::
+
+    def manage_books(request, author_id):
+        author = Author.objects.get(pk=author_id)
+        BookInlineFormSet = inlineformset_factory(Author, Book)
+        if request.method == "POST":
+            formset = BookInlineFormSet(request.POST, request.FILES, instance=author)
+            if formset.is_valid():
+                formset.save()
+                # Do something.
+        else:
+            formset = BookInlineFormSet(instance=author)
+        return render_to_response("manage_books.html", {
+            "formset": formset,
+        })
+
+Notice how we pass ``instance`` in both the ``POST`` and ``GET`` cases.

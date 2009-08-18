@@ -4,7 +4,7 @@
 ミドルウェア
 =============
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 11321 (1.1) unfinished
 
 ミドルウェア (Middleware) とは、 Django のリクエスト/レスポンス処理をフック
 するためのフレームワークです。ミドルウェアは軽量かつ低水準な「プラグイン」
@@ -16,11 +16,8 @@ Django には ``XViewMiddleware`` ミドルウェアコンポーネントがあ�
 
 このドキュメントでは、 Django についてくる全てのミドルウェアコンポーネント
 の使用法と、自分で新たにミドルウェアを作る方法を説明します。
-
 Django には、すぐに使える組み込みのミドルウェアが付属しています。
 :ref:`組み込みミドルウェアガイド <ref-middleware>` を参照してください。
-
-.. _Activating middleware:
 
 ミドルウェアの有効化
 ====================
@@ -36,7 +33,6 @@ Django には、すぐに使える組み込みのミドルウェアが付属し�
         'django.middleware.common.CommonMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.middleware.doc.XViewMiddleware',
     )
 
 リクエストの処理フェーズでは、Django は :setting:`MIDDLEWARE_CLASSES`
@@ -54,8 +50,6 @@ Django には、すぐに使える組み込みのミドルウェアが付属し�
 Django はミドルウェアがなくても動作します -- 望むなら
 :setting:`MIDDLEWARE_CLASSES` は空でもよいのです。とはいえ、少なくとも
 :class:`~django.middleware.common.CommonMiddleware` は使うように強く勧めます。
-
-.. _Writing your own middleware:
 
 ミドルウェアを自作する
 ======================
@@ -121,6 +115,15 @@ URLconf で設定されたビューを呼び出さず、 :class:`~django.http.Ht
 新たに :class:`~django.http.HttpResponse` オブジェクトを生成して返してもか
 まいません。
 
+Unlike the ``process_request()`` and ``process_view()`` methods, the
+``process_response()`` method is always called, even if the ``process_request()``
+and ``process_view()`` methods of the same middleware class were skipped because
+an earlier middleware method returned an :class:`~django.http. HttpResponse`
+(this means that your ``process_response()`` method cannot rely on setup done in
+``process_request()``, for example). In addition, during the response phase the
+classes are applied in reverse order, from the bottom up. This means classes
+defined at the end of :setting:`MIDDLEWARE_CLASSES` will be run first.
+
 .. _exception-middleware:
 
 ``process_exception``
@@ -138,6 +141,10 @@ Django はビューが例外を送出した際に ``process_exception()`` を呼
 をそのままブラウザに返します。それ以外の場合、デフォルトの例外処理を起動し
 ます。
 
+Again, middleware are run in reverse order during the response phase, which
+includes ``process_exception``. If an exception middleware return a response,
+the middleware classes above that middleware will not be called at all.
+
 ``__init__``
 ------------
 
@@ -152,8 +159,6 @@ Django はビューが例外を送出した際に ``process_exception()`` を呼
     * ``process_*`` メソッドはリクエストごとに呼び出されますが、
       ``__init__`` は Web サーバの起動時に *一度* しか呼び出されません。
 
-.. Marking middleware as unused
-
 ミドルウェアを動的に有効にする
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -161,8 +166,6 @@ Django はビューが例外を送出した際に ``process_exception()`` を呼
 ルウェアの ``__init__`` メソッドで
 :exc:`django.core.exceptions.MiddlewareNotUsed` を送出すると、 Django はそ
 のミドルウェアを処理から外します。
-
-.. _Guidelines:
 
 ガイドライン
 ------------
@@ -174,9 +177,7 @@ Django はビューが例外を送出した際に ``process_exception()`` を呼
       パスが指定されていることだけです。
 
     * :mod:`Django で使えるミドルウェア <django.middleware>` を参考にしてく
-      ださい。Django ミドルウェアのデフォルトの置場は
-      ``django/middleware/`` です。ただし、セッションミドルウェアは
-      ``django/contrib/sessions`` にあります。
+      ださい。
 
     * 自分の書いたミドルウェアコンポーネントが他の人にとっても有用だと思っ
       たなら、ぜひ :ref:`コミュニティにコントリビュート <internals-contributing>`
