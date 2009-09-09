@@ -70,23 +70,23 @@ Cherokee_ のような標準的な Web サーバには、 Web アプリケーシ
     * ``/path/bar.jpg`` というファイルはドキュメントルート下にないのでアク
       セスできません。
 
-Of course, it's not compulsory to use a fixed string for the
-``'document_root'`` value. You might wish to make that an entry in your
-settings file and use the setting value there. That will allow you and
-other developers working on the code to easily change the value as
-required. For example, if we have a line in ``settings.py`` that says::
+もちろん、 ``'document_root'`` には必ずしも固定の文字列を入れる必要はありま
+せん。すべてを設定ファイル上の値で制御したいような場合もあるでしょう。そう
+すれば、このコードを使うユーザが必要に応じて簡単に設定値を変更できるからで
+す。例えば、 ``settings.py`` に以下のように書いておいたとします::
 
     STATIC_DOC_ROOT = '/path/to/media'
 
-...we could write the above :ref:`URLconf <topics-http-urls>` entry as::
+こうしておけば、 :ref:`URLconf <topics-http-urls>` は、以下のように書けます::
 
     from django.conf import settings
     ...
     (r'^site_media/(?P<path>.*)$', 'django.views.static.serve',
             {'document_root': settings.STATIC_DOC_ROOT}),
 
-Be careful not to use the same path as your :setting:`ADMIN_MEDIA_PREFIX` (which defaults
-to ``/media/``) as this will overwrite your URLconf entry.
+:setting:`ADMIN_MEDIA_PREFIX` (デフォルト値は ``/media/``) と同じ値を使わな
+いように注意しましょう。 :setting:`ADMIN_MEDIA_PREFIX` の設定値は URLconf
+のエントリをオーバライドする形で適用されるからです。
 
 ディレクトリのリスト表示
 ========================
