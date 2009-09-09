@@ -3,7 +3,7 @@
 コードの寄贈に関する FAQ
 ==========================
 
-:revision-up-to: 11321 (1.1) unfinished
+:revision-up-to: 11321 (1.1)
 
 Django プロジェクトにコードを寄贈したいんですが、どうすればよいですか？
 -----------------------------------------------------------------------
@@ -28,83 +28,81 @@ Django プロジェクトにコードを寄贈したいんですが、どうす�
 クトに割ける時間もその時々で変化します。忙しいときには、十分な時間をかけら
 れず、なかなか要望に応えられない場合もあるのです。
 
-The best way to make sure tickets do not get hung up on the way to checkin is
-to make it dead easy, even for someone who may not be intimately familiar with
-that area of the code, to understand the problem and verify the fix:
+チケットを速やかにチェックインさせたいなら、チケットの内容をできるだけ簡単
+にして、分野の違う人であっても問題を理解でき、修正内容を検証できるようにし
+ましょう。そのために、以下のことをチェックしてください:
 
-    * Are there clear instructions on how to reproduce the bug? If this
-      touches a dependency (such as PIL), a contrib module, or a specific
-      database, are those instructions clear enough even for someone not
-      familiar with it?
+    * バグを再現するための明快な手順が書かれていますか？ (PIL のような) 外
+      部ライブラリや contrib のモジュール、特定のデータベースに依存する問題
+      の場合、そうした依存物に関する説明が、詳しくない人にとってもわかりや
+      すいでしょうか？
 
-    * If there are several patches attached to the ticket, is it clear what
-      each one does, which ones can be ignored and which matter?
+    * パッチを複数チケットに添付している場合、どのチケットが何で、本当に大
+      事なパッチとそうでないものが区別されていますか？
 
-    * Does the patch include a unit test? If not, is there a very clear
-      explanation why not? A test expresses succinctly what the problem is,
-      and shows that the patch actually fixes it.
-
+    * パッチにはユニットテストが入っていますか？そうでないなら、ユニットテ
+      ストを含めない明確な理由の説明がありますか？テストがあれば、何が問題
+      なのか、そしてパッチが実際にその問題を解決することを効果的に説明でき
+      ます。
 
 また、あなたのリクエストを Django に取り込まないとはっきりした場合でも、チ
 ケットを無視せず、必ずクローズします。従って、チケットがまだオープンの状態
 なら、リクエストは無視されているのではなく、いま一時的にリクエストに目を通
 す時間を取れないという状態なのです。
 
-When and how might I remind the core team of a patch I care about?
-------------------------------------------------------------------
+私の大事なパッチのことを、いつ、どのようにコアチームに促せばよいですか？
+------------------------------------------------------------------------
 
-A polite, well-timed message to the mailing list is one way to get attention.
-To determine the right time, you need to keep an eye on the schedule. If you
-post your message when the core developers are trying to hit a feature
-deadline or manage a planning phase, you're not going to get the sort of
-attention you require. However, if you draw attention to a ticket when the
-core developers are paying particular attention to bugs -- just before a bug
-fixing sprint, or in the lead up to a beta release for example -- you're much
-more likely to get a productive response.
+丁寧に書かれたメッセージを、メーリングリストにタイミングよくポストするのが
+コツです。タイミングをはかるには、開発のスケジュールを追いかける必要がある
+でしょう。コアチームの開発者が開発スケジュールの締め切りを目指しているとき
+やプランニングを行っているときには、思ったように注意を引けないでしょう。
+逆に、コアチームの開発者がバグフィクスに注意を払っているとき、たとえばバグ
+フィクスのためのスプリントを控えているときや、ベータリリースの最中には、建
+設的なレスポンスをもらえることでしょう。
 
-Gentle IRC reminders can also work -- again, strategically timed if possible.
-During a bug sprint would be a very good time, for example.
+IRC で適度にリマインダを送るのもそこそこ効果があるでしょう。もちろん、可能
+なら戦略的にやりましょう。たとえば、バグフィクススプリントの最中などは、と
+てもよいタイミングのはずです。
 
-Another way to get traction is to pull several related tickets together. When
-the core developers sit down to fix a bug in an area they haven't touched for
-a while, it can take a few minutes to remember all the fine details of how
-that area of code works. If you collect several minor bug fixes together into
-a similarly themed group, you make an attractive target, as the cost of coming
-up to speed on an area of code can be spread over multiple tickets.
+注意を引くもう一つの方法は、関連のある複数のチケットを一つにまとめるという
+ものです。コアの開発者がしばらくいじっていない分野のコードのバグフィクスに
+取りかかるときには、コードがどのように動くかを細かく思い出すまで時間がかか
+るものです。同じ分野の小さなバグフィクスを複数まとめて、共通のテーマをもっ
+た一つのグループとして提示すれば、特定の分野のコードに慣れるまでのコストを
+複数のチケットに分散させられるので、開発者にとっては魅力的なターゲットにな
+り得ます。
 
-Please refrain from emailing core developers personally, or repeatedly raising
-the same issue over and over. This sort of behavior will not gain you any
-additional attention -- certainly not the attention that you need in order to
-get your pet bug addressed.
+コアチームの開発者に直接メールを送るのは避けてください。また、同じ問題を何
+度も何度も繰り返すのもよくありません。その手の行動は、あなたの大切なバグの
+解決につながるような注意を全く引きません。
 
-But I've reminded you several times and you keep ignoring my patch!
--------------------------------------------------------------------
+でも、何度も催促しているのに、私のパッチは無視されたままなんですが！
+--------------------------------------------------------------------
 
-Seriously - we're not ignoring you. If your patch stands no chance of
-inclusion in Django, we'll close the ticket. For all the other tickets, we
-need to prioritize our efforts, which means that some tickets will be
-addressed before others.
+本当に、本当に無視はしていません。トラッカにあるパッチを Django に組み込ま
+ないと決めたなら、チケットは閉じられます。それ以外のチケットに対しては、優
+順位付けをして取り組んでいます。従って、チケットによっては先にポストされた
+他のチケットよりも前に解決されることがあります。
 
-One of the criteria that is used to prioritize bug fixes is the number of
-people that will likely be affected by a given bug. Bugs that have the
-potential to affect many people will generally get priority over those that
-are edge cases.
+バグフィクスの優先順位を決める基準の一つは、そのバグによって影響を受けると
+考えられるユーザの規模です。多くのユーザに重大な影響を与えるようなバグは、
+極端なケースでのみ発生するバグよりも優先されます。
 
-Another reason that bugs might be ignored for while is if the bug is a symptom
-of a larger problem. While we can spend time writing, testing and applying
-lots of little patches, sometimes the right solution is to rebuild. If a
-rebuild or refactor of a particular component has been proposed or is
-underway, you may find that bugs affecting that component will not get as much
-attention. Again, this is just a matter of prioritizing scarce resources. By
-concentrating on the rebuild, we can close all the little bugs at once, and
-hopefully prevent other little bugs from appearing in the future.
+もう一つ、バグが無視されたかのように扱われる状況があります。それは、バグが
+より大きな問題の一症状である場合です。時として、たくさんの小さなパッチを書
+いてテストし、適用していけば解決できる問題の中に、いっそ再構築してしまうの
+が正しいようなケースがあります。あるコンポーネントの再構築やリファクタが提
+案されていたり、作業中だったりする場合には、そのコンポーネントに関するバグ
+には注意が払われないことがあるのです。再構築に集中すれば、小さなバグをまと
+めて一気に閉じられるし、将来にわたって似たような小さなバグが現れるのを防げ
+ます。
 
-Whatever the reason, please keep in mind that while you may hit a particular
-bug regularly, it doesn't necessarily follow that every single Django user
-will hit the same bug. Different users use Django in different ways, stressing
-different parts of the code under different conditions. When we evaluate the
-relative priorities, we are generally trying to consider the needs of the
-entire community, not just the severity for one particular user. This doesn't
-mean that we think your problem is unimportant -- just that in the limited
-time we have available, we will always err on the side of making 10 people
-happy rather than making 1 person happy.
+理由はどうあれ、あなたの環境では常に問題化するバグが、他のすべての Django
+ユーザの環境で問題化するとは限らない、ということを覚えておいてください。
+Django のユーザはそれぞれに違う方法で Django を使っていて、コードに負荷をか
+ける場所も違えば条件も違います。全般的に、バグフィクスの優先順位を相対的に
+決めるときには、私たちは特定のユーザにとっての深刻さより、コミュニティ全体
+にとっての必要性を考慮します。だからといって、あなたの環境で起きている問題
+が重要でないと考えているわけではありません -- 限られた時間を使うときには、
+1 人のユーザを救うことより、10 人のユーザを救う側に立たざるを得ないのです。
