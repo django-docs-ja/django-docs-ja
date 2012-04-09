@@ -4,13 +4,10 @@
 ペジネータ (paginator)
 =========================
 
-:revision-up-to: 11321 (1.1) unfinished
+:revision-up-to: 17812 (1.4)
 
 .. module:: django.core.paginator
    :synopsis: ページ分割されたデータを管理しやすくするためのクラスです。
-
-.. versionchanged:: 1.0
-   ペジネーション機能はバージョン 1.0 でほぼ完全に書き直されました。
 
 Django は、ページ分割された (paginated) データを扱うためのペジネータ
 (paginator) クラスを提供しています。ページ分割とは、データが複数のページに
@@ -79,40 +76,38 @@ Django は、ページ分割された (paginated) データを扱うためのペ
     のようなオブジェクトで、より効率的な ``count()`` を呼び出しています。 
 
 
-Using ``Paginator`` in a view
-==============================
+``Paginator`` をビューで使う
+============================
 
-Here's a slightly more complex example using :class:`Paginator` in a view to
-paginate a queryset. We give both the view and the accompanying template to
-show how you can display the results. This example assumes you have a
-``Contacts`` model that has already been imported.
+今度は、ビューの中でクエリセットをページ分割するために :class:`Paginator` を
+使うもう少し複雑な例です。どのように結果が表示されるかが分かるように、ビュー
+とビューが使うテンプレートの両方を示します。この例では ``Contacts`` モデルが
+既にインポートされているものとします。
 
-The view function looks like this::
+ビュー関数は以下のようになります::
 
-    from django.core.paginator import Paginator, InvalidPage, EmptyPage
+    from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
     def listing(request):
         contact_list = Contacts.objects.all()
         paginator = Paginator(contact_list, 25) # Show 25 contacts per page
 
-        # Make sure page request is an int. If not, deliver first page.
-        try:
-            page = int(request.GET.get('page', '1'))
-        except ValueError:
-            page = 1
-
-        # If page request (9999) is out of range, deliver last page of results.
+        page = request.GET.get('page')
         try:
             contacts = paginator.page(page)
-        except (EmptyPage, InvalidPage):
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            contacts = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
             contacts = paginator.page(paginator.num_pages)
 
         return render_to_response('list.html', {"contacts": contacts})
 
-In the template :file:`list.html`, you'll want to include navigation between
-pages along with any interesting information from the objects themselves::
+テンプレート :file:`list.html` では、ページ間のナビゲーションを組み込みたいで
+しょう。ページはオブジェクトをもとにした何らかの興味深い情報を含んでいます::
 
-    {% for contact in contacts.object_list %}
+    {% for contact in contacts %}
         {# Each "contact" is a Contact model object. #}
         {{ contact.full_name|upper }}<br />
         ...
@@ -133,6 +128,11 @@ pages along with any interesting information from the objects themselves::
             {% endif %}
         </span>
     </div>
+
+.. versionchanged:: 1.4
+    以前は ``Page`` オブジェクトがイテレーション可能ではなかったので
+    ``{% for contact in contacts.object_list %}``
+    とする必要がありました。
 
 
 ``Paginator`` オブジェクト
@@ -176,9 +176,9 @@ pages along with any interesting information from the objects themselves::
 
 .. method:: Paginator.page(number)
 
-    指定ページの :class:``Page`` オブジェクトを返します。ページ番号は 1 か
-    ら始まる数です。存在しないページを指定すると :exc:`InvalidPage` を送出
-    します。
+    指定ページの :class:`Page` オブジェクトを返します。ページ番号は 1 から
+    始まる数です。存在しないページを指定すると :exc:`InvalidPage` を送出し
+    ます。
 
 属性
 ------
@@ -192,7 +192,7 @@ pages along with any interesting information from the objects themselves::
         ``object_list`` に入っているオブジェクトの個数を調べるときに、
         ``Paginator`` はまず ``object_list.count()`` を呼びます。
         ``object_list`` に ``count()`` メソッドがなければ、 ``Paginator`` 
-	は ``object_list.__len__()`` に切り替えます。これにより、
+        は ``len(object_list)`` に切り替えます。これにより、
         ``QuerySet`` のようなオブジェクトで、より効率的な ``count()`` を呼
         び出しているのです。
         
@@ -204,33 +204,44 @@ pages along with any interesting information from the objects themselves::
     
     ``[1, 2, 3, 4]`` のように、 1 から始まるページ番号です。
 
+
 ``InvalidPage`` 例外
 ==========================
 
-リクエストされたページが無効なページ (整数でないページ番号) であったり、ペー
-ジにオブジェクトが含まれていない場合、 ``page()`` メソッドは
-``InvalidPage`` を送出します。通常はこの ``InvalidPage`` 例外をトラップする
-だけですみますが、より細かく例外処理するには、以下の例外をトラップしてくだ
-さい:
+.. exception:: InvalidPage
 
-``PageNotAnInteger``
+       ペジネータが不正なページ番号を渡された時に送出される例外の基底クラス
+       です。
+
+リクエストされたページが無効なページ (整数でないページ番号) であったり、ペー
+ジにオブジェクトが含まれていない場合、 :meth:`Paginator.page` メソッドは例外
+を送出します。通常はこの ``InvalidPage`` 例外をトラップするだけですみますが、
+より細かく例外処理するには、以下の例外をトラップしてください:
+
+.. exception:: PageNotAnInteger
+
     ``page()`` に整数でない値を渡したときに送出されます。
 
-``EmptyPage`` 
+.. exception:: EmptyPage
+
     ``page()`` には有効な値が渡されているが、ページにオブジェクトが含まれな
     い場合に送出されます。
 
-どちらの例外も ``InvalidPage`` のサブクラスなので、単に
+どちらの例外も :exc:``InvalidPage`` のサブクラスなので、単に
 ``except InvalidPage`` としておけば両方の例外を捕捉できます。
+
 
 ``Page`` オブジェクト
 =====================
 
+普通は ``Page`` オブジェクトを手動で作ろうとは思わないでしょう。
+:meth:`Paginator.page` を使って取得できます。
+
 .. class:: Page(object_list, number, paginator):
 
-You usually won't construct :class:`Pages <Page>` by hand -- you'll get them
-using :meth:`Paginator.page`.
-
+.. versionadded:: 1.4
+    ``len()`` を使ったり直接イテレーションする場合、ページは
+    :attr:`Page.object_list` のように振る舞います。
 
 メソッド
 ---------
