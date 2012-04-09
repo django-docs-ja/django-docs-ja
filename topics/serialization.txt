@@ -1,10 +1,8 @@
-.. _topics-serialization:
-
 =================================
 Django オブジェクトのシリアライズ
 =================================
 
-:revision-up-to: 11321 (1.1) unfinished
+:revision-up-to: 17812 (1.4)
 
 Django のシリアライズフレームワークを使うと、 Django オブジェクトを他の形式
 に「翻訳」できます。通常、こうした形式はテキストベースで、 Django オブジェ
@@ -13,8 +11,8 @@ Django のシリアライズフレームワークを使うと、 Django オブ�
 
 .. seealso::
 
-    If you just want to get some data from your tables into a serialized
-    form, you could use the :djadmin:`dumpdata` management command.
+    もしテーブルに入っているデータをシリアライズされた形式で取り出したいだ
+    けなら、 :djadmin:`dumpdata` コマンドを使うことができます。
 
 データのシリアライズ
 --------------------
@@ -43,6 +41,12 @@ Django のシリアライズフレームワークを使うと、 Django オブ�
 
     out = open("file.xml", "w")
     xml_serializer.serialize(SomeModel.objects.all(), stream=out)
+
+.. note::
+
+    :func:`~django.core.serializers.get_serializer` に不明な
+    :ref:`format <serialization-formats>` を渡すと、
+    :class:`~django.core.serializers.SerializerDoesNotExist` が送出されます。
 
 一部のフィールドだけをシリアライズする
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -135,35 +139,35 @@ Django オブジェクト自体に対するインスペクションは、
 シリアライズの形式
 ------------------
 
-Django supports a number of serialization formats, some of which require you
-to install third-party Python modules:
+Django は複数のシリアライズ形式に対応しています。そのうちいくつかではサード
+パーティモジュールのインストールが必要です。
 
-    ==========  ==============================================================
-    名前        情報
-    ==========  ==============================================================
-    ``xml``     単純な XML シリアライザです。
+==========  ==============================================================
+名前        情報
+==========  ==============================================================
+``xml``     単純な XML シリアライザです。
 
-    ``json``    JSON_ シリアライザ (Django に付属の simplejson_ を使ったも
-                の) です。 
+``json``    JSON_ シリアライザ (Django に付属の simplejson_ を使ったも
+            の) です。 
 
-    ``python``  「単純な」Python オブジェクト (リスト、辞書、文字列など) の
-                シリアライザです。単体では取り立てて便利ではありませんが、
-                他のシリアライザのベースになっています。
+``python``  「単純な」Python オブジェクト (リスト、辞書、文字列など) の
+            シリアライザです。単体では取り立てて便利ではありませんが、
+            他のシリアライザのベースになっています。
 
-    ``yaml``    YAML (YAML Ain't a Markup Language) へのシリアライザです。
-                このシリアライザは PyYAML_ がインストールされている場合のみ
-                利用できます。
-    ==========  ==============================================================
+``yaml``    YAML (YAML Ain't a Markup Language) へのシリアライザです。
+            このシリアライザは PyYAML_ がインストールされている場合のみ
+            利用できます。
+==========  ==============================================================
 
 .. _json: http://json.org/
 .. _simplejson: http://undefined.org/python/#simplejson
 .. _PyYAML: http://www.pyyaml.org/
  
 各シリアライズ形式についての注意
---------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 json
-~~~~
+^^^^
 
 UTF-8 (や、非 ASCII エンコーディング) でエンコードされたデータを JSON シリ
 アライザで扱うには、 ``serialize()`` のパラメタに ``ensure_ascii=False`` を
@@ -175,15 +179,14 @@ UTF-8 (や、非 ASCII エンコーディング) でエンコードされたデ�
     json_serializer.serialize(queryset, ensure_ascii=False, stream=response)
 
 Django のソースコードには simplejson_ モジュールが付属しています。
-However, if you're
-using Python 2.6 (which includes a builtin version of the module), Django will
-use the builtin ``json`` module automatically. If you have a system installed
-version that includes the C-based speedup extension, or your system version is
-more recent than the version shipped with Django (currently, 2.0.7), the
-system version will be used instead of the version included with Django.
+ですが、もし (組み込みバージョンのモジュールが付属する) Python 2.6 かそれ以
+降のバージョンを使っているなら、 Django は自動的に組み込みの ``json`` モジュ
+ールを使います。Cベースの高速化拡張を含むシステムインストール版や、もっと最
+近のバージョンを使っているなら Django に付属しているバージョンの代わりにシス
+テムバージョンが使われます。
 
 注意してほしいのは、このモジュールを直接使ってシリアライズを実行すると、一
-部のDjango オブジェクトは何らかの変更が加えられた上で simplejson に渡されて
+部の Django オブジェクトは何らかの変更が加えられた上で simplejson に渡されて
 しまうということです。特に、 :ref:`遅延翻訳オブジェクト
 <lazy-translations>` をシリアライズする場合は、 `特殊なエンコーダ`_ が必要
 です。以下のように書くと、うまくいくでしょう::
@@ -200,3 +203,214 @@ system version will be used instead of the version included with Django.
 .. _simplejson: http://undefined.org/python/#simplejson
 .. _special encoder: http://svn.red-bean.com/bob/simplejson/tags/simplejson-1.7/docs/index.html
 .. _`特殊なエンコーダ`: `special encoder`_
+
+ナチュラルキー
+--------------
+
+.. versionadded:: 1.2
+
+    データをシリアライズ、デシリアライズする時に本来のキーを使用する機能が 1.2
+    で追加されました。
+
+外部キーや多対多のリレーションをシリアライズする時の基本方針は、リレーションオ
+ブジェクトの主キー値をシリアライズすることです。
+この方針はたいていのオブジェクトに対してうまくいきますが、特定の状況では難しい
+問題を引き起こします。
+
+:class:`~django.contrib.conttenttypes.models.ContentType` を参照する外部キーを
+持つオブジェクトのリストを考えてください。オブジェクトをシリアライズしようとす
+ると、 ContentType を参照する方法がなければいけません。
+``ContentType`` オブジェクトはデータベースへの同期処理で Django が自動的に生成
+するので、 ContentType の主キーを予測するのは困難です。それはいつ
+:djadmin:`syncdb` が実行されたかによって決まるでしょう。このことはオブジェクト
+を生成する全てのモデル、特に :class:`~django.contrib.auth.models.Permission` 、
+:class:`~django.contrib.auth.models.Group` 、
+:class:`~django.contrib.auth.models.User` において成り立ちます。
+
+.. warning::
+
+    自動生成されたオブジェクトを、フィクスチャや他のシリアライズされたデータに
+    含めるべきではありません。フィクスチャの中の主キーが偶然データベースの中の
+    主キーに一致すると、フィクスチャのロードが効果を持たなくなってしまいます。
+    もっとありそうなのは、主キーが一致せずにロードが
+    :class:`~django.db.IntegrityError` を出して失敗するということです。
+
+これは利便性の問題とも言えます。整数のIDはオブジェクトを参照するのにいつも一番
+良い方法というわけではありません。時にはより分かりやすい自然な参照があるかもし
+れません。
+
+これらの理由から Django は *ナチュラルキー* を提供します。ナチュラルキーは値の
+タプルで、主キーを使わずにオブジェクトインスタンスを特定するために使うことがで
+きます。
+
+ナチュラルキーのデシリアライズ
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+次のような２つのモデルを考えてください::
+
+    from django.db import models
+
+    class Person(models.Model):
+        first_name = models.CharField(max_length=100)
+        last_name = models.CharField(max_length=100)
+
+        birthdate = models.DateField()
+
+        class Meta:
+            unique_together = (('first_name', 'last_name'),)
+
+    class Book(models.Model):
+        name = models.CharField(max_length=100)
+        author = models.ForeignKey(Person)
+
+通常、 ``Book`` のシリアライズ済みデータは著者を参照するのに整数を使います。
+例えば JSON では、 Book はこのようにシリアライズされるかもしれません::
+
+    ...
+    {
+        "pk": 1,
+        "model": "store.book",
+        "fields": {
+            "name": "Mostly Harmless",
+            "author": 42
+        }
+    }
+    ...
+
+これは著者を参照するための特に自然な方法とは言えません。著者を参照する主キーの値
+を知っていなければなりませんし、主キーの値は変更がなく、予測可能なものでなければ
+なりません。
+
+しかし、 Person を扱うナチュラルキーを追加すれば、このフィクスチャはより理解しや
+すいものになります。ナチュラルキーの扱いを追加するには、 Person のデフォルトマネ
+ジャに ``get_by_natural_key()`` メソッドを定義してください。 Person の場合、
+ファーストネームとラストネームが良いナチュラルキーかもしれません::
+
+    from django.db import models
+
+    class PersonManager(models.Manager):
+        def get_by_natural_key(self, first_name, last_name):
+            return self.get(first_name=first_name, last_name=last_name)
+
+    class Person(models.Model):
+        objects = PersonManager()
+
+        first_name = models.CharField(max_length=100)
+        last_name = models.CharField(max_length=100)
+
+        birthdate = models.DateField()
+
+        class Meta:
+            unique_together = (('first_name', 'last_name'),)
+
+これで Book は ``Person`` オブジェクトを参照するナチュラルキーを使えます::
+
+    ...
+    {
+        "pk": 1,
+        "model": "store.book",
+        "fields": {
+            "name": "Mostly Harmless",
+            "author": ["Douglas", "Adams"]
+        }
+    }
+    ...
+
+シリアライズ済みデータをロードしようとすると、 ``["Douglas", "Adams"]`` を実際
+の ``Person`` オブジェクトの主キーへと解決するために、 Django は
+``get_by_natural_key()`` を使います。
+
+.. note::
+
+    ナチュラルキーに使うフィールドは、オブジェクトを一意に特定することができなけ
+    ればなりません。これは普通、そのモデルがユニーク句を持っていることを意味しま
+    す。（単独のフィールドで unique=True であるか、複数のフィールドに対して
+    ``unique_together`` であるか）しかし、データベースレベルでユニークであること
+    は強制されません。実際上ユニークだという確証があれば、それらのフィールドをナ
+    チュラルキーとして使うことができます。
+
+ナチュラルキーのシリアライズ
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+さて、オブジェクトをシリアライズする時に Django にナチュラルキーを発行させるにはど
+うすれば良いでしょうか。まず、もう一つのメソッドを、今度はモデル自身に追加する必
+要があります::
+
+    class Person(models.Model):
+        objects = PersonManager()
+
+        first_name = models.CharField(max_length=100)
+        last_name = models.CharField(max_length=100)
+
+        birthdate = models.DateField()
+
+        def natural_key(self):
+            return (self.first_name, self.last_name)
+
+        class Meta:
+            unique_together = (('first_name', 'last_name'),)
+
+このメソッドは常にナチュラルキーのタプルを返すべきです。この例では
+``(first name, last name)`` です。それから、 ``serializers.serialize()`` を呼ぶ時
+に ``use_natural_keys=True`` 引数を渡します::
+
+    >>> serializers.serialize('json', [book1, book2], indent=2, use_natural_keys=True)
+
+``use_natural_keys=True`` が指定されると、 Django はこのメソッドを定義している型の
+オブジェクト参照をシリアライズするために、 ``natural_key()`` メソッドを使います。
+
+シリアライズデータを生成するために :djadmin:`dumpdata` を使う時は、 `--natural`
+コマンドラインフラグを使います。
+
+.. note::
+
+    ``natural_key()`` と ``get_by_natural_key()`` の両方を定義する必要はありませ
+    ん。シリアライズの時にナチュラルキーを出力させたくなく、しかもナチュラルキー
+    をロードすることもできるようにするには、 ``natural_key()`` メソッドを実装しな
+    いということも可能です。
+
+    逆に言えば、（何かの変わった理由で）シリアライズ時にナチュラルキーを出力させ
+    たく、かつこれらのキーを出力できないようにしたければ、
+    ``get_by_natural_key()`` メソッドを定義するだけにすれば良いのです。
+
+シリアライズ中の依存関係
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+ナチュラルキーは参照を解決するためにデータベースのルックアップに依存するので、参
+照される前にデータが存在することが大切です。ナチュラルキーで `forward refernce`
+を作ることはできません。ナチュラルキーをデータに含める前に、参照したいデータが存
+在していなければならないのです。
+
+この制限に適応させるため、 :djadmin:`dumpdata` で :djadminopt:`--natural` オプシ
+ョンを使うと、どんなモデルでも標準的な主キーオブジェクトでのシリアライズより前に
+``natural_key()`` メソッドでシリアライズされます。
+
+しかし、いつもこれで充分とは限りません。外部キーかナチュラルキーによってナチュラ
+ルキーの一部である別のオブジェクトを参照している時には、シリアライズされたデータ
+のなかでは依存される側のオブジェクトが先に出現することを保証できなければなりませ
+ん。
+
+この順序を保証するため、 ``natural_key()`` メソッドに依存関係を定義できます。
+``natural_key()`` メソッド自体に ``dependencies`` 属性を設定するのです。
+
+例えば、 上の例で見た ``Book`` モデルにナチュラルキーを与えましょう::
+
+    class Book(models.Model):
+        name = models.CharField(max_length=100)
+        author = models.ForeignKey(Person)
+
+        def natural_key(self):
+            return (self.name,) + self.author.natural_key()
+
+``Book`` のナチュラルキーは名前と著者の組み合わせです。つまり ``Person`` は
+``Book`` より先にシリアライズされる必要があります。この依存関係を定義するため、
+もう一行加えます::
+
+        def natural_key(self):
+            return (self.name,) + self.author.natural_key()
+        natural_key.dependencies = ['example_app.person']
+
+この定義により、どんな ``Person`` オブジェクトも ``Book`` オブジェクトより先に
+シリアライズされることが保証されます。逆に、 ``Book`` を参照するどんなオブジェ
+クトも、 ``Person`` と ``Book`` の両方がシリアライズされた後にシリアライズされ
+るでしょう。
