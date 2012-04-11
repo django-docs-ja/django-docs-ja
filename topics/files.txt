@@ -1,12 +1,8 @@
-.. _topics-files:
-
 ==============
 ファイルの管理
 ==============
 
-:revision-up-to: 11321 (1.1)
-
-.. versionadded:: 1.0
+:revision-up-to: 17812 (1.4)
 
 このドキュメントでは、 Django のファイルアクセス API について解説します。
 
@@ -26,7 +22,8 @@
 :class:`~django.db.models.ImageField` を使うと、 Django はフィールドに対し
 てファイルを操作するための API を提供します。
 
-以下のような、写真の保存に ``FileField`` を使っているモデルを考えましょう::
+以下のような、写真の保存に :class:`~django.db.models.ImageField` を使っている
+モデルを考えましょう::
 
     class Car(models.Model):
         name = models.CharField(max_length=255)
@@ -49,15 +46,20 @@
 このオブジェクト (例中の ``car.photo``) が ``File`` オブジェクトで、後で述
 べるメソッドや属性を備えています。
 
+.. note::
+    モデルがデータベースに保存される一環としてファイルは保存されます。
+    なので、モデルの保存が終わるまで実際のファイル名は信用できません。
+
+
 ``File`` オブジェクト
 =====================
 
 内部的には、 Django はファイルを表現する必要がある場合には常に 
-``django.core.files.File`` を使います。このオブジェクトは Python の
+:class:`django.core.files.File` を使います。このオブジェクトは Python の
 `組み込みファイルオブジェクト <built-in file object>`_ に対する薄いラッパで、
 Django 固有の機能が追加されています。
 
-.. _built-in file object: http://docs.python.org/lib/bltin-file-objects.html
+.. _built-in file object: http://docs.python.org/library/stdtypes.html#bltin-file-objects
 
 普段は、単に (モデルに結びつけられたファイルや、アップロードされたファイル
 として) Django から渡される ``File`` オブジェクトを使うだけでしょう。
@@ -71,8 +73,8 @@ Django 固有の機能が追加されています。
     >>> f = open('/tmp/hello.world', 'w')
     >>> myfile = File(f)
 
-これで、 ``File`` の全ての属性やメソッドを使えます。 ``File`` の属性やメソッ
-ドは :ref:`ref-files-file` で解説しています。
+これで、 :class:`django.core.files.File` クラスの属性やメソッドの全てを
+使えます。
 
 .. _file-storage:
 
@@ -88,7 +90,7 @@ Django のデフォルトのファイルストレージは :setting:`DEFAULT_FIL
 イルストレージとしてこの設定の値を使います。
 
 組み込みのファイルストレージシステムの詳細は下記を参照してください。また、
-ファイルストレージシステムを自作する方法は :ref:`howto-custom-file-storage`
+ファイルストレージシステムを自作する方法は :doc:`/howto/custom-file-storage`
 を参照してください。
 
 ストレージオブジェクト
@@ -115,7 +117,7 @@ Django のデフォルトのファイルストレージは :setting:`DEFAULT_FIL
     >>> default_storage.exists(path)
     False
 
-ファイルストレージの API については :ref:`ref-files-storage` を参照してくだ
+ファイルストレージの API については :doc:`/ref/files/storage` を参照してくだ
 さい。
 
 組み込みのファイルシステムストレージクラス
@@ -130,14 +132,14 @@ Django には組み込みの ``FileSystemStorage`` クラスが付属してい�
 引数                    説明
 ======================  ===================================================
 ``location``            省略可能です。ファイルを保存するディレクトリの絶対
-                        パスです。省略すると、 ``MEDIA_ROOT`` の設定値を使
-			います。
+                        パスです。省略すると、 :settings:`MEDIA_ROOT` の
+                        設定値を使います。
 ``base_url``            省略可能です。保存されているファイルを公開する URL
-                        です。省略すると、 ``MEDIA_URL`` の設定値を使いま
-                        す。
+                        です。省略すると、 :settings:`MEDIA_URL` の設定値を
+                        使います。
 ======================  ===================================================
 
-例えば、以下のコードは、アップロードされたファイルを ``MEDIA_ROOT`` の設定
+例えば、以下のコードは、アップロードされたファイルを :settings:`MEDIA_ROOT` の設定
 値と関係なく、 ``/media/photos`` 以下に保存します::
 
     from django.db import models
@@ -149,5 +151,6 @@ Django には組み込みの ``FileSystemStorage`` クラスが付属してい�
         ...
         photo = models.ImageField(storage=fs)
 
-:ref:`カスタムのストレージシステム <howto-custom-file-storage>` でも同じで、
-``FileField`` の ``storage`` にストレージのインスタンスを渡します。
+:doc:`カスタムのストレージシステム </howto/custom-file-storage>` でも同じで、
+:class:`~django.db.models.FileField` の ``storage`` にストレージのインスタンスを
+渡します。
