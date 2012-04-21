@@ -1,22 +1,18 @@
-.. _topics-email:
+============
+メールの送信
+============
 
-=================
-電子メールの送信
-=================
-
-:revision-up-to: 11321 (1.1) unfinished
+:revision-up-to: 17812 (1.4)
 
 .. module:: django.core.mail
-   :synopsis: 電子メールを簡単に送信するためのヘルパです。
+   :synopsis: メールを簡単に送信するためのヘルパです。
 
-Python の `smtplib ライブラリ`_ を使えば、比較的簡単に電子メールを送信でき
-ますが、 Django ではこのライブラリへの軽量ラッパを二つ用意して、電子メール
-の送信を極めて素早くおこなえるようにしています。
+Python の :mod:`smtplib` モジュール を使えば、比較的簡単にメールを送信できます
+が、 Django ではこのライブラリへの軽量ラッパを二つ用意しています。これらのラッパ
+ではメールの送信を極めて素早くおこなえ、開発時のテストメールの送信を簡単にでき、
+SMTPを使えないプラットフォームにも対応しています。
 
 コードは: ``django.core.mail`` にあります。
-
-.. _`smtplib ライブラリ`: http://www.python.jp/doc/release/lib/module-smtplib.html
-.. _smtplib library: http://www.python.org/doc/current/lib/module-smtplib.html
 
 お手軽な例
 ==========
@@ -28,112 +24,123 @@ Python の `smtplib ライブラリ`_ を使えば、比較的簡単に電子メ
     send_mail('Subject here', 'Here is the message.', 'from@example.com',
         ['to@example.com'], fail_silently=False)
 
-これで、 :setting:`EMAIL_HOST` および :setting:`EMAIL_PORT` 設定で指定した
-SMTP ホストを介してメールを送信します。 :setting:`EMAIL_HOST_USER` および
-:setting:`EMAIL_HOST_PASSWORD` を指定していれば、 SMTP サーバの認証に使い
-ます。また、SMTP サーバとの接続に TLS を使うかどうかを
+これで、 :setting:`EMAIL_HOST` および :setting:`EMAIL_PORT` 設定で指定した SMTP
+ホストを介してメールを送信します。 :setting:`EMAIL_HOST_USER` および
+:setting:`EMAIL_HOST_PASSWORD` を指定していれば、 SMTP サーバの認証に使います。
+また、SMTP サーバとの接続に TLS を使うかどうかを
 :setting:`EMAIL_USE_TLS` で設定できます。
 
 .. note::
 
-    ``django.core.mail`` で送信される電子メールの文字セットは
+    ``django.core.mail`` で送信されるメールの文字セットは
     :setting:`DEFAULT_CHARSET`  設定の値に設定されます。
     
 
 send_mail()
 ===========
 
-電子メールを送信する最も簡単な方法は ``django.core.mail.send_mail()``
-関数です。この関数の定義は以下の通りです:
+.. function:: send_mail(subject, message, from_email, recipient_list, fail_silently=False, auth_user=None, auth_password=None, connection=None)
 
-    .. function:: send_mail(subject, message, from_email, recipient_list, fail_silently=False, auth_user=None, auth_password=None)
+メールを送信する最も簡単な方法は ``django.core.mail.send_mail()`` です。
 
 ``subject``, ``message``, ``from_email`` および ``recipient_list`` は必須の
 パラメタです。
 
-    * ``subject``: 文字列です。
-    * ``message``: 文字列です。
-    * ``from_email``: 文字列です。
-    * ``recipient_list``: 文字列からなるリストで、各々が電子メールアドレス
-      を表します。 ``recipient_list`` に入っているユーザは、お互いに他のユー
-      ザをメールの "To:" フィールドで見られます。
-    * ``fail_silently``: ブール型の値です。 ``False`` なら ``send_mail`` は
-      ``smtplib.SMTPException`` 例外を出すようになります。 
-      送出されうる例外のリストは `smtplib のドキュメント`_ を参照してくださ
-      い。いずれの例外も ``SMTPException`` のサブクラスです。
-    * ``auth_user``: オプションです。 SMTP サーバでの認証に使うユーザ名です。
-      この値を指定しなければ、 Django は ``EMAIL_HOST_USER`` 設定を使います。
-    * ``auth_password``: オプションです。 SMTP サーバでの認証に使うパスワー
-      ドです。この値を指定しなければ、 Django は ``EMAIL_HOST_PASSWORD`` 設
-      定を使います。
-
-.. _`smtplib のドキュメント`:
-   http://www.python.jp/doc/release/lib/module-smtplib.html
-.. _smtplib docs:
-   http://www.python.org/doc/current/lib/module-smtplib.html
+* ``subject``: 文字列です。
+* ``message``: 文字列です。
+* ``from_email``: 文字列です。
+* ``recipient_list``: 文字列からなるリストで、各々がメールアドレ
+  スを表します。 ``recipient_list`` に入っているユーザは、お互いに他のユー
+  ザをメールの "To:" フィールドで見られます。
+* ``fail_silently``: ブール型の値です。 ``False`` なら ``send_mail`` は
+  :exc:`smtplib.SMTPException` 例外を出すようになります。
+  送出されうる例外のリストは :mod:`smtplib` ドキュメントを参照してくださ
+  い。いずれの例外も :exc:`~smtplib.SMTPException` のサブクラスです。
+* ``auth_user``: オプションです。 SMTP サーバでの認証に使うユーザ名です。
+  この値を指定しなければ、 Django は :setting:`EMAIL_HOST_USER` 設定を使います。
+* ``auth_password``: オプションです。 SMTP サーバでの認証に使うパスワー
+  ドです。この値を指定しなければ、 Django は :setting:`EMAIL_HOST_PASSWORD` 設
+  定を使います。
+* ``connection``: オプションです。メール送信に使うバックエンドです。
+  明示しなければデフォルトのバックエンドが使われます。詳細はドキュメントの
+  :ref:`Email backends <topic-email-backends>` を参照してください。
 
 send_mass_mail()
 ================
 
-``django.core.mail.send_mass_mail()`` は一括電子メール (mass e-mail) の送信
-用の関数です。この関数の定義は以下の通りです:
+.. function:: send_mass_mail(datatuple, fail_silently=False, auth_user=None, auth_password=None, connection=None)
 
-    .. function:: send_mass_mail(datatuple, fail_silently=False, auth_user=None, auth_password=None)
+``django.core.mail.send_mass_mail()`` は一括メール (mass email) の送信
+用の関数です。この関数の定義は以下の通りです
 
 ``datatuple`` はタプルで、各要素は以下の形式になっています::
 
     (subject, message, from_email, recipient_list)
 
 ``fail_silently``, ``auth_user`` および ``auth_password`` は
-``send_mail()`` と同じです。
+:meth:`~django.core.mail.send_mail()` と同じです。
 
-``datatuple`` の各要素ごとに個別の電子メールメッセージを作成して送信します。
-``send_mail()`` と同様、同じ ``recipient_list`` に入っている受信者は、他の
-受信者を "To:" フィールドで見られます。
+``datatuple`` の各要素ごとに個別のメールメッセージを作成して送信します。
+:meth:`~django.core.mail.send_mail()` と同様、同じ ``recipient_list`` に入ってい
+る受信者は、他の受信者を "To:" フィールドで見られます。
+
+例えば下記のコードでは、2つのメールがそれぞれ複数の宛先に一斉送信されます。
+しかし、メールサーバへの接続は1つだけ開かれます。::
+
+    message1 = ('Subject here', 'Here is the message', 'from@example.com', ['first@example.com', 'other@example.com'])
+    message2 = ('Another Subject', 'Here is another message', 'from@example.com', ['second@test.com'])
+    send_mass_mail((message1, message2), fail_silently=False)
+
 
 send_mass_mail() と send_mail()
 -------------------------------
 
-``send_mass_mail()`` と ``send_mail()`` の大きな違いは、 ``send_mail()``
-は実行の度にメールサーバに接続するのに対し、 ``send_mass_mail()`` は全ての
-メッセージの送信に一つの接続を使う点です。このため、 ``send_mass_mail()`` 
+:meth:`~django.core.mail.send_mass_mail()` と :meth:`~django.core.mail.send_mail()`
+の大きな違いは :meth:`~django.core.mail.send_mail()` は実行の度にメールサーバに
+接続するのに対し、 :meth:`~django.core.mail.send_mass_mail()` は全てのメッセージの
+送信に一つの接続を使う点です。このため、 :meth:`~django.core.mail.send_mass_mail()`
 の方が少しだけ効率的です。
 
 mail_admins()
 =============
 
-``django.core.mail.mail_admins()`` は :setting:`ADMINS` に書かれたサイト管
-理者への電子メール送信を行うためのショートカットです。関数の定義は以下の通
-りです:
+.. function:: mail_admins(subject, message, fail_silently=False, connection=None, html_message=None)
 
-    .. function:: mail_admins(subject, message, fail_silently=False)
+``django.core.mail.mail_admins()`` は :setting:`ADMINS` に書かれたサイト管理者
+へのメール送信を行うためのショートカットです。
 
 ``mail_admins()`` はサブジェクトの先頭に :setting:`EMAIL_SUBJECT_PREFIX` の
 設定値を付加します。デフォルトは ``"[Django] "`` です。
 
-電子メールの "From:" ヘッダには :setting:`SERVER_EMAIL` の設定値が入ります。
+メールの "From:" ヘッダには :setting:`SERVER_EMAIL` の設定値が入ります。
 
 このメソッドは利便性と可読性のために用意されています。
+
+.. versionchanged:: 1.3
+ 
+``html_message`` が指定されているなら、結果のメールは
+:mimetype:`multipart/alternative` メールになります。 :mimetype:`text/plain`
+タイプの ``message`` と :mimetype:`text/html` タイプの ``html_message`` から
+なります。
 
 mail_managers()
 ===============
 
-``django.core.mail.mail_managers()`` は ``mail_admins`` と同じですが、
-電子メールを :setting:`MANAGERS` に書かれたサイトマネジャに送信します
-関数は以下のように定義されています::
+.. function:: mail_managers(subject, message, fail_silently=False, connection=None, html_message=None)
 
-    .. function:: mail_managers(subject, message, fail_silently=False)
+``django.core.mail.mail_managers()`` は ``mail_admins()`` と同じですが、メールを
+:setting:`MANAGERS` 設定に書かれたサイトマネジャに送信します。
 
 例
 ===
 
-以下の例は、単一の電子メールを john@example.com と jane@example.com に送信
+以下の例は、単一のメールを john@example.com と jane@example.com に送信
 します。両方の宛先が "To:" に表示されます::
 
     send_mail('Subject', 'Message.', 'from@example.com',
         ['john@example.com', 'jane@example.com'])
 
-以下の例は、単一の電子メールを john@example.com と jane@example.com に送信
+以下の例は、単一のメールを john@example.com と jane@example.com に送信
 しますが、受け取り人はそれぞれ別々のメッセージを受け取ります::
 
     datatuple = (
@@ -146,18 +153,18 @@ mail_managers()
 ============================
 
 `ヘッダインジェクション`_ とは、スクリプトが生成したメッセージの "To:" や
-"From:" に、攻撃者が余分な電子メールヘッダを挿入するというセキュリティ侵害
+"From:" に、攻撃者が余分なメールヘッダを挿入するというセキュリティ侵害
 です。
 
-上記で解説した Django の電子メール機能では、ヘッダの値に改行を使えないよう
+上記で解説した Django のメール機能では、ヘッダの値に改行を使えないよう
 にしてヘッダインジェクションを防御しています。 ``subject``, ``from_email`` 
 および ``recipient_list`` が (Unix, Windows または Mac 形式の) 改行を含む場
-合、電子メール送信関数 (``send_mail()`` など) は
+合、メール送信関数 ( :meth:`~django.core.mail.send_mail()` など) は
 ``django.core.mail.BadHeaderError`` 例外 (``ValueError`` のサブクラス) を送
-出します。このため、電子メールは送信されません。電子メール送信関数に渡すデー
+出します。このため、メールは送信されません。メール送信関数に渡すデー
 タの検証はユーザに任されています。
 
-``message`` の文字列の先頭にヘッダが入っている場合、ヘッダは単に電子メッセー
+``message`` の文字列の先頭にヘッダが入っている場合、ヘッダは単にメッセー
 ジ本文の先頭部分として出力されます。
 
 以下に示すのは、  ``subject``, ``message`` および ``from_email`` をリクエス
@@ -186,72 +193,79 @@ mail_managers()
 
 .. _emailmessage-and-smtpconnection:
 
-EmailMessage および SMTPConnection クラス
-=========================================
+EmailMessage クラス
+===================
 
-.. versionadded:: 1.0
+Django の :meth:`~django.core.mail.send_mail()`` および
+:meth:`~django.core.mail.send_mass_mail()` 関数は、実際には
+:class:`~django.core.mail.EmailMessage` クラスに対して薄いラッパをかぶせたものに
+すぎません。
 
-Django の ``send_mail()`` および ``send_mass_mail()`` 関数は、実際には
-``django.core.mail`` の ``EmailMessage`` クラスや ``SMTPConnection`` クラス
-に対して薄いラッパをかぶせたものにすぎません。 Django からメールを送信する
-方法をカスタマイズしたければ、これらのクラスをサブクラス化してやりたいこと
-を実現できます。
+:meth:`~django.core.mail.send_mail()` をはじめとしたラッパ関数から利用できる
+機能は、 :class:`~django.core.mail.EmailMessage` クラスで提供している全ての
+機能をカバーしているわけではありません。BCC への宛先を指定やファイルの添付、
+マルチパート形式メールの送信などを行いたい場合には、
+:class:`~django.core.mail.EmailMessage` インスタンスを直接生成する必要があり
+ます。
 
 .. note::
-    
-    ``send_mail()`` をはじめとしたラッパ関数から利用できる機能は、
-    ``EmailMessage`` クラスで提供している全ての機能をカバーしているわけでは
-    ありません。BCC への宛先を指定やファイルの添付、マルチパート形式メール
-    の送信を行いたい場合には、 ``EmailMessage`` インスタンスを直接生成する
-    必要があります。
+    :meth:`~django.core.mail.send_mail()`` がこのような、いささかややこしい仕様
+    なのは、設計上の事情によるものです。 :meth:`~django.core.mail.send_mail()``
+    などの関数はもともと単なる Django 向けの単純なメールインタフェースでしか
+    ありませんでした。その後、指定できるパラメタが少しづつふえてきたのです。
+    今となっては、メールメッセージを扱うためのよりオブジェクト指向の設計に移行
+    して、 :meth:`~django.core.mail.send_mail()`` は互換性のためだけにおいておく
+    方が有意義でしょう。
 
-    ``send_mail()`` がこのようないささかややこしい仕様なのは、設計上の事情
-    によるものです。 ``send_mail()`` などの関数はもともと単なる Django 向け
-    の単純なメールインタフェースでしかありませんでした。その後、
-    ``send_mail()`` に指定できるパラメタが少しづつふえてきたのです。今となっ
-    ては、メールメッセージを扱うためのよりオブジェクト指向の設計に移行して、
-    ``send_mail()`` は互換性のためだけにおいておく方が有意義でしょう。
+:class:`~django.core.mail.EmailMessage` はメールメッセージ自体の生成に関わり
+ます。 :ref:`メールバックエンド <topic-email-backends>` は、メールの送信に関わり
+ます。
 
-一般に、 ``EmailMessage`` はメールメッセージ自体の生成に関わります。
-``SMTPConnection`` はメール送信処理におけるネットワーク接続に関わっています。
-このことは、同じ接続 (``SMTPConnection`` インスタンス) を再利用すれば、複数
-のメッセージを一括送信できることを示しています。
+便宜上、 :class:`~django.core.mail.EmailMessage` は単純な ``send()`` メソッド
+を単一のメールを送信するために提供しています。複数のメッセージを送りたいときは、
+メールバックエンドAPIは :ref:`他の手段を提供しています 
+<topics-sending-multiple-emails>` 。
 
 EmailMessage オブジェクト
 --------------------------
 
 .. class:: EmailMessage
 
-``EmailMessage`` クラスは以下のパラメタ (固定引数を使う場合には以下に示す順
-番に指定します) で初期化します。パラメタは全て省略可能で、 ``send()`` メソッ
-ドを呼び出す前であればいつでも設定しなおせます。
+:class:`~django.core.mail.EmailMessage` クラスは以下のパラメタ (固定引数を使
+う場合には以下に示す順番に指定します) で初期化します。パラメタは全て省略可能
+で、 ``send()`` メソッドを呼び出す前であればいつでも設定しなおせます。
 
-    * ``subject``: メールの題名です。
+.. versionchanged:: 1.3
+   引数 ``cc`` が追加されました。
 
-    * ``body``: メール本文です。平文テキストのメッセージでなければなりませ
-      ん。
+* ``subject``: メールの題名です。
 
-    * ``from_email``: 送信者のアドレスです。 ``fred@example.com`` 形式でも
-      ``Fred <fred@example.com>`` 形式でもかまいません。省略すると、
-      :setting:`DEFAULT_FROM_EMAIL` の設定値を使います。
+* ``body``: メール本文です。平文テキストのメッセージでなければなりません。
 
-    * ``to``: 受信者アドレスのリストまたはタプルです。
+* ``from_email``: 送信者のアドレスです。 ``fred@example.com`` 形式でも
+  ``Fred <fred@example.com>`` 形式でもかまいません。省略すると、
+  :setting:`DEFAULT_FROM_EMAIL` の設定値を使います。
 
-    * ``bcc``: メールを送信する際に "Bcc" ヘッダに指定するアドレスのリスト
+* ``to``: 受信者アドレスのリストまたはタプルです。
+
+* ``bcc``: メールを送信する際に "Bcc" ヘッダに指定するアドレスのリスト
       またはタプルです。 
 
-    * ``connection``: ``SMTPConnection`` のインスタンスです。一つの SMTP 接
-      続を使い回して複数のメッセージを送信したい場合に指定します。省略する
-      と、 ``send()`` を呼び出す瞬間に新しい接続を生成します。
+* ``connection``: メールバックエンドのインスタンスです。一つの SMTP 接
+  続を使い回して複数のメッセージを送信したい場合に指定します。この引数を省略する
+  と、 ``send()`` を呼び出す瞬間に新しい接続を生成します。
 
-    * ``attachments``: メールに添付するデータのリストです。リストの各要素は、
-      ``email.MIMEBase.MIMEBase`` のインスタンスか、 
-      ``(filename, content, mimetype)`` からなるタプルです。
+* ``attachments``: メールに添付するデータのリストです。リストの各要素は、
+  ``email.MIMEBase.MIMEBase`` のインスタンスか、 
+  ``(filename, content, mimetype)`` からなるタプルです。
 
-    * ``headers``: メッセージに追加するヘッダの辞書です。ヘッダ名をキーに、
-      ヘッダ値を値にします。このパラメタを使うのなら、指定したヘッダがメー
-      ルメッセージ中で正しいヘッダとして扱われるように気をつけねばなりませ
-      ん。
+* ``headers``: メッセージに追加するヘッダの辞書です。ヘッダ名をキーに、
+  ヘッダ値を値にします。このパラメタを使うのなら、指定したヘッダがメー
+  ルメッセージ中で正しいヘッダとして扱われるように気をつけねばなりませ
+  ん。
+
+* ``cc``: 受信者アドレスのリストまたはタプルです。メール送信時の "Cc" ヘッダに
+  使われます。
 
 例を示します::
 
@@ -261,51 +275,52 @@ EmailMessage オブジェクト
 
 ``EmailMessage`` クラスのインスタンスには以下のようなメソッドがあります:
 
-  * ``send(fail_silently=False)`` メソッドを呼び出すと、 ``connection`` 属
-    性に指定した接続を使ってメッセージを送信します。接続がなければ、自動的
-    に新たな接続を生成して使います。 ``fail_silently`` を ``True`` にすると、
-    メッセージ送信に失敗した場合に例外を送出します。
+* ``send(fail_silently=False)`` メソッドはメッセージを送信します。メールが作成さ
+  れたときに接続が指定されれば、その接続が使われます。接続がなければ、デフォルト
+  バックエンドのインスタンスが生成され、使われます。 ``fail_silently`` を
+  ``True`` にすると、メッセージ送信に失敗した場合に例外を送出します。
 
-  * ``message()`` は ``django.core.mail.SafeMIMEText`` クラス (Python の
-    ``email.MIMEText.MIMEText`` クラスのサブクラス) または
-    ``django.core.mail.SafeMIMEMultipart`` クラスのインスタンスを生成します。
-    このオブジェクトには送信するメッセージが入っています。
-    ``EmailMessage`` クラスを拡張する必要がある場合、おそらくこのメソッドを
-    オーバライドして、所望の内容を MIME オブジェクト内に配置することになるで
-    しょう。
+* ``message()`` は ``django.core.mail.SafeMIMEText`` クラス (Python の
+  ``email.MIMEText.MIMEText`` クラスのサブクラス) または
+  ``django.core.mail.SafeMIMEMultipart`` クラスのインスタンスを生成します。
+  このオブジェクトには送信するメッセージが入っています。
+  :class:`~django.core.mail.EmailMessage` クラスを拡張する必要がある場合、
+  おそらくこのメソッドをオーバライドして、所望の内容を MIME オブジェクト内に
+  配置することになるでしょう。
 
-  * ``recipients()`` はメッセージの全ての宛先からなるリストを返します。この
-    宛先リストは、 ``to`` と ``bcc`` に指定した全ての宛先が入ります。
-    ``EmailMessage`` をサブクラス化する際、このメソッドもオーバライドする必
-    要があるかもしれません。というのも、 SMTP サーバはメッセージ送信時に全て
-    の宛先を知る必要があり、全ての宛先はこのメソッドを介して返さねばならない
-    からです。
+* ``recipients()`` はメッセージの全ての宛先からなるリストを返します。この
+  宛先リストは、 ``to`` と ``bcc`` に指定した全ての宛先が入ります。
+  :class:`~django.core.mail.EmailMessage` をサブクラス化する際、このメソッドも
+  オーバライドする必要があるかもしれません。というのも、 SMTP サーバはメッセージ
+  送信時に全ての宛先を知る必要があり、全ての宛先はこのメソッドを介して返さねば
+  ならないからです。
 
-  * ``attach()`` を呼び出すと、新たなファイル添付用パートを生成してメッセー
-    ジに追加します。 ``attach()`` の呼び出しかたは 2 通りあります:
+* ``attach()`` を呼び出すと、新たなファイル添付用パートを生成してメッセー
+  ジに追加します。 ``attach()`` の呼び出しかたは 2 通りあります:
 
-     * ``attach()`` に引数を一つだけ指定し、 ``email.MIMEBase.MIMEBase``
-       のインスタンスを渡します。このインスタンスの内容は最終的なメッセージ
-       に直接挿入されます。
+  * ``attach()`` に引数を一つだけ指定し、 ``email.MIMEBase.MIMEBase``
+    のインスタンスを渡します。このインスタンスの内容は最終的なメッセージ
+    に直接挿入されます。
 
-     * 別の方法として、 ``attach()`` に 3 つの引数、 ``filename``,
-       ``content`` および ``mimetype`` を渡します。 ``filename`` は添付する
-       ファイルの名前で、これはメール中で表示される添付ファイルの名前になり
-       ます。 ``content`` は添付パート中に入るデータで、 ``mimetype`` は添
-       付内容の MIME タイプです。 ``mimetype`` を省略すると、ファイル名を元
-       に推測を行います。
+  * 別の方法として、 ``attach()`` に 3 つの引数、 ``filename``,
+    ``content`` および ``mimetype`` を渡します。 ``filename`` は添付する
+    ファイルの名前で、これはメール中で表示される添付ファイルの名前になり
+    ます。 ``content`` は添付パート中に入るデータで、 ``mimetype`` は添
+    付内容の MIME タイプです。 ``mimetype`` を省略すると、ファイル名を元
+    に推測を行います。
 
-       例を示します::
+    例を示します::
 
-          message.attach('design.png', img_data, 'image/png')
+       message.attach('design.png', img_data, 'image/png')
 
-  * ``attach_file()`` を呼び出すと、ファイルシステム上のファイルから添付パー
-    トを生成します。 ``attach_file()`` の引数には添付したいファイルのパスを
-    指定します。オプションとして、添付ファイルの MIME タイプも指定できます。
-    MIME タイプを省略すると、ファイル名をもとに推測を行います。簡単な使い方
-    を示すと、以下のようになります::
+* ``attach_file()`` を呼び出すと、ファイルシステム上のファイルから添付パー
+  トを生成します。 ``attach_file()`` の引数には添付したいファイルのパスを
+  指定します。オプションとして、添付ファイルの MIME タイプも指定できます。
+  MIME タイプを省略すると、ファイル名をもとに推測を行います。簡単な使い方
+  を示すと、以下のようになります::
 
-      message.attach_file('/images/weather_map.png')
+    message.attach_file('/images/weather_map.png')
+
 
 .. _DEFAULT_FROM_EMAIL: ../settings/#default-from-email
 
@@ -316,10 +331,11 @@ EmailMessage オブジェクト
 古典的な例でいえば、テキスト形式と HTML 形式の両方でメールを送信するような
 場合です。
 複数バージョンのメールを同時に送るには、 ``EmailMultiAlternatives`` クラス
-を使います。このクラスは ``EmailMessage`` のサブクラスで、
+を使います。このクラスは :class:`~django.core.mail.EmailMessage` のサブクラスで、
 ``attach_alternative()`` メソッドを使ってメールのメッセージ本文に別のバージョ
 ンの本文を追加できます。 ``attach_alternative()`` 以外は、(クラスをインスタ
-ンス化するときの初期化メソッドも含めて) ``EmailMessage`` と全く同じです。
+ンス化するときの初期化メソッドも含めて) :class:`~django.core.mail.EmailMessage`
+と全く同じです。
 
 テキストと HTML を組み合わせて送信したければ、以下のように書けます::
 
@@ -332,62 +348,272 @@ EmailMessage オブジェクト
     msg.attach_alternative(html_content, "text/html")
     msg.send()
 
-デフォルトでは、 ``EmailMessage`` の ``body`` パラメタの MIME タイプは
-``"text/plain"`` です。実践的には、このパラメタは変更せずにおいた方がよいで
-しょう。なぜなら、メールを受信した人が使っているメールクライアントソフトに
-関係なくメッセージを読めるよう保証できるからです。とはいえ、メールの読み手
+デフォルトでは、 :class:`~django.core.mail.EmailMessage` の ``body`` パラメタの
+MIME タイプは ``"text/plain"`` です。実践的には、このパラメタは変更せずにおいた
+方がよいでしょう。なぜなら、メールを受信した人が使っているメールクライアントソフ
+トに関係なくメッセージを読めるよう保証できるからです。とはいえ、メールの読み手
 が拡張コンテンツ形式 (alternative content type) のメッセージを扱えると分かっ
-ている場合には、 ``EmailMessage`` の ``content_subtype`` 属性を使って、主メッ
-セージのコンテンツタイプを変更できます。メールのメジャーコンテンツタイプは
-常に ``"text"`` ですが、サブタイプは以下のように変更できます::
+ている場合には、 :class:`~django.core.mail.EmailMessage` の ``content_subtype`` 
+属性を使って、主メッセージのコンテンツタイプを変更できます。メールのメジャー
+コンテンツタイプは常に ``"text"`` ですが、サブタイプは以下のように変更できます::
 
     msg = EmailMessage(subject, html_content, from_email, [to])
-    msg.content_subtype = "html"  # Main content is now text/html
+    msg.content_subtype = "html"  # メインのコンテンツは text/html になります。
     msg.send()
 
-SMTPConnection オブジェクト
-----------------------------
+.. _topic-email-backends:
 
-.. class:: SMTPConnection
+メールバックエンド
+====================
 
-``SMTPConnection`` クラスの初期化は、SMTP サーバのホスト、ポート、SMTP 接続
-を行うユーザ名、そしてパスワードを指定して初期化でき、それぞれのパラメタは
-``host``, ``port``, ``username``, ``password`` オプションで指定します。パラ
-メタを省略すると、設定ファイルから値を読み出します。
+.. versionadded:: 1.2
 
-たくさんの数のメッセージを一度に送信したいなら、 ``SMTPConnection`` クラス
-の ``send_messages()`` メソッドが便利です。このクラスは ``EmailMessage`` ク
-ラス (またはサブクラス) のインスタンスのリストを引数にとり、一つの SMTP 接
-続で一度に送信します。例えば、 ``get_notification_email()`` という関数があ
-り、この関数が定期的に送信されるメールの入った ``EmailMessage`` オブジェク
-トのリストを返すとしましょう。メッセージは以下のようにして一括送信できます::
+メールを送るのは、実際にはメールバックエンドが扱っています。
 
-    connection = SMTPConnection()   # デフォルトの設定で接続を作成
+メールバックエンドクラスには以下のようなメソッドがあります:
+
+* ``open()`` 永続するメール送信接続をインスタンス化します。
+
+* ``close()`` 現在のメール送信接続を閉じます。
+
+* ``send_messages(email_messages)``  :class:`~django.core.mail.EmailMessage`
+  オブジェクトを送信します。接続が開かれていないときは暗黙的に接続が開かれ、
+  メール送信後に閉じられます。 接続がすでに開かれているときは、メール送信後も
+  接続は開かれたままになります。
+
+メールバックエンドのインスタンスを得る
+----------------------------------------
+
+``django.core.mail`` の :meth:`get_connection` 関数はメールバックエンドの
+インスタンスを、あなたが使えるように返します。
+
+.. currentmodule:: django.core.mail
+
+.. function:: get_connection(backend=None, fail_silently=False, *args, **kwargs)
+
+デフォルトで ``get_connection()`` は :setting:`EMAIL_BACKEND` で指定された
+メールバックエンドのインスタンスを返します。引数 ``backend`` を指定した
+場合は、そのバックエンドのインスタンスを返します。
+
+``fail_silently`` 引数は、バックエンドがエラーを扱うかどうかを指定できます。
+``fail_silently`` が True のときは、メール送信プロセス中の例外が無視されます。
+
+それ以外の引数は、メールバックエンドのコンストラクタに直接渡されます。
+
+いくつかのメール送信バックエンドが Django には付属しています。SMTPバックエンド
+（デフォルト）以外のバックエンドは、テストと開発時にのみ有効です。特別なメール送信
+が必要な場合は、
+:ref:`自分でメールバックエンドを書いてください <topic-custom-email-backend>` 
+。
+
+.. _topic-email-smtp-backend:
+
+SMTP バックエンド
+~~~~~~~~~~~~~~~~
+
+これはデフォルトのバックエンドです。メールは SMTP サーバを通して送信されます。
+サーバのアドレスと認証情報は :setting:`EMAIL_HOST` 、 :setting:`EMAIL_PORT` 、
+:setting:`EMAIL_HOST_USER` 、 :setting:`EMAIL_HOST_PASSWORD` と
+:setting:`EMAIL_USE_TLS` 設定を設定ファイルに書いてください。
+
+
+SMTP バックエンドは古くから Django のデフォルトです。
+明示的に指定したいときは以下のように設定ファイルに書いてください::
+
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+.. admonition:: SMTPConnection objects
+
+    先のバージョン 1.2 では、 Django は :class:`~django.core.mail.SMTPConnection`
+    クラスを提供していました。このクラスは SMTP を直接制御してメールを送信する方法
+    を提供します。このクラスは、汎用のメールバックエンドAPIが採用さたので廃止され
+    ました。
+
+    後方互換性のために :class:`~django.core.mail.SMTPConnection` は
+    SMTP バックエンドの別名として ``django.core.mail`` で依然使えます。
+
+.. _topic-email-console-backend:
+
+コンソールバックエンド
+~~~~~~~~~~~~~~~~~~~~~~
+
+実際にメールを送信する代わりに、コンソールバックエンドはただメールを書く
+だけです。コンソールバックエンドに書かれたメールは標準出力に送られます。
+デフォルトでは、コンソールバックエンドは ``stdout`` に書きます。
+接続を構成するときに ``stream`` キーワード引数を与えると、他のストリームなどの
+オブジェクトも使えます。
+
+コンソールバックエンドを指定するには以下を設定ファイルに記述してください::
+
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+コンソールバックエンドは製品での使用を意図していません。開発時に使える、利便性の
+ため提供されるものです。
+
+.. _topic-email-file-backend:
+
+ファイルバックエンド
+~~~~~~~~~~~~~~~~~~~~
+
+ファイルバックエンドはメールをファイルに書き込みます。ファイルバックエンドが
+新しいセッションを開く度に、新しいファイルは作られます。ファイルが書き込まれる
+ディレクトリは、 :setting:`EMAIL_FILE_PATH` 設定か ``file_path`` キーワードの
+どちらかで決められます。これは :meth:`~django.core.mail.get_connection` との接続
+が作成されるときに決まります。
+
+ファイルバックエンドを指定するには以下を設定ファイルに記述してください::
+
+    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+    EMAIL_FILE_PATH = '/tmp/app-messages' # 適切な値に変えてください。
+
+ファイルバックエンドは製品での使用を意図していません。開発時に使える、利便性の
+ため提供されるものです。
+
+.. _topic-email-memory-backend:
+
+メモリバックエンド
+~~~~~~~~~~~~~~~~~~
+
+``'locmem'`` バックエンドはメッセージを ``django.core.mail`` モジュールの特殊な
+属性に格納します。 ``outbox`` 属性は最初のメッセージが送られたときに作られます。
+:class:`~django.core.mail.EmailMessage` インスタンスのリストがそれぞれのメッセージ
+として送られます。
+
+メモリバックエンドを指定するには以下を設定ファイルに記述してください::
+
+  EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+
+メモリバックエンドは製品での使用を意図していません。開発やテスト時に使える、
+利便性のため提供されるものです。
+
+.. _topic-email-dummy-backend:
+
+ダミーバックエンド
+~~~~~~~~~~~~~~~~~~
+
+名前が示すように、ダミーバックエンドはメッセージに対して何もしません。
+
+ダミーバックエンドを指定するには以下を設定ファイルに記述してください::
+
+   EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
+
+ダミーバックエンドは製品での使用を意図していません。開発時に使える、利便性の
+ため提供されるものです。
+
+.. _topic-custom-email-backend:
+
+カスタムメールバックエンドを定義する
+------------------------------------
+
+メールがどのようにして送られるかを変更する必要があるなら、あなた自身のメールバッ
+クエンドを書いてください。設定ファイルの :setting:`EMAIL_BACKEND` 設定には、
+あなたが書いたバックエンドへの Python インポートパスを指定してください。
+
+カスタムメールバックエンドは ``django.core.mail.backends.base`` モジュールにあ
+る ``BaseEmailBackend`` のサブクラスであるべきです。カスタムメールバックエンド
+は ``send_messages(email_messages)`` メソッドを実装しなければなりません。この
+メソッドは :class:`~django.core.mail.EmailMessage` インスタンスを受け取り、正常
+に送信されたメッセージの数を返します。カスタムメールバックエンドが永続するセッ
+ションか接続をもてるようにするには、 ``open()`` および ``close()`` メソッドも実
+装する必要があります。リファレンス実装のために ``smtp.EmailBackend`` を参考にして
+ください。
+
+.. _topics-sending-multiple-emails:
+
+複数のメールを送信する
+----------------------
+
+SMTP 接続の確立と切断（もしくは他のどのネットワーク接続もそうですが）は重い処理
+です。多くのメールを送る必要があるなら、 SMTP 接続を再利用するのは納得できます。
+メールを送る度に接続を確立して切断するのは良い方法ではないでしょう。
+
+接続を再利用できるようにメールバックエンドに指定する方法は2つあります。
+
+第一に、 ``send_messages()`` メソッドを使う方法があります。 ``send_messages()``
+は :class:`~django.core.mail.EmailMessage` インスタンス (もしくはサブクラス) の
+リストを受け取り、1つの接続を使ってそれら全てを送信します。
+
+例えば ``get_notification_email()`` 関数を使えば、定期送信するメールを
+:class:`~django.core.mail.EmailMessage` オブジェクトのリストで返してくれるので、
+そのまま send_messages を使って送信することができます::
+
+    from django.core import mail
+    connection = mail.get_connection()   # デフォルトのメール接続を使います。
     messages = get_notification_email()
     connection.send_messages(messages)
 
-Testing e-mail sending
-----------------------
+この例では、 ``send_messages()`` は接続をバックエンドで開き、メッセージのリスト
+を送信し、さらに接続を切断します。
 
-The are times when you do not want Django to send e-mails at all. For example,
-while developing a website, you probably don't want to send out thousands of
-e-mails -- but you may want to validate that e-mails will be sent to the right
-people under the right conditions, and that those e-mails will contain the
-correct content.
+2つ目の方法はメールバックエンドの ``open()`` と ``close()`` メソッドを手動で使っ
+て接続をコントロールすることです。 ``send_sessages()`` では手動で接続を開いたり
+閉じたりコントロールできません。すでに接続が開かれているときは手動で接続を開いた
+ということなので、閉じるタイミングをコントロールできます::
 
-The easiest way to test your project's use of e-mail is to use a "dumb" e-mail
-server that receives the e-mails locally and displays them to the terminal,
-but does not actually send anything. Python has a built-in way to accomplish
-this with a single command::
+    from django.core import mail
+    connection = mail.get_connection()
+
+    # 手動で接続を開きます。
+    connection.open()
+
+    # メールメッセージを作成します。さっき作った接続で使います。
+    email1 = mail.EmailMessage('Hello', 'Body goes here', 'from@example.com',
+                              ['to1@example.com'], connection=connection)
+    email1.send() # Send the email
+
+    # さらに二つ作成します。
+    email2 = mail.EmailMessage('Hello', 'Body goes here', 'from@example.com',
+                              ['to2@example.com'])
+    email3 = mail.EmailMessage('Hello', 'Body goes here', 'from@example.com',
+                              ['to3@example.com'])
+
+    # 二つのメールを一つの呼び出しで送信します。
+    connection.send_messages([email2, email3])
+    # send_messages() が接続を閉じなかったので未だに開かれています。
+    # なので手動で閉じる必要があります。
+    connection.close()
+
+メール送信のテスト
+==================
+
+Django に一切のメール送信をしてほしくないときがあります。例えば、 Web サイトの
+開発をしているとき、何千ものメールを送信してほしくないと思います。しかし適切な
+条件の下で適切な相手に、正しい内容のメールを送るのを認めたい場合があるかもしれま
+せん。
+
+プロジェクトのメールの扱いをテストする最も簡単な方法は ``console`` を使うこと
+です。このバックエンドはすべてのメールを標準出力にリダイレクトします。これで
+メールの内容を検査することができます。
+
+``file`` メールバックエンドも開発時には使えます。このバックエンドはすべての
+SMTP コネクションのコンテンツをファイルにダンプします。なので暇なときに検査
+できます。
+
+他にも "無口な (dumb)" SMTP サーバを使う方法があります。この SMTP サーバはロー
+カルでメールを受け取って端末に表示しまが、送信はなにもしません。 Python のビル
+ドインで、1つのコマンドでできます::
 
     python -m smtpd -n -c DebuggingServer localhost:1025
 
-This command will start a simple SMTP server listening on port 1025 of
-localhost. This server simply prints to standard output all email headers and
-the email body. You then only need to set the :setting:`EMAIL_HOST` and
-:setting:`EMAIL_PORT` accordingly, and you are set.
+このコマンドはローカルホストのリスニングポート 1025 で SMTP サーバ を開始しま
+す。このサーバはすべてのメールのヘッダ、ボディーを標準出力に書き出します。そし
+て必要なのは :setting:`EMAIL_HOST` と :setting:`EMAIL_PORT` をそれらしく設定し
+ます。以上です。
 
-For more entailed testing and processing of e-mails locally, see the Python
-documentation on the `SMTP Server`_.
+ローカルでのメールの処理やテストの詳細については、 Python ドキュメントの
+:mod:`smtpd` を参照してください。
 
-.. _SMTP Server: http://docs.python.org/library/smtpd.html
+SMTPConnection
+==============
+
+.. class:: SMTPConnection
+
+.. deprecated:: 1.2
+
+``SMTPConnection`` クラスは汎用のメールバックエンドAPIが採用されたので廃止されま
+した。
+
+後方互換性のために ``SMTPConnection`` は依然使えます。
+``django.core.mail`` に :ref:`SMTP バックエンド <topic-email-smtp-backend>` の
+別名として存在します。これから書くコードには
+:meth:`~django.core.mail.get_connection` を使うべきです。
