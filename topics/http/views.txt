@@ -4,7 +4,7 @@
 ビューを書く
 =============
 
-:revision-up-to: 11321 (1.1) unfinished
+:revision-up-to: 17812 (1.4)
 
 ビュー関数、あるいは単に *ビュー* とは、簡単にいえばウェブリクエストを引数
 にとり、ウェブレスポンスを返す関数です。レスポンスはウェブページを表す HTML
@@ -12,8 +12,9 @@
 でも、画像でも、何でもかまいません。ビューの中には、レスポンスを生成する上
 で必要なロジックを自由に書けます。ビューのコードは、 Python パス上にあるか
 ぎり、どこに置いてもかまいません。他にはなんの制限も「黒魔術」もありません。
-とはいえ、この節の例では、 ``mysite`` ディレクトリ下に ``views.py`` という
-名前のファイルを作成して、そこにビューのコードを置くことにしましょう。
+慣習では、 プロジェクトディレクトリかアプリケーションディレクトリの下に
+``views.py`` という名前のファイルを作成して、そこにビューのコードを置くこと
+になっています。
 
 簡単なビュー
 =============
@@ -32,23 +33,24 @@
 
 Let's step through this code one line at a time:
 
-    * まず、 ``django.http`` モジュールから ``HttpResponse`` クラスを
-      import しています。 Python の ``datetime`` ライブラリもロードしておき
-      ます。
+* まず、 :mod:`django.http` モジュールから
+  :class:`~django.http.HttpResponse` クラスを import しています。
+  Python の ``datetime`` ライブラリもロードしておきます。
 
-    * 次に、 ``current_datetime`` という関数を定義しています。これがビュー
-      関数です。ビュー関数は第一引数に ``HttpRequest`` オブジェクトを取りま
-      す。慣習的に、この引数の名前は ``request`` にしています。
+* 次に、 ``current_datetime`` という関数を定義しています。これがビュー
+  関数です。ビュー関数は第一引数に :class:`~django.http.HttpRequest`
+  オブジェクトを取ります。慣習的に、この引数の名前は ``request`` にして
+  います。
 
-      ビュー関数はどんな名前でもかまいません。Django にビュー関数として認識
-      してもらうために、何らかの特殊な命名規則に従う必要はないのです。ここ
-      では、 ``current_datetime`` という名前を付けて、どんな機能のビューか
-      分かりやすくしています。
+  ビュー関数はどんな名前でもかまいません。Django にビュー関数として認識
+  してもらうために、何らかの特殊な命名規則に従う必要はないのです。ここ
+  では、 ``current_datetime`` という名前を付けて、どんな機能のビューか
+  分かりやすくしています。
 
-    * ビューは、生成したレスポンスコンテンツの入った ``HttpResponse`` オブ
-      ジェクトを返します。ビュー関数は ``HttpResponse`` オブジェクトを返さ
-      ねばなりません (例外も返してよいのですが、それについては後で説明しま
-      す)。
+* ビューは、生成したレスポンスコンテンツの入った
+  :class:`~django.http.HttpResponse` オブジェクトを返します。ビュー関数
+  は ``HttpResponse`` オブジェクトを返さねばなりません (例外も返してよ
+  いのですが、それについては後で説明します)。
 
 .. admonition:: Django のタイムゾーン設定
     
@@ -61,7 +63,7 @@ URL をビューにマップする
 
 このビュー関数は、現在の日付と時刻が入った HTML ページを生成して返します。
 何らかの URL でこのビューを表示したければ、 *URLconf* を作成する必要があり
-ます。 :ref:`topics-http-urls` の説明を読んでください。
+ます。 :doc:`/topics/http/urls` の説明を読んでください。
 
 エラーを返す
 ============
@@ -79,11 +81,11 @@ Django では、簡単に HTTP エラーコードを返せます。エラー応�
         else:
             return HttpResponse('<h1>Page was found</h1>')
 
-There isn't a specialized subclass for every possible HTTP response code,
-since many of them aren't going to be that common. However, as documented in
-the :class:`~django.http.HttpResponse` documentation, you can also pass the
-HTTP status code into the constructor for :class:`~django.http.HttpResponse`
-to create a return class for any status code you like. For example::
+全ての HTTP レスポンスコードごとに特別なサブクラスがあるわけではありません。
+多くは共通化できるからです。しかし :class:`~django.http.HttpResponse` のドキ
+ュメントにあるように、 :class:`~django.http.HttpResponse` のコンストラクタに
+HTTP ステータスコードを渡すことで、好きなステータスコードを返すクラスを作れ
+ます。例::
 
     def my_view(request):
         # ...
@@ -97,8 +99,10 @@ to create a return class for any status code you like. For example::
 Http404 例外
 ------------
 
-``HttpResponseNotFound`` のようなエラーを返す場合、以下のように、エラーペー
-ジの中身になる HTML を指定せねばなりません::
+.. class:: django.http.Http404()
+
+:class:`~django.http.HttpResponseNotFound`` のようなエラーを返す場合、以下
+のように、エラーページの中身になる HTML を指定せねばなりません::
 
     return HttpResponseNotFound('<h1>Page not found</h1>')
 
@@ -122,6 +126,8 @@ Http404 例外
 成しておかねばなりません。このテンプレートの名前は ``404.html`` で、テンプ
 レートツリーの一番上に配置せねばなりません。
 
+.. _customizing-error-views:
+
 エラービューのカスタマイズ
 ==========================
 
@@ -136,7 +142,8 @@ Http404 例外
 
 このため、テンプレートディレクトリの再上階層に ``404.html`` という名前のテ
 ンプレートを作成しておかねばなりません。このテンプレートは全ての 404 エラー
-に対して用いられます。
+に対して用いられます。デフォルトの 404 ビューはテンプレートに ``request_path``
+という変数を渡します。これはエラーになった URL です。
 
 ``page_not_found`` ビューは 99% の Web アプリケーションの要求を満たすはずで
  すが、 404 ビューを自作したい場合には、URLconf で以下のようにして
@@ -144,35 +151,26 @@ Http404 例外
 
     handler404 = 'mysite.views.my_custom_404_view'
 
-舞台裏では、 Django は ``handler404`` を介して 404 ビューを捜し出します。デ
-フォルトでは、 URLconf の以下の行::
+舞台裏では、 Django はルート URLconf の ``handler404`` を介して 404 ビューを
+捜し出します。定義がなければ ``django.views.defaults.page_not_found`` にフォ
+ールバックします。
 
-    from django.conf.urls.defaults import *
+404 ビューについて、知っておかねばならないことが 4 つあります:
 
-によって、 ``handler404`` が現在のモジュールに取り込まれます。
-``django/conf/urls/defaults.py`` を見れば分かりますが、 ``handler404`` のデ
-フォルト値は ``'django.views.defaults.page_not_found'`` に設定されています。
+* 404 ビューは、リクエストされた URL に対して、 Django が URLconf の全
+  ての正規表現を調べた結果、一致するものをみつけられなかった場合にも呼
+  び出されます。
 
-404 ビューについて、知っておかねばならないことが 3 つあります:
+* 404 ビューを自作せず、ただデフォルトのビューを使う場合でも、一つだけ
+  やらねばならないこととして、 ``404.html`` という名前のテンプレートを
+  作成せねばなりません。
 
-    * 404 ビューは、リクエストされた URL に対して、 Django が URLconf の全
-      ての正規表現を調べた結果、一致するものをみつけられなかった場合にも呼
-      び出されます。
+* 404 ビューに渡されるコンテキストは :class:`django.template.RequestContext`
+  なので、テンプレートには ``TEMPLATE_CONTEXT_PROCESSORS`` で追加した変数も
+  渡ります。 (例えば ``MEDIA_URL``)
 
-    * 404 ビューを自作せず、ただデフォルトのビューを使う場合でも、一つだけ
-      やらねばならないこととして、 ``404.html`` という名前のテンプレートを
-      作成せねばなりません。このテンプレートはテンプレートディレクトリの最
-      上階層に配置します。デフォルトの 404 ビューは全ての 404 エラーに対
-      して同じテンプレートを使います。デフォルトの 404 ビューは、 404 エラー
-      を引き起こした URL を、``request_path`` という変数としてテンプレート
-      に渡します。
-
-    * 404 ビューに渡されるコンテキストは ``RequestContext`` なので、
-      テンプレートには ``TEMPLATE_CONTEXT_PROCESSORS`` で追加した変数も
-      渡ります。
-
-    * (settings モジュールで) ``DEBUG`` を ``True`` にすると、 404 ビューは
-      呼び出されず、代わりにトレースバックが表示されます。
+* (settings モジュールで) :setting:`DEBUG` を ``True`` にすると、 404 ビューは
+  呼び出されず、代わりにトレースバックが表示されます。
 
 500 (サーバエラー) ビュー
 ---------------------------
@@ -195,12 +193,36 @@ Django はデフォルトで ``django.views.defaults.server_error`` というビ
 
     handler500 = 'mysite.views.my_custom_error_view'
 
-舞台裏では、 Django は ``handler500`` を介して 500 ビューを捜し出します。デ
-フォルトでは、 URLconf の以下の行::
+舞台裏では、 Django はルート URLconf の ``handler500`` を介して 500 ビューを
+捜し出します。何も定義していなければ、 ``django.views.defaults.server_error``
+にフォールバックします。
 
-    from django.conf.urls.defaults import *
+500 ビューについて、知っておかねばならないことが 2 つあります:
 
-によって、 ``handler500`` が現在のモジュールに取り込まれます。
-``django/conf/urls/defaults.py`` を見れば分かりますが、 ``handler500`` のデ
-フォルト値は ``'django.views.defaults.server_error'`` に設定されています。
+* 500 ビューを自作せず、ただデフォルトのビューを使う場合でも、一つだけ
+  やらねばならないこととして、 ``500.html`` という名前のテンプレートを
+  作成せねばなりません。
 
+* (settings モジュールで) :setting:`DEBUG` を ``True`` にすると、 500 ビューは
+  呼び出されず、代わりにトレースバックが表示されます。
+
+.. _http_forbidden_view:
+
+403 (閲覧が禁止されています) ビュー
+-----------------------------------
+
+.. versionadded:: 1.4
+
+404 ビュー、 500 ビューと同じスタイルで、 Django は 403 Forbidden エラーを
+処理するためのビューを持っています。ビューが 403 例外を起こしたら、 Django
+はデフォルトでは ``django.views.defaults.permission_denied`` ビューを呼びま
+す。
+
+このビューは ``403.html`` テンプレートを最上階層のテンプレートディレクトリ
+からロードし、レンダします。ファイルがない場合、
+:rfc:`2616` (HTTP 1.1 仕様) により "403 Forbidden" テキストを返します。
+
+404 や 500 ビューと同じように、 ``handler403`` を URLconf に設定することで
+``django.views.defaults.permission_denied`` をオーバーライドできます::
+
+    handler403 = 'mysite.views.my_custom_permission_denied_view'
