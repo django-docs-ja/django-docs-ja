@@ -4,7 +4,7 @@
 Django でのユーザ認証
 =====================
 
-:revision-up-to: 11321 (1.1) unfinished
+:revision-up-to: 17812 (1.4)
 
 .. module:: django.contrib.auth
    :synopsis: Django の認証フレームワークです。
@@ -18,13 +18,13 @@ Django にはユーザ認証システムがついてきます。 Django のユ�
 
 認証システムは以下の要素から成り立っています:
 
-    * ユーザ (Users)
-    * パーミッション: あるユーザが特定のタスクを実行してよいかどうかを決め
-      る、バイナリ (yes/no) のフラグです。
-    * グループ (Groups): 複数のユーザに対してラベル付したり、認証を設定した
-      りするための一般的な方法です。
-    * メッセージ (Messages): 指定のユーザ(達) に対するメッセージをキューす
-      るための簡単な方法です。
+* ユーザ (Users)
+* パーミッション: あるユーザが特定のタスクを実行してよいかどうかを決め
+  る、バイナリ (yes/no) のフラグです。
+* グループ (Groups): 複数のユーザに対してラベル付したり、認証を設定した
+  りするための一般的な方法です。
+* メッセージ (Messages): 指定のユーザ(達) に対するメッセージをキューす
+  るための簡単な方法です。
 
 インストール
 ============
@@ -32,11 +32,11 @@ Django にはユーザ認証システムがついてきます。 Django のユ�
 認証のサポートは Django アプリケーションとして ``django.contrib.auth`` にバ
 ンドルされています。インストールするには、以下のようにします:
 
-    1. :setting:`INSTALLED_APPS` 設定に ``'django.contrib.auth'`` を加えま
-       す。
+    1. :setting:`INSTALLED_APPS` 設定に ``'django.contrib.auth'`` と、
+    ``'django.contrib.contenttypes'`` を加えます。
     2. ``manage.py syncdb`` を実行します。
 
-:djadmin:`django-admin.py startproject` が生成するデフォルトの
+:djadmin:`django-admin.py startproject<startproject>` が生成するデフォルトの
 :file:`settings.py` ファイルの :setting:`INSTALLED_APPS` には、簡便のため
 ``'django.contrib.auth'`` が最初から入っています。この場合は、単に
 :djadmin:`manage.py syncdb` するだけでかまいません。 
@@ -50,16 +50,18 @@ Django にはユーザ認証システムがついてきます。 Django のユ�
 
 これだけで、認証サポートを使えるようになります。
 
+
+
 ユーザ (User)
 ===============
 
 .. class:: models.User
 
 API リファレンス
-------------------
+----------------
 
 フィールド
-~~~~~~~~~~~
+~~~~~~~~~~
 
 .. class:: models.User
 
@@ -71,6 +73,10 @@ API リファレンス
         必須です。30 文字以下の文字列で、英数字 (アルファベット、数字、アン
         ダースコア) だけを使えます。
 
+        .. versionchanged:: 1.2
+            ユーザネームには今では ``@``, ``+``, ``.`` and ``-`` 等の文字列を
+            含めることが出来ます。
+
     .. attribute:: models.User.first_name
 
         オプションです。30 文字以下です。オプションです。30 文字以下です。
@@ -81,7 +87,7 @@ API リファレンス
 
     .. attribute:: models.User.email
 
-        オプションです。 E-mail アドレスです。
+        オプションです。 Email アドレスです。
 
     .. attribute:: models.User.password
 
@@ -93,19 +99,25 @@ API リファレンス
     .. attribute:: models.User.is_staff
 
         Bool 値です。この値が真なら、ユーザは admin サイトにアクセスできま
-	す。
+        す。
 
     .. attribute:: models.User.is_active
 
         Bool 値です。この値が真なら、このアカウントを使ってログインできます。
         アカウントを削除する代わりに、この値を ``False`` に設定してください。
+        もしアプリケーションが外部キーをユーザに対して持っていたとしても、
+        この方法なら破綻しないのでおすすめです。
 
-        This doesn't control whether or not the user can log in. Nothing in the
-        authentication path checks the ``is_active`` flag, so if you want to
-        reject a login based on ``is_active`` being ``False``, it is up to you
-        to check that in your own login view. However, permission checking
-        using the methods like :meth:`~models.User.has_perm` does check this
-        flag and will always return ``False`` for inactive users.
+        ユーザがログインできるかどうかをコントロールする必要性がない場合でも
+        認証バックエンドが ``is_active`` フラッグをチェックする必要がない時
+        であっても、もしログインできるかどうかを ``is_active`` を ``False``
+        にしたくない場合でも、ログインビューの中ではあなた次第です。
+        しかしながら、 :func:`~django.contrib.auth.views.login` によって使わ
+        れる :class:`~django.contrib.auth.forms.AuthenticationForm` ビューは
+        *does* このチェックを実行します。:meth:`~models.User.has_perm` のよう
+        な権限を確かめるメソッドのように、そして Django アドミンでの認証と
+        同じように。これらのような関数/メソッドはアクティブでないユーザに
+        対して、 ``False`` を返します.
 
     .. attribute:: models.User.is_superuser
 
@@ -123,14 +135,14 @@ API リファレンス
         ルトではアカウント作成時現在の日付/時刻になります。
 
 メソッド
-~~~~~~~~~~
+~~~~~~~~
 
 .. class:: models.User
 
     :class:`~django.contrib.auth.models.User` オブジェクトには ``groups``
     と ``user_permissions`` という二つの多対多のフィールドがあります。この
     関係性のために、 :class:`~django.contrib.auth.models.User` オブジェクト
-    は他の :ref:`Django モデル <topics-db-models>` と同じようにして、関連づ
+    は他の :ref:`Django モデル </topics/db/models>` と同じようにして、関連づ
     けされたオブジェクトにアクセスできます:
 
     .. code-block:: python
@@ -183,8 +195,6 @@ API リファレンス
 
     .. method:: models.User.set_unusable_password()
 
-        .. versionadded:: 1.0
-
         ユーザにパスワード未設定のマークをつけます。パスワード未設定の状態
         は、パスワードが空の文字列である状態と区別されます。パスワード未設
         定状態のユーザに対して
@@ -198,47 +208,63 @@ API リファレンス
 
     .. method:: models.User.has_usable_password()
 
-        .. versionadded:: 1.0
-
         ユーザに対して
         :meth:`~django.contrib.auth.models.User.set_unusable_password()` を
         呼び出し、パスワードが未設定状態であれば ``False`` を返します。
 
-    .. method:: models.User.get_group_permissions()
+    .. method:: models.User.get_group_permissions(obj=None)
 
         ユーザが自分の属するグループから得ているパーミッションを表す文字列
 	からなるリストを返します。
 
-    .. method:: models.User.get_all_permissions()
+        .. versionadded:: 1.2
+
+        もし ``obj`` が引数に渡されていれば、その種類のオブジェクトへ対する、
+        属するグループから得ているパーミッションしか返しません。
+
+    .. method:: models.User.get_all_permissions(obj=None)
 
         ユーザ自身のもつパーミッションと、ユーザの属するグループのパーミッ
 	ションの両方からなるリストを返します。
 
-    .. method:: models.User.has_perm(perm)
+        .. versionadded:: 1.2
+
+        もし、 ``obj`` が引数に渡されていれば、その特有のオブジェクトに
+        対するユーザのパーミッションを返します。
+
+    .. method:: models.User.has_perm(perm, obj=None)
 
         ユーザが特定のパーミッションを持っている場合に ``True`` を返します。
-        パーミッション名 perm は ``"package.codename"`` のような形式で表し
+        パーミッション名 perm は
+        ``"<application name>.<lowercased model name>"`` のような形式で表し
         ます。ユーザがアクティブでない場合、このメソッドは常に ``False`` を
         返します。
 
-    .. method:: models.User.has_perms(perm_list)
+        .. versionadded:: 1.2
+        
+        もし ``obj`` が引数に渡されていれば、このメソッドはモデルに対する
+        パーミッションをチェックせず、引数のオブジェクトに対するものを
+        チェックしようとします。
+
+
+    .. method:: models.User.has_perms(perm_list, obj=None)
 
         ユーザが perm_list 内のパーミッションのいずれかを持っている場合に
         ``True`` を返します。各々のパーミッション名は
-        ``"package.codename"`` のような形式で表します。 ユーザがアクティブ
-        でない場合、このメソッドは常に ``False`` を返します。
+        ``"<app label>.<permission codename>"`` のような形式で表します。
+        ユーザがアクティブでない場合、このメソッドは常に ``False`` を
+        返します。
+
+        .. versionadded:: 1.2
+
+        もし ``obj`` が引数で渡されていれば、このメソッドはモデルに対する
+        権限ではなく、引数のオブジェクトに対するものを調べます。
 
     .. method:: models.User.has_module_perms(package_name)
 
         ユーザが指定した名前のパッケージ (アプリケーション) の何らかのパー
         ミッションを持っていれば ``True`` を返します。ユーザがアクティブで
         ない場合、このメソッドは常に ``False`` を返します。
-
-    .. method:: models.User.get_and_delete_messages()
-
-        ユーザのキューに入っている
-        :class:`~django.contrib.auth.models.Message` オブジェクトを返し、入っ
-        ていたメッセージをキューから取り除きます。
 
     .. method:: models.User.email_user(subject, message, from_email=None)
 
@@ -250,8 +276,10 @@ API リファレンス
         ユーザのサイト固有のプロファイル (site-specific profile) を返します。
         プロファイルを使えないサイトでは 
 	:exc:`django.contrib.auth.models.SiteProfileNotAvailable` を送出し
-        ます。サイト固有のユーザプロファイルを定義するには、後述の
-	`追加のユーザ情報の保存`_ を参照して下さい。
+        ます。もしくはユーザがプロファイルを持っていなければ
+        :exc:`django.core.exceptions.ObjectDoesNotExtis` を送出します。
+        サイト固有のユーザプロファイルを定義するには、後述の
+	    `追加のユーザ情報の保存`_ を参照して下さい。
 
 .. _storing additional user information: #storing-additional-information-about-users
 .. _`追加のユーザ情報の保存`: `storing additional user information`_
@@ -264,12 +292,18 @@ API リファレンス
     :class:`~django.contrib.auth.models.User` モデルには、以下のヘルパ関数
     を備えたマネジャがあります。
 
-    .. method:: models.UserManager.create_user(username, email, password=None)
+    .. method:: models.UserManager.create_user(username, email=None, password=None)
+
+        .. versionchanged:: 1.4
+           ``email`` パラメータはオプションになりました。username パラメ
+           ータは、空のものと有効でない値が出た時の :exc:`ValueError` 
+           を上げるものをチェックするのに使われています。
 
         ユーザを生成して保存し、生成された
         :class:`~django.contrib.auth.models.User` を返します。
 	:attr:`~django.contrib.auth.models.User.username`,
-        :attr:`~django.contrib.auth.models.User.email` および
+        :attr:`~django.contrib.auth.models.User.email`
+        は、自動的に小文字に変更され、
         :attr:`~django.contrib.auth.models.User.password` は指定した値にな
         り、 ``is_active`` は ``True`` に設定されます。
 
@@ -285,10 +319,10 @@ API リファレンス
         使える文字は文字列で指定します。 ``allowed_chars`` のデフォルト値は、
         ユーザが見間違いやすい以下の文字を除いてあります:
 
-            * ``i``, ``l``, ``I``, and ``1`` (lowercase letter i, lowercase
-              letter L, uppercase letter i, and the number one)
-            * ``o``, ``O``, and ``0`` (uppercase letter o, lowercase letter o,
-              and zero)
+        * ``i``, ``l``, ``I``, and ``1`` (lowercase letter i, lowercase
+          letter L, uppercase letter i, and the number one)
+        * ``o``, ``O``, and ``0`` (uppercase letter o, lowercase letter o,
+          and zero)
 
 基本的な使い方
 --------------
@@ -310,26 +344,41 @@ API リファレンス
     >>> user.is_staff = True
     >>> user.save()
 
-You can also create users using the Django admin site. Assuming you've enabled
-the admin site and hooked it to the URL ``/admin/``, the "Add user" page is at
-``/admin/auth/user/add/``. You should also see a link to "Users" in the "Auth"
-section of the main admin index page. The "Add user" admin page is different
-than standard admin pages in that it requires you to choose a username and
-password before allowing you to edit the rest of the user's fields.
+Django のアドミンサイトを使用するユーザを作ることも出来ます。アドミンサイトの
+URL を ``/admin/`` にひも付けると思います、 "Add user" ページは
+``/admin/auth/user/add/`` にあります。また、アドミンのメインページ（インデ
+ックスページ）の "Auth" セクションの "Users" へのリンクでも確認できます。
+"Add user" 管理ページは、通常の管理ページ（アドミン）とはユーザネームと
+パスワードを、残りのフィールドを変更する前に埋めなくてはならない点で異なって
+います。
 
-Also note: if you want your own user account to be able to create users using
-the Django admin site, you'll need to give yourself permission to add users
-*and* change users (i.e., the "Add user" and "Change user" permissions). If
-your account has permission to add users but not to change them, you won't be
-able to add users. Why? Because if you have permission to add users, you have
-the power to create superusers, which can then, in turn, change other users. So
-Django requires add *and* change permissions as a slight security measure.
+また、 note: もし、自身のユーザアカウントを Django のアドミンサイトを使える
+ようにしたいのならば、パーミッションを２つ与える必要があり、それぞれ
+ユーザを加える権限 *と* ユーザを変更する権限です。（すなわち、
+"Add user" と "Change user" の権限です。）もし、あなたのアカウントが
+「ユーザを加える権限」は持っていても、「ユーザを変更する権限」を持っていない
+場合、ユーザを加えることはできません。なぜか？ それは、ユーザを加える権限を
+有しているということは、スーパユーザを作る権限を有しているということで、
+スーパーユーザは同様に、他のユーザを変えることができます。だから、
+Django はそれに加えてユーザ変更の権限も、セキュリティ対策として
+必要としているのです。
 
 パスワードの変更
 ~~~~~~~~~~~~~~~~~~
 
+.. versionadded:: 1.2
+   ``manage.py changepassword`` コマンドが追加されました。
+
+:djadmin:`manage.py changepassword *username* <changepassword>` 
+はコマンドラインからユーザのパスワードを変更する手続きを提供していま
+す。パスワードを変更するには、二度指定したユーザの変更後のパスワード
+を入力しなくてはいけません。二つがマッチすると、ただちにパスワードが
+変更されます。ユーザを渡さないと、コマンドは最新のユーザのパスワード
+を変更しようとします。
+
 パスワードの変更には
 :meth:`~django.contrib.auth.models.User.set_password()` を使います::
+
 
 .. code-block:: python
 
@@ -341,40 +390,171 @@ Django requires add *and* change permissions as a slight security measure.
 特別な意図のない限り、 :attr:`~django.contrib.auth.models.User.password`
 属性を直接設定しないでください。これについては次節で説明します。
 
-パスワード
--------------
+.. _auth_password_storage:
+
+Django はどのようにパスワードを保持するか
+-----------------------------------------
+
+.. versionadded:: 1.4
+   Django 1.4 では新しくフレキシブルなパスワードのストレージシステムと
+   PBKDF2 をデフォルトで使用しています。以前のバージョンの Django では
+   SHA1 が使われており、他のアルゴリズムを使用することは出来ませんでした。
 
 :class:`~django.contrib.auth.models.User` オブジェクトの 
 :attr:`~django.contrib.auth.models.User.password` フィールドは、以下の形式::
 
-    hashtype$salt$hash
+    algorithm$hash
 
-すなわちハッシュ方式 (hashtype)、ハッシュソルト (salt)、そしてハッシュ値
-(hash) をドル記号 (``"$"``) で分割した文字列形式をとります。
+すなわちストレージアルゴリズム（storage algorithm)と、ハッシュソルト (salt)、
+そしてハッシュ値(hash) はドル記号 (``"$"``) で分割した文字列形式をとります。
+アルゴリズムはいくつかのハッシュ化または Django で使えるパスワードの
+ストレージ方式のうちの一つです。下を見てください。ハッシュ値はハッシュ関数の
+結果であります。
 
-ハッシュ形式は ``sha1`` (デフォルト) または ``md5`` 、 ``crypt`` のいずれか
-で、それぞれパスワードの一方向ハッシュ化アルゴリズムを表します。 salt は生
-のパスワード文字列からハッシュを生成するときに味付け (salt) しておくための
-ランダムな文字列です。 ``crypt`` のサポートは、 Python の標準モジュール
-``crypt`` がサポートされている環境だけで有効です。また、 ``crypt`` のサポー
-トは開発版の Django でのみ利用できます。
+通常では、 Django は PBKDF2_ アルゴリズムをSHA256ハッシュ関数で暗号化します。
+パスワードのストレッチ機構は NIST_ によって勧告されています。これはほとんどの
+ユーザにとっては満足できるものでしょう。高い安全性で、パスワードを破るには
+莫大な計算量を必要とします。
 
-.. versionadded:: 1.0
-    Support for the ``crypt`` module is new in Django 1.0.
+しかしながら必要に応じて、他のアルゴリズムを選択することもあるでしょう、また
+必要なセキュリティの度合いに応じてカスタムアルゴリズムを使用する必要もあるこ
+とでしょう。繰り返すと、ほとんどのユーザはそれを必要とはしていません。もし、
+必要性が確かではないなら、それは必要なことではないでしょう。もし、あなたが
+そうしたいのならば読み進めてください。
 
-例えば::
+Django では :setting:`PASSWORD_HASHERS` の設定でアルゴリズムを選択することが
+できます。これは Django で使用するハッシュ化のアルゴリズムクラス群のリストです、
+リストの最初の項目（すなわち ``settings.PASSWORD_HASHERS[0]`` )はパスワードを
+保存するために使われます。そして、他の項目は有効となったハッシュで実在する
+パスワードをチェックするために使われます。つまり、もし違うアルゴリズムを使用
+したくなったときに、 :setting:`PASSWORD_HASHERS` を修正する必要があり、
+リストの先頭に好きなアルゴリズムを組み込んでください。
 
-    sha1$a1976$a36cc8cbf81742a8fb52e221aaeab48ed7f58ab4
+通常 :setting:`PASSWORD_HASHERS` は ::
 
-:meth:``~django.contrib.auth.models.User.set_password`` および 
-:meth:``~django.contrib.auth.models.User.check_password``  関数は、これら
-の値の設定やチェックを背後で行っています。
+    PASSWORD_HASHERS = (
+        'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+        'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+        'django.contrib.auth.hashers.BCryptPasswordHasher',
+        'django.contrib.auth.hashers.SHA1PasswordHasher',
+        'django.contrib.auth.hashers.MD5PasswordHasher',
+        'django.contrib.auth.hashers.CryptPasswordHasher',
+    )
 
-バージョン 0.90 のような以前の Django では、パスワードソルトなしの単純な
-MD5 ハッシュを使っていました。この形式は、以前のバージョンとの互換性を持た
-せるためにまだサポートしています。ただし、古いパスワードのユーザに対する
-:meth:`~django.contrib.auth.models.User.check_password()` が成功すると、パ
-スワードは自動的に新しい形式に変換されます。
+これは、 Django は PBKDF2_ を全てのパスワードの保存時に使おうとする
+ということです。でも、保存されたパスワードをチェックする際には、
+PBKDF2SHA1, bcrypt_, SHA1_, その他を用います。次以降のセクションでは
+高度なユーザのために、設定を変更する一般的な二つの方法を紹介します。
+
+bcrypt を Django で使うには
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Bcrypt_ は一般的なパスワードの保存アルゴリズムは長期間パスワードを
+保持しておくためにデザインされたアルゴリズムです。 Django では
+デフォルトで使われていません。サードパーティのライブラリを必要とする
+からです。しかし、 bcrypt をサポートするにはちょびっとの労力で
+使えるように Django は配慮してくれています。
+
+Bcrypt をデフォルトのアルゴリズムで使うには、以下に従ってください。
+
+1. `py-bcrypt`_ ライブラリをインストールしてください（
+   ``sudo pip install py-bcrypt`` を実行するか、ライブラリを
+   ダウンロードして、 ``python setup.py install`` を使って
+   インストールしてください。)
+
+2. :setting:`PASSWORD_HASHERS` を設定してください。リスト内で
+   ``BCryptPasswordHasher`` を先頭へ。セッティングファイルは
+   こうなります::
+
+       PASSWORD_HASHERS = (
+            'django.contrib.auth.hashers.BCryptPasswordHasher',
+            'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+            'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+            'django.contrib.auth.hashers.SHA1PasswordHasher',
+            'django.contrib.auth.hashers.MD5PasswordHasher',
+            'django.contrib.auth.hashers.CryptPasswordHasher',
+        )
+
+  (リストの中の他の項目は、そのままにしておいてください、または
+  Django がパスワードをアップグレードできないようにしてください。
+  下部を見てください)
+
+今、Django は Bcrypt をデフォルトの
+パスワード保存アルゴリズムとして使おうとします。
+
+.. admonition:: bcrypt を使う他の方法
+
+    Django 内で bcrypt を用いる方法はいくつかあります。
+    Django の bcrypt サポート同士では直接的に互換性がありません。
+    アップグレードするために、フォームの `bcrypt$(生の bcrypt
+    アウトプット)内で、データベースのハッシュを修正する必要が
+    あります。例えば:
+    `bcrypt$$2a$12$NT0I31Sa7ihGEWpka9ASYrEFkhuTNeBQ2xfZskIiiJeyFXhRgS.Sy`
+
+作業面の向上
+~~~~~~~~~~~~
+
+PDKDF2 と、 bcrypt アルゴリズムは、沢山のイテレーションとハッシュの循環を
+用います。これはシステムへの攻撃の手を遅めます。ハッシュ化された
+パスワードによって攻撃に立ち向かいます。しかし、コンピュータのマシンパワー
+の向上とともに、必要なイテレーションの数も増加しました。それ相当なものを
+選んでいます( Django のリリースの度に数を増やしてます)が、その強度を
+増したい時もあれば減らしたい時もあるでしょう、セキュリティ環境に応じて、
+または実行環境に応じて。そうするために、サブクラスを作り適切なアルゴリズム
+と ``iterations`` パラメータの上書きをするでしょう。たとえば、イテレーション
+の回数を PBKDF2 で増加させるには::
+
+1. サブクラスを ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` という
+名前で作ります。::
+
+         from django.contrib.auth.hashers import PBKDF2PasswordHasher
+
+         class MyPBKDF2PasswordHasher(PBKDF2PasswordHasher):
+             """
+             PBKDF2PasswordHasher のサブクラスで百回以上イテレーションします
+             """
+             iterations = PBKDF2PasswordHasher.iterations * 100
+
+   プロジェクトのどこかでこれを保存してください。例えば、 ``myproject/hashers.py``
+   のようなファイルを置くのがよいでしょう。
+
+2. :setting:`PASSWORD_HASHERS` の中の最初の項目として新しいハッシュを加え
+ます::
+
+        PASSWORD_HASHERS = (
+            'myproject.hashers.MyPBKDF2PasswordHasher',
+            'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+            'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+            'django.contrib.auth.hashers.BCryptPasswordHasher',
+            'django.contrib.auth.hashers.SHA1PasswordHasher',
+            'django.contrib.auth.hashers.MD5PasswordHasher',
+            'django.contrib.auth.hashers.CryptPasswordHasher',
+        )
+
+
+これだけで -- DJango は PBKDF2 を使ってパスワードを保存する時に、もっと
+沢山のイテレーションを用いれるようになりました。
+
+パスワードのアップグレード
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ログインする時に、パスワードがアルゴリズムよりも好ましいもので保存されて
+いれば、 Django は自動的にアルゴリズムをそちらにアップグレードします。
+この意味は、古い Django でもユーザがログインするたびにセキュアなものに
+なるということです、そしてまた新しく（そしてより良い）パスワードの
+保持アルゴリズムが作られるたびにそちらへ切り替えられるということです。
+
+しかしながら、 DJango がアップグレードできるパスワードはアルゴリズムとして
+:setting:`PASSWORD_HASHERS` のなかで宣言されているものだけです。新しい
+システムにアップグレードする時には、 *以前使っていたものを削除しない* こと
+を気をつけてください。もし削除してしまうと、消去してしまったアルゴリズムを
+いつまでもアップグレードできないでいることになります。
+
+.. _sha1: http://en.wikipedia.org/wiki/SHA1
+.. _pbkdf2: http://en.wikipedia.org/wiki/PBKDF2
+.. _nist: http://csrc.nist.gov/publications/nistpubs/800-132/nist-sp800-132.pdf
+.. _bcrypt: http://en.wikipedia.org/wiki/Bcrypt
+.. _py-bcrypt: http://pypi.python.org/pypi/py-bcrypt/
 
 匿名ユーザ (Anonymous users)
 -------------------------------
@@ -399,8 +579,6 @@ MD5 ハッシュを使っていました。この形式は、以前のバージ�
       でなく ``True`` を返します。
     * :meth:`~django.contrib.auth.models.User.is_authenticated()` は
       ``True`` でなく ``False`` を返します。
-    * :meth:`~django.contrib.auth.models.User.has_perm()` は常に ``False``
-      を返します。
     * :meth:`~django.contrib.auth.models.User.set_password()`,
       :meth:`~django.contrib.auth.models.User.check_password()`, 
       :meth:`~django.contrib.auth.models.User.save()`, 
@@ -418,8 +596,6 @@ MD5 ハッシュを使っていました。この形式は、以前のバージ�
 スーパユーザの作成
 ------------------
 
-.. versionadded:: 1.0
-   ``manage.py createsuperuser`` コマンドが追加されました。
 
 :setting:`INSTALLED_APPS` に ``'django.contrib.auth'`` を追加した直後に
 :djadmin:`manage.py syncdb <syncdb>` を実行すると、スーパユーザの作成を促す
@@ -452,10 +628,22 @@ MD5 ハッシュを使っていました。この形式は、以前のバージ�
 
 ユーザプロファイルを利用するには、まず、ユーザにひもづけて保存したい情報を
 入れるためのフィールドや持たせたいメソッド、そして
-:class:`~django.contrib.auth.models.User` モデルへの
-:class:`~django.db.models.Field.ForeignKey` を持ったモデルを定義します。
-:class:`~django.db.models.Field.ForeignKey` には ``unique=True`` をセットし、
-ユーザごとにモデルが一つだけ生成されるようにします。
+:class:`~django.contrib.auth.models.User` モデルへの ``user`` という名前で
+:class:`~django.db.models.Field.OneToOneField` を持ったモデルを定義します。
+:class:`~django.db.models.Field.OneToOneField` には
+`~django.contrib.auth.models.User` に対してユーザごとにモデルが一つだけ生成
+されるようにします。例をあげると::
+
+    from django.contrib.auth.models import User
+
+    class UserProfile(models.Model):
+        # このフィールドが必要です.
+        user = models.OneToOneField(User)
+
+        # 他のフィールドはこちらにあります
+        accepted_eula = models.BooleanField()
+        facorite_animal = models.CharField(max_length=20, default="Dragons.")
+
 
 このモデルをあるサイトのユーザプロファイルモデルにするには、
 :setting:`AUTH_PROFILE_MODULE` に以下の内容をドット区切りの文字列で指定しま
@@ -473,22 +661,33 @@ MD5 ハッシュを使っていました。この形式は、以前のバージ�
 
     AUTH_PROFILE_MODULE = 'accounts.userprofile'
 
-When a user profile model has been defined and specified in this manner, each
-:class:`~django.contrib.auth.models.User` object will have a method --
-:class:`~django.contrib.auth.models.User.get_profile()` -- which returns the
-instance of the user profile model associated with that
-:class:`~django.contrib.auth.models.User`.
+ユーザプロファイルモデルが定義されていて、この規則通りになっていた場合、
+:class:`~django.contrib.auth.models.User` のオブジェクトは、
+:class:`~django.contrib.auth.models.User.get_profile()` というメソッドを
+持つでしょう。 -- これは :class:`~django.contrib.auth.models.User` ユーザ
+プロファイルモデルに関連づけられたインスタンスを返します。
 
-The method :class:`~django.contrib.auth.models.User.get_profile()`
-does not create the profile, if it does not exist. You need to
-register a handler for the signal
-:attr:`django.db.models.signals.post_save` on the User model, and, in
-the handler, if created=True, create the associated user profile.
+:class:`~django.contrib.auth.models.User.get_profile()` のメソッドは、
+プロファイルを作る訳ではありません。もし存在しないものがあれば、
+自身でユーザモデルの :attr:`django.db.models.signals.post_save` のハンドル
+のシグナルを登録する必要と、ハンドラーの中で、 ``created`` が ``True``
+ならばユーザプロファイルと関連させて作るようにします::
 
-さらに詳しい情報は、 `Django book の 12 章`_ を参照してください。
+    # models.py の中で
 
-.. _Chapter 12 of the Django book: http://www.djangobook.com/en/1.0/chapter12/#cn222
-.. _`Django book の 12 章`: `Chapter 12 of the Django book`_
+    from django.contrib,.auth.models import User
+    from django.db.models.signals import post_save
+
+    # 上のユーザプロファイルの定義
+    # ...
+
+    def create_user_profile(sender, instance, created, **kwargs):
+        if created:
+            USerProfile.objects.create(user=instance)
+
+    post_save.connect(create_user_profile, sender=User)
+
+.. seealso:: :doc:`/topics/signals` シグナルについての詳しい情報です。
 
 Web リクエストに対する認証
 ==============================
@@ -502,7 +701,7 @@ API について扱ってきました。より高水準の API では、 Django 
 び :class:`~django.contrib.auth.middleware.AuthenticationMiddleware` を
 :setting:`MIDDLEWARE_CLASSES` 設定に追加して、これらのミドルウェアをインス
 トールします。詳しくは
-:ref:`セッションのドキュメント <topics-http-sessions>` を参照してください。
+:doc:`セッションのドキュメント </topics/http/sessions>` を参照してください。
 
 ミドルウェアをインストールしたら、ビューから 
 :attr:`request.user <django.http.HttpRequest.user>` にアクセスできるように
@@ -520,7 +719,7 @@ API について扱ってきました。より高水準の API では、 Django 
     else:
         # Do something for anonymous users.
 
-.. _howtologauserin:
+.. _how-to-log-a-user-in:
 
 ユーザをログインさせる
 -----------------------
@@ -560,6 +759,9 @@ Django では、 :mod:`django.contrib.auth` の中で、
     クを使って、ユーザの ID をセッションに保存します。従って、上でも述べた
     ように、セッションミドルウェアをインストールしておかねばなりません。
 
+    ユーザがログインする時に、匿名ユーザだった時のデータセットを残しておく
+    方法にも触れておきます。
+
     以下の例は :func:`~django.contrib.auth.authenticate()` と
     :func:`~django.contrib.auth.login()` の使い方を示しています::
 
@@ -591,21 +793,54 @@ Django では、 :mod:`django.contrib.auth` の中で、
 .. _backends documentation: #other-authentication-sources
 .. _`認証バックエンドのドキュメント`: `backends documentation`_
 
-ユーザのパスワードを手動で調べる
---------------------------------
+ユーザのパスワードを手動で管理する
+----------------------------------
+
+.. currentmodule:: django.contrib.auth.hashers
+
+.. versionadded:: 1.4
+    :mod:`django.contrib.auth.hashers` モジュールは関数セットを
+    ハッシュ化したパスワードの作成と有効化のために提供しています。
+    独立してそれらを使うことが出来ます。
 
 .. function:: check_password()
 
+    .. versionaddd:: 1.4
+
     ユーザ認証を手動で行うために平文パスワードとデータベース上のハッシュ化
     パスワードを比較したい場合には、
-    :func:`django.contrib.auth.models.check_password`
+    :func:`django.contrib.auth.hashers.check_password`
     という便宜関数を使えます。この関数は、調べたい平文パスワードと、比較対
     象のデータベースに格納されているユーザの ``password`` フィールド全体の
     二つの引数をとり、二つが一致すれば ``True`` を、そうでなければ
     ``False`` を返します。
 
+.. function:: make_password()
+
+    .. versionadded:: 1.4
+
+    アプリケーションの中で使うフォーマット通りにハッシュ化したパスワードを作り
+    るには、二つの引数をとります: ハッシュ化するアルゴリズムとプレーンテキスト
+    のパスワードです。今サポートされているアルゴリズムは
+    : ``'sha1'``, ``'md5'`` で、もし ``crypt`` のライブラリがインストールされ
+    ていれば、それも使えます。もし、二つ目の引数が ``None`` だと、使えない
+    パスワードがかえってきます（一つは、
+    :func:`django.contrib.auth.hashers.check_password` によって受け付けられ
+    ません）
+
+.. function:: is_password_usable()
+
+    .. versionadded:: 1.4
+
+    与えられた文字列がハッシュ化されたパスワードであれば、それをチェックしま
+    す。 :func:`django.contrib.auth.hashers.check_password` に反しないかが
+    確かめられます。
+
+
 ユーザをログアウトさせる
 ------------------------
+
+.. currentmodule:: django.contrib.auth
 
 .. function:: logout()
 
@@ -624,8 +859,6 @@ Django では、 :mod:`django.contrib.auth` の中で、
     ユーザがログインしていなくても :func:`~django.contrib.auth.logout()` は
     エラーを送出しないことに注意してください。
 
-    .. versionchanged:: 1.0
-       ``logout()`` を呼び出すとセッションデータを消去するようになりました。
 
     :func:`~django.contrib.auth.logout()` を呼び出すと、現在のリクエストに
     結び付いたセッションデータを全て抹消します。その時に記憶されていたデー
@@ -634,6 +867,48 @@ Django では、 :mod:`django.contrib.auth` の中で、
     きないようにするためです。ユーザのログアウト後に何らかのセッションデー
     タを記憶させたければ、 :func:`django.contrib.auth.logout()` の *後で*
     行ってください。
+
+.. _topics-auth-signals:
+
+ログインとログアウトのサイン
+----------------------------
+
+.. versionadded:: 1.3
+
+auth 認証のフレームワークは二つ :doc:`signals </topics/signals>`
+を使います。それは、ユーザがログインまたはログアウトした時のお知らせ
+のためです。
+
+.. data:: django.contrib.auth.signals.user_logged_in
+
+ユーザがログインに成功した時に送信します。
+
+このシグナルが引数で送られます:
+
+``sender``
+    上にある通り: このクラスはユーザがログインした時のものです
+
+``request``
+    最新のものは :class:`~django.http.HttpRequest` のインスタンスです。
+
+``user``
+    ログインしたユーザのインスタンスです。
+
+.. data:: django.contrib.auth.signals.user_logged_out
+
+ユーザがログアウトする時に送信するものは
+
+``sender``
+    上にあるとおり: ログアウトしたユーザのクラスまたは
+    ユーザが認証されていなければ ``None`` を返します。
+
+``request``
+    最新のものは :class:`~django.http.HttpRequest` instance.
+
+``user``
+    ログアウトしたユーザのインスタンスか、もし認証されていな
+    ければ `None`` を返します。
+
 
 ログインユーザだけがアクセスできるように制限をかける
 ----------------------------------------------------
@@ -662,99 +937,104 @@ Django では、 :mod:`django.contrib.auth` の中で、
 login_required デコレータ
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: decorators.login_required()
+.. function:: decorators.login_required([redirect_field_name=REDIRECT_FIELD_NAME, login_url=None])
 
     手間を省くために、
     :func:`~django.contrib.auth.decorators.login_required` デコレータを使え
     ます::
 
         from django.contrib.auth.decorators import login_required
-
-        def my_view(request):
-            # ...
-        my_view = login_required(my_view)
-
-    Python 2.4 で登場したよりコンパクトなデコレータ構文を使った例を以下に示
-    します::
-
-        from django.contrib.auth.decorators import login_required
-
+        
         @login_required
         def my_view(request):
-            # ...
+            ...
 
+    :func:`~django.contrib.auth.decorators.login_required` に従うと:
+
+    * もし、ユーザがログインしていなければ、クエリ文字列の現在の完全
+      パスを通って、 :setting:`settings.LOGIN_URL <LOGIN_URL>`
+      へとリダイレクトします。例えば: ``/accounts/login/?next=/polls/3/``
+    
+    * もし、ユーザがログインしていれば、通常のビューを実行します。
+      ビューコードは、ユーザがログインしているかという仮定には縛られません。
+
+    通常、ユーザがリダイレクトされる認証が成功した場合のパスは
+    クエリ文字列のパラメータの中に ``"next"`` という名前で保持されています。
+    もし、このパラメータに別の名前をあてがいたい場合には、
     :func:`~django.contrib.auth.decorators.login_required` はオプションの
     ``redirect_field_name`` パラメタをとります。例えば::
 
         from django.contrib.auth.decorators import login_required
 
+        @login_required(redirect_field_name='my_redirect_field')
         def my_view(request):
-            # ...
-        my_view = login_required(redirect_field_name='redirect_to')(my_view)
+            ...
 
-    同様に、 Python 2.4 で登場したよりコンパクトなデコレータ構文を使った例
-    を以下に示します::
+    もし、 ``redirect_field_name`` に値を設定した場合、ログインテンプレート
+    もそれに応じて変更する必要があります、テンプレートのコンテキスト（context)
+    変数が保持するリダイレクトパスは ``redirect_field_name`` で設定した値を、
+    ``"next"`` （通常）のかわりにキーとして扱うからです。
+
+    .. versionadded:: 1.3
+
+    :func:`~django.contrib.auth.decorators.login_required` もまた、オプション
+    として ``login_url`` パラメータを取ります。例えば::
 
         from django.contrib.auth.decorators import login_required
 
-        @login_required(redirect_field_name='redirect_to')
+        @login_required(login_url='/accounts/login/')
         def my_view(request):
-            # ...
+            ...
 
-    :func:`~django.contrib.auth.decorators.login_required` が行うのは以下の
-    ような処理です:
+    ``login_url`` パラメータを設定しない場合には
+    :setting:`settings.LOGIN_URL <LOGIN_URL>` に適切な Django のビュー関数
+    を対応づけておかねばなりません。例えば URLconf に以下のような行を設定します::
 
-        * ユーザがログインしていなければ、
-	  :setting:`settings.LOGIN_URL <LOGIN_URL>` に指定した値 (デフォル
-	  トでは ``/accounts/login/``) にリダイレクトします。このとき、現在
-	  のクエリの絶対 URL を ``next`` または ``redirect_field_name`` に
-          指定したパラメタの値に設定します。 URL は例えば
-	  ``/accounts/login/?next=/polls/3/`` のようになります。
+        (r'^accounts/login/$', 'django.contrib.auth.views.login'),
 
-        * ユーザがログインしていれば、 ビューを普通に実行します。ビューコー
-          ドの中では、ユーザがログインしているものとみなして構いません。
+.. function:: views.login(request, [template_name, redirect_field_name, authentication_form])
 
-ただし、これを行うには :setting:`settings.LOGIN_URL <LOGIN_URL>` に適切な
-Django のビュー関数を対応づけておかねばなりません。例えば URLconf に以下の
-ような行を設定します::
+    **URL name:** ``login``
 
-    (r'^accounts/login/$', 'django.contrib.auth.views.login'),
-
-.. function:: views.login()
+    :doc:`the URL documentation </topics/http/urls>` に URL パターンについて
+    詳細にのっているので見てください。
 
     ``django.contrib.auth.views.login`` は以下のような処理を行います:
 
-        * ``GET`` で呼び出されると、同じ URL に対して POST を行うためのログ
-          インフォームを表示します。これについては後でもう少し説明します。
+    * ``GET`` で呼び出されると、同じ URL に対して POST を行うためのログ
+      インフォームを表示します。これについては後でもう少し説明します。
 
-        * ``POST`` で呼び出されると、ユーザのログイン処理を試みます。ログイ
-          ンに成功すると、ビューは ``next`` に示された URL にリダイレクトし
-          ます。 ``next`` を指定しない場合、
+    * ``POST`` で呼び出されると、ユーザのログイン処理を試みます。ログイ
+      ンに成功すると、ビューは ``next`` に示された URL にリダイレクトし
+      ます。 ``next`` を指定しない場合、
 	  :setting:`settings.LOGIN_REDIRECT_URL <LOGIN_REDIRECT_URL>`
-          (デフォルト値は ``/accounts/profile/``) にリダイレクトします。ロ
-          グインに失敗すると、ログインフォームを再度表示します。
+      (デフォルト値は ``/accounts/profile/``) にリダイレクトします。ロ
+      グインに失敗すると、ログインフォームを再度表示します。
 
     開発者は ``registration/login.html`` という名前のテンプレート上でログイ
     ンフォームを提供せねばなりません。 Django はこのテンプレートに、以下の
     3 つのテンプレートコンテキスト変数を渡します:
 
-        * ``form``: ログインフォームを表現する :class:`~django.forms.Form`
-          オブジェクトです。 :class:`~django.forms.Form` オブジェクトの詳細
-          は :ref:`forms のドキュメント <topics-forms-index>` を参照してく
-          ださい。
+    * ``form``: ログインフォームを表現する :class:`~django.forms.Form`
+      オブジェクトです。 :class:`~django.forms.Form` オブジェクトの詳細
+      は :doc:`forms のドキュメント </topics/forms/index>` を参照してく
+      ださい。
 
-        * ``next``: ログイン成功後にリダイレクトされる先の URL です。 URL
-          にはクエリ文字列を含めてかまいません。
+    * ``next``: ログイン成功後にリダイレクトされる先の URL です。 URL
+      にはクエリ文字列を含めてかまいません。
 
-        * ``site``: The current :class:`~django.contrib.sites.models.Site`,
-          according to the :setting:`SITE_ID` setting. If you don't have the
-          site framework installed, this will be set to an instance of
-          :class:`~django.contrib.sites.models.RequestSite`, which derives the
-          site name and domain from the current
-          :class:`~django.http.HttpRequest`.
-        
-        * ``site_name``: :setting:`SITE_ID` によって決定される現在の
-          :class:`~django.contrib.sites.models.Site`` の名前です。
+    * ``site``: 現在の :class:`~django.contrib.sites.models.Site`,
+      :setting:`SITE_ID` のセッティングに従っています。もし、サイト
+      フレームワークがインストールされていなければ、これは、
+      :class:`~django.contrib.sites.models.RequestSite` のインスタンスが
+      セットされます。これはサイトの名前とドメインを現在の
+      :class:`~django.http.HttpRequest` から取ってきます。
+
+    * ``site_name``: ``site.name`` のための別名（alias)です。もし、
+      サイトフレームワークがインストールされていなければ、
+      :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`
+      の値がセットされます。サイトについてもっと知りたければ
+      :doc:`/ref/contrib/sites` を見てください。
 
     :file:`registration/login.html` テンプレートを呼び出したくないのなら、
     URLconf を通じて外部パラメタ ``template_name`` をビューに渡してください。
@@ -763,17 +1043,19 @@ Django のビュー関数を対応づけておかねばなりません。例え�
 
         (r'^accounts/login/$', 'django.contrib.auth.views.login', {'template_name': 'myapp/login.html'}),
 
-    You can also specify the name of the ``GET`` field which contains the URL
-    to redirect to after login by passing ``redirect_field_name`` to the view.
-    By default, the field is called ``next``.
-        
+    ``GET`` フィールドの名前を指定できます。 ``GET`` フィールドは、
+    ``redirect_field_name`` からビューへの、
+    ログイン後のリダイレクト先を含むURLを設定してください。
+    通常では、このフィールドは ``next`` です。
+            
     編集の雛型にできるような :file:`registration/login.html` テンプレートの
     例を以下に示します。このテンプレートは、 ``content`` ブロックの定義された
     :file:`base.html` があるという前提で書かれています:
 
-    .. code-block:: html
+    .. code-block:: html+django
 
         {% extends "base.html" %}
+        {% load url from future %}
 
         {% block content %}
 
@@ -781,7 +1063,8 @@ Django のビュー関数を対応づけておかねばなりません。例え�
         <p>Your username and password didn't match. Please try again.</p>
         {% endif %}
 
-        <form method="post" action="{% url django.contrib.auth.views.login %}">
+        <form method="post" action="{% url 'django.contrib.auth.views.login'%}">
+        {% csrf_token %}
         <table>
         <tr>
             <td>{{ form.username.label_tag }}</td>
@@ -799,36 +1082,79 @@ Django のビュー関数を対応づけておかねばなりません。例え�
 
         {% endblock %}
 
+    .. versionadded:: 1.2
+
+    もし、他の認証を使っているならば( :ref:`authentication-backends` を見て
+    ください)カスタムされた認証フォームを通って、 ``authentication_form`` 
+    パラメータを経てログインビューへと行きます。このフォームは ``request``
+    キーワード引数を自身の ``__init__`` メソッドの中で受け取らなくては
+    いけません。そして、 ``get_user`` メソッドは認証されたユーザーオブジェクト
+    を返します。(このメソッドは、成功したフォームバリデーションの
+    後に一度だけ呼ばれます。)
+
     .. _forms documentation: ../forms/
     .. _site framework docs: ../sites/
+
+    .. versionadded:: 1.4
+
+    :func:`~views.login` のビューと :ref:`other-built-in-views` は今、
+    全て :class:`~django.template.response.TemplateResponse` のインスタンス
+    を返します。これは、レスポンスデータをレンダリング前に容易に改変できる
+    ようにします。もっと情報が欲しければ
+    :doc:`TemplateResponse documentation </ref/template-response>` を見て
+    ください。
+
+.. _other-built-in-views:
 
 その他の組み込みビュー
 -----------------------
 
-認証システムでは、 ``login`` ビューの他にも便利なビューをいくつか提供してい
-ます:
+.. module:: django.contrib.auth.views
 
-.. function:: views.logout(request, [next_page, template_name, redirect_field_name])
+:func:`~views.login` ビューに加えて、認証システムはその他の役に立つビューを
+:mod:`django.contrib.auth.views`: に持っています。:
+
+.. function:: logout(request, [next_page, template_name, redirect_field_name])
 
     ユーザをログアウトさせます。
 
+    **URL name:** ``logout``
+
+    :doc:`the URL documentation </topics/http/urls>` を見てください。もっと
+    詳しく URL パターンを使う上での情報が載っています。
+
+
     **オプション引数:**
 
-        * ``next_page``: The URL to redirect to after logout.
+    * ``next_page``: ログアウト後にリダイレクトされる URL です。
 
-        * ``template_name``: ログアウトページのテンプレートの完全な名前です。
-          この引数を省略すると、デフォルト値の
-          :file:`registration/logged_out.html` を使います。
+    * ``template_name``: ログアウトページのテンプレートの完全な名前です。
+      この引数を省略すると、デフォルト値の
+      :file:`registration/logged_out.html` を使います。
 
-        * ``redirect_field_name``: The name of a ``GET`` field containing the
-          URL to redirect to after log out. Overrides ``next_page`` if the given
-          ``GET`` parameter is passed.
+    * ``redirect_field_name``: ``GET`` フィールドの名前で、ログアウト後の
+      リダイレクト先 URL を含みます。 ``GET`` パラメータが渡されると
+      ``next_page`` が上書きされます。
+
 
     **テンプレートコンテキスト:**
 
-        * ``title``: "Logged out" という文字列を翻訳した値になります。
+    * ``title``: "Logged out" の文字列を翻訳した値になります。
 
-.. function:: views.logout_then_login(request[, login_url])
+    * ``site``: 現在の :class:`~django.contrib.sites.models.Site` で、
+      :setting:`SITE_ID` のセッティングに従っています。もし、サイト
+      フレームワークをインストールしていなければ、これは
+      :class:`~django.contrib.sites.models.RequestSite` のインスタンス
+      がセットされ、サイトの名前てドメインを現在の
+      :class:`~django.http.HttpRequest` から取ってきます。
+
+    * ``site_name``: ``site.name`` のための別名（alias)です。もし、
+      サイトフレームワークがインストールされていなければ、
+      :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`
+      の値がセットされます。サイトについてもっと知りたければ
+      :doc:`/ref/contrib/sites` を見てください。
+
+.. function:: logout_then_login(request[, login_url])
 
     ユーザをログアウトさせてから、ログインページにリダイレクトします。
 
@@ -838,65 +1164,143 @@ Django のビュー関数を対応づけておかねばなりません。例え�
           略すると、デフォルト値の :setting:`settings.LOGIN_URL <LOGIN_URL>`
 	  を使います。
 
-.. function:: views.password_change(request[, template_name, post_change_redirect])
+.. function:: password_change(request[, template_name, post_change_redirect])
 
     ユーザがパスワードを変更できるようにします。
 
     **オプション引数:**
 
-        * ``template_name``: パスワード変更ページのテンプレートの完全な名前
-          です。この引数を省略すると、デフォルト値の
+    * ``template_name``: パスワード変更ページのテンプレートの完全な名前
+      です。この引数を省略すると、デフォルト値の
 	  :file:`registration/password_change_form.html` を使います。
 
-        * ``post_change_redirect``: The URL to redirect to after a successful
-          password change.
+    * ``post_change_redirect``: パスワードの変更に成功した場合の
+      URLリダイレクト先です。
+
+        .. versionadded:: 1.2
+
+    * ``password_change_form``: "パスワードの変更" フォームのカスタマイズ
+      は、 ``user`` のキーワード引数を受け取らなくてはいけません。
+      フォームは実際にウーザのパスワードが変更される責任があります。
+      通常では、 :class:`~django.contrib.auth.forms.PasswordChangeForm`
+      になります。
 
     **テンプレートコンテキスト:**
 
-        * ``form``: パスワード変更のためのフォームです。
+    * ``form``: パスワード変更のためのフォームです。
 
-.. function:: views.password_change_done(request[, template_name])
+.. function:: password_change_done(request[, template_name])
 
     ユーザがパスワードを変更した後のページを表示するためのビューです。
 
+    ** URL name:** ``password_change_done``
+
     **オプション引数:**
 
-        * ``template_name``: パスワード変更完了ページのテンプレートの完全な
-          名前です。この引数を省略すると、デフォルト値の
+    * ``template_name``: パスワード変更完了ページのテンプレートの完全な
+      名前です。この引数を省略すると、デフォルト値の
 	  :file:`registration/password_change_done.html` を使います。
 
-.. function:: views.password_reset(request[, is_admin_site, template_name, email_template_name, password_reset_form, token_generator, post_reset_redirect])
+.. function:: password_reset(request[, is_admin_site, template_name, email_template_name, password_reset_form, token_generator, post_reset_redirect, from_email])
 
-    ユーザがパスワードをリセットできるようにします。また、新たなパスワード
-    をメールで送信します。
+    ユーザがパスワードをリセットできるように、一回しか使用できないリンクを
+    作成します。また、新たなパスワードをメールで送信します。
+
+    .. versionchanged:: 1.3
+        ``from_email`` 引数が加えられました。
+
+    .. versionchanged:: 1.4
+       使えないパスワードでフラグ付けされたユーザ(
+       :meth:`~django.contrib.auth.models.User.set_unusable_password()`
+       を見てください)は、パスワードのリセットをリクエストできません。
+       外部の認証ソース、例えばLDAPのようなものを使う際の悪用を防ぐためです。
+
+    ** URL name:** ``password_reset``
 
     **オプション引数:**
 
-        * ``template_name``: パスワードリセットページのテンプレートの完全な
-          名前です。この引数を省略すると、デフォルト値の
-	  :file:`registration/password_reset_form.html` を使います。
+    * ``template_name``: パスワードリセットページのテンプレートの完全な
+      名前です。この引数を省略すると、デフォルト値の
+      :file:`registration/password_reset_form.html` を使います。
 
-        * ``email_template_name``: 新しいパスワードを e-mail で送信する際に
-          使うテンプレートの完全な名前です。この引数を省略すると、デフォル
-          ト値の :file:`registration/password_reset_email.html` を使います。
+    * ``email_template_name``: 新しいパスワードを e-mail で送信する際に
+      使うテンプレートの完全な名前です。この引数を省略すると、デフォル
+      ト値の :file:`registration/password_reset_email.html` を使います。
 
-        * ``password_reset_form``: Form that will be used to set the password.
-          Defaults to ``SetPasswordForm``.
-        
-        * ``token_generator``: Instance of the class to check the password. This
-          will default to ``default_token_generator``, it's an instance of
-          ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
-          
-        * ``post_reset_redirect``: The URL to redirect to after a successful
-          password change.
-          
+    * ``subject_template_name``: 新しいパスワードのemailを生成するのに使う
+      テンプレートのフルネームです。デフォルトでは
+      :file:`registration/password_reset_email.html` が設定されています。
+
+      .. versionadded:: 1.4
+
+    * ``password_reset_form``: パスワードのセットに使うフォームです。
+      デフォルトでは
+      :class:`~django.contrib.auth.forms.PasswordResetForm`
+      が設定されています。
+
+
+    * ``token_generator``: パスワードのチェックに使うクラスのインスタンスで
+      す。通常は ``default_token_generator`` に設定されています、これは
+      ``django.contrib.auth.tokens.PasswordResetTokenGenerator`` のインスタ
+      ンスです。
+
+
+    * ``post_reset_redirect``: パスワードの変更が成功した後にリダイレクト
+      する URL です。
+
+    * ``from_email``: 有効な email アドレスです。通常 Django が使うのは
+      :setting:`DEFAULT_FROM_EMAIL` です。
+
+
     **テンプレートコンテキスト:**
 
-        * ``form``: パスワードリセットのためのフォームです。
+    * ``form``: パスワードリセットのためのフォームです。
+      (上にある `password_reset_form`` を見てください)
+
+    ** Email テンプレートコンテキスト: **
+
+    * ``email`` : ``user.email`` の別名です。
+
+    * ``user``: 現在の :class:`~django.contrib.auth.models.User` で、
+      ``email`` フォームフィールドに従っています。アクティブユーザのみ
+      が、パスワードをリセットすることができます。(
+      ``User.is_active is True`` )
+
+    * ``site_name``: ``sit.name`` のエイリアス（別名）です。もし、
+      インストール済みのサイトフレームワークがない場合は、
+      :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`
+      の値をセットします。これについては :doc:`/ref/contrib/sites` を
+      ご覧ください。
+
+    * ``domain``: ``site.domain`` のエイリアス（別名）です。もし、
+      サイトフレームワークがインストールされていない場合、これは
+      ``request.get_host()`` の値をセットします。
+
+    * ``protocol``: http or https
+
+    * ``uid``: ユーザのIDは36進数でエンコードされます。
+
+    *``token``: トークンはパスワードが有効なものかをチェックします。
+
+    ``registration/password_reset_email.html`` （ email ボディテンプレー
+    ト）にサンプルがあります:
+
+    .. code-block:: html+django
+
+        {% load url from future %}
+        誰かがパスワードの変更を求めたら {{ email }} のように
+        email から送られたリンクへと飛ぶことになります。下のリンクに従ってください。:
+        {{ protocol }}://{{ site_name }}{% url 'auth_password_reset_confirm' uidb36=uid token=token %}
+
+    同じテンプレートコンテキストが、サブジェクトテンプレートに使われる
+    時、サブジェクトは一行のプレーンテキストでなくてはなりません。
+
 
 .. function:: views.password_reset_done(request[, template_name])
 
     ユーザがパスワードをリセットした後のページを表示するためのビューです。
+    このビューは :func:`password_reset` ビューが ``post_reset_redirect`` 
+    の URL セットを所持していない時にデフォルトで呼ばれます。
 
     **オプション引数:**
 
@@ -904,53 +1308,75 @@ Django のビュー関数を対応づけておかねばなりません。例え�
           全な名前です。この引数を省略すると、デフォルト値の
 	  :file:`registration/password_reset_done.html` を使います。
 
-.. function:: views.redirect_to_login(next[, login_url, redirect_field_name])
-
-    ログインページにリダイレクトし、ログインに成功したら別の URL に戻れるよ
-    うにするためのビューです。
-
-    **必須の引数:**
-
-        * ``next``: ログイン成功後のリダイレクト先 URL です。
-
-    **オプション引数:**
-
-        * ``login_url``: ログインページへのリダイレクト先です。
-	  この引数を省略すると、デフォルト値の
-	  :setting:`settings.LOGIN_URL <LOGIN_URL>` を使います。
-
-        * ``redirect_field_name``: The name of a ``GET`` field containing the
-          URL to redirect to after log out. Overrides ``next`` if the given
-          ``GET`` parameter is passed.
-          
 .. function:: password_reset_confirm(request[, uidb36, token, template_name, token_generator, set_password_form, post_reset_redirect])
 
     Presents a form for entering a new password.
 
-    **Optional arguments:**
+    **オプション 引数:**
 
-        * ``uidb36``: The user's id encoded in base 36. This will default to
-          ``None``.
-        * ``token``: Token to check that the password is valid. This will default to ``None``.
-        * ``template_name``: The full name of a template to display the confirm
-          password view. Default value is :file:`registration/password_reset_confirm.html`.
-        * ``token_generator``: Instance of the class to check the password. This
-          will default to ``default_token_generator``, it's an instance of
-          ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
-        * ``set_password_form``: Form that will be used to set the password.
-          This will default to ``SetPasswordForm``.
-        * ``post_reset_redirect``: URL to redirect after the password reset
-          done. This will default to ``None``.
+    * ``uidb36``: 36進数でエンコードされたユーザのIDです。デフォルトでは
+      ``None`` です。
+
+    * ``token``: パスワードが有効かをチェックするためのトークンです。
+      デフォルトでは ``None`` です。
+
+    * ``template_name``: 確定したパスワードのビューを表示するテンプレート
+      のフルネームです。
+
+    * ``token_generator``: パスワードをチェックするためのクラスのインスタ
+      ンスです。これは ``default_token_generator`` がデフォルトです。
+      そして、 ``django.contrib.auth.tokens.PasswordResetTokenGenerator``
+      のインスタンスでもあります。
+
+    * ``set_password_form``: パスワードをセットするためのフォームとして
+      使用されます。 :class:`~django.contrib.auth.forms.SetPasswordForm`
+      がデフォルトです。
+
+    * ``post_reset_redirect``: パスワードのリセットが終了した後に
+      リダイレクトされる先です。デフォルトでは ``None`` です。
+
+    **テンプレートコンテキスト:**
+
+    * ``form``: 新しいユーザのパスワードをセットするための
+      フォームです（上にある ``set_password_form`` を見てください）
+
+    * ``validlink``: Boolean 型です。 True でリンクが有効か（
+      uidb36 とトークンの組み合わせ）またはまだ使われていないかです。
 
 .. function:: password_reset_complete(request[,template_name])
 
-   Presents a view which informs the user that the password has been
-   successfully changed.
+   ユーザにパスワードの変更が成功したということを伝えるためのビューです。
 
-   **Optional arguments:** 
+   ** URL name:** ``password_reset_complete``
 
-       * ``template_name``: The full name of a template to display the view.
-         This will default to :file:`registration/password_reset_complete.html`.
+   **オプション引数:** 
+
+   * ``template_name``: ビューを表示するためのテンプレートのフルネームで
+     す。:file:`registration/password_reset_complete.html` がデフォルトの
+     値になります。
+
+ヘルパー関数
+------------
+
+.. currentmodule:: django.contrib.auth.views
+
+.. function:: redirect_to_login(next[, login_url, redirect_field_name])
+
+    ログインページへリダイレクトします、ログインに成功したら、トップ画面で
+    はなく、違う URL へと戻ります。
+
+    **必要な 引数:**
+
+    * ``next``: ログインに成功した後のリダイレクト先の URL です。
+
+    **オプション 引数:**
+
+    *``login_url``: リダイレクトするログインページの URL です。
+     デフォルトでは :setting:`settings.LOGIN_URL <LOGIN_URL>` となります。
+
+    * ``redirect_field_name``: ``GET`` フィールドに含まれているログアウト後
+      にリダイレクトする先の URL です。 ``GET`` パラメータが渡されていれば
+      ``next`` を上書きします。
 
 組み込みフォーム
 ----------------------
@@ -979,13 +1405,12 @@ Django のビュー関数を対応づけておかねばなりません。例え�
 
 .. class:: SetPasswordForm
 
-    A form that lets a user change his/her password without entering the old
-    password.
+    古いパスワードを入力することなく、パスワードを変更させるための
+    フォームです。
 
 .. class:: UserChangeForm
 
-    A form used in the admin interface to change a user's information and
-    permissions.
+    ユーザ情報とパーミッションを変更するためのアドミンインターフェースです
 
 .. class:: UserCreationForm
 
@@ -994,7 +1419,7 @@ Django のビュー関数を対応づけておかねばなりません。例え�
 テストにパスしたログインユーザだけがアクセスできるように制限をかける
 --------------------------------------------------------------------
 
-.. currentmodule:: django.contrib.auth
+.. currentmodule:: django.contrib.auth.decorators
 
 特定のパーミッションやその他のテストの結果に応じたアクセスの制限には、前節
 で説明したの本質的に同じことをします。
@@ -1005,19 +1430,19 @@ Django のビュー関数を対応づけておかねばなりません。例え�
 ``polls.can_vote`` というパーミッションを持っているかチェックします::
 
     def my_view(request):
-        if not (request.user.is_authenticated() and request.user.has_perm('polls.can_vote')):
+        if not request.user.has_perm('polls.can_vote'):
             return HttpResponse("You can't vote in this poll.")
         # ...
 
-.. function:: decorators.user_passes_test()
+.. function:: user_passes_test(func, [login_url=None])
 
     ``user_passes_test`` デコレータを使えば、手間を省けます::
 
         from django.contrib.auth.decorators import user_passes_test
 
+        @user_passes_test(lamda u: u.has_perm('polls.can_vote'))
         def my_view(request):
-            # ...
-        my_view = user_passes_test(lambda u: u.has_perm('polls.can_vote'))(my_view)
+            ...
 
     ここでは、簡単な例としてパーミッションのテストに
     :func:`~django.contrib.auth.decorators.user_passes_test` を使っています
@@ -1025,14 +1450,6 @@ Django のビュー関数を対応づけておかねばなりません。例え�
     なら、後で解説する
     :func:`django.contrib.auth.decorators.permission_required()` デコレータ
     を使えます。
-
-    Python 2.4 のデコレータ構文ならこうなります::
-
-        from django.contrib.auth.decorators import user_passes_test
-
-        @user_passes_test(lambda u: u.has_perm('polls.can_vote'))
-        def my_view(request):
-            # ...
 
     :func:`~django.contrib.auth.decorators.user_passes_test` には必須の引数
     が一つあります。この引数は、 :class:`~django.contrib.auth.models.User`
@@ -1047,26 +1464,18 @@ Django のビュー関数を対応づけておかねばなりません。例え�
     の URL を指定できます (デフォルトでは
     :setting:`settings.LOGIN_URL <LOGIN_URL>` になります)。
 
-    Python 2.3 風の構文で書いた例を示します::
-
-        from django.contrib.auth.decorators import user_passes_test
-
-        def my_view(request):
-            # ...
-        my_view = user_passes_test(lambda u: u.has_perm('polls.can_vote'), login_url='/login/')(my_view)
-
-    Python 2.4 風の構文で例を書くと以下のようになります::
+    例えば::
 
         from django.contrib.auth.decorators import user_passes_test
 
         @user_passes_test(lambda u: u.has_perm('polls.can_vote'), login_url='/login/')
         def my_view(request):
-            # ...
+            ...
 
 ``permission_required`` デコレータ
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: decorators.permission_required()
+.. function:: decorators.permission_required([login_url=None, raise_exception=False)
 
     あるユーザが特定のパーミッションを有しているかのチェックは、比較的よく
     ある操作なので、 Django はショートカットとして
@@ -1076,38 +1485,57 @@ Django のビュー関数を対応づけておかねばなりません。例え�
 
         from django.contrib.auth.decorators import permission_required
 
+        @permission_required('polls.can_vote')
         def my_view(request):
-            # ...
-        my_view = permission_required('polls.can_vote')(my_view)
+            ...
 
     As for the :meth:`User.has_perm` method, permission names take the form
-    ``"<application name>.<lowercased model name>"`` (i.e. ``polls.choice`` for
-    a ``Choice`` model in the ``polls`` application).
+    ``"<app label>.<permission codename>"`` (すなわち ``polls.choice`` は
+    は ``polls`` アプリケーションのモデルへのパーミッションです.)
 
     :func:`~django.contrib.auth.decorators.permission_required()` もまた、
     ``login_url`` を引数に取れます。例えば::
 
         from django.contrib.auth.decorators import permission_required
 
+        @permission_required('polls.can_vote', login_url='/loginpage/')
         def my_view(request):
-            # ...
-        my_view = permission_required('polls.can_vote', login_url='/loginpage/')(my_view)
+            ...
 
     ``login_required`` デコレータと同様、 ``login_url`` のデフォルト値は
     :setting:`settings.LOGIN_URL <LOGIN_URL>` です。
 
+    .. versionchanged:: 1.4
+
+    ``raise_exception`` パラメータが追加されました。もし、パラメータが
+    与えられると、でコレータは :exc:`~django.core.exceptions.PermissionDenied`
+    を送出します。 :ref:`the 403 (HTTP Forbidden) view<http_forbidden_view>`
+    を、ログインページへのリダイレクトの代わりに出します。
+
+.. currentmodule:: django.contrib.auth
+
 アクセスを汎用ビューに制限する
 ------------------------------
 
-アクセスを :ref:`汎用ビュー <ref-generic-views>` に制限するには、ビューを
-囲む薄いラッパコードを書き、URLconf を変更して、ジェネリックビュー自体では
-なくラッパコードを指すようにします。例えば::
+アクセスを :doc:`汎用ビュー </ref/class-based-views>` に制限するには、
+:meth:`View.dispatch <django.views.generic.base.View.dispatch>` という
+クラスのメソッドをデコレートする必要があります。
+:ref:`decorating-class-based-views` の詳細を確認してください。
+
+汎用ビューをベースにした関数
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:doc:`class-based generic view </ref/class-based-views>` にアクセスを制限
+するにはビューを囲む薄いラッパコードを書き、URLconf を変更して、
+ジェネリックビュー自体ではなくラッパコードを指すようにします。例えば::
 
     from django.views.generic.date_based import object_detail
 
     @login_required
     def limited_object_detail(*args, **kwargs):
         return object_detail(*args, **kwargs)
+
+.. _permissions:
 
 パーミッション (Permission)
 ===========================
@@ -1119,13 +1547,13 @@ Django には単純なパーミッション機構がついてきます。この�
 パーミッション機構は Django の admin サイトでも使われていますが、自作のコー
 ド内でも自由に使えます。
 
-    * "add" フォームをビューし、オブジェクトを追加するためのアクセスを、そ
-      の型のオブジェクトの "add" パーミッションを持つユーザに制限しています。
-    * 変更リストをビューし、"change" フォームをビューしてオブジェクトを変更
-      するためのアクセスを、その型のオブジェクトの "change" パーミッション
-      を持つユーザに制限しています。
-    * あるオブジェクトを削除するためのアクセスを、その型のオブジェクトの
-      "delete" パーミッションを持つユーザに制限しています。
+* "add" フォームをビューし、オブジェクトを追加するためのアクセスを、そ
+  の型のオブジェクトの "add" パーミッションを持つユーザに制限しています。
+* 変更リストをビューし、"change" フォームをビューしてオブジェクトを変更
+  するためのアクセスを、その型のオブジェクトの "change" パーミッション
+  を持つユーザに制限しています。
+* あるオブジェクトを削除するためのアクセスを、その型のオブジェクトの
+  "delete" パーミッションを持つユーザに制限しています。
 
 パーミッションはオブジェクトインスタンスごとではなく、オブジェクトの型ごと
 にグローバルに設定されます。例えば、「Mary はニュース記事を変更できる」のよ
@@ -1150,6 +1578,14 @@ Django には単純なパーミッション機構がついてきます。この�
 :djadmin:`manage.py syncdb <syncdb>` を実行するたびに、新たに追加されたモデ
 ルのデフォルトパーミッションが生成されます。
 
+もし、アプリケーションを :attr:`~django.db.models.Options.app_label` ``foo``
+という名前にしていてモデルの名前を ``Bar`` だと仮定します、
+標準のパーミッションをテストするにはこのようにします:
+
+* add: ``user.has_perm('foo.add_bar')``
+* change: ``user.has_perm('foo.change_bar')``
+* delete: ``user.has_perm('foo.delete_bar')`
+
 .. _custom-permissions:
 
 カスタムのパーミッション
@@ -1158,29 +1594,36 @@ Django には単純なパーミッション機構がついてきます。この�
 カスタムのパーミッションを生成するには、 ``permissions`` という
 :ref:`モデルのメタ属性 <meta-options>` を使います。
 
-この例では、三つのカスタムパーミッションを生成しています::
+この例では、 Task モデルに三つのカスタムパーミッションを作っています、
+すなわち Task インスタンスによってユーザが出来るアクションが決まります。
+アプリケーション内でのコードは::
 
-    class USCitizen(models.Model):
-        # ...
+    class Task(models.Model):
+        ...
         class Meta:
             permissions = (
-                ("can_drive", "Can drive"),
-                ("can_vote", "Can vote in elections"),
-                ("can_drink", "Can drink alcohol"),
+                ("view_task", "Can see available tasks"),
+                ("change_task_status", "Can change the status of tasks"),
+                ("close_task", "Can remove a task by setting its status as closed"),
             )
 
-この定義の役割は、 :djadmin:`manage.py syncdb <syncdb>` を実行したときに追
-加のパーミッションを追加することだけです。
+この定義の役割は特別なパーミッションを追加することだけです。
+:djadmin:`manage.py syncdb <syncdb>` を実行すると、コードは
+パーミッションをチェックする役割を負います。それが実行されるのは、
+ユーザがアプリケーションによって機能へとアクセスしようとする時
+（タスクを見て、タスクのステータスを変え、タスクを閉じるような動作）
+です。上の例に続ければ、ユーザがタスクを見る時にそれと共にチェックし
+ます::
+
+    user.has_perm('app.view_task')
 
 API リファレンス
------------------
+----------------
+
+.. currentmodule:: django.contrib.auth.models
 
 .. class:: models.Permission
 
-    ユーザと同様、パーミッションは Django モデルとして実装されています。実
-    装は `django/contrib/auth/models.py`_ にあります。
-
-.. _django/contrib/auth/models.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/auth/models.py
 
 フィールド
 ~~~~~~~~~~~~
@@ -1188,16 +1631,16 @@ API リファレンス
 :class:`~django.contrib.auth.models.Permission` オブジェクトには以下のフィー
 ルドがあります:
 
-.. attribute:: models.Permission.name
+.. attribute:: Permission.name
     
     必須です。50 文字以下です。例: ``'Can vote'``
 
-.. attribute:: models.Permission.content_type
+.. attribute:: Permission.content_type
 
     必須です。インストール済みの Django モデルのレコードが入った
     ``django_content_type`` データベーステーブルへの参照です。
 
-.. attribute:: models.Permission.codename
+.. attribute:: Permission.codename
     
     必須です。 100 文字以下です。例: ``'can_vote'``
 
@@ -1205,15 +1648,38 @@ API リファレンス
 ~~~~~~~~~
 
 :class:`~django.contrib.auth.models.Permission` オブジェクトは、他の
-`Django モデル <ref-models-instances>` と同じく、標準的なデータアクセスメソッ
+:doc:`Django モデル </ref/models/instances>` と同じく、標準的なデータアクセスメソッ
 ドを備えています。
+
+.. currrentmodule:: django.contrib.auth
+
+プログラム的にパーミッションを作る
+----------------------------------
+
+``Meta`` クラス内でカスタムパーミッションが定義される一方、
+直接的にパーミッションを作ることもまたできます。例えば、
+``myapp`` の ``BlogPost`` モデルに対して、 ``can_publish``
+パーミッションを作ろうとすると::
+
+    from django.contrib.auth.models import Group, Permission
+    from django.contrib.contenttypes.models import ContentType
+
+    content_type = ContentType.objects.get(app_label='myapp', model='BlogPost')
+    permission = Permission.objects.create(codename='can_publish',
+                                           name='Can Publish Posts',
+                                           content_type=content_type)
+
+パーミッションは自身のクラスの ``user_permissions`` アトリビュートか、
+:class:`~django.contrib.auth.models.Group` の ``permissions`` 
+アトリビュートから
+:class:`~django.contrib.auth.models.User` へと割り当てることができます。
 
 認証データのテンプレート上での扱い
 =====================================
 
 :class:`~django.template.context.RequestContext` を使っている場合、ログイン
 ユーザとそのパーミッションに
-:ref:`テンプレートコンテキスト <ref-templates-api>` (template context) を使っ
+:doc:`テンプレートコンテキスト </ref/templates/api>` (template context) を使っ
 てアクセスできます。
 
 .. admonition:: 技術的な話題
@@ -1221,7 +1687,7 @@ API リファレンス
    デフォルトの設定では、テンプレートコンテキストに
    :class:`~django.template.context.RequestContext` を使うようになっていて、
    *かつ*  :setting:`TEMPLATE_CONTEXT_PROCESSORS` の設定に
-   ``"django.core.context_processors.auth"`` が入っています。この場合にのみ、
+   ``"django.contrib.auth.context_processors.auth"`` が入っています。この場合にのみ、
    上記の変数をテンプレートコンテキストの中で使えるようになります。詳しくは
    :ref:`RequestContext のドキュメント <subclassing-context-requestcontext>`
    を参照してください。
@@ -1233,7 +1699,7 @@ API リファレンス
 ンスであっても :class:`~django.contrib.auth.models.AnonymousUser` インスタ
 ンスであっても、テンプレート変数 ``{{ user }}`` に入ります:
 
-.. code-block:: html
+.. code-block:: html + django
 
     {% if user.is_authenticated %}
         <p>Welcome, {{ user.username }}. Thanks for logging in.</p>
@@ -1241,8 +1707,8 @@ API リファレンス
         <p>Welcome, new user. Please log in.</p>
     {% endif %}
 
-This template context variable is not available if a ``RequestContext`` is not
-being used.
+このテンプレートコンテキスト変数は、 ``RequestContext`` が使われていないと
+使うことが出来ません。
 
 パーミッション
 --------------
@@ -1250,7 +1716,11 @@ being used.
 現在のログインユーザのパーミッションはテンプレート変数 ``{{ perms }}`` に入っ
 ています。この変数はパーミッションオブジェクトをテンプレートで扱いやすくす
 るためのプロキシ (proxy) である、 
-:class:`django.core.context_processors.PermWrapper` のインスタンスです。
+:class:`django.contrib.auth.context_processors.PermWrapper` のインスタンスです。
+
+.. versionchanged:: 1.3
+    バージョン1.3の変更で、 ``django.contrib.auth.context_processors``
+    の中に ``PermWrapper`` が置かれました。
 
 ``{{ perms }}`` オブジェクトに対して 1 段の属性参照を行うと、実際には
 :meth:`User.has_module_perms <django.contrib.auth.models.User.has_module_perms>`
@@ -1260,7 +1730,7 @@ being used.
 
     {{ perms.foo }}
 
-2 段階属性を参照すると、
+2 段階属性を探索すると、
 :meth:`User.has_perm <django.contrib.auth.models.User.has_perm>` へのプロキ
 シに到達します。以下の例では、ログインユーザが ``foo.can_vote`` へのパーミッ
 ションを持つ場合に ``True`` を表示します::
@@ -1269,7 +1739,7 @@ being used.
 
 こうして、テンプレート内で ``{% if %}`` 文を使ってチェックを行えます:
 
-.. code-block:: html
+.. code-block:: html+django
 
     {% if perms.foo %}
         <p>You have permission to do something in the foo app.</p>
@@ -1298,67 +1768,36 @@ being used.
 パーミッションだけではなく、グループはユーザをカテゴリに分けてラベルを付け
 たり、機能を拡張したりできます。例えば、 ``'特別なユーザ'`` のグループを作
 成して、そのグループのユーザ向けに、例えばサイト内のメンバー限定エリアへの
-アクセスを提供したり、メンバーだけに e-mail メッセージを送るといった、特別
+アクセスを提供したり、メンバーだけに email メッセージを送るといった、特別
 な処理を行うコードを書けます。
 
 メッセージ (Message)
 ====================
 
-メッセージシステムは、任意のユーザ宛のメッセージをキューしておく軽量な方法
-です。
+API リファレンス
+----------------
 
-メッセージは :class:`~django.contrib.auth.models.User` に関連づけられます。
-メッセージには有効期限やタイムスタンプの概念はありません。
+.. class:: models.Group
 
-メッセージは Django admin で何らかの処理の成功を知らせる際に使われています。
-例えば、 ``"The poll Foo was created successfully."`` はメッセージで実現さ
-れています。
+フィールド
+~~~~~~~~~~
 
-メッセージの API は単純です:
+:class:`~django.contrib.auth.models.Group` オブジェクトはそれに続くフィールドを
+持っています:
 
-.. method:: models.User.message_set.create(message)
+.. attribute:: Group.name
 
-    メッセージの追加には、 
-    ``user_obj.message_set.create(message='message_text')`` を使います。
+    必須です。 80文字以下です。どんな文字でも使えます。例えば:
+    `` 'Awesome Users' `` このように。
 
-    メッセージの取得と削除には、
-    :meth:`user_obj.get_and_delete_messages() <django.contrib.auth.models.User.get_and_delete_messages>`
-    を使います。このメソッドは、該当ユーザのキューに溜っている ``Message``
-    オブジェクトがあれば、リストにして返し、キュー内のメッセージを削除しま
-    す。
+.. attribute:: Group.permissions
 
-このビューの例では、システムはプレイリストの作成後に表示されるメッセージを
-保存します::
+    Many-to-many フィールド :class:`~django.contrib.auth.models.Permissions`::
 
-    def create_playlist(request, songs):
-        # Create the playlist with the given songs.
-        # ...
-        request.user.message_set.create(message="Your playlist was added successfully.")
-        return render_to_response("playlists/create.html",
-            context_instance=RequestContext(request))
-
-:class:`~django.template.context.RequestContext` を使うと、現在のログインユー
-ザとそのメッセージを :ref:`テンプレート変数 <ref-templates-api>` 
-``{{ messages }}`` として使えます。メッセージを表示するためのテンプレートコー
-ド例を示します:
-
-.. code-block:: html
-
-    {% if messages %}
-    <ul>
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-
-:class:`~django.template.context.RequestContext` は
-:meth:`~django.contrib.auth.models.User.get_and_delete_messages` を背後で呼
-び出すので、メッセージは表示されなくても消去されることに注意してください。
-
-最後に、このメッセージフレームワークはユーザデータベースに登録されているユー
-ザに対してしか動作しないことに注意して下さい。匿名ユーザにメッセージを送る
-には、 :ref:`セッションフレームワーク<topics-http-sessions>` を使って下さい。
+        group.permissions = [permission_list]
+        group.permissions.add(permission, permission, ...)
+        group.permissions.remove(permission, permission, ...)
+        group.permissions.clear()
 
 .. _authentication-backends:
 
@@ -1380,14 +1819,15 @@ being used.
 スキームをオーバライドしたり、デフォルトのシステムを他のシステムと並列して
 動作させたりできます。
 
-See the :ref:`authentication backend reference <ref-authentication-backends>`
-for information on the authentication backends included with Django.
+:doc:`authentication backend reference </ref/authbackends>` を見てください
+もっと詳しい情報が載っています。
 
 他の認証バックエンドを指定する
 ------------------------------
 
 舞台裏では、 Django は認証に使う「認証バックエンド」のリストを維持していま
-す。前述の「ユーザをログインさせる」で説明したように
+す。前述の:ref:`「ユーザをログインさせる」
+<how-to-log-a-user-in>` で説明したように
 :func:`django.contrib.auth.authenticate()` を呼び出すと、Django は全ての認
 証バックエンドにわたって認証テストを試みます。最初の認証メソッドに失敗する
 と次の認証バックエンド、という具合にして、認証に成功しない限り、全てのバッ
@@ -1411,13 +1851,14 @@ for information on the authentication backends included with Django.
 
 .. note::
 
-    Once a user has authenticated, Django stores which backend was used to
-    authenticate the user in the user's session, and re-uses the same backend
-    for subsequent authentication attempts for that user. This effectively means
-    that authentication sources are cached, so if you change
-    :setting:`AUTHENTICATION_BACKENDS`, you'll need to clear out session data if
-    you need to force users to re-authenticate using different methods. A simple
-    way to do that is simply to execute ``Session.objects.all().delete()``.
+    一度ユーザが認証されると、 Django はユーザのセッション内でどのバック
+    エンドによってユーザが認証されたかを保持します。そして、同じバックエンド
+    を「認証されたユーザ」であることが必要とされる時にアクセスします。
+    この効率性が意味するのは、認証ソースが一回のセッションを基礎として
+    キャッシュされるということです。だから、もし
+    :setting:`AUTHENTICATION_BACKENDS` を変更すると、セッションデータをクリア
+    しなければ、異なる方法で再認証することができません。これのシンプルな方法
+    は、 ``Session.objects.all().delete()`` を実行することです。
 
 認証バックエンドを作成する
 --------------------------
@@ -1431,13 +1872,13 @@ for information on the authentication backends included with Django.
 ``authenticate`` メソッドは証明情報、すなわちユーザ名とパスワードなどをキー
 ワード引数の形で受け取ります。ほとんどの場合、以下のような形式をとります::
 
-    class MyBackend:
+    class MyBackend(object):
         def authenticate(self, username=None, password=None):
             # Check the username/password and return a User.
 
 以下のようにトークンに対する認証を行うようにも書けます::
 
-    class MyBackend:
+    class MyBackend(object):
         def authenticate(self, token=None):
             # Check the token and return a User.
 
@@ -1460,15 +1901,18 @@ Django の admin システムは、冒頭で説明した Django の ``User`` オ
     from django.conf import settings
     from django.contrib.auth.models import User, check_password
 
-    class SettingsBackend:
+    class SettingsBackend(object):
         """
-        Authenticate against the settings ADMIN_LOGIN and ADMIN_PASSWORD.
+        セッティングにそぐわない認証の ADMIN_LOGIN and ADMIN_PASSWORD
 
-        Use the login name, and a hash of the password. For example:
+        ログインネームとパスワードのハッシュを使ってみます。例えば:
 
         ADMIN_LOGIN = 'admin'
         ADMIN_PASSWORD = 'sha1$4e987$afbcf42e21bd417fb71db8c66b321e9fc33051de'
         """
+
+        supports_inactive_user = False
+
         def authenticate(self, username=None, password=None):
             login_valid = (settings.ADMIN_LOGIN == username)
             pwd_valid = check_password(password, settings.ADMIN_PASSWORD)
@@ -1493,7 +1937,7 @@ Django の admin システムは、冒頭で説明した Django の ``User`` オ
                 return None
 
 カスタムのバックエンドでパーミッションを扱う
-----------------------------------------------
+--------------------------------------------
 
 カスタムの認証バックエンドから、独自のパーミッションを提供できます。
 
@@ -1511,11 +1955,11 @@ Django の admin システムは、冒頭で説明した Django の ``User`` オ
 前述の単純なバックエンドで、万能の管理ユーザを作る方法は、以下のようにとても
 簡単です::
 
-    class SettingsBackend:
+    class SettingsBackend(object):
 
         # ...
 
-        def has_perm(self, user_obj, perm):
+        def has_perm(self, user_obj, perm, obj=None):
             if user_obj.username == settings.ADMIN_LOGIN:
                 return True
             else:
@@ -1531,4 +1975,58 @@ Django の admin システムは、冒頭で説明した Django の ``User`` オ
 バックエンドはデフォルトのバックエンドであり、ほとんどの場合
 ``auth_permission`` にパーミッションを問い合わせます。
 
-.. _django/contrib/auth/backends.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/auth/backends.py
+.. _django/contrib/auth/backends.py:
+https://code.djangoproject.com/browser/django/trunk/django/contrib/auth/backends.py
+
+.. _anonymous_auth:
+
+匿名ユーザへの権限
+~~~~~~~~~~~~~~~~~~
+
+.. versionchanged:: 1.2
+
+匿名ユーザは認証されていません。すなわち、有効な認証の情報が提供されていませ
+ん。しかしながら、権限が与えられてないから何もしなくてよいという意味ではありま
+せん。最も基本的な部分で、ほとんどの Web サイトはサイトの大部分を匿名ユーザ
+に対して見せています。そして、許可された匿名ユーザはコメントなどを投稿する
+ことができます。
+
+Django のパーミッションフレームワークは、匿名ユーザに対してのパーミッションを
+保持する場所を設けてはいません。ですが、匿名ユーザに対しての権限を指定するため
+の認証バックエンドのカスタムは基礎部分で許可されています。これは特に、
+再利用できるアプリの作者に取って役に立つものです。認証バックエンドに権限につい
+ての全ての問題を任せてしまうことが出来ます。セッティングを必要とするというより
+、例が匿名ユーザのコントロールです。
+
+アクティブでないユーザの権限
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.3
+
+アクティブでないユーザは、認証されていても ``is_active`` が ``False``に
+セットされているユーザです。しかし、これは何も認証されていないという意味で
+はありません。例えば、そのようなユーザは自身のアカウントをアクティブにする
+ことができます。
+
+パーミッションシステム内での匿名ユーザに対してのサポートは、アクティブでな
+いユーザがしない、「何かをする権限を得ること」を許可しています。
+
+これをバックエンドで有効にするには、クラスの ``supports_inactive_user``
+アトリビュートを ``True`` にしなければいけません。
+
+``supports_inactive_user`` 属性が存在しないことは、
+``PendingDeprecationWarning`` を送出します。もし、 Django 1.3 または、
+1.4 ではこの警告は、 ``DeprecationWarning`` にアップデートされています。
+これは大きくうるさげに表示されます。加えて、 ``supports_inactive_user``
+が ``False`` になっていると、 Django 1.5 ではアクティブでないユーザが
+認証手続きでパスされることをサポートするでしょう。
+
+
+オブジェクトへのパーミッションのハンドリング
+--------------------------------------------
+
+Django のパーミッションフレームワークは、オブジェクトへのパーミッションを
+基礎に持っています、でも、コアにその実装を持っていません。その意味は、
+オブジェクトへのパーミッションは常に ``False`` が返るか、または空っぽの
+リスト（チェックがどう働いたかに依存します）が返ります。
+
