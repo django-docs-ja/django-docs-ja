@@ -3,7 +3,7 @@
 Django を使う
 ===============
 
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
 
 このセクションでは、Django を使う上での鍵となる要素について解説しています。
 
@@ -14,17 +14,28 @@ Django を使う
    db/index
    http/index
    forms/index
-   forms/modelforms
    templates
-   generic-views
+   class-based-views
+   generic-views-migration
    files
    testing
    auth
    cache
    conditional-view-processing
+   signing
    email
-   i18n
+   i18n/index
+   logging
    pagination
+   security
    serialization
    settings
    signals
+
+Deprecated features
+-------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   generic-views
