@@ -1,0 +1,91 @@
+====================
+国際化とローカライズ
+====================
+
+:revision-up-to: 17812 (1.4)
+
+.. toctree::
+   :hidden:
+   :maxdepth: 1
+
+   translation
+   formatting
+   timezones
+
+概要
+====
+
+国際化とローカライズの目的は、一つの Web アプリケーションが閲覧者に合わせた言
+語や書式でコンテンツを提供できるようにすることにあります。
+
+Django は :doc:`テキスト翻訳</topics/i18n/translation>` 、
+:doc:`日時と数字の書式設定</topics/i18n/formatting>` 、
+:doc:`タイムゾーン</topics/i18n/timezones>` をフルサポートしています。
+
+Django が行っているのは、本質的には以下の二つの作業です:
+
+* 開発者やテンプレート作成者に、アプリケーションのどの部分がローカルな言語と
+  文化に翻訳およびフォーマットされるべきかを、指定させます。
+* 指定したフックを使って、特定のユーザの言語設定に従って Web アプリケーショ
+  ンをローカライズします。
+
+言うまでもなく、翻訳は対象言語に依存し、書式は対象の国に依存します。これらの
+情報はブラウザの ``Accept-Language`` ヘッダで与えられます。ただし、タイムゾ
+ーンを読み取ることはできません。
+
+定義
+====
+
+「国際化 (internationalization) 」と「ローカライズ (localization) 」という言
+葉はよく混乱を招きます。ここでは簡単に定義しましょう:
+
+.. glossary::
+
+    国際化 (internationalization)
+      ソフトウェアをローカライズに備えさせること。通常、開発者によって行われ
+      ます。
+
+    ローカライズ (localization)
+      翻訳およびローカルな書式を記述すること。通常、翻訳者によって行われます。
+
+より詳しくは、 `W3C Web Internationalization FAQ`_ 、 `Wikipediaの記事`_ 、
+`GNU gettext documentation`_ で知ることができます。
+
+.. _W3C Web Internationalization FAQ: http://www.w3.org/International/questions/qa-i18n
+.. _GNU gettext documentation: http://www.gnu.org/software/gettext/manual/gettext.html#Concepts
+.. _Wikipediaの記事: http://en.wikipedia.org/wiki/Internationalization_and_localization
+
+.. warning::
+
+    翻訳と書式設定は :setting:`USE_I18N` と :setting:`USE_L10N` 設定によって
+    制御されますが、どちらも国際化とローカライズを含む設定です。この設定名は
+    Django の歴史によってこうなってしまったものです。
+
+共通言語を扱うため、他にいくつかの用語が助けになるでしょう:
+
+.. glossary::
+
+    ロケール名 (locale name)
+      ``ll`` 形式の言語指定、または ``ll_CC`` 形式での言語および国指定です。
+      ``it``, ``de_AT``, ``es``, ``pt_BR`` など。
+      言語部分は常に小文字で、国部分は大文字です。アンダースコアで区切りま
+      す。
+
+    言語コード (language code)
+      言語名を表します。ブラウザは ``Accept-Language`` HTTPヘッダの中でこの
+      書式を使って表示可能な言語名を通知します。 ``it``, ``de-at``,
+      ``es``, ``pt-br`` など。言語部分と国部分の両方が小文字で、ダッシュ
+      (-) で区切られています。
+
+    メッセージファイル
+      メッセージファイルは一つの言語を表すプレーンテキストファイルです。利用
+      可能な全ての
+      :term:`翻訳文字列 (translation strings)<translation string>` と、それ
+      らがその言語でどのように表されるかが記述されます。ファイル拡張子は
+      ``.po`` です。
+
+    翻訳文字列 (translation string)
+      翻訳可能なリテラル文字列です。
+
+    書式ファイル (format file)
+      指定されたロケールでのデータ書式を表す Python モジュールです。
