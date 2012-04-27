@@ -492,7 +492,7 @@ Python標準の文字列連結 (``''.join([...])``) は遅延翻訳オブジェ�
 .. versionadded:: 1.4
 
 ``{% trans %}`` は ``context`` キーワードを使って
-:ref:`コンテキストマーカー<contextual-markers>` もサポートします:
+:ref:`コンテストマーカー<contextual-markers>` もサポートします:
 
 .. code-block:: html+django
 
