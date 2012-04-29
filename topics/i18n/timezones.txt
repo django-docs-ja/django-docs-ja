@@ -1,0 +1,705 @@
+.. _time-zones:
+
+============
+タイムゾーン
+============
+
+:revision-up-to: 17812 (1.4)
+
+.. versionadded:: 1.4
+
+.. _time-zones-overview:
+
+概要
+====
+
+タイムゾーンを有効にすると、 Django はデータベースに日時の情報を UTC で保存しま
+す。内部的にはタイムゾーンを考慮した datetime オブジェクト を使用し、テンプレー
+トとフォームでエンドユーザのタイムゾーンに変換します。
+
+これは、ユーザが複数のタイムゾーンに渡っていて、それぞれのユーザの時計に合わせ
+た日時を表示したい場合に便利です。
+
+Web サイトがただ一つのタイムゾーンのみで使えるものだとしても、データベースに
+UTC でデータを保存しておくのは良い習慣です。一つの大きな理由は、 Daylight Saving
+Time (DST) があることです。多くの国では DST の制度があり、春には時計の針を進め
+て秋には遅れさせます。ローカル時間を使っていると、一年に二度時間の移動が起こっ
+てエラーにぶつかることになります。 (pytz_ ドキュメントは `これらの問題`_ につい
+て深く議論しています。) これはおそらくブログでは気にならないでしょうが、毎年 2
+回、1 時間ずれて顧客に過大請求や過小請求をしてしまうとしたら問題です。解決方法
+はプログラムで UTC を使うこと、そしてエンドユーザとやり取りをする時だけローカル
+時間を使うことです。
+
+タイムゾーンのサポートはデフォルトで無効になっています。有効にするには
+:setting:`USE_TZ = True <USE_TZ>` を設定ファイルで設定します。強制ではありませ
+んが pytz_ をインストールすることを強くお薦めします。インストール方法は簡単です:
+
+.. code-block:: bash
+
+    $ sudo pip install pytz
+
+.. note::
+
+    :djadmin:`django-admin.py startproject <startproject>` が作成する
+    :file:`settings.py` ファイルは利便性のため :setting:`USE_TZ = True <USE_TZ>`
+    を含んでいます。
+
+.. note::
+
+    別の関連する設定として :setting:`USE_L10N` 設定があります。これは Django が
+    書式ローカライズを有効にするかを決める設定です。詳しくは
+    :doc:`/topics/i18n/formatting` を参照してください。
+
+特定の問題と格闘しているなら :ref:`タイムゾーン FAQ <time-zones-faq>` から探し
+てください。
+
+概念
+====
+
+ナイーブな datetime オブジェクトとタイムゾーン考慮のオブジェクト
+----------------------------------------------------------------
+
+Python の :class:`datetime.datetime` オブジェクトは ``tzinfo`` 属性を持っていま
+す。この属性は :class:`datetime.tzinfo` のサブクラスのインスタンスで、タイムゾ
+ーン情報を保存するために使われています。この属性がセットされ、オフセットを表し
+ている時、 datetime オブジェクトは **タイムゾーン考慮** になります。そうでなけ
+れば **ナイーブ** なものになります。
+
+datetime がタイムゾーンを考慮しているか、またナイーブかを判断するには
+:func:`~django.utils.timezone.is_aware` 関数および
+:func:`~django.utils.timezone.is_naive` 関数を使います。
+
+タイムゾーンサポートが無効の場合、 Django はローカル時間のナイーブな datetime
+オブジェクトを使用します。これはシンプルであり、多くの使い方ではこれで問題あり
+ません。このモードでは、現在時刻を取得するためにこのように書きます::
+
+    import datetime
+
+    now = datetime.datetime.now()
+
+タイムゾーンサポートが有効な時は Django はタイムゾーン考慮の datetime オブジェ
+クトを使用します。ソースコードで datetime オブジェクトを作るなら、それらもタイ
+ムゾーン考慮であるべきです。このモードでは、上の例はこうなります::
+
+    import datetime
+    from django.utils.timezone import utc
+
+    now = datetime.datetime.utcnow().replace(tzinfo=utc)
+
+.. note::
+
+    :mod:`django.utils.timezone` モジュールは
+    :func:`~django.utils.timezone.now()` 関数を提供しています。
+    function that returns a naive or
+    aware datetime object according to the value of :setting:`USE_TZ`.
+    :setting:`USE_TZ` に従って、ナイーブな datetime オブジェクトか、タイムゾー
+    ンを考慮した datetime オブジェクトのいずれかを返します。
+
+.. warning::
+
+    タイムゾーン考慮の datetime オブジェクトの扱いは必ずしも直感的とは言えない
+    ことがあります。例えば標準の datetime のコンストラクタに渡す ``tzinfo`` 引
+    数は DST タイムゾーンでは正しく動作しません。 UTC を使えば概して安全です。
+    他のタイムゾーンを使っているなら、 `pytz`_ のドキュメントをよく読んでくださ
+    い。
+
+.. note::
+
+    Python では :class:`datetime.time` オブジェクトも ``tzinfo`` 属性を備えてお
+    り、 PostgreSQL の ``time with time zone`` 型に適合します。しかし、
+    PostgreSQL のドキュメントにあるように、この型は利便性に疑問がある情報を表し
+    ています。
+
+    Django は ナイーブな time オブジェクトだけをサポートしており、タイムゾーン
+    考慮の time オブジェクトを保存しようとすると例外を送出します。
+
+.. _naive-datetime-objects:
+
+ナイーブな datetime オブジェクトの解釈
+--------------------------------------
+
+:setting:`USE_TZ` が ``True`` の場合でも、 Django は後方互換性のためナイーブな
+datetime オブジェクトを受け付けることができます。データベースレイヤがこのオブジ
+ェクトを受け取ると、 :ref:`デフォルトタイムゾーン <default-current-time-zone>`
+のもとでタイムゾーンを考慮するように変換し、警告を送出します。
+
+残念ながら DST での変換では datetime が存在しなかったり、曖昧だったりすること
+があります。このような状況では pytz_ は例外を送出します。別の
+:class:`~datetime.tzinfo` の実装では、 pytz_ がインストールされていない場合のフ
+ォールバックに使われるローカルタイムゾーンが例外を起こしたり、不正確な結果を返
+す可能性があります。ですから、タイムゾーンサポートを有効にした場合は、常にタイ
+ムゾーン考慮の datetime オブジェクト を作るようにしてください。
+
+実用上は、これが問題を起こすことはまれです。 Django はモデルやフォームでタイム
+ゾーン考慮の datetime オブジェクトを使えるようになっています。
+もっと多いのは新しい datetime オブジェクトは :class:`~datetime.timedelta` との
+計算で作られます。アプリケーションのコードでよく作られるのは現在時刻です。
+:func:`timezone.now() <django.utils.timezone.now>` は自動で正しい動作をします。
+
+.. _default-current-time-zone:
+
+デフォルトタイムゾーンとカレントタイムゾーン
+--------------------------------------------
+
+**デフォルトタイムゾーン** は :setting:`TIME_ZONE` で定義されたタイムゾーンで
+す。
+
+**カレントタイムゾーン** はレンダリングに使われるタイムゾーンです。
+
+カレントタイムゾーンは :func:`~django.utils.timezone.activate`. を使ってエンド
+ユーザの実際のタイムゾーンをセットしておきましょう。そうしなければ、デフォルト
+タイムゾーンが使われることになります。
+
+.. note::
+
+    :setting:`TIME_ZONE` のドキュメントで説明しているように、 Django は
+    自分自身のプロセスがデフォルトタイムゾーンで実行されるように環境変数を設定
+    します。 これは :setting:`USE_TZ` やカレントタイムゾーンの値にかからわず起
+    こります。
+
+    :setting:`USE_TZ` が ``True`` の時、この動作はローカル時間に依存しているア
+    プリケーションとの後方互換性を保つために便利です。しかし
+    :ref:`先ほど説明したように <naive-datetime-objects>` これは完全に信頼できる
+    動作ではありませんので、ソースコードでは UTC のもとでタイムゾーン考慮の処理
+    をするべきです。例えば、 :meth:`~datetime.datetime.fromtimestamp` の代わり
+    に :meth:`~datetime.datetime.utcfromtimestamp` を使います。そして
+    :data:`~django.utils.timezone.utc` を ``tzinfo`` に設定するのを忘れないよう
+    にしましょう。
+
+カレントタイムゾーンの選択
+--------------------------
+
+カレントタイムゾーンは翻訳における :term:`ロケール名 <locale name>` に相当しま
+す。しかし、 ``Accept-Language`` HTTP ヘッダに相当するものはないので、 Django
+は自動的にユーザのタイムゾーンを判別することができません。代わりに Django は
+:ref:`タイムゾーン選択関数 <time-zone-selection-functions>` を提供しています。
+この関数を使ってタイムゾーン選択ロジックを構築してください。
+
+多くの Web サイトは ユーザが生活しているタイムゾーンを訊ね、その情報をユーザプ
+ロフィールに保存します。匿名ユーザには主要なユーザ層のタイムゾーンか UTC を使い
+ます。 pytz_ は国ごとのタイムゾーンリストのような ヘルパ_ を提供していますので
+開発者はもっともありえそうな選択肢を前もって選んでおくことができます。
+
+次の例ではセッションにカレントタイムゾーンを保存しています。 (簡単にするため
+エラーハンドリングは省略しています。)
+
+:setting:`MIDDLEWARE_CLASSES` にこのミドルウェアを追加してください::
+
+    from django.utils import timezone
+
+    class TimezoneMiddleware(object):
+        def process_request(self, request):
+            tz = request.session.get('django_timezone')
+            if tz:
+                timezone.activate(tz)
+
+カレントタイムゾーンを設定するビューを作りましょう::
+
+    import pytz
+    from django.shortcuts import redirect, render
+
+    def set_timezone(request):
+        if request.method == 'POST':
+            request.session[session_key] = pytz.timezone(request.POST['timezone'])
+            return redirect('/')
+        else:
+            return render(request, 'template.html', {'timezones': pytz.common_timezones})
+
+このビューに ``POST`` するフォームを ``template.html`` に書きます:
+
+.. code-block:: html+django
+
+    {% load tz %}{% load url from future %}
+    <form action="{% url 'set_timezone' %}" method="POST">
+        {% csrf_token %}
+        <label for="timezone">Time zone:</label>
+        <select name="timezone">
+            {% for tz in timezones %}
+            <option value="{{ tz }}"{% if tz == TIME_ZONE %} selected="selected"{% endif %}>{{ tz }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Set" />
+    </form>
+
+.. _time-zones-in-forms:
+
+タイムゾーンを考慮したフォームからの入力
+========================================
+
+タイムゾーンサポートを有効にすると、 Django は :ref:`カレントタイムゾーン
+<default-current-time-zone>` によってフォームから入力された日時を解釈し、
+``cleaned_data`` でタイムゾーン考慮の datetime オブジェクトを返します。
+
+DST による時間移動で日時が存在しなかったり曖昧になって、カレントタイムゾーンが
+例外を送出する場合 (pytz_ が提供するタイムゾーンはこのような動作をします) 、
+そうした日時データは不正な値として報告されます。
+
+.. _time-zones-in-templates:
+
+タイムゾーンを考慮したテンプレートでの出力
+==========================================
+
+タイムゾーンサポートを有効にしていると、 Django はタイムゾーン考慮の datetime
+オブジェクトをテンプレートでレンダする時に :ref:`カレントタイムゾーン
+<default-current-time-zone>` に変換します。この振舞は :doc:`書式ローカライズ
+</topics/i18n/formatting>` ととてもよく似ています。
+
+.. warning::
+
+    Django はナイーブな datetime オブジェクトを変換しません。理由は、それが曖昧
+    であることと、タイムゾーンサポートが有効な時には決してナイーブな datetime
+    を作るべきではないからです。しかし下に述べるテンプレートフィルタを使えば
+    強引に変換することもできます。
+
+ローカル時間に変換することがいつも適切であるとは限りません。人間ではなくコンピ
+ュータのために出力を生成したいこともあるでしょう。以下のフィルタやタグは ``tz``
+テンプレートタグライブラリにあり、開発者はタイムゾーン変換をコントロールするこ
+とができます。
+
+テンプレートタグ
+----------------
+
+.. templatetag:: localtime
+
+localtime
+~~~~~~~~~
+
+タイムゾーン考慮の datetime オブジェクトを現在のタイムゾーンに変換するかどうか
+を切り替えます。
+
+このタグはテンプレートエンジンに関係することを除けば :setting:`USE_TZ` 設定と同
+じ効果がありますが、もっと細かい粒度で変換を制御できます。
+
+テンプレートブロックで変換を有効化、無効化するにはこのようにします::
+
+    {% load tz %}
+
+    {% localtime on %}
+        {{ value }}
+    {% endlocaltime %}
+
+    {% localtime off %}
+        {{ value }}
+    {% endlocaltime %}
+
+.. note::
+
+    ``{% localtime %}`` ブロックの中では :setting:`USE_TZ` の値は考慮されません。
+
+.. templatetag:: timezone
+
+timezone
+~~~~~~~~
+
+囲んだブロックでカレントタイムゾーンを設定したり無効にしたりします。カレントタ
+イムゾーンが設定されていない場合、デフォルトタイムゾーンが使われます::
+
+    {% load tz %}
+
+    {% timezone "Europe/Paris" %}
+        Paris time: {{ value }}
+    {% endtimezone %}
+
+    {% timezone None %}
+        Server time: {{ value }}
+    {% endtimezone %}
+
+.. note::
+
+    2 番目のブロックで ``None`` は Python の ``None`` オブジェクトになりますが、
+    ``None`` という名前のためではなく、テンプレートコンテキストで定義されていな
+    いからに過ぎません。
+
+.. templatetag:: get_current_timezone
+
+get_current_timezone
+~~~~~~~~~~~~~~~~~~~~
+
+:func:`django.core.context_processors.tz` コンテキストプロセッサが有効になって
+いれば (デフォルトで有効です) :class:`~django.template.RequestContext` は
+カレントタイムゾーンの名前を表す ``TIME_ZONE`` 変数を持ちます。
+
+:class:`~django.template.RequestContext` を使わないなら、
+``get_current_timezone`` でカレントタイムゾーンの名前を取得できます。
+
+    {% get_current_timezone as TIME_ZONE %}
+
+テンプレートフィルタ
+--------------------
+
+これらのフィルタはタイムゾーン考慮の datetime とナイーブな datetime の両方を受
+け取ることができます。変換のため、ナイーブな datetime はデフォルトタイムゾーン
+のもとの値と仮定されます。返す値はつねに タイムゾーン考慮の datetime です。
+
+.. templatefilter:: localtime
+
+localtime
+~~~~~~~~~
+
+1 つの値をカレントタイムゾーンに変換することを強制します。
+
+例::
+
+    {% load tz %}
+
+    {{ value|localtime }}
+
+.. templatefilter:: utc
+
+utc
+~~~
+
+1 つの値を UTC に変換することを強制します。
+
+例::
+
+    {% load tz %}
+
+    {{ value|utc }}
+
+.. templatefilter:: timezone
+
+timezone
+~~~~~~~~
+
+1 つの値を任意のタイムゾーンに変換することを強制します。
+
+引数は :class:`~datetime.tzinfo` のサブクラスかタイムゾーン名でなければなりませ
+ん。タイムゾーン名を使う場合、 pytz_ が必要になります。
+
+例::
+
+    {% load tz %}
+
+    {{ value|timezone:"Europe/Paris" }}
+
+.. _time-zones-migration-guide:
+
+移行ガイド
+==========
+
+Django がタイムゾーンをサポートする前につくられたプロジェクトを移行する方法を説
+明します。
+
+データベース
+------------
+
+PostgreSQL
+~~~~~~~~~~
+
+PostgreSQL バックエンドは datetime を ``timestamp with time zone`` として保存し
+ます。 これは、 datetime をデータベース接続のタイムゾーンから、ストレージ上では
+UTC に変換するということです。検索時には UTC からコネクションのタイムゾーンに変
+換されます。
+
+結果的に PostgreSQL を使っているなら、 ``USE_TZ = False`` と ``USE_TZ = True``
+を自由に変更してよいことになります。データベース接続のタイムゾーンにはそれぞれ
+:setting:`TIME_ZONE` か ``UTC`` が設定されます。どちらの場合でも Django は正し
+い datetime を得ることができます。データの変換を自分でする必要はありません。
+
+その他のデータベース
+~~~~~~~~~~~~~~~~~~~~
+
+他のバックエンドは datetime をタイムゾーンつきで保存しません。 もし設定を
+``USE_TZ = False`` から ``USE_TZ = True`` に変更したら、自分でデータをローカル
+時間から UTC に変換する必要があります。ローカル時間が DST を持っているかどうか
+は決定論的に決まるものではありません。
+
+コード
+------
+
+最初に :setting:`USE_TZ = True <USE_TZ>` を設定ファイルに追加し、 (可能なら)
+pytz_ をインストールしましょう。これでもう、だいたいうまく行くでしょう。
+ソースコードでナイーブな datetime オブジェクトを作成すると、 Django はそれらを
+必要な時にタイムゾーン考慮に変換します。
+
+しかし、 DST 移動がある場合はこの変換は失敗します。そのため開発者はタイムゾーン
+サポートから最大限に利益を得ることができません。また、ナイーブな datetime と
+タイムゾーン考慮の datetime を比較することは不可能なため、いろいろと問題にぶつ
+かるに違いありません。 Django はタイムゾーン考慮の datetime を返すので、モデル
+やフォームからの datetime を、自分のコードで作成したナイーブな datetime と比較
+すると、常に例外が発生することになります。
+
+そのため、 2 番目のステップとして、 datetime オブジェクトを生成している全ての箇
+所で、タイムゾーン考慮にリファクタリングしましょう。これは少しずつ行うことがで
+きます。
+:mod:`django.utils.timezone` モジュールは互換性のあるコードのために手軽なヘルパ
+ーを数点定義しています: :func:`~django.utils.timezone.now`,
+:func:`~django.utils.timezone.is_aware`,
+:func:`~django.utils.timezone.is_naive`,
+:func:`~django.utils.timezone.make_aware`,
+:func:`~django.utils.timezone.make_naive` です。
+
+最後に、アップグレードが必要なコードを見つけやすくするために、 ナイーブな
+datetime をデータベースに保存しようとすると Django は警告を送出します。
+
+    RuntimeWarning: DateTimeField received a naive datetime (2012-01-01 00:00:00) while time zone support is active.
+
+開発中は、設定ファイルに以下を記述しておけば、この警告を例外に変更しトレースバ
+ックを見ることができます::
+
+    import warnings
+    warnings.filterwarnings(
+            'error', r"DateTimeField received a naive datetime",
+            RuntimeWarning, r'django\.db\.models\.fields')
+
+フィクスチャ
+------------
+
+タイムゾーン考慮の datetime をシリアライズすると、このように UTC オフセットが含
+まれるようになります::
+
+    "2011-09-01T13:20:30+03:00"
+
+ナイーブな datetime では含まれていません::
+
+    "2011-09-01T13:20:30"
+
+この違いのため :class:`~django.db.models.DateTimeField` を含むモデルでは タイム
+ゾーンありでもなしでも動作するフィクスチャを書き出すことはできません。
+
+``USE_TZ = False`` で生成したフィクスチャや、 Django 1.4 以前では、 "ナイーブな"
+フォーマットが使われます。プロジェクトにこのようなフィクスチャが含まれていると、
+タイムゾーンサポートを有効にした後でそれらをロードした時に :exc:`RuntimeWarning`
+を見ることになるでしょう。警告が出ないようにするにはフィクスチャを "タイムゾー
+ン考慮の" フォーマットに変換する必要があります。
+
+:djadmin:`loaddata` してから :djadmin:`dumpdata` することでフィクスチャを再生成
+できます。または、それらが少量なら単に編集して :setting:`TIME_ZONE` に合わせた
+UTC オフセットを付加するだけでもかまいません。
+
+.. _time-zones-faq:
+
+FAQ
+===
+
+セットアップ
+------------
+
+1. **複数のタイムゾーンは必要ないけど、タイムゾーンサポートを有効にするべき ?**
+
+   はい。タイムゾーンサポートを有効にしておくと、 Django はローカル時間のモデル
+   をより正確に使えます。これによって Daylight Saving Time (DST) まわりの微妙で
+   再現しにくいバグを防ぐことができます。
+
+   この点では、タイムゾーンは Python の ``unicode`` と比較できます。あなたはエ
+   ンコーディングエラーやデコーディングエラーを起こします。それからあなたは規則
+   を学びます。すると色々な問題が消えてなくなります。あなたはもうアプリケーショ
+   ンが非 ASCII の入力を受け取った時に出力をめちゃくちゃにすることはないでしょう。
+
+   タイムゾーンサポートを有効にしても、 Django がタイムゾーン考慮の datetime を
+   期待している場所でナイーブな datetime を使うと色々なエラーに遭遇します。それ
+   らのエラーはテストを実行すると発見でき、簡単に直せます。誤った操作を避けるに
+   はどうすれば良いかを素早く学ぶことができるでしょう。
+
+   一方、タイムゾーンサポートがないことによるバグは、防いだり、原因を突き止めた
+   り、直すのがもっと難しいものです。スケジュールされたタスクや datetime の計算
+   を含む箇所ではどこでも、 1 年に 1 度か 2 度しか起こらない微妙なバグを含む可
+   能性があります。
+
+   このような理由でタイムゾーンサポートは新しいプロジェクトでは有効になっていま
+   す。そうしないことにとても良い理由がない限りは、そのままにしておいてください。
+
+2. **タイムゾーンサポートを有効にしておけば安全ですか ?**
+
+   おそらく。そうしておけば DST 関連のバグは防ぎやすくなっています。ただ、ナイ
+   ーブな datetime をタイムゾーン考慮の datetime へと不注意に変えることで墓穴を
+   掘る可能性は残されています。
+
+   あなたがアプリケーションを他のシステムに接続するなら -- 例えば、ある Web サ
+   ービスにクエリを発行するとか -- datetime が適切に指定されているかを確認して
+   ください。安全に datetime を伝えるには、表記に UTC オフセットを含めるか、値
+   を UTC にするか (または両方!) であるべきです。
+
+   このカレンダーシステムはコンピュータにとって奇妙な罠があります::
+
+       >>> import datetime
+       >>> def substract_one_year(value):       # DON'T DO THAT!
+       ...     return value.replace(year=value.year - 1)
+       >>> one_year_before(datetime.datetime(2012, 3, 1, 10, 0))
+       datetime.datetime(2011, 3, 1, 10, 0)
+       >>> one_year_before(datetime.datetime(2012, 2, 29, 10, 0))
+       Traceback (most recent call last):
+       ...
+       ValueError: day is out of range for month
+
+   (この関数を実装するには、2012-02-29 マイナス 1 年が 2011-02-28 なのか
+   2011-03-01 なのかを決定しなければなりません)
+
+3. **pytz をインストールするべきですか ?**
+
+   はい。 Django は外部依存を必要としないというポリシーをもっているので、 pytz_
+   は必須ではありません。でも、インストールするほうがより安全です。
+
+   タイムゾーンサポートを有効にした瞬間から Django はデフォルトタイムゾーンの定
+   義を必要とします。 pytz が有効であれば Django はこの定義を `tz database`_ か
+   らロードします。これはより正確な解決方法です。 pytz が使えなければ OS が報告
+   するローカル時間と UTC の差に頼って変換を計算することになります。これは信頼
+   性がそれほど高くありません。 DST の移動が起こる場合は特にそうです。
+
+   さらにまた、ユーザが 1 つ以上のタイムゾーンを使えるようにしたいなら、 pytz
+   はタイムゾーン定義のリファレンスになります。
+
+トラブルシューティング
+----------------------
+
+1. ``TypeError: can't compare offset-naive and offset-aware datetimes`` という
+   メッセージで **アプリケーションがクラッシュします -- 何がまずいの?**
+
+   ナイーブな datetime とタイムゾーン考慮の datetime を比較してこのエラーを再現
+   してみましょう。
+
+       >>> import datetime
+       >>> from django.utils import timezone
+       >>> naive = datetime.datetime.utcnow()
+       >>> aware = naive.replace(tzinfo=timezone.utc)
+       >>> naive == aware
+       Traceback (most recent call last):
+       ...
+       TypeError: can't compare offset-naive and offset-aware datetimes
+
+   このエラーに出会ったならあなたのコードがこの 2 つを比較しているに違いありま
+   せん:
+
+   - Django によって作られた datetime -- 例えばフォームやモデルフィールドから読
+     み込まれた値。タイムゾーンサポートを有効にしていると、タイムゾーン考慮の値
+     です。
+   - a datetime generated by your code, which is naive (or you wouldn't be
+     reading this).
+   - あなたのコードが生成したナイーブな datetime (でなければここを読んでいない
+     でしょう)
+
+   一般論として、タイムゾーン考慮の datetime を使うようにコードを変えることのが
+   正しい方法です。
+
+   :setting:`USE_TZ` の値と関係なく動作しなければいけないプラガブルなアプリケー
+   ションを書いているのであれば :func:`django.utils.timezone.now` が便利だと思
+   います。この関数は ``USE_TZ = False`` の時はナイーブな datetime を返しますし、
+   ``USE_TZ = True`` の時はタイムゾーン考慮の datetime を返します。必要なら
+   :class:`datetime.timedelta` を足したり引いたりすることもできます。
+
+2. ``RuntimeWarning: DateTimeField received a naive datetime``
+   ``(YYYY-MM-DD HH:MM:SS)`` ``while time zone support is active`` **というエラ
+   ーを良く見ます。これって良くない?**
+
+   タイムゾーンサポートが有効な時、データベース層はあなたのコードからタイムゾー
+   ン考慮の datetime のみを受け取ることを期待しています。この警告はナイーブな
+   datetime を受け取った時に起こります。あなたのコードはタイムゾーンサポートの
+   ための移植が終わっていないということになります。移植のコツは
+   :ref:`マイグレーションガイド <time-zones-migration-guide>` を参考にしてくだ
+   さい。
+
+   移植が終わるまでは、後方互換性のため datetime はデフォルトタイムゾーンにある
+   とみなされます。これはたいていあなたが期待していることでしょう。
+
+3. ``now.date()`` **が昨日 (あるいは明日) です !**
+
+   あなたがいつもナイーブな datetime を使っているなら、おそらく
+   :meth:`~datetime.datetime.date` メソッドを呼び出して date に変換できると考え
+   ているのでしょう。また、 :class:`~datetime.date` は
+   :class:`~datetime.datetime` によく似ていて、時間の精度が低いだけだと思ってい
+   るでしょう。
+
+   タイムゾーン考慮の環境では、いずれも正しくありません::
+
+       >>> import datetime
+       >>> import pytz
+       >>> paris_tz = pytz.timezone("Europe/Paris")
+       >>> new_york_tz = pytz.timezone("America/New_York")
+       >>> paris = paris_tz.localize(datetime.datetime(2012, 3, 3, 1, 30))
+       # This is the correct way to convert between time zones with pytz.
+       >>> new_york = new_york_tz.normalize(paris.astimezone(new_york_tz))
+       >>> paris == new_york, paris.date() == new_york.date()
+       (True, False)
+       >>> paris - new_york, paris.date() - new_york.date()
+       (datetime.timedelta(0), datetime.timedelta(1))
+       >>> paris
+       datetime.datetime(2012, 3, 3, 1, 30, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>)
+       >>> new_york
+       datetime.datetime(2012, 3, 2, 19, 30, tzinfo=<DstTzInfo 'America/New_York' EST-1 day, 19:00:00 STD>)
+
+   この例が示すように、同じ datetime でもそれを表現するタイムゾーンによっては違
+   う日付を持っています。ですが、本当の問題はもっと基本的なことです。
+
+   ある datetime は **1 つの時点** を表します。これは絶対的なことで、何にも依存
+   していません。対照的に、 date は **カレンダー上の概念** です。 date が考慮さ
+   れるタイムゾーンに依存して範囲が決まる、時間の区切りです。この 2 つの概念は
+   根本的に異なっていて、 datetime から date への変換は決定論的な操作ではないの
+   です。
+
+   これは実用上何を意味するのでしょうか。
+
+   一般的に :class:`~datetime.datetime` から :class:`~datetime.date` への変換を
+   避けるべきです。例えば :tfilter:`date` テンプレートフィルタを使って datetime
+   の日付の部分だけを表示することができます。このフィルタは datetime をカレント
+   タイムゾーンの上で変換し、それからフォーマットしますので、正しく結果が表示さ
+   れることが保証できます。
+
+   本当に自分自身で変換する必要があるなら、 datetime がまず適切なタイムゾーンに
+   変換されることを保証しなければなりません。それは普通、カレントタイムゾーンで
+   しょう::
+
+       >>> from django.utils import timezone
+       >>> timezone.activate(pytz.timezone("Asia/Singapore"))
+       # For this example, we just set the time zone to Singapore, but here's how
+       # you would obtain the current time zone in the general case.
+       >>> current_tz = timezone.get_current_timezone()
+       # Again, this is the correct way to convert between time zones with pytz.
+       >>> local = current_tz.normalize(paris.astimezone(current_tz))
+       >>> local
+       datetime.datetime(2012, 3, 3, 8, 30, tzinfo=<DstTzInfo 'Asia/Singapore' SGT+8:00:00 STD>)
+       >>> local.date()
+       datetime.date(2012, 3, 3)
+
+使用法
+------
+
+1. ``"2012-02-21 10:28:45"`` **という文字列があり**
+   ``"Europe/Helsinki"`` **タイムゾーンでのものだと分かっています。どうやってタ
+   イムゾーン考慮の datetime にすれば良いでしょうか ?**
+
+   まさに pytz_ がこのためにあります。
+
+       >>> from django.utils.dateparse import parse_datetime
+       >>> naive = parse_datetime("2012-02-21 10:28:45")
+       >>> import pytz
+       >>> pytz.timezone("Europe/Helsinki").localize(naive)
+       datetime.datetime(2012, 2, 21, 10, 28, 45, tzinfo=<DstTzInfo 'Europe/Helsinki' EET+2:00:00 STD>)
+
+   `` localize`` は pytz における :class:`~datetime.tzinfo` API の拡張であるこ
+   とに注意してください。 :exc:`~pytz.InvalidTimeError` を把捉したいかもしれま
+   せん。 pytz のドキュメントには `もっと多くの例`_ があります。タイムゾーン考
+   慮の datetime を操作しようと試みる前に、見てみるほうが良いでしょう。
+
+2. **ローカルタイムゾーンでの現在時刻を得るにはどうすればいい ?**
+
+   そうですね、最初の質問は、本当にそれが必要なのかということです。
+
+   ローカル時間を使うのは人間とのインタラクションの時だけにすべきです。テンプレ
+   ート層は datetime をあなたが選んだタイムゾーンに変換するための
+   :ref:`フィルタとタグ <time-zones-in-templates>` を提供しています。
+
+   さらにまた、 Python は必要な時に UTC オフセットを考慮して、タイムゾーン考慮
+   の datetime を比較することができます。
+
+   しかし念のため、本当にローカルタイムゾーンの現在時刻が必要なら、このようにし
+   て得ることができます::
+
+       >>> import datetime
+       >>> from django.utils import timezone
+       >>> datetime.datetime.now(tz=timezone.get_default_timezone())
+       datetime.datetime(2012, 3, 3, 20, 10, 53, 873365, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>)
+
+   この例では pytz_ がインストールされていて :setting:`TIME_ZONE` は
+   ``"Europe/Paris"`` に設定されています。
+
+3. **使えるタイムゾーンを全て見たいのですが ?**
+
+   pytz_ はカレントタイムゾーンのリストと全ての使えるタイムゾーン (一部は歴史的
+   な関心しか持たれません) のリストを含んだ ヘルパ_ を提供しています。
+
+.. _pytz: http://pytz.sourceforge.net/
+.. _もっと多くの例: http://pytz.sourceforge.net/#example-usage
+.. _これらの問題: http://pytz.sourceforge.net/#problems-with-localtime
+.. _ヘルパ: http://pytz.sourceforge.net/#helpers
+.. _tz database: http://en.wikipedia.org/wiki/Tz_database
