@@ -4,14 +4,14 @@
 フォームの操作
 ==================
 
-:revision-up-to: 11321 (1.1) unfinished
+:revision-up-to: 17812 (1.4)
 
 .. admonition:: このドキュメントについて
 
     このドキュメントでは、 Django のフォーム処理機能を紹介しています。
-    フォーム API の詳細は、 :ref:`ref-forms-api` を参照してください。
-    利用できるフィールドタイプのドキュメントは :ref:`ref-forms-fields`
-    を参照してください。
+    フォーム API の特定のフィールドに関する詳細は、 :doc:`/ref/forms/api` 、
+    :doc:`/ref/forms/fields` 、 :doc:`/ref/forms/validation` を参照してくだ
+    さい。
 
 .. highlightlang:: html+django
 
@@ -22,13 +22,12 @@
 ムライブラリを使うと、フォーム処理に必要な共通のタスクの面倒を見てくれます。
 フォームライブラリを使えば、以下のようなことを実現できます:
 
-    1. フォームウィジェットから、 HTML フォームを自動的に生成して表示できま
-       す。
-    2. 提出されたデータに対して、バリデーション規則 (validation rule) を適
-       用できます。
-    3. バリデーションエラーを検出したときに、フォームをエラーメッセージ付き
-       で表示できます。
-    4. 提出されたデータを、適切な Python のデータ型に変換できます。
+1. フォームウィジェットから、 HTML フォームを自動的に生成して表示できます。
+2. 提出されたデータに対して、バリデーション規則 (validation rule) を適用できま
+す。
+3. バリデーションエラーを検出したときに、フォームをエラーメッセージ付きで表示で
+きます。
+4. 提出されたデータを、適切な Python のデータ型に変換できます。
 
 概要
 =====
@@ -85,9 +84,9 @@ Django のデータベースモデルによく似た方法でフォームのフ�
 ``subject`` (題名)、 ``message`` (メッセージ)、 ``sender`` (送信者)、そして
 ``cc_myself`` (自分に CC する)、の 4 つのフィールドをフォームに持たせます。
 ``CharField`` や ``EmailField``, ``BooleanField`` はフィールド型です。
-フィールド型の一覧は :ref:`ref-forms-fields` を参照してください。
+フィールド型の一覧は :doc:`/ref/forms/fields` を参照してください。
 
-:ref:`ModelForm <topics-forms-modelforms>` を使えば、フォームを使って
+:ref:`ModelForm </topics/forms/modelforms>` を使えば、フォームを使って
 Django のモデルを直接追加したり編集したりしたいときに、モデルと重複する記述
 をせずにすみます。
 
@@ -122,10 +121,6 @@ Django のモデルを直接追加したり編集したりしたいときに、�
     3. フォームデータが提出され、バリデーションに成功しなければ、束縛フォー
        ムインスタンスをテンプレートに渡します。
 
-.. versionchanged:: 1.0
-    ``cleaned_data`` 属性は、以前のリリースでは ``clean_data`` という名前で
-    した。
-
 **束縛** フォームと **非束縛** フォームの違いはとても重要です。非束縛フォー
 ムには、何らデータが結び付いていません。非束縛フォームをレンダしてユーザに
 呈示すると、フォームには空の値かデフォルトの値が表示されます。束縛フォーム
@@ -136,11 +131,11 @@ Django のモデルを直接追加したり編集したりしたいときに、�
 束縛フォームと非束縛フォームの違いについてもっと詳しく知りたければ、
 :ref:`ref-forms-api-bound-unbound` を参照してください。
 
-Handling file uploads with a form
----------------------------------
+フォームからアップロードされたファイルを扱う
+--------------------------------------------
 
-To see how to handle file uploads with your form see
-:ref:`binding-uploaded-files` for more information.
+フォームからアップロードされたファイルを扱う方法は
+:ref:`binding-uploaded-files` に詳しく書いてあります。
 
 フォームから入力されたデータを処理する
 ----------------------------------------
@@ -153,6 +148,10 @@ To see how to handle file uploads with your form see
 な Python の型に変換されているからです。上の例では、 ``cc_myself`` はブール
 型の値に変換されています。同様に、 ``IntegerField`` や ``FloatField`` は、
 それぞれ Python の整数型や浮動小数型の値に変換されています。
+読み込み専用のフィールドは入力要素としてでなく、むしろテキストとして表示さ
+れ、かつそれらはサーバにポストで戻されることがないため、それらのフィールド
+は、 ``form.cleaned_data`` で利用できないということに注意してください ( また
+カスタマイズした ``celan()`` 関数で設定した値は何も影響を与えないでしょう) 。
 
 上の例を拡張すると、フォームデータの処理は以下のように書けます:
 
@@ -173,7 +172,7 @@ To see how to handle file uploads with your form see
         return HttpResponseRedirect('/thanks/') # Redirect after POST
 
 この例ではメールを送信しています。Django からメールを送信する方法の詳細は
-:ref:`topics-email` を参照してください。
+:doc:`/topics/email` を参照してください。
 
 テンプレートを使ってフォームを表示する
 ----------------------------------------
@@ -182,7 +181,7 @@ To see how to handle file uploads with your form see
 は、コンテキスト変数 ``form`` を使ってテンプレートに ``ContactForm`` インス
 タンスを渡しています。簡単なテンプレートの例を示します::
 
-    <form action="/contact/" method="POST">
+    <form action="/contact/" method="POST">{% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Submit" />
     </form>
@@ -190,10 +189,19 @@ To see how to handle file uploads with your form see
 フォームインスタンスはフィールドのマークアップだけを出力します。前後の
 ``<form>`` タグや、 submit ボタンは自分で追加します。
 
+.. admonition:: フォームとクロスサイトリクエストフォージェリプロテクション
+
+  Djangoは使いやすい :doc:`クロスサイトリクエストフォージェリプロテクション
+  </ref/contrib/csrf>` を搭載してます. 前述した例のように、 CSRF 保護機能を有
+  効にした POST を経由して送信するとき、テンプレートタグの :ttag:`csrf_token` 
+  を使うべきです。しかしながら、 CSRF 保護はテンプレート内のフォームに直接紐づ
+  いていないため、このタグは、このドキュメント内の以下の例では、省略されてい
+  ます。
+
 ``form.as_p`` を参照すると、各フィールドとラベルをパラグラフ (``<p>``) タグ
 で囲って出力します。上のテンプレートの例を出力すると、以下のようになります::
 
-   <form action="/contact/" method="POST">
+   <form action="/contact/" method="post">
    <p><label for="id_subject">Subject:</label>
        <input id="id_subject" type="text" name="subject" maxlength="100" /></p>
    <p><label for="id_message">Message:</label>
@@ -222,10 +230,11 @@ To see how to handle file uploads with your form see
 て、フォームの表示方法をいくらでもカスタマイズできます。例えば、前掲の例は
 以下のように拡張できます::
 
-    <form action="/contact/" method="POST">
+    <form action="/contact/" method="post">
+        {{ form.non_field_errors }}
         <div class="fieldWrapper">
             {{ form.subject.errors }}
-            <label for="id_subject">E-mail subject:</label>
+            <label for="id_subject">Email subject:</label>
             {{ form.subject }}
         </div>
         <div class="fieldWrapper">
@@ -266,15 +275,15 @@ To see how to handle file uploads with your form see
         {% endfor %}
         </ol>
     {% endif %}
-    
-Looping over the form's fields
+
+フォームフィールドのループ
 ------------------------------
 
-If you're using the same HTML for each of your form fields, you can reduce
-duplicate code by looping through each field in turn using a ``{% for %}``
-loop::
+もしそれぞれのフォームフィルドで同じ HTML を利用するなら、順次それぞれのフィ
+ールドを繰り替えす ``{% for %}`` ループを利用することで、重複するコードを減ら
+すことができます::
 
-    <form action="/contact/" method="POST">
+    <form action="/contact/" method="post">
         {% for field in form %}
             <div class="fieldWrapper">
                 {{ field.errors }}
@@ -284,66 +293,64 @@ loop::
         <p><input type="submit" value="Send message" /></p>
     </form>
 
-Within this loop, ``{{ field }}`` is an instance of :class:`BoundField`.
-``BoundField`` also has the following attributes, which can be useful in your
-templates:
+このループの ``{{ field }}`` は、 :class:`BoundField` のインスタンスです。
+``BoundField`` は以下の属性も持ち、テンプレート内で利用することができま
+す。
 
-    ``{{ field.label }}``
-        The label of the field, e.g. ``E-mail address``.
+``{{ field.label }}``
+    フィールドのラベルです。例 ``Email address`` 
 
-    ``{{ field.label_tag }}``
-        The field's label wrapped in the appropriate HTML ``<label>`` tag,
-        e.g. ``<label for="id_email">E-mail address</label>``
+``{{ field.label_tag }}``
+    フィールドの label をHTML の ``<label>`` タグに適した形式にラッピング
+    します。例 ``<label for="id_email">Email address</label>`` 
 
-    ``{{ field.html_name }}``
-        The name of the field that will be used in the input element's name
-        field. This takes the form prefix into account, if it has been set.
+``{{ field.value }}`` 
+    フィールドの値です。例 ``someone@example.com``
 
-    ``{{ field.help_text }}``
-        Any help text that has been associated with the field.
+``{{ field.help_text }}``
+    フィールドに関連付けられている任意のヘルプテキストです。
 
-    ``{{ field.errors }}``
-        Outputs a ``<ul class="errorlist">`` containing any validation errors
-        corresponding to this field. You can customize the presentation of
-        the errors with a ``{% for error in field.errors %}`` loop. In this
-        case, each object in the loop is a simple string containing the error
-        message.
+``{{ field.errors }}``    
+    このフィールドに一致する複数のバリデーションエラーを含んでいる
+    ``<ul class="errorlist">`` が表示されます。
+    ``{% for error in field.errors %}`` ループを利用してエラーの表示をカス
+    タマイズすることができます。この場合、ループ内の各オブジェクトは、エラ
+    ーメッセージを含んでいる単純な文字列です。
 
-    ``field.is_hidden``
-        This attribute is ``True`` if the form field is a hidden field and
-        ``False`` otherwise. It's not particularly useful as a template
-        variable, but could be useful in conditional tests such as::
+``field.is_hidden``
+    フォームフィールドが非表示フィールドの場合、この属性は ``True`` とな
+    り、そうでなければ、 ``False`` になります。テンプレートの変数としては、
+    特に便利でありませんが、以下に示すような条件文のテストには役立つでし
+    ょう。::
 
-            {% if field.is_hidden %}
-               {# Do something special #}
-            {% endif %}
+        {% if field.is_hidden %}
+           {# Do something special #}
+        {% endif %}
 
-Looping over hidden and visible fields
+
+非表示と表示フィールドのループ
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you're manually laying out a form in a template, as opposed to relying on
-Django's default form layout, you might want to treat ``<input type="hidden">``
-fields differently than non-hidden fields. For example, because hidden fields
-don't display anything, putting error messages "next to" the field could cause
-confusion for your users -- so errors for those fields should be handled
-differently.
+もしテンプレート内で、フォームを手動で表示しているなら、 つまり Django のデフ
+ォルトフォームレイアウトに反対するとき、非表示ではないフィールドより 
+``<input type="hidden">`` フィールドは注意深くを処理するべきです。
+例えば、非表示フィールドは何も表示しないので、エラーメッセージをそのフィールド
+の横に表示した場合、ユーザの混乱の原因になるでしょう。よって、それらの非表示フ
+ィールドのエラーに対しては、別の手段で対処するべきです。
 
-Django provides two methods on a form that allow you to loop over the hidden
-and visible fields independently: ``hidden_fields()`` and
-``visible_fields()``. Here's a modification of an earlier example that uses
-these two methods::
+Django は非表示、表示フィールドに対して、ループを可能にするフォームに、
+``hidden_fields()`` と ``visible_fields()`` という独立した2つのメソッドを規定
+しています。上記の例に対して、これら2つのメソッドを使った場合の、変更点は以下
+のとおりである。::
 
-    <form action="/contact/" method="POST">
-        {% for field in form.visible_fields %}
+    <form action="/contact/" method="post">
+         {# Include the hidden fields #}
+         {% for hidden in form.hidden_fields %}
+         {{ hidden }}
+         {% endfor %}
+         {# Include the visible fields #}
+         {% for field in form.visible_fields %}
             <div class="fieldWrapper">
-
-                {# Include the hidden fields in the form #}
-                {% if forloop.first %}
-                    {% for hidden in form.hidden_fields %}
-                    {{ hidden }}
-                    {% endfor %}
-                {% endif %}
-
                 {{ field.errors }}
                 {{ field.label_tag }}: {{ field }}
             </div>
@@ -351,23 +358,23 @@ these two methods::
         <p><input type="submit" value="Send message" /></p>
     </form>
 
-This example does not handle any errors in the hidden fields. Usually, an
-error in a hidden field is a sign of form tampering, since normal form
-interaction won't alter them. However, you could easily insert some error
-displays for those form errors, as well.
+この例では、非表示フィールドに対してのエラーは処理されません。たいていの場合、
+非表示フィールドのエラーは、フォームの改ざんを表します。なぜなら、普通のフォー
+ムのインタラクションを、非表示フィールドに変更すべきではないからある。しかしな
+がら、フォームのエラーに対応するエラー表示を簡単に挿し込むこともできるでしょう。
 
 .. versionadded:: 1.1
-    The ``hidden_fields`` and ``visible_fields`` methods are new in Django
-    1.1.
+    ``hidden_fields`` と ``visible_fields`` メソッドは Django 1.1 で新しく
+    追加されました。
 
-Reusable form templates
------------------------
+フォームテンプレートの再利用
+----------------------------
 
-If your site uses the same rendering logic for forms in multiple places, you
-can reduce duplication by saving the form's loop in a standalone template and
-using the :ttag:`include` tag to reuse it in other templates::
+複数の場所で同じ描画ロジックのフォームを利用するなら、独立したテンプレートにフォ
+ームのループと :ttag:`include` タグを保存し、それを他のテンプレート内で再利用す
+ることで、重複を減らすことができます::
 
-    <form action="/contact/" method="POST">
+    <form action="/contact/" method="post">
         {% include "form_snippet.html" %}
         <p><input type="submit" value="Send message" /></p>
     </form>
@@ -381,18 +388,18 @@ using the :ttag:`include` tag to reuse it in other templates::
         </div>
     {% endfor %}
 
-If the form object passed to a template has a different name within the
-context, you can alias it using the :ttag:`with` tag::
+もしテンプレートに渡されたフォームオブジェクトが、コンテキスト内で異なった名前
+を持っているなら、 :ttag:`include` タグの引数に ``with`` を利用することでそれを
+別名にすることができます::
 
-    <form action="/comments/add/" method="POST">
-        {% with comment_form as form %}
-            {% include "form_snippet.html" %}
-        {% endwith %}
+    <form action="/comments/add/" method="post">
+        {% include "form_snippet.html" with form=comment_form %}
         <p><input type="submit" value="Submit comment" /></p>
     </form>
 
-If you find yourself doing this often, you might consider creating a custom
-:ref:`inclusion tag<howto-custom-template-tags-inclusion-tags>`.
+もし、頻繁にこのようなことをするなら、
+:ref:`inclusion tag<howto-custom-template-tags-inclusion-tags>` をカスタマイズ
+することを検討すべきです。
 
 その他のトピック
 ==================
@@ -401,12 +408,14 @@ If you find yourself doing this often, you might consider creating a custom
 とたくさんあります:
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
-   modelforms
    formsets
+   modelforms
    media
    
 .. seealso::
 
-    :ref:`フォーム API リファレンス <ref-forms-index>`
+    :doc:`フォーム API リファレンス </ref/forms/index>`
+        フォームフィールド、フォームウィジェット、フォームやフィールドのバリ
+        デーションを含むすべてのAPIリファレンスをカバーしています。
