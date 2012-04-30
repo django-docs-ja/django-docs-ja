@@ -1,58 +1,61 @@
-.. _topics-generic-views:
-
 ==========
 汎用ビュー
 ==========
 
-:revision-up-to: 11321 (1.1) unfinished
+:revision-up-to: 17812 (1.4)
+
+
+.. versionchanged:: 1.3
+
+.. note::
+
+    Django 1.3 から、クラスベースの汎用ビューが採用されたので、関数ベースの汎用
+    ビューは廃止されました。クラスベースビューの :doc:`トピックガイド
+    </topics/class-based-views>` と :doc:`詳細なリファレンス
+    </ref/class-based-views>` に記述されています。
 
 Web アプリケーションの作成は、同じパターンを何度も何度も繰り返し書くことに
 なるため、退屈なものです。 Django は、こうした単調作業をモデルやテンプレー
 トのレイヤで軽減しようとしていますが、 Web 開発者はビューレベルでも退屈さを
 感じています。
 
-Django's *generic views* were developed to ease that pain. They take certain
-common idioms and patterns found in view development and abstract them so that
-you can quickly write common views of data without having to write too much
-code.
+Django の *汎用ビュー (generic views)* はその苦労を無くすために開発されま
+した。ビューの開発時に見かける、特定の共通するイディオムとパターンを汎用ビュー
+という形で抽象化しています。余計なコードを書かずによく定義されるビューを素早く
+実装できます。
 
-We can recognize certain common tasks, like displaying a list of objects, and
-write code that displays a list of *any* object. Then the model in question can
-be passed as an extra argument to the URLconf.
+我々はオブジェクトのリスト表示などの、ありふれたタスクを知っています。 *任意の*
+オブジェクトをリスト表示するコードも提供できます。その上、リスト表示させたい
+モデルは URLconf に追加の引数として渡せます。
 
-Django ships with generic views to do the following:
+Django の汎用ビューで以下のようなことができます:
 
-    * Perform common "simple" tasks: redirect to a different page and
-      render a given template.
+* 別のページへリダイレクトし、与えられたテンプレートをレンダリングするような、
+  よくある簡単なタスクの処理。
 
-    * Display list and detail pages for a single object. If we were creating an
-      application to manage conferences then a ``talk_list`` view and a
-      ``registered_user_list`` view would be examples of list views. A single
-      talk page is an example of what we call a "detail" view.
+* リストと単一オブジェクトの詳細ページを表示。カンファレンスを管理するアプリケー
+  ションを作っているなら、 ``talk_list`` ビューと ``registerd_user_list`` ビュー
+  にリストビューを、単一の発表に関するページに詳細ビューが使えます。
 
-    * Present date-based objects in year/month/day archive pages,
-      associated detail, and "latest" pages. The Django Weblog's
-      (http://www.djangoproject.com/weblog/) year, month, and
-      day archives are built with these, as would be a typical
-      newspaper's archives.
+* 日付ベースのオブジェクトを年/月/日のアーカイブで表示。詳細と最新ページで
+  関連付けて表示します。 Django のブログ (http://www.djangoproject.com/weblog/)
+  の年月日ごとのアーカイブはこれで作られています。
 
-    * Allow users to create, update, and delete objects -- with or
-      without authorization.
+* 認証あり、または無しでユーザにオブジェクトを生成、更新、削除を許可。
 
-Taken together, these views provide easy interfaces to perform the most common
-tasks developers encounter.
+汎用ビューは開発者が遭遇する、よくあるタスクを果たすための簡単なインターフェース
+を提供しています。
 
-Using generic views
-===================
+汎用ビューを使う
+================
 
-All of these views are used by creating configuration dictionaries in
-your URLconf files and passing those dictionaries as the third member of the
-URLconf tuple for a given pattern.
+これらビューはすべて、 URLconf ファイルに設定の入った辞書を作成し、 URLconf
+で URL パターンを記述しているタプルの 3 つめのメンバにその辞書を渡せば使えます。
 
-For example, here's a simple URLconf you could use to present a static "about"
-page::
+例えばここでは、静的な "about" ページを提示するために使えるシンプルな URLconf を
+示します::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
     from django.views.generic.simple import direct_to_template
 
     urlpatterns = patterns('',
@@ -61,31 +64,29 @@ page::
         })
     )
 
-Though this might seem a bit "magical" at first glance  -- look, a view with no
-code! --, actually the ``direct_to_template`` view simply grabs information from
-the extra-parameters dictionary and uses that information when rendering the
-view.
+これは一見、ちょっとした "魔法" のように見えるかもしません。だってほら、コー
+ド無しのビューですよ！実際には ``direct_to_template`` ビューは単に、特別なパ
+ラメータの入った辞書から情報を取得し、レンダリングに使用しています。
 
-Because this generic view -- and all the others -- is a regular view functions
-like any other, we can reuse it inside our own views. As an example, let's
-extend our "about" example to map URLs of the form ``/about/<whatever>/`` to
-statically rendered ``about/<whatever>.html``. We'll do this by first modifying
-the URLconf to point to a view function:
+汎用ビューは独自のビュー内で再利用できます。汎用ビューは、その他ビューと同じよう
+に普通のビュー関数だからです。例として、 "about" を拡張して静的にレンダリングさ
+れた ``about/<whatever>.html`` にURL ``/about/<whatever>/`` を対応させてみましょ
+う。まずは、ビュー関数を指定するように URLconf を変更します:
 
 .. parsed-literal::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
     from django.views.generic.simple import direct_to_template
-    **from mysite.books.views import about_pages**
+    **from books.views import about_pages**
 
     urlpatterns = patterns('',
         ('^about/$', direct_to_template, {
             'template': 'about.html'
         }),
-        **('^about/(\w+)/$', about_pages),**
+        **('^about/(\\w+)/$', about_pages),**
     )
 
-Next, we'll write the ``about_pages`` view::
+次に ``about_pages`` ビューを書きましょう::
 
     from django.http import Http404
     from django.template import TemplateDoesNotExist
@@ -97,37 +98,37 @@ Next, we'll write the ``about_pages`` view::
         except TemplateDoesNotExist:
             raise Http404()
 
-Here we're treating ``direct_to_template`` like any other function. Since it
-returns an ``HttpResponse``, we can simply return it as-is. The only slightly
-tricky business here is dealing with missing templates. We don't want a
-nonexistent template to cause a server error, so we catch
-``TemplateDoesNotExist`` exceptions and return 404 errors instead.
+ここでは ``direct_to_template`` をほかの関数と同じように扱っています。
+``direct_to_template`` は ``HttpResponse`` をそのまま返すので、戻り値を単純にそ
+のまま返せます。唯一トリッキーでやっかいなのが、存在しないテンプレートを扱ってい
+る点です。存在しないテンプレートがサーバエラーを引き起こさないように
+``TemplateDoesNotExist`` 例外をキャッチし、代わりに404エラーを返しています。
 
-.. admonition:: Is there a security vulnerability here?
+.. admonition:: セキュリティ上の脆弱性はありますか？
 
-    Sharp-eyed readers may have noticed a possible security hole: we're
-    constructing the template name using interpolated content from the browser
-    (``template="about/%s.html" % page``). At first glance, this looks like a
-    classic *directory traversal* vulnerability. But is it really?
+    目ざとい読者ならセキュリティホールの可能性に気がついてるかもしれません。ブラ
+    ウザから補間されたコンテンツを使ってテンプレート名を構築しているからです
+    (``template="about/%s.html" % page``) 。一見すると、古典的な *ディレクトリト
+    ラバーサル* の脆弱性のようです。しかし本当でしょうか？
 
-    Not exactly. Yes, a maliciously crafted value of ``page`` could cause
-    directory traversal, but although ``page`` *is* taken from the request URL,
-    not every value will be accepted. The key is in the URLconf: we're using
-    the regular expression ``\w+`` to match the ``page`` part of the URL, and
-    ``\w`` only accepts letters and numbers. Thus, any malicious characters
-    (dots and slashes, here) will be rejected by the URL resolver before they
-    reach the view itself.
+    そうではありません。たしかに、悪意をもって作成された ``page`` の値なら、
+    ディレクトリトラバーサルを引き起こす可能性があります。しかし、 ``page``
+    の値はリクエストURLから取得されますが、必ずしもすべての値が受け入れられるわ
+    けではありません。鍵は URLconf にあります。正規表現 ``\w+`` を ``page`` の
+    URL の一部とマッチさせるために使っています。 ``\w`` はアルファベットと数字の
+    み受け付けます。なので、悪意ある文字列 (ここではドットやスラッシュなど) は
+    ビュー自体に到達する前に、 URL リゾルバに拒否されます。
 
-Generic views of objects
+オブジェクトの汎用ビュー
 ========================
 
-The ``direct_to_template`` certainly is useful, but Django's generic views
-really shine when it comes to presenting views on your database content. Because
-it's such a common task, Django comes with a handful of built-in generic views
-that make generating list and detail views of objects incredibly easy.
+``direct_to_template`` は確かに便利です。しかし、 Django の汎用ビューが真価を
+発揮するのは、データベースの内容についてビューを提示するときです。驚くほど簡単に
+オブジェクトのリスト、詳細ビューを生成できる組み込みの汎用ビューが、 Django 
+には少数付属しています。それらはよくあるタスクだからです。
 
-Let's take a look at one of these generic views: the "object list" view. We'll
-be using these models::
+それでは汎用ビューの 1 つ、 "オブジェクトリスト (object list)" ビューを見てみま
+しょう。以下のようなモデルを使います::
 
     # models.py
     from django.db import models
@@ -152,11 +153,12 @@ be using these models::
         publisher = models.ForeignKey(Publisher)
         publication_date = models.DateField()
 
-To build a list page of all books, we'd use a URLconf along these lines::
+全ての出版社 (publisher) のリストページを構築するため、以下のような URLconf を
+使います::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
     from django.views.generic import list_detail
-    from mysite.books.models import Publisher
+    from books.models import Publisher
 
     publisher_info = {
         "queryset" : Publisher.objects.all(),
@@ -166,20 +168,19 @@ To build a list page of all books, we'd use a URLconf along these lines::
         (r'^publishers/$', list_detail.object_list, publisher_info)
     )
 
-That's all the Python code we need to write. We still need to write a template,
-however. We could explicitly tell the ``object_list`` view which template to use
-by including a ``template_name`` key in the extra arguments dictionary, but in
-the absence of an explicit template Django will infer one from the object's
-name. In this case, the inferred template will be
-``"books/publisher_list.html"`` -- the "books" part comes from the name of the
-app that defines the model, while the "publisher" bit is just the lowercased
-version of the model's name.
+書くべき Python コードは以上です。しかしテンプレートも書く必要があります。追加の
+引数の辞書に ``template_name`` キーを含めることにより、どのテンプレートを使用す
+るべきであるか ``object_list`` ビューに明示的に伝えることができます。明示的なテ
+ンプレートがない場合 Django は、オブジェクトの名前からテンプレートを推論します。
+今回の場合、推論されるテンプレートは ``"books/publisher_list.html"`` となるで
+しょう。 "books" という部分はモデルを定義しているアプリケーションの名前からきて
+います。 "publisher" は単にモデル名が lowercase になったものです。
 
 .. highlightlang:: html+django
 
-This template will be rendered against a context containing a variable called
-``object_list`` that contains all the book objects. A very simple template
-might look like the following::
+このテンプレートは、 ``object_list`` 変数を含むコンテキストに対してレンダリング
+されます。 ``object_list`` はすべての Publisher オブジェクトからなります。とても
+シンプルなテンプレートにするなら以下のようになるでしょう::
 
     {% extends "base.html" %}
 
@@ -192,38 +193,36 @@ might look like the following::
         </ul>
     {% endblock %}
 
-That's really all there is to it. All the cool features of generic views come
-from changing the "info" dictionary passed to the generic view. The
-:ref:`generic views reference<ref-generic-views>` documents all the generic
-views and all their options in detail; the rest of this document will consider
-some of the common ways you might customize and extend generic views.
+本当にこれだけです。汎用ビューに渡される "info" 辞書を変更することで、クールな
+機能をすべて使用できます。すべての汎用ビューとオプションの詳細は
+:doc:`generic views reference</ref/generic-views>` に記されています。このドキュ
+メントの残りでは、よくある汎用ビューのカスタマイズ、拡張の方法を記しています。
 
-Extending generic views
-=======================
+汎用ビューの拡張
+================
 
 .. highlightlang:: python
 
-There's no question that using generic views can speed up development
-substantially. In most projects, however, there comes a moment when the
-generic views no longer suffice. Indeed, the most common question asked by new
-Django developers is how to make generic views handle a wider array of
-situations.
+疑いようも無く、汎用ビューを使用すると開発スピードは大幅に上がります。しかし多
+くのプロジェクトでは、汎用ビューでは物足りないときがあります。確かに、新米の
+Django 開発者からくる質問で典型的なのは、汎用ビューをより幅広い状況で扱うことに
+ついてです。
 
-Luckily, in nearly every one of these cases, there are ways to simply extend
-generic views to handle a larger array of use cases. These situations usually
-fall into a handful of patterns dealt with in the sections that follow.
+幸いほぼすべてのケースで、汎用ビューを簡単に拡張して、より大きいユースケースを
+処理するようにできます。通常これらの状況は、以下のセクションで扱うごく少数の
+パターンに分類できます。
 
-Making "friendly" template contexts
------------------------------------
+"フレンドリー" なテンプレートコンテキストを作る
+-----------------------------------------------
 
-You might have noticed that our sample publisher list template stores all the
-books in a variable named ``object_list``. While this works just fine, it isn't
-all that "friendly" to template authors: they have to "just know" that they're
-dealing with books here. A better name for that variable would be
-``publisher_list``; that variable's content is pretty obvious.
+サンプルの出版社リストテンプレートでは、 ``object_list`` 変数にすべての
+書籍 (book) オブジェクトが格納されていると思ってしまうかもしれません。現状でも
+うまく動作しますが、テンプレートの作者にとって "フレンドリー" ではありません。
+テンプレート作者は、ここでは出版社のことだけを知っているべきです。より良い変数名は
+``publisher_list`` です。変数の内容がかなり明らかになっています。
 
-We can change the name of that variable easily with the ``template_object_name``
-argument:
+``template_object_name`` 引数を変更することで、簡単に ``object_list`` の名前を
+変えられます:
 
 .. parsed-literal::
 
@@ -236,26 +235,25 @@ argument:
         (r'^publishers/$', list_detail.object_list, publisher_info)
     )
 
-Providing a useful ``template_object_name`` is always a good idea. Your
-coworkers who design templates will thank you.
+便利な ``template_object_name`` を提供するのは常によいことです。テンプレートの
+デザインを担当する同僚は、あなたに感謝することでしょう。
 
-Adding extra context
---------------------
+追加のコンテキスト
+------------------
 
-Often you simply need to present some extra information beyond that provided by
-the generic view. For example, think of showing a list of all the other
-publishers on each publisher detail page. The ``object_detail`` generic view
-provides the publisher to the context, but it seems there's no way to get a list
-of *all* publishers in that template.
+汎用ビューで提供されるもの以上に、追加の情報を提示したいときがあります。例えば、
+各出版社の詳細ページに、書籍の全リストを表示したいときなどです。汎用ビュー
+``object_detail`` はコンテキストに Publisher オブジェクトを提供していますが、
+テンプレートに追加の情報を与えることはできなさそうです。
 
-But there is: all generic views take an extra optional parameter,
-``extra_context``. This is a dictionary of extra objects that will be added to
-the template's context. So, to provide the list of all publishers on the detail
-detail view, we'd use an info dict like this:
+しかしそうではありません。すべての汎用ビューは追加のパラメータ ``extra_context``
+をとります。これは追加オブジェクトの辞書で、テンプレートコンテキストに追加され
+ます。書籍の全リストを詳細ビューに提供するには、以下のように info 辞書を使い
+ます。
 
 .. parsed-literal::
 
-    from mysite.books.models import Publisher, **Book**
+    from books.models import Publisher, **Book**
 
     publisher_info = {
         "queryset" : Publisher.objects.all(),
@@ -263,29 +261,29 @@ detail view, we'd use an info dict like this:
         **"extra_context" : {"book_list" : Book.objects.all()}**
     }
 
-This would populate a ``{{ book_list }}`` variable in the template context.
-This pattern can be used to pass any information down into the template for the
-generic view. It's very handy.
+これでテンプレートコンテキストで ``{{ book_list }}`` が使えるようになります。
+このパターンは、汎用ビューのテンプレートに任意の情報を渡すために使えます。非常に
+便利です。
 
-However, there's actually a subtle bug here -- can you spot it?
+しかし実際には、微妙なバグがあります。見つけられました？
 
-The problem has to do with when the queries in ``extra_context`` are evaluated.
-Because this example puts ``Publisher.objects.all()`` in the URLconf, it will
-be evaluated only once (when the URLconf is first loaded). Once you add or
-remove publishers, you'll notice that the generic view doesn't reflect those
-changes until you reload the Web server (see :ref:`caching-and-querysets`
-for more information about when QuerySets are cached and evaluated).
+その問題は ``extra_context`` 中のクエリが評価されるときに関係します。この例で
+は、 URLconf に ``Book.objects.all()`` を置いているので、クエリは 1 度だけ
+(URLconf が最初にロードされるとき) 評価されます。書籍を追加か削除すれば、 Web
+サーバをリロードするまで変更が反映されません。 (クエリセットが、いつキャッ
+シュ、評価されるかついては :ref:`caching-and-querysets` を参照してください) 。
 
 .. note::
 
-    This problem doesn't apply to the ``queryset`` generic view argument. Since
-    Django knows that particular QuerySet should *never* be cached, the generic
-    view takes care of clearing the cache when each view is rendered.
+    この問題は汎用ビューの ``queryset`` 引数には当てはまりません。
+    特定の QuerySet は *絶対に* キャッシュすべきでないと Django は知っています。
+    汎用ビューはビューがそれぞれレンダリングされるときに、キャッシュを消去して
+    くれます。
 
-The solution is to use a callback in ``extra_context`` instead of a value. Any
-callable (i.e., a function) that's passed to ``extra_context`` will be evaluated
-when the view is rendered (instead of only once). You could do this with an
-explicitly defined function:
+解決策は、値の代わりに ``extra_context`` でコールバックを使うことです。
+``extra_context`` に渡される呼び出し可能オブジェクト (つまり関数) は、ビューが
+レンダリングされたときに (1 度だけではなく) 評価されます。明示的に定義した関数を
+使います:
 
 .. parsed-literal::
 
@@ -298,8 +296,8 @@ explicitly defined function:
         "extra_context" : **{"book_list" : get_books}**
     }
 
-or you could use a less obvious but shorter version that relies on the fact that
-``Book.objects.all`` is itself a callable:
+明示性に欠けるも、短く書く方法もあります。 ``Book.objects.all`` 自体が呼び出し
+可能なので、それを利用します:
 
 .. parsed-literal::
 
@@ -309,20 +307,20 @@ or you could use a less obvious but shorter version that relies on the fact that
         "extra_context" : **{"book_list" : Book.objects.all}**
     }
 
-Notice the lack of parentheses after ``Book.objects.all``; this references
-the function without actually calling it (which the generic view will do later).
+``Book.objects.all`` の後ろに丸括弧が足りませんね。実際に関数は呼び出されて
+いません (汎用ビューが後で呼び出します)。
 
-Viewing subsets of objects
---------------------------
+オブジェクトのサブセットを表示
+------------------------------
 
-Now let's take a closer look at this ``queryset`` key we've been using all
-along. Most generic views take one of these ``queryset`` arguments -- it's how
-the view knows which set of objects to display (see :ref:`topics-db-queries` for
-more information about ``QuerySet`` objects, and see the
-:ref:`generic views reference<ref-generic-views>` for the complete details).
+さて、ずっと使ってきた ``queryset`` キーを詳しく見ていきましょう。ほとんどの
+汎用ビューは ``queryset`` 引数を取ります。それはビューがどのオブジェクト
+のセットを表示すべきかを指定します。 ( ``QuerySet`` オブジェクトのについては
+:doc:`/topics/db/queries` 、詳細は
+:doc:`汎用ビューのリファレンス </ref/generic-views>` を参照してください)。
 
-To pick a simple example, we might want to order a list of books by
-publication date, with the most recent first:
+簡単な例として、出版日 (publication date) 順の書籍のリストを最新のものから取得
+してみます:
 
 .. parsed-literal::
 
@@ -336,10 +334,9 @@ publication date, with the most recent first:
     )
 
 
-That's a pretty simple example, but it illustrates the idea nicely. Of course,
-you'll usually want to do more than just reorder objects. If you want to
-present a list of books by a particular publisher, you can use the same
-technique:
+かなり簡単な例ですが、うまく考えを表しています。もちろんオブジェクトを再整理する
+以上のことをしたいでしょう。特定の出版社についての書籍を渡したい場合も、同じ
+テクニックが使えます:
 
 .. parsed-literal::
 
@@ -353,55 +350,56 @@ technique:
         **(r'^books/acme/$', list_detail.object_list, acme_books),**
     )
 
-Notice that along with a filtered ``queryset``, we're also using a custom
-template name. If we didn't, the generic view would use the same template as the
-"vanilla" object list, which might not be what we want.
+フィルタされた ``queryset`` 以外に、テンプレート名を指定しています。そうしな
+いと、汎用ビューは同じテンプレートを "ありきたりな" オブジェクトリストとして使い
+回します。たぶん期待とは違うことでしょう。
 
-Also notice that this isn't a very elegant way of doing publisher-specific
-books. If we want to add another publisher page, we'd need another handful of
-lines in the URLconf, and more than a few publishers would get unreasonable.
-We'll deal with this problem in the next section.
+これは、ある出版社固有の書籍を扱ううえでエレガントな方法ではありません。他の
+出版社のページを追加したいなら、 URLconf に手動で追記する必要があるからです。
+追記したうちのいくつかは不当 (unreasonable) になるでしょう。詳しくは次のセク
+ションで扱います。
 
 .. note::
 
-    If you get a 404 when requesting ``/books/acme/``, check to ensure you
-    actually have a Publisher with the name 'ACME Publishing'.  Generic
-    views have an ``allow_empty`` parameter for this case.  See the
-    :ref:`generic views reference<ref-generic-views>` for more details.
+    ``/books/acme/`` をリクエストするの際に 404 になったときは、
+    'ACME Publishing' という名の Publisher が実際に存在するか確かめてください。
+    こういったケースに備えて、汎用ビューは ``allow_empty`` というパラメータを
+    持っています。詳細は :doc:`汎用ビューのリファレンス </ref/generic-views>`
+    を参照してください。
 
-Complex filtering with wrapper functions
-----------------------------------------
+ラッパー関数で多重フィルタリング
+------------------------------
 
-Another common need is to filter down the objects given in a list page by some
-key in the URL. Earlier we hard-coded the publisher's name in the URLconf, but
-what if we wanted to write a view that displayed all the books by some arbitrary
-publisher? We can "wrap" the ``object_list`` generic view to avoid writing a lot
-of code by hand. As usual, we'll start by writing a URLconf:
+他によくあるニーズは、 URL のキーでオブジェクトをフィルタしてから、オブジェクト
+をリストページに渡すことです。すでに出版社名は URLconf にハードコードしてい
+ますが、ある任意の出版社について書籍をすべて表示するビューを書きたいなら、どう
+しますか？ ``object_list`` 汎用ビューを "ラップ (wrap)" して大量のコードを手書き
+することを避けられます。いつも通り、 URLconf から書きます:
 
 .. parsed-literal::
 
-    from mysite.books.views import books_by_publisher
+    from books.views import books_by_publisher
 
     urlpatterns = patterns('',
         (r'^publishers/$', list_detail.object_list, publisher_info),
-        **(r'^books/(\w+)/$', books_by_publisher),**
+        **(r'^books/(\\w+)/$', books_by_publisher),**
     )
 
-Next, we'll write the ``books_by_publisher`` view itself::
+次に、 ``books_by_publisher`` ビュー自体を書きます::
 
     from django.http import Http404
     from django.views.generic import list_detail
-    from mysite.books.models import Book, Publisher
+    from books.models import Book, Publisher
 
     def books_by_publisher(request, name):
 
-        # Look up the publisher (and raise a 404 if it can't be found).
+        # publisher を取得 (見つからなければ 404 エラーを返します)。
         try:
             publisher = Publisher.objects.get(name__iexact=name)
         except Publisher.DoesNotExist:
             raise Http404
 
-        # Use the object_list view for the heavy lifting.
+        # 重労働には object_list view ビューを使います。
         return list_detail.object_list(
             request,
             queryset = Book.objects.filter(publisher=publisher),
@@ -410,27 +408,26 @@ Next, we'll write the ``books_by_publisher`` view itself::
             extra_context = {"publisher" : publisher}
         )
 
-This works because there's really nothing special about generic views -- they're
-just Python functions. Like any view function, generic views expect a certain
-set of arguments and return ``HttpResponse`` objects. Thus, it's incredibly easy
-to wrap a small function around a generic view that does additional work before
-(or after; see the next section) handing things off to the generic view.
+汎用ビューはとくに特別なものでもないので、これで動作します。単なる Python の関数
+です。他のビューのように、汎用ビューは引数のセットを期待し、 ``HttpResponse``
+オブジェクトを返します。このように、汎用ビューを小さな関数でラップするのは非常に
+簡単です。ラッパー関数は、汎用ビューに引き渡す前 (もしくは後。詳細は次のセクション
+で) に追加の処理をします。
 
 .. note::
 
-    Notice that in the preceding example we passed the current publisher being
-    displayed in the ``extra_context``. This is usually a good idea in wrappers
-    of this nature; it lets the template know which "parent" object is currently
-    being browsed.
+    先の例では、表示されている Publisher オブジェクトを ``extra_context`` に
+    渡しています。この性質のラッパーにおいては良いアイディアです。どの "親"
+    オブジェクトが現在閲覧されているかをテンプレートに知らせられるかれです。
 
-Performing extra work
----------------------
+追加の処理をさせる
+------------------
 
-The last common pattern we'll look at involves doing some extra work before
-or after calling the generic view.
+最後の共通パターンは、汎用ビューを呼び出す前か後に、追加の処理をさせることです。
 
-Imagine we had a ``last_accessed`` field on our ``Author`` object that we were
-using to keep track of the last time anybody looked at that author::
+
+``Author`` オブジェクト中に ``last_accessed`` フィールドがあると想像してください。
+著者 (author) が最後に問い合わせされた時間を記録します::
 
     # models.py
 
@@ -442,38 +439,37 @@ using to keep track of the last time anybody looked at that author::
         headshot = models.ImageField(upload_to='/tmp')
         last_accessed = models.DateTimeField()
 
-The generic ``object_detail`` view, of course, wouldn't know anything about this
-field, but once again we could easily write a custom view to keep that field
-updated.
+``object_detail`` 汎用ビューはもちろん、このフィールドについては知りません。
+しかし再び、このフィールドの更新を維持するためのカスタムビューを書けます。
 
-First, we'd need to add an author detail bit in the URLconf to point to a
-custom view:
+初めに、カスタムビューを指定するために URLconf に著者の詳細に関する 1 行を追加
+します:
 
 .. parsed-literal::
 
-    from mysite.books.views import author_detail
+    from books.views import author_detail
 
     urlpatterns = patterns('',
         #...
-        **(r'^authors/(?P<author_id>\d+)/$', author_detail),**
+        **(r'^authors/(?P<author_id>\\d+)/$', author_detail),**
     )
 
-Then we'd write our wrapper function::
+そしてラッパー関数を書きます::
 
     import datetime
-    from mysite.books.models import Author
+    from books.models import Author
     from django.views.generic import list_detail
     from django.shortcuts import get_object_or_404
 
     def author_detail(request, author_id):
-        # Look up the Author (and raise a 404 if she's not found)
+        # Author を取得 (見つからなければ 404 エラーを返します)。
         author = get_object_or_404(Author, pk=author_id)
 
-        # Record the last accessed date
+        # 最終アクセス日時を記録します。
         author.last_accessed = datetime.datetime.now()
         author.save()
 
-        # Show the detail page
+        # 詳細ページを表示します。
         return list_detail.object_detail(
             request,
             queryset = Author.objects.all(),
@@ -482,12 +478,11 @@ Then we'd write our wrapper function::
 
 .. note::
 
-    This code won't actually work unless you create a
-    ``books/author_detail.html`` template.
+    実際には、このコードには ``books/author_detail.html`` テンプレートが必要
+    です。
 
-We can use a similar idiom to alter the response returned by the generic view.
-If we wanted to provide a downloadable plain-text version of the list of
-authors, we could use a view like this::
+汎用ビューのレスポンスを変更するために、同じイディオムが使えます。著者リストの
+プレーンテキスト版をダウンロード可能にするには、以下のようなビューが使えます::
 
     def author_list_plaintext(request):
         response = list_detail.object_list(
@@ -499,7 +494,7 @@ authors, we could use a view like this::
         response["Content-Disposition"] = "attachment; filename=authors.txt"
         return response
 
-This works because the generic views return simple ``HttpResponse`` objects
-that can be treated like dictionaries to set HTTP headers. This
-``Content-Disposition`` business, by the way, instructs the browser to
-download and save the page instead of displaying it in the browser.
+これで動作するのは、汎用ビューがシンプルな ``HttpResponse`` オブジェクトを返す
+からです。 ``HttpResponse`` オブジェクトを辞書のように扱って、 Http セッダを設定
+できます。この ``Content-Disposition`` の編集によって、ブラウザにページ表示する
+代わりに、ダウンロードと保存するよう指示します。
