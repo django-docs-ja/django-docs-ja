@@ -1,23 +1,22 @@
-===============
-View decorators
-===============
+==================
+ビューのデコレータ
+==================
 
 .. module:: django.views.decorators.http
 
-Django provides several decorators that can be applied to views to support
-various HTTP features.
+Django には、HTTP の様々な機能をビューに適用するためのいくつかのデコレータ
+が用意されています。
 
-Allowed HTTP methods
-====================
+HTTP メソッドの制限
+===================
 
-The decorators in :mod:`django.views.decorators.http` can be used to restrict
-access to views based on the request method. These decorators will return
-a :class:`django.http.HttpResponseNotAllowed` if the conditions are not met.
+:mod:`django.views.decorators.http` 内の以下のデコレータはリクエストメソッド
+によるアクセス制限に使用できます。このデコレータは、条件を満たしていない
+場合 :class:`django.http.HttpResponseNotAllowed` を返します。
 
 .. function:: require_http_methods(request_method_list)
 
-    Decorator to require that a view only accept particular request
-    methods. Usage::
+    特定のリクエストメソッドのみを許可するためのデコレータの利用方法です::
 
         from django.views.decorators.http import require_http_methods
 
@@ -27,37 +26,36 @@ a :class:`django.http.HttpResponseNotAllowed` if the conditions are not met.
             # ...
             pass
 
-    Note that request methods should be in uppercase.
+    リクエストメソッドは大文字にする必要があります。
 
 .. function:: require_GET()
 
-    Decorator to require that a view only accept the GET method.
+    ビューに GET メソッドのみを許可するデコレータです。
 
 .. function:: require_POST()
 
-    Decorator to require that a view only accept the POST method.
+    ビューに POST メソッドのみを許可するデコレータです。
 
 .. function:: require_safe()
 
     .. versionadded:: 1.4
 
-    Decorator to require that a view only accept the GET and HEAD methods.
-    These methods are commonly considered "safe" because they should not have
-    the significance of taking an action other than retrieving the requested
-    resource.
+    ビューに GET と HEAD メソッドのみを許可するデコレータです。
+    これらのメソッドは、リクエストされたリソースを取得する意外の目的で使用すべき
+    ではないので、一般的に "safe" (安全) と見なされています。
 
     .. note::
-        Django will automatically strip the content of responses to HEAD
-        requests while leaving the headers unchanged, so you may handle HEAD
-        requests exactly like GET requests in your views. Since some software,
-        such as link checkers, rely on HEAD requests, you might prefer
-        using ``require_safe`` instead of ``require_GET``.
+        Django は、HEAD リクエストのレスポンスからヘッダは変更せず、
+        コンテンツを自動的に削除するため、GET リクエストのビューと同様に処理
+        できます。リンクチェッカー等のソフトウェアは、
+        HEAD リクエストに依存しているので、 ``require_GET`` よりも
+        ``require_safe`` を使うほうが良いでしょう。
 
-Conditional view processing
-===========================
+ビューの条件処理
+================
 
-The following decorators in :mod:`django.views.decorators.http` can be used to
-control caching behavior on particular views.
+:mod:`django.views.decorators.http` 内の以下のデコレータは特定のビューの
+キャッシュ制御に使用できます。
 
 .. function:: condition(etag_func=None, last_modified_func=None)
 
@@ -65,37 +63,38 @@ control caching behavior on particular views.
 
 .. function:: last_modified(last_modified_func)
 
-    These decorators can be used to generate ``ETag`` and ``Last-Modified``
-    headers; see
-    :doc:`conditional view processing </topics/conditional-view-processing>`.
+    これらのデコレータは ``ETag`` や ``Last-Modified`` ヘッダの生成に
+    使用します。詳細については
+    :doc:`ビューの条件処理 </topics/conditional-view-processing>`
+    を参照してください。
 
 .. module:: django.views.decorators.gzip
 
-GZip compression
-================
+GZip 圧縮
+=========
 
-The decorators in :mod:`django.views.decorators.gzip` control content
-compression on a per-view basis.
+:mod:`django.views.decorators.gzip` 内のデコレータはビュー単位でコンテンツの
+圧縮を制御します。
 
 .. function:: gzip_page()
 
-    This decorator compresses content if the browser allows gzip compression.
-    It sets the ``Vary`` header accordingly, so that caches will base their
-    storage on the ``Accept-Encoding`` header.
+    このデコレータは、ブラウザが gzip 圧縮に対応している場合に圧縮します。
+    ``Vary`` ヘッダをセットするので、
+    ``Accept-Encoding`` ヘッダに基づいてキャッシュに保管されます。
 
 .. module:: django.views.decorators.vary
 
-Vary headers
-============
+Vary ヘッダ
+===========
 
-The decorators in :mod:`django.views.decorators.vary` can be used to control
-caching based on specific request headers.
+:mod:`django.views.decorators.vary` 内のデコレータにより特定のリクエストヘッダ
+に基づきキャッシュを制御できます。
 
 .. function:: vary_on_cookie(func)
 
 .. function:: vary_on_headers(*headers)
 
-    The ``Vary`` header defines which request headers a cache mechanism should take
-    into account when building its cache key.
+    ``Vary`` ヘッダは、キャッシュメカニズムがキャッシュキーを生成する際に考慮すべき
+    リクエストヘッダを定義します。
 
-    See :ref:`using vary headers <using-vary-headers>`.
+    詳細については :ref:`Vary ヘッダを使う <using-vary-headers>` を参照してください。
