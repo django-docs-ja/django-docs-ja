@@ -1,19 +1,17 @@
-.. _topics-http-file-uploads:
-
 ========================
 ファイルアップロード
 ========================
 
-:revision-up-to: 11321 (1.1) unfinished
+:revision-up-to: 17812 (1.4)
 
-.. currentmodule:: django.core.files
 
-.. versionadded:: 1.0
+.. currentmodule:: django.core.files.uploadedfile
+
 
 多くの Web サイトにとって、ファイルアップロードのサポートは不可欠ですね。
 Django がアップロードされたファイルを扱うとき、ファイルデータは最終的に
-``request.FILES`` に入ります (``request`` オブジェクトの詳細は
-:ref:`リクエスト／レスポンスオブジェクト <ref-request-response>` のドキュメ
+:attr:`request.FILES` に入ります (``request`` オブジェクトの詳細は
+:doc:`リクエスト／レスポンスオブジェクト <ref-request-response>` のドキュメ
 ントを参照してください)。このドキュメントでは、ファイルがどのようにしてディ
 スクやメモリ上に保存されるかを説明し、そのデフォルトの動作をカスタマイズす
 る方法について説明します。
@@ -21,7 +19,8 @@ Django がアップロードされたファイルを扱うとき、ファイル�
 ファイルアップロードの基本
 ============================
 
-``FileField`` を含む以下のような簡単なフォームを考えてみましょう::
+:class:`~django.forms.FileField` を含む以下のような簡単なフォームを考えて
+みましょう::
 
     from django import forms
 
@@ -29,23 +28,25 @@ Django がアップロードされたファイルを扱うとき、ファイル�
         title = forms.CharField(max_length=50)
         file  = forms.FileField()
 
-このフォームからの入力を扱うビューは、ファイルデータを ``request.FILES`` で
-受け取ります。 ``request.FILES`` はファイルデータの入った辞書で、辞書のキー
-はフォームクラス中の ``FileField`` (または ``ImageField`` や ``FileField``
-のサブクラス) の名前です。従って、上の例では、 ``request.FILES['file']`` で
-ファイルデータにアクセスできます。
+このフォームからの入力を扱うビューは、ファイルデータを ``request.FILES``
+で受け取ります。 :attr:`request.FILES <django.http.HttpRequest.FILES>` は
+ファイルデータの入った辞書で、辞書のキーはフォームクラス中の
+:class:`~django.forms.FileField` (または :class:`~django.forms.ImageField`
+や :class:`~django.forms.FileField` のサブクラス) の名前です。従って、
+上の例では、 ``request.FILES['file']`` でファイルデータにアクセスできます。
 
-Note that ``request.FILES`` will only contain data if the request method was 
-``POST`` and the ``<form>`` that posted the request has the attribute
-``enctype="multipart/form-data"``. Otherwise, ``request.FILES`` will be empty.
+もしリクエストメソッドが ``POST`` であり、尚且つ ``<form>`` において
+アトリビュート ``enctype="multipart/form-data"`` を含むリクエストが
+ポストされたのであれば、 :attr:`request.FILES <django.http.HttpRequest.FILES>`
+はデータのみを含んでいる事に注意して下さい。
+そうでない場合 ``request.FILES`` は空です。
 
 ほとんどの場合は、「 :ref:`binding-uploaded-files` 」の節で説明した方法に従っ
 て、 ``request`` からデータを取り出してフォームに渡すだけでアップロードファ
 イルを処理できます::
 
     from django.http import HttpResponseRedirect
-    from django.shortcuts import render_to_response
-
+    from django.shortcuts import render_to_response 
     # アップロードファイルを処理する関数を import します
     from somewhere import handle_uploaded_file
 
@@ -59,51 +60,59 @@ Note that ``request.FILES`` will only contain data if the request method was
             form = UploadFileForm()
         return render_to_response('upload.html', {'form': form})
 
-``request.FILES`` を明示的にフォームのコンストラクタに渡さねばならないので
-注意してください。これはフォームにファイルデータを結びつけるために必要な手
-順です。
+:attr:`request.FILES <django.http.HttpRequest.FILES>` を明示的にフォーム
+のコンストラクタに渡さねばならないので注意してください。
+これはフォームにファイルデータを結びつけるために必要な手順です。
 
 アップロードファイルの処理
 ----------------------------
 
-ファイルアップロードというパズルの最後のピースは、 ``request.FILES`` の
-ファイルデータを実際に処理する部分です。 ``request.FILES`` の各エントリは
-``UploadedFile`` オブジェクトです。 ``UploadedFile`` は単純なアップロードファ
-イルデータのラッパです。このインスタンスには、以下のようなメソッドがあり、
-アップロードされたデータにアクセスできます:
+.. class:: UploadedFile
 
-    ``UploadedFile.read()``
+    パズルの最後のピースは :attr:`request.FILES <django.http.HttpRequest.
+    FILES>` からの実際のデータファイルをハンドリングすることです。
+    この辞書の各エントリーはアップロードされたファイルをシンプルなラッパで
+    包んだ ``UploadedFile`` オブジェクトです。
+    通常、アップロードされた内容にアクセスする為にこれらのメソッドのいずれか
+    を使う事になるでしょう:
+
+    .. method:: read()
+
         アップロードされたデータ全体をファイルから読み出します。このメソッ
         ドを使うときに十分注意してください。というのも、アップロードされた
         ファイルが巨大だと、メモリに読み込む際にシステムの容量を越してしま
         うかもしれないからです。そのようなときは、後述の ``chunks()`` を使う
         とよいでしょう。
-        
-    ``UploadedFile.multiple_chunks()``
+
+    .. method:: multiple_chunks()
+
         ファイルが大きくて、複数のチャンクに分けて読み出すべきである場合に
         ``True`` を返します。デフォルトの設定では、 2.5 Mbytes より大きなファ
         イルに対して ``True`` を返します。サイズの閾値は設定でき、後で説明
         します。
-    
-    ``UploadedFile.chunks()``
+
+    .. attribute:: chunks()
+
         ファイルのチャンクを返すジェネレータです。 ``multiple_chunks()`` が
-	``True`` の場合には、 ``read()`` ではなくこのメソッドを使ってくださ
+        ``True`` の場合には、 ``read()`` ではなくこのメソッドを使ってくださ
         い。
-        
-	実際には、常に ``chunks()`` を使うのがよいでしょう。後述の例を参照
-	してください。
-    
-    ``UploadedFile.name``
+
+        実際には、常に ``chunks()`` を使うのがよいでしょう。後述の例を参照
+        してください。
+
+    .. attribute:: name
+
         ``my_file.txt`` のような、アップロードされたファイルの名前です。
-        
-    ``UploadedFile.size``
+
+    .. attribute:: size
+
         アップロードファイルのサイズ(単位バイト)です。
-        
+
 ``UploadedFile`` オブジェクトは他にもいくつかメソッドや属性を備えています。
 詳しくは `UploadedFile オブジェクト`_ を参照してください。
 
 まとめると、アップロードファイルの一般的な処理例は以下の通りです::
-    
+
     def handle_uploaded_file(f):
         destination = open('some/file/name.txt', 'wb+')
         for chunk in f.chunks():
@@ -140,97 +149,96 @@ Note that ``request.FILES`` will only contain data if the request method was
 
 ファイルアップロードの挙動は、以下の 3 つの設定で制御できます:
 
-    :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`
-        アップロードされたファイルをメモリに保存する上限のサイズです。
-	設定値よりも大きなファイルがアップロードされると、ファイルデータは
-        ディスクに書き込まれます。
-        
-        デフォルト値は 2.5 Mbytes です。
-        
-    :setting:`FILE_UPLOAD_TEMP_DIR`
-        :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE` より大きなファイルがアップロー
-        ドされたときにファイルデータを保存するディレクトリです。
-        
-        デフォルト値はシステム標準の一時ファイルディレクトリです
-	(UNIX ライクのシステムでは ``/tmp`` です)。
+:setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`
+    アップロードされたファイルをメモリに保存する上限のサイズです。
+    設定値よりも大きなファイルがアップロードされると、ファイルデータは
+    ディスクに書き込まれます。
+    デフォルト値は 2.5 Mbytes です。
 
-    :setting:`FILE_UPLOAD_PERMISSIONS`
-        アップロードされたファイルに設定するファイルモードで、数字で表現
-        (例: ``0644``) します。ファイルモードの意味は
-	`os.chmod のドキュメント`_ を参照してください。
+:setting:`FILE_UPLOAD_TEMP_DIR`
+    :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE` より大きなファイルがアップロー
+    ドされたときにファイルデータを保存するディレクトリです。
 
-        この値を設定しないか、 ``None`` にすると、アップロードされたファイ
-	ルのモードはオペレーティングシステムに依存します。ほとんどのプラッ
-	トフォームでは、一時ファイルのファイルモードは ``0600`` で、メモリ
-	からファイルにデータを書き出すときにはシステム標準の umask を使いま
-	す。
-        
-        .. warning::
-        
-            ファイルモードにあまりくわしくないのなら、先頭の ``0`` がとても
-            重要だということに注意してください。先頭の 0 は、値が 8 進数で
-            あることを示しています。 ``644`` のように指定すると、全くおかし
-            な挙動になってしまうでしょう。
-            
-            **ファイルモードの先頭には常に ``0`` をつけてください**.
+    デフォルト値はシステム標準の一時ファイルディレクトリです
+    (UNIX ライクのシステムでは ``/tmp`` です)。
 
-    :setting:`FILE_UPLOAD_HANDLERS`
-        アップロードファイルを処理する実際のハンドラです。
-        この設定を変更すると、ファイルアップロードの処理を完全にカスタマイ
-        ズでき、 Django のアップロード処理全体の置き換えすらできます。
-	詳しくは後述の `アップロードハンドラ`_ を参照してください。
-        
-        デフォルト値は以下の通りです::
-        
-            ("django.core.files.uploadhandler.MemoryFileUploadHandler",
-             "django.core.files.uploadhandler.TemporaryFileUploadHandler",)
-            
-        このデフォルトの設定では、アップロードされたファイルをまずメモリに
-        保存しようと試み、その後ファイルへの保存を試みます。
+:setting:`FILE_UPLOAD_PERMISSIONS`
+    アップロードされたファイルに設定するファイルモードで、数字で表現
+    (例: ``0644``) します。ファイルモードの意味は
+    :func:`os.chmod` のドキュメントを参照してください。
+
+    この値を設定しないか、 ``None`` にすると、アップロードされたファイ
+    ルのモードはオペレーティングシステムに依存します。ほとんどのプラッ
+    トフォームでは、一時ファイルのファイルモードは ``0600`` で、メモリ
+    からファイルにデータを書き出すときにはシステム標準の umask を使います。
+
+    .. warning::
+
+        ファイルモードにあまりくわしくないのなら、先頭の ``0`` がとても
+        重要だということに注意してください。先頭の 0 は、値が 8 進数で
+        あることを示しています。 ``644`` のように指定すると、全くおかし
+        な挙動になってしまうでしょう。
+
+        **ファイルモードの先頭には常に 0 をつけてください**.
+
+:setting:`FILE_UPLOAD_HANDLERS`
+    アップロードファイルを処理する実際のハンドラです。
+    この設定を変更すると、ファイルアップロードの処理を完全にカスタマイ
+    ズでき、 Django のアップロード処理全体の置き換えすらできます。
+    詳しくは後述の `アップロードハンドラ`_ を参照してください。
+
+    デフォルト値は以下の通りです::
+
+        ("django.core.files.uploadhandler.MemoryFileUploadHandler",
+         "django.core.files.uploadhandler.TemporaryFileUploadHandler",)
+
+    このデフォルトの設定では、アップロードされたファイルをまずメモリに
+    保存しようと試み、その後ファイルへの保存を試みます。
 
 
 .. _documentation for os.chmod: http://docs.python.org/lib/os-file-dir.html 
 .. _`os.chmod のドキュメント`: `documentation for os.chmod`_
-        
+
 ``UploadedFile`` オブジェクト
 ===============================
-
-.. class:: UploadedFile
 
 :class:`File` から継承したものの他に、 ``UploadedFile`` オブジェクトは、以
 下のメソッドや属性を定義しています。
 
-    ``UploadedFile.content_type``
-        ``content-type`` ヘッダの内容 (``text/plain`` や
-        ``application/pdf`` など) です。ユーザが指定した他のデータ同様、こ
-        の値がアップロードされたファイルのコンテンツタイプを正確に表してい
-        ると信用してはなりません。アップロードされたファイルのコンテンツタ
-        イプが ``content-type`` ヘッダと一致しているか確かめておく必要があ
-        ります。「値は一応信用するが、検証し」てください。
-    
-    ``UploadedFile.charset``
-        ``content-type`` が ``text/*`` のときに、ブラウザが指定した文字セッ
-        ト (``utf8`` など) です。「値は一応信用するが、検証する」ようにして
-        ください。
+.. attribute:: UploadedFile.content_type
 
-    ``UploadedFile.temporary_file_path()``
-        アップロードファイルがディスクに一時保存されているときにのみ使える
-        メソッドで、一時ファイルの完全なパスを返します。
+    ``content-type`` ヘッダの内容 (:mimetype:`text/plain` や
+    :mimetype:`application/pdf` など) です。ユーザが指定した他のデータ同様、
+    この値がアップロードされたファイルのコンテンツタイプを正確に表してい
+    ると信用してはなりません。アップロードされたファイルのコンテンツタイプ
+    が ``content-type`` ヘッダと一致しているか確かめておく必要があります。
+    「値は一応信用するが、検証し」てください。
+
+.. attribute:: UploadedFile.charset
+
+    ``content-type`` が :mimetype:`text/*` のときに、ブラウザが指定した
+    文字セット (``utf8`` など) です。「値は一応信用するが、検証する」よう
+    にしてください。
+
+.. attribute:: UploadedFile.temporary_file_path()
+
+    アップロードファイルがディスクに一時保存されているときにのみ使える
+    メソッドで、一時ファイルの完全なパスを返します。
 
 .. note::
 
     通常の Python のファイルオブジェクトと同じく、アップロードファイルをイ
     テレータとして扱うと、ファイルの内容を一行づつ読めます:
-    
+
     .. code-block:: python
-        
+
         for line in uploadedfile:
             do_something_with(line)
 
     しかし、標準の Python ファイルとは *違って* 、 :class:`UploadedFile` は
     改行文字として ``\n`` (いわゆる Unix形式) しか認識しません。 ``\n`` 以
-    外の改行で終端されたアップロードファイルを処理する必要があるのなら、ビュー
-    内で適切に処理する必要があります。
+    外の改行で終端されたアップロードファイルを処理する必要があるのなら、ビュ
+    ー内で適切に処理する必要があります。
 
 アップロードハンドラ
 =====================
@@ -238,8 +246,8 @@ Note that ``request.FILES`` will only contain data if the request method was
 ユーザがファイルをアップロードすると、 Django はファイルデータを 
 *アップロードハンドラ (upload handler)* と呼ばれるクラスに渡します。このク
 ラスはアップロードされたファイルデータを処理するためのクラスです。
-デフォルトのアップロードハンドラは :setting:`FILE_UPLOAD_HANDLERS` で以下のように
-定義されています::
+デフォルトのアップロードハンドラは :setting:`FILE_UPLOAD_HANDLERS` で以下の
+ように定義されています::
 
     ("django.core.files.uploadhandler.MemoryFileUploadHandler",
      "django.core.files.uploadhandler.TemporaryFileUploadHandler",)
@@ -259,8 +267,8 @@ Note that ``request.FILES`` will only contain data if the request method was
 ビューごとに別々のアップロード処理を行いたい場合があります。その場合、
 リクエストごとに ``request.upload_handlers`` を変更してアップロードハンドラ
 のチェインをオーバライドできます。デフォルトでは、
-``request.upload_handlers`` には :setting:`FILE_UPLOAD_HANDLERS` に指定したハンド
-ラのリストが入っていますが、これを他のリストに変更できます。
+``request.upload_handlers`` には :setting:`FILE_UPLOAD_HANDLERS` に指定した
+ハンドラのリストが入っていますが、これを他のリストに変更できます。
 
 
 例えば、 ``ProgressBarUploadHandler`` というハンドラを書いて、 Ajax 
@@ -290,6 +298,30 @@ Note that ``request.FILES`` will only contain data if the request method was
 
     従って、アップロードハンドラチェインはビュー処理の出来るだけ早い段階で
     変更しておくことになるでしょう。
+    また ``request.POST`` は通常与えられる
+    :class:`~django.middleware.csrf.CsrfViewMiddleware` によって許可されます。
+    これはビューの中でアップロードハンドラの変更をする為に
+    :func:`~django.views.decorators.csrf.csrf_exempt` を使う必要がある事を
+    意味します。
+    またそのとき :func:`~django.views.decorators.csrf.csrf_protect` を
+    リクエストの実際のプロセスの関数上で使う必要があります。
+    このときハンドラがCSRFチェックが行われる前にファイルアップロードを受け取
+    り始める可能性がある事に注意して下さい。
+    Example code:
+
+    .. code-block:: python
+
+        from django.views.decorators.csrf import csrf_exempt, csrf_protect
+
+        @csrf_exempt
+        def upload_file_view(request):
+            request.upload_handlers.insert(0, ProgressBarUploadHandler())
+            return _upload_file_view(request)
+
+        @csrf_protect
+        def _upload_file_view(request):
+            ... # Process request
+
 
 カスタムのアップロードハンドラを書く
 ---------------------------------------
@@ -304,33 +336,32 @@ Note that ``request.FILES`` will only contain data if the request method was
 カスタムのファイルアップロードハンドラは以下のメソッドを **必ず**
 定義せねばなりません:
 
-    ``FileUploadHandler.receive_data_chunk(self, raw_data, start)``
-        ファイルアップロード時に、データの「チャンク」を受け取ったときに呼
-        び出されます。
+``FileUploadHandler.receive_data_chunk(self, raw_data, start)``
+    ファイルアップロード時に、データの「チャンク」を受け取ったときに呼
+    び出されます。
 
-        ``raw_data`` はアップロードされたデータの入ったバイト文字列です。
+    ``raw_data`` はアップロードされたデータの入ったバイト文字列です。
 
-        ``start`` は ``raw_data`` チャンクのファイルデータ中の開始位置です。
+    ``start`` は ``raw_data`` チャンクのファイルデータ中の開始位置です。
 
-	このメソッドが返すデータは、次のアップロードハンドラの
-	``receive_data_chunk`` メソッドにフィードされます。この仕組みによっ
-	て、あるハンドラにデータを「フィルタ」させ、他のハンドラに入力でき
-	ます。
+    このメソッドが返すデータは、次のアップロードハンドラの
+    ``receive_data_chunk`` メソッドにフィードされます。この仕組みによって、
+    あるハンドラにデータを「フィルタ」させ、他のハンドラに入力できます。
 
-        ``receive_data_chunk`` で受け取ったデータを後続のハンドラに処理させ
-	たくない場合には ``None`` を返してください。このメソッドは、アップ
-	ロードされたデータを自分で処理して、他のハンドラにデータを保存させ
-	たくない場合に便利です。
+    ``receive_data_chunk`` で受け取ったデータを後続のハンドラに処理させたく
+    ない場合には ``None`` を返してください。このメソッドは、アップロードさ
+    れたデータを自分で処理して、他のハンドラにデータを保存させたくない場合に
+    便利です。
 
-        ``StopUpload`` や ``SkipFile`` といった例外を送出すると、アップロー
-        ド処理は中断し、アップロードファイルの処理を行いません。
+    ``StopUpload`` や ``SkipFile`` といった例外を送出すると、アップロード
+    処理は中断し、アップロードファイルの処理を行いません。
 
-    ``FileUploadHandler.file_complete(self, file_size)``
-        ファイルのアップロードが終了したときに呼び出されます。
+``FileUploadHandler.file_complete(self, file_size)``
+    ファイルのアップロードが終了したときに呼び出されます。
 
-        このハンドラは ``request.FILES`` に入れるための ``UploadedFile`` オ
-        ブジェクトを返さねばなりません。後続のアップロードハンドラに
-        ``UploadedFile`` を返させたい場合は ``None`` を返してください。
+    このハンドラは ``request.FILES`` に入れるための ``UploadedFile`` オブジ
+    ェクトを返さねばなりません。後続のアップロードハンドラに ``UploadedFile``
+    を返させたい場合は ``None`` を返してください。
 
 オプションのメソッド
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -338,63 +369,58 @@ Note that ``request.FILES`` will only contain data if the request method was
 カスタムのアップロードハンドラでは、以下のオプションのメソッドや属性を定義
 できます:
 
-    ``FileUploadHandler.chunk_size``
-        Django がアップロードファイルをメモリ上に読み込み、ハンドラに渡すと
-        きに使うチャンクのサイズです。バイト単位です。この属性は、
-	``FileUploadHandler.receive_data_chunk`` で読み込まれるチャンクのサ
-        イズ指定でもあります。
+``FileUploadHandler.chunk_size``
+    Django がアップロードファイルをメモリ上に読み込み、ハンドラに渡すときに
+    使うチャンクのサイズです。バイト単位です。この属性は、
+    ``FileUploadHandler.receive_data_chunk`` で読み込まれるチャンクのサイズ
+    指定でもあります。
 
-	パフォーマンスを最大化するには、チャンクのサイズを ``4`` の倍数とし、
-	2GB (2\ :sup:`31` バイト) 以下とすべきです。複数のハンドラがそれぞ
-	れ別々のチャンクサイズを提供していた場合、 Django は最小のチャンク
-	サイズを使います。
+    パフォーマンスを最大化するには、チャンクのサイズを ``4`` の倍数とし、
+    2GB (2\ :sup:`31` バイト) 以下とすべきです。複数のハンドラがそれぞれ別々
+    のチャンクサイズを提供していた場合、 Django は最小のチャンクサイズを使い
+    ます。
 
-        デフォルト値は 64*2\ :sup:`10` バイトまたは 64 KB です。
+    デフォルト値は 64*2\ :sup:`10` バイトまたは 64 KB です。
 
-    ``FileUploadHandler.new_file(self, field_name, file_name, content_type, content_length, charset)``
-        新たなファイルアップロードが開始されるときに呼び出されるコールバッ
-        クです。このメソッドは、アップロードハンドラがまだデータを受け取っ
-        ていない段階で呼び出されます。
+``FileUploadHandler.new_file(self, field_name, file_name, content_type, content_length, charset)``
+    新たなファイルアップロードが開始されるときに呼び出されるコールバックです。
+    このメソッドは、アップロードハンドラがまだデータを受け取っていない段階で
+    呼び出されます。
 
-        ``field_name`` はファイルの ``<input>`` フィールドの名前です。
+    ``field_name`` はファイルの ``<input>`` フィールドの名前です。
 
-        ``file_name`` は unicode のファイル名としてブラウザから提供された値
-        です。
+    ``file_name`` は unicode のファイル名としてブラウザから提供された値です。
 
-        ``content_type`` は ``'image/jpeg'`` のような MIME タイプで、ブラウ
-	ザから提供された値です。
+    ``content_type`` は ``'image/jpeg'`` のような MIME タイプで、ブラウザから
+    提供された値です。
 
-        ``content_length`` はファイルの長さで、ブラウザから提供された値です。
-	ブラウザがファイルサイズを提供しないこともあり、その場合は ``None``
-	です。
+    ``content_length`` はファイルの長さで、ブラウザから提供された値です。
+    ブラウザがファイルサイズを提供しないこともあり、その場合は ``None`` です。
 
-        ``charset`` は (``utf8`` のような) 文字セットで、ブラウザから提供さ
-        れた値です。 ``content_length`` と同様、指定されないこともあります。
+    ``charset`` は (``utf8`` のような) 文字セットで、ブラウザから提供さ
+    れた値です。 ``content_length`` と同様、指定されないこともあります。
 
-	他のハンドラにファイルを処理させたくない場合、このメソッドから
-	``StopFutureHandlers`` 例外を送出してもかまいません。
+    他のハンドラにファイルを処理させたくない場合、このメソッドから
+    ``StopFutureHandlers`` 例外を送出してもかまいません。
 
-    ``FileUploadHandler.upload_complete(self)``
-        ファイル全体のアップロードが終了したときに呼び出されるコールバック
-        です。
+``FileUploadHandler.upload_complete(self)``
+    ファイル全体のアップロードが終了したときに呼び出されるコールバックです。
 
-    ``FileUploadHandler.handle_raw_input(self, input_data, META, content_length, boundary, encoding)``
-        このメソッドを使うと、生の HTTP 入力の解析を完全にオーバライドでき
-        ます。
+``FileUploadHandler.handle_raw_input(self, input_data, META, content_length, boundary, encoding)``
+    このメソッドを使うと、生の HTTP 入力の解析を完全にオーバライドできます。
 
-        ``input_data`` は ``read()`` をサポートするファイルライクオブジェク
-        トです。
+    ``input_data`` は ``read()`` をサポートするファイルライクオブジェクトです。
 
-        ``META`` は ``request.META`` と同じです。
+    ``META`` は ``request.META`` と同じです。
 
-        ``content_length`` は ``input_data`` に入っているデータの長さです。
-	``input_data`` から ``content_length`` バイト以上を読み出そうとして
-	はなりません。
+    ``content_length`` は ``input_data`` に入っているデータの長さです。
+    ``input_data`` から ``content_length`` バイト以上を読み出そうとしてはなり
+    ません。
 
-        ``boundary`` はリクエストの MIME バウンダリです。
+    ``boundary`` はリクエストの MIME バウンダリです。
 
-        ``encoding`` はリクエストのエンコーディングです。
+    ``encoding`` はリクエストのエンコーディングです。
 
-        アップロードの処理を他のハンドラに継続させたい場合には ``None`` を、
-	リクエストの直接処理に適したデータ構造を新たに生成して返したければ
-	``(POST, FILES)`` のタプルを返してください。
+    アップロードの処理を他のハンドラに継続させたい場合には ``None`` を、
+    リクエストの直接処理に適したデータ構造を新たに生成して返したければ
+    ``(POST, FILES)`` のタプルを返してください。
