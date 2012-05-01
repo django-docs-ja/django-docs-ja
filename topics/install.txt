@@ -25,7 +25,7 @@ http://www.python.org から Python を取ってきましょう。 Linux や Mac
 .. admonition:: Jython で Django を動かす
 
     Jython_ (Java プラットフォームで動く Python 実装) を使っているなら、他
-    にもいくつかステップを踏む必要があります。詳しくは :doc:`howto-jython`
+    にもいくつかステップを踏む必要があります。詳しくは :doc:`/howto/jython`
     を参照してください。
 
 .. _jython: http://jython.org/
