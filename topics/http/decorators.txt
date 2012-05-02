@@ -1,0 +1,101 @@
+==================
+ビューのデコレータ
+==================
+
+.. module:: django.views.decorators.http
+
+Django には、HTTP の様々な機能をビューに適用するためのいくつかのデコレータ
+が用意されています。
+
+HTTP メソッドの制限
+===================
+
+:mod:`django.views.decorators.http` 内の以下のデコレータはリクエストメソッド
+によるアクセス制限に使用できます。このデコレータは、条件を満たしていない
+場合 :class:`django.http.HttpResponseNotAllowed` を返します。
+
+.. function:: require_http_methods(request_method_list)
+
+    特定のリクエストメソッドのみを許可するためのデコレータの利用方法です::
+
+        from django.views.decorators.http import require_http_methods
+
+        @require_http_methods(["GET", "POST"])
+        def my_view(request):
+            # I can assume now that only GET or POST requests make it this far
+            # ...
+            pass
+
+    リクエストメソッドは大文字にする必要があります。
+
+.. function:: require_GET()
+
+    ビューに GET メソッドのみを許可するデコレータです。
+
+.. function:: require_POST()
+
+    ビューに POST メソッドのみを許可するデコレータです。
+
+.. function:: require_safe()
+
+    .. versionadded:: 1.4
+
+    ビューに GET と HEAD メソッドのみを許可するデコレータです。
+    これらのメソッドは、リクエストされたリソースを取得する意外の目的で使用
+    すべきではないので、一般的に "safe" (安全) と見なされています。
+
+    .. note::
+        Django は、HEAD リクエストのレスポンスからヘッダは変更せず、
+        コンテンツを自動的に削除するため、GET リクエストのビューと同様に処理
+        できます。リンクチェッカー等のソフトウェアは、
+        HEAD リクエストに依存しているので、 ``require_GET`` よりも
+        ``require_safe`` を使うほうが良いでしょう。
+
+ビューの条件処理
+================
+
+:mod:`django.views.decorators.http` 内の以下のデコレータは特定のビューの
+キャッシュ制御に使用できます。
+
+.. function:: condition(etag_func=None, last_modified_func=None)
+
+.. function:: etag(etag_func)
+
+.. function:: last_modified(last_modified_func)
+
+    これらのデコレータは ``ETag`` や ``Last-Modified`` ヘッダの生成に
+    使用します。詳細については
+    :doc:`ビューの条件処理 </topics/conditional-view-processing>`
+    を参照してください。
+
+.. module:: django.views.decorators.gzip
+
+GZip 圧縮
+=========
+
+:mod:`django.views.decorators.gzip` 内のデコレータはビュー単位でコンテンツの
+圧縮を制御します。
+
+.. function:: gzip_page()
+
+    このデコレータは、ブラウザが gzip 圧縮に対応している場合に圧縮します。
+    ``Vary`` ヘッダをセットするので、
+    ``Accept-Encoding`` ヘッダに基づいてキャッシュに保管されます。
+
+.. module:: django.views.decorators.vary
+
+Vary ヘッダ
+===========
+
+:mod:`django.views.decorators.vary` 内のデコレータにより特定のリクエストヘッダ
+に基づきキャッシュを制御できます。
+
+.. function:: vary_on_cookie(func)
+
+.. function:: vary_on_headers(*headers)
+
+    ``Vary`` ヘッダは、キャッシュメカニズムがキャッシュキーを生成する際に考慮
+    すべきリクエストヘッダを定義します。
+
+    詳細については
+    :ref:`Vary ヘッダを使う <using-vary-headers>` を参照してください。

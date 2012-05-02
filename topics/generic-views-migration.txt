@@ -1,0 +1,152 @@
+==============================
+関数ベース汎用ビューを移行する
+==============================
+
+Django 1.2 のすべての :doc:`関数ベース汎用ビュー</ref/generic-views>` には類似
+する :doc:`クラスベース汎用ビュー</ref/class-based-views>` が、 Django 1.3 に
+あります。関数ベース汎用ビューで提供されている機能セットは、クラスベース版で
+再現可能です。
+
+移行の仕方
+==========
+
+汎用ビューを汎用クラスで置き換える
+----------------------------------
+
+現行使われている関数ベース汎用ビューは、そのクラスベース版に置き換えるべきです:
+
+====================================================  ====================================================
+旧 : 関数ベース汎用ビュー                             新 : クラスベース汎用ビュー
+====================================================  ====================================================
+``django.views.generic.simple.direct_to_template``    :class:`django.views.generic.base.TemplateView`
+``django.views.generic.simple.redirect_to``           :class:`django.views.generic.base.RedirectView`
+``django.views.generic.list_detail.object_list``      :class:`django.views.generic.list.ListView`
+``django.views.generic.list_detail.object_detail``    :class:`django.views.generic.detail.DetailView`
+``django.views.generic.create_update.create_object``  :class:`django.views.generic.edit.CreateView`
+``django.views.generic.create_update.update_object``  :class:`django.views.generic.edit.UpdateView`
+``django.views.generic.create_update.delete_object``  :class:`django.views.generic.edit.DeleteView`
+``django.views.generic.date_based.archive_index``     :class:`django.views.generic.dates.ArchiveIndexView`
+``django.views.generic.date_based.archive_year``      :class:`django.views.generic.dates.YearArchiveView`
+``django.views.generic.date_based.archive_month``     :class:`django.views.generic.dates.MonthArchiveView`
+``django.views.generic.date_based.archive_week``      :class:`django.views.generic.dates.WeekArchiveView`
+``django.views.generic.date_based.archive_day``       :class:`django.views.generic.dates.DayArchiveView`
+``django.views.generic.date_based.archive_today``     :class:`django.views.generic.dates.TodayArchiveView`
+``django.views.generic.date_based.object_detail``     :class:`django.views.generic.dates.DateDetailView`
+====================================================  ====================================================
+
+これを行うには、汎用ビュー関数への参照を、クラスベースビューを ``as_view()`` で
+インスタンス化したものに置き換えます。例えば、旧スタイルの
+``direct_to_template`` は::
+
+    ('^about/$', direct_to_template, {'template': 'about.html'})
+
+:class:`~django.views.generic.base.TemplateView` のインスタンスで置き換えられます::
+
+    ('^about/$', TemplateView.as_view(template_name='about.html'))
+
+``direct_to_template`` ビューの ``template`` 引数
+-------------------------------------------------
+
+``direct_to_template`` ビューの ``template`` 引数は ``template_name`` に改名され
+ました。他のビューとの一貫性を保つためです。
+
+詳細ビューの ``object_id`` 引数
+-------------------------------
+
+``object_detail`` ビューの ``object_id`` 引数は、
+:class:`~django.views.generic.detail.DetailView` の ``pk`` に改名されました。
+
+``template_object_name``
+------------------------
+
+``template_object_name`` は  ``context_object_name`` に改名されました。コンテ
+キストデータが、テンプレートのレンダリング以外の目的 (例えば JSON 出力の追加)
+に使えるからです。
+
+リストビューの ``_list`` サフィックス
+-------------------------------------
+
+関数ベースの :class:`ListView` でコンテキスト変数名は、 ``template_object_name``
+の値に ``_list`` サフィックスが追加されたものでした。クラスベースの ``ListView``
+では、 ``context_object_name`` の値がそのまま使用されています。デフォルトの
+コンテキストオブジェクト名を生成するときにのみ、 ``'_list'`` サフィックスが適応
+されます。
+
+``object_list`` ビューのコンテキストデータ
+------------------------------------------
+
+:class:`~django.views.generic.list.MultipleObjectMixin` に提供されるコンテキスト
+は、 ``object_list`` のそれとは全く異なります。ほとんどのページネーション関連の
+変数が、単一の ``page_obj`` オブジェクトに置き換えられています。以下の変数はもう
+提供されていません:
+
+* ``first_on_page``
+* ``has_next``
+* ``has_previous``
+* ``hits``
+* ``last_on_page``
+* ``next``
+* ``page_range``
+* ``page``
+* ``pages``
+* ``previous``
+* ``results_per_page``
+
+``extra_context``
+-----------------
+
+関数ベース汎用ビューは ``extra_context`` 引数を提供していました。これはレンダリ
+ング時に、コンテキストへ追加のオブジェクトを渡すために使われていました。
+
+クラスベースビューは ``extra_context`` 引数を提供しません。代わりにビューを継承
+して、 :meth:`get_context_data()` をオーバーライドします。例を挙げます::
+
+    class MyListView(ListView):
+        def get_context_data(self, **kwargs):
+            context = super(MyListView, self).get_context_data(**kwargs)
+            context.update({
+                'foo': 42,
+                'bar': 37
+            })
+            return context
+
+生成、更新ビューの ``post_save_redirect``
+-----------------------------------------
+
+生成、更新ビューの ``post_save_redirect`` は、
+:class:`~django.views.generic.edit.ModelFormMixin` で ``success_url`` に改名
+されました。
+
+``mimetype``
+------------
+
+いくつかの関数ベース汎用ビューは ``mimetype`` 引数を提供していました。これは
+レスポンスの MIME タイプを管理するために使われていました。
+
+クラスベースビューは ``mimetype`` 引数を提供しません。代わりにビューを継承して
+:meth:`TemplateResponseMixin.render_to_response()` をオーバーライドします。
+そして TemplateResponse コンストラクタの引数に渡します。例を挙げます::
+
+    class MyListView(ListView):
+        def render_to_response(self, context, **kwargs):
+            return super(MyListView, self).render_to_response(context,
+                            content_type='application/json', **kwargs)
+
+``context_processors``
+----------------------
+
+いくつかの関数ベース汎用ビューは ``context_processors`` 引数を提供していました。
+テンプレートのレンダリング時に使う、コンテキストプロセッサを指定できます。
+
+クラスベースビューは ``context_processors`` 引数を提供しません。代わりにビューを
+継承して :meth:`TemplateResponseMixin.render_to_response()` をオーバーライド
+します。そして、使いたいプロセッサをインスタンス化した、コンテキストインスタンス
+を渡します。例を挙げます::
+
+    class MyListView(ListView):
+        def render_to_response(self, context, **kwargs):
+            return super(MyListView, self).render_to_response(
+                    RequestContext(self.request,
+                                   context,
+                                   processors=[custom_processor]),
+                    **kwargs)
