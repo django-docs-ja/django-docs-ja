@@ -13,8 +13,8 @@ Python のインストール
 
 Django は Python の Web フレームワークなので、当然 Python が必要です。
 
-Djangoを動かすには2.5から2.7までのバージョンのPythonが必要です。（後方
-互換性の確保のため、Python3.0ではDjangoは動作しません。
+Djangoを動かすには2.5から2.7までのバージョンのPythonが必要です。
+（後方互換性の確保のため、Python3.0ではDjangoは動作しません。
 :doc:`the Django FAQ </faq/install>`
 を参考にすれば、Python3.0のサポートに関してもっと詳しい
 情報を手に入れることが出来ます。
@@ -37,7 +37,7 @@ http://www.python.org から Python を取ってきましょう。 Linux や Mac
     ``C:\Python27\`` にPythonがインストールがされているならば、追加しなけ
     ればいけない ``PATH`` は::
 
-           C:\Python27\;C:\Python27\Scripts;
+        C:\Python27\;C:\Python27\Scripts;
 
 
 Apache と mod_wsgi のインストール
@@ -64,16 +64,15 @@ mod_wsgi は mod_perl のようなもので、 Python を Apache の中に埋め
 Django は mod_wsgi をサポートする全てのバージョンの Apache で動作します。
 
 mod_wsgi をインストールした後の設定方法は
-:doc:`mod_wsgi で Django を動かす </howto/deployment/wsgi/modwsgi>` を参照してく
+:doc:`mod_wsgiでDjangoを動かす </howto/deployment/wsgi/modwsgi>` を参照してく
 ださい。
 
 何らかの理由で mod_wsgi を使えない場合でも心配はいりません Django を運用す
 る方法は他にもあります。お勧めの第二選択肢は、
 mod_wsgi の前身、 :doc:`uWSGI </howto/deployment/fastcgi>` です。これは
-`nginx`_.と一緒に動きます。もう一つは
- :doc:`FastCGI </howto/deployment/fastcgi>`
+`nginx`_.と一緒に動きます。もう一つは :doc:`FastCGI </howto/deployment/fastcgi>`
 これはApache以外のDjangoと一緒にサーバーを動かす完璧な方法です。付け加えれば、
-Django は WSGI_ 仕様(:pep:`3333`)に従っているので、他にも様々なサーバプラットフォームで
+Django は WSGI 仕様(:pep:`3333`)に従っているので、他にも様々なサーバプラットフォームで
 動作させられます。個々のプラットフォームにおけるインストール方法の説明は
 `サーバ構成に関する wiki ページ`_ を参照してください。
 
@@ -119,19 +118,8 @@ DjangoとORM機能は非公式なバックエンドによってよく考慮さ�
   て下さい。
 
 * MySQL を使う場合は、バージョン 1.2.1p2 以降の MySQLdb_ が必要です。
-  :ref:`MySQL バックエンド :ref:`notes for the MySQL
-  backend <mysql-notes>`. にまつわるデータベース固有の説
+  :ref:`MySQL　バックエンド<mysql-notes>` にまつわるデータベース固有の説
   明も読んでおいたほうがよいでしょう。
-
-* Python 2.3 または Python 2.4 で SQLite を使う場合、は pysqlite_ が必要で
-  す。バージョン 2.0.3 以上を使って下さい。 Python 2.5 は標準ライブラリに
-  SQLite のラッパモジュールが入っているので、特に追加でインストールするもの
-  はありません。
-
-* Oracle を使っているなら、 cx_Oracle_ が必要です。バージョン 4.3.1 以上を
-  使ってください。データベース固有の説明は :ref:`notes for the Oracle backend
-  <oracle-notes>`、サポートされているバージョンについての情報はオラクルと ``cx_Oracle`` .
-  の両方に載っています。
 
 * もし、サポートされていないサードパーティのバックエンドを用いる場合、
   更なる要望に応えるために提供されているドキュメントを読んでください。
@@ -191,13 +179,16 @@ Python egg を使って Django をインストールした場合、Django の ``
     コマンドを実行してみてください:
 
     .. code-block:: bash
-    
-      python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()"
- 
+
+        python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()"
+
     (このコマンドはPythonの対話プロンプトではなく、シェルプロンプトで実行してください。)
-LinuxディストリビューションのDebianは分割する ``site-packages`` というデ
-ィレクトリをユーザがインストールしたパッケージのために持っていて、
-Djangoをダウンロードしたtarballファイルからインストールするような時に使う。上にあげたコマンドはシステムの ``site-packages`` を渡します、ユーザのディレクトリは  ``/usr/local/lib/`` にあり、 ``/usr/lib/`` ではありません。
+
+    LinuxディストリビューションのDebianは分割する ``site-packages`` というデ
+    ィレクトリをユーザがインストールしたパッケージのために持っていて、
+    Djangoをダウンロードしたtarballファイルからインストールするような時に使う。
+    上にあげたコマンドはシステムの ``site-packages`` を渡します、ユーザのディレクトリは 
+    ``/usr/local/lib/`` にあり、 ``/usr/lib/`` ではありません。
 
 
 .. _install-django-code:
@@ -262,7 +253,7 @@ OS ごとのインストールパッケージによるインストール
 
 1. `ダウンロードページ`_ から、最新版の Django をダウンロードします。
 
-2. ダウンロードしたファイルを tar で展開します 
+2. ダウンロードしたファイルを tar で展開します。
    (例: ``tar xzvf Django-NNN.tar.gz``)。 Windows を使っているのなら、
    コマンドラインツール bsdtar_ を使うか、 7-zip_ のような GUI ベースの
    ツールを使います。
@@ -274,9 +265,8 @@ OS ごとのインストールパッケージによるインストール
    シェルプロンプトからコマンド ``sudo python setup.py install`` を入力
    します。 Windows を使っているのなら、管理者権限でコマンドプロンプト
    を起動して、コマンド ``setup.py install`` を実行します。
-       
-上のコマンドを実行すると、 Django は Python インストールディレクトリの
-``site-packages`` ディレクトリ下にインストールされます。
+   上のコマンドを実行すると、 Django は Python インストールディレクトリの
+   ``site-packages`` ディレクトリ下にインストールされます。
 
 .. _download page: https://www.djangoproject.com/download/
 .. _bsdtar: http://gnuwin32.sourceforge.net/packages/bsdtar.htm
@@ -288,7 +278,7 @@ OS ごとのインストールパッケージによるインストール
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. admonition:: Django の開発版を追いかける
-    
+
     最新版の Django を使うと決めたのなら、 `開発の進行状況`_ によく注意して、
     `以前のバージョンと互換性のない変更`_ がないか気をつけておく必要がある
     でしょう。これらのリンク先のページに注意していれば、使ってみたい新たな
@@ -320,16 +310,14 @@ Django のコードを更新して最新のバグフィクスや改良を適用�
 
    Subversionリポジトリのミラーはこんな風に取得できます
 
-
-
    .. code-block:: bash
 
        # Git (requires version 1.6.6 or later)
        git clone https://github.com/django/django.git
        # or (works with all versions)
        git clone git://github.com/django/django.git
-	   
-	   # Mercurial
+
+       # Mercurial
        hg clone https://bitbucket.org/django/django
 
    .. warning ::
@@ -338,10 +326,8 @@ Django のコードを更新して最新のバグフィクスや改良を適用�
         けれど、サービス上にホストされてから常に五分ごとにアップデートされている
         という保証がついているわけではないので注意してください。
 
-
-
 3. Python インタプリタが Django のコードをロードできるようにします。一番便利な
-   方法は、`modify Python's search path`_ することです。 ``.pth`` ファイルに
+   方法は、 `Python パスの修正`_ することです。 ``.pth`` ファイルに
    ``django-trunk`` ディレクトリへのフルpathをシステムの ``site-packages``
    ディレクトリまで追加することです。例えば Unixライクなシステムでは
 
@@ -349,27 +335,11 @@ Django のコードを更新して最新のバグフィクスや改良を適用�
        echo WORKING=DIR/django-trunk > SITE-PACKAGES-DIR/django.pth
 
 
-(上の作業では、使っているプラットフォームの ``site-packages``  ディレク
-トリに合わせて ``SITE-PACKAGES-DIR`` を書き換えてください。 
-``site-packages`` の場所の探し方は、「 ``site-packages`` はどこにあるの？」
-を参照してください)
-
-環境変数 ``PYTHONPATH`` に、 ``django-trunk`` ディレクトリを含めるよう設
-定する方法もあります。 Windows システムではシンボリックリンクがサポート
-されていないので、この方法が最も便利な方法です。 (Windows システムでは、
-環境変数は、 `コントロールパネルから`_ 設定します)。
-
-
-   .. admonition:: Apache と mod_python の設定は？
-
-     ``PYTHONPATH`` を設定する方法をとる場合、同じ値を Apache の設定ファ
-     イルにも入れておくのを忘れないでください。 Apache で PYTHONPATH を設定
-     するには、 ``PythonPath`` ディレクティブを使います。
-
-     もちろん、 Apache と mod_python を使った運用に関する情報はこれだけでは
-     ありません。 
-     :ref:`mod_python で Django を動かす <howto-deployment-modpython>` も参
-     照してください。
+   (上の作業では、使っているプラットフォームの ``site-packages``  ディレク
+   トリに合わせて ``SITE-PACKAGES-DIR`` を書き換えてください。 
+   ``site-packages`` の場所の探し方は、 
+   :ref:`site-packages はどこにあるの？ <finding-site-package>`
+   を参照してください)
 
 4. ``django_src/django/bin/django-admin.py`` を実行できるようにします。
    Unix系のシステムでは、例えば以下のようにして、 ``/usr/local/bin`` のよう
@@ -379,7 +349,7 @@ Django のコードを更新して最新のバグフィクスや改良を適用�
 
        ln -s WORKING-DIR/django-trunk/django/bin/django-admin.py /usr/local/bin
 
-   （上の行では、WORKING-DIRを新しい``django-trunk`` ディレクトリまでのフル
+   （上の行では、WORKING-DIRを新しい ``django-trunk`` ディレクトリまでのフル
    pathとマッチするように変えてください）
 
    これで、 ``django-admin.py`` とコマンド入力するだけで、どのディレクトリ
@@ -403,6 +373,6 @@ Mercurialでは ``hg pull --update`` を実行します
 .. _Subversion: http://subversion.tigris.org/
 .. _Git: http://git-scm.com/
 .. _Mercurial: http://mercurial.selenic.com/
-.. _`modify Python's search path`: http://docs.python.org/install/index.html#modifying-python-s-search-path
+.. _`Python パスの修正`: http://docs.python.org/install/index.html#modifying-python-s-search-path
 .. _`ダウンロードページ`: `download page`_
 .. _`コントロールパネルから`: http://www.microsoft.com/resources/documentation/windows/xp/all/proddocs/ja/sysdm_advancd_environmnt_addchange_variable.mspx
