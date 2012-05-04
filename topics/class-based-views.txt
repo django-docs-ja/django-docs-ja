@@ -1,0 +1,592 @@
+======================
+クラスベース汎用ビュー
+======================
+
+.. versionadded:: 1.3
+
+.. note::
+    Django 1.3 の前は、汎用ビューは関数として実装されていました。ここで述べる
+    クラスベース汎用ビューが採用されたので、関数ベース汎用ビューは廃止されま
+    した。
+
+    関数ベース汎用ビューの詳細は :doc:`トピックガイド </topics/generic-views>`
+    と :doc:`詳細リファレンス </ref/generic-views>` を参照してください。
+
+Web アプリケーションの作成は、同じパターンを何度も何度も繰り返し書くことに
+なるため、退屈なものです。 Django は、こうした単調作業をモデルやテンプレー
+トのレイヤで軽減しようとしていますが、 Web 開発者はビューレベルでも退屈さを
+感じています。
+
+Django の *汎用ビュー (generic views)* はその苦労を無くすために開発されま
+した。ビューの開発時に見かける、特定の共通するイディオムとパターンを汎用ビュー
+という形で抽象化しています。余計なコードを書かずによく定義されるビューを素早く
+実装できます。
+
+我々はオブジェクトのリスト表示などの、ありふれたタスクを知っています。 *任意の*
+オブジェクトをリスト表示するコードも提供できます。その上、リスト表示させたい
+モデルは URLconf に追加の引数として渡せます。
+
+Django の汎用ビューで以下のようなことができます:
+
+* 別のページへリダイレクトし、与えられたテンプレートをレンダリングするような、
+  よくある簡単なタスクの処理。
+
+* リストと単一オブジェクトの詳細ページを表示。カンファレンスを管理するアプリケー
+  ションを作っているなら、 ``TalkListView`` と ``RegisteredUserListView`` に
+  リストビューを、単一の発表に関するページに詳細ビューが使えます。
+
+* 日付ベースのオブジェクトを年/月/日のアーカイブで表示。詳細と最新ページで
+  関連付けて表示します。
+  `Django のブログ <http://www.djangoproject.com/weblog/>`_ の年月日ごとのアーカ
+  イブはこれで作られています。
+
+* 認証あり、または無しでユーザにオブジェクトを生成、更新、削除を許可。
+
+汎用ビューは開発者が遭遇する、よくあるタスクを果たすための簡単なインターフェース
+を提供しています。
+
+
+簡単な使い方
+============
+
+クラスベース汎用ビュー (と、 Django が提供する基底クラスを継承したすべてのクラス
+ベースビュー) は、 2 つの方法で設定します。サブクラス化か、引数を直接 URLconf に
+渡すとできます。
+
+クラスベースビューをサブクラス化するとき、引数 (``template_name`` など) やメソッ
+ド (``get_context_data`` など) をオバーライドします。そうして新しい値やメソッド
+を提供できます。ここで、テンプレート ``about.html`` を単に表示するビューを例と
+します。 Django の汎用ビュー :class:`~django.views.generic.base.TemplateView`
+をサブクラス化して、テンプレート名をオーバーライドするとできます::
+
+    # some_app/views.py
+    from django.views.generic import TemplateView
+
+    class AboutView(TemplateView):
+        template_name = "about.html"
+
+あとは、このビューを URLconf に追記するだけです。クラスベースビュー自体はクラス
+なので、 URLconf では代わりに ``as_view`` メソッドを使います。このメソッドが、
+クラスベースビューの入り口になります::
+
+    # urls.py
+    from django.conf.urls import patterns, url, include
+    from some_app.views import AboutView
+
+    urlpatterns = patterns('',
+        (r'^about/', AboutView.as_view()),
+    )
+
+クラスベースビューで簡単な引数を少し変えるだけなら、 ``as_view`` を呼び出す
+ときの引数としても渡せます::
+
+    from django.conf.urls import patterns, url, include
+    from django.views.generic import TemplateView
+
+    urlpatterns = patterns('',
+        (r'^about/', TemplateView.as_view(template_name="about.html")),
+    )
+
+同じオーバーライドのパターンが ``url`` 属性で使えます。
+``url`` は :class:`~django.views.generic.base.RedirectView` などのシンプルな
+汎用ビューで使われています。
+
+
+オブジェクトの汎用ビュー
+========================
+
+:class:`~django.views.generic.base.TemplateView` は確かに便利です。しかし、
+Django の汎用ビューが真価を発揮するのは、データベースの内容についてビューを
+提示するときです。驚くほど簡単にオブジェクトのリスト、詳細ビューを生成できる組み
+込みの汎用ビューが、 Django には少数付属しています。それらはよくあるタスクだから
+です。
+
+それでは汎用ビューの 1 つ、 "オブジェクトリスト (object list)" ビューを見てみま
+しょう。以下のようなモデルを使います::
+
+    # models.py
+    from django.db import models
+
+    class Publisher(models.Model):
+        name = models.CharField(max_length=30)
+        address = models.CharField(max_length=50)
+        city = models.CharField(max_length=60)
+        state_province = models.CharField(max_length=30)
+        country = models.CharField(max_length=50)
+        website = models.URLField()
+
+        class Meta:
+            ordering = ["-name"]
+
+        def __unicode__(self):
+            return self.name
+
+    class Book(models.Model):
+        title = models.CharField(max_length=100)
+        authors = models.ManyToManyField('Author')
+        publisher = models.ForeignKey(Publisher)
+        publication_date = models.DateField()
+
+全ての出版社 (publisher) のリストページを構築するため、以下のような URLconf を
+使います::
+
+    from django.conf.urls import patterns, url, include
+    from django.views.generic import ListView
+    from books.models import Publisher
+
+    urlpatterns = patterns('',
+        (r'^publishers/$', ListView.as_view(
+            model=Publisher,
+        )),
+    )
+
+書くべき Python コードは以上です。しかしテンプレートも書く必要があります。
+as_view への引数に ``template_name`` キーを含めることにより、どのテンプレートを
+使用するべきであるかビューに明示的に伝えることができます。明示的なテンプレートが
+ない場合 Django は、オブジェクトの名前からテンプレートを推論します。今回の場合、
+推論されるテンプレートは ``"books/publisher_list.html"`` となるでしょう。
+"books" という部分はモデルを定義しているアプリケーションの名前からきています。
+"publisher" は単にモデル名が lowercase になったものです。
+
+.. note::
+    ここで、 :setting:`TEMPLATE_LOADERS` の
+    :class:`django.template.loaders.app_directories.Loader` テンプレートローダを
+    有効にすると、テンプレートは以下の場所になります::
+
+        /path/to/project/books/templates/books/publisher_list.html
+
+.. highlightlang:: html+django
+
+このテンプレートは、 ``object_list`` 変数を含むコンテキストに対してレンダリング
+されます。 ``object_list`` はすべての出版社オブジェクトからなります。とても
+単純なテンプレートにするなら以下のようになるでしょう::
+
+    {% extends "base.html" %}
+
+    {% block content %}
+        <h2>Publishers</h2>
+        <ul>
+            {% for publisher in object_list %}
+                <li>{{ publisher.name }}</li>
+            {% endfor %}
+        </ul>
+    {% endblock %}
+
+本当にこれだけです。汎用ビューに渡される "info" 辞書を変更することで、クールな
+機能をすべて使用できます。汎用ビューとオプションの詳細は
+:doc:`generic views reference</ref/class-based-views>` に記されています。この
+ドキュメントの残りでは、よくある汎用ビューのカスタマイズ、拡張の方法を記して
+います。
+
+
+汎用ビューの拡張
+================
+
+.. highlightlang:: python
+
+疑いようも無く、汎用ビューを使用すると開発スピードは大幅に上がります。しかし多
+くのプロジェクトでは、汎用ビューでは物足りないときがあります。確かに、新米の
+Django 開発者からくる質問で典型的なのは、汎用ビューをより幅広い状況で扱うことに
+ついてです。
+
+1.3 リリース以前は単なるビュー関数で、困惑させるようなオプション群を備えていま
+した。これが汎用ビューを設計し直した理由の 1 つです。より良い汎用ビューの拡張
+方法は、汎用ビューをサブクラス化して、属性とメソッドをオーバーライドすること
+です。 URLconf で大量の設定を渡すことではありません。
+
+
+"フレンドリー" なテンプレートコンテキストを作る
+-----------------------------------------------
+
+サンプルの出版社リストテンプレートでは、 ``object_list`` 変数にすべての出版社
+オブジェクトが格納されています。現状でもうまく動作しますが、テンプレートの作者に
+とって "フレンドリー" ではありません。ここでテンプレート作者には、出版社オブジェ
+クトを扱うことだけを知らせるべきです。
+
+モデルオブジェクトを扱っているなら、これはもう完了しています。オブジェクトか
+クエリセットを扱っているとき、 Django は表示されているオブジェクトの
+冗長名(verbose name) を使って、コンテキストを追加します。オブジェクトのリストの
+場合は、複数の冗長名を使います。これはデフォルトの ``object_list`` 変数に加えて
+提供されますが、同じデータが含まれています。
+
+冗長名 (または複数の冗長名) がまだマッチしていない場合は、手動でコンテキスト変数
+の名前を設定することができます。汎用ビューの ``context_object_name`` 属性で使用
+するコンテキスト変数を明記できます。この例では簡単な変更だけで良いので、 URLconf
+でオーバーライドします:
+
+.. parsed-literal::
+
+    urlpatterns = patterns('',
+        (r'^publishers/$', ListView.as_view(
+            model=Publisher,
+            **context_object_name="publisher_list",**
+        )),
+    )
+
+便利な ``context_object_name`` を提供するのは常によいことです。テンプレートの
+デザインを担当する同僚は、あなたに感謝することでしょう。
+
+
+追加のコンテキスト
+------------------
+
+汎用ビューで提供されるもの以上に、追加の情報を提示したいときがあります。例えば、
+各出版社の詳細ページに、書籍 (book) の全リストを表示したいときなどです。汎用
+ビュー :class:`~django.views.generic.detail.DetailView` はコンテキストに出版社
+オブジェクトを提供していますが、テンプレートに追加の情報を与えることはできなさ
+そうです。
+
+しかしそうではありません。 :class:`~django.views.generic.detail.DetailView` を
+サブクラス化して、 ``get_context_data`` メソッドに独自の実装を提供できます。
+:class:`~django.views.generic.detail.DetailView` のデフォルトの実装では、
+表示されているオブジェクトをテンプレートに追加します。より多く表示するためには
+オーバーライドします::
+
+    from django.views.generic import DetailView
+    from books.models import Publisher, Book
+
+    class PublisherDetailView(DetailView):
+
+        context_object_name = "publisher"
+        model = Publisher
+
+        def get_context_data(self, **kwargs):
+            # コンテキストを取得するために、先に基底クラスの機能を呼び出します。
+            context = super(PublisherDetailView, self).get_context_data(**kwargs)
+            # 全書籍のクエリセットを追加します。
+            context['book_list'] = Book.objects.all()
+            return context
+
+
+オブジェクトのサブセットを表示
+------------------------------
+
+さて、ずっと使ってきた ``model`` 引数を詳しく見ていきましょう。 ``model`` 引数
+は、ビューが操作するデータベースモデルを指定します。単一のオブジェクト、もしくは
+複数のオブジェクトを操る、すべての汎用ビューで利用可能です。しかし ``model``
+引数以外にも、ビューで操作するオブジェクトを指定する方法があります。
+``queryset`` 引数を使って、オブジェクトのリストを指定することができます::
+
+    from django.views.generic import DetailView
+    from books.models import Publisher, Book
+
+    class PublisherDetailView(DetailView):
+
+        context_object_name = "publisher"
+        queryset = Publisher.objects.all()
+
+``model = Publisher`` という書き方は ``queryset = Publisher.objects.all()`` を
+単に略記したものです。 ``queryset`` はフィルタされたオブジェクトのリストを定義
+するものです。これを使ってビューにあるオブジェクトをより特定することができます。
+:class:`QuerySet` については :doc:`/topics/db/queries` を参照してください。
+より詳細には :doc:`クラスベースビューのリファレンス </ref/class-based-views>`
+を参照してください。
+
+簡単な例として、出版日 (publication date) 順の書籍のリストを最新のものから取得
+してみます::
+
+    urlpatterns = patterns('',
+        (r'^publishers/$', ListView.as_view(
+            queryset=Publisher.objects.all(),
+            context_object_name="publisher_list",
+        )),
+        (r'^books/$', ListView.as_view(
+            queryset=Book.objects.order_by("-publication_date"),
+            context_object_name="book_list",
+        )),
+    )
+
+
+かなり簡単な例ですが、うまく考えを表しています。もちろんオブジェクトを再整理する
+以上のことをしたいでしょう。特定の出版社についての書籍を渡したい場合も、同じテク
+ニックが使えます (URLconf で引数を渡すのでなくサブクラス化を使う例はこちら)::
+
+    from django.views.generic import ListView
+    from books.models import Book
+
+    class AcmeBookListView(ListView):
+
+        context_object_name = "book_list"
+        queryset = Book.objects.filter(publisher__name="Acme Publishing")
+        template_name = "books/acme_list.html"
+
+フィルタされた ``queryset`` 以外に、テンプレート名を指定しています。そうしな
+いと、汎用ビューは同じテンプレートを "ありきたりな" オブジェクトリストとして使い
+回します。たぶん期待とは違うことでしょう。
+
+これは、ある出版社固有の書籍を扱ううえでエレガントな方法ではありません。他の
+出版社のページを追加したいなら、 URLconf に手動で追記する必要があるからです。
+追記したうちいくつかは不当 (unreasonable) になるでしょう。詳しくは次のセクション
+で扱います。
+
+.. note::
+
+    ``/books/acme/`` をリクエストするの際に 404 になったときは、
+    'ACME Publishing' という名の Publisher が実際に存在するか確かめてください。
+    こういったケースに備えて、汎用ビューは ``allow_empty`` というパラメータを
+    持っています。詳細は
+    :doc:`クラスベースビューのリファレンス </ref/class-based-views>` を参照して
+    ください。
+
+
+動的フィルタリング
+------------------
+
+他によくあるニーズは、 URL のキーでオブジェクトをフィルタしてから、オブジェクト
+をリストページに渡すことです。すでに出版社名は URLconf にハードコードしてい
+ますが、ある任意の出版社について書籍をすべて表示するビューを書きたいなら、どう
+しますか？
+
+扱いやすいように、 ``ListView`` は
+:meth:`~django.views.generic.detail.ListView.get_queryset` メソッドを持って
+おり、オーバーライドできます。以前は ``queryset`` 属性の値を返すだけでしたが、
+今ではより多くのロジックを追加できます。
+
+クラスベースビューが呼ばれたとき、有用なオブジェクトは ``self`` に格納されていま
+す。これはこの仕事するうえで重要です。リクエスト (``self.request``) と同様に、
+URLconf でキャプチャされた、位置指定引数 (``self.args``) とキーワード引数
+(``self.kwargs``) を含みます。
+
+URLconf は以下のようになり、キャプチャ用の正規表現グループ (captured group)
+がつきます::
+
+    from books.views import PublisherBookListView
+
+    urlpatterns = patterns('',
+        (r'^books/(\w+)/$', PublisherBookListView.as_view()),
+    )
+
+次は ``PublisherBookListView`` ビュー自身を書きます::
+
+    from django.shortcuts import get_object_or_404
+    from django.views.generic import ListView
+    from books.models import Book, Publisher
+
+    class PublisherBookListView(ListView):
+
+        context_object_name = "book_list"
+        template_name = "books/books_by_publisher.html"
+
+        def get_queryset(self):
+            publisher = get_object_or_404(Publisher, name__iexact=self.args[0])
+            return Book.objects.filter(publisher=publisher)
+
+見ての通り、クエリセットの選別 (selection) をするロジックを、とても簡単に追加
+できます。 ``self.request.user`` を使ってカレントユーザをフィルタするなど、他の
+複雑なロジックも追加できます。
+
+コンテキストにも同時に、出版社オブジェクトを追加できます。なのでテンプレートで
+使えます::
+
+    class PublisherBookListView(ListView):
+
+        context_object_name = "book_list"
+        template_name = "books/books_by_publisher.html"
+
+        def get_queryset(self):
+            self.publisher = get_object_or_404(Publisher, name__iexact=self.args[0])
+            return Book.objects.filter(publisher=self.publisher)
+
+        def get_context_data(self, **kwargs):
+            # Call the base implementation first to get a context
+            context = super(PublisherBookListView, self).get_context_data(**kwargs)
+            # Add in the publisher
+            context['publisher'] = self.publisher
+            return context
+
+追加の処理をさせる
+------------------
+
+最後の共通パターンは、汎用ビューを呼び出す前か後に、追加の処理をさせることです。
+
+``Author`` オブジェクト中に ``last_accessed`` フィールドがあるとします。著者
+(author) オブジェクトが最後に問い合わせされた時刻を記録します::
+
+    # models.py
+
+    class Author(models.Model):
+        salutation = models.CharField(max_length=10)
+        first_name = models.CharField(max_length=30)
+        last_name = models.CharField(max_length=40)
+        email = models.EmailField()
+        headshot = models.ImageField(upload_to='/tmp')
+        last_accessed = models.DateTimeField()
+
+``DetailView`` クラスはもちろん、このフィールドについては知りません。
+しかし再び、このフィールドの更新を維持するためのカスタムビューを書けます。
+
+初めに、カスタムビューを指定するために URLconf に著者の詳細に関する 1 行を追加
+します:
+
+.. parsed-literal::
+
+    from books.views import AuthorDetailView
+
+    urlpatterns = patterns('',
+        #...
+        **(r'^authors/(?P<pk>\\d+)/$', AuthorDetailView.as_view()),**
+    )
+
+ここで新しいビューを書きます。 ``get_object`` はオブジェクトを取得するメソッド
+なので、これをオーバーライドして呼び出しをラップします::
+
+    import datetime
+    from books.models import Author
+    from django.views.generic import DetailView
+    from django.shortcuts import get_object_or_404
+
+    class AuthorDetailView(DetailView):
+
+        queryset = Author.objects.all()
+
+        def get_object(self):
+            # 基底クラスを呼び出す
+            object = super(AuthorDetailView, self).get_object()
+            # 最終アクセス日時を記録する
+            object.last_accessed = datetime.datetime.now()
+            object.save()
+            # オブジェクトを返す
+            return object
+
+.. note::
+
+    実際には、このコードには ``books/author_detail.html`` テンプレートが必要
+    です。
+
+.. note::
+
+    ここで URLconf は ``pk`` という正規表現グループを使います。この名前は
+    ``DetailView`` がクエリセットをフィルタするときに使う、プライマリキーの値に
+    なるデフォルト名です。
+
+    これを変更したいなら ``self.kwargs`` に新しい名前のパラメーターを追加して、
+    ``self.queryset`` の ``get()`` でそれを使って呼び出す必要があります。
+
+HTML 以上のこと
+---------------
+
+今のところ、レスポンスを生成するためのテンプレートレンダリングに焦点をあててい
+ました。しかし、これが汎用ビューにできることのすべてではありません。
+
+どの汎用ビューも一連の Mixin から構成されています。それぞれの Mixin はビュー全体
+の一部を提供します。そのうち例えば
+:class:`~django.views.generic.base.TemplateResponseMixin` はテンプレートを使って
+HTML レスポンスをレンダリングするよう設計されています。様々な動作をする独自の
+Mixin を書くこともできます。
+
+例えば、単純な JSON Mixin は以下のようになるでしょう::
+
+    from django import http
+    from django.utils import simplejson as json
+
+    class JSONResponseMixin(object):
+        def render_to_response(self, context):
+            "Returns a JSON response containing 'context' as payload"
+            return self.get_json_response(self.convert_context_to_json(context))
+
+        def get_json_response(self, content, **httpresponse_kwargs):
+            "`HttpResponse` オブジェクトのコンストラクタ"
+            return http.HttpResponse(content,
+                                     content_type='application/json',
+                                     **httpresponse_kwargs)
+
+        def convert_context_to_json(self, context):
+            "コンテクスト辞書を JSON オブジェクトに変換"
+            # Note: これは *非常に (EXTREMELY)* 単純です。実際には、任意のオブジ
+            # ェクト (Django のモデルインスタンスやクエリセットなど) を JSON に
+            # シリアライズするには、より複雑な処理をする必要があります。
+            return json.dumps(context)
+
+これで、 JSON を返す :class:`~django.views.generic.detail.DetailView` を、
+:class:`JSONResponseMixin` と
+:class:`~django.views.generic.detail.BaseDetailView` を Mixin して構築できます。
+(テンプレートレンダリングの前に :class:`~django.views.generic.detail.DetailView`
+が Mixin されています)::
+
+    class JSONDetailView(JSONResponseMixin, BaseDetailView):
+        pass
+
+その後このビューは、他の :class:`~django.views.generic.detail.DetailView` と
+全く同じようにデプロイできます。 (レスポンスのフォーマットを除いて)
+
+さらに大胆なことをするなら、 HTML 、 JSON コンテンツの *両方を* 返せる
+:class:`~django.views.generic.detail.DetailView` サブクラスを作ることもでき
+ます。これはクエリ引数や HTTP ヘッダなど、いくつかの HTTP リクエストのプロパティ
+に依存します。 :class:`JSONResponseMixin` と
+:class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin` を
+合わせて、ユーザがリクエストしたレスポンスタイプに応じて、該当するサブクラスに
+任せるために :func:`render_to_response()` をオーバーライドします::
+
+    class HybridDetailView(JSONResponseMixin, SingleObjectTemplateResponseMixin, BaseDetailView):
+        def render_to_response(self, context):
+            # Look for a 'format=json' GET argument
+            if self.request.GET.get('format','html') == 'json':
+                return JSONResponseMixin.render_to_response(self, context)
+            else:
+                return SingleObjectTemplateResponseMixin.render_to_response(self, context)
+
+:class:`JSONResponseMixin` と
+:class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin` の
+``render_to_response`` を、ローカルのそれでオーバーライドすることで、Python は
+メソッドのオーバーライドを解決します。
+
+クラスベースビューのデコレート
+==============================
+
+.. highlightlang:: python
+
+クラスベースビューの拡張には、 Mixin 以外を使う方法があります。デコレータを
+使う方法です。
+
+URLconf のデコレート
+--------------------
+
+クラスベースビューをデコレートする 1 番単純な方法は、
+:meth:`~django.views.generic.base.View.as_view` メソッドの結果をデコレートする
+ことです。ビューをデプロイした URLconf に置くのが 1 番楽でしょう::
+
+    from django.contrib.auth.decorators import login_required, permission_required
+    from django.views.generic import TemplateView
+
+    from .views import VoteView
+
+    urlpatterns = patterns('',
+        (r'^about/', login_required(TemplateView.as_view(template_name="secret.html"))),
+        (r'^vote/', permission_required('polls.can_vote')(VoteView.as_view())),
+    )
+
+このアプローチでは、インスタンスごとにデコレータを適用します。ビューのインス
+タンス全てをデコレートしたいなら、他のアプローチが必要です。
+
+.. _decorating-class-based-views:
+
+クラスのデコレート
+------------------
+
+クラスベースビューの全インスタンスをデコレートするには、クラスの定義そのものを
+デコレートします。クラスの :meth:`~django.views.generic.base.View.dispatch`
+メソッドにデコレータを適用することでできます。
+
+クラスメソッドは単なる関数とは違います。メソッドに関数デコレータを適用することは
+できません。関数デコレータをメソッドデコレータに変換する必要があります。
+``method_decorator`` デコレータは関数デコレータをメソッドデコレータに変換する
+ので、これをインスタンスメソッドで使えます。例を以下に示します::
+
+    from django.contrib.auth.decorators import login_required
+    from django.utils.decorators import method_decorator
+    from django.views.generic import TemplateView
+
+    class ProtectedView(TemplateView):
+        template_name = 'secret.html'
+
+        @method_decorator(login_required)
+        def dispatch(self, *args, **kwargs):
+            return super(ProtectedView, self).dispatch(*args, **kwargs)
+
+この例で、 ``ProtectedView`` の全インスタンスはログインが必要になります。
+
+.. note::
+
+    ``method_decorator`` は ``*args`` と ``**kwargs`` をパラメータとして、デコレ
+    ートされたクラスメソッドに渡します。メソッドが互換性を持つパラメータのセット
+    を許可していない場合は、 ``TypeError`` 例外が送出されます。
