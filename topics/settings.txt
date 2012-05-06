@@ -76,7 +76,7 @@ django-admin.py ユーティリティ
     os.environ['DJANGO_SETTINGS_MODULE'] = 'mysite.settings'   
 
 より詳しい情報やその他Django WSGIアプリケーションに一般的な事項に関しては
- :ref:`mod_wsgiでDjango を使うためのドキュメント
+:ref:`mod_wsgiでDjango を使うためのドキュメント
 </howto/deployment/wsgi/modwsgi>` を参照してください。
 
 デフォルトの設定
