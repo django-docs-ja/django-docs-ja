@@ -4,7 +4,7 @@
 URL ディスパッチャ
 ==================
 
-:revision-up-to: 11321 (1.1) unfinished
+:revision-up-to: 17812 (1.4)
 
 .. module:: django.core.urlresolvers
 
@@ -30,6 +30,12 @@ configuration) と呼びならわされている Python モジュールを作成
 から Python のコールバック関数 (自作のビュー) へのマッピングが入っているだ
 けです。
 
+.. versionadded:: 1.4
+    Django はまた、 URL が稼働している言語から翻訳することを許可しています。
+    このプロセスは、
+    :ref:`internationalization docs <url-internationalization>` で、説明
+    しています。
+
 このマッピングは短くもできますし、必要なだけ長くもできます。他のマッピング
 も参照できます。また、 pure Python コードなので、動的に生成できます。
 
@@ -41,29 +47,34 @@ Django のリクエスト処理
 ユーザが Django で作られたサイト上のページをリクエストした時に、どの Python
 コードが実行されるかは以下のアルゴリズムで決定されます:
 
-    1. まず、Django は、どのモジュールをルート URLconf として使うか決定しま
-       す。もともとは、この値は ``ROOT_URLCONF`` に設定されています。ただし、
-       ``HttpRequest`` オブジェクトに ``urlconf`` という属性が設定されてい
-       た場合、その値を ``ROOT_URLCONF`` の代わりに使います。
+1. まず、Django は、どのモジュールをルート URLconf として使うか決定しま
+   す。もともとは、この値は ``ROOT_URLCONF`` に設定されています。ただし、
+   ``HttpRequest`` オブジェクトに ``urlconf`` という属性が設定されてい
+   た場合( :ref:`request processing <request-middleware>` で設定されます)
+   、その値を ``ROOT_URLCONF`` の代わりに使います。
 
-    2. Django は上記の Python モジュールをロードして、 ``urlpatterns`` とい
-       う名前の変数を探します。この変数の値は Python のリストで、
-       ``django.conf.urls.defaults.patterns()`` が返すのと同じ形式です。
+2. Django は上記の Python モジュールをロードして、 ``urlpatterns`` とい
+   う名前の変数を探します。この変数の値は Python のリストで、
+   :func:`django.conf.urls.patterns` が返すのと同じ形式です。
 
-    3. Django は URL パターンを順に調べて、リクエスト URL に最初にマッチし
-       たところで止まります。
+3. Django は URL パターンを順に調べて、リクエスト URL に最初にマッチし
+   たところで止まります。
 
-    4. 何らかの正規表現にマッチしたら、 Django はマッピングされているビュー
-       を import して呼び出します。ビューは単純な Python 関数です。ビュー関
-       数の第一引数には :class:`~django.http.HttpRequest` が、それ以降の引
-       数には正規表現でキャプチャした値が渡されます。
+4. 何らかの正規表現にマッチしたら、 Django はマッピングされているビュー
+   を import して呼び出します。ビューは単純な Python 関数です。ビュー関
+   数の第一引数には :class:`~django.http.HttpRequest` が、それ以降の引
+   数には正規表現でキャプチャした値が渡されます。
+
+5. もし、正規表現が何にもマッチしなかったり、パターンマッチングプロセスの
+   途中のどこかで例外が発生した場合、 Django は、適切なエラーハンドリング
+   ビューを呼び出します。 ``エラーハンドリング`` を見てください。
 
 凡例
 ====
 
 URLconf の一例を示します::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
 
     urlpatterns = patterns('',
         (r'^articles/2003/$', 'news.views.special_case_2003'),
@@ -74,41 +85,38 @@ URLconf の一例を示します::
 
 注意:
 
-    * ``from django.conf.urls.defaults import *`` によって、 ``patterns()``
-      関数を使えるようになります。
+* URL 中の値を取り出すには、単に丸括弧で囲むだけです。
 
-    * URL 中の値を取り出すには、単に丸括弧で囲むだけです。
+* 先頭のスラッシュは必要ありません。全ての URL に共通だからです。例えば、
+  ``^/articles`` ではなく ``^articles`` にします。
 
-    * 先頭のスラッシュは必要ありません。全ての URL に共通だからです。例えば、
-      ``^/articles`` ではなく ``^articles`` にします。
-
-    * 正規表現文字列のリテラルの前に ``'r'`` があります。これは必須ではあり
-      ませんが、付けた方がよいでしょう。 ``r`` は、"raw" 文字列、すなわち文
-      字列中のいかなる文字もエスケープしないことを表します。 
-      `Dive Into Python's explanation`_ も参考にしてください。
+* 正規表現文字列のリテラルの前に ``'r'`` があります。これは必須ではあり
+  ませんが、付けた方がよいでしょう。 ``r`` は、"raw" 文字列、すなわち文
+  字列中のいかなる文字もエスケープしないことを表します。 
+  `Dive Into Python's explanation`_ も参考にしてください。
 
 例のリクエストを挙げて説明しましょう:
 
-    * ``/articles/2005/03/`` へのリクエストは 3 つめのエントリにマッチしま
-      す。 Django は ``news.views.month_archive(request, '2005', '03')`` を
-      呼び出します。
+* ``/articles/2005/03/`` へのリクエストは 3 つめのエントリにマッチしま
+  す。 Django は ``news.views.month_archive(request, '2005', '03')`` を
+  呼び出します。
 
-    * ``/articles/2005/3/`` はどの UrL パターンにもマッチしません。リストの
-      3 つめのエントリでは月番号が 2 桁になるよう要求しているからです。
+* ``/articles/2005/3/`` はどの UrL パターンにもマッチしません。リストの
+  3 つめのエントリでは月番号が 2 桁になるよう要求しているからです。
 
-    * ``/articles/2003/`` はリストの 2 番目ではなく、最初のパターンにマッチ
-      します。パターンは順番に調べられ、最初にテストにパスしたものが使われ
-      るからです。この法則を、特別扱いしたい URL の処理に使ってもかまいませ
-      ん。
+* ``/articles/2003/`` はリストの 2 番目ではなく、最初のパターンにマッチ
+  します。パターンは順番に調べられ、最初にテストにパスしたものが使われ
+  るからです。この法則を、特別扱いしたい URL の処理に使ってもかまいませ
+  ん。
 
-    * ``/articles/2003`` は URL がスラッシュで終わっていないので、どのパター
-      ンにもマッチしません。
+* ``/articles/2003`` は URL がスラッシュで終わっていないので、どのパター
+  ンにもマッチしません。
 
-    * ``/articles/2003/03/3/`` は最後のパターンにマッチします。 Django は
-      ``news.views.article_detail(request, '2003', '03', '3')`` を呼び出し
-      ます。
+* ``/articles/2003/03/3/`` は最後のパターンにマッチします。 Django は
+  ``news.views.article_detail(request, '2003', '03', '3')`` を呼び出し
+  ます。
 
-.. _Dive Into Python's explanation: http://diveintopython.org/regular_expressions/street_addresses.html#re.matching.2.3
+.. _Dive Into Python's explanation: http://diveintopython.net/regular_expressions/street_addresses.html#re.matching.2.3
 
 名前つきグループ
 ================
@@ -128,26 +136,26 @@ Python の正規表現では、名前つき正規表現グループは、 ``name
         (r'^articles/2003/$', 'news.views.special_case_2003'),
         (r'^articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
         (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'news.views.month_archive'),
-        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'news.views.article_detail'),
+        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d{2})/$', 'news.views.article_detail'),
     )
 
 この URLconf は前の例と全く同じ機能を実現しますが、一つだけはっきり違うのは、
 取り出した値を固定引数ではなくキーワード引数としてビュー関数に渡すという点
 です。例えば:
 
-    * ``/articles/2005/03/`` へのリクエストは、
-      ``news.views.month_archive(request, year='2005', month='03')`` ではな
-      く ``news.views.month_archive(request, '2005', '03')`` を呼び出します。
+* ``/articles/2005/03/`` へのリクエストは、
+  ``news.views.month_archive(request, year='2005', month='03')`` ではなく
+  ``news.views.month_archive(request, '2005', '03')`` を呼び出します。
 
-    * ``/articles/2003/03/3/`` へのリクエストは
-      ``news.views.article_detail(request, year='2003', month='03', day='3')``
-      を呼び出します。
+* ``/articles/2003/03/3/`` へのリクエストは
+  ``news.views.article_detail(request, year='2003', month='03', day='3')``
+  を呼び出します。
 
 実際には、このような名前つきグループを使うと URLconf が少しだけ明示的な書き
 方になり、引数の順番に起因するバグを起こしにくくなります -- それに、自作ビュー
 の関数定義で引数順を変更できます。いうまでもなく、こうした恩恵は簡潔さの犠
-牲の上に成り立っています: 開発者の中には、名前つきグループの構文が醜くて冗
-長だと感じる人もいます。
+牲の上に成り立っています: 開発者の中には、名前つきグループの構文が醜くて冗長
+だと感じる人もいます。
 
 マッチ/グルーピングのメカニズム
 -------------------------------
@@ -180,13 +188,25 @@ URLconf はリクエストメソッドを調べません。換言すれば、同
 ``urlpatterns`` の書き方
 =========================
 
-``urlpatterns`` は ``django.conf.urls.defaults.patterns()`` の返す形式の
+``urlpatterns`` は :func:`django.conf.urls.patterns`` の返す形式の
 Python リストになります。 ``urlpatterns`` 変数の値を作るときには、常に 
 ``patterns()`` を使うようにして下さい。
 
-慣習的に、URLconf の先頭には ``from django.conf.urls.defaults import *`` を
-書くことになっています。これによって、以下のようなオブジェクトにアクセスで
-きるようになります:
+``django.conf.urls`` 汎用的な関数
+=================================
+
+.. module:: django.conf.urls
+
+.. deprecated:: 1.4
+    Django 1.4 の関数 ``patterns``, ``url``, ``include``
+    に加えて ``handler*`` は
+    ``django.conf.urls`` モジュールの中にあり、以下で説明さ
+    れているシンボル群です。
+
+    Django 1.3 までは、これらは ``django.conf.urls.defaults``
+    の中に位置していました。まだ、以前のモジュールからインポート
+    することが出来ますが、 Django 1.6 でそれが出来なくなります。
+
 
 patterns
 --------
@@ -230,8 +250,6 @@ patterns
 url
 ---
 
-.. versionadded:: 1.0
-
 .. function:: url(regex, view, kwargs=None, name=None, prefix='')
 
 ``url()`` 関数は、タプルの代わりとして ``patterns()`` の引数に指定できます。
@@ -254,43 +272,81 @@ url
 ``prefix`` パラメタは ``patterns()`` の最初の引数と同じ意味を持ち、
 ``view`` を文字列形式で指定する場合にしか使われません。
 
+include
+-------
+
+.. function:: include(<module or pattern_list>)
+
+関数は現在の URLconf で "included" しておくべき
+Python のフル import パス を他の URLconf モジュールへと
+取りこみます。
+
+:func:`include` も引数としてイテレート可能です。これは、
+URL パターンを返します。
+
+`他の URLconf を取り込む`_ を見てください。
+
+エラーハンドリング
+==================
+
+Django が、リクエストされた URL にマッチする正規表現を
+見つけられなかったとき、または例外が発生したとき、 Django
+は error-handling view　を発生させます。ビューはルートの
+URlconf に設定された三つの変数で、指定されたケースで使用
+されます。これらの変数の設定は、他のどの URLconf にも影響を
+与えません。
+
+:ref:`エラービューのカスタマイズ <customizing-error-views>`
+を参照してください、もっと詳しいことが載っています。
+
+handler403
+----------
+
+.. data:: handler403
+
+呼ぶことができます、またはユーザがリソースにアクセスするのに
+必要なパーミッション（permission 権限）を持っていない場合に、
+ビュー関数への完全な Python の import パスが入った文字列です。
+
+通常、これは ``'django.views.defaults.permission_denied'``
+これのデフォルト値は満足させるでしょう。
+
+:ref:`403 （閲覧が禁止されています　ビュー） <http_forbidden_view>`
+にもっと沢山の情報が載っています。
+
+.. versionadded:: 1.4
+    ``handler403`` は Django 1.4の新しいものです
+
 handler404
 ----------
 
 .. data:: handler404
 
-マッチする URL パターンがない場合に呼び出されるビュー関数への、完全な
-Python の import パスが入った文字列です。
+呼び出せるか、マッチする URL パターンがない場合に呼び出されるビュー関数への、
+完全な Python の import パスが入った文字列です。
 
-デフォルト値は、 ``'django.views.defaults.page_not_found'`` です。普通はこ
-のデフォルト値で十分のはずです。
+デフォルト値は、 ``'django.views.defaults.page_not_found'`` です。
+普通はこのデフォルト値で十分のはずです。
+
+.. versionchanged:: 1.2
+    前のバージョンの Django では、 import パスが入った文字列のみを、受け取れ
+    ます。
 
 handler500
 ----------
 
 .. data:: handler500
 
-サーバエラーが生じた場合に呼び出されるビュー関数への、完全な Python の
-import パスが入った文字列です。サーバエラーはビュー関数のコード中で実行時エ
-ラーが生じたときに起きます。
+呼び出しか、サーバエラーが生じた場合に呼び出されるビュー関数への、
+完全な Python の import パスが入った文字列です。
+サーバエラーはビュー関数のコード中で実行時エラーが生じたときに起きます。
 
-デフォルト値は、 ``'django.views.defaults.page_not_found'`` です。普通はこ
-のデフォルト値で十分のはずです。
+デフォルト値は、 ``'django.views.defaults.page_not_found'`` です。
+普通はこのデフォルト値で十分のはずです。
 
-include
--------
-
-.. function:: include(<module or pattern_list>)
-
-現在の URLconf に「取り込む」別の URLconf への完全な Python の import パス
-が入った文字列です。
-
-.. versionadded:: 1.1
-
-:func:`include` also accepts as an argument an iterable that returns URL
-patterns.
-
-後述の「 `他の URLconf を取り込む`_ 」を参照してください。
+.. versionchanged:: 1.2
+    前のバージョンの Django では、 import パスが入った文字列のみを、受け取れ
+    ます。
 
 URL 中のテキストを取り出す際の注意
 ==================================
@@ -335,26 +391,26 @@ Python 文字列型になります。例えば、下のような URLconf の行:
 コードを繰り返し書かなくてもよいように、 ``patterns()`` 呼び出しの中で共通
 のプレフィクスを指定できます。
 
-:ref:`Django の概要 <intro-overview>` からとってきた URLconf の例を示します::
+:doc:`Django の概要 </intro/overview>` からとってきた URLconf の例を示します::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
 
     urlpatterns = patterns('',
-        (r'^articles/(\d{4})/$', 'mysite.news.views.year_archive'),
-        (r'^articles/(\d{4})/(\d{2})/$', 'mysite.news.views.month_archive'),
-        (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'mysite.news.views.article_detail'),
+        (r'^articles/(\d{4})/$', 'news.views.year_archive'),
+        (r'^articles/(\d{4})/(\d{2})/$', 'news.views.month_archive'),
+        (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'news.views.article_detail'),
     )
 
-この例では、各ビューには共通のプレフィクス、 ``'mysite.news.views'`` があり
+この例では、各ビューには共通のプレフィクス、 ``'news.views'`` があり
 ます。 ``urlpatterns`` の各エントリに繰り返し入力する代わりに、
 ``patterns()`` 関数の最初の引数にプレフィクスを指定して、各ビュー関数に適用
 できます。
 
 このことを念頭に置いて、上記の例をもっと簡潔に書くと以下のようになります::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
 
-    urlpatterns = patterns('mysite.news.views',
+    urlpatterns = patterns('news.views',
         (r'^articles/(\d{4})/$', 'year_archive'),
         (r'^articles/(\d{4})/(\d{2})/$', 'month_archive'),
         (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'article_detail'),
@@ -374,7 +430,7 @@ Django はドットを自動的に入れます。
 
 古い書き方::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
 
     urlpatterns = patterns('',
         (r'^$', 'django.views.generic.date_based.archive_index'),
@@ -384,7 +440,7 @@ Django はドットを自動的に入れます。
 
 は、以下のような書き方に改められます::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
 
     urlpatterns = patterns('django.views.generic.date_based',
         (r'^$', 'archive_index'),
@@ -402,15 +458,18 @@ Django はドットを自動的に入れます。
 この操作は、本質的には一連の URL を他の URLconf の下に「すげかえる(root)」
 操作になります。
 
-例として、 `Django ウェブサイト`_ 自体の URLconf を示します。この URLconf
+例として、 `Django ウェブサイト`_ 自体の URLconf の例外を示します。この URLconf
 は他の URLconf をいくつも取り込んでいます::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
 
     urlpatterns = patterns('',
-        (r'^weblog/',        include('django_website.apps.blog.urls.blog')),
-        (r'^documentation/', include('django_website.apps.docs.urls.docs')),
-        (r'^comments/',      include('django.contrib.comments.urls')),
+        # ... snip ...
+        (r'^comments/', include('django.contrib.comments.urls')),
+        (r'^community/', include('django_website.aggregator.urls')),
+        (r'^contact/', include('django_website.contact.urls')),
+        (r'^r/', include('django.conf.urls.shortcut')),
+        # ... snip ...
     )
 
 この例の正規表現が、 ``$`` (行末にマッチする文字) を使っておらず、末尾にスラッ
@@ -418,17 +477,15 @@ Django はドットを自動的に入れます。
 URL からマッチした部分を取り去り、残りの文字列を include された URLconf に
 送って続きの処理を行わせます。
 
-.. versionadded:: 1.1
+URLconf を Python モジュールで `include`_ 引数で指定する方法ではなく、
+追加した URL patterns を含める別の可能性として、 `patterns`_ によって
+返されたパターンリストを直接的に使う方法があります。::
 
-Another possibility is to include additional URL patterns not by specifying the
-URLconf Python module defining them as the `include`_ argument but by using
-directly the pattern list as returned by `patterns`_ instead. For example::
-
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
 
     extra_patterns = patterns('',
-        url(r'reports/(?P<id>\d+)/$', 'credit.views.report', name='credit-reports'),
-        url(r'charge/$', 'credit.views.charge', name='credit-charge'),
+        url(r'^reports/(?P<id>\d+)/$', 'credit.views.report', name='credit-reports'),
+        url(r'^charge/$', 'credit.views.charge', name='credit-charge'),
     )
 
     urlpatterns = patterns('',
@@ -437,14 +494,16 @@ directly the pattern list as returned by `patterns`_ instead. For example::
         (r'^credit/', include(extra_patterns)),
     )
 
-This approach can be seen in use when you deploy an instance of the Django
-Admin application. The Django Admin is deployed as instances of a
-:class:`AdminSite`; each :class:`AdminSite` instance has an attribute
-``urls`` that returns the url patterns available to that instance. It is this
-attribute that you ``include()`` into your projects ``urlpatterns`` when you
-deploy the admin instance.
+この手法は、 Django のアドミンアプリケーションのインスタンスを配置する時に
+見られます。 Django のアドミンは、
+:class:`~django.contrib.admin.AdminSite` のインスタンスとして
+配置されます。それぞれの `~django.contrib.admin.AdminSite` 
+インスタンスは ``urls`` アトリビュートを持っていて、
+それらは url パターンとしてインスタンスに使用可能です。
+それは、アドミンのインターフェイスを配置する時に、 ``include()`` を
+プロジェクトの ``urlpatterns`` に入れることができます。
 
-.. _`Django Web site`: http://www.djangoproject.com/
+.. _`Django Web site`: https://www.djangoproject.com/
 .. _`Django ウェブサイト`: `Django Web site`_
 
 キャプチャされたパラメタ
@@ -469,55 +528,60 @@ include された側の URLconf は、親となる URLconf で取り出された
 
 .. _topics-http-defining-url-namespaces:
 
-Defining URL Namespaces
+URL の名前空間を定義する
 -----------------------
 
-When you need to deploy multiple instances of a single application, it can be
-helpful to be able to differentiate between instances. This is especially
-important when using :ref:`named URL patterns <naming-url-patterns>`, since
-multiple instances of a single application will share named URLs. Namespaces
-provide a way to tell these named URLs apart.
+もし、複数のインスタンスを一つのアプリケーションで必要としたならば、
+インスタンスの間で区別を付けられることが役立つでしょう。
+これは、一つのアプリケーションが分割する URL の名前付けの
+複数のインスタンスにおいて
+:ref:`URL の名前付け <naming-url-patterns>` を使う時に
+特に大切になります。一つのアプリケーションの中の複数の
+インスタンスは、名前づけられた URL を分割します、名前空間は
+インスタンスそれぞれに名前づけられた URL の分割を教える方法です。
 
-A URL namespace comes in two parts, both of which are strings:
+URL の名前空間は二つのパートになります、両方とも文字列です:
 
-    * An **application namespace**. This describes the name of the application
-      that is being deployed. Every instance of a single application will have
-      the same application namespace. For example, Django's admin application
-      has the somewhat predictable application namespace of ``admin``.
+* 一つは **application namespace** です。これはデプロイ(deploy)されている
+  アプリケーションの名前を示します。単一のアプリケーションの全てのインスタンス
+  は、同じアプリケーションの名前空間
+  を持ちます。例えば、 Django のアドミンアプリケーションは幾分予測可能な
+  アプリケーションの名前空間を持っています ``admin`` です。
 
-    * An **instance namespace**. This identifies a specific instance of an
-      application. Instance namespaces should be unique across your entire
-      project. However, an instance namespace can be the same as the
-      application namespace. This is used to specify a default instance of an
-      application. For example, the default Django Admin instance has an
-      instance namespace of ``admin``.
+* そして、 **instance namespace** です。この識別子はアプリケーションの特有の
+  インスタンスです。インスタンスの名前空間は、プロジェクト全体に渡り、
+  一意のものです。これはアプリケーションの通常のインスタンスを指定するために
+  使われます。例えば、通常 Django のアドミンインスタンスは ``admin`` の
+  インスタンスの名前空間を持っています。
 
-URL Namespaces can be specified in two ways.
+URL の名前空間は二つの方法によって指定されています。
 
-Firstly, you can provide the application and instance namespace as arguments
-to ``include()`` when you construct your URL patterns. For example,::
+始めに、URL パターンを構成する時、アプリケーションとインスタンスの名前空間を、
+``include()`` の引数として、渡すことができます。::
 
-    (r'^help/', include('apps.help.urls', namespace='foo', app_name='bar')),
+    (r'^help/', include('apps.help.urls', namespace='foo', app_name='bar'))
 
-This will include the URLs defined in ``apps.help.urls`` into the application
-namespace ``bar``, with the instance namespace ``foo``.
+これは ``apps.help.urls`` のなかで定義された URL を含み、インスタンスの
+名前空間 ``bar`` と、アプリケーションの名前空間 ``foo`` へといきます。
 
-Secondly, you can include an object that contains embedded namespace data. If
-you ``include()`` a ``patterns`` object, that object will be added to the
-global namespace. However, you can also ``include()`` an object that contains
-a 3-tuple containing::
+二つ目は、埋め込まれた名前空間のデータを内包するオブジェクトを含むことができま
+す。もし、 ``patterns`` オブジェクトを ``include()`` したなら、オブジェクトは
+グローバルな名前空間へと加えられます。しかしながら、三つのタプルを
+含んだオブジェクトを ``include()`` することもできます::
 
     (<patterns object>, <application namespace>, <instance namespace>)
 
-This will include the nominated URL patterns into the given application and
-instance namespace. For example, the ``urls`` attribute of Django's
-:class:`AdminSite` object returns a 3-tuple that contains all the patterns in
-an admin site, plus the name of the admin instance, and the application
-namespace ``admin``.
 
-Once you have defined namespaced URLs, you can reverse them. For details on
-reversing namespaced urls, see the documentation on :ref:`reversing namespaced
-URLs <topics-http-reversing-url-namespaces>`.
+これは、与えられたアプリケーションとインスタンスの名前空間へと指定された
+URL パターンを含みます。例えば、 Django の :class:`AdminSite` オブジェクトの
+``urls`` アトリビュートは 3つのタプルを返し、それはアドミンサイトの
+全てのパターンを含んでいます。そして、アドミンインスタンスの名前を足すと
+アプリケーション名前空間の ``admin`` です。
+
+一度定義した、名前空間化された URL は、名前空間から逆引きしてたどること
+が出来ます。もっと詳しく、名前空間づけた URL を逆引きする方法について知るには、
+:ref:`URL 名前空間 <topics-http-reversing-url-namespaces>`
+を見てください。
 
 ビュー関数に追加のオプションを渡す
 ==================================
@@ -540,8 +604,8 @@ URLconf タプルにはオプションとして 3 つめの要素を指定でき
 
     year='2005', foo='bar'
 
-このテクニックは :ref:`汎用ビュー <ref-generic-views>` や 
-:ref:`配信フィードフレームワーク <ref-contrib-syndication>` で、メタデータ
+このテクニックは :doc:`汎用ビュー </ref/generic-views>` や 
+:doc:`配信フィードフレームワーク </ref/contrib/syndication>` で、メタデータ
 やビューへのオプションを渡すために使われています。
 
 .. admonition:: 衝突を避ける
@@ -631,14 +695,14 @@ Python 関数オブジェクトを渡す方が自然だと考えている者も�
 どのスタイルを使うかは自由です。
 
 このテクニックを使った場合 (文字列の代わりにオブジェクトを渡した場合)
-(上で説明した) `ビュープレフィクス`_ は効果を及ぼさないので注意してください。
+上で説明した ""ビュープレフィクス"" は効果を及ぼさないので注意してください。
+
+
 
 .. _naming-url-patterns:
 
 URL パターンに名前を付ける
 ==========================
-
-.. versionadded:: 1.0
 
 URLconf 中の複数の URL パターンから同じビュー関数を呼ぶケースはよくあります。
 たとえば、以下の二つの URL パターンは、どちらも ``archive`` というビューを
@@ -667,8 +731,8 @@ URLconf 中の複数の URL パターンから同じビュー関数を呼ぶケ�
         url(r'/archive-summary/(\d{4})/$', archive, {'summary': True}, "arch-summary"),
     )
 
-With these names in place (``full-archive`` and ``arch-summary``), you can
-target each pattern individually by using its name:
+上記に記した名前(``full-archive`` and ``arch-summary``)を使って、個別にそれ
+ぞれのパターンの URL にアクセスすることができます。
 
 .. code-block:: html+django
 
@@ -696,94 +760,99 @@ URLconf エントリに付ける名前は、どんな文字を入れても構い
 
 .. _topics-http-reversing-url-namespaces:
 
-URL namespaces
+URL 名前空間
 --------------
 
-.. versionadded:: 1.1
+名前空間化された URL は ``:`` 演算子を使うことによって指定されます。
+例えば、アドミンアプリケーションの、メインのインデックスページは
+``admin:index`` を使うことによって参照されます。
 
-Namespaced URLs are specified using the ``:`` operator. For example, the main
-index page of the admin application is referenced using ``admin:index``. This
-indicates a namespace of ``admin``, and a named URL of ``index``.
+名前空間は、ネスト（nest 入れ子）することができます。 ``foo:bar:whiz``
+と名前づけられた URL は、トップレベルの名前空間である ``foo`` の中から
+``bar`` という名前で定義されたものを探し、さらにその中から ``whiz``
+という名前のパターンを探します。
 
-Namespaces can also be nested. The named URL ``foo:bar:whiz`` would look for
-a pattern named ``whiz`` in the namespace ``bar`` that is itself defined within
-the top-level namespace ``foo``.
+名前空間化された URL (すなわち、``myapp:index`` のようなもの) が与えられる
+て解決すると、 Django は完全にパス化されたものをパーツごとに分解しようとしま
+す。そしてその時に、 URL の探索を行おうとします。
 
-When given a namespaced URL (e.g. ``myapp:index``) to resolve, Django splits
-the fully qualified name into parts, and then tries the following lookup:
+1. 最初に、 Django はアプリケーションの名前空間とマッチするものを探そうとし
+   ます。(この例では ``myapp`` です。)これは、アプリケーションのインスタンスの
+   リストを作ります。
 
-    1. First, Django looks for a matching application namespace (in this
-       example, ``myapp``). This will yield a list of instances of that
-       application.
+2. もし、 *現在の* アプリケーションが定義されていれば、 Django は
+   インスタンスの為に URL リゾルバを見つけて返します。 *現在の* アプリケーション
+   は、テンプレートコンテキストの上のアトリビュートとして指定されます。
+   アプリケーションは複数の配置を持つことを想定していて、テンプレートのレンダ
+   リングをするために使われる ``Context`` か ``RequestContext`` の
+   ``current_app`` アトリビュートに指定されます。
 
-    2. If there is a *current* application defined, Django finds and returns
-       the URL resolver for that instance. The *current* application can be
-       specified as an attribute on the template context - applications that
-       expect to have multiple deployments should set the ``current_app``
-       attribute on any ``Context`` or ``RequestContext`` that is used to
-       render a template.
+   現在のアプリケーションは :func:`reverse()` 関数の引数から、手動で
+   指定することも出来ます。
 
-       The current application can also be specified manually as an argument
-       to the :func:`reverse()` function.
+3. もし、現在のアプリケーションがないとしたらどうでしょう。 Django は
+   デフォルトのアプリケーションインスタンスを探します。デフォルトの
+   アプリケーションインスタンスは、アプリケーションの名前空間とマッチする
+   インスタンスの名前空間を持つインスタンスです。(この例では、
+   ``myapp`` のインスタンスは ``myapp`` と呼ばれます)
 
-    3. If there is no current application. Django looks for a default
-       application instance. The default application instance is the instance
-       that has an instance namespace matching the application namespace (in
-       this example, an instance of the ``myapp`` called ``myapp``).
+4. もし、デフォルトのアプリケーションインスタンスがなかったとしたら、
+   Django は一番初めに配置されたアプリケーションのインスタンスを選択します。
+   それは、インスタンスの名前がどんなものであってもそうでしょう。
 
-    4. If there is no default application instance, Django will pick the first
-       deployed instance of the application, whatever its instance name may be.
+5. もし、提供された名前空間がステップの１のアプリケーションの名前空間と
+   マッチしない場合、 Djangoはインスタンスの名前空間として、直接参照しようと
+   します。
 
-    5. If the provided namespace doesn't match an application namespace in
-       step 1, Django will attempt a direct lookup of the namespace as an
-       instance namespace.
+もし入れ子になった名前空間なら、ビューの名前が逆引きできるまで、名前空間の
+それぞれのパートに対してこれらのステップを繰り返します。
 
-If there are nested namespaces, these steps are repeated for each part of the
-namespace until only the view name is unresolved. The view name will then be
-resolved into a URL in the namespace that has been found.
+この行動の解決戦略をお見せしましょう、 ``myapp``: の ``foo`` と呼ばれる
+インスタンスと、 ``bar`` と呼ばれるものについて考えてみましょう。
+``myapp`` はメインのインデックスページを持っていて、 URL の名前は `index` で
+す。セットアップを使って、参照可能にしてみましょう。:
 
-To show this resolution strategy in action, consider an example of two instances
-of ``myapp``: one called ``foo``, and one called ``bar``. ``myapp`` has a main
-index page with a URL named `index`. Using this setup, the following lookups are
-possible:
+* もし、インスタンスのうち一つが現在のものであれば、言い換えると、もし
+  ``bar`` インスタンスの中でユーティリティページをレンダリングしならば、
+  ``myapp:index`` は、 ``bar`` インスタンスのインデックスページとして
+  逆引きします。
 
-    * If one of the instances is current - say, if we were rendering a utility page
-      in the instance ``bar`` - ``myapp:index`` will resolve to the index page of
-      the instance ``bar``.
+* もし、現在のインスタンスがなければ、言い換えると、もしサイトのどこかで
+  ページのレンダリングを行うならば、 ``myapp:index`` は最後に登録された
+  ``myapp`` のインスタンスを逆引きします。これらは通常のインスタンスではなく、
+  ``myapp`` の最後のインスタンスが使われます。これは ``foo`` か ``bar``
+  で、プロジェクトの URL パターンに導入された順番に依存します。
 
-    * If there is no current instance - say, if we were rendering a page
-      somewhere else on the site - ``myapp:index`` will resolve to the first
-      registered instance of ``myapp``. Since there is no default instance,
-      the first instance of ``myapp`` that is registered will be used. This could
-      be ``foo`` or ``bar``, depending on the order they are introduced into the
-      urlpatterns of the project.
+* ``foo:index`` は常に ``foo`` インスタンスのインデックスページを解決しようと
+  します。
 
-    * ``foo:index`` will always resolve to the index page of the instance ``foo``.
+もし、通常のインスタンスも存在すれば、すなわち、 `myapp` と名前づけられた
+インスタンスが存在すると、このようなことがおきます。:
 
-If there was also a default instance - i.e., an instance named `myapp` - the
-following would happen:
+* もし、インスタンスのうち一つが現在のものであれば、言い換えると、もし
+  ``bar`` インスタンスの中でユーティリティページをレンダリングしならば、
+  ``myapp:index`` は、 ``bar`` インスタンスのインデックスページとして
+  逆引きします。
 
-    * If one of the instances is current - say, if we were rendering a utility page
-      in the instance ``bar`` - ``myapp:index`` will resolve to the index page of
-      the instance ``bar``.
+* もし、現在インスタンスがなければ、言い換えるとサイトのどこかのページを
+  レンダリングするなら ``myapp:index`` は、通常のインスタンスの
+  インデックスページとして逆引きします。
 
-    * If there is no current instance - say, if we were rendering a page somewhere
-      else on the site - ``myapp:index`` will resolve to the index page of the
-      default instance.
+* ``foo:index`` は、再び ``foo`` インスタンスのインデックスページへと
+  逆引きします。
 
-    * ``foo:index`` will again resolve to the index page of the instance ``foo``.
+``django.core.urlresolvers`` ユーティリティ関数
+===============================================
 
-
-ユーティリティメソッド
-======================
+.. currentmodule:: django.core.urlresolvers
 
 reverse()
 ---------
 
-コード中で :ttag:`{% url %}` のようなことをしたい場合のために、Django では
-``django.core.urlresolvers.reverse()`` を提供しています:
+コード中で :ttag:`url` のようなことをしたい場合のために、Django では
+:mod:`django.core.urlresolvers.reverse` モジュールを提供しています:
 
-.. function:: reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None)
+.. function:: reverse(viewname, [urlconf=None, args=None, kwargs=None, current_app=None])
 
 ``viewname`` は関数名 (関数への参照か、関数名の文字列表記で、
 ``urlpatterns`` 上で使っている形式) または  
@@ -796,46 +865,152 @@ reverse()
     def myview(request):
         return HttpResponseRedirect(reverse('arch-summary', args=[1945]))
 
+.. _URL パターン名: `Naming URL patterns`_
+
 ``reverse()`` 関数は大抵の正規表現パターンを URL に逆変換できますが、全てと
 は限りません。今のところ、パターン中に垂直バー (``"|"``) を含められません。
 垂直バーを含むパターンは、 URL からビューへのマッチングには問題なく使えます
 が、パターンの逆変換はできないので注意してください。
 
-.. versionadded:: 1.1
+``current_app`` 引数は、リゾルバが現在実行しているるビューが属している
+アプリケーションを指し示すためのヒントを提供します。この ``current_app``
+引数は、アプリケーションの名前空間をひも解き、指定したアプリケーション
+インスタンスへと導くヒントとして扱われ、
+:ref:`URL 名前空間 <topics-http-reversing-url-namespaces>`
+に従っています。
 
-The ``current_app`` argument allows you to provide a hint to the resolver
-indicating the application to which the currently executing view belongs.
-This ``current_app`` argument is used as a hint to resolve application
-namespaces into URLs on specific application instances, according to the
-:ref:`namespaced URL resolution strategy <topics-http-reversing-url-namespaces>`.
+``args`` の代わりに、 ``kwargs`` を用いることもできます。例えば::
 
-.. admonition:: Make sure your views are all correct
+    >>> reverse('admin:app_list', kwargs={'app_label': 'auth'})
+    '/admin/auth/'
 
-    As part of working out which URL names map to which patterns, the
-    ``reverse()`` function has to import all of your URLconf files and examine
-    the name of each view. This involves importing each view function. If
-    there are *any* errors whilst importing any of your view functions, it
-    will cause ``reverse()`` to raise an error, even if that view function is
-    not the one you are trying to reverse.
+``args`` と ``kwargs`` は、 ``reverse()`` を同時に通過することはできません。
 
-    Make sure that any views you reference in your URLconf files exist and can
-    be imported correctly. Do not include lines that reference views you
-    haven't written yet, because those views will not be importable.
+.. admonition:: ビューが全て正しいことを確認してください
+
+    URL 名の種々のパターンへのひも付けの生成の一部として、
+    ``reverse()`` 関数は、 URLconf ファイルのすべてと調べる各ビューの名前
+    をインポートする必要があります。これは各ビュー関数のインポートと関連
+    しています。もし *何か* エラーが、ビュー関数のインポートする中で起きれば
+    、それは ``reverse()`` がエラーを返す原因になります。もし、ビュー関数が
+    逆引きしようとしたものでなかったときでさえもです。
+
+    URLconf ファイルの中でビューの参照が実在するのと、
+    正しくインポートされていることを確かにしてください。
+    参照するビューがまだ書かれていないのに、それを行に含まないでください。
+    なぜならそのビューはまだインポートできないからです。
+
+.. note::
+
+    :meth:`~django.core.urlresolvers.reverse` によって返される文字列は、
+    ref:`URL クオート <uri-and-iri-handling>` です。例えば::
+
+        >>> reverse('cities', args=[u'Orléans'])
+        '.../Orl%C3%A9ans/'
+
+    もっとエンコーディングを適用するには(:meth:`~django.utils.http.urlquote` か
+    ``urllib.quote`` のように)
+    :meth:`~django.core.urlresolvers.reverse` のアウトプットは望ましくない
+    結果を引き起こします。
+
+reverse_lazy()
+--------------
+
+.. versionadded:: 1.4
+
+`reverse()`_ の簡単に使えるバージョン
+
+.. function:: reverse_lazy(viewname, [urlconf=None, args=None, kwargs=None, current_app=None])
+
+これは、プロジェクトの URLConf がロードされる前に、 URL 逆引きを使う必要がある
+場合に便利です。いくつかの一般的なケースではこの関数がまさに必要になります:
+
+* ジェネリッククラスベースビューをの ``url`` アトリビュートとして、
+  URL を逆引きして提供する場合
+
+* デコレータとして、逆引き URL を提供する場合（
+  :func:`django.contrib.auth.decorators.permission_required` の
+  デコレータのための ``login_url`` 引数のような）
+
+* 関数のシグネチャの中で、パラメータとしてデフォルトの値として
+  逆引きした URL を提供する場合。
 
 resolve()
 ---------
 
-The :func:`django.core.urlresolvers.resolve` function can be used for resolving
-URL paths to the corresponding view functions. It has the following signature:
+:func:`django.core.urlresolvers.resolve` 関数は、URL のパスとそれに付随してい
+るビュー関数を呼び出すのに使われます。
 
 .. function:: resolve(path, urlconf=None)
 
-``path`` is the URL path you want to resolve. As with ``reverse()`` above, you
-don't need to worry about the ``urlconf`` parameter. The function returns the
-triple (view function, arguments, keyword arguments).
+``path`` はあなたがひも解きたい URL パスです。
+:func:`~django.core.urlresolvers.reverse` と一緒で、 ``urlconf`` パラメータ
+に関して考える必要はありません。この関数が返すのは :class:`ResolverMatch`
+オブジェクトで、これは解決された URL の様々なメタデータにアクセスできる
+クラスです。
 
-For example, it can be used for testing if a view would raise a ``Http404``
-error before redirecting to it::
+もし、 URL がひも解かれなかったら、関数は :class:`~django.http.Http404`
+という例外を発生させます。
+
+.. class:: ResolverMatch
+
+    .. attribute:: ResolverMatch.func
+
+        URL を提供するのに使われるビュー関数です。
+
+    .. attribute:: ResolverMatch.args
+
+        これは、ビュー関数に渡されて、 URL からパースされた
+        引数です。
+
+    .. attribute:: ResolverMatch.kwargs
+
+        このキーワード引数はビュー関数に渡され、 URL からパースされた
+        引数です。
+
+    .. attribute:: ResolverMatch.url_name
+
+        URL にマッチした URL パターンの名前です。
+
+    .. attribute:: ResolverMatch.app_name
+
+        アプリケーションの名前空間で、 URL にマッチした URL パターンの
+        為に使われます。
+
+    .. attribute:: ResolverMatch.namespace
+
+        インスタンスの名前空間で、 URL にマッチした URL パターンの
+        為に使われます。
+
+    .. attribute:: ResolverMatch.namespaces
+
+       インスタンスのフルの名前空間の、個別の名前空間の要素を
+       リストにしたもので、 URL パターンにマッチした URL のために
+       用いられます。すなわち、もし名前空間が ``foo:bar`` であるなら、
+       このリストは ``['foo', 'bar']`` になります。
+
+:class:`ResolverMatch` オブジェクトは、 URL にマッチする URL パターンに
+ついての情報を提供し、それの問い合わせを行うことが出来ます。::
+
+    # Resolve a URL
+    match = resolve('/some/path/')
+    # Print the URL pattern that matches the URL
+    print match.url_name
+
+:class:`ResolverMatch` オブジェクトは、三つのものに対して割当てられます。::
+
+    func, args, kwargs = resolve('/some/path/')
+
+.. versionchanged:: 1.3
+    三つの割当は、逆方向への互換性のためにあります。
+    :func:`~django.core.urlresolvers.resolve` は Django 1.3 では、
+    三つのものを含んで(ビュー関数と、引数、キーワード引数)いて、
+    :class:`ResolverMatch` object (名前空間とパターン情報の提供も同じように)
+    は DJango の前バージョンのものでは使えません。
+
+一つの :func:`~django.core.urlresolvers.resolve` の使い方としては、
+``Http404`` エラーが出ているかどうかを、リダイレクトする前にテストする
+ような用途です。::
 
     from urlparse import urlparse
     from django.core.urlresolvers import resolve
@@ -844,9 +1019,9 @@ error before redirecting to it::
     def myview(request):
         next = request.META.get('HTTP_REFERER', None) or '/'
         response = HttpResponseRedirect(next)
-
-        # modify the request and response as required, e.g. change locale
-        # and set corresponding locale cookie
+        
+        #リクエストとレスポンスを必要に合わせて変更してください。
+        #依存するローカルな環境のクッキーもセットしてください。
 
         view, args, kwargs = resolve(urlparse(next)[2])
         kwargs['request'] = request
@@ -862,4 +1037,23 @@ permalink()
 :func:`django.db.models.permalink` は、モデルの ``get_absolute_url()`` メソッ
 ドのような、完全な URL パスを返す短いメソッドを書く際に便利なデコレータです。
 詳細は、 :func:`django.db.models.permalink` を参照してください。
+
+get_script_prefix()
+-------------------
+
+.. function:: get_script_prefix()
+
+通常、 :func:`~django.core.urlresolvers.reverse` を
+使うか、 :func:`~django.db.models.permalink` を URL を
+アプリケーション内で定義するために用います。しかし、もしアプリケーションが
+自身の URL の階層の一部分を構成するのならば、 URL を生成する機会が必要です。
+このようなケースで、 Web サーバー内の Django プロジェクトの ベース URL を
+見つけられる必要があり(通常、 :func:`~django.core.urlresolvers.reverse`
+がこのような必要性を満たしてくれます)、この場合、 ``get_script_prefix()``
+を呼ぶと、Django プロジェクトにへ URL スクリプトのプレフィクスを返します。
+もし、 Django プロジェクトが Web サーバーのルートに存在するなら、
+これは常に ``"/"`` になります、しかしこれは変更可能です、
+``django.root`` を使うことでインスタンスで出来ます。(
+:doc:`Django と Apache と mod_python </howto/deployment/modpython>`
+を見てください。)
 
