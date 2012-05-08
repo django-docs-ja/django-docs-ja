@@ -1,9 +1,7 @@
-.. _topics-http-generic-views:
-
 ============================
 汎用ビュー (Generic views)
 ============================
 
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
 
-:ref:`ref-generic-views` を参照してください。
+:doc:`/ref/generic-views` を参照してください。
