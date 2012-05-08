@@ -4,7 +4,7 @@
 フォームセット (formsets)
 =============================
 
-:revision-up-to: 11321 (1.1) unfinished
+:revision-up-to: 17812 (1.4)
 
 フォームセットとは、同じページで複数のフォームを扱うための抽象化レイヤで、
 いわばデータグリッドのようなものです。フォームセットを説明するために、まず
@@ -27,16 +27,39 @@
 ぞれを普通のフォームとして表示する機能があります::
 
     >>> formset = ArticleFormSet()
-    >>> for form in formset.forms:
+    >>> for form in formset:
     ...     print form.as_table()
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title" /></td></tr>
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></td></tr>
 
-出力を見て分かる通り、フォームは一つだけ表示されています。これは、
+出力を見て分かる通り、空のフォームが一つだけ表示されています。
+今表示されている空っぽのフォームの合計は、 ``extra`` パラメータ
+によってコントロールされます。
 ``formset_factory`` のデフォルトの設定で、「追加のフォーム表示数 (extra)」
-を 1 に設定しているからです。表示数は ``extra`` パラメタで制御できます::
+を 1 に設定しているからです。二つの空っぽのフォームを出す例は::
 
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2)
+
+.. versionchanged:: 1.3
+
+Django 1.3 で重要視されるのは、　フォームセットのインスタンスがイテレート
+(iterate)できないということです。フォームセットの表示をするために、
+``forms`` アトリビュート(attribute)をイテレートします。::
+
+    >>> formset = ArticleFormSet()
+    >>> for form in formset.forms:
+    ...    print form.as_table()
+
+``formset.forms`` をイテレートすることは、フォームが作成された順番で
+フォームを並べるのと同じことです。通常、フォームセットのイテレータは
+この順番でフォームを表示します、しかしこの順番を :meth:`__iter__()`
+メソッドを使って別の順番へと変更することができます。
+
+フォームセットは、インデックスを入れこむこともできます。フォームセットは
+組み込まれたフォームを返します。もし、 ``__iter__`` を上書きしたならば、
+``__getitem__`` も、フォームとのマッチングのために上書きする必要があります。
+
+.. _formsets-initial-data:
 
 フォームセットに初期データを指定する
 -------------------------------------
@@ -49,10 +72,10 @@
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2)
     >>> formset = ArticleFormSet(initial=[
     ...     {'title': u'Django is now open source',
-    ...      'pub_date': datetime.date.today()},
+    ...      'pub_date': datetime.date.today(),}
     ... ])
 
-    >>> for form in formset.forms:
+    >>> for form in formset:
     ...     print form.as_table()
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" value="Django is now open source" id="id_form-0-title" /></td></tr>
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" value="2008-05-12" id="id_form-0-pub_date" /></td></tr>
@@ -69,6 +92,8 @@
 
     :ref:`Creating formsets from models with model formsets <model-formsets>`.
 
+.. _formsets-max-num:
+
 フォームの最大表示数を制限する
 ------------------------------------
 
@@ -77,13 +102,20 @@
 
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2, max_num=1)
     >>> formset = ArticleFormset()
-    >>> for form in formset.forms:
+    >>> for form in formset:
     ...     print form.as_table()
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title" /></td></tr>
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></td></tr>
 
-``max_num`` のデフォルト値は表示数に制限がないことを示す ``0`` に設定されて
-います。
+.. versionchanged:: 1.2
+
+もし、 ``max_num`` の値が存在するオブジェクトの合計より大きい場合、
+``extra`` 次第で、空のフォームがフォームセットに加えられます。
+フォームの合計の長さは ``max_num`` を超えることはできません。
+
+``max_num`` の値が ``None`` (通常です)であった場合、表示されるフォームの数には
+制限がありません。 ``max_num`` の値が  ``0`` から ``None`` になったことを
+覚えておいてください。 version 1.2 から ``0`` は有効な値となりました。
 
 フォームセットのバリデーション
 ------------------------------------
@@ -93,7 +125,12 @@
 簡単に検証できます::
 
     >>> ArticleFormSet = formset_factory(ArticleForm)
-    >>> formset = ArticleFormSet({})
+    >>> data = {
+    ...     'form-TOTAL_FORMS': u'1',
+    ...     'form-INITIAL_FORMS': u'0',
+    ...     'form-MAX_NUM_FORMS': u'',
+    ... }
+    >>> formset = ArticleFormSet(data)
     >>> formset.is_valid()
     True
 
@@ -105,8 +142,9 @@
     >>> data = {
     ...     'form-TOTAL_FORMS': u'2',
     ...     'form-INITIAL_FORMS': u'0',
+    ...     'form-MAX_NUM_FORMS': u'',
     ...     'form-0-title': u'Test',
-    ...     'form-0-pub_date': u'16 June 1904',
+    ...     'form-0-pub_date': u'1904-06-16',
     ...     'form-1-title': u'Test',
     ...     'form-1-pub_date': u'', # <-- this date is missing but required
     ... }
@@ -116,16 +154,33 @@
     >>> formset.errors
     [{}, {'pub_date': [u'This field is required.']}]
 
-As we can see, ``formset.errors`` is a list whose entries correspond to the
-forms in the formset. Validation was performed for each of the two forms, and
-the expected error message appears for the second item.
+確認できるように、 ``formset.errors`` はリストで、
+そのエントリーは、フォームセットの中のフォームのものです。
+バリデーションは、二つのフォームそれぞれに働いて、
+リストの二つ目のアイテムにエラーメッセージが表示されています。
+
+また、初めのデータと入力されたデータが異なっているかどうかも
+チェックできます。(すなわち、フォームは何のデータもなしに送信されない)
+ということです。
+
+    >>> data = {
+    ...     'form-TOTAL_FORMS': u'1',
+    ...     'form-INITIAL_FORMS': u'0',
+    ...     'form-MAX_NUM_FORMS': u'',
+    ...     'form-0-title': u'',
+    ...     'form-0-pub_date': u'',
+    ... }
+    >>> formset = ArticleFormSet(data)
+    >>> formset.has_changed()
+    False
 
 .. _understanding-the-managementform:
 
 ``ManagementForm`` を理解する
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-上の例でフォームセットに与えた初期値には、追加のデータが入っていたことに気
+上の例でフォームセットに与えた初期値には、追加のデータ( ``form-TOTAL_FORMS``
+, ``form-INITIAL_FORMS`` , ``form-MAX_NUM_FORMS`` )が入っていたことに気
 付いたでしょうか。これはフォームセットで内部的に処理されているフォーム、
 ``ManagementForm`` で扱うためのデータです。追加のデータ抜きでフォームセット
 を使おうとすると、例外が送出されます::
@@ -143,19 +198,32 @@ the expected error message appears for the second item.
 めに使われます。 JavaScript でフォームを動的に追加する場合、
 ``ManagementForm`` データのカウントも増やさねばなりません。
 
-.. versionadded:: 1.1
+マネジメントフォームはフォームセット自身のアトリビュートとして使用可能です。
+テンプレートにフォームセットをレンダリングする際、
+``{{ my_formset.management_form }}`` をレンダリングすることでマネジメント
+データを含むことができます。(フォームセットのところは適切な名前に変えて
+使ってください)
 
-``total_form_count`` and ``initial_form_count``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``total_form_count`` と ``initial_form_count``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``BaseModelFormSet`` has a couple of methods that are closely related to the
-``ManagementForm``, ``total_form_count`` and ``initial_form_count``.
+``BaseFormSet`` は二つの ``ManagementForm`` に類似したメソッドを持っています、
+``total_form_count`` と ``initial_form_count`` です。
 
-``total_form_count`` returns the total number of forms in this formset.
-``initial_form_count`` returns the number of forms in the formset that were
-pre-filled, and is also used to determine how many forms are required. You
-will probably never need to override either of these methods, so please be
-sure you understand what they do before doing so.
+``total_form_count`` は、フォームセットの中のフォームの合計の数を返します。
+``initial_form_count`` はフォームセットの中のフォームのうち、データが
+入力されているものだけを返します、また幾つのフォームが必要かを判断するのに
+使えます。おそらくこれらのメソッドを上書きする必要に迫られることはないでしょ
+う。まずは、実行する前に何を実行するのかを理解しておいたほうがよいでしょう。
+
+.. versionadded:: 1.2
+
+``empty_form``
+~~~~~~~~~~~~~~
+
+``BaseFormSet`` は ``empty_form`` という追加のアトリビュートを提供します。
+これは、 JavaScript を使った動的なフォーム生成を簡単にするために
+``__prefix__`` のプレフィクスをフォームインスタンスとともに返します。
 
 カスタムのフォームセットバリデーション
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -176,17 +244,18 @@ sure you understand what they do before doing so.
     ...             form = self.forms[i]
     ...             title = form.cleaned_data['title']
     ...             if title in titles:
-    ...                 raise forms.ValidationError, "Articles in a set must have distinct titles."
+    ...                 raise forms.ValidationError("Articles in a set musthave distinct titles.")
     ...             titles.append(title)
 
     >>> ArticleFormSet = formset_factory(ArticleForm, formset=BaseArticleFormSet)
     >>> data = {
     ...     'form-TOTAL_FORMS': u'2',
     ...     'form-INITIAL_FORMS': u'0',
+    ...     'form-MAX_NUM_FORMS': u'',
     ...     'form-0-title': u'Test',
-    ...     'form-0-pub_date': u'16 June 1904',
+    ...     'form-0-pub_date': u'1904-06-16',
     ...     'form-1-title': u'Test',
-    ...     'form-1-pub_date': u'23 June 1912',
+    ...     'form-1-pub_date': u'1912-06-23',
     ... }
     >>> formset = ArticleFormSet(data)
     >>> formset.is_valid()
@@ -214,14 +283,14 @@ sure you understand what they do before doing so.
 
 デフォルト値: ``False``
 
-Lets create a formset with the ability to order::
+並べ替え機能とともに、フォームセットを作ってみましょう::
 
     >>> ArticleFormSet = formset_factory(ArticleForm, can_order=True)
     >>> formset = ArticleFormSet(initial=[
     ...     {'title': u'Article #1', 'pub_date': datetime.date(2008, 5, 10)},
     ...     {'title': u'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
     ... ])
-    >>> for form in formset.forms:
+    >>> for form in formset:
     ...     print form.as_table()
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" value="Article #1" id="id_form-0-title" /></td></tr>
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" value="2008-05-10" id="id_form-0-pub_date" /></td></tr>
@@ -269,16 +338,18 @@ Lets create a formset with the ability to order::
 
 デフォルト値: ``False``
 
-Lets create a formset with the ability to delete::
+削除機能とともに、フォームセットを作ってみましょう::
 
     >>> ArticleFormSet = formset_factory(ArticleForm, can_delete=True)
     >>> formset = ArticleFormSet(initial=[
     ...     {'title': u'Article #1', 'pub_date': datetime.date(2008, 5, 10)},
     ...     {'title': u'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
     ... ])
-    >>> for form in formset.forms:
+    >>> for form in formset:
     ....    print form.as_table()
-    <input type="hidden" name="form-TOTAL_FORMS" value="3" id="id_form-TOTAL_FORMS" /><input type="hidden" name="form-INITIAL_FORMS" value="2" id="id_form-INITIAL_FORMS" />
+    <input type="hidden" name="form-TOTAL_FORMS" value="3" id="id_form-TOTAL_FORMS" />
+    <input type="hidden" name="form-INITIAL_FORMS" value="2" id="id_form-INITIAL_FORMS" />
+    <input type="hidden" name="form-MAX_NUM_FORMS" id="id_form-MAX_NUM_FORMS" />
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" value="Article #1" id="id_form-0-title" /></td></tr>
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" value="2008-05-10" id="id_form-0-pub_date" /></td></tr>
     <tr><th><label for="id_form-0-DELETE">Delete:</label></th><td><input type="checkbox" name="form-0-DELETE" id="id_form-0-DELETE" /></td></tr>
@@ -297,6 +368,7 @@ Lets create a formset with the ability to delete::
     >>> data = {
     ...     'form-TOTAL_FORMS': u'3',
     ...     'form-INITIAL_FORMS': u'2',
+    ...     'form-MAX_NUM_FORMS': u'',
     ...     'form-0-title': u'Article #1',
     ...     'form-0-pub_date': u'2008-05-10',
     ...     'form-0-DELETE': u'on',
@@ -330,7 +402,7 @@ Lets create a formset with the ability to delete::
 
     >>> ArticleFormSet = formset_factory(ArticleForm, formset=BaseArticleFormSet)
     >>> formset = ArticleFormSet()
-    >>> for form in formset.forms:
+    >>> for form in formset:
     ...     print form.as_table()
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title" /></td></tr>
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></td></tr>
@@ -359,10 +431,10 @@ Lets create a formset with the ability to delete::
 
 .. code-block:: html+django
 
-    <form method="POST" action="">
+    <form method="post" action="">
         {{ formset.management_form }}
         <table>
-            {% for form in formset.forms %}
+            {% for form in formset %}
             {{ form }}
             {% endfor %}
         </table>
@@ -373,7 +445,7 @@ Lets create a formset with the ability to delete::
 
 .. code-block:: html+django
 
-    <form method="POST" action="">
+    <form method="post" action="">
         <table>
             {{ formset }}
         </table>
@@ -381,6 +453,32 @@ Lets create a formset with the ability to delete::
 
 このショートカットは、フォームセットの ``as_table`` を呼び出した時と同じ内
 容を出力します。
+
+.. _manually-rendered-can-delete-and-can-order:
+
+``can_delete`` と ``can_order`` を手動で出力する。
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+もし、テンプレートの中で手動でフィールドを出力するなら、
+``can_delete`` パラメータは ``{{ form.DELETE }}`` で出力できます:
+
+.. code-block:: html+django
+
+    <form method="post" action="">
+        {{ formset.management_form }}
+        {% for form in formset %}
+            {{ form.id }}
+            <ul>
+                <li>{{ form.title }}</li>
+                {% if formset.can_delete %}
+                    <li>{{ form.DELETE }}</li>
+                {% endif %}
+            </ul>
+        {% endfor %}
+    </form>
+
+同じように、もしフォームセットが並べ替え機能を所持するなら( ``can_order=True``
+)、これもまた ``{{ form.ORDER }}`` で呼び出すことができます。
 
 複数のフォームセットを一つのビュー内で使う
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
