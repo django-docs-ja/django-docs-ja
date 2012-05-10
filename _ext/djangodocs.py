@@ -2,23 +2,30 @@
 """
 Sphinx plugins for Django documentation.
 """
+import os
+import re
 
-import docutils.nodes
-import docutils.transforms
-import sphinx
-import sphinx.addnodes
+from docutils import nodes, transforms
 try:
-    from sphinx import builders
+    import json
 except ImportError:
-    import sphinx.builder as builders
-import sphinx.directives
-import sphinx.environment
-try:
-    import sphinx.writers.html as sphinx_htmlwriter
-except ImportError:
-    import sphinx.htmlwriter as sphinx_htmlwriter
-import sphinx.roles
-from docutils import nodes
+    try:
+        import simplejson as json
+    except ImportError:
+        try:
+            from django.utils import simplejson as json
+        except ImportError:
+            json = None
+
+from sphinx import addnodes, roles, __version__ as sphinx_ver
+from sphinx.builders.html import StandaloneHTMLBuilder
+from sphinx.writers.html import SmartyPantsHTMLTranslator
+from sphinx.util.console import bold
+from sphinx.util.compat import Directive
+
+# RE for option descriptions without a '--' prefix
+simple_option_desc_re = re.compile(
+    r'([-_a-zA-Z0-9]+)(\s*.*?)(?=,\s+(?:/|-|--)|$)')
 
 def setup(app):
     app.add_crossref_type(
@@ -54,105 +61,90 @@ def setup(app):
         parse_node    = parse_django_adminopt_node,
     )
     app.add_config_value('django_next_version', '0.0', True)
-    app.add_directive('versionadded', parse_version_directive, 1, (1, 1, 1))
-    app.add_directive('versionchanged', parse_version_directive, 1, (1, 1, 1))
-    app.add_transform(SuppressBlockquotes)
-    
-    # Monkeypatch PickleHTMLBuilder so that it doesn't die in Sphinx 0.4.2
-    if sphinx.__version__ == '0.4.2':
-        monkeypatch_pickle_builder()
-
-def parse_version_directive(name, arguments, options, content, lineno,
-                      content_offset, block_text, state, state_machine):
-    env = state.document.settings.env
-    is_nextversion = env.config.django_next_version == arguments[0]
-    ret = []
-    node = sphinx.addnodes.versionmodified()
-    ret.append(node)
-    if not is_nextversion:
-        if len(arguments) == 1:
-            linktext = 'Please, see the release notes <releases-%s>' % (arguments[0])
-            xrefs = sphinx.roles.xfileref_role('ref', linktext, linktext, lineno, state)
-            node.extend(xrefs[0])
-        node['version'] = arguments[0]
-    else:
-        node['version'] = "Development version"
-    node['type'] = name
-    if len(arguments) == 2:
-        inodes, messages = state.inline_text(arguments[1], lineno+1)
-        node.extend(inodes)
-        if content:
-            state.nested_parse(content, content_offset, node)
-        ret = ret + messages
-    env.note_versionchange(node['type'], node['version'], node, lineno)
-    return ret
+    app.add_directive('versionadded', VersionDirective)
+    app.add_directive('versionchanged', VersionDirective)
+    app.add_builder(DjangoStandaloneHTMLBuilder)
 
 
-class SuppressBlockquotes(docutils.transforms.Transform):
-    """
-    Remove the default blockquotes that encase indented list, tables, etc.
-    """
-    default_priority = 300
-    
-    suppress_blockquote_child_nodes = (
-        docutils.nodes.bullet_list, 
-        docutils.nodes.enumerated_list, 
-        docutils.nodes.definition_list,
-        docutils.nodes.literal_block, 
-        docutils.nodes.doctest_block, 
-        docutils.nodes.line_block, 
-        docutils.nodes.table
-    )
-    
-    def apply(self):
-        for node in self.document.traverse(docutils.nodes.block_quote):
-            if len(node.children) == 1 and isinstance(node.children[0], self.suppress_blockquote_child_nodes):
-                node.replace_self(node.children[0])
+class VersionDirective(Directive):
+    has_content = True
+    required_arguments = 1
+    optional_arguments = 1
+    final_argument_whitespace = True
+    option_spec = {}
 
-class DjangoHTMLTranslator(sphinx_htmlwriter.SmartyPantsHTMLTranslator):
+    def run(self):
+        env = self.state.document.settings.env
+        arg0 = self.arguments[0]
+        is_nextversion = env.config.django_next_version == arg0
+        ret = []
+        node = addnodes.versionmodified()
+        ret.append(node)
+        if not is_nextversion:
+            if len(self.arguments) == 1:
+                linktext = u'リリースノートを参照してください </releases/%s>' % (arg0)
+                xrefs = roles.XRefRole()('doc', linktext, linktext, self.lineno, self.state)
+                node.extend(xrefs[0])
+            node['version'] = arg0
+        else:
+            node['version'] = "Development version"
+        node['type'] = self.name
+        if len(self.arguments) == 2:
+            inodes, messages = self.state.inline_text(self.arguments[1], self.lineno+1)
+            node.extend(inodes)
+            if self.content:
+                self.state.nested_parse(self.content, self.content_offset, node)
+            ret = ret + messages
+        env.note_versionchange(node['type'], node['version'], node, self.lineno)
+        return ret
+
+
+class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
     """
     Django-specific reST to HTML tweaks.
     """
 
     # Don't use border=1, which docutils does by default.
     def visit_table(self, node):
+        self._table_row_index = 0 # Needed by Sphinx
         self.body.append(self.starttag(node, 'table', CLASS='docutils'))
-    
+
     # <big>? Really?
     def visit_desc_parameterlist(self, node):
         self.body.append('(')
         self.first_param = 1
-    
+        self.param_separator = node.child_text_separator
+
     def depart_desc_parameterlist(self, node):
         self.body.append(')')
-        pass
-        
+
+    if sphinx_ver < '1.0.8':
+        #
+        # Don't apply smartypants to literal blocks
+        #
+        def visit_literal_block(self, node):
+            self.no_smarty += 1
+            SmartyPantsHTMLTranslator.visit_literal_block(self, node)
+
+        def depart_literal_block(self, node):
+            SmartyPantsHTMLTranslator.depart_literal_block(self, node)
+            self.no_smarty -= 1
+
     #
-    # Don't apply smartypants to literal blocks
-    #
-    def visit_literal_block(self, node):
-        self.no_smarty += 1
-        sphinx_htmlwriter.SmartyPantsHTMLTranslator.visit_literal_block(self, node)
-        
-    def depart_literal_block(self, node):
-        sphinx_htmlwriter.SmartyPantsHTMLTranslator.depart_literal_block(self, node) 
-        self.no_smarty -= 1
-        
-    #
-    # Turn the "new in version" stuff (versoinadded/versionchanged) into a
+    # Turn the "new in version" stuff (versionadded/versionchanged) into a
     # better callout -- the Sphinx default is just a little span,
     # which is a bit less obvious that I'd like.
     #
-    # FIXME: these messages are all hardcoded in English. We need to chanage 
+    # FIXME: these messages are all hardcoded in English. We need to change
     # that to accomodate other language docs, but I can't work out how to make
-    # that work and I think it'll require Sphinx 0.5 anyway.
+    # that work.
     #
     version_text = {
         'deprecated':       u'Django %s で撤廃されました',
         'versionchanged':   u'Django %s で変更されました',
         'versionadded':     u'Django %s で新たに登場しました',
     }
-    
+
     def visit_versionmodified(self, node):
         self.body.append(
             self.starttag(node, 'div', CLASS=node['type'])
@@ -162,41 +154,28 @@ class DjangoHTMLTranslator(sphinx_htmlwriter.SmartyPantsHTMLTranslator):
             len(node) and ":" or "."
         )
         self.body.append('<span class="title">%s</span> ' % title)
-    
+
     def depart_versionmodified(self, node):
         self.body.append("</div>\n")
-    
+
     # Give each section a unique ID -- nice for custom CSS hooks
-    # This is different on docutils 0.5 vs. 0.4...
-    
-    if hasattr(sphinx_htmlwriter.SmartyPantsHTMLTranslator, 'start_tag_with_title') and sphinx.__version__ == '0.4.2':
-        def start_tag_with_title(self, node, tagname, **atts):
-            node = {
-                'classes': node.get('classes', []), 
-                'ids': ['s-%s' % i for i in node.get('ids', [])]
-            }
-            return self.starttag(node, tagname, **atts)
-            
-    else:        
-        def visit_section(self, node):
-            old_ids = node.get('ids', [])
-            node['ids'] = ['s-' + i for i in old_ids]
-            if sphinx.__version__ != '0.4.2':
-                node['ids'].extend(old_ids)
-            sphinx_htmlwriter.SmartyPantsHTMLTranslator.visit_section(self, node)
-            node['ids'] = old_ids
+    def visit_section(self, node):
+        old_ids = node.get('ids', [])
+        node['ids'] = ['s-' + i for i in old_ids]
+        node['ids'].extend(old_ids)
+        SmartyPantsHTMLTranslator.visit_section(self, node)
+        node['ids'] = old_ids
 
 def parse_django_admin_node(env, sig, signode):
     command = sig.split(' ')[0]
     env._django_curr_admin_command = command
     title = "django-admin.py %s" % sig
-    signode += sphinx.addnodes.desc_name(title, title)
+    signode += addnodes.desc_name(title, title)
     return sig
 
 def parse_django_adminopt_node(env, sig, signode):
     """A copy of sphinx.directives.CmdoptionDesc.parse_signature()"""
-    from sphinx import addnodes
-    from sphinx.directives.desc import option_desc_re
+    from sphinx.domains.std import option_desc_re
     count = 0
     firstname = ''
     for m in option_desc_re.finditer(sig):
@@ -208,44 +187,44 @@ def parse_django_adminopt_node(env, sig, signode):
         if not count:
             firstname = optname
         count += 1
+    if not count:
+        for m in simple_option_desc_re.finditer(sig):
+            optname, args = m.groups()
+            if count:
+                signode += addnodes.desc_addname(', ', ', ')
+            signode += addnodes.desc_name(optname, optname)
+            signode += addnodes.desc_addname(args, args)
+            if not count:
+                firstname = optname
+            count += 1
     if not firstname:
         raise ValueError
     return firstname
 
-def monkeypatch_pickle_builder():
-    import shutil
-    from os import path
-    try:
-        import cPickle as pickle
-    except ImportError:
-        import pickle
-    from sphinx.util.console import bold
-    
-    def handle_finish(self):
-        # dump the global context
-        outfilename = path.join(self.outdir, 'globalcontext.pickle')
+
+class DjangoStandaloneHTMLBuilder(StandaloneHTMLBuilder):
+    """
+    Subclass to add some extra things we need.
+    """
+
+    name = 'djangohtml'
+
+    def finish(self):
+        super(DjangoStandaloneHTMLBuilder, self).finish()
+        if json is None:
+            self.warn("cannot create templatebuiltins.js due to missing simplejson dependency")
+            return
+        self.info(bold("writing templatebuiltins.js..."))
+        xrefs = self.env.domaindata["std"]["objects"]
+        templatebuiltins = {
+            "ttags": [n for ((t, n), (l, a)) in xrefs.items()
+                        if t == "templatetag" and l == "ref/templates/builtins"],
+            "tfilters": [n for ((t, n), (l, a)) in xrefs.items()
+                        if t == "templatefilter" and l == "ref/templates/builtins"],
+        }
+        outfilename = os.path.join(self.outdir, "templatebuiltins.js")
         f = open(outfilename, 'wb')
-        try:
-            pickle.dump(self.globalcontext, f, 2)
-        finally:
-            f.close()
-
-        self.info(bold('dumping search index...'))
-        self.indexer.prune(self.env.all_docs)
-        f = open(path.join(self.outdir, 'searchindex.pickle'), 'wb')
-        try:
-            self.indexer.dump(f, 'pickle')
-        finally:
-            f.close()
-
-        # copy the environment file from the doctree dir to the output dir
-        # as needed by the web app
-        shutil.copyfile(path.join(self.doctreedir, builders.ENV_PICKLE_FILENAME),
-                        path.join(self.outdir, builders.ENV_PICKLE_FILENAME))
-
-        # touch 'last build' file, used by the web application to determine
-        # when to reload its environment and clear the cache
-        open(path.join(self.outdir, builders.LAST_BUILD_FILENAME), 'w').close()
-
-    builders.PickleHTMLBuilder.handle_finish = handle_finish
-    
+        f.write('var django_template_builtins = ')
+        json.dump(templatebuiltins, f)
+        f.write(';\n')
+        f.close();

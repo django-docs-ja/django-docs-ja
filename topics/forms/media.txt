@@ -1,9 +1,9 @@
 .. _topics-forms-media:
 
-Form Media
-==========
+フォームメディア( Form Media )
+==============================
 
-:revision-up-to: 11321 (1.1) unfinished
+:revision-up-to: 17812 (1.4)
 
 魅力的で使いやすい Web フォームをレンダしたいなら、 HTML だけでは能力不足で
 しょう。CSS スタイルシートが必要でしょうし、ファンシーな "Web2.0" 的ウィジェッ
@@ -132,12 +132,12 @@ CSS ファイルのリストを指定してください。以下の例では、�
 んなメディアファイル要件を宣言したかに関係なく行われます。例えば、上の例の
 カレンダーウィジェットを、以下のように拡張したとします::
 
-    class FancyCalendarWidget(CalendarWidget):
-        class Media:
-            css = {
-                'all': ('fancy.css',)
-            }
-            js = ('whizbang.js',)
+    >>> class FancyCalendarWidget(CalendarWidget):
+    ...     class Media:
+    ...         css = {
+    ...             'all': ('fancy.css',)
+    ...         }
+    ...         js = ('whizbang.js',)
 
     >>> w = FancyCalendarWidget()
     >>> print w.media
@@ -194,31 +194,51 @@ CSS ファイルのリストを指定してください。以下の例では、�
 動的なメディアプロパティの戻り値を構築するための詳しい方法は、 
 `Media オブジェクト`_ の節を参照してください。
 
+.. _form-media-paths:
+
 .. _ref-forms-paths-in-media-definitions:
 
 メディア定義のパス
 --------------------
 
+.. versionchanged:: 1.3
+
 メディアファイルの場所を指定するためのパスは、相対でも絶対でもかまいません。
 パスが ``'/'``, ``'http://'``, ``'https://'`` のいずれかで開始していれば、
-絶対パス指定として、値をそのまま使います。それ以外のパスの前には
-``settings.MEDIA_URL`` の値を付加します。例えば、 ``MEDIA_URL`` が
-``http://media.example.com/`` の場合は、以下のウィジェット::
+絶対パス指定として、値をそのまま使います。それ以外のパスの前には適切な
+プレフィクス(prefix)を指定します。
+:doc:`staticfiles app </ref/contrib/staticfiles> の部分的な紹介として、
+"静的なファイル"(イメージや CSS, JavaScript, など)に完全な Web ページを
+表示するための二つの新しい設定が追加されました。:
+:setting:`STATIC_URL` and :setting:`STATIC_ROOT` がそれです。
+適切なプレフィクスを使うために、 Django は :setting:`STATIC_URL` が
+``None`` ではないかどうかを確かめ、 :setting:`MEDIA_URL` を使うために自動的に
+巻き戻ります。例えば、もしサイトの :setting:`MEDIA_URL` が
+``'http://uploads.example.com/'`` であって :setting:`STATIC_URL` が ``None``
+であった場合::
 
-    class CalendarWidget(forms.TextInput):
-        class Media:
-            css = {
-                'all': ('/css/pretty.css',),
-            }
-            js = ('animations.js', 'http://othersite.com/actions.js')
-
-は、以下のように HTML を出力します::
+    >>> class CalenderWidget(forms.TextInput):
+            class Media:
+                css = {
+                    'all: ('/css/pretty.css',),
+                }
+                js = ('animations.js', 'http://othersite.com/actions.js')
 
     >>> w = CalendarWidget()
     >>> print w.media
     <link href="/css/pretty.css" type="text/css" media="all" rel="stylesheet" />
-    <script type="text/javascript" src="http://media.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://uploads.example.com/animations.js"></script>
     <script type="text/javascript" src="http://othersite.com/actions.js"></script>
+
+ですが、もし :setting:`STATIC_URL` が ``'http://static.example.com/'`` なら
+ば::
+
+    >>> w = CalendarWidget()
+    >>> print w.media
+    <link href="/css/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="http://static.example.com/animations.js"></script>
+    <script type="text/javascript" src="http://othersite.com/actions.js"></script>
+
 
 ``Media`` オブジェクト
 ------------------------
@@ -255,17 +275,16 @@ HTML コードです。
 ``Media`` オブジェクトは加算できます。二つの ``Media`` オブジェクトを加算す
 ると、結果の ``Media`` オブジェクトには両方のメディアファイル情報が入ります::
 
-    class CalendarWidget(forms.TextInput):
-        class Media:
-            css = {
-                'all': ('pretty.css',)
-            }
-            js = ('animations.js', 'actions.js')
+    >>> class CalendarWidget(forms.TextInput):
+    ...     class Media:
+    ...         css = {
+    ...             'all': ('pretty.css',)
+    ...         }
+    ...         js = ('animations.js', 'actions.js')
 
-    class OtherWidget(forms.TextInput):
-        class Media:
-            js = ('whizbang.js',)
-
+    >>> class OtherWidget(forms.TextInput):
+    ...     class Media:
+    ...         js = ('whizbang.js',)
     >>> w1 = CalendarWidget()
     >>> w2 = OtherWidget()
     >>> print w1.media + w2.media
@@ -287,9 +306,9 @@ HTML コードです。
 フォームを構成する全てのウィジェットのメディアファイル定義を加算したもので
 す::
 
-    class ContactForm(forms.Form):
-        date = DateField(widget=CalendarWidget)
-        name = CharField(max_length=40, widget=OtherWidget)
+    >>> class ContactForm(forms.Form):
+    ...     date = DateField(widget=CalendarWidget)
+    ...     name = CharField(max_length=40, widget=OtherWidget)
 
     >>> f = ContactForm()
     >>> f.media
@@ -301,15 +320,14 @@ HTML コードです。
 フォーム固有のメディア宣言を付加したい場合、例えば、フォームのレイアウトを
 決める CSS を指定したい場合には、以下のようにメディア定義を追加します::
 
-    class ContactForm(forms.Form):
-        date = DateField(widget=CalendarWidget)
-        name = CharField(max_length=40, widget=OtherWidget)
-
-        class Media:
-            css = {
-                'all': ('layout.css',)
-            }
-
+    >>> class ContactForm(forms.Form):
+    ...     date = DateField(widget=CalendarWidget)
+    ...     name = CharField(max_length=40, widget=OtherWidget)
+    ...
+    ...     class Media:
+    ...         css = {
+    ...             'all': ('layout.css',)
+    ...         }
     >>> f = ContactForm()
     >>> f.media
     <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
