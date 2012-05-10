@@ -811,7 +811,7 @@ Djangoテンプレートでフォームセットをレンダーするには３�
 第２の方法はフォームセットのレンダリングを手動で行いますが、フォーム
 自体のレンダリングはそれらに任せる方法です ::
 
-    <form method="pos" action="">
+    <form method="post" action="">
         {{ formset.management_form }}
         {% for form in formset.forms %}
             {{ form }}
