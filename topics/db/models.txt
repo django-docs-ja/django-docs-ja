@@ -4,7 +4,7 @@
 モデルの作成
 ============
 
-:revision-up-to: 11321 (1.1) unfinished
+:revision-up-to: 17812 (1.4)
 
 .. module:: django.db.models
 
@@ -14,22 +14,14 @@
 
 モデルの基本として、以下のことを知っておいてください:
 
-    * 各モデルは Python のクラスで、 :class:`django.db.models.Model` のサブ
-      クラスです。
+* 各モデルは Python のクラスで、 :class:`django.db.models.Model` のサブ
+  クラスです。
 
-    * モデルの各アトリビュートの値は、データベース上のあるフィールドを表現
-      します。
+* モデルの各アトリビュートの値は、データベース上のあるフィールドを表現
+  します。
 
-    * モデルの情報をもとに、 Django はデータベース API を自動生成します。
-      API の詳細は「 :ref:`topics-db-queries` 」で解説します。
-
-.. seealso::
-
-    このドキュメントを理解する上で、 `公式のモデルサンプルリポジトリ`_ 
-    が参考になるでしょう。 (Django のソース配布物中では、これらの例は
-    ``tests/modeltests`` ディレクトリに入っています。)
-
-    .. _`公式のモデルサンプルリポジトリ`: http://www.djangoproject.com/documentation/models/
+* モデルの情報をもとに、 Django はデータベース API を自動生成します。
+  API の詳細は「 :ref:`topics-db-queries` 」で解説します。
 
 簡単な例
 ========
@@ -59,16 +51,16 @@
 
 いくつか、技術的な注意点があります:
 
-    * テーブルの名前 ``myapp_person`` はモデルのメタデータから自動的に決定
-      します。テーブル名は変更できます。「 :ref:`table-names` 」を参照して
-      ください。
+* テーブルの名前 ``myapp_person`` はモデルのメタデータから自動的に決定
+  します。テーブル名は変更できます。「 :ref:`table-names` 」を参照して
+  ください。
 
-    * ``id`` は自動的に追加されます。この動作も変更できます。
-      「 :ref:`automatic-primary-key-fields` 」を参照してください。
+* ``id`` は自動的に追加されます。この動作も変更できます。
+  「 :ref:`automatic-primary-key-fields` 」を参照してください。
 
-    * 上の例の ``CREATE TABLE`` SQL 文は PostgreSQL の書式で書かれています
-      が、 Django は :ref:`設定ファイル <topics-settings>` に指定しておいた
-      データベースバックエンドに合わせて適切な SQL を発行します。
+* 上の例の ``CREATE TABLE`` SQL 文は PostgreSQL の書式で書かれています
+  が、 Django は :ref:`設定ファイル <topics-settings>` に指定しておいた
+  データベースバックエンドに合わせて適切な SQL を発行します。
 
 モデルを使う
 ============
@@ -115,19 +107,19 @@
 ラスから、適切なクラスのインスタンスを生成して入れます。Django は、フィール
 ドのクラスが何であるかという情報を、以下のような判定で使います:
 
-    * データベースのカラム型 (``INTEGER``, ``VARCHAR`` など) の決定
+* データベースのカラム型 (``INTEGER``, ``VARCHAR`` など) の決定
 
-    * Django の管理サイトで使うウィジェット (``<input type="text">``,
-      ``<select>`` など) の決定
+* Django の管理サイトで使うウィジェット (``<input type="text">``,
+  ``<select>`` など) の決定
 
-    * Django の管理サイトやマニピュレータが実施する最小限のバリデーション
-      の決定
+* Django の管理サイトやマニピュレータが実施する最小限のバリデーション
+  の決定
 
 Django にはたくさんのフィールドクラスが組み込みで付属しています。組み込みの
 フィールドクラス一覧は「 :ref:`モデルフィールドリファレンス
 <model-field-types>` 」にあります。組み込みのフィールドで実現できないことが
 あれば、フィールドクラスを自分で定義できます。
-「 :ref:`howto-custom-model-fields` 」を参照してください。
+「 :doc:`howto-custom-model-fields` 」を参照してください。
 
 フィールドのオプション
 ----------------------
@@ -145,90 +137,90 @@ Django にはたくさんのフィールドクラスが組み込みで付属し�
 
 ここでは、良く使う引数を簡単に紹介しましょう:
 
-    :attr:`~Field.null`
-        ``True`` にすると、フィールドの値が空のとき、データベースには
-        ``NULL`` を保存します。デフォルトの設定は ``False`` です。
+:attr:`~Field.null`
+    ``True`` にすると、フィールドの値が空のとき、データベースには
+    ``NULL`` を保存します。デフォルトの設定は ``False`` です。
 
-    :attr:`~Field.blank`
-        ``True`` にすると、フィールドの値を空白 (blank) にできます。デフォ
-        ルトの設定は ``False`` です。
+:attr:`~Field.blank`
+    ``True`` にすると、フィールドの値を空白 (blank) にできます。デフォ
+    ルトの設定は ``False`` です。
 
-        :attr:`~Field.null` とは違うので注意してください。
-        :attr:`~Field.null` は、単に空のデータをデータベース上でどう表現す
-        るかを決めています。一方、 :attr:`~Field.blank` はフィールドの値の
-        検証 (validation) 方法を決めています。あるフィールドに
-        :attr:`blank=True <Field.blank>` を指定すると、 Django の管理サイト
-        上で、そのフィールドを空の値にしたままエントリを作れます。
-        :attr:`blank=False <Field.blank>` にすると、フィールドには必ず値を
-        入れねばなりません。
+    :attr:`~Field.null` とは違うので注意してください。
+    :attr:`~Field.null` は、単に空のデータをデータベース上でどう表現す
+    るかを決めています。一方、 :attr:`~Field.blank` はフィールドの値の
+    検証 (validation) 方法を決めています。あるフィールドに
+    :attr:`blank=True <Field.blank>` を指定すると、 Django の管理サイト
+    上で、そのフィールドを空の値にしたままエントリを作れます。
+    :attr:`blank=False <Field.blank>` にすると、フィールドには必ず値を
+    入れねばなりません。
 
-    :attr:`~Field.choices`
-        iterable (リストまたはタプル) を指定します。 iterable の各要素は
-	フィールドの値の選択肢を表す 2 要素のタプルです。
-        :attr:`~Field.choices` を指定すると、 Django の管理サイト上には、標
-        準的なテキストフィールドの代わりにセレクタボックスが表示され、ユー
-        ザは選択肢の値だけを選べます。
+:attr:`~Field.choices`
+    iterable (リストまたはタプル) を指定します。 iterable の各要素は
+    フィールドの値の選択肢を表す 2 要素のタプルです。
+    :attr:`~Field.choices` を指定すると、 Django の管理サイト上には、標
+    準的なテキストフィールドの代わりにセレクタボックスが表示され、ユー
+    ザは選択肢の値だけを選べます。
 
-        選択肢のタプル列は、例えば以下のように定義します::
+    選択肢のタプル列は、例えば以下のように定義します::
 
-            YEAR_IN_SCHOOL_CHOICES = (
-                ('FR', 'Freshman'),
-                ('SO', 'Sophomore'),
-                ('JR', 'Junior'),
-                ('SR', 'Senior'),
-                ('GR', 'Graduate'),
+        YEAR_IN_SCHOOL_CHOICES = (
+            ('FR', 'Freshman'),
+            ('SO', 'Sophomore'),
+            ('JR', 'Junior'),
+            ('SR', 'Senior'),
+            ('GR', 'Graduate'),
+        )
+
+    各タプルの最初の要素が実際にデータベースに保存される値で、二つめの
+    要素が管理インタフェースや  ``ModelChoiceField`` に表示される内容で
+    す。あるモデルオブジェクトのインスタンスで後者の値 (表示値) を取り
+    出したければ、 ``get_FOO_display`` メソッドを使います。例えば、以下
+    のようなモデルを考えましょう::
+
+        from django.db import models
+
+        class Person(models.Model):
+            GENDER_CHOICES = (
+                (u'M', u'Male'),
+                (u'F', u'Female'),
             )
+            name = models.CharField(max_length=60)
+            gender = models.CharField(max_length=2, choices=GENDER_CHOICES)
 
-        各タプルの最初の要素が実際にデータベースに保存される値で、二つめの
-        要素が管理インタフェースや  ``ModelChoiceField`` に表示される内容で
-        す。あるモデルオブジェクトのインスタンスで後者の値 (表示値) を取り
-        出したければ、 ``get_FOO_display`` メソッドを使います。例えば、以下
-        のようなモデルを考えましょう::
+    ``gender`` の表示値は ``get_gender_display`` で取り出します::
 
-            from django.db import models
+        >>> p = Person(name="Fred Flinstone", gender="M")
+        >>> p.save()
+        >>> p.gender
+        u'M'
+        >>> p.get_gender_display()
+        u'Male'
 
-            class Person(models.Model):
-                GENDER_CHOICES = (
-                    (u'M', u'Male'),
-                    (u'F', u'Female'),
-                )
-                name = models.CharField(max_length=60)
-                gender = models.CharField(max_length=2, choices=GENDER_CHOICES)
+:attr:`~Field.default`
+    フィールドのデフォルト値です。この値は、固定の値でも、関数などの呼
+    び出し可能オブジェクトでもかまいません。呼び出し可能オブジェクトに
+    した場合、新たなモデルインスタンスを生成するたびにそのオブジェクト
+    を呼び出して、フィールドのデフォルト値を動的に決定します。
 
-        ``gender`` の表示値は ``get_gender_display`` で取り出します::
+:attr:`~Field.help_text`
+    管理サイトでフォームの下に表示される、詳しい「ヘルプ」テキストです。
+    管理サイトを使っていなくても、定義しておけばドキュメントとして役に
+    立ちます。
 
-            >>> p = Person(name="Fred Flinstone", gender="M")
-            >>> p.save()
-            >>> p.gender
-            u'M'
-            >>> p.get_gender_display()
-            u'Male'
+:attr:`~Field.primary_key`
+    ``True`` を指定すると、フィールドをモデルの主キーにします。
 
-    :attr:`~Field.default`
-        フィールドのデフォルト値です。この値は、固定の値でも、関数などの呼
-        び出し可能オブジェクトでもかまいません。呼び出し可能オブジェクトに
-        した場合、新たなモデルインスタンスを生成するたびにそのオブジェクト
-        を呼び出して、フィールドのデフォルト値を動的に決定します。
+    モデルのどのフィールドにも :attr:`primary_key=True
+    <Field.primary_key>` が指定されていない場合、Django は自動的に
+    :class:`IntegerField` を追加して主キーを保存します。従って、主キー
+    の設定をデフォルトの状態から変更したいのでないかぎり、 
+    :attr:`primary_key=True<Field.primary_key>` を指定する必要はありま
+    せん。詳しくは「 :ref:`automatic-primary-key-fields` 」を参照してく
+    ださい。
 
-    :attr:`~Field.help_text`
-        管理サイトでフォームの下に表示される、詳しい「ヘルプ」テキストです。
-        管理サイトを使っていなくても、定義しておけばドキュメントとして役に
-        立ちます。
-
-    :attr:`~Field.primary_key`
-        ``True`` を指定すると、フィールドをモデルの主キーにします。
-
-	モデルのどのフィールドにも :attr:`primary_key=True
-	<Field.primary_key>` が指定されていない場合、Django は自動的に
-	:class:`IntegerField` を追加して主キーを保存します。従って、主キー
-	の設定をデフォルトの状態から変更したいのでないかぎり、 
-	:attr:`primary_key=True<Field.primary_key>` を指定する必要はありま
-	せん。詳しくは「 :ref:`automatic-primary-key-fields` 」を参照してく
-	ださい。
-
-    :attr:`~Field.unique`
-        ``True`` の場合、フィールドの値はテーブル全体で一意でなければなりま
-        せん。
+:attr:`~Field.unique`
+    ``True`` の場合、フィールドの値はテーブル全体で一意でなければなりま
+    せん。
 
 前置きしたように、ここではよく使うオプションを簡単に説明するにとどめます。
 全オプションの詳しい情報は 「 :ref:`共通のモデルフィールドオプションのリファ
@@ -266,9 +258,9 @@ Django にはたくさんのフィールドクラスが組み込みで付属し�
 を指定しない場合、 Django がフィールドのアトリビュート名のアンダースコアを
 スペースに置き換えて、表示用のフィールド名を自動的に生成します。
 
-下の例では、表示用のフィールド名は ``"Person's first name"`` です::
+下の例では、表示用のフィールド名は ``"person's first name"`` です::
 
-    first_name = models.CharField("Person's first name", max_length=30)
+    first_name = models.CharField("person's first name", max_length=30)
 
 下の例では ``"first name"`` です::
 
@@ -317,7 +309,7 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
     class Car(models.Model):
         manufacturer = models.ForeignKey(Manufacturer)
         # ...
-        
+
 :ref:`再帰的リレーション <recursive-relationships>` (自分自身に対する多対多
 のリレーション) や、 :ref:`未定義のモデルに対するリレーション
 <lazy-relationships>` も定義できます。「 :ref:`モデルフィールドのリファレン
@@ -333,14 +325,14 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
 
 .. seealso::
 
-    詳しい例は `多対一のリレーションを持つモデルの例`_ を参照してください。
+    :class:`~django.db.models.ForeignKey` フィールドは
+    :ref:`モデルフィールドリファレンス <foreign-key-arguments>` で説明してい
+    る多くの追加引数を受け取ります。これらのオプションはリレーションがどのよ
+    うに動くべきかを定義するのに役立ちます。
 
-.. _`多対一のリレーションを持つモデルの例`: http://www.djangoproject.com/documentation/models/many_to_one/
-
-:class:`~django.db.models.ForeignKey` フィールドは、リレーションの動作を定
-義するための引数をいくつかとれます。各引数は「 :ref:`モデルフィールドのリファ
-レンス <foreign-key-arguments>` 」で解説しています。そうした引数を使うと、
-リレーションのふるまいを定義する上で役に立ちます。引数は全てオプションです。
+    逆参照されるオブジェクトへのアクセスについては
+    :ref:`リレーションの逆参照の例 <backwards-related-objects>`.
+    に詳しく書いてあります。
 
 多対多のリレーション
 ~~~~~~~~~~~~~~~~~~~~
@@ -365,9 +357,9 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
         toppings = models.ManyToManyField(Topping)
 
 :class:`~django.db.models.ForeignKey` と同様、 :ref:`再帰的リレーション
-<recursive-relationships>` (自分自身に対する多対一のリレーション) や、
+<recursive-relationships>` (自分自身に対する多対多のリレーション) や、
 :ref:`未定義のモデルに対するリレーション<lazy-relationships>` も定義できま
-す。「 :ref:`モデルフィールドのリファレンス <ref-foreignkey>` 」を参照して
+す。「 :ref:`モデルフィールドのリファレンス <ref-manytomany>` 」を参照して
 ください。
 
 必須ではありませんが、 :class:`~django.db.models.fields.ManyToManyField` の
@@ -375,8 +367,8 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
 う勧めます。
 
 どちらのモデルで :class:`~django.db.models.fields.ManyToManyField` を定義し
-てもかまいませんが、どちらか片方のモデルにしか必要ありません -- 両方には指
-定できません。
+てもかまいませんが、どちらか片方のモデルだけ指定すべきです -- 両方には指定
+すべきではありません。
 
 一般的に言って、 Django の管理インタフェースを使うのなら、
 :class:`~django.db.models.fields.ManyToManyField` インスタンスを入れておく
@@ -390,21 +382,15 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
 
 .. seealso:: 
 
-    詳細な例は `多対多のリレーションを持つモデルの例`_ を参照してください。
-
-    .. _`多対多のリレーションを持つモデルの例`: http://www.djangoproject.com/documentation/models/many_to_many/
-
-:class:`~django.db.models.ManyToManyField` フィールドは、リレーションの動作
-を定義するための引数をいくつかとれます。各引数は「 :ref:`モデルフィールドの
-リファレンス <foreign-key-arguments>` 」で解説しています。引数は全てオプショ
-ンです。
+    :class:`~django.db.models.ManyToManyField` フィールドも
+    :ref:`モデルフィールドリファレンス <manytomany-arguments>` で説明して
+    いる多くの引数を受け取ります。これらのオプションはリレーションがどの
+    ように動くべきかを定義するのに役立ちます。必須ではありません。
 
 .. _intermediary-manytomany:
 
 エクストラフィールドで多対多を定義する
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.0
 
 ピザとトッピングを組み合わせたり照合したりするだけのような多対多のリレーショ
 ンを扱いたいのなら、標準の :class:`~django.db.models.ManyToManyField` で事
@@ -448,31 +434,31 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
 
 中間モデルには、いくつか制約があります:
 
-    * 中間モデルは、多対多リレーションのターゲットモデル (リレーションを張
-      られる側のモデル) に対する外部キーを *一つだけ* しか定義できません
-      (上の例では ``Person`` ですね)。同じモデルに複数の外部キーを定義する
-      と、モデルのバリデーション時にエラーを送出します。
+* 中間モデルは、多対多リレーションのターゲットモデル (リレーションを張
+  られる側のモデル) に対する外部キーを *一つだけ* しか定義できません
+  (上の例では ``Person`` ですね)。同じモデルに複数の外部キーを定義する
+  と、モデルのバリデーション時にエラーを送出します。
 
-    * 中間モデルは、多対多リレーションのソースモデル (リレーションを張る側
-      のモデル) に対する外部キーを *一つだけ* しか定義できません (上の例で
-      は ``Group`` ですね)。同じモデルに複数の外部キーを定義すると、モデル
-      のバリデーション時にエラーを送出します。
+* 中間モデルは、多対多リレーションのソースモデル (リレーションを張る側
+  のモデル) に対する外部キーを *一つだけ* しか定義できません (上の例で
+  は ``Group`` ですね)。同じモデルに複数の外部キーを定義すると、モデル
+  のバリデーション時にエラーを送出します。
 
-    * 自分自身に対する多対多のリレーションを定義するのに中間モデルを使う場
-      合にのみ、例外的に同じモデルに対するリレーションを二つ定義できます。
-      ただし、多対多リレーションの中では、二つの外部キーは別々、すなわちソー
-      スとターゲットを区別して扱います。
-    
-    * 中間モデルを使って、あるモデルから自分自身に多対対のリレーションを定
-      義する場合、 :attr:`symmetrical=False <ManyToManyFields.symmetrical>`
-      を指定せねばなりません (「 :ref:`モデルフィールドのリファレンス
-      <manytomany-arguments>` 」を参照してください) 。
+* 自分自身に対する多対多のリレーションを定義するのに中間モデルを使う場
+  合にのみ、例外的に同じモデルに対するリレーションを二つ定義できます。
+  ただし、多対多リレーションの中では、二つの外部キーは別々、すなわちソー
+  スとターゲットを区別して扱います。
+
+* 中間モデルを使って、あるモデルから自分自身に多対対のリレーションを定
+  義する場合、 :attr:`symmetrical=False <ManyToManyFields.symmetrical>`
+  を指定せねばなりません (「 :ref:`モデルフィールドのリファレンス
+  <manytomany-arguments>` 」を参照してください) 。
 
 さて、これで中間モデル (例でいうところの ``Membership``) を使った
 :class:`~django.db.models.ManyToManyField` を設定したので、多対多のリレーショ
 ンを生成できます。リレーションの生成は、中間モデルのインスタンス生成によっ
 て実現します::
-    
+
     >>> ringo = Person.objects.create(name="Ringo Starr")
     >>> paul = Person.objects.create(name="Paul McCartney")
     >>> beatles = Group.objects.create(name="The Beatles")
@@ -509,7 +495,9 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
 中間モデルを使っている場合、多対多のリレーションを保存するには、中間モデル
 のインスタンスを生成するしかない、ということを覚えておいてください。
 
-同じ理由で、 ``remove`` メソッドも使えません。ただし、 ``clear()`` メソッド
+同じ理由で :meth:`~django.db.models.fields.related.RelatedManager.remove`
+メソッドも使えません。 ただし、
+:meth:`~django.db.models.fields.related.RelatedManager.clear` メソッド
 を使えば、以下のように多対多のリレーションを一括して消去できます::
 
     # ビートルズ解散
@@ -530,7 +518,27 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
     >>> Person.objects.filter(
     ...     group__name='The Beatles',
     ...     membership__date_joined__gt=date(1961,1,1))
-    [<Person: Ringo Starr]    
+    [<Person: Ringo Starr]
+
+メンバの情報にアクセスする必要があれば、 ``Membership`` モデルのクエリを
+直接実行することができます::
+
+    >>> ringos_membership = Membership.objects.get(group=beatles, person=ringo)
+    >>> ringos_membership.date_joined
+    datetime.date(1962, 8, 16)
+    >>> ringos_membership.invite_reason
+    u'Needed a new drummer.'
+
+別の方法として、``Person`` オブジェクトから
+:ref:`多対多の逆参照<m2m-reverse-relationships>` クエリを使うことによって
+も同じ情報にアクセスできます。
+
+    >>> ringos_membership = ringo.membership_set.get(group=beatles)
+    >>> ringos_membership.date_joined
+    datetime.date(1962, 8, 16)
+    >>> ringos_membership.invite_reason
+    u'Needed a new drummer.'
+
 
 一対一のリレーション
 ~~~~~~~~~~~~~~~~~~~~
@@ -565,15 +573,9 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
 
 .. seealso::
 
-    詳細な例は `一対一のリレーションを持つモデルの例`_ を参照してください。
-
-    .. _`一対一のリレーションを持つモデルの例`: http://www.djangoproject.com/documentation/models/one_to_one/
-
-.. versionadded:: 1.0
-
-:class:`~django.db.models.OneToOneField` フィールドは、オプションの引数を一
-つとります。引数は「 :ref:`モデルフィールドリファレンス <ref-onetoone>` 」
-で解説しています。
+  :class:`~django.db.models.OneToOneField` フィールドは、オプションの引数を一
+  つとります。引数は「 :ref:`モデルフィールドリファレンス <ref-onetoone>` 」
+  で解説しています。
 
 以前は、モデル中で :class:`~django.db.models.fields.OneToOneField` を使うと、
 そのフィールドは自動的にモデルの主キーになっていました。この仕様はもうなく
@@ -588,7 +590,7 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
 レーションを張るには、以下の例のようにモデル定義の先頭でリレーション対称の
 モデルを import しておき、必要なところでそのモデルクラスを参照します::
 
-    from mysite.geography.models import ZipCode
+    from geography.models import ZipCode
 
     class Restaurant(models.Model):
         # ...
@@ -599,22 +601,22 @@ Django は必要なときに先頭の文字を自動的に大文字にします�
 
 Django がモデルのフィールド名に課している制約は二つしかありません:
 
-    1. フィールド名は Python の予約語であってはなりません。さもないと
-       Python のシンタクスエラーを引き起こすからです。
+1. フィールド名は Python の予約語であってはなりません。さもないと
+   Python のシンタクスエラーを引き起こすからです。
 
-       悪い例::
+   悪い例::
 
-           class Example(models.Model):
-               pass = models.IntegerField() # 'pass' は予約語です！
+       class Example(models.Model):
+           pass = models.IntegerField() # 'pass' は予約語です！
 
-    2. フィールド名には二つ以上の連続するアンダースコアを入れてはなりません。
-       なぜなら、Django は二重アンダースコアをクエリ照合構文で使っているか
-       らです。
+2. フィールド名には二つ以上の連続するアンダースコアを入れてはなりません。
+   なぜなら、Django は二重アンダースコアをクエリ照合構文で使っているか
+   らです。
 
-       悪い例::
+   悪い例::
 
-           class Example(models.Model):
-               foo__bar = models.IntegerField() # 二重アンダースコアがあります!
+       class Example(models.Model):
+           foo__bar = models.IntegerField() # 二重アンダースコアがあります!
 
 データベースのカラム名はフィールドの名前と一致していなくてもよいので、デー
 タベース側では制約を回避できます。詳しくは後述の :attr:`~Field.db_column` を
@@ -628,12 +630,10 @@ Django がモデルのフィールド名に課している制約は二つしか�
 カスタムのフィールド型
 ----------------------
 
-.. versionadded:: 1.0
-
 既存のモデルフィールドが目的とするアプリケーションに合わない場合や、あまり
 一般的でないデータベースカラムタイプを活用したい場合のために、独自のフィー
 ルドクラスを作成できます。カスタムフィールドの詳しい作成方法は
-「 :ref:`howto-custom-model-fields` 」で説明しています。
+「 :doc:`howto-custom-model-fields` 」で説明しています。
 
 .. _meta-options:
 
@@ -657,8 +657,8 @@ Meta オプション
 た、「フィールドの情報でない」情報です。必須のメタデータはなく、
 ``class Meta`` すら省略できます。
 
-``Meta`` に指定できるオプションの一覧は、「 :ref:`モデルオプションのリファ
-レンス <ref-models-options>` 」で解説しています。
+``Meta`` に指定できるオプションの一覧は、「 :doc:`モデルオプションのリファ
+レンス </ref/models/options>` 」で解説しています。
 
 .. _model-methods:
 
@@ -703,35 +703,34 @@ Meta オプション
             return '%s %s' % (self.first_name, self.last_name)
         full_name = property(_get_full_name)
 
-この例の最後のメソッドは :term:`プロパティ` (:term:`property`) です。詳しく
-は `プロパティの説明`_ を参照してください。
+この例の最後のメソッドは :term:`プロパティ` (:term:`property`) です。
 
-.. _`プロパティの説明`: http://www.python.org/download/releases/2.2/descrintro/#property
-
-「 :ref:`モデルインスタンスのリファレンス <ref-models-instances>` 」では、
+「 :doc:`モデルインスタンスのリファレンス </ref/models/instances>` 」では、
 :ref:`各モデルに自動的に付与されるメソッド <model-instance-methods>` を全て
 紹介しています。ほとんどのメソッドはオーバライド可能です。詳しくは後述の
 `既存のモデルメソッドをオーバライドする`_ を参照してください。といっても、
 たいていはせいぜい以下の 2 つのメソッドをオーバライドするぐらいで済むでしょ
 う:
 
-    :meth:`~Model.__unicode__`
-        オブジェクトの「Unicode 表現」を返す、Python の「マジックメソッド」
-        です。 Python や Django はこのメソッドを使ってモデルインスタンスに
-        型強制を適用し、通常の文字列に変換したり表示したりしています。特に、
-        対話コンソールや管理インタフェース上でオブジェクトを表示するときに
-        使われています。
-        
-        このメソッドは常に定義するよう勧めます。定義しておくと、いろいろと
-	便利だからです。
-        
-    :meth:`~Model.get_absolute_url`
-        このメソッドを定義しておくと、 Django にオブジェクトの URL を計算さ
-        せられます。 Django の管理インタフェースなどで、オブジェクトに関連
-        した URL を特定するときにこのメソッドを使います。
-        
-        オブジェクトを一意に特定できるような URL を持たせたいときには、この
-	メソッドを定義しましょう。
+:meth:`~Model.__unicode__`
+    オブジェクトの「Unicode 表現」を返す、Python の「マジックメソッド」
+    です。 Python や Django はこのメソッドを使ってモデルインスタンスに
+    型強制を適用し、通常の文字列に変換したり表示したりしています。特に、
+    対話コンソールや管理インタフェース上でオブジェクトを表示するときに
+    使われています。
+
+    このメソッドは常に定義するよう勧めます。定義しておくと、いろいろと
+    便利だからです。
+
+:meth:`~Model.get_absolute_url`
+    このメソッドを定義しておくと、 Django にオブジェクトの URL を計算さ
+    せられます。 Django の管理インタフェースなどで、オブジェクトに関連
+    した URL を特定するときにこのメソッドを使います。
+
+    オブジェクトを一意に特定できるような URL を持たせたいときには、この
+    メソッドを定義しましょう。
+
+.. _overriding-model-methods:
 
 既存のモデルメソッドをオーバライドする
 --------------------------------------
@@ -751,9 +750,9 @@ Meta オプション
         name = models.CharField(max_length=100)
         tagline = models.TextField()
 
-        def save(self, force_insert=False, force_update=False):
+        def save(self, *args, **kwargs):
             do_something()
-            super(Blog, self).save(force_insert, force_insert) # 「実際の」 save() を呼び出します。
+            super(Blog, self).save(*args, **kwargs) # 「実際の」 save() を呼び出します。
             do_something_else()
 
 また、以下のようにすれば保存を抑止できます::
@@ -762,29 +761,43 @@ Meta オプション
         name = models.CharField(max_length=100)
         tagline = models.TextField()
 
-        def save(self, force_insert=False, force_update=False):
+        def save(self, *args, **kwargs):
             if self.name == "Yoko Ono's blog":
                 return # Yoko は自分のブログを持っていません！
             else:
-                super(Blog, self).save(force_insert, force_update) # Call the "real" save() method.
+                super(Blog, self).save(*args, **kwargs) # 「実際の」 save() を呼び出します。
 
-スーパクラスのメソッド呼び出し、つまり ``super(Blog, self).save()`` を忘れ
-ないでください。この呼び出しを忘れると、デフォルトの処理が行われないため、
-データベースにデータが保存されません。
+スーパクラスのメソッド呼び出し、つまり
+``super(Blog, self).save(*args, **kwargs)`` を忘れないでください。この呼び
+出しを忘れると、デフォルトの処理が行われないため、データベースにデータが保
+存されません。
+
+``*args, **kwargs`` によってモデルメソッドに渡せる引数をパススルーすること
+も重要です。 Django は時々ビルトインのモデルメソッドに新しい引数を追加して
+拡張することがあります。メソッド定義で ``*args, **kwargs`` を使っておけば、
+これらの引数が追加されても自動でサポートされることが保証されます。
+
+.. admonition:: 削除のオーバーライド
+
+    :ref:`QuerySet による一括オブジェクト削除<topics-db-queries-delete>`
+    の時にはオブジェクトの :meth:`~Model.delete()` メソッドが呼ばれないこ
+    とに注意してください。カスタマイズした削除ロジックが実行されることを
+    保証するには
+    :data:`~django.db.models.signals.pre_delete` と
+    :data:`~django.db.models.signals.post_delete` シグナルのいずれかまたは
+    両方を使えば良いでしょう。
 
 カスタム SQL の実行
 -------------------
 
 もう一つよくあるパターンは、カスタムの SQL 文をモデルメソッドやモジュールレ
 ベルのメソッドにに書くというものです。詳しくは、
-「 :ref:`素の SQL を扱う<topics-db-sql>` 」を参照してください。
+「 :doc:`素の SQL を扱う</topics/db/sql>` 」を参照してください。
 
 .. _model-inheritance:
 
 モデルの継承
 ============
-
-.. versionadded:: 1.0
 
 Django のモデルクラス継承は、 Python の通常のクラス継承とほぼ同じように動作
 します。モデル継承を実現するには、一つだけきめておかねばならないことがあり
@@ -794,15 +807,15 @@ Django のモデルクラス継承は、 Python の通常のクラス継承と�
 
 Django には 3 種類のモデル継承スタイルがあります。
 
- 1. 複数の子モデルクラスでいちいち同じ情報を入力せずに済ませるために、親モ
-    デルクラスに共通の情報を持たせたいことはよくあります。親モデルクラスを
-    単体で使うことがないのなら、 :ref:`abstract-base-classes` を使うのがよ
-    いでしょう。
- 2. 一方、(他のアプリケーションなどにある) 既存のモデルをサブクラス化して拡
-    張したり、個々のモデルに固有のデータベースを持たせたいような場合には、
-    :ref:`multi-table-inheritance` を使うのがよいでしょう。 
- 3. 親モデルクラスのフィールドには手を加えず、 Python レベルでの振る舞いだ
-    けを変えたいのなら、 :ref:`proxy-models` を使うのがよいでしょう。
+1. 複数の子モデルクラスでいちいち同じ情報を入力せずに済ませるために、親モ
+   デルクラスに共通の情報を持たせたいことはよくあります。親モデルクラスを
+   単体で使うことがないのなら、 :ref:`abstract-base-classes` を使うのがよ
+   いでしょう。
+2. 一方、(他のアプリケーションなどにある) 既存のモデルをサブクラス化して拡
+   張したり、個々のモデルに固有のデータベースを持たせたいような場合には、
+   :ref:`multi-table-inheritance` を使うのがよいでしょう。 
+3. 親モデルクラスのフィールドには手を加えず、 Python レベルでの振る舞いだ
+   けを変えたいのなら、 :ref:`proxy-models` を使うのがよいでしょう。
 
 .. _abstract-base-classes:
 
@@ -887,15 +900,23 @@ Django は抽象ベースクラスの :ref:`Meta <meta-options>` クラスを生
 :attr:`~django.db.models.ForeignKey.related_name` のフィールドができてしま
 うため、問題を引き起こします。
 
+.. versionchanged:: 1.2
+
 この問題を回避するには、抽象ベースクラスで
 :attr:`~django.db.models.ForeignKey.related_name` を使うときに(かつその時に
-限り)、文字列の一部に ``'%(class)s'`` を付加してください。そうすると、
-``'%(class)s'`` は子クラスでクラスの小文字名に置き換えられます。各クラスは
-個別の名前をもっているので、結果的にリレーション名は個別の名前に
-なります。例えば::
+限り)、文字列の一部に ``'%(class)s'`` を付加してください。
+
+- ``'%(class)s'`` は子クラスでクラスの小文字名に置き換えられます。
+
+- ``'%(app_label)s'`` 子クラスでアプリケーションの小文字名に置き換えられます。
+  インストールされるアプリケーション名はユニークでなければならず、
+  アプリケーションごとのモデルクラス名もユニークでなければなりません。
+  そのため結果の名前は異なるものになります。
+
+あるアプリケーションの ``common/models.py`` の例::
 
     class Base(models.Model):
-        m2m = models.ManyToManyField(OtherModel, related_name="%(class)s_related")
+        m2m = models.ManyToManyField(OtherModel, related_name="%(app_label)s_%(class)s_related")
 
         class Meta:
             abstract = True
@@ -906,10 +927,20 @@ Django は抽象ベースクラスの :ref:`Meta <meta-options>` クラスを生
     class ChildB(Base):
         pass
 
-この例で、 ``ChildA.m2m`` フィールドの逆リレーション名は ``childa_related``
-になり、 ``ChildB.m2m`` フィールドの逆リレーション名は ``childb_related``
-になります。逆リレーション名の定義で ``'%(class)s'`` をどう使うかはユーザ次
-第ですが、 ``'%(class)s'`` を使いわすれると、モデルの検証時 (または
+別のアプリケーションの ``rare/models.py``::
+
+    from common.models import Base
+
+    class ChildB(Base):
+        pass
+
+この例で、 ``common.ChildA.m2m`` フィールドの逆リレーション名は
+``common_childa_related`` になり、 ``common.ChildB.m2m`` フィールドの逆リレ
+ーション名は ``common_childb_related`` になります。 最後に、
+``rare.ChildB.m2m`` フィールドの逆リレーション名は ``rare_childb_related``
+になります。
+逆リレーション名の定義で ``'%(class)s'`` と ``'%(app_label)s`` をどう使うか
+はユーザ次第ですが、 これらを使いわすれると、モデルの検証時 (または
 :djadmin:`syncdb` 時) に例外を送出します。
 
 抽象ベースクラスのフィールドに
@@ -930,8 +961,8 @@ Django では、継承の各階層にいるクラスが抽象クラスでない�
 うな、もう一つのタイプのモデル継承をサポートしています。各モデルはそれぞれ
 が一個のデータベーステーブルを表現していて、個別にクエリを発行したり、イン
 スタンスを生成したりできます。継承の関係によって、親クラスと子クラスの間に
-は (自動生成された :class:`~django.db.models.fields.OneToOneField` によって)
-リンクが張られます。以下の例で説明しましょう::
+は (自動生成された :class:`~django.db.models.OneToOneField` によって) リン
+クが張られます。以下の例で説明しましょう::
 
     class Place(models.Model):
         name = models.CharField(max_length=50)
@@ -952,8 +983,8 @@ Django では、継承の各階層にいるクラスが抽象クラスでない�
 あれば、モデル名を小文字にした属性を使って、 ``Place`` から ``Restaurant``
 を取り出せます::
 
-    >>> p = Place.objects.filter(name="Bob's Cafe")
-    # Bob's Cafe が Restaurant オブジェクトなら、子クラスを返す:
+    >>> p = Place.objects.get(id=12)
+    # p が Restaurant オブジェクトなら、子クラスを返す:
     >>> p.restaurant
     <Restaurant: ...>
 
@@ -973,8 +1004,8 @@ Django では、継承の各階層にいるクラスが抽象クラスでない�
 従って、マルチテーブル継承の子クラスは親クラスの :ref:`Meta <meta-options>`
 クラスにアクセスする方法を持ちません。ただし、限られたケースで、子クラスが
 親クラスの挙動を継承する場合があります。それは、子クラスで 
-:attr:`django.db.models.Options.ordering` または
-:attr:`django.db.models.Options.get_latest_by` 属性を指定していない場合に、
+:attr:`~django.db.models.Options.ordering` または
+:attr:`~django.db.models.Options.get_latest_by` 属性を指定していない場合に、
 親クラスの属性を継承するというものです。
 
 親クラスで整列カラムが指定されていて、子クラス側で整列カラムを指定したくな
@@ -990,22 +1021,21 @@ Django では、継承の各階層にいるクラスが抽象クラスでない�
 ~~~~~~~~~~~~~~~~~~~~
 
 マルチテーブル継承は親クラスと子クラスを暗黙の
-:class:`~django.db.models.fields.OneToOneField` でリンクするので、前述の例
-のように、親クラスから子クラスをたどれます。しかし、子クラスをたどるときに
-使う名前は、 :class:`~django.db.models.fields.ForeignKey` や
-:class:`~django.db.models.fields.ManyToManyField` リレーションを定義したと
+:class:`~django.db.models.OneToOneField` でリンクするので、前述の例のように、
+親クラスから子クラスをたどれます。しかし、子クラスをたどるときに使う名前は、
+:class:`~django.db.models.ForeignKey` や
+:class:`~django.db.models.ManyToManyField` リレーションを定義したと
 きのデフォルトの :attr:`~django.db.models.ForeignKey.related_name` と同じ値
 を使っています。従って、子クラスで
-:class:`~django.db.models.fields.ForeignKey` や
-:class:`~django.db.models.fields.ManyToManyField` を別のクラスに向けて張る
-ときには、 **必ず** :attr:`~django.db.models.ForeignKey.related_name` をフィー
-ルドに指定せねばなりません。指定し忘れると、 Django は 
-:djadmin:`manage.py validate <validate>` や :djadmin:`syncdb` 時にエラーを
-送出します。
+:class:`~django.db.models.ForeignKey` や
+:class:`~django.db.models.ManyToManyField` を別のクラスに向けて張る
+ときには、 **必ず** :attr:`~django.db.models.ForeignKey.related_name` をフ
+ィールドに指定せねばなりません。指定し忘れると、 Django は
+:djadmin:`validate` や :djadmin:`syncdb` 時にエラーを送出します。
 
 例えば、上の ``Place`` クラスに対して、
-:class:`~django.db.models.fields.ManyToManyField` を持った別のサブクラスを
-定義するには、以下のように書きます::
+:class:`~django.db.models.ManyToManyField` を持った別のサブクラスを定義する
+には、以下のように書きます::
 
     class Supplier(Place):
         # Must specify related_name on all relations.
@@ -1015,39 +1045,36 @@ Django では、継承の各階層にいるクラスが抽象クラスでない�
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 すでに触れたように、 Django は子クラスと抽象クラスでない親クラスにリンクし
-た :class:`~django.db.models.fields.OneToOneField` を自動的に生成します。親
-クラスへのリンク名を操作したければ、自分で
-:class:`~django.db.models.fields.OneToOneField` を作成し、パラメタに
-:attr:`parent_link=True <django.db.models.fields.OneToOneField.parent_link>`
-を渡してください。
+た :class:`~django.db.models.OneToOneField` を自動的に生成します。親クラス
+へのリンク名を操作したければ、自分で
+:class:`~django.db.models.OneToOneField` を作成し、パラメタに
+:attr:`parent_link=True <django.db.models.OneToOneField.parent_link>` を渡
+してください。
 
 .. _proxy-models:
 
 プロキシモデル
 --------------
 
-.. versionadded:: 1.1
+:ref:`マルチテーブル継承 <multi-table-inheritance>` を使う時には、各々のモ
+デルのサブクラスに新しくデータベーステーブルが作られます。サブクラスはデー
+タフィールドを追加して、親クラスにはない新しいデータを保存する箇所を増やす
+ので、これは一般的には望まれる動作です。
 
-When using :ref:`multi-table inheritance <multi-table-inheritance>`, a new
-database table is created for each subclass of a model. This is usually the
-desired behavior, since the subclass needs a place to store any additional
-data fields that are not present on the base class. Sometimes, however, you
-only want to change the Python behavior of a model -- perhaps to change the
-default manager, or add a new method.
+しかしながら、デフォルトのマネジャーを変えたり新しいメソッドを追加すること
+によって、同じモデルに対して Python の動作を変えたいだけのときがあります。
+これが、プロキシモデル継承がある理由です。オリジナルのモデルに対して
+*プロキシ* を作ります。そうすれば、ただオリジナルのモデルを使用しているよ
+うに、プロキシモデルのインスタンスを作成、更新、削除して、全てのデータをセ
+ーブすることが出来ます。違いは、モデルの順序づけやデフォルトのマネジャーを
+オリジナルを改変せずに変更できるということです。
 
-This is what proxy model inheritance is for: creating a *proxy* for the
-original model. You can create, delete and update instances of the proxy model
-and all the data will be saved as if you were using the original (non-proxied)
-model. The difference is that you can change things like the default model
-ordering or the default manager in the proxy, without having to alter the
-original.
+プロキシモデルは通常のモデルと同じように宣言します。 Django に対してそのモ
+デルがプロキシモデルであることを教えるためには、 ``Meta`` クラス内の
+:attr:`~django.db.models.Options.proxy` アトリビュートを ``True`` にします。
 
-Proxy models are declared like normal models. You tell Django that it's a
-proxy model by setting the :attr:`~django.db.models.Options.proxy` attribute of
-the ``Meta`` class to ``True``.
-
-For example, suppose you want to add a method to the standard ``User`` model
-that will be used in your templates. You can do it like this::
+例えば、標準の :class:`~django.contrib.auth.models.User` モデルに対してテ
+ンプレートの中で用いるメソッドを追加したい場合、このように定義します::
 
     from django.contrib.auth.models import User
 
@@ -1058,61 +1085,61 @@ that will be used in your templates. You can do it like this::
         def do_something(self):
             ...
 
-The ``MyUser`` class operates on the same database table as its parent
-``User`` class. In particular, any new instances of ``User`` will also be
-accessible through ``MyUser``, and vice-versa::
+``MyUser`` クラスは親である :class:`~django.contrib.auth.models.User` クラ
+スと同じデータベーステーブル上で動作します。特に、
+:class:`~django.contrib.auth.models.User` のどんな新しいインスタンスでも、
+``MyUser`` を通してアクセスすることができます。逆も可能です::
 
     >>> u = User.objects.create(username="foobar")
     >>> MyUser.objects.get(username="foobar")
     <MyUser: foobar>
 
-You could also use a proxy model to define a different default ordering on a
-model. The standard ``User`` model has no ordering defined on it
-(intentionally; sorting is expensive and we don't want to do it all the time
-when we fetch users). You might want to regularly order by the ``username``
-attribute when you use the proxy. This is easy::
+また、モデルに別のデフォルトオーダーを定義する場合にもプロキシモデルを用い
+ることができます。標準の :class:`~django.contrib.auth.models.User` モデル
+ではオーダーが定義されていません (ソートはコストがかかるので、ユーザを取得
+する時にいつもそうしたくないため、故意にそうしています。) プロキシを使って
+いて、いつも ``username`` 属性で順序づけたい場合は、こうすると簡単です::
 
     class OrderedUser(User):
         class Meta:
             ordering = ["username"]
             proxy = True
 
-Now normal ``User`` queries will be unorderd and ``OrderedUser`` queries will
-be ordered by ``username``.
+こうすると、普通の :class:`~django.contrib.auth.models.User` のクエリでは
+順序が定められていませんが ``OrderedUser`` のクエリは ``username`` で順序
+づけられます。
 
-Querysets still return the model that was requested
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+クエリセットはリクエストされたモデルを返す
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There is no way to have Django return, say, a ``MyUser`` object whenever you
-query for ``User`` objects. A queryset for ``User`` objects will return those
-types of objects. The whole point of proxy objects is that code relying on the
-original ``User`` will use those and your own code can use the extensions you
-included (that no other code is relying on anyway). It is not a way to replace
-the ``User`` (or any other) model everywhere with something of your own
-creation.
+:class:`~django.contrib.auth.models.User` オブジェクトへのクエリで Django
+に ``MyUser`` オブジェクトを返させることはできません。 ``User`` オブジェク
+トへのクエリセットは ``User`` 型のオブジェクトを返すでしょう。プロキシオブ
+ジェクトの全体的なポイントは、元の ``User`` に依存しているコードは元のモデ
+ルを使い、追加したコードは拡張を使えるということです。（他のどんなコードも
+追加のコードに依存しません。) プロキシモデルは ``User`` (または他のどんな
+モデルも) を自分で作成したもので置き換える手段ではないのです。
 
-Base class restrictions
-~~~~~~~~~~~~~~~~~~~~~~~
+親クラスの制限
+~~~~~~~~~~~~~~
 
-A proxy model must inherit from exactly one non-abstract model class. You
-can't inherit from multiple non-abstract models as the proxy model doesn't
-provide any connection between the rows in the different database tables. A
-proxy model can inherit from any number of abstract model classes, providing
-they do *not* define any model fields.
+プロキシモデルは抽象クラスでないモデルクラスを 1 つだけ継承しなくてはなり
+ません。抽象クラスでないモデルクラスの多重継承をすることはできません。プロ
+キシモデルは、異なるデータベーステーブルの行へのコネクションを提供していな
+いからです。プロキシモデルはモデルフィールドを定義して *いない* 抽象モデル
+クラスならばいくつでも継承することができます。
 
-Proxy models inherit any ``Meta`` options that they don't define from their
-non-abstract model parent (the model they are proxying for).
+プロキシモデルは親の抽象モデルクラスから ``Meta`` オプションを継承します。
 
-Proxy model managers
-~~~~~~~~~~~~~~~~~~~~
+プロキシモデルマネジャー
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you don't specify any model managers on a proxy model, it inherits the
-managers from its model parents. If you define a manager on the proxy model,
-it will become the default, although any managers defined on the parent
-classes will still be available.
+もしプロキシモデルにモデルマネジャーを指定しなかった場合、マネジャーはモデ
+ルの親から継承します。もしマネジャーを定義すれば、それがデフォルトになりま
+す。それでも、親クラスに指定されたマネジャーを使用することも出来ます。
 
-Continuing our example from above, you could change the default manager used
-when you query the ``User`` model like this::
+上述した例を続けましょう。``User`` モデルに問い合わせる時使われるデフォル
+トのマネジャーを、このように変更することが出来ます::
 
     class NewManager(models.Manager):
         ...
@@ -1123,10 +1150,12 @@ when you query the ``User`` model like this::
         class Meta:
             proxy = True
 
-If you wanted to add a new manager to the Proxy, without replacing the
-existing default, you can use the techniques described in the :ref:`custom
-manager <custom-managers-and-inheritance>` documentation: create a base class
-containing the new managers and inherit that after the primary base class::
+もしプロキシに新しいマネジャーを加えたい場合、デフォルトで存在するものと置
+き換えることなく、付け加えることができます。
+:ref:`custom manager <custom-managers-and-inheritance>` のドキュメントで述
+べているテクニックを使うことができます。
+新しいマネジャーを含んだベースクラスを作成して、主なベースクラスの後にそれ
+を継承しています::
 
     # Create an abstract class for the new manager.
     class ExtraManagers(models.Model):
@@ -1139,52 +1168,53 @@ containing the new managers and inherit that after the primary base class::
         class Meta:
             proxy = True
 
-You probably won't need to do this very often, but, when you do, it's
-possible.
+このテクニックを必要とすることはそんなにないでしょうが、可能です。
 
 .. _proxy-vs-unmanaged-models:
 
-Differences between proxy inheritance and  unmanaged models
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+プロキシの継承とマネージされないモデルの違い
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Proxy model inheritance might look fairly similar to creating an unmanaged
-model, using the :attr:`~django.db.models.Options.managed` attribute on a
-model's ``Meta`` class. The two alternatives are not quite the same and it's
-worth considering which one you should use.
+プロキシモデルの継承は、マネージされないモデルを作るのによく似ています。
+マネージされないモデルは、モデルの ``Meta`` クラスに
+:attr:`~django.db.models.Options.managed` 属性を使うものです。
+2 つの方法は全く同じものではないので、どちらを使った方がよいのか熟慮する
+価値があります。
 
-One difference is that you can (and, in fact, must unless you want an empty
-model) specify model fields on models with ``Meta.managed=False``. You could,
-with careful setting of :attr:`Meta.db_table
-<django.db.models.Options.db_table>` create an unmanaged model that shadowed
-an existing model and add Python methods to it. However, that would be very
-repetitive and fragile as you need to keep both copies synchronized if you
-make any changes.
+一つ目の違いは ``Meta.managed=False`` のモデルにはモデルフィールドを指定
+できることです。 (そして実際、空のモデルを欲しいのでなければ、そうしなく
+てはいけませんね） 注意深く
+:attr:`Meta.db_table<django.db.models.Options.db_table>` を注意深く設定
+することで、既存のモデルの影のような、しかし Python メソッドを追加する
+マネージされないモデルを作れます。しかしながら、それは新しく変更を加え
+る時に両方のコピーを同期させ続けなければならない脆弱なものになります。
 
-The other difference that is more important for proxy models, is how model
-managers are handled. Proxy models are intended to behave exactly like the
-model they are proxying for. So they inherit the parent model's managers,
-including the default manager. In the normal multi-table model inheritance
-case, children do not inherit managers from their parents as the custom
-managers aren't always appropriate when extra fields are involved. The
-:ref:`manager documentation <custom-managers-and-inheritance>` has more
-details about this latter case.
+もう 1 つの違いは、どのようにモデルのマネジャーが扱われるのかという、プ
+ロキシモデルにとってもっと大切な点です。プロキシモデルが意図しているの
+は、代理しているモデル自体のようにふるまうことです。だからデフォルトの
+マネジャーを含む親のモデルマネージャーを継承します。多テーブルのモデル
+を継承する場合、子は親からマネジャーを継承しません。エクストラフィールド
+が関係している場合は、カスタムマネジャーが適切であるとは限らないからです。
+:ref:`マネジャードキュメント <custom-managers-and-inheritance>` にもっ
+と詳細な内容が載っています。
 
-When these two features were implemented, attempts were made to squash them
-into a single option. It turned out that interactions with inheritance, in
-general, and managers, in particular, made the API very complicated and
-potentially difficult to understand and use. It turned out that two options
-were needed in any case, so the current separation arose.
+これら 2 つの特徴が実装されている時、これらを 1 つのオプションに押し込
+めることが試みられました。そして継承の相互作用は一般的に、特にマネジャー
+は、 API をとても複雑にし、理解して使うことを難しくする可能性があると分
+かりました。 2 つのオプションはあるケースでは必要だと分かりました。それ
+で、現在は 2 つのオプションが存在しています。
 
-So, the general rules are:
+一般的なルールとして:
 
-    1. If you are mirroring an existing model or database table and don't want
-       all the original database table columns, use ``Meta.managed=False``.
-       That option is normally useful for modeling database views and tables
-       not under the control of Django.
-    2. If you are wanting to change the Python-only behavior of a model, but
-       keep all the same fields as in the original, use ``Meta.proxy=True``.
-       This sets things up so that the proxy model is an exact copy of the
-       storage structure of the original model when data is saved.
+1. 既存のモデルやデータベーステーブルをミラーしたくて、元のデータベース
+   テーブルカラム全てを必要としない場合、 ``Meta.managed=False`` にして
+   ください。このオプションはデータベースのビューとテーブルを Django の
+   コントロール下に入れずにモデリングするのに役立ちます。
+
+2. Python でのみモデルの振る舞いを変えたいけれど、フィールドは同じものを
+   使いたい場合には ``Meta.proxy=True`` を使ってください。このように設定
+   すると、データがセーブされた時にプロキシモデルが元のモデルの構造を保
+   持したままの正確なコピーとなります。
 
 多重継承
 --------
@@ -1204,31 +1234,28 @@ Python のサブクラスと同様、 Django のモデルも複数の親モデ�
 子クラスで扱っている情報が、どの親クラスから来たか調べるために四苦八苦する
 はめになるでしょう。
 
-Field name "hiding" is not permitted
--------------------------------------
+フィールド名を「覆い隠すこと」は許可されていない
+------------------------------------------------
 
-In normal Python class inheritance, it is permissible for a child class to
-override any attribute from the parent class. In Django, this is not permitted
-for attributes that are :class:`~django.db.models.fields.Field` instances (at
-least, not at the moment). If a base class has a field called ``author``, you
-cannot create another model field called ``author`` in any class that inherits
-from that base class.
+通常の Python クラスの継承では、子クラスで親クラスのどんな属性でもオーバラ
+イドすることができます。 Django では、 :class:`~django.db.models.Field` イ
+ンスタンスの属性は (少なくとも今のところは) オーバライドすることができませ
+ん。もし親クラスが ``author`` というフィールドを持っていたとして、親クラス
+を継承したどんなクラスの中でも新しく ``author`` フィールドを作ることはでき
+ません。
 
-Overriding fields in a parent model leads to difficulties in areas such as
-initialising new instances (specifying which field is being intialised in
-``Model.__init__``) and serialization. These are features which normal Python
-class inheritance doesn't have to deal with in quite the same way, so the
-difference between Django model inheritance and Python class inheritance isn't
-merely arbitrary.
+親モデルのフィールドをオーバライドすることは、インスタンスの初期化 (どのフ
+ィールドが ``Model.__init__`` で初期化されるかを指定すること) 、そしてシリ
+アライズを困難なものにします。これらは通常の Python クラスの継承が全
+く同じように扱う必要のない特徴です。つまり Django のモデル継承と Python ク
+ラスの継承との違いは決定的なものなのです。
 
-This restriction only applies to attributes which are
-:class:`~django.db.models.fields.Field` instances. Normal Python attributes
-can be overridden if you wish. It also only applies to the name of the
-attribute as Python sees it: if you are manually specifying the database
-column name, you can have the same column name appearing in both a child and
-an ancestor model for multi-table inheritance (they are columns in two
-different database tables).
+この制限は :class:`~django.db.models.Field` インスタンスである属性のみに適
+用されます。通常の Python 属性は望み通りにオーバーライドできます。また、こ
+の制限は Python が見ている属性の名前のみに適用されます。自身の手でデータベ
+ースのカラム名を指定するのなら、多テーブルの継承向けに同じカラム名を先祖と
+子のクラス両方に登場させることもできます (二つの異なるデータベーステーブル
+のカラムとして)
 
-Django will raise a ``FieldError`` exception if you override any model field
-in any ancestor model.
-
+先祖のモデルの中にあるモデルフィールドをオーバーライドしようとすると、
+Django は :exc:`~django.core.exceptions.FieldError` を生じさせます。
