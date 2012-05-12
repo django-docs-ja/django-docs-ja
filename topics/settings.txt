@@ -1,10 +1,8 @@
-.. _topics-settings:
-
 =============
 Django の設定
 =============
 
-:revision-up-to: 11321 (1.1) unfinished
+:revision-up-to: 17812 (1.4)
 
 Django の設定ファイルには、インストールした Django の使う全ての設定が入って
 います。このドキュメントでは、各設定の役割と、どのような設定を利用できるか
@@ -23,12 +21,13 @@ Django の設定ファイルには、インストールした Django の使う�
 
 設定ファイルは Python モジュールなので、以下のような性質を備えています:
 
-    * Python の構文エラーが入っていてはなりません。
-    * 通常の Python 構文を使って動的に値を設定できます。例えば::
+* Python の構文エラーが入っていてはなりません。
+* 通常の Python 構文を使って動的に値を設定できます。
+  例えば::
 
           MY_SETTING = [str(i) for i in range(30)]
 
-    * 他の設定ファイルから値を import できます。
+* 他の設定ファイルから値を import できます。
 
 .. _django-settings-module:
 
@@ -42,13 +41,13 @@ Django を使う場合、どの設定を使っているのかを Django に教�
 ``mysite.settings`` のようにします。設定モジュールは Python の
 `モジュール検索パス`_ になければなりません。
 
-.. _import search path: http://diveintopython.org/getting_to_know_python/everything_is_an_object.html
+.. _import search path: http://diveintopython.net/getting_to_know_python/everything_is_an_object.html
 .. _`モジュール検索パス`: `import search path`_
 
 django-admin.py ユーティリティ
 ------------------------------
 
-:ref:`django-admin.py <ref-django-admin>` を使う場合、環境変数をあらかじめ
+:doc:`django-admin.py </ref/django-admin>` を使う場合、環境変数をあらかじめ
 指定しておくか、ユーティリティを起動する度に設定モジュールを明示的に渡しま
 す。
 
@@ -68,20 +67,19 @@ django-admin.py ユーティリティ
 
 .. _django-admin.py: ../django-admin/
 
-サーバ (mod_python) の設定
+サーバ (mod_wsgi) の設定
 --------------------------
 
-実際のサーバ環境では、 Apache/mod_python にどの設定モジュールを使うのか教え
-る必要があります。これには ``SetEnv`` を使います::
+実際のサーバ環境では、 WSGIアプリケーショにどの設定モジュールを使うのか教え
+る必要があります。これには ``os.environ`` を使います::
 
-    <Location "/mysite/">
-        SetHandler python-program
-        PythonHandler django.core.handlers.modpython
-        SetEnv DJANGO_SETTINGS_MODULE mysite.settings
-    </Location>
+    import os     
 
-詳しくは :ref:`mod_python で Django を使うためのドキュメント
-<howto-deployment-modpython>` を参照してください。
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'mysite.settings'   
+
+より詳しい情報やその他Django WSGIアプリケーションに一般的な事項に関しては
+:ref:`mod_wsgiでDjango を使うためのドキュメント
+</howto/deployment/wsgi/modwsgi>` を参照してください。
 
 デフォルトの設定
 ================
@@ -92,9 +90,9 @@ Django の設定ファイルでは、特に必要のない限り設定をおこ�
 
 Django が設定をコンパイルする際には、以下のようなアルゴリズムを使います:
 
-    * ``global_settings.py`` から設定を読みだします。
-    * 指定の設定ファイルから設定を読み出し、グローバルな設定をオーバライド
-      します。
+* ``global_settings.py`` から設定を読みだします。
+* 指定の設定ファイルから設定を読み出し、
+  グローバルな設定をオーバライドします。
 
 設定ファイルから ``global_setting`` を import するのは無駄で、
 *必要ありません* 。
@@ -154,8 +152,8 @@ Python コード内で設定を参照する
 利用可能な設定
 ==============
 
-利用可能な設定は :ref:`setting リファレンス <ref-settings>` を参照してくだ
-さい。
+利用可能な設定は :ref:`setting リファレンス </ref/settings>` 
+を参照してください。
 
 設定項目を自作する
 ==================
@@ -163,8 +161,8 @@ Python コード内で設定を参照する
 設定項目は自由に自作でき、 Django アプリケーションから利用できます。いくつ
 か取り決めがあるので従うようにして下さい:
 
-    * 設定名は全て大文字にします。
-    * 既に存在する設定の再発明はやめましょう。
+* 設定名は全て大文字にします。
+* 既に存在する設定の再発明はやめましょう。
 
 .. _settings-without-django-settings-module:
 
@@ -209,7 +207,7 @@ Django はデフォルトの設定値を使います。
 ``default_settings`` 引数 (または最初の固定引数) でデフォルト設定を渡せます。
 
 以下の例では、デフォルトの設定を ``myapp_defaults`` から取り出し、
-``DEBUG`` の設定を ``myapp_defaults`` の設定に関わらず ``True`` になるよう
+:setting:`DEBUG` の設定を ``myapp_defaults`` の設定に関わらず ``True`` になるよう
 にしています::
 
     from django.conf import settings

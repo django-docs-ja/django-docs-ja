@@ -1,10 +1,8 @@
-.. _topics-http-middleware:
-
 =============
 ミドルウェア
 =============
 
-:revision-up-to: 11321 (1.1) unfinished
+:revision-up-to: 17812 (1.4)
 
 ミドルウェア (Middleware) とは、 Django のリクエスト/レスポンス処理をフック
 するためのフレームワークです。ミドルウェアは軽量かつ低水準な「プラグイン」
@@ -17,7 +15,7 @@ Django には ``XViewMiddleware`` ミドルウェアコンポーネントがあ�
 このドキュメントでは、 Django についてくる全てのミドルウェアコンポーネント
 の使用法と、自分で新たにミドルウェアを作る方法を説明します。
 Django には、すぐに使える組み込みのミドルウェアが付属しています。
-:ref:`組み込みミドルウェアガイド <ref-middleware>` を参照してください。
+:ref:`組み込みミドルウェアガイド </ref/middleware>` を参照してください。
 
 ミドルウェアの有効化
 ====================
@@ -32,7 +30,9 @@ Django には、すぐに使える組み込みのミドルウェアが付属し�
     MIDDLEWARE_CLASSES = (
         'django.middleware.common.CommonMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware', 
         'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware', 
     )
 
 リクエストの処理フェーズでは、Django は :setting:`MIDDLEWARE_CLASSES`
@@ -99,6 +99,53 @@ Python の関数です、 (実際の関数オブジェクトで、関数名を�
 URLconf で設定されたビューを呼び出さず、 :class:`~django.http.HttpResponse`
 オブジェクトをそのまま返します。レスポンスミドルウェアは必ず呼び出されます。
 
+.. note::
+
+    ``process_request`` や``process_view`` からミドルウェアの中の
+    :attr:`request.POST <django.http.HttpRequest.POST>` や
+    :attr:`request.REQUEST <django.http.HttpRequest.REQUEST>`  
+    にアクセスするとそのミドルウェアの後で実行される任意のビューが
+    :ref:`リクエストのアップロードハンドラーを動的に変更する 
+    <modifying_upload_handlers_on_the_fly>` ことができなくなるので避けるべきです。
+
+    :class:`~django.middleware.csrf.CsrfViewMiddleware` クラスは例外と
+    考えることができます。
+    :func:`~django.views.decorators.csrf.csrf_exempt` デコレータと
+    :func:`~django.views.decorators.csrf.csrf_protect` デコレータでは
+    ビューはCSRF検証が行われる時点で明示的に制御することができるからです。
+
+.. _template-response-middleware:
+
+``process_template_response``
+-----------------------------
+
+.. versionadded:: 1.3
+
+.. method:: process_template_response(self, request, response)
+
+``request`` は :class:`~django.http.HttpRequest` クラスのオブジェクトです。
+``response`` は :class:`~django.template.response.SimpleTemplateResponse` 
+クラスのサブクラス (例えば :class:`~django.template.response.TemplateResponse`) 
+、あるいは ``render`` メソッドを実装する任意の response オブジェクトです。
+
+``process_template_response()`` は ``render`` メソッドを実装する response 
+オブジェクト返さなければいけません。
+与えられた ``response`` の ``response.template_name`` と
+``response.context_data`` を変更することができますが、 全くあたらしい
+:class:`~django.template.response.SimpleTemplateResponse` か同等のものを
+作成することも可能です。
+
+``process_template_response()`` は response インスタンスが ``render()`` メソッド
+を持っている時、つまりそのresponse が
+:class:`~django.template.response.TemplateResponse` クラス、あるいは同等のクラス
+であるのみ呼び出されます。
+
+明示的にresponseをレンダする必要はありません。 -- 全てのテンプレート応答ミドルウェア
+が呼び出された時に１度だけ自動的にresponseがレンダされます。
+
+応答フェーズの間、ミドルウェアは逆順で実行されます。
+process_template_response もそれに含まれます。
+
 .. _response-middleware:
 
 ``process_response``
@@ -111,18 +158,19 @@ URLconf で設定されたビューを呼び出さず、 :class:`~django.http.Ht
 :class:`~django.http.HttpResponse` オブジェクトです。
 
 ``process_response()`` は :class:`~django.http.HttpResponse` オブジェクトを
-返さねばなりません。渡された ``response`` オブジェクトを変更して返しても、
-新たに :class:`~django.http.HttpResponse` オブジェクトを生成して返してもか
-まいません。
+返さねばなりません。渡された ``response`` オブジェクトを変更して返しても良いですし、
+新たに :class:`~django.http.HttpResponse` オブジェクトを生成して返すことも可能です。
 
-Unlike the ``process_request()`` and ``process_view()`` methods, the
-``process_response()`` method is always called, even if the ``process_request()``
-and ``process_view()`` methods of the same middleware class were skipped because
-an earlier middleware method returned an :class:`~django.http. HttpResponse`
-(this means that your ``process_response()`` method cannot rely on setup done in
-``process_request()``, for example). In addition, during the response phase the
-classes are applied in reverse order, from the bottom up. This means classes
-defined at the end of :setting:`MIDDLEWARE_CLASSES` will be run first.
+``process_request()`` や ``process_view()`` メソッドとは異なって、
+``process_response()`` メソッドは必ず呼ばれます。
+同じミドルウェアクラスの ``process_request()`` や ``process_view()`` メソッド
+がスキップされても呼ばれます。これより先に呼ばれるミドルウェアメソッドが
+:class:`~django.http. httpresponse` クラスを返していたからです(つまり、例えば
+``process_response()`` メソッドは ``process_request()`` でセットアップが
+完了していることを前提としてはいけない、ということです。) 
+さらに、レスポンスフェーズの間はクラスは逆順、つまり下から上に適用されます。
+これは :setting:`MIDDLEWARE_CLASSES`  の最後に定義されたクラスが最初に
+実行されるという意味です。
 
 .. _exception-middleware:
 
@@ -141,9 +189,10 @@ Django はビューが例外を送出した際に ``process_exception()`` を呼
 をそのままブラウザに返します。それ以外の場合、デフォルトの例外処理を起動し
 ます。
 
-Again, middleware are run in reverse order during the response phase, which
-includes ``process_exception``. If an exception middleware return a response,
-the middleware classes above that middleware will not be called at all.
+ここでも応答フェーズの間はミドルウエアは逆順で実行されます。
+``process_exception`` もそれに含まれます。
+もしも例外ミドルウェアが応答を返すのであれば、
+そのミドルウェアより上位にあるミドルウェアクラスは決して呼ばれることはありません。
 
 ``__init__``
 ------------
@@ -153,11 +202,11 @@ the middleware classes above that middleware will not be called at all.
 な状態を保存するのに ``__init__`` メソッドを使ってもかまいませんが、以下の
 点に注意してください:
 
-    * Django はミドルウェアクラスを引数なしで初期化するので、 ``__init__``
-      には必須の引数を定義できません。
+* Django はミドルウェアクラスを引数なしで初期化するので、 ``__init__``
+  には必須の引数を定義できません。
 
-    * ``process_*`` メソッドはリクエストごとに呼び出されますが、
-      ``__init__`` は Web サーバの起動時に *一度* しか呼び出されません。
+* ``process_*`` メソッドはリクエストごとに呼び出されますが、
+  ``__init__`` は Web サーバの起動時に *一度* しか呼び出されません。
 
 ミドルウェアを動的に有効にする
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -170,16 +219,16 @@ the middleware classes above that middleware will not be called at all.
 ガイドライン
 ------------
 
-    * ミドルウェアのクラスはサブクラスでなくてもかまいません。
+* ミドルウェアのクラスはサブクラスでなくてもかまいません。
 
-    * ミドルウェアのクラスはPython のモジュールパス上のどこにでも置けます。
-      Django にとって必要なのは :setting:`MIDDLEWARE_CLASSES` にクラスへの
-      パスが指定されていることだけです。
+* ミドルウェアのクラスはPython のモジュールパス上のどこにでも置けます。
+  Django にとって必要なのは :setting:`MIDDLEWARE_CLASSES` にクラスへの
+  パスが指定されていることだけです。
 
-    * :mod:`Django で使えるミドルウェア <django.middleware>` を参考にしてく
-      ださい。
+* :mod:`Django で使えるミドルウェア <django.middleware>` を参考にしてく
+  ださい。
 
-    * 自分の書いたミドルウェアコンポーネントが他の人にとっても有用だと思っ
-      たなら、ぜひ :ref:`コミュニティにコントリビュート <internals-contributing>`
-      してください！知らせてくだされば、 Django に追加するか検討します。
+* 自分の書いたミドルウェアコンポーネントが他の人にとっても有用だと思っ
+  たなら、ぜひ :ref:`コミュニティにコントリビュート <internals-contributing>`
+  してください！知らせてくだされば、 Django に追加するか検討します。
 
