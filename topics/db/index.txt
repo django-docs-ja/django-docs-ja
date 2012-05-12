@@ -1,9 +1,9 @@
-.. _topics-db-index:
-
 モデルとデータベース
 ====================
 
-:revision-up-to: 11321 (1.1) unfinished
+.. module:: django.db
+
+:revision-up-to: 17812 (1.4) unfinished
 
 モデルとは、サイトを構成するデータの、ただ一つかつ最終的なデータソースを指
 します。モデルには、保存したいデータに不可欠なデータフィールドと、その振舞
@@ -19,3 +19,7 @@
    managers
    sql
    transactions
+   multi-db
+   tablespaces
+   optimization
+   examples/index
