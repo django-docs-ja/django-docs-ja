@@ -1,13 +1,8 @@
-.. _topics-db-managers:
-.. _Managers:
-
 ========
 マネジャ
 ========
 
-:revision-up-to: 11321 (1.1) unfinished
-
-.. currentmodule:: django.db.models
+:revision-up-to: 17812 (1.4) unfinished
 
 .. class:: Manager()
 
@@ -16,7 +11,7 @@
 も一つマネジャを備えています。
 
 マネジャクラス ``Manager`` の動作はデータベース API ドキュメントの
-:ref:`topics-db-queries` で説明していますが、この節ではマネジャの挙動をカス
+:doc:`/topics/db/queries` で説明していますが、この節ではマネジャの挙動をカス
 タマイズするためのモデルオプションについて具体的に触れます。
 
 .. _manager-names:
@@ -176,8 +171,8 @@
 カスタムのマネジャオブジェクトを使う場合、 Django がモデル内に最初に見つけ
 たマネジャ (モデルに定義した順番で最初のマネジャ) は特別扱いされるというこ
 とに注意してください。 Django はクラス内で最初に見つけたマネジャを「デフォ
-ルトの」マネジャにし、このデフォルトマネジャを (admin アプリケーション以外
-でも) あちこちでモデルのマネジャとして使います。ですから、
+ルトの」マネジャにし、このデフォルトマネジャを ( :djadmin:`dumpdata` を含
+む) あちこちでモデルのマネジャとして使います。ですから、
 ``get_query_set()`` のオーバライドによって、扱いたいオブジェクトを取り出せ
 なくなるような羽目に陥らないように、デフォルトマネジャの選択には細心の注意
 を払ってください。
@@ -193,12 +188,13 @@
 ブジェクトを (たとえデフォルトマネジャによって除外され、通常はアクセスでき
 ないオブジェクトだとしても) 取り出せるようにしておく必要があるからです。
 
-If the normal plain manager class (:class:`django.db.models.Manager`) is not
-appropriate for your circumstances, you can force Django to use the same class
-as the default manager for your model by setting the `use_for_related_fields`
-attribute on the manager class. This is documented fully below_.
+通常のプレーンなマネジャ ( :class:`django.db.models.Manager` ) があなたの
+環境にふさわしく無いのであれば、 マネジャクラスに `use_for_related_fields` 
+を定義することであなたのモデルのデフォルトとして同じクラスを使うように 
+Django に対して制約をかけることができます。
+これは `下記`_ に詳しくドキュメントされています。
 
-.. _below: manager-types_
+.. _下記: manager-types_
 
 .. _custom-managers-and-inheritance:
 
@@ -212,61 +208,62 @@ attribute on the manager class. This is documented fully below_.
 の制御が重要になってきます。そこで、ここでは、 Django がカスタムマネジャと
 :ref:`モデル継承 <model-inheritance>` をどのように扱うか説明します:
 
-    1. 抽象ベースクラスでないクラスで定義されたマネジャは、他のクラスに継承
-       *されません* 。非抽象ベースクラスのマネジャを再利用したければ、
-       子クラスで明示的に宣言してください。この種のマネジャは、たいていマネ
-       ジャを定義しているクラス固有のもので、(デフォルトマネジャとして) 継
-       承すると思わぬ結果を招くことがあるからです。そのため、子クラスに自動
-       的に継承されないのです。
+1. 抽象ベースクラスでないクラスで定義されたマネジャは、他のクラスに継承
+   *されません* 。非抽象ベースクラスのマネジャを再利用したければ、
+   子クラスで明示的に宣言してください。この種のマネジャは、たいていマネ
+   ジャを定義しているクラス固有のもので、(デフォルトマネジャとして) 継
+   承すると思わぬ結果を招くことがあるからです。そのため、子クラスに自動
+   的に継承されないのです。
 
-    2. 抽象ベースクラスのマネジャは、通常の Python の名前解決規則 
-       (name resolution order, 子クラスの名前が他の名前をオーバライドする、
-       親クラスリストの最初の親クラスの名前から順に参照する、など) に基づい
-       て、常に子クラスに継承されます。抽象ベースクラスは、子クラスに共通し
-       て持たせたい情報やふるまいを保持するためのクラスだからです。共通のマ
-       ネジャの定義は、共通の情報として親クラスに置くのが適切です。
+2. 抽象ベースクラスのマネジャは、通常の Python の名前解決規則 
+   (name resolution order, 子クラスの名前が他の名前をオーバライドする、
+   親クラスリストの最初の親クラスの名前から順に参照する、など) に基づい
+   て、常に子クラスに継承されます。抽象ベースクラスは、子クラスに共通し
+   て持たせたい情報やふるまいを保持するためのクラスだからです。共通のマ
+   ネジャの定義は、共通の情報として親クラスに置くのが適切です。
 
-    3. デフォルトマネジャは、そのクラスで最初に宣言されたマネジャクラスか、
-       最初に見付かった抽象ベースクラスのデフォルトマネジャです。明示的なデ
-       フォルトマネジャの設定がなければ、 Django の通常のデフォルトマネジャ
-       を使います。
+3. デフォルトマネジャは、そのクラスで最初に宣言されたマネジャクラスか、
+   最初に見付かった抽象ベースクラスのデフォルトマネジャです。明示的なデ
+   フォルトマネジャの設定がなければ、 Django の通常のデフォルトマネジャ
+   を使います。
 
-These rules provide the necessary flexibility if you want to install a
-collection of custom managers on a group of models, via an abstract base
-class, but still customize the default manager. For example, suppose you have
-this base class::
+これらのルールはモデルのグループに対してカスタムマネジャのコレクションを
+インストールしたいときに十分なフレキシビリティを提供しています。
+例えば、このようなベースクラスがあるとします ::
 
     class AbstractBase(models.Model):
         ...
-        objects = CustomerManager()
+        objects = CustomManager()
 
         class Meta:
             abstract = True
 
-If you use this directly in a subclass, ``objects`` will be the default
-manager if you declare no managers in the base class::
+サブクラスでこれを直接使うのであれば、 ベースクラスでマネジャを定義して
+いないので ``objects`` がデフォルトのマネジャ になります。 ::
 
     class ChildA(AbstractBase):
         ...
-        # This class has CustomManager as the default manager.
+        # このクラスは CustomManager をデフォルトマネジャとして持っています
 
-If you want to inherit from ``AbstractBase``, but provide a different default
-manager, you can provide the default manager on the child class::
+``AbstractBase`` から継承するけれども別のマネジャをデフォルトで用意する
+のであれば、子クラスにデフォルトマネジャを提供することが出来ます::
 
     class ChildB(AbstractBase):
         ...
-        # An explicit default manager.
+        # 明示的なデフォルトマネジャ
         default_manager = OtherManager()
 
-Here, ``default_manager`` is the default. The ``objects`` manager is
-still available, since it's inherited. It just isn't used as the default.
+ここで、 ``default_manager`` がデフォルトです。 ``objects`` マネジャは
+引き続き利用できます。というのは継承されているからです。デフォルトとして
+使われないというだけです。
 
-Finally for this example, suppose you want to add extra managers to the child
-class, but still use the default from ``AbstractBase``. You can't add the new
-manager directly in the child class, as that would override the default and you would
-have to also explicitly include all the managers from the abstract base class.
-The solution is to put the extra managers in another base class and introduce
-it into the inheritance hierarchy *after* the defaults::
+この例の最後として、子クラスにマネジャを追加したいけれども、 
+``AbstractBase`` のデフォルトを引き続き利用したいとします。子クラスに
+新しいマネジャを直接追加することができません。
+というのはそうするとデフォルトを上書いてしまい、抽象基底クラスの全ての
+マネジャを明示的に含めなければならなくなるからです。
+解決法は他の基底クラスにマネジャを追加して、デフォルトの後に継承階層に
+含めることです ::
 
     class ExtraManager(models.Model):
         extra_manager = OtherManager()
@@ -276,94 +273,121 @@ it into the inheritance hierarchy *after* the defaults::
 
     class ChildC(AbstractBase, ExtraManager):
         ...
-        # Default manager is CustomManager, but OtherManager is
-        # also available via the "extra_manager" attribute.
+        # デフォツオマネージャは CustomManagerですが、
+        # OtherManagerも"extra_manager"属性として利用可能です。
+
+実装する際に考慮すること
+------------------------------------
+
+カスタム ``Manager`` にどんな機能を追加したにせよ、 ``Manager`` 
+インスタンスのシャロウコピー (shallow copy)を可能にしなければなりませ; 
+すなわち、以下のコードは正しく動く必要があります ::
+
+    >>> import copy
+    >>> manager = MyManager()
+    >>> my_copy = copy.copy(manager)
+
+Django はある種のクエリの最中にマネジャをシャロウコピーさせます;
+もしも Manager がコピーされないのであればそのようなクエリは失敗します。
+
+これはほとんどのカスタムマネジャにとっては問題とはならないでしょう。
+自分の ``Manager`` に簡単なメソッドを追加するだけであれば、
+うっかり ``Manager`` インスタンスをコピーさせないようにしてしまう、という
+ことはあり得ないでしょう。しかし、 オブジェクトの状態を管理するために 
+``Manager`` オブジェクトの ``__getattr__`` やその他のプライベートメソッド
+をオーバーライドするのであれば、 ``Manager`` がコピーされる能力に影響を
+与えないようにするべきです。
 
 .. _manager-types:
 
-Controlling Automatic Manager Types
+自動マネジャタイプの制御
 ===================================
 
-This document has already mentioned a couple of places where Django creates a
-manager class for you: `default managers`_ and the "plain" manager used to
-`access related objects`_. There are other places in the implementation of
-Django where temporary plain managers are needed. Those automatically created
-managers will normally be instances of the :class:`django.db.models.Manager`
-class.
+このドキュメントはDjangoがマネジャクラスを作る際にすでに何度も触れられて
+きました: `関連オブジェクトにアクセスする`_ ための  `デフォルトマネジャ`_ 
+と "プレーン" マネジャ、です。 Djangoの実装においては、一時的なプレーン
+マネジャが必要な箇所がいくつかあります。これらの自動的に作成されるマネジャ
+は通常は :class:`django.db.models.Manager` のインスタンスです。
 
-.. _default managers: manager-names_
-.. _access related objects: managers-for-related-objects_
+.. _デフォルトマネジャ: manager-names_
+.. _関連オブジェクトにアクセスする: managers-for-related-objects_
 
-Throughout this section, we will use the term "automatic manager" to mean a
-manager that Django creates for you -- either as a default manager on a model
-with no managers, or to use temporarily when accessing related objects.
+この章では "自動マネジャ( automatic manager )" という用語を、 Django が
+モデルマネジャを自動的に作成してくれる、という意味で使います。 --
+マネジャ無しのモデルのデフォルトマネジャの場合もありますし、関連オブジェクト
+にアクセスする際に一時的に使われたりもします。
 
-Sometimes this default class won't be the right choice. One example is in the
-`django.contrib.gis` application that ships with Django itself. All `gis`
-models must use a special manager class (``GeoManager``) because they need a
-special queryset (``GeoQuerySet``) to be used for interacting with the
-database.  It turns out that models which require a special manager like this
-need to use the same manager class wherever an automatic manager is created.
+このデフォルトクラスが正しい選択では無い場合もあります。 Django自体では
+提供されていない `django.contrib.gis` アプリケーションに１つの例があります。
+データベースと円滑に相互作用するためには、特殊なクエリセット
+(``GeoQuerySet``)を使わなくてはならないので、 全ての `gis` モデルは特殊な
+マネジャクラス(``GeoManager``)を使わなくてはいけません。
+このような特殊なマネジャを必要とするモデルは自動マネジャが作成されるときには
+必ず同じマネジャクラスを使う必要があります。
 
-Django provides a way for custom manager developers to say that their manager
-class should be used for automatic managers whenever it is the default manager
-on a model. This is done by setting the ``use_for_related_fields`` attribute on
-the manager class::
+Django にはカスタムマネジャ開発者に対して、モデルのデフォルトマネジャが作成
+される際には必ず自分の作成したマネジャクラスが自動マネジャとして使われるよう
+に指定できるような方法が用意されています。これは、マネジャクラスに
+``use_for_related_fields`` 属性を設定することで実現されます ::
+
 
     class MyManager(models.Manager):
         use_for_related_fields = True
 
         ...
 
-If this attribute is set on the *default* manager for a model (only the
-default manager is considered in these situations), Django will use that class
-whenever it needs to automatically create a manager for the class.  Otherwise,
-it will use :class:`django.db.models.Manager`.
+この属性がモデルの *デフォルト* マネジャに設定される(デフォルトマネジャだけ
+がこのような状況になり得ます)と、Django はクラスに対して自動的にマネジャを
+作成する必要になると必ずこのクラスを使うようになります。 それ以外の場合は、
+:class:`django.db.models.Manager` が使われます。
 
-.. admonition:: Historical Note
+.. admonition:: 歴史的ノート
 
-    Given the purpose for which it's used, the name of this attribute
-    (``use_for_related_fields``) might seem a little odd. Originally, the
-    attribute only controlled the type of manager used for related field
-    access, which is where the name came from. As it became clear the concept
-    was more broadly useful, the name hasn't been changed. This is primarily
-    so that existing code will :ref:`continue to work <misc-api-stability>` in
-    future Django versions.
+    使われる目的を考えると、この属性名(``use_for_related_fields``)は
+    少し変です。元々は、この属性は関連フィールドのアクセスだけに使われる
+    ようなマネジャを制御していましたのでこういう名前になったのです。
+    コンセプトが明確になるにつれてますます広い用途で使われるようになり
+    ましたが、名前は変更されていません。これは第一に既存のコードが 将来の 
+    Django のバージョンに置いても 
+    :ref:`継続し動作する <misc-api-stability>` ようにするためです。
 
-Writing Correct Managers For Use In Automatic Manager Instances
+
+自動マネジャインスタンスに使えるように正しくマネジャを書く
 ---------------------------------------------------------------
 
-As already suggested by the `django.contrib.gis` example, above, the
-``use_for_related_fields`` feature is primarily for managers that need to
-return a custom ``QuerySet`` subclass. In providing this functionality in your
-manager, there are a couple of things to be remember and that's the topic of
-this section.
+上記の `django.contrib.gis` の例ですでに触れたように、
+``use_for_related_fields`` は主にカスタム ``QuerySet`` サブクラス
+を返さなければならないマネージャのための機能です。
+あなたのマネジャでこの機能を提供する場合、いくつか覚えておかなければ
+ならないことがありますので、このセクションで示します。
 
-Do not filter away any results in this type of manager subclass
+この種のマネジャのサブクラスでは結果をフィルタしてはいけない
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-One reason an automatic manager is used is to access objects that are related
-to from some other model. In those situations, Django has to be able to see
-all the objects for the model it is fetching, so that *anything* which is
-referred to can be retrieved.
+自動マネジャが使われる一つの理由は、他のモデルから関連したオブジェクトに
+アクセスする場合です。この場合、Djangoはフェッチしようとしているモデル
+の全てのオブジェクトを見る必要があるので、 参照される *全て* が取得
+される必要があるのです。
 
-If you override the ``get_query_set()`` method and filter out any rows, Django
-will return incorrect results. Don't do that. A manager that filters results
-in ``get_query_set()`` is not appropriate for use as an automatic manager.
+もしも ``get_query_set()`` メソッドをオーバーライドして、列をフィルター
+すれば Django は正しくない結果を返します。これをやってはいけません。
+``get_query_set()`` の結果をフィルタするマネジャは自動マネジャとしては
+ふさわしくありません。
 
-Set ``use_for_related_fields`` when you define the class
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``use_for_related_fields`` attribute must be set on the manager *class*,
-object not on an *instance* of the class. The earlier example shows the
-correct way to set it, whereas the following will not work::
+クラスを定義するときは ``use_for_related_fields`` を設定すること
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    # BAD: Incorrect code
+``use_for_related_fields`` 属性はマネージャーの *クラス* に設定されなければ
+なりません。 *インスタンス* にではありません。前の例ではそれを設定する正しい
+方法を示していましたが、以下のコードは正しく動作しません :: 
+
+    # BAD: 不正なコード
     class MyManager(models.Manager):
         ...
 
-    # Sets the attribute on an instance of MyManager. Django will
-    # ignore this setting.
+    # MyManagerインスタンスに属性を設定します。
+    # Django はこの設定を無視します
     mgr = MyManager()
     mgr.use_for_related_fields = True
 
@@ -371,11 +395,10 @@ correct way to set it, whereas the following will not work::
         ...
         objects = mgr
 
-    # End of incorrect code.
+    # 不正なコードの終了
 
-You also shouldn't change the attribute on the class object after it has been
-used in a model, since the attribute's value is processed when the model class
-is created and not subsequently reread. Set the attribute on the manager class
-when it is first defined, as in the initial example of this section and
-everything will work smoothly.
-
+モデルで既に使用されている後でクラスオブジェクトの属性を変更することも
+やってはいけません。なぜならば属性値はモデルクラスが作成された時に既に
+処理されていて、再読み込みは行われないからです。
+マネージャクラスが最初に定義されたときに属性を設定すれば、この章の最初の
+例で示したように全てスムーズに動作します。
