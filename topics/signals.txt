@@ -1,10 +1,8 @@
-.. _topics-signals:
-
 =========
 シグナル
 =========
 
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
 
 .. module:: django.dispatch
    :synopsis: Signal dispatch
@@ -17,43 +15,68 @@ Django には「シグナルディスパッチャ (signal dispatcher)」が組�
 知できるのです。シグナルは、たくさんのコードが同じイベントを待ち受けるよう
 な状況で特に便利です。
 
-Django は、自分自身の特定のアクションを通知するための :ref:`組み込みシグナ
-ル<ref-signals>` を提供しています。。組み込みシグナルの中には、以下のような
+Django は、自分自身の特定のアクションを通知するための :doc:`組み込みシグナ
+ル</ref/signals>` を提供しています。組み込みシグナルの中には、以下のような
 便利なものがあります:
 
-    * :data:`django.db.models.signals.pre_save` および
-      :data:`django.db.models.signals.post_save`
+* :data:`django.db.models.signals.pre_save` および
+  :data:`django.db.models.signals.post_save`
 
-      モデルの :meth:`~django.db.models.Model.save` メソッド呼び出しの前後
-      で送信されます。
+  モデルの :meth:`~django.db.models.Model.save` メソッド呼び出しの前後
+  で送信されます。
 
-    * :data:`django.db.models.signals.pre_delete` および
-      :data:`django.db.models.signals.post_delete`
+* :data:`django.db.models.signals.pre_delete` および
+  :data:`django.db.models.signals.post_delete`
 
-      モデルの :meth:`~django.db.models.Model.delete` メソッド呼び出しの前
-      後に送信されます。
+  モデルの :meth:`~django.db.models.Model.delete` メソッドか、クエリセットの
+  :meth:`~django.db.models.query.QuerySet.delete` 呼び出しの前後に送信されます。
 
+* :data:`django.db.models.signals.m2m_changed`
 
-    * :data:`django.core.signals.request_started` および
-      :data:`django.core.signals.request_finished`
+  :class:`ManyToManyField` が変更されたときに送信されます。
 
-      Django が HTTP リクエストを処理する直前直後に送信されます。
+* :data:`django.core.signals.request_started` および
+  :data:`django.core.signals.request_finished`
 
-組み込みシグナルの全容と各々の解説は、 :ref:`組み込みシグナルのドキュメント
-<ref-signals>` で解説しています。
+  Django が HTTP リクエストを処理する直前直後に送信されます。
 
-シグナルは `自分て定義したり送信したり
-<topics-signals-defining-and-sending>`_ できます。詳しくは以下を参照し
+組み込みシグナルの全容と各々の解説は、 :doc:`組み込みシグナルのドキュメント
+</ref/signals>` で解説しています。
+
+シグナルは `自分で定義したり送信したり`_ できます。詳しくは以下を参照し
 てください。
+
+.. _自分で定義したり送信したり: `シグナルの定義と送信`_
 
 シグナルを待ち受ける
 ====================
 
-シグナルを受信するには、シグナルが送信されたときに呼び出される 
-*レシーバ(receiver)* 関数を登録する必要があります。 HTTP リクエストの処理が
-終ったときに呼び出されるシグナルのレシーバを登録して、この仕組みを見てみま
-しょう。この例では、 :data:`~django.core.signals.request_finished` シグナル
-をレシーバに結びつけます。
+シグナルを受信するには、シグナルが送信されたときに呼び出される *レシーバ
+(receiver)* 関数を、 :meth:`.Signal.connect` メソッドを使って登録する必要が
+あります。 
+
+.. method:: Signal.connect(receiver, [sender=None, weak=True, dispatch_uid=None])
+    
+    :param receiver: シグナルに結びつけられるコールバック関数を指定します。
+        詳細は :ref:`receiver-functions` を参照してください。
+    
+    :param sender: シグナルを受け取るための特定のセンダを指定します。詳細は
+        :ref:`connecting-to-specific-signals` を参照してください。
+
+    :param weak: デフォルトで Django は、シグナルハンドラを弱参照として保持
+        します。なのでレシーバがローカル関数の場合、ガベージコレクトされる恐れが
+        あります。これを防ぐにはシグナルの ``connect()`` メソッドを呼び出す際に
+        ``weak=False`` を渡してください。
+
+    :param dispatch_uid: ユニークな識別子。シグナルのレシーバに重複するシグナル
+        が送られる場合に備えたものです。詳細は
+        :ref:`preventing-duplicate-signals` を参照してください。
+
+HTTP リクエストの処理が終ったときに呼び出されるシグナルのレシーバを登録して、
+この仕組みを見てみましょう。この例では、
+:data:`~django.core.signals.request_finished` シグナルをレシーバに結びつけます。
+
+.. _receiver-functions:
 
 レシーバ関数
 -------------
@@ -70,24 +93,27 @@ Django は、自分自身の特定のアクションを通知するための :re
 ド引数 (``**kwargs``) をとります。シグナルハンドラは、全てこの形式の引数を
 とらねばなりません。
 
-``sender`` については `後で <a bit later>`_ 説明するとして、今はまず
+``sender`` については `後で`_ 説明するとして、今はまず
 ``**kwargs`` に注目しましょう。シグナルはすべてキーワード引数を伴い、キーワー
 ド引数の内容はいつでも変更される可能性があります。
 :data:`~django.core.signals.request_finished` の場合、ドキュメントにキーワー
 ド引数をもたないと明記されているので、シグナルハンドラを
 ``my_callback(sender)`` と書いていいと思いがちです。
 
-.. _a bit later: `connecting to signals sent by specific senders`_
+.. _後で: `特定のセンダから送信されたシグナルだけを結びつける`_
 
 しかしこれは誤っています。実際、 ``my_callback(sender)`` のように定義すると
 Django はエラーを送出します。というのも、将来シグナルに引数が追加されるかも
 しれず、そのときにもレシーバは新たに追加された引数を扱えねばならないからで
 す。
 
-レシーバ関数を結びつける
------------------------------
+.. _connecting-receiver-functions:
 
-次に、レシーバをシグナルに結びつけます:
+レシーバ関数を結びつける
+------------------------
+
+レシーバをシグナルに結びつけるには 2 つの方法があります。手動での接続方法は
+以下のようになります:
 
 .. code-block:: python
 
@@ -95,8 +121,24 @@ Django はエラーを送出します。というのも、将来シグナルに�
 
     request_finished.connect(my_callback)
 
+あるいは、 ``receiver`` デコレータを使う方法があります。レシーバを定義するときに
+使います:
+
+.. code-block:: python
+
+    from django.core.signals import request_finished
+    from django.dispatch import receiver
+
+    @receiver(request_finished)
+    def my_callback(sender, **kwargs):
+        print "Request finished!"
+
 これで、 ``my_callback`` 関数は、リクエストの処理が終了するたびに呼び出され
 ます。
+
+.. versionadded:: 1.3
+
+``receiver`` デコレータは Django 1.3 で追加されました。
 
 .. admonition:: シグナル処理のコードはどこにおけばよいのですか?
 
@@ -105,7 +147,7 @@ Django はエラーを送出します。というのも、将来シグナルに�
     ているモジュールを早々に import しておきたいいでしょう。そのため、シグ
     ナルハンドラの登録は ``models.py`` に置くのがよいでしょう。
 
-.. _connecting to signals sent by specific senders:
+.. _connecting-to-specific-signals:
 
 特定のセンダから送信されたシグナルだけを結びつける
 ----------------------------------------------------
@@ -124,21 +166,40 @@ Django はエラーを送出します。というのも、将来シグナルに�
 .. code-block:: python
 
     from django.db.models.signals import pre_save
+    from django.dispatch import receiver
     from myapp.models import MyModel
 
+    @receiver(pre_save, sender=MyModel)
     def my_handler(sender, **kwargs):
         ...
 
-    pre_save.connect(my_handler, sender=MyModel)
-
 これで、保存されるインスタンスが ``MyModel`` のインスタンスであるときだけ、
- ``my_handler`` 関数が呼び出されます。
+``my_handler`` 関数が呼び出されます。
 
 センダに入るオブジェクトは、シグナルによって異なります。個々のシグナルにつ
-いての情報は :ref:`組み込みシグナルのドキュメント <ref-signals>` を参照して
+いての情報は :doc:`組み込みシグナルのドキュメント </ref/signals>` を参照して
 ください。
 
-.. _topics-signals-defining-and-sending:
+.. _preventing-duplicate-signals:
+
+重複するシグナルを防ぐ
+----------------------
+
+いくつかの状況では、シグナルに結びつけたモジュールが複数回インポートされます。
+これはレシーバ関数が 2 回以上登録されている可能性があり、 1 つのシグナルイベント
+が複数回呼び出されています。
+
+この振る舞いに問題があるとき (例えばモデルが保存されたときにメールを送るシグナル
+を使うなど) は、ユニークな識別子である ``dispatch_uid`` 引数をレシーバ関数に
+渡してください。普通この識別子は文字列ですが、ハッシュ可能オブジェクトも使え
+ます。個々のユニークな ``dispatch_uid`` 値のため、レシーバ関数はシグナルに 1 度
+だけ結び付けられます。
+
+.. code-block:: python
+
+    from django.core.signals import request_finished
+
+    request_finished.connect(my_callback, dispatch_uid="my_unique_identifier")
 
 シグナルの定義と送信
 =====================
@@ -172,10 +233,13 @@ Django はエラーを送出します。というのも、将来シグナルに�
 シグナルを送信する
 --------------------
 
-.. method:: Signal.send(sender, **kwargs)
+Django にはシグナルを送信する方法が 2 つあります。
 
-シグナルを送信するには :meth:`Signal.send` を呼び出します。 ``sender`` を必
-ず指定し、必要に応じて追加の引数を指定します。
+ .. method:: Signal.send(sender, **kwargs)
+ .. method:: Signal.send_robust(sender, **kwargs)
+
+シグナルを送信するには :meth:`Signal.send` か :meth:`Signal.send_robust` を
+呼び出します。 ``sender`` を必ず指定し、必要に応じて追加の引数を指定します。
 
 例えば、 ``pizza_done`` シグナルを送信するには、以下のように書きます:
 
@@ -188,4 +252,27 @@ Django はエラーを送出します。というのも、将来シグナルに�
             pizza_done.send(sender=self, toppings=toppings, size=size)
             ...
 
+``send()`` と ``send_robust()`` の両方とも、要素数 2 のタプルのリスト
+``[(receiver, response), ... ]`` を返します。呼び出されたレシーバ関数とその
+レスポンス値が、リストになっています。
 
+``send()`` と ``send_robust()`` の違いは、レシーバ関数から送出された例外をどの
+ように処理するかです。 ``send()`` はレシーバから送出される例外を一切 *捕らえま
+せん* 。単純にエラーが伝播されます。レシーバがエラーを起こすと、シグナルは通知
+されません。
+
+``send_robust()`` は Python の ``Exception`` クラスから送出されるエラーを捕ら
+えます。シグナルがレシーバに通知されることを保証します。レシーバがエラーを送出
+するとエラーインスタンス (そのレシーバとエラー内容のタプル) が返されます。
+
+シグナルとの接続を断つ
+======================
+
+.. method:: Signal.disconnect([receiver=None, sender=None, weak=True, dispatch_uid=None])
+
+シグナルとレシーバの接続を断つには :meth:`Signal.disconnect` を呼び出します。
+引数は :meth:`.Signal.connect` に述べられている通りです。
+
+*receiver* 引数には、接続を断ちたい登録済みのレシーバを指定します。
+レシーバを識別するために ``dispath_uid``  使われている場合、 *receiver* は
+``None`` で構いません。
