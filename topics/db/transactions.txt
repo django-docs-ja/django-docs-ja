@@ -4,7 +4,9 @@
 データベーストランザクションの管理
 ==================================
 
-:revision-up-to: 11321 (1.1) unfinished
+:revision-up-to: 17812 (1.4)
+
+.. module:: django.db.transaction
 
 Django はトランザクションをサポートしているデータベース向けに、トランザクショ
 ン管理を制御する方法をいくつか提供しています。
@@ -33,14 +35,15 @@ HTTP リクエストとトランザクションを結び付ける
 クを起こします。
 
 この機能を有効にするには、 ``TransactionMiddleware`` ミドルウェアを
-``MIDDLEWARE_CLASSES`` 設定に追加します::
+:setting:`MIDDLEWARE_CLASSES` 設定に追加します::
 
 
     MIDDLEWARE_CLASSES = (
+        'django.middleware.cache.UpdateCacheMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.common.CommonMiddleware',
-        'django.middleware.cache.CacheMiddleware',
         'django.middleware.transaction.TransactionMiddleware',
+        'django.middleware.cache.FetchFromCacheMiddleware',
     )
 
 ミドルウェアの配置順はとても重要です。トランザクションミドルウェアは呼び出
@@ -48,92 +51,155 @@ HTTP リクエストとトランザクションを結び付ける
 従って、セッションミドルウェアをトランザクションミドルウェアの後ろに配置す
 ると、セッションの生成はトランザクションの一部に入ってしまいます。
 
-例外は ``CacheMiddleware`` です。このミドルウェアは影響を受けません。
-キャッシュミドルウェア自体は独自のデータベースカーソル (このカーソルは、内
-部的には独自のデータベース接続上にあります) を使います。
+いくつかのキャッシュミドルウェアの例外は:
+:class:`~django.middleware.cache.CacheMiddleware`,
+:class:`~django.middleware.cache.UpdateCacheMiddleware`,
+:class:`~django.middleware.cache.FetchFromCacheMiddleware` は影響を受けませ
+ん。データベースキャッシュを使用しているときでも、 Django のキャッシュミドル
+ウェアは独自のデータベースカーソルを使います。(内部的に独自のデータベース
+コネクションとマッピングされています。)
+
+.. _transaction-management-functions:
 
 ビュー内でトランザクションを管理する
 ====================================
 
+.. versionchanged:: 1.3
+    トランザクションを管理するコンテキストマネージャーは Django 1.3 で
+    新しくなりました。
+
 ほとんどのユーザにとって、非明示的なリクエストベースのトランザクションは素
 晴らしい働きをすることでしょう。しかしながら、トランザクションの管理方法を
-より詳細に制御したい場合、Python の関数デコレータを使って特定の関数のトラン
-ザクション処理を変更できます。
+より詳細に制御したい場合、 ``django.db.transaction`` の中の関数群を使って
+関数ごと、またはコードブロックベースごとにトランザクションを管理してください。
 
-.. note::
+これらの関数は、下記で詳細に説明しています。二つの方法で使えます。:
 
-    下記ではビュー関数を例に取ってはいますが、以下に述べるデコレータはビュー
-    関数でないものにも適用できます。
-
-.. _topics-db-transactions-autocommit:
-
-``django.db.transaction.autocommit``
-------------------------------------
-
-ビュー関数のトランザクションの挙動を、グローバルな設定に関係なく Django の
-デフォルトの挙動にスイッチするには、 ``autocommit`` デコレータを使います。
-
-例えば::
-
-    from django.db import transaction
-
-    @transaction.autocommit
-    def viewfunc(request):
-        ....
-
-``viewfunc()`` の中では、 ``model.save()`` や ``model.delete()`` 、その他デー
-タベースに書き込みを行う全ての関数でトランザクションを commit します。
-
-``django.db.transaction.commit_on_success``
--------------------------------------------
-
-``commit_on_success`` デコレータを使うと、関数内の全ての処理にわたるトラン
-ザクションを使えます::
+* 特定の関数のデコレーター_ としての一例は::
 
     from django.db import transaction
 
     @transaction.commit_on_success
     def viewfunc(request):
-        ....
+        # ...
+        # this code executes inside a transaction
+        # ...
 
-関数の実行に成功すると、 Django はそれまでの全ての作業を commit します。関
-数が例外を送出すると、 Django はトランザクションを rollback します。 
-
-``django.db.transaction.commit_manually``
------------------------------------------
-
-トランザクションを完全に管理したい場合には、 ``commit_manually`` デコレータ
-を使います。このデコレータは Django にユーザが自分でトランザクションを管理
-しようとしていることを知らせます。
-
-``commit()`` や ``rollback()`` を行わずにデータを変更した場合は
-``TransactionManagementError`` 例外を送出します。
-
-手動のトランザクション管理は以下のようになります::
+* `コンテキストマネージャー`_ として特定のブロックに使うには ::
 
     from django.db import transaction
 
-    @transaction.commit_manually
     def viewfunc(request):
-        ...
-        # commit/rollback を好きなタイミングで行えます
-        transaction.commit()
-        ...
+        # ...
+        # this code executes using default transaction management
+        # ...
 
-        # ただし、自分でちゃんとやっておくのを忘れないように!
-        try:
+        with transaction.commit_on_success():
+            # ...
+            # this code executes inside a transaction
+            # ...
+
+両方のテクニックは、 Python の全てのサポートバージョンで使えます。
+しかしながら、 Python 2.5 では、 ``with`` 文を使う際には
+``from __future__ import with_statement`` をモジュールの先頭で
+加えなければ行けません。
+
+.. _デコレーター: http://docs.python.org/glossary.html#term-decorator
+.. _コンテキストマネージャー: http://docs.python.org/glossary.html#term-context-manager
+
+.. note::
+
+    下記ではビュー関数を例に取ってはいますが、以下に述べるデコレータと
+    コンテキストマネージャーはトランザクションを扱う必要がある全ての
+    コードで使用することが出来ます。
+
+.. _topics-db-transactions-autocommit:
+
+.. function:: autocommit
+
+    ビュー関数のトランザクションの挙動を、グローバルな設定に関係なく Django の
+    デフォルトの挙動にスイッチするには、 ``autocommit`` デコレータを使います。
+
+    例えば::
+
+        from django.db import transaction
+
+        @transaction.autocommit
+        def viewfunc(request):
+            ....
+
+    ``viewfunc()`` の中では、 ``model.save()`` や ``model.delete()`` 、その他デー
+    タベースに書き込みを行う全ての関数でトランザクションを commit します。
+    ``viewfunc2()`` は同じ挙動になるでしょう、ですが ``"別のデータベース"``
+    コネクションにです。
+
+  .. function:: commit_on_success
+
+      ``commit_on_success`` デコレータを使うのは、関数内の全ての処理にわたるトラン
+      ザクションを使えます::
+
+          from django.db import transaction
+
+          @transaction.commit_on_success
+          def viewfunc(request):
+              ....
+
+          @transaction.commit_on_success(using="my_other_database")
+          def viewfunc2(request):
+              ....
+
+      関数の実行に成功すると、 Django はそれまでの全ての作業を commit します。関
+      数が例外を送出すると、 Django はトランザクションを rollback します。
+
+.. function:: commit_manually
+
+    トランザクションを完全に管理したい場合には、 ``commit_manually`` デコレータ
+    を使います。このデコレータは Django にユーザが自分でトランザクションを管理
+    しようとしていることを知らせます。
+
+    ``commit()`` や ``rollback()`` を行わずにデータを変更した場合は
+    ``TransactionManagementError`` 例外を送出します。
+
+    手動のトランザクション管理は以下のようになります::
+
+        from django.db import transaction
+
+        @transaction.commit_manually
+        def viewfunc(request):
             ...
-        except:
-            transaction.rollback()
-        else:
+            # commit/rollback を好きなタイミングで行えます
             transaction.commit()
+            ...
 
-.. admonition:: 以前の Django リリースを使っていたユーザへの重要なお知らせ:
+            # ただし、自分でちゃんとやっておくのを忘れないように!
+            try:
+                ...
+            except:
+                transaction.rollback()
+            else:
+                transaction.commit()
 
-    データベースの ``connection.commit()`` や ``connection.rollback()`` と
-    いった関数 (0.91 以前では ``db.commit()`` や ``db.rollback()`` と呼ばれ
-    ていました) はなくなり、 ``transaction.commit()`` および
-    ``transaction.rollback()`` コマンドに置き換わりました。
+        @transaction.commit_manually(using="my_other_database")
+        def viewfunc2(request):
+            ...
+
+.. _topics-db-transactions-requirements:
+
+トランザクションを操作する必要性
+================================
+
+.. versionadded:: 1.3
+
+Django はリクエストの完了より前にオープンなトランザクションを閉じなくてはいけ
+ません。もし、 :func:`autocommit` (通常のコミットモード)を使用しているか、
+func:`commit_on_success` ならば、自動的にその処理が行われます。
+しかし、手動でトランザクションを管理していると( :func:`commit_manually`
+デコレータを使用していれば)、トランザクションがコミットされるか、
+ロールバックするかをリクエストが終了する前に確かめておかなければいけません。
+
+これは全てのデータベースオペレーションに適用されます、書き込み処理だけでは
+ありません。データベースから読み取るだけだったとしても、トランザクションは
+リクエストが完了する前にコミットかロールバックされてなければいけません。
 
 トランザクション管理をグローバルに無効化する方法
 ================================================
@@ -154,43 +220,52 @@ HTTP リクエストとトランザクションを結び付ける
 
 .. _topics-db-transactions-savepoints:
 
-Savepoints
-==========
+セーブポイント
+==============
 
-A savepoint is a marker within a transaction that enables you to roll back
-part of a transaction, rather than the full transaction. Savepoints are
-available to the PostgreSQL 8 and Oracle backends. Other backends will
-provide the savepoint functions, but they are empty operations - they won't
-actually do anything.
+セーブポイントはトランザクションの中で、全てのトランザクションではなく、
+トランザクションの一部をロールバックできるようにします。セーブポイントは
+PostgreSQL 8 や Oracle 、MySQL (バージョン 5.0.3 とそれより新しいもので
+InnnoDB をストレージエンジンに使っているもの)バックエンドで使えます。
+他のバックエンドはセーブポイントを関数で提供します、しかしこれは空の
+オペレーションです -- これは実際何もしません。
 
-Savepoints aren't especially useful if you are using the default
-``autocommit`` behaviour of Django. However, if you are using
-``commit_on_success`` or ``commit_manually``, each open transaction will build
-up a series of database operations, awaiting a commit or rollback. If you
-issue a rollback, the entire transaction is rolled back. Savepoints provide
-the ability to perform a fine-grained rollback, rather than the full rollback
-that would be performed by ``transaction.rollback()``.
+.. versionchanged:: .14
+    MySQL バックエンドでのセーブポイントは Django 1.4 からサポートされ始め
+    ました。
 
-Savepoints are controlled by three methods on the transaction object:
+セーブポイントは、通常の ``autocommit`` を Django で使っている限りこれは
+役に立ちません。もし、 ``commit_on_success`` か ``commit_manually`` を
+使っていると、それぞれの開かれたトランザクションは一連のデータベース処理として
+構築され、コミットやロールバックを待ちます。もし生じた問題をロールバックしたい
+のならば、完全にトランザクションをロールバックします。セーブポイントは、
+``transaction.rollback()`` で動作する完全なロールバックを細かく
+動作させられるようにします、
 
-.. method:: transaction.savepoint()
+それぞれの関数は ``using`` 引数を取ります。これはこの処理が適用される
+データベースの名前にしてください。もし ``using`` 引数がなかったら、
+``"default"`` データベースが使われます。
 
-    Creates a new savepoint. This marks a point in the transaction that
-    is known to be in a "good" state.
+セーブポイントは、トランザクションオブジェクトの三つのメソッドによって
+コントロールされています。:
 
-    Returns the savepoint ID (sid).
+.. method:: transaction.savepoint(using=None)
 
-.. method:: transaction.savepoint_commit(sid)
+    新しいセーブポイントを作ります。これは、 "よい"状態にある
+    トランザクションをマークするポイントです。
 
-    Updates the savepoint to include any operations that have been performed
-    since the savepoint was created, or since the last commit.
+    セーブポイント ID (sid)を返します。
+
+.. method:: transaction.savepoint_commit(sid, using=None)
+
+    最後のコミットか、セーブポイントが作られたときからの動作を含むように
+    セーブポイントをアップデートします。
 
 .. method:: transaction.savepoint_rollback(sid)
 
-    Rolls the transaction back to the last point at which the savepoint was
-    committed.
+    トランザクションをセーブポイントかコミットされたところまで戻します。
 
-The following example demonstrates the use of savepoints::
+セーブポイントを使った例は::
 
     from django.db import transaction
 
@@ -230,23 +305,23 @@ Django はこのドキュメントの説明通りにトランザクションを�
 .. _information on MySQL transactions: http://dev.mysql.com/doc/refman/5.0/en/sql-syntax-transactions.html
 .. _`トランザクションに関する情報`: `information on MySQL transactions`_
 
-Handling exceptions within PostgreSQL transactions
-==================================================
+PostgreSQL のトランザクションで例外処理を扱う
+=============================================
 
-When a call to a PostgreSQL cursor raises an exception (typically
-``IntegrityError``), all subsequent SQL in the same transaction will fail with
-the error "current transaction is aborted, queries ignored until end of
-transaction block". Whilst simple use of ``save()`` is unlikely to raise an
-exception in PostgreSQL, there are more advanced usage patterns which
-might, such as saving objects with unique fields, saving using the
-force_insert/force_update flag, or invoking custom SQL.
+PostgreSQL のカーソルが例外を呼び出した時(典型的には ``IntegrityError`` )、
+同じトランザクションの中の以後全ての SQL がエラーにより失敗します "トランザ
+クションブロックの終わりまでクエリは無視され、最新のトランザクションは
+破棄されます"。一方で ``save()`` は PostgreSQL の例外処理とは似ていません、
+そこではもっと進歩して慣用的なパターンがあり、ユニークフィールドでオブジェクト
+をセーブするようなものであったり、 force_insert/force_update フラグを使って
+セーブしたり、またはカスタム SQL の
 
-There are several ways to recover from this sort of error.
+この種のエラーからの回復方法はいくつかあります。
 
-Transaction rollback
---------------------
+トランザクションロールバック
+----------------------------
 
-The first option is to roll back the entire transaction. For example::
+トランザクションを全て巻き戻すための最初のオプション例です::
 
     a.save() # Succeeds, but may be undone by transaction rollback
     try:
@@ -255,19 +330,20 @@ The first option is to roll back the entire transaction. For example::
         transaction.rollback()
     c.save() # Succeeds, but a.save() may have been undone
 
-Calling ``transaction.rollback()`` rolls back the entire transaction. Any
-uncommitted database operations will be lost. In this example, the changes
-made by ``a.save()`` would be lost, even though that operation raised no error
-itself.
+``transaction.rollback()`` を呼ぶと、トランザクションをまるまる元に戻します。
+コミットされてないデータベースへの手続きは全て失われます。この例では、
+``a.save()`` による変更は失われます、ですがこの手続きはエラーを出しません。
 
-Savepoint rollback
-------------------
 
-If you are using PostgreSQL 8 or later, you can use :ref:`savepoints
-<topics-db-transactions-savepoints>` to control the extent of a rollback.
-Before performing a database operation that could fail, you can set or update
-the savepoint; that way, if the operation fails, you can roll back the single
-offending operation, rather than the entire transaction. For example::
+セーブポイント　ロールバック
+----------------------------
+
+もし、 PostgreSQL 8 か、それより新しいものを使っていれば、
+:ref:`セーブポイント<topics-db-transactions-savepoints>` を使って
+データベースが動作する前、失敗するまえに戻せます、セーブポイントを
+アップグレードしたり設定することが出来ます。この方法は、オペレーションが
+失敗した時に、一つ前の手続きにもどることができ、完全にトランザクションを
+巻き戻さなくて済みます。::
 
     a.save() # Succeeds, and never undone by savepoint rollback
     try:
@@ -278,18 +354,16 @@ offending operation, rather than the entire transaction. For example::
         transaction.savepoint_rollback(sid)
     c.save() # Succeeds, and a.save() is never undone
 
-In this example, ``a.save()`` will not be undone in the case where
-``b.save()`` raises an exception.
+この例では、 ``a.save()`` は実行されておらず、 ``b.save()`` が
+例外を発生させています。
 
-Database-level autocommit
--------------------------
+データベースレベル　オートコミット
+----------------------------------
 
-.. versionadded:: 1.1
-
-With PostgreSQL 8.2 or later, there is an advanced option to run PostgreSQL
-with :ref:`database-level autocommit <ref-databases>`. If you use this option,
-there is no constantly open transaction, so it is always possible to continue
-after catching an exception. For example::
+PostgreSQL 8.2 かそれより新しいと、進歩したオプションが PostgreSQLを実行
+するためにあります。 :doc:`database-level autocommit </ref/databases>` です。
+もしこのオプションを使うと、恒常的にトランザクションが開かなくなり、
+例外を捕まえた後でも処理を継続できるようになります。::
 
     a.save() # succeeds
     try:
@@ -300,8 +374,8 @@ after catching an exception. For example::
 
 .. note::
 
-    This is not the same as the :ref:`autocommit decorator
-    <topics-db-transactions-autocommit>`. When using database level autocommit
-    there is no database transaction at all. The ``autocommit`` decorator
-    still uses transactions, automatically committing each transaction when
-    a database modifying operation occurs.
+    これは、 :ref:`オートコミットデコレータ<topics-db-transactions-autocommit>`
+    と同じではなく、データベースレベルでのオートコミットを使う時に、それは
+    データベースのトランザクションは全くありません。 ``オートコミット``
+    でコレーッタはトランザクションを使い、データベースが変化する処理が生じた
+    時に、自動的にそれぞれのトランザクションをコミットします。

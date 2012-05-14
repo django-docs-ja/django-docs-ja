@@ -4,15 +4,15 @@
 クエリを生成する
 =================
 
-:revision-up-to: 11321 (1.1) unfinished
+:revision-up-to: 17812 (1.4)
 
 .. currentmodule:: django.db.models
 
-:ref:`データモデル <topics-db-models>` を作成したら、次はデータベースからデー
+:doc:`データモデル </topics/db/models>` を作成したら、次はデータベースからデー
 タを取り出す必要があります。このドキュメントでは、モデルから利用できるデー
 タベース抽象化 API と、オブジェクトを生成、取得、更新する方法について説明し
 ます。モデルの照合オプションの詳細は
-:ref:`データモデルリファレンス <ref-models-index>` を参照してください。
+:doc:`データモデルリファレンス </ref/models/index>` を参照してください。
 
 このリファレンスでは、以下のような Poll アプリケーションを参考に話を進めま
 す:
@@ -40,6 +40,7 @@
         headline = models.CharField(max_length=255)
         body_text = models.TextField()
         pub_date = models.DateTimeField()
+        mod_date = models.DateTimeField()
         authors = models.ManyToManyField(Author)
         n_comments = models.IntegerField()
         n_pingbacks = models.IntegerField()
@@ -56,7 +57,8 @@ Django では、データベーステーブル上のデータを Python オブ�
 テーブル上のレコードを表現するという直感的なシステムを使っています。
 
 オブジェクトを生成するには、キーワード引数を使ってモデルクラスのインスタン
-スを生成し、 ``save()`` メソッドを呼び出してデータベースに保存します。
+スを生成し、 :meth:`~django.db.models.Model.save` メソッドを呼び出して
+データベースに保存します。
 
 モデルクラスは Python パス上のどこからでも import でき、期待通りに動作しま
 す (わざわざこのような説明をするのは、以前のバージョンの Django ではモデル
@@ -65,27 +67,31 @@ Django では、データベーステーブル上のデータを Python オブ�
 モデルが ``mysite/blog/models.py`` というファイルで定義されているとすると、
 オブジェクトの作成は以下の例のようになります::
 
-    >>> from mysite.blog.models import Blog
+    >>> from blog.models import Blog
     >>> b = Blog(name='Beatles Blog', tagline='All the latest Beatles news.')
     >>> b.save()
 
 この操作によって、背後では ``INSERT`` SQL 文が実行されます。 Django はユー
-ザが明示的に ``save()`` を呼び出すまでデータベースを操作しません。
+ザが明示的に :meth:`~django.db.models.Model.save` を呼び出すまで
+データベースを操作しません。
 
-``save()`` メソッドには戻り値がありません。
+:meth:`~django.db.models.Model.save` メソッドには戻り値がありません。
 
 .. seealso::
 
-    ``save()`` には高度な使い方のためのオプションがありますが、ここでは解説
-    しません。詳しくは ``save()`` のドキュメントを参照してください。
+    :meth:`~django.db.models.Model.save` には高度な使い方のための
+    オプションがありますが、ここでは解説しません。詳しくは
+    :meth:`~django.db.models.Model.save` のドキュメントを参照してください。
 
-    ワンステップでオブジェクトを生成して保存するには ``create`` メソッドを
+    ワンステップでオブジェクトを生成して保存するには
+    :meth:`~django.db.models.query.QuerySet.create()` メソッドを使って
+    ください。
 
 オブジェクトへの変更を保存する
 ==============================
 
-すでにデータベース上にあるオブジェクトへの変更を保存するには ``save()`` を
-使います。
+すでにデータベース上にあるオブジェクトへの変更を保存するには
+:meth:`~django.db.models.Model.save` を使います。
 
 ``Blog`` インスタンス ``b5`` がすでにデータベース上にあるとすると、以下の例
 は ``b5`` の名前を変更して、データベース上のレコードを更新します::
@@ -94,24 +100,40 @@ Django では、データベーステーブル上のデータを Python オブ�
     >> b5.save()
 
 この例では、背後で ``UPDATE`` SQL 文が実行されています。 Django は明示的に
-``save()`` を呼び出すまでデータベースを操作しません。
+:meth:`~django.db.models.Model.save` を呼び出すまでデータベースを操作しません。
 
 ``ForeignKey`` や ``ManyToManyField`` の保存
 ---------------------------------------------
 
-``ForeignKey`` フィールドの更新は、通常のフィールドへの変更と同じです。すな
-わち、適切な型のオブジェクトを代入して保存すると、フィールドの値を更新でき
-ます::
+:class:`~django.db.models.ForeignKey` フィールドの更新は、
+通常のフィールドへの変更と同じです。すなわち、
+適切な型のオブジェクトを代入して保存すると、フィールドの値を更新でき
+ます。この例では、``Entry`` のインスタンス ``entry``の
+``blog`` アトリビュートを更新しています。::
 
     >>> cheese_blog = Blog.objects.get(name="Cheddar Talk") 
     >>> entry.blog = cheese_blog 
     >>> entry.save() 
 
-``ManyToManyField`` の更新は少し違います。リレーションにレコードを一つ追加
-したい場合は ``add()`` メソッドを使います::
+:class:`~django.db.models.ManyToManyField` の更新は少し違います。
+リレーションにレコードを一つ追加したい場合は
+:meth:`~django.db.models.fields.related.RelatedManager.add` メソッドを使いま
+す。この例では、 ``entry`` オブジレェクトに、 ``Author`` インスタンスの
+``joe`` を加えています::
 
-    >> joe = Author.objects.create(name="Joe")
-    >> entry.authors.add(joe)
+    >>> from blog.models import Author
+    >>> joe = Author.objects.create(name="Joe")
+    >>> entry.authors.add(joe)
+
+複数のレコードを :class:`~django.db.models.ManyToManyField` に一度で加えたい
+場合、 :meth:`~django.db.models.fields.related.RelatedManager.add` に、
+複数の引数をくるんで呼び出せばいいのです。::
+
+    >>> john = Author.objects.create(name="John")
+    >>> paul = Author.objects.create(name="Paul")
+    >>> george = Author.objects.create(name="George")
+    >>> ringo = Author.objects.create(name="Ringo")
+    >>> entry.authors.add(john, paul, george, ringo)
 
 間違った型のオブジェクトを外部キーに代入したり ``add()`` したりすると
 Django はエラーを出します。
@@ -120,17 +142,20 @@ Django はエラーを出します。
 ==================
 
 オブジェクトをデータベースから取得するには、モデルクラスのマネジャ
-(``Manager``) を介してクエリセット (``QuerySet``) を構築します。
+:class:`~django.db.models.Manager` を介してクエリセット
+:class:`~django.db.models.query.QuerySet` を構築します。
 
-クエリセットはデータベース上にあるオブジェクトの集まりを表現しています。
-クエリセットには、集合を指定パラメタに従って絞り込むための条件である
-*フィルタ (filter)* を複数個持たせられます。 SQL 用語でいえば、クエリセット
-は ``SELECT`` 文であり、フィルタは ``WHERE`` や ``LIMIT`` のような限定節に
-あたります。
+:class:`~django.db.models.query.QuerySet` はデータベース上にある
+オブジェクトの集まりを表現しています。
+:class:`~django.db.models.query.QuerySet`には、集合を指定パラメタに従って
+絞り込むための条件である*フィルタ (filter)* を複数個持たせられます。
+SQL 用語でいえば、クエリセットは ``SELECT`` 文であり、
+フィルタは ``WHERE`` や ``LIMIT`` のような限定節にあたります。
 
-クエリセットはモデルのマネジャから取得します。モデルには最低一つの
-マネジャがあり、デフォルトでは ``objects`` という名前がついています。
-マネジャにはモデルクラスから直接アクセスしてください::
+:class:`~django.db.models.query.QuerySet` はモデル
+の:class:`~django.db.models.Manager` から取得します。モデルには最低一つの
+:class:`~django.db.models.Manager` があり、デフォルトでは ``objects`` という
+名前がついています。マネジャにはモデルクラスから直接アクセスしてください::
 
     >>> Blog.objects
     <django.db.models.manager.Manager object at ...>
@@ -146,22 +171,23 @@ Django はエラーを出します。
     ネジャはモデルのインスタンスではなくモデルクラスだけからアクセスできる
     ようになっています。)
 
-モデル内でのクエリセットの主なソースはマネジャです。マネジャは、データベー
-スオブジェクト上の全てのオブジェクトを表す「ルートの」クエリセットであるか
-のように振舞います。例えば、初期クエリセットである ``Blog.objects`` には、
-データベース上の全ての ``Blog`` オブジェクトが入っています。
+モデル内での ``QuerySets`` の主なソースは :class:`~django.db.models.Manager` です。
+マネジャは、データベースオブジェクト上の全てのオブジェクトを表す「ルートの」
+クエリセットであるかのように振舞います。例えば、初期クエリセットである
+``Blog.objects`` には、データベース上の全ての ``Blog`` オブジェクトが入っています。
 
 全てのオブジェクトの取得
 ------------------------
 
 テーブルからオブジェクトを取得する最も単純な方法は全てのオブジェクトを取得
-するというものです。全オブジェクトを取得するには、マネジャの ``all()`` メソッ
-ドを使って下さい::
+するというものです。全オブジェクトを取得するには、
+:class:`~django.db.models.Manager` の
+:meth:`~django.db.models.query.QuerySet.all` メソッドを使って下さい::
 
     >>> all_entries = Entry.objects.all()
 
-``all()`` メソッドはデータベース上の全てのオブジェクトを表現するクエリセッ
-トを返します。
+:meth:`~django.db.models.query.QuerySet.all` メソッドはデータベース上の全ての
+オブジェクトを表現する :meth:`~django.db.models.query.QuerySet` を返します。
 
 (``Entry.objects`` がクエリセットを返すというのなら、なぜ単に
 ``Entry.objects`` と書かないのでしょうか？それは、ルートのクエリセットであ
@@ -171,41 +197,46 @@ Django はエラーを出します。
 フィルタを使ってオブジェクトを取り出す
 ----------------------------------------
 
-マネジャによって提供される、いわゆるルートクエリセットを使えば、データベー
-ステーブル上の全てのオブジェクトを表せます。とはいえ、通常は全オブジェクト
-の集合からサブセットだけを取り出したいことでしょう。
+:class:`~django.db.models.Manager` によって提供される、
+いわゆるルート :class:`~django.db.models.query.QuerySet` を使えば、
+データベーステーブル上の全てのオブジェクトを表せます。とはいえ、
+通常は全オブジェクトの集合からサブセットだけを取り出したいことでしょう。
 
-サブセットを作成するには、フィルタ条件を追加して、初期クエリセットをリファ
-インする必要があります。クエリセットの洗練には、主に二つの方法があります:
+サブセットを作成するには、フィルタ条件を追加して、
+初期 :class:`~django.db.models.query.QuerySet` を
+リファインする必要があります。
+:class:`~django.db.models.query.QuerySet` の洗練には、主に二つの方法があります:
 
-    ``filter(**kwargs)``
-        指定した照合パラメタに一致するオブジェクトの集合を表現する、新たな
-        クエリセットを返します。
+``filter(**kwargs)``
+    指定した照合パラメタに一致するオブジェクトの集合を表現する、新たな
+    :class:`~django.db.models.query.QuerySet` を返します。
 
-    ``exclude(**kwargs)``
-        指定した照合パラメタに一致 *しない* オブジェクトの集合を表現する、
-        新たなクエリセットを返します。
+``exclude(**kwargs)``
+    指定した照合パラメタに一致 *しない* オブジェクトの集合を表現する、
+    新たな :class:`~django.db.models.query.QuerySet` を返します。
 
 照合パラメタ (上の関数定義における ``**kwargs``) は、後述の
 `フィールドの照合`_ で解説するフォーマットにせねばなりません。
 
-例えば、 2006 年のブログエントリを表すクエリセットを取得するには、以下のよ
-うに ``filter()`` を使います::
+例えば、 2006 年のブログエントリを表す :class:`~django.db.models.query.QuerySet` 
+を取得するには、以下のように :meth:`~django.db.models.query.QuerySet.filter` を使います::
 
     Entry.objects.filter(pub_date__year=2006)
 
-(``Entry.objects.all().filter(...)`` のように、 ``all()`` を使わなくてもよ
-いことに注意して下さい。 ``all()`` を使っても問題なく動作しますが、
-``all()`` が必要となるのはルートクエリセットから全てのオブジェクトを取り出
-したい場合だけです。)
+(``Entry.objects.all().filter(...)`` のように、
+:meth:`~django.db.models.query.QuerySet.all` を使わなくてもよいことに注意して下さい。
+:meth:`~django.db.models.query.QuerySet.all` を使っても問題なく動作しますが、
+:meth:`~django.db.models.query.QuerySet.all` が必要となるのはルートクエリセットから
+全てのオブジェクトを取り出したい場合だけです。)
 
 .. _chaining-filters:
 
 フィルタの連鎖
 ~~~~~~~~~~~~~~
 
-クエリセットをリファインした結果は、それ自体クエリセットになります。従って、
-リファイン操作は連鎖させられます。例えば::
+:class:`~django.db.models.query.QuerySet` をリファインした結果は、
+それ自体 :class:`~django.db.models.query.QuerySet` になります。
+従って、リファイン操作は連鎖させられます。例えば::
 
     >>> Entry.objects.filter(
     ...     headline__startswith='What'
@@ -225,10 +256,11 @@ Django はエラーを出します。
 フィルタしたクエリセットは一意なオブジェクトである
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-クエリセットのリファインを行うと、その都度新たなクエリセットを得ます。新た
-なクエリセットは以前のクエリセットになんら縛られていません。リファイン操作
-のたびに、別個の独立したクエリセットが作成され、個別に保存したり、再利用し
-たりできます。
+:class:`~django.db.models.query.QuerySet` のリファインを行うと、
+その都度新たなクエリセットを得ます。新たな :class:`~django.db.models.query.QuerySet` は
+以前のクエリセットになんら縛られていません。リファイン操作のたびに、
+別個の独立した :class:`~django.db.models.query.QuerySet` が作成され、個別に保存したり、
+再利用したりできます。
 
 例えば::
 
@@ -249,8 +281,10 @@ Django はエラーを出します。
 クエリセットは遅延評価される
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-クエリセットの評価は遅延型 (lazy) です。すなわち、クエリセットの作成自体は
-データベース操作を引き起こしません。クエリセットは *評価される* までデータ
+クエリセットの評価は遅延型 (lazy) です。すなわち、
+:class:`~django.db.models.query.QuerySet` の作成自体は
+データベース操作を引き起こしません。
+:class:`~django.db.models.query.QuerySet` は *評価される* までデータ
 ベースへのクエリを実行しないので、延々フィルタを重ねられます::
 
     >>> q = Entry.objects.filter(headline__startswith="What")
@@ -265,14 +299,50 @@ Django はエラーを出します。
 るのです。値評価がいつ行われているかは、
 :ref:`when-querysets-are-evaluated` で詳しく説明しています。
 
-その他のクエリセットメソッド
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _retriving-single-object-with-get:
 
-ほとんどの場合、データベース上のオブジェクトを照合するには、 ``all()``,
-``filter()``, ``exclude()`` メソッドで事足ります。とはいえ、クエリセットが
-サポートしているメソッドはもっとたくさんあります。クエリセットメソッドの詳
-細な説明は、 :ref:`クエリセット API リファレンス <queryset-api>` を参照して
-ください。
+ゲットを使って一つのオブジェクトを取り出す
+------------------------------------------
+
+:meth:`~django.db.models.query.QuerySet.filter` は常に、
+:class:`~django.db.models.query.QuerySet` を渡し、もし一つだけ
+オブジェクトがマッチするクエリ - のようなケースならば、
+これは単一の要素を含んだ :class:`~django.db.models.query.QuerySet`
+です。
+
+もし、クエリにマッチするのが一つだけだと分かるなら、
+`Manager` の :meth:`~django.db.models.query.QuerySet.get` メソッドが使えます。
+これはオブジェクトを直接的に返します。::
+
+    >>> one_entry = Entry.objects.get(pk=1)
+
+:meth:`~django.db.models.query.QuerySet.filter` と同じように、
+クエリは :meth:`~django.db.models.query.QuerySet.get` と一緒に使えます、
+もう一度 `フィールドの照合`_ を見てください。
+
+:meth:`~django.db.models.query.QuerySet.get` を使うのと、
+:meth:`~django.db.models.query.QuerySet.filter` を  ``[0]`` でスライス
+するのとでは違いがあります。もし、クエリにマッチするものがなかった時、
+:meth:`~django.db.models.query.QuerySet.get` は ``DoesNotExist`` 例外を
+送出します。この例外はモデルクラスの属性で、クエリは上にあるコードのように
+動きます、もし ``Entry`` オブジェクトに 1 というプライマリーキーがないなら、
+Django は ``Entry.DoesNotExist`` 例外を送出します。
+
+同様に、 Django は :meth:`~django.db.models.query.QuerySet.get` クエリで
+一つ以上のアイテムとマッチした場合にも例外を送出します。このようなケースでは、
+``MultipleObjectsReturned`` がモデルクラス自身の属性に反しています。
+
+その他のクエリセットメソッド
+----------------------------
+
+ほとんどの場合、データベース上のオブジェクトを照合するには、
+:meth:`~django.db.models.query.QuerySet.all` か、
+:meth:`~django.db.models.query.QuerySet.get`
+:meth:`~django.db.models.query.QuerySet.filter`
+:meth:`~django.db.models.query.QuerySet.exclude`
+メソッドで事足ります。とはいえ、クエリセットがサポートしているメソッドは
+もっとたくさんあります。クエリセットメソッドの詳細な説明は、
+:ref:`クエリセット API リファレンス <queryset-api>` を参照してください。
 
 .. _limiting-querysets:
 
@@ -291,9 +361,11 @@ Django はエラーを出します。
 
     >>> Entry.objects.all()[5:10]
 
-Negative indexing (i.e. ``Entry.objects.all()[-1]``) is not supported.
+負の数でのインデクシングはサポートしていません。
+(すなわち、 ``Entry.objects.all()[-1]`` このようなものです)
 
-一般に、クエリセットをスライスしてもクエリセットを新たに生成して返すだけで、
+一般に、 :class:`~django.db.models.query.QuerySet` をスライスしても
+:class:`~django.db.models.query.QuerySet` を新たに生成して返すだけで、
 クエリの評価は行いません。例外はスライス表記に「ステップ (step)」パラメタを
 使ったときです。以下の例では、クエリを実際に実行し、最初の 10 オブジェクト
 中から 1 つおきにオブジェクトを取り出したリストを返します::
@@ -312,8 +384,8 @@ Negative indexing (i.e. ``Entry.objects.all()[-1]``) is not supported.
     >>> Entry.objects.order_by('headline')[0:1].get()
 
 ただし、指定条件にマッチするオブジェクトがない場合、前者は ``IndexError``,
-後者は ``DoesNotExist`` を送出します。詳しくは ``get()`` のドキュメントを参
-照してください。
+後者は ``DoesNotExist`` を送出します。詳しくは
+:meth:`~django.db.models.query.QuerySet.get` のドキュメントを参照してください。
 
 .. _field-lookups-intro:
 
@@ -321,8 +393,10 @@ Negative indexing (i.e. ``Entry.objects.all()[-1]``) is not supported.
 ----------------
 
 フィールドの照合操作によって、 SQL の ``WHERE`` 節の中身が決まります。フィー
-ルドの照合を行うには、 ``filter()``, ``exclude()`` および ``get()`` といっ
-たクエリセットのメソッドのキーワード引数を指定します。
+ルドの照合を行うには、 :meth:`~django.db.models.query.QuerySet.filter`,
+:meth:`~django.db.models.query.QuerySet.exclude` および
+:meth:`~django.db.models.query.QuerySet.get` といった
+:class:`~django.db.models.query.QuerySet` のメソッドのキーワード引数を指定します。
 
 基本的に、照合のキーワード引数名は  ``field__lookuptype=value`` のような形
 式をとります (アンダースコアは二重です)。例えば::
@@ -333,15 +407,24 @@ Negative indexing (i.e. ``Entry.objects.all()[-1]``) is not supported.
 
     SELECT * FROM blog_entry WHERE pub_date <= '2006-01-01';
 
-.. admonition:: How this is possible
+.. admonition:: これがどうして可能なのか
 
    Python には、任意の名前と値をもった引数を受け取れる関数を定義する機能が
    あり、引数名とその値は実行時に評価されます。くわしい情報は公式の Python
    チュートリアルの `キーワード引数`_ を参照してください。
 
-   .. _`Keyword Arguments`: http://docs.python.org/tut/node6.html#SECTION006720000000000000000
+   .. _`Keyword Arguments`: http://docs.python.org/tutorial/controlflow.html#keyword-arguments
    .. _`キーワード引数`: 
        http://www.python.jp/doc/release/tut/node6.html#SECTION006720000000000000000
+
+.. versionchanged:: 1.4
+    照合の中でのフィールドの指定は、モデルフィールドの名前でなければいけませ
+    ん。 :class:`~django.db.models.ForeignKey` の場合、例外ががありますが、
+    フィールドネームを ``_id`` というサフィックス(suffix)で指定できます。
+    このようなケースでは、バリューパラメータはフォーリンモデルの
+    プライマリーキーの生の値を含みます。例えば::
+
+        >>> Entry.objects.filter(blog_id__exact=4)
 
 照合時に無効なキーワード引数が渡されると、 ``TypeError`` が送出されます。
 
@@ -349,58 +432,60 @@ Negative indexing (i.e. ``Entry.objects.all()[-1]``) is not supported.
 ファレンスは :ref:`フィールド照合リファレンス <field-lookups>` を参照してく
 ださい。ここでは、よく使う照合タイプをいくつか示します:
 
-    :lookup:`exact`
-        「厳密一致」です。例えば::
-        
-            >>> Entry.objects.get(headline__exact="Man bites dog")
-
-        は、以下のような SQL を生成します:
-        
-        .. code-block:: sql
-
-            SELECT ... WHERE headline = 'Man bits dog';
-            
-        照合タイプを指定しなかった場合、つまり二重アンダースコアの入ったキー
-	ワード引数を使わないかぎり、照合条件は ``exact`` とみなされます。
-
-        例えば、以下の二つの文は同じ意味です::
-
-            >>> Blog.objects.get(id__exact=14)  # Explicit form
-            >>> Blog.objects.get(id=14)         # __exact is implied
-
-        ``exact`` はよく使われるため、便宜的にこのような仕様にしています。
-        
-    :lookup:`iexact`
-        大小文字を区別しない一致です。以下のクエリ::
-        
-            >>> Blog.objects.get(name__iexact="beatles blog")
-            
-        は、 "Beatles Blog", "beatles blog", "BeAtlES blOG" といったタイト
-        ルの ``Blog`` オブジェクトにマッチします。
+:lookup:`exact`
+    「厳密一致」です。例えば::
     
-    :lookup:`contains`
-        大小文字を区別する部分一致テストです。以下のクエリ::
+        >>> Entry.objects.get(headline__exact="Man bites dog")
 
-            Entry.objects.get(headline__contains='Lennon')
+    は、以下のような SQL を生成します:
+    
+    .. code-block:: sql
 
-        は、おおざっぱにいって以下の SQL に変換されます:
+        SELECT ... WHERE headline = 'Man bits dog';
         
-        .. code-block:: sql
+    照合タイプを指定しなかった場合、つまり二重アンダースコアの入ったキー
+    ワード引数を使わないかぎり、照合条件は ``exact`` とみなされます。
 
-            SELECT ... WHERE headline LIKE '%Lennon%';
+    例えば、以下の二つの文は同じ意味です::
 
-        ``'Today Lennon honored'`` には一致しますが、 
-	``'today lennon honored'`` には一致しないので注意してください。
+        >>> Blog.objects.get(id__exact=14)  # Explicit form
+        >>> Blog.objects.get(id=14)         # __exact is implied
+
+    ``exact`` はよく使われるため、便宜的にこのような仕様にしています。
+    
+:lookup:`iexact`
+    大小文字を区別しない一致です。以下のクエリ::
+    
+        >>> Blog.objects.get(name__iexact="beatles blog")
         
-        大小文字を区別しない :lookup:`icontains` もあります。
-        
-    :lookup:`startswith`, :lookup:`endswith`
-        それぞれ、前方一致と後方一致です。大小文字を区別しない 
-        :lookup:`istartswith` や :lookup:`iendswith` もあります。
+    は、 "Beatles Blog", "beatles blog", "BeAtlES blOG" といったタイト
+    ルの ``Blog`` オブジェクトにマッチします。
+
+:lookup:`contains`
+    大小文字を区別する部分一致テストです。以下のクエリ::
+
+        Entry.objects.get(headline__contains='Lennon')
+
+    は、おおざっぱにいって以下の SQL に変換されます:
+    
+    .. code-block:: sql
+
+        SELECT ... WHERE headline LIKE '%Lennon%';
+
+    ``'Today Lennon honored'`` には一致しますが、 
+    ``'today lennon honored'`` には一致しないので注意してください。
+    
+    大小文字を区別しない :lookup:`icontains` もあります。
+    
+:lookup:`startswith`, :lookup:`endswith`
+    それぞれ、前方一致と後方一致です。大小文字を区別しない 
+    :lookup:`istartswith` や :lookup:`iendswith` もあります。
 
 ここに挙げたのはほんの一部です。全ての照合タイプの解説は
 :ref:`フィールド照合タイプのリファレンス <field-lookups>` を参照してくださ
 い。
+
+.. _lookups-that-span-relationships:
 
 リレーションをまたいだ照合
 ---------------------------
@@ -436,7 +521,7 @@ Django では、背後で自動的に SQL ``JOIN`` を処理し、照合の際�
 (``Author`` モデルは存在するものとします) ``entry`` の ``author`` を空にし
 ていると、 Django は ``author`` が存在しないために ``name`` を辿れませんが、
 エラーは送出せず、あたかも ``name`` も空であるかのように扱います。たいてい
-は、この仕様で期待通りに動きますが、 ``isnull`` を使うと、少し混乱をきたし
+は、この仕様で期待通りに動きますが、 :lookup:`isnull` を使うと、少し混乱をきたし
 ます。すなわち::
 
     Blog.objects.filter(entry__author__name__isnull=True)
@@ -451,9 +536,10 @@ Django では、背後で自動的に SQL ``JOIN`` を処理し、照合の際�
 多値のリレーションをスパンする
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.0
 
-``ManyToManyField`` や ``ForeignKey`` の逆リレーションを使ってフィルタを行
+
+:class:`~django.db.models.ManyToManyField` や
+:class:`~django.db.models.ForeignKey` の逆リレーションを使ってフィルタを行
 う場合、 2 種類の異なるフィルタ方法があります。 ``Blog`` / ``Entry`` のリレー
 ション (``Blog`` から ``Entry`` が 1 対多であるようなリレーション) を考えて
 みましょう。このようなモデルでは、例えばヘッドラインに *'Lennon'* を含み、
@@ -463,15 +549,18 @@ Django では、背後で自動的に SQL ``JOIN`` を処理し、照合の際�
 トリが一つの ``Blog`` に関連付けられているので、いずれのクエリも実行可能で
 すし、意味をなす場合があるでしょう。
 
-``ManyToManyField`` を使っている場合にも、同じような状況が起こります。例え
-ば、 ``Entry`` に ``tags`` という名前の ``ManyToManyField`` があり、
-*'music'* や *'band'* というタグに関連付けられたエントリを検索したい場合や、
-*'music'* タグのついた *'public'* 状態のエントリを取り出したい場合があるで
+:class:`~django.db.models.ManyToManyField` を使っている場合にも、
+同じような状況が起こります。例えば、 ``Entry`` に ``tags`` という名前の 
+:class:`~django.db.models.ManyToManyField` があり、
+*"music"* や *"band"* というタグに関連付けられたエントリを検索したい場合や、
+*"music"* タグのついた *"public"* 状態のエントリを取り出したい場合があるで
 しょう。
 
-こうした状況をうまく扱うために、 Django には ``filter()`` および
-``exclude()`` といった呼び出しがあります。 ``filter()`` に指定した条件は同
-時に適用され、条件全てに一致する要素をフィルタします。 ``filter()`` を連続
+こうした状況をうまく扱うために、
+Django には :meth:`~django.db.models.query.QuerySet.filter` および
+:meth:`~django.db.models.query.QuerySet.exclude` といった呼び出しがあります。
+:meth:`~django.db.models.query.QuerySet.filter` に指定した条件は同時に適用され、
+条件全てに一致する要素をフィルタします。 ``filter()`` を連続
 して呼び出すと、通常はオブジェクトの集合により狭い制約をかけますが、多値リ
 レーションの場合、新たな制約は、前の ``filter()`` で絞り込んだリレーション
 先をさらに絞り込むのではなく、前の ``filter()`` で絞り込んだリレーション先
@@ -499,53 +588,63 @@ Django では、背後で自動的に SQL ``JOIN`` を処理し、照合の際�
 きもあります。一つめの ``filter()`` でフィルタしているのはあくまでも
 ``Blog`` であって、 ``Entry`` ではないからです。
 
-この挙動は、 ``exclude()`` にもあてはまります。一つの ``exclude()`` に指定
-した条件は、 (多値リレーションの場合は) 各インスタンスに同時に適用されます。
-``filter()`` や ``exclude()`` を連続して呼び出すと、毎回違うリンク先集合を
-使ってフィルタを行ってしまう可能性があるのです。
+この挙動は、 :meth:`~django.db.models.query.QuerySet.exclude` にもあてはまります。
+一つの :meth:`~django.db.models.query.QuerySet.exclude` に指定した条件は、
+(多値リレーションの場合は) 各インスタンスに同時に適用されます。
+:meth:`~django.db.models.query.QuerySet.filter` や
+:meth:`~django.db.models.query.QuerySet.exclude` を連続して呼び出すと、
+毎回違うリンク先集合を使ってフィルタを行ってしまう可能性があるのです。
 
 .. _query-expressions:
 
-Filters can reference fields on the model
------------------------------------------
+フィルタはモデルのフィールドを参照できる
+----------------------------------------
 
-.. versionadded:: 1.1
+これまで与えられた例の中で、私たちはフィルタを同じモデルフィールドの
+バリューと比較してきました。しかし、モデルの値を同一のモデルの別のフィールドと
+比較したい場合はどうしたらよいのでしょう？
 
-In the examples given so far, we have constructed filters that compare
-the value of a model field with a constant. But what if you want to compare
-the value of a model field with another field on the same model?
+Django は :ref:`F() expressions <query-expressions>` をこの比較のために
+提供しています。 ``F()`` のインスタンスはクエリの内側のモデルフィールドへの
+参照として働きます。これらのは同じモデルインス
+タンスの異なる二つのフィールドを比較するクエリフィルターです。
 
-Django provides the ``F()`` object to allow such comparisons. Instances
-of ``F()`` act as a reference to a model field within a query. These
-references can then be used in query filters to compare the values of two
-different fields on the same model instance.
-
-For example, to find a list of all blog entries that have had more comments
-than pingbacks, we construct an ``F()`` object to reference the comment count,
-and use that ``F()`` object in the query::
+例えば、これは pingbacks よりコメントが多い全てのブログエントリーのリスト
+を見つけるものです。 ``F()``　オブジェクトを使って、 pingback　のカウント数
+が参照できるようにすます。::
 
     >>> from django.db.models import F
-    >>> Entry.objects.filter(n_pingbacks__lt=F('n_comments'))
+    >>> Entry.objects.filter(n_comments__gt=F('n_pingbacks'))
 
-Django supports the use of addition, subtraction, multiplication,
-division and modulo arithmetic with ``F()`` objects, both with constants
-and with other ``F()`` objects. To find all the blog entries with *twice* as
-many comments as pingbacks, we modify the query::
 
-    >>> Entry.objects.filter(n_pingbacks__lt=F('n_comments') * 2)
+Django は追加や削除、かけ算、分割と剰余などの計算も ``F()`` オブジェクトで
+使えるようにサポートしています。ブログエントリーの中で、 pingbacks　よりコメン
+トが *二倍* 以上あるものを抽出するには、クエリをこのようにします::
 
-To find all the entries where the sum of the pingback count and comment count
-is greater than the rating of the entry, we would issue the query::
+    >>> Entry.objects.filter(n_comments__gt=F('n_pingbacks') * 2)
+
+ブログエントリーの中で、 pingback 自体ののカウント数とコメント数よりも
+ブログエントリーの、エントリーのレーティングが小さい・少ないものにするには
+このようにクエリを書きます。::
 
     >>> Entry.objects.filter(rating__lt=F('n_comments') + F('n_pingbacks'))
 
-You can also use the double underscore notation to span relationships in
-an ``F()`` object. An ``F()`` object with a double underscore will introduce
-any joins needed to access the related object. For example, to retrieve all
-the entries where the author's name is the same as the blog name, we could
-issue the query:
+また、 ``F()`` オブジェクト内で離れた関係を表記するために、ダブルアンダー
+スコア表記を用いることができます。ダブルアンダースコア付きの
+``F()`` オブジェクトは、ひもづいているオブジェクトへのアクセスが必要な
+時のために存在しています。例えば、作者の名前がブログの名前と同じ
+全てのエントリーを取り出そうとしたとき、このようなクエリが発行できます。
 
-    >>> Entry.objects.filter(author__name=F('blog__name'))
+    >>> Entry.objects.filter(authors__name=F('blog__name'))
+
+.. versionadded:: 1.3
+
+date と date/time フィールドは、 :class:`~datetime.timedelta` オブジェクト
+で足したり引いたりできます。これは発行されてから三日以上経た全ての
+エントリーを抽出するクエリです::
+
+    >>> from datetime import timedelta
+    >>> Entry.objects.filter(mod_date__gt=F('pub_date') + timedelta(days=3))
 
 pk 照合ショートカット
 ---------------------
@@ -609,21 +708,25 @@ Django はクオートの処理に気を配ってくれます。 SQL は以下�
 キャッシュとクエリセット
 ------------------------
 
-データベースへのアクセスを最小限にとどめるため、クエリセット各々にはキャッ
-シュがあります。効率的なコードを書く上で、キャッシュのからくりを理解してお
-くのは重要なことです。
+データベースへのアクセスを最小限にとどめるため、
+:class:`~django.db.models.query.QuerySet` 各々にはキャッシュがあります。
+効率的なコードを書く上で、キャッシュのからくりを理解しておくのは重要なことです。
 
-クエリセットが新たに生成された時点では、キャッシュは空です。クエリセットを
+:class:`~django.db.models.query.QuerySet` が新たに生成された時点では、
+キャッシュは空です。 :class:`~django.db.models.query.QuerySet` を
 最初に評価したとき (すなわち、データベースへのクエリが最初に生じたとき)、
 Django はクエリ結果をクエリセットオブジェクト内のキャッシュに保存し、明示的
-にリクエストした結果だけ (例えば、クエリセットに対してイテレーション操作を
-する場合には、結果セットの最初の要素) を返します。それ以後は、クエリセット
-を際利用するとキャッシュ済みの結果を返します。
+にリクエストした結果だけ (例えば、
+:class:`~django.db.models.query.QuerySet`\'s に対してイテレーション操作を
+する場合には、結果セットの最初の要素) を返します。それ以後は、
+:class:`~django.db.models.query.QuerySet`\'
+を再利用するとキャッシュ済みの結果を返します。
 
-このキャッシュの挙動をよく覚えておいて下さい。というのも、クエリセットを正
-しく扱わないと、おもわぬところで手を噛まれるはめになるからです。例えば、以
-下の例では二つのクエリセットを作成し、値を評価して、すぐにクエリセットを捨
-ててしまっています::
+このキャッシュの挙動をよく覚えておいて下さい。というのも、
+:class:`~django.db.models.query.QuerySet` を正しく扱わないと、
+おもわぬところで手を噛まれるはめになるからです。例えば、以下の例では
+二つの :class:`~django.db.models.query.QuerySet` を作成し、値を評価して、
+すぐにクエリセットを捨ててしまっています::
 
     >>> print [e.headline for e in Entry.objects.all()]
     >>> print [e.pub_date for e in Entry.objects.all()]
@@ -633,27 +736,31 @@ Django はクエリ結果をクエリセットオブジェクト内のキャッ�
 り削除されたりする可能性があるため、二つのリストには必ずしも同じデータベー
 スレコードが入っているとは限りません。
 
-こうした問題を避けるには、クエリセットを保存して再利用してください::
+こうした問題を避けるには、
+:class:`~django.db.models.query.QuerySet` を保存して再利用してください::
 
-    >>> queryset = Poll.objects.all()
+    >>> queryset = Entry.objects.all()
     >>> print [p.headline for p in queryset] # クエリセットを評価します。
     >>> print [p.pub_date for p in queryset] # キャッシュの値を再利用します。
 
 Q オブジェクトを使った複雑な照合
 ================================
 
-``filter()`` などで複数のキーワード引数を指定してクエリを行うと、各々のキー
-ワード引数の表す照合条件は違いに "AND" で結ばれます。より複雑なクエリ (例え
-ば ``OR`` を使ったクエリ) を実行する必要がある場合には ``Q`` オブジェクトを
-使えます。
+:meth:`~django.db.models.query.QuerySet.filter` などで複数の
+キーワード引数を指定してクエリを行うと、各々のキーワード引数の表す照合条件は
+違いに "AND" で結ばれます。より複雑なクエリ (例えば ``OR`` を使ったクエリ) を
+実行する必要がある場合には ``Q`` オブジェクトを使えます。
 
-``Q`` オブジェクト (``django.db.models.Q``) は、複数のキーワード引数
-をカプセル化するために使われます。キーワード引数は前述の 「フィールドの照合」
-で説明したものと同じです。
+.. comment: Link to Q does not work, since this documentation does not exist yet.
+
+:class:`~django.db.models.Q` オブジェクト (``django.db.models.Q``) は、
+複数のキーワード引数をカプセル化するために使われます。
+キーワード引数は前述の 「フィールドの照合」で説明したものと同じです。
 
 例えば、以下の ``Q`` オブジェクトは単一の ``LIKE`` クエリをカプセル化してい
 ます::
 
+    from django.db.models import Q
     Q(question__startswith='What')
 
 ``Q`` オブジェクトは ``&`` や ``|`` といった演算子で組み合わせられます。二
@@ -676,7 +783,9 @@ Q オブジェクトを使った複雑な照合
 
     Q(question__startswith='Who') | ~Q(pub_date__year=2005)
 
-キーワード引数をとる照合関数 (``filter()``, ``exclude()``, ``get()`` など)
+キーワード引数をとる照合関数 ( :meth:`~django.db.models.query.QuerySet.filter`
+:meth:`~django.db.models.query.QuerySet.exclude`
+:meth:`~django.db.models.query.QuerySet.get` など)
 には、複数の ``Q`` を固定引数として (名前なしの引数として) 渡せます。複数の
 ``Q`` オブジェクトを照合関数に渡した場合、それらは互いに "AND" で結ばれます。
 例えば::
@@ -714,7 +823,8 @@ Q オブジェクトを使った複雑な照合
     `OR lookups examples`_ の例には、 ``Q`` を使った Django のユニット
     テストがあります。
 
-    .. _OR lookups examples: http://code.djangoproject.com/browser/django/trunk/tests/modeltests/or_lookups/models.py
+    .. _OR lookups examples: https://code.djangoproject.com/browser/django/trunk/tests/modeltests/or_lookups/tests.py
+
 
 オブジェクトの比較
 ==================
@@ -740,13 +850,16 @@ Q オブジェクトを使った複雑な照合
 オブジェクトの削除
 ==================
 
-削除用のメソッドには、便宜的に ``delete()`` という名前が付いてます。このメ
-ソッドはオブジェクトをただちに削除し、戻り値を返しません::
+削除用のメソッドには、
+便宜的に :meth:`~django.db.models.Model.delete` という名前が付いてます。
+このメソッドはオブジェクトをただちに削除し、戻り値を返しません::
 
     e.delete()
 
-複数のオブジェクトの一斉削除も可能です。 ``QuerySet`` には ``delete()``
-メソッドがあり、 ``QuerySet`` の全てのメンバを削除します。
+複数のオブジェクトの一斉削除も可能です。
+:class:`~django.db.models.query.QuerySet` には
+:meth:`~django.db.models.query.QuerySet.delete`メソッドがあり、
+:class:`~django.db.models.query.QuerySet` の全てのメンバを削除します。
 
 例えば、 ``pub_date`` が 2005 年の ``Entry`` オブジェクトを全て削除するには
 以下のようにします::
@@ -756,20 +869,30 @@ Q オブジェクトを使った複雑な照合
 忘れてならないのは、この処理はできる限り SQL レベルで行われるため、
 ``delete()`` メソッドが全てのインスタンスの ``delete()`` メソッドを呼ぶとは
 限らないということです。モデルクラス上で ``delete()`` をカスタマイズしてい
-て、オブジェクトを削除するときに呼び出したいのなら、 ``QuerySet`` の
-``delete()`` メソッドで一括削除するのではなく、直接(``QuerySet`` の各要素を
+て、オブジェクトを削除するときに呼び出したいのなら、
+:class:`~django.db.models.query.QuerySet` の
+``delete()`` メソッドで一括削除するのではなく、直接
+( :class:`~django.db.models.query.QuerySet` の各要素を
 取り出して逐次 ``delete()`` を呼ぶなどして) 「手動で」インスタンスを削除せ
 ねばなりません。
 
-Django は、オブジェクトを削除する際に、SQLでいう ``ON DELETE CASCADE`` 制約
-をエミュレートします。すなわち、削除対象のオブジェクトを指すような外部キー
-を持つ全てのオブジェクトも同時に削除されるのです。::
+Django は、オブジェクトを削除する際に、通常 SQLでいう
+``ON DELETE CASCADE`` 制約をエミュレートします。すなわち、
+削除対象のオブジェクトを指すような外部キーを持つ全てのオブジェクトも
+同時に削除されるのです。::
 
     b = Blog.objects.get(pk=1)
     # 次の命令は、 Blog と Blog を指す Entry 全てを削除してしまいます。
     b.delete()
 
-``delete()`` は ``QuerySet`` のメソッドにすぎず、 ``Manager`` 自体には公開
+.. versionadded:: 1.3
+    このカスケードの挙動は :class:`~django.db.models.ForeignKey` の
+    :attr:`~django.db.models.ForeignKey.on_delete` 引数を通して変えることが出
+    来ます。
+
+:meth:`~django.db.models.query.QuerySet.delete` は
+:class:`~django.db.models.query.QuerySet` のメソッドにすぎず、
+:class:`~django.db.models.Manager` 自体には公開
 されていないので注意してください。これは誤って ``Entry.objects.delete()`` 
 を実行して *全ての* エントリを削除してしまわないようにするための安全機構で
 す。本当に全てのオブジェクトを削除 *したい* のなら、以下のように明示的に全
@@ -777,69 +900,121 @@ Django は、オブジェクトを削除する際に、SQLでいう ``ON DELETE 
 
     Entry.objects.all().delete()
 
+.. _topics-db-queries-copy:
+
+モデルインスタンスをコピーする
+==============================
+
+モデルインスタンスをコピーする組み込みのメソッドは提供されていません、
+ですが全てのフィールドとバリューを同一にした新しいインスタンスを簡単に作成する
+ことができます。最もシンプルなケースでは、 ``pk`` を ``None`` にすることができ
+ます。ブログの例を使うと::
+
+    blog = Blog(name='My blog', tagline='Blogging is easy')
+    blog.save() # post.pk == 1
+
+    blog.pk = None
+    blog.save() # post.pk == 2
+
+継承を使うと、もう少し複雑になってしまいます。 ``Blog`` のサブクラスについて
+考えてみましょう。::
+
+    class ThemeBlog(Blog):
+        theme = models.CharField(max_length=200)
+
+    django_blog = ThemeBlog(name='Django', tagline='Django is easy', theme = 'python')
+    django_blog.save() # django_blog.pk == 3
+
+継承の働きによって、 ``pk`` と ``id`` を None にしなくてはいけません::
+
+    django_blog.pk = None
+    django_blog.id = None
+    django_blog.save() # django_blog.pk == 4
+
+このプロセスはひもづいているオブジェクトをコピーしません。もし、関係性のあるも
+のもコピーしたいのならば、もう少し多めにコードを書かなければいけません。
+``Entry`` が ``Author`` に many to many フィールドを持っている場合::
+
+    entry = Entry.objects.all()[0] # some previous entry
+    old_authors = entry.authors.all()
+    entry.pk = None
+    entry.save()
+    entry.authors = old_authors # saves new many2many relations
+
 .. _topics-db-queries-update:
 
 複数のオブジェクトを一度に更新する
 ===================================
 
-.. versionadded:: 1.0
-
-クエリセットが表現する全てのオブジェクトのあるフィールドに特定の値を指定し
-たいような場合があります。 ``update()`` メソッドを使えば、この処理を実現で
-きます。例えば::
+:class:`~django.db.models.query.QuerySet` が表現する全てのオブジェクトのある
+フィールドに特定の値を指定したいような場合があります。
+:meth:`~django.db.models.query.QuerySet.update` メソッドを使えば、
+この処理を実現できます。例えば::
 
     # pub_date が 2007 の全エントリのヘッドラインを更新する
     Entry.objects.filter(pub_date__year=2007).update(headline='Everything is the same')
 
 この操作を行えるのは、リレーションフィールドでないフィールドか、
-``ForeignKey`` のフィールドのみです。また、フィールドに指定する値はハードコー
+:class:`~django.db.models.ForeignKey`
+のフィールドのみです。また、フィールドに指定する値はハードコー
 ドされた Python の値でなければなりません (つまり、その時の何らかのフィール
-ド値は直接セットできません)。 ``ForeignKey`` のフィールドを更新するには、以
-下のように、新たなモデルインスタンスを作成して渡します::
+ド値は直接セットできません)。 :class:`~django.db.models.ForeignKey`
+のフィールドを更新するには、以下のように、
+新たなモデルインスタンスを作成して渡します::
 
     >>> b = Blog.objects.get(pk=1)
-    
+
     # 全てのエントリをこの blog に属させる
     >>> Entry.objects.all().update(blog=b)
 
 ``update()`` メソッドは (``delete()`` と同様)、即座に適用され、値を返しませ
 ん。また、更新対象のクエリセットには、モデルの主のテーブル一つに対してし
-かアクセスできないという制限があります。従って、クエリセットを構築するとき
-に、リレーション先のフィールドでフィルタしたりしてはなりません。複数のテー
-ブルを操作するようなクエリセットに対しては、 ``update()`` は動作しません。
+かアクセスできないという制限があります。フィルターは関係するテーブルに
+使えますが、アップデートできるのはモデルのメインテーブルのカラムだけです。::
+
+    >>> b = Blog.objects.get(pk=1)
+
+    # この blog に属している全ての headline をアップデートします。
+    >>> Entry.objects.select_related().filter(blog=b).update(headline='Everything is the same')
+
 
 ``update()`` メソッドは SQL 文に直接変換されるので注意してください。このメ
 ソッドは、フィールド値の直接更新を大量一括実行するためのものです。
-モデルの ``save()`` メソッドを呼出さないので、 (``save()`` の呼び出しに連動
-している) ``pre_save`` や ``post_save`` といったシグナルは発生しません。
-クエリセット内の全ての要素に対して ``save()`` メソッドを適用したければ、
-単に全要素に渡って ``save()`` を呼び出してください::
+モデルの :meth:`~django.db.models.Model.save` メソッドを呼出さないので、
+( :class:`~django.db.models.query.QuerySet` の呼び出しに連動している)
+``pre_save`` や ``post_save`` といった
+シグナルは発生しません。:class:`~django.db.models.query.QuerySet` 内の全ての要素に対して
+``save()`` メソッドを適用したければ、
+単に全要素に渡って :meth:`~django.db.models.Model.save` を呼び出してください::
 
     for item in my_queryset:
         item.save()
 
-.. versionadded:: 1.1
+モデルの中の別フィールドの値によって別フィールドをアップデートするには
+:ref:`F() objects <query-expressions>` も使えます。これは、特に
+最新の値によってカウンタを増加させたい場合に使えます。例えば、
+pingback のカウント数をブログのエントリごとに増加させるには::
 
-Calls to update can also use :ref:`F() objects <query-expressions>` to update
-one field based on the value of another field in the model. This is especially
-useful for incrementing counters based upon their current value. For example, to
-increment the pingback count for every entry in the blog::
+>>> Entry.objects.all().update(n_pingbacks=F('n_pingbacks') + 1)
 
-    >>> Entry.objects.all().update(n_pingbacks=F('n_pingbacks') + 1)
-
-However, unlike ``F()`` objects in filter and exclude clauses, you can't
-introduce joins when you use ``F()`` objects in an update -- you can only
-reference fields local to the model being updated. If you attempt to introduce
-a join with an ``F()`` object, a ``FieldError`` will be raised::
+しかしながら、 ``F()`` はフィルタ内と EXCLUDE 句とは 違うところもあり、
+アップデートに ``F()`` オブジェクトを使った時には JOIN が使えません。
+つまり、アップデートされるモデル内で参照できるフィールドのみを使えるという
+ことです。もし、 JOIN を ``F()`` オブジェクトで使おうとした場合、
+``FieldError`` が生じます。::
 
     # THIS WILL RAISE A FieldError
     >>> Entry.objects.update(headline=F('blog__name'))
 
+.. _topics-db-queries-related:
+
 リレーション
 ============
 
-モデル内でリレーション (``ForeignKey``, ``OneToOneField``,
-``ManyToManyField``) を定義すると、そのモデルのインスタンスはリレーション先
+モデル内でリレーション ( :class:`~django.db.models.ForeignKey`
+:class:`~django.db.models.OneToOneField`
+:class:`~django.db.models.ManyToManyField` ) を定義すると、
+そのモデルのインスタンスはリレーション先
 のオブジェクトにアクセスするための便利な API を持つようになります。
 
 このドキュメントの冒頭のモデルを例にとると、 ``Entry`` オブジェクト ``e`` 
@@ -868,8 +1043,9 @@ Django はまた、リレーションの「相手側」へのアクセス API、
 順方向
 ~~~~~~
 
-モデルに ``ForeignKey`` フィールドがある場合、そのモデルのインスタンスは、
-単に属性を使ってリレーション先 (外部) のオブジェクトを参照できます。
+モデルに :class:`~django.db.models.ForeignKey` フィールドがある場合、
+そのモデルのインスタンスは、単に属性を使ってリレーション先 (外部) の
+オブジェクトを参照できます。
 
 例::
 
@@ -877,14 +1053,16 @@ Django はまた、リレーションの「相手側」へのアクセス API、
     >>> e.blog # リレーション先の Blog オブジェクトを返します。
 
 外部キー属性の値は取得 (get) も設定 (set) もできます。当然ながら、外部キー
-への変更は ``save()`` を呼び出すまでデータベースに反映されません。例えば::
+への変更は :meth:`~django.db.models.Model.save` を呼び出すまで
+データベースに反映されません。例えば::
 
     >>> e = Entry.objects.get(id=2)
     >>> e.blog = some_blog
     >>> e.save()
 
-``ForeignKey`` フィールドに ``null=True`` が設定されていた場合 (``NULL`` 値
-を許している場合)、以下の例のように ``None`` を代入できます::
+:class:`~django.db.models.ForeignKey` フィールドに ``null=True`` が
+設定されていた場合 (``NULL`` 値を許している場合)、
+以下の例のように ``None`` を代入できます::
 
     >>> e = Entry.objects.get(id=2)
     >>> e.blog = None
@@ -899,26 +1077,26 @@ Django はまた、リレーションの「相手側」へのアクセス API、
     >>> print e.blog  # データベースを検索して、関連づけられた Blog を返します。
     >>> print e.blog  # データベースは検索せず、キャッシュを使います。
 
-クエリセットのメソッド ``select_related()`` を使うと、一対多のリレーション
-のリレーション先オブジェクト全てをあらかじめ再帰的にキャッシュに取り込みま
-す。例えば::
+クエリセットのメソッド :meth:`~django.db.models.query.QuerySet.select_related` を
+使うと、一対多のリレーションのリレーション先オブジェクト全てをあらかじめ
+再帰的にキャッシュに取り込みます。例えば::
 
     >>> e = Entry.objects.select_related().get(id=2)
-    >>> print e.blog  # Doesn't hit the database; uses cached version.
-    >>> print e.blog  # Doesn't hit the database; uses cached version.
+    >>> print e.blog  # データベースを使わずにキャッシュを使います。
+    >>> print e.blog  # データベースを使わずにキャッシュを使います。
 
 .. _backwards-related-objects:
 
 「逆方向の」リレーション
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-あるモデルが ``ForeignKey`` で別のモデルにリレーションを張っている場合、リ
-レーションを張られた側のモデルのインスタンスは、リレーションを張った側のモ
-デルの全てのインスタンスを返すマネジャにアクセスでます。リレーションを張っ
-ている側のモデル名を全て小文字にしたものを ``FOO`` とすると、マネジャの名前
-のデフォルト値は ``FOO_set`` です。このマネジャはクエリセットを返します。ク
-エリセットには前述の「オブジェクトの取得」の節で説明したフィルタや操作を行
-えます。
+あるモデルが :class:`~django.db.models.ForeignKey` で別のモデルに
+リレーションを張っている場合、リレーションを張られた側のモデルのインスタンスは、
+リレーションを張った側のモデルの全てのインスタンスを返すマネジャにアクセスでます。
+リレーションを張っている側のモデル名を全て小文字にしたものを ``FOO`` とすると、
+:class:`~django.db.models.Manager`  の名前のデフォルト値は ``FOO_set`` です。
+このマネジャは ``クエリセット`` を返します。クエリセットには前述の「オブジェクトの取得」
+の節で説明したフィルタや操作を行えます。
 
 例を示しましょう::
 
@@ -941,7 +1119,8 @@ Django はまた、リレーションの「相手側」へのアクセス API、
     >>> b.entries.filter(headline__contains='Lennon')
     >>> b.entries.count()
 
-``ForeignKey`` 逆参照は、マネジャとしてのアクセスはできず、インスタンスとし
+:class:`~django.db.models.ForeignKey` 逆参照は、
+:class:`~django.db.models.Manager` としてのアクセスはできず、インスタンスとし
 てアクセスせねばなりません。例えば::
 
     >>> Blog.entry_set
@@ -949,10 +1128,12 @@ Django はまた、リレーションの「相手側」へのアクセス API、
         ...
     AttributeError: "Manager must be accessed via instance".
 
-前述の「オブジェクトの取得」で説明したクエリセットのメソッドに加えて、
-``ForeignKey`` で表現されるマネジャには、リレーション元のオブジェクトの集合
-を扱うための追加のメソッドがあります。メソッドの概要は以下に示しますが、詳
-細は :ref:`リレーションのリファレンス <ref-models-relations>` を参照してく
+前述の「オブジェクトの取得」
+で説明した :class:`~django.db.models.query.QuerySet` のメソッドに加えて、
+:class:`~django.db.models.ForeignKey` で表現されるマネジャには、
+リレーション元のオブジェクトの集合を扱うための追加のメソッドがあります。
+メソッドの概要は以下に示しますが、詳細は
+:doc:`リレーションのリファレンス </ref/models/relations>` を参照してく
 ださい。
 
 ``add(obj1, obj2, ...)``
@@ -976,8 +1157,8 @@ Django はまた、リレーションの「相手側」へのアクセス API、
     b = Blog.objects.get(id=1)
     b.entry_set = [e1, e2]
 
-In this example, ``e1`` and ``e2`` can be full Entry instances, or integer
-primary key values.
+この例では、 ``e1`` と ``e2`` が Entry インスタンスになるか、
+数値のプライマリーキーの値となります。
 
 ``clear()`` メソッドを利用できる場合に代入を行うと、まず ``entry_set`` から
 全てのオブジェクトを除去しておき、その後で右辺の iterable (上の例ではリスト)
@@ -989,6 +1170,8 @@ primary key values.
 操作結果は追加、新規作成、削除といった操作を行う度に即座に自動的にデータベー
 スに保存されます。
 
+.. _m2m-reverse-relationships:
+
 多対多のリレーション
 --------------------
 
@@ -997,9 +1180,10 @@ primary key values.
 ションにおける「逆方向の」参照のように動作します。
 
 一対多のリレーションとの唯一の違いは、属性の名前づけ規則です。
-``ManyToManyField`` を定義した側のモデルはフィールド名をそのまま使いますが、
-「反対側の」モデルでは、相手のモデルのモデル名を小文字にして、 ``'_set'``
-を追加したもの (一対多のリレーションにおける逆方向の参照と同じ) になります。
+:class:`~django.db.models.ManyToManyField` を定義した側のモデルは
+フィールド名をそのまま使いますが、「反対側の」モデルでは、
+相手のモデルのモデル名を小文字にして、 ``'_set'`` を追加したもの
+(一対多のリレーションにおける逆方向の参照と同じ) になります。
 
 例を使って説明した方が理解しやすいでしょう::
 
@@ -1011,7 +1195,8 @@ primary key values.
     a = Author.objects.get(id=5)
     a.entry_set.all() # Author の全ての Entry オブジェクトを返します。
 
-``ForeignKey`` と同様、 ``ManyToManyField`` には ``related_name`` パラメタ
+:class:`~django.db.models.ForeignKey` と同様、
+:class:`~django.db.models.ManyToManyField` には ``related_name`` パラメタ
 を指定できます。 上の例で、 ``Entry`` の ``ManyToManyField`` に
 ``related_name='entries'`` を指定していた場合、 ``Author`` インスタンスは
 ``entry_set`` ではなく ``entries`` という属性を持つようになります。
@@ -1084,7 +1269,8 @@ primary key values.
 =========================
 
 Django のデータベースマッパで扱うには複雑すぎる SQL 文を書かねばならないよ
-うな場合には、生の SQL 文実行モードを使えます。
+うな場合には、生の SQL 文実行モードを使えます。Django は生 SQL 文をクエリ
+とうる方法を二つ持っています。 :doc:`/topics/db/sql` を見てください。
 
 生 raw-SQL 文実行モードの使い方としてお勧めなのは、そのようなクエリ文を実行
 するモデルのカスタムメソッドやカスタムマネジャのメソッドを実装するというも
