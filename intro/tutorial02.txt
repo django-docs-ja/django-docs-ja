@@ -1,12 +1,10 @@
-.. _intro-tutorial02:
-
 =====================================
 はじめての Django アプリ作成、その 2
 =====================================
 
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
 
-このチュートリアルは :ref:`チュートリアルその 1 <intro-tutorial01>` の続き
+このチュートリアルは :doc:`チュートリアルその 1 </intro/tutorial01>` の続き
 です。ここでは、引続き Web 投票アプリケーションの開発を例にして、Django が
 自動生成する管理サイト (admin) を中心に解説します。
 
@@ -18,14 +16,14 @@
     理するためのインタフェース生成を完全に自動化しています。
 
     Django はニュースルーム環境で開発されました。ニュースルーム環境では、
-    「コンテンツの作成者 (content publisher)用」と「公開用 (public) 」サイ
+    「コンテンツの作成者 (content publisher) 用」と「公開用 (public) 」サイ
     トをきわめて明確に区別しています。サイト管理者は新たな話題やイベント、
     スポーツのスコアなどの入力に使い、コンテンツは公開用サイト上で表示され
     ます。 Django は、サイト管理者向けの一元化されたコンテンツ編集インタフェー
     スの提供という問題を解決しているのです。
 
-    admin は一般のサイトを訪問者に使ってもらうためのものではなく、サイト管
-    理者のためのものなのです。
+    admin は一般のサイト訪問者に使ってもらうためのものではなく、サイト管理
+    者のためのものです。
 
 管理サイトの有効化
 ====================
@@ -33,45 +31,40 @@
 デフォルトでは、 Django の管理サイトは無効化されていて、自分で選択して有効
 にせねばなりません。 admin を有効にするには、以下の 3 つの作業が必要です:
 
-    * :setting:`INSTALLED_APPS` 設定に ``"django.contrib.admin"`` を追加し
-      ます。
+* :setting:`INSTALLED_APPS` 設定の ``"django.contrib.admin"`` をコメント
+  アウトを解除します。
 
-    * ``python manage.py syncdb`` を実行します。新たなアプリケーションを
-      :setting:`INSTALLED_APPS` に追加したので、データベースを更新せねばな
-      りません。
+* ``python manage.py syncdb`` を実行します。新たなアプリケーションを
+  :setting:`INSTALLED_APPS` に追加したので、データベースを更新せねばな
+  りません。
 
-    * ``mysite/urls.py`` ファイルを編集し、 "Uncomment this for admin:" と
-      書かれた行の次の行のコメントアウトを解除します。このファイルは
-      URLconf といいます。 URLconf についてはチュートリアルの次の部で解説し
-      ます。今はただ、この設定が URL をアプリケーションに対応づけていること
-      だけを覚えておきましょう。最終的に、 ``urls.py`` は以下のようになるは
-      ずです:
+* ``mysite/urls.py`` ファイルを編集し、 admin に関連する3行のコメントアウト
+  を解除します。このファイルは URLconf といいます。 URLconf についてはチュー
+  トリアルの次の部で解説します。今はただ、この設定が URL をアプリケーション
+  に対応づけていることだけを覚えておきましょう。最終的に、 ``urls.py`` は
+  以下のようになるはずです:
 
-    .. versionchanged:: 1.1
-        バージョン 1.1 で、管理サイトの URL を URLConf に追加する方法が変更されました。
+  .. parsed-literal::
 
+      from django.conf.urls import patterns, include, url
 
-      .. parsed-literal::
+      # Uncomment the next two lines to enable the admin:
+      **from django.contrib import admin**
+      **admin.autodiscover()**
 
-          from django.conf.urls.defaults import *
+      urlpatterns = patterns('',
+          # Examples:
+          # url(r'^$', '{{ project_name }}.views.home', name='home'),
+          # url(r'^{{ project_name }}/', include('{{ project_name }}.foo.urls')),
 
-          # Uncomment the next two lines to enable the admin:
-          **from django.contrib import admin**
-          **admin.autodiscover()**
+          # Uncomment the admin/doc line below to enable admin documentation:
+          # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
-          urlpatterns = patterns('',
-              # Example:
-              # (r'^mysite/', include('mysite.foo.urls')),
+          # Uncomment the next line to enable the admin:
+          **url(r'^admin/', include(admin.site.urls)),**
+      )
 
-              # Uncomment the admin/doc line below and add 'django.contrib.admindocs'
-              # to INSTALLED_APPS to enable admin documentation:
-              # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-              # Uncomment the next line to enable the admin:
-              **(r'^admin/', include(admin.site.urls)),**
-          )
-
-      (太字の行はコメントを外した部分です)
+  (太字の行はコメントを外した部分です)
 
 開発サーバの起動
 ================
@@ -92,6 +85,19 @@ http://127.0.0.1:8000/admin/ にアクセスします。以下のような admin
 .. image:: _images/admin01.png
    :alt: Django 管理サイトのログイン画面
 
+.. admonition:: 自分の画面と違う場合
+
+    もしこの時点で、上のログイン画面の代わりに以下のようなエラーの画面が
+    表示された場合は::
+
+        ImportError at /admin/
+        cannot import name patterns
+        ...
+
+    おそらくこのチュートリアルのバージョンとは違う Django のバージョンを
+    使用していることでしょう。古いチュートリアルを参照するか、新しいバー
+    ジョンの Django を入手してください。
+
 管理サイトに入る
 ==================
 
@@ -102,9 +108,9 @@ http://127.0.0.1:8000/admin/ にアクセスします。以下のような admin
 .. image:: _images/admin02t.png
    :alt: Django 管理サイトのインデクスページ
 
-他にも、「グループ (Groups)」や「ユーザ (Users)」、「サイト (Sites)」といっ
-た編集可能なコンテンツが表示されるはずです。これらはデフォルトで Django
-に付属しているコアの機能です。
+「グループ (Groups)」や「ユーザ (Users)」、「サイト (Sites)」といった編集
+可能なコンテンツが表示されるはずです。これらはデフォルトで Django に付属し
+ているコアの機能です。
 
 Poll モデルを admin 上で編集できるようにする
 ==============================================
@@ -116,7 +122,7 @@ Poll モデルを admin 上で編集できるようにする
 ンタフェースを持つことを教える必要があるのです。 ``polls`` ディレクトリの
 ``admin.py`` ファイルを編集して、末尾に以下のような一文を加えてください::
 
-    from mysite.polls.models import Poll
+    from polls.models import Poll
     from django.contrib import admin
 
     admin.site.register(Poll)
@@ -149,31 +155,35 @@ admin の機能を探究してみる
 
 以下の点に注意してください:
 
-  * フォームは Poll モデルをもとに自動的に生成されています。
+* フォームは Poll モデルをもとに自動的に生成されています。
 
-  * モデルのフィールドの型によって (
-    :class:`~django.db.models.DateTimeField`,
-    :class:`~django.db.models.CharField` などの) 適切な HTML 入力ウィジェッ
-    トが対応しています。各タイプのフィールドには、 Django 管理サイトでデー
-    タを表示する方法が定義されています。
+* モデルのフィールドの型によって (
+  :class:`~django.db.models.DateTimeField`,
+  :class:`~django.db.models.CharField` などの) 適切な HTML 入力ウィジェッ
+  トが対応しています。各タイプのフィールドには、 Django 管理サイトでデー
+  タを表示する方法が定義されています。
 
-  * :class:`~django.db.models.DateTimeField` には JavaScript のショートカッ
-    トがついています。日付 (Date) のカラムには「今日 (Today)」へのショート
-    カットと、カレンダーのポップアップボタンがあります。時刻 (Time) のカラ
-    ムには「現在 (Now)」へのショートカットと、よく入力される時間のリストを
-    表示するポップアップボタンがあります。
+* :class:`~django.db.models.DateTimeField` には JavaScript のショートカッ
+  トがついています。日付 (Date) のカラムには「今日 (Today)」へのショート
+  カットと、カレンダーのポップアップボタンがあります。時刻 (Time) のカラ
+  ムには「現在 (Now)」へのショートカットと、よく入力される時間のリストを
+  表示するポップアップボタンがあります。
 
 ページの末尾の部分には操作ボタンがいくつか表示されています:
 
-  * 保存 (Save) -- 変更を保存して、このモデルの変更リストのページに戻ります。
+* 保存 (Save) -- 変更を保存して、このモデルの変更リストのページに戻ります。
 
-  * 保存して編集を続ける (Save and continue editing) -- 変更を保存して、こ
-    のオブジェクトの編集ページをリロードします。
+* 保存して編集を続ける (Save and continue editing) -- 変更を保存して、こ
+  のオブジェクトの編集ページをリロードします。
 
-  * 保存してもう一つ追加 (Save and add another) -- 変更を保存して、このモデ
-    ルのオブジェクトを新規追加するための空の編集ページをロードします。
+* 保存してもう一つ追加 (Save and add another) -- 変更を保存して、このモデ
+  ルのオブジェクトを新規追加するための空の編集ページをロードします。
 
-  * 削除 (Delete) -- 削除確認ページを表示します。
+* 削除 (Delete) -- 削除確認ページを表示します。
+
+もし「Date published」の値がチュートリアル 1 で作成した時間と違う場合は、
+:setting:`TIME_SONE` に現在のタイムゾーンの設定をし忘れた可能性があります。
+変更し、リロードして正しい値が表示されるか確認してください。
 
 「今日」や「現在」ショートカットをクリックして、「Date published」を変更し
 てみましょう。変更したら、「保存して編集を続ける」を押します。次に、右上に
@@ -257,7 +267,7 @@ OK、 Poll の管理サイトページはできました。しかし ``Poll`` �
 この問題の解決法は二つあります。一つ目は、 ``Poll`` と同様、以下のようにし
  て ``Choice`` モデルを管理サイトに登録するというものです::
 
-    from mysite.polls.models import Choice
+    from polls.models import Choice
 
     admin.site.register(Choice)
 
@@ -303,7 +313,8 @@ Choice モデルに対する ``register()`` を削除して、 ``Poll`` を登�
 する。デフォルトでは、 3 つの Choice を表示するのに十分なフィールドを用意す
 ること」と指示しています。
 
-「Poll を追加」ページをロードして、どんな表示になったか見てみましょう:
+「Poll を追加」ページをロードして、どんな表示になったか見てみましょう。開発
+サーバをリスタートする必要があるかもしれません:
 
 .. image:: _images/admin11t.png
    :alt: 「Poll を追加」ページに選択肢が表示された
@@ -350,11 +361,11 @@ Poll を表示するページです。
         list_display = ('question', 'pub_date')
 
 おまけとして、チュートリアル 1 で定義したカスタムメソッド
-``was_published_today`` も追加してみましょう::
+``was_published_recently`` も追加してみましょう::
 
     class PollAdmin(admin.ModelAdmin):
         # ...
-        list_display = ('question', 'pub_date', 'was_published_today')
+        list_display = ('question', 'pub_date', 'was_published_recently')
 
 これで、 Poll のチェンジリストのページは以下のようになります:
 
@@ -362,19 +373,24 @@ Poll を表示するページです。
    :alt: カスタムメソッドのカラムを追加した Poll のチェンジリスト
 
 カラムのヘッダをクリックすると、カラムの値に応じてエントリを並べ換えできま
-す。ただし ``was_published_today`` ヘッダは例外で、これはメソッドの戻り値を
-使った並べ換えをサポートしていないからです。 ``was_published_today`` のカラ
+す。ただし ``was_published_recently`` ヘッダは例外で、これはメソッドの戻り値を
+使った並べ換えをサポートしていないからです。 ``was_published_recently`` のカラ
 ムヘッダのデフォルト値がメソッドの名前になっている (アンダースコアは空白に
-置き換わっている) ことにも注意して下さい。メソッドに ``short_description``
-属性を指定すればカラム名を変更できます::
+置き換わっている)こと、各行が戻り値の文字列となっていることにも注意して下さい。
 
-    def was_published_today(self):
-        return self.pub_date.date() == datetime.date.today()
-    was_published_today.short_description = 'Published today?'
+以下の属性を (``models.py`` の中の) メソッドに与えることで、これを改良出来ま
+す::
 
+    class Poll(models.Model):
+        # ...
+        def was_published_recently(self):
+            return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
+        was_published_recently.admin_order_field = 'pub_date'
+        was_published_recently.boolean = True
+        was_published_recently.short_description = 'Published recently?'
 
-もう一点、 Poll のチェンジリストを改良して、フィルタをを加えましょう。 
-以下の行を ``PollAdmin`` の中に入れます::
+admin.py ファイルを編集し、もう一点、 Poll のチェンジリストを改良して、フィル
+タをを加えます。以下の行を ``PollAdmin`` の中に入れます::
 
     list_filter = ['pub_date']
 
@@ -385,10 +401,10 @@ Poll を表示するページです。
    :alt: Poll のチェンジリストをさらに改良
 
 表示されるフィルタのタイプは、フィルタに使うフィールドのタイプによって変わ
-ります。 ``pub_date`` は ``DateTimeField`` なので、 Django はデフォルトの
-フィルタのオプションが「すべての日 (Any date)」、「今日 (Today)」、「過去 7
-日間 (Past 7 days)」、「今月 (This month)」そして「今年 (This year)」である
-と考えます。
+ります。 ``pub_date`` は :class:`~django.db.models.fields.DateTimeField`
+なので、 Django はデフォルトのフィルタのオプションとして
+「すべての日 (Any date)」、「今日 (Today)」、「過去 7 日間 (Past 7 days)」、
+「今月 (This month)」そして「今年 (This year)」を与えればよいと考えます。
 
 細工は隆々ですね。こんどは検索機能を追加してみましょう::
 
@@ -409,7 +425,7 @@ Poll を表示するページです。
 いて、最後は日ごとにエントリを表示します。
 
 さて、変更リストには何もしなくてもページ分割機能がある、ということをここで
-お知らせしておいた方がよいでしょう。デフォルトではページあたり 50 個の要素
+お知らせしておいた方がよいでしょう。デフォルトではページあたり 100 個の要素
 を表示します。ページ分割、検索ボックス、フィルタ、日付による階層化、カラム
 ヘッダを使った並べ換えといった変更リストの機能は、すべてが協調して思いのま
 まに動作するのです。
@@ -423,10 +439,10 @@ Poll を表示するページです。
 
 変更するのは簡単で、 Django のテンプレートシステムを使います。 Django の
 管理サイトは、それ自身 Django で作られているので、インタフェースは Django
-のテンプレートシステムを使っているのです (なんてメタな！)
+のテンプレートシステムを使っているのです。
 
 設定ファイル (``mysite/settings.py`` でしたよね) を開いて、
-:setting:`TEMPLATE_DIRS` という設定を探して下さい。 
+:setting:`TEMPLATE_DIRS` という設定を探して下さい。
 :setting:`TEMPLATE_DIRS` はファイルシステム上のディレクトリ名からなるタプル
 で、 Django テンプレートをロードするときに探す場所を指定します。つまり検索
 パスです。
@@ -435,20 +451,27 @@ Poll を表示するページです。
 追加して、Django に自作テンプレートの置き場所を教えましょう::
 
     TEMPLATE_DIRS = (
-        "/home/my_username/mytemplates", # 自分の環境に合わせて変更してください。
+        '/home/my_username/mytemplates', # 自分の環境に合わせて変更してください。
     )
 
-admin アプリケーションのデフォルトのテンプレート置場
-(``django/contrib/admin/templates``) から、 ``admin/base_site.html`` という
-テンプレートをコピーして、 :setting:`TEMPLATE_DIRS` 上の ``admin`` というディ
-レクトリ下に置きます。例えば、 :setting:`TEMPLATE_DIRS` に
-``"/home/my_username/mytemplates"`` と 設定していれば、 
-``django/contrib/admin/templates/admin/base_site.html`` を
-``/home/my_username/mytemplates/admin/base_site.html`` にコピーします。 
+Django のソースコードの中にある admin アプリケーションのデフォルトのテンプ
+レート置場 (``django/contrib/admin/templates``) から、
+``admin/base_site.html`` というテンプレートをコピーして、
+:setting:`TEMPLATE_DIRS` 上の ``admin`` というディレクトリ下に置きます。例え
+ば、 :setting:`TEMPLATE_DIRS` に ``"/home/my_username/mytemplates"`` と設定
+していれば、 ``django/contrib/admin/templates/admin/base_site.html`` を
+``/home/my_username/mytemplates/admin/base_site.html`` にコピーします。
 ``admin`` というサブディレクトリを作るのを忘れないようにして下さい。
 
 ファイルを編集して、 Django と書かれた部分を自分のサイトに合わせて変更して
 ください。
+
+テンプレートファイルは、 ``{% block branding %}`` や ``{{ title }}`` といっ
+たテキストを多く含みます。 ``{%`` と ``{{`` タグは Django のテンプレート言語
+のうちの一つです。 Django が ``admin/base_site.html`` を読み込んだ時、この
+テンプレート言語が評価され、最終的な HTML ページが作られます。今の時点でテ
+ンプレートについて理解できなくても心配しないでください。テンプレート言語に
+ついてはチュートリアルその 3 で詳しく掘り下げていきます。
 
 admin アプリケーションのデフォルトのテンプレートはどれもオーバライド可能で
 す。テンプレートをオーバライドするには、 ``base_site.html`` と同じ、つまり
@@ -480,8 +503,10 @@ admin アプリケーションのデフォルトのテンプレートはどれ�
 ``app_list`` というテンプレート変数が見つかるはずです。この変数に、インス
 トール済みの全てのアプリケーションが入っています。この変数の代りに、特定の
 オブジェクトごとに admin ページのリンクをハードコードすれば、自分の思い通り
-に変更できます。
+に変更できます。繰り返しますが、もしテンプレート言語について理解できなくて
+も心配しないで下さい。チュートリアルその 3 でテンプレート言語について扱って
+いきます。
 
 admin サイトを使いこなせるようになったら、 
-:ref:`チュートリアルその 3 <intro-tutorial03>` に進んで、 poll アプリケーショ
+:doc:`チュートリアルその 3 </intro/tutorial03>` に進んで、 poll アプリケーショ
 ンの公開用ビュー作成にとりかかりましょう。
