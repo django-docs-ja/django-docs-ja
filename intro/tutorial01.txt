@@ -761,5 +761,5 @@ Python でタイムゾーンを取り扱うことに不慣れな場合は、
 :doc:`データベース API リファレンス </topics/db/queries>` を参照してください。
 
 API を使いこなせるようになったら、 
-:doc:`チュートリアル第 2 部 </intro/tutorial02>` に進んで、Django が自動生成
+:doc:`チュートリアルその 2 </intro/tutorial02>` に進んで、Django が自動生成
 する管理インタフェースを動かしてみましょう。
