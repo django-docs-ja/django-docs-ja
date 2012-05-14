@@ -1,5 +1,4 @@
 .. _topics-db-transactions:
-
 ==================================
 データベーストランザクションの管理
 ==================================
@@ -75,7 +74,7 @@ HTTP リクエストとトランザクションを結び付ける
 
 これらの関数は、下記で詳細に説明しています。二つの方法で使えます。:
 
-* 特定の関数のデコレーター_ としての一例は::
+* 特定の関数の デコレーター_ としての一例は::
 
     from django.db import transaction
 
@@ -128,28 +127,32 @@ HTTP リクエストとトランザクションを結び付ける
         def viewfunc(request):
             ....
 
+        @transaction.autocommit(using="my_other_database")
+        def viewfunc2(request):
+            ....
+
     ``viewfunc()`` の中では、 ``model.save()`` や ``model.delete()`` 、その他デー
     タベースに書き込みを行う全ての関数でトランザクションを commit します。
     ``viewfunc2()`` は同じ挙動になるでしょう、ですが ``"別のデータベース"``
     コネクションにです。
 
-  .. function:: commit_on_success
+.. function:: commit_on_success
 
-      ``commit_on_success`` デコレータを使うのは、関数内の全ての処理にわたるトラン
-      ザクションを使えます::
+    ``commit_on_success`` デコレータを使うのは、関数内の全ての処理にわたるトラン
+    ザクションを使えます::
 
-          from django.db import transaction
+        from django.db import transaction
 
-          @transaction.commit_on_success
-          def viewfunc(request):
-              ....
+        @transaction.commit_on_success
+        def viewfunc(request):
+            ....
 
-          @transaction.commit_on_success(using="my_other_database")
-          def viewfunc2(request):
-              ....
+        @transaction.commit_on_success(using="my_other_database")
+        def viewfunc2(request):
+            ....
 
-      関数の実行に成功すると、 Django はそれまでの全ての作業を commit します。関
-      数が例外を送出すると、 Django はトランザクションを rollback します。
+    関数の実行に成功すると、 Django はそれまでの全ての作業を commit します。関
+    数が例外を送出すると、 Django はトランザクションを rollback します。
 
 .. function:: commit_manually
 
@@ -192,7 +195,7 @@ HTTP リクエストとトランザクションを結び付ける
 
 Django はリクエストの完了より前にオープンなトランザクションを閉じなくてはいけ
 ません。もし、 :func:`autocommit` (通常のコミットモード)を使用しているか、
-func:`commit_on_success` ならば、自動的にその処理が行われます。
+:func:`commit_on_success` ならば、自動的にその処理が行われます。
 しかし、手動でトランザクションを管理していると( :func:`commit_manually`
 デコレータを使用していれば)、トランザクションがコミットされるか、
 ロールバックするかをリクエストが終了する前に確かめておかなければいけません。
@@ -214,8 +217,8 @@ func:`commit_on_success` ならば、自動的にその処理が行われます�
 自分で行わねばならなくなります。
 
 従って、トランザクションの無効化は、自作のトランザクション制御ミドルウェア
-を実行したい場合や、本当に変わったことをやりたい場合向けです。ほとんどの状
-況では、デフォルトの挙動かトランザクションミドルウェアで十分で、必要に応じ
+を実行したい場合や、本当に変わったことをやりたい場合向けです。ほとんどの状況では、
+デフォルトの挙動かトランザクションミドルウェアで十分で、必要に応じ
 て特定の関数だけを変更すればよいでしょう。
 
 .. _topics-db-transactions-savepoints:
@@ -361,7 +364,7 @@ PostgreSQL のカーソルが例外を呼び出した時(典型的には ``Integ
 ----------------------------------
 
 PostgreSQL 8.2 かそれより新しいと、進歩したオプションが PostgreSQLを実行
-するためにあります。 :doc:`database-level autocommit </ref/databases>` です。
+するためにあります。 :doc:`データベースレベル オートコミット </ref/databases>` です。
 もしこのオプションを使うと、恒常的にトランザクションが開かなくなり、
 例外を捕まえた後でも処理を継続できるようになります。::
 
