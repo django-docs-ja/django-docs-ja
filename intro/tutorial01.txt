@@ -1,10 +1,8 @@
-.. _intro-tutorial01:
-
 =====================================
 はじめての Django アプリ作成、その 1 
 =====================================
 
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
 
 さあ、例を交えながら学んでゆきましょう。
 
@@ -13,12 +11,12 @@
 
 Poll アプリケーションは、
 
-    * ユーザが投票したり結果を表示したりできる公開用サイト
-    * 投票項目の追加、変更、削除を行うための管理 (admin) サイト
+* ユーザが投票したり結果を表示したりできる公開用サイト
+* 投票項目の追加、変更、削除を行うための管理 (admin) サイト
 
 の二つの部分に分かれています。
 
-:ref:`Django は既にインストール済み <intro-install>` として、説明を進めます。
+:doc:`Django は既にインストール済み </intro/install>` として、説明を進めます。
 Django がインストールされているかどうかは、Python 対話シェルを起動して
 ``import django`` を実行してみればわかります。エラーなく import できるなら、
 Django はインストールされています。
@@ -40,33 +38,47 @@ Django の :term:`プロジェクト` (:term:`project`) を構成するコード
 プリケーション固有の設定などといった、個々の Django インスタンスの設定をあ
 つめたものです。
 
-コマンドラインから、コードを置きたい場所に ``cd`` して、
-``django-admin.py startproject mysite`` を実行してください。現在のディレク
-トリに ``mysite`` ディレクトリが作成されます。
+コマンドラインから、コードを置きたい場所に ``cd`` して、以下のコマンドを
+実行してください。
+
+.. code-block:: bash
+   django-admin.py startproject mysite
+
+現在のディレクトリに ``mysite`` ディレクトリが作成されます。
+
+.. admonition:: ディストリビューションパッケージでスクリプトの名前が違うかも
+
+   もし apt-get や yum のような Linux ディストリビューションのパッケージ
+   マネージャを使って Django をインストールした場合、 ``django-admin.py``
+   は ``django-admin`` に名前が変更されている場合があります。その場合は、
+   これ以降のドキュメント内で出てくるそれぞれのコマンドから ``.py`` を削除
+   して操作を続けてください。
 
 .. admonition:: Max OS X でのパーミッションに関するエラー
-   
+ 
    Mac OS X を使っている場合、 ``django-admin.py startproject`` を実行しよ
    うとすると、 "permission denied" というメッセージが出ることがあります。
    OS X のような Unix ベースのシステムでは、ファイルをプログラムとして実行
    したい場合に、ファイルに「プログラムとして実行可能」というマークをつけて
    おく必要があるためです。ファイルに実行可能マークをつけるには、
-   Terminal.app を起動して、 :ref:`django-admin.py <ref-django-admin>` を収
+   Terminal.app を起動して、 :doc:`django-admin.py </ref/django-admin>` を収
    めているディレクトリに ( ``cd`` コマンドで) 移動して、 
-   ``chmod +x django-admin.py`` を実行してください。
+   ``sudo chmod +x django-admin.py`` を実行してください。
 
 .. note::
-    
+ 
     プロジェクトの名前を付けるとき、組み込みの Python モジュールや Django
     のコンポーネントの名前を使わないようにしてください。とりわけ、 
     ``django`` (Django 自体と名前が衝突します) や ``test`` (組み込みの
     Python パッケージ名と名前が衝突します) を使わないようにしましょう。
 
 ``python setup.py`` ユーティリティで Django をインストールしたのなら、
-:file:`django-admin.py` はシステムパスのどこかにあるはずです。パス上になけ
-れば、 ``site-packages/django/bin`` にあります。 ``site-packages`` は
-Python インストールディレクトリの中にあります。パス上のどこか、例えば
-:file:`/usr/local/bin` にシンボリックリンクを張っておきましょう。)
+:doc:`django-admin.py </ref/django-admin>` はシステムパスのどこかにあるはず
+です。パス上になければ、 ``site-packages/django/bin`` にあります。
+``site-packages`` は Python インストールディレクトリの中にあります。パス上
+のどこか、例えば :file:`/usr/local/bin` に
+:doc:`django-admin.py </ref/django-admin>` へのシンボリックリンクを張って
+おきましょう。
 
 .. admonition:: コードはどこに置くの？
 
@@ -83,39 +95,64 @@ Python インストールディレクトリの中にあります。パス上の�
 :djadmin:`startproject` が何を作成したかをみてみましょう::
 
     mysite/
-        __init__.py
         manage.py
-        settings.py
-        urls.py
+        mysite/
+            __init__.py
+            settings.py
+            urls.py
+            wsgi.py
+
+.. admonition:: 自分のレイアウトと違う場合
+
+    デフォルトのプロジェクトのレイアウトが最近変わりました。もし、フラットな
+    レイアウトの場合 (内側の :file:`mysite/` ディレクトリがない場合) は、この
+    チュートリアルのバージョンとは違う Django のバージョンを使用していること
+    でしょう。古いチュートリアルを参照するか、新しいバージョンの Django を
+    入手してください。
 
 ファイルはそれぞれ以下のような役割を持っています:
 
-    * :file:`__init__.py`: このディレクトリが Python パッケージであることを
-      Python に知らせるための空のファイルです。(Python の初心者は、 Python
-      の公式ドキュメントの (`パッケージの詳しい説明`_ を読んで下さい。)
-    * :file:`manage.py`: Django プロジェクトに対する様々な操作を行うための
-      コマンドラインユーティリティです。詳しくは :ref:`ref-django-admin`
-      を参照してください。
-    * :file:`settings.py`: Django プロジェクトの設定ファイルです。
-      設定の仕組みは :ref:`topics-settings` を参照してください。
-    * ``urls.py``: Django プロジェクトの URL 宣言、いうなれば Django 化サイ
-      トにおける「目次」に相当します。 :ref:`topics-http-urls` を参照してく
-      ださい。
+* 外側の :file:`mysite/` ディレクトリは、このプロジェクトのただの入れ物です。
+  名前は Django に関係しませんので、好きな名前に変更できます。
 
-.. _`パッケージの詳しい説明`: http://www.python.jp/doc/release/tut/node8.html#packages
-.. _more on packages: http://docs.python.org/tut/node8.html#packages
+* :file:`manage.py`: Django プロジェクトに対する様々な操作を行うための
+  コマンドラインユーティリティです。詳しくは :doc:`/ref/django-admin`
+  を参照してください。
+
+* 内側の :file:`mysite/` ディレクトリは、このプロジェクトの本当の Python
+  パッケージです。この名前が Python パッケージの名前であり、 import の際に
+  使用する名前です (例えば ``import mysite.settings``) 。
+
+* :file:`mysite/__init__.py`: このディレクトリが Python パッケージであることを
+  Python に知らせるための空のファイルです。(Python の初心者は、 Python の公式
+  ドキュメントの `パッケージの詳しい説明`_ を読んで下さい。)
+
+* :file:`mysite/settings.py`: Django プロジェクトの設定ファイルです。
+  設定の仕組みは :doc:`/topics/settings` を参照してください。
+
+* :file:``mysite/urls.py``: Django プロジェクトの URL 宣言、いうなれば Django
+  サイトにおける「目次」に相当します。詳しくは :doc:`/topics/http/urls` を参照
+  してください。
+
+* :file:`mysite/wsgi.py`: WSGI互換のある Web サーバでプロジェクトを動かすための
+  エントリーポイントです。詳しくは :doc:`/howto/deployment/wsgi/index` を参照
+  してください。
+
+
+.. _`パッケージの詳しい説明`: http://www.python.jp/doc/2.7/tutorial/modules.html#tut-packages
+.. _more about packages: http://docs.python.org/tutorial/modules.html#packages
 
 開発用サーバ
 ------------
 
-プロジェクトがうまく動作するか確かめましょう。 :file:`mysite` ディレクトリ
-に移り、 ``python manage.py runserver`` を実行してください。以下のようなメッ
-セージが表示されるはずです::
+プロジェクトがうまく動作するか確かめましょう。外側の :file:`mysite` ディレク
+トリに移り、 ``python manage.py runserver`` を実行してください。以下のような
+メッセージが表示されるはずです::
 
     Validating models...
     0 errors found.
 
-    Django version 1.0, using settings 'mysite.settings'
+    Django version 1.4, using settings 'mysite.settings'
     Development server is running at http://127.0.0.1:8000/
     Quit the server with CONTROL-C.
 
@@ -160,37 +197,38 @@ Python インストールディレクトリの中にあります。パス上の�
 Database の設定
 ---------------
 
-それでは、 :file:`settings.py` を編集しましょう。 :file:`settings.py` は
-Django の設定を表現する通常の Python モジュールです。設定を書き換えて、お使
+それでは、 :file:`mysite/settings.py` を編集しましょう。
+:file:`mysite/settings.py` は Django の設定を表現する通常の Python モジュール
+です。 :setting:`DATABASES` ``'default'`` の中の以下のキーを書き換えて、お使
 いのデータベースへの接続パラメタに合わせましょう:
 
-    * :setting:`DATABASE_ENGINE` -- 'postgresql_psycopg2', 'mysql' または
-      'sqlite3'のいずれかです。他にも :setting:`いくつか <DATABASE_ENGINE>`
-      あります。
+* :setting:`ENGINE <DATABASE-ENGINE>` --
+  ``'django.db.backends.postgresql_psycopg2'``,
+  ``'django.db.backends.mysql'``, ``'django.db.backends.sqlite3'`` または
+  ``'django.db.backends.oracle'`` のいすれかです。
+  他にも :setting:`いくつか <DATABASE-ENGINE>` あります。
 
-    * :setting:`DATABASE_NAME`` -- データベースの名前です。 SQLite を使っ
-      ている場合にはデータベースファイルのフルパス (絶対パス) にします。
-      指定したパスのファイルが存在しなければ、 Django は最初にデータベース
-      の同期を実行したときにファイルを生成します (後で解説します)。
+* :setting:`NAME`` -- データベースの名前です。 SQLite を使っている場合には
+  データベースファイルのフルパス (絶対パス) にします。
+  指定したパスのファイルが存在しなければ、 Django は最初にデータベースの同期
+  を実行したときにファイルを生成します (後で解説します)。
 
-      パスを指定するときには、 Windows 環境でも必ずスラッシュ (``/``) を区
-      切り文字に使ってください (例: ``C:/homes/user/mysite/sqlite3.db``)
+  パスを指定するときには、 Windows 環境でも必ずスラッシュ (``/``) を区切り文字
+  に使ってください (例: ``C:/homes/user/mysite/sqlite3.db``)
 
-    * :setting:`DATABASE_USER` -- データベースのユーザ名です (SQLite では
-      使いません)。
+* :setting:`USER` -- データベースのユーザ名です (SQLite では使いません)。
 
-    * :setting:`DATABASE_PASSWORD` -- データベースのパスワードです。
-      (SQLite では使いません)。
+* :setting:`PASSWORD` -- データベースのパスワードです。
+  (SQLite では使いません)。
 
-    * :setting:`DATABASE_HOST` -- データベースのあるホストです。データベー
-      スサーバが物理的に同じマシン上にあるのなら空文字列にしておきます。
-      (SQLite では使いません)。
+* :setting:`HOST` -- データベースのあるホストです。データベースサーバが物理的に
+  同じマシン上にあるのなら空文字列にしておきます。(SQLite では使いません)。
 
 
-データベースをあまり扱ったことがないのなら、 SQLite をお勧めします (
-:setting:`DATABASE_ENGINE` には ``'sqlite3'`` を指定します)。 SQLite はバー
-ジョン 2.5 以降の Python に組み込まれているので、特にインストールする必要が
-ありません。
+データベースをあまり扱ったことがないのなら、 :setting:`ENGINE` に
+``'django.db.backends.sqlite3'`` を指定して SQLite を使用することをお勧めしま
+す。 SQLite はバージョン 2.5 以降の Python に組み込まれているので、特にインス
+トールする必要がありません。
 
 .. note::
 
@@ -201,23 +239,29 @@ Django の設定を表現する通常の Python モジュールです。設定�
     SQLite を使う場合には、予め何か作成しておく必要はありません。データベー
     スファイルは、必要に応じて自動的に生成されます。
 
-:file:`settings.py` を編集する際、ファイルの末尾近くにある
-:setting:`INSTALLED_APPS` 設定に注意してください。この変数には、現在の
-Django インスタンスで有効な全ての Django アプリケーションの名前が入ります。
-アプリケーションは複数のプロジェクトで利用でき、配布もできます。
+:file:`settings.py` を編集する際、 :setting:`TIME_ZONE` にタイムゾーンをセット
+してください。デフォルト値はアメリカのセントラルタイムゾーン (シカゴ) になり
+ます。また、ファイルの末尾近くにある :setting:`INSTALLED_APPS` 設定に注意して
+ください。この変数には、現在の Django インスタンスで有効な全ての Django アプリ
+ケーションの名前が入ります。アプリケーションは複数のプロジェクトで利用でき、
+配布もできます。
 
 デフォルトでは :setting:`INSTALLED_APPS` には以下のアプリケーションが入って
 います。これらのアプリケーションはいずれも Django に付属のものです:
 
-    * :mod:`django.contrib.auth` -- 認証システムです。
+* :mod:`django.contrib.auth` -- 認証システムです。
 
-    * :mod:`django.contrib.contenttypes` -- コンテンツタイプフレームワーク
-      です。
+* :mod:`django.contrib.contenttypes` -- コンテンツタイプフレームワークです。
 
-    * :mod:`django.contrib.sessions` -- セッションフレームワークです。
+* :mod:`django.contrib.sessions` -- セッションフレームワークです。
 
-    * :mod:`django.contrib.sites` -- 一つの Django で複数のサイトを管理する
-      ためのフレームワークです。
+* :mod:`django.contrib.sites` -- 一つの Django で複数のサイトを管理する
+  ためのフレームワークです。
+
+* :mod:`django.contrib.messages` -- メッセージフレームワークです。
+
+* :mod:`django.contrib.staticfiles` -- 静的なファイルを管理するための
+  フレームワークです。
 
 これらの機能はよく使われるのでデフォルトで付属しています。
 
@@ -275,9 +319,13 @@ Django で書いたアプリケーションは Python パッケージからな�
 プリングします。すなわち、 poll アプリケーション内の Python コードは
 ``mysite.polls`` のように参照されることになります。チュートリアルの後半では、
 アプリケーションを配布用に脱カップリングする方法について議論する予定です。
+アプリケーションは、 `Python パス`_ のどこにでも置くことができます。この
+チュートリアルでは、投票アプリケーションを :file:`manage.py` ファイルのすぐ
+隣に作り、 ``mysite`` のサブモジュールというより、自身のトップレベルのモジュ
+ールとして import できるようにします。
 
-アプリケーションを作成するには、 :file:`mysite` ディレクトリの下に入って、
-以下のようなコマンド:
+アプリケーションを作成するには、 :file:`manage.py` と同じディレクトリに入っ
+て、以下のようなコマンド:
 
 .. code-block:: bash
 
@@ -289,6 +337,7 @@ Django で書いたアプリケーションは Python パッケージからな�
     polls/
         __init__.py
         models.py
+        tests.py
         views.py
 
 このディレクトリ構造こそが、 poll アプリケーションの全体像です。
@@ -326,23 +375,6 @@ Django では、こうした概念を簡単な Python クラスで表現でき�
         choice = models.CharField(max_length=200)
         votes = models.IntegerField()
 
-.. admonition:: \  :attr:`~django.db.models.Field.max_length` にまつわるエラー
-
-   Django が「 :attr:`~django.db.models.Field.max_length` は正しい引数で
-   ない」というエラーを出す場合、古いバージョンの Django を使っているはずで
-   す。(チュートリアルのこのバージョンは、最新の開発版 Django に準拠してい
-   ます) Subversion を使って開発版の Django をチェックアウトしている場合
-   (詳しい方法は :ref:`インストール方法 <topics-install>` を参照してくださ
-   い) 、エラーは起きないはずです。
-
-   古いバージョンの Django を使わねばならない場合、 
-   `バージョン 0.96 用のチュートリアル`_ を参照するよう勧めます。というのも、
-   このチュートリアルのカバーしている機能には、開発版の Django にしかないも
-   のがあるからです。
-
-.. _the Django 0.96 tutorial: http://www.djangoproject.com/documentation/0.96/tutorial01/
-.. _`バージョン 0.96 用のチュートリアル`: `the Django 0.96 tutorial`_
-
 コードは単純明解ですね。各モデルは一つのクラスで表現され、いずれも
 :class:`django.db.models.Model` のサブクラスです。各モデルには複数のクラス
 変数があり、個々のクラス変数はモデルのデータベースフィールドを表現していま
@@ -378,8 +410,8 @@ Python コードの中で使いますし、データベースではカラム名�
 対一といった、広く使われているリレーション全てをサポートしています。
 
 
-.. _`Python パス`: http://www.python.jp/doc/release/tut/node8.html#SECTION008110000000000000000
-.. _`Python path`: http://docs.python.org/tut/node8.html#SECTION008110000000000000000
+.. _`Python パス`: http://www.python.jp/doc/2.7/tutorial/modules.html#tut-searchpath
+.. _`Python path`: http://docs.python.org/tutorial/modules.html#the-module-search-path
 
 モデルを有効にする
 ==================
@@ -387,10 +419,10 @@ Python コードの中で使いますし、データベースではカラム名�
 前述のようなほんのわずかなコードをモデルに書くだけで、 Django はたくさんの
 情報を手にします。このコードを使って、 Django は:
 
-    * アプリケーションのデータベーススキーマを作成 (``CREATE TABLE`` 文を実
-      行) できます。
-    * Poll や Choice オブジェクトに Python からアクセスするためのデータベー
-      ス API を作成できます。
+* アプリケーションのデータベーススキーマを作成 (``CREATE TABLE`` 文を実
+  行) できます。
+* Poll や Choice オブジェクトに Python からアクセスするためのデータベー
+  ス API を作成できます。
 
 ただし、その前に ``polls`` アプリケーションをインストールしたことをプロジェ
 クトに教えてやる必要があります。
@@ -403,18 +435,24 @@ Python コードの中で使いますし、データベースではカラム名�
     を複数のプロジェクトで使ったり、単体で配布したりできます。
 
 再度 :file:`settings.py` ファイルを編集して、 :setting:`INSTALLED_APPS` 設
-定を変更し、 ``'mysite.polls'`` を入れます。以下のようになるはずです::
+定を変更し、 ``'polls'`` を入れます。以下のようになるはずです::
 
     INSTALLED_APPS = (
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
         'django.contrib.sites',
-        'mysite.polls'
+        'django.contrib.messages',
+        'django.contrib.staticfiles',
+        # Uncomment the next line to enable the admin:
+        # 'django.contrib.admin',
+        # Uncomment the next line to enable admin documentation:
+        # 'django.contrib.admindocs',
+        'polls',
     )
 
-これで Django は ``mysite`` に ``polls`` アプリケーションが入っているこ
-とを知りました。もう一つコマンドを実行してみましょう:
+これで Django は ``polls`` アプリケーションが入っていることを知りました。
+もう一つコマンドを実行してみましょう:
 
 .. code-block:: bash
 
@@ -433,7 +471,7 @@ Python コードの中で使いますし、データベースではカラム名�
     );
     CREATE TABLE "polls_choice" (
         "id" serial NOT NULL PRIMARY KEY,
-        "poll_id" integer NOT NULL REFERENCES "polls_poll" ("id"),
+        "poll_id" integer NOT NULL REFERENCES "polls_poll" ("id") DEFERRABLE INITIALLY DEFERRED,
         "choice" varchar(200) NOT NULL,
         "votes" integer NOT NULL
     );
@@ -441,54 +479,53 @@ Python コードの中で使いますし、データベースではカラム名�
 
 以下の点に注意してください:
 
-    * 実際に出力される SQL 文は、使っているデータベースによって変わります。
+* 実際に出力される SQL 文は、使っているデータベースによって変わります。
 
-    * テーブル名はアプリケーションの名前 (``polls``) とモデルの小文字表記
-      (``poll`` および ``choice``) を使って自動的に生成されます (この挙動は
-      オーバライドできます。)
+* テーブル名はアプリケーションの名前 (``polls``) とモデルの小文字表記
+  (``poll`` および ``choice``) を使って自動的に生成されます (この挙動は
+  オーバライドできます。)
 
-    * 主キー (primary key, ID) は自動的に生成されます (この挙動もオーバライ
-      ド可能です)
+* 主キー (primary key, ID) は自動的に生成されます (この挙動もオーバライ
+  ド可能です)
 
-    * 便宜上、 Django は外部キーのフィールド名に ``"_id"`` を追加します。も
-      ちろんこの挙動もオーバライド可能です。
+* 便宜上、 Django は外部キーのフィールド名に ``"_id"`` を追加します。も
+  ちろんこの挙動もオーバライド可能です。
 
-    * 外部キーのリレーションは ``REFERENCES`` 文で明示的に作成されます。
+* 外部キーのリレーションは ``REFERENCES`` 文で明示的に作成されます。
 
-    * SQL 文は使っているデータベースに応じて細かく調整されます。従って、
-      ``auto_increment`` (MySQL)、 ``serial`` (PostgreSQL)、 
-      ``integer primary key`` (SQLite) といったデータベース固有のフィールド
-      タイプは自動的に指定されます。クオートの仕方、すなわち一重と二重のど
-      ちらの引用符を使うか、といったことも自動で調整します。このチュートリ
-      アルの作者は PostgreSQL を使っており、例題での出力は PostgreSQL の文
-      法に準じています。
+* SQL 文は使っているデータベースに応じて細かく調整されます。従って、
+  ``auto_increment`` (MySQL)、 ``serial`` (PostgreSQL)、 
+  ``integer primary key`` (SQLite) といったデータベース固有のフィールド
+  タイプは自動的に指定されます。クオートの仕方、すなわち一重と二重のど
+  ちらの引用符を使うか、といったことも自動で調整します。このチュートリ
+  アルの作者は PostgreSQL を使っており、例題での出力は PostgreSQL の文
+  法に準じています。
 
-    * :djadmin:`sql` コマンドを実行しても、実際にデータベースで SQL を実行
-      するわけではありません。 ``sql`` コマンドは、ユーザが Django の挙動を
-      知りたいと考えたときのため、単に SQL 文をスクリーンに表示しているだけ
-      です。必要なら、この SQL 文をコピーしてデータベースクライアントのプロ
-      ンプトにペーストできますが、後ですぐ述べるように、 Django では SQL を
-      データベースに commit させる簡単な方法を提供しています。
+* :djadmin:`sql` コマンドを実行しても、実際にデータベースで SQL を実行
+  するわけではありません。 ``sql`` コマンドは、ユーザが Django の挙動を
+  知りたいと考えたときのため、単に SQL 文をスクリーンに表示しているだけ
+  です。必要なら、この SQL 文をコピーしてデータベースクライアントのプロ
+  ンプトにペーストできますが、後ですぐ述べるように、 Django では SQL を
+  データベースに commit させる簡単な方法を提供しています。
 
 興味があるなら、以下のコマンドも実行してみてください:
 
-    * :djadmin:`python manage.py validate <validate>` -- モデルの構成にエ
-      ラーがないか調べます。
+* :djadmin:`python manage.py validate <validate>` -- モデルの構成にエ
+  ラーがないか調べます。
 
-    * :djadmin:`python manage.py sqlcustom polls <sqlcustom>` -- 各アプリケー
-      ション向けに定義しておいた、カスタマイズ (テーブル形式の変更や制約)
-      用の SQL 文を出力します。
+* :djadmin:`python manage.py sqlcustom polls <sqlcustom>` -- 各アプリケー
+  ション向けに定義しておいた、カスタマイズ (テーブル形式の変更や制約)
+  用の SQL 文を出力します。
 
-    * :djadmin:`python manage.py sqlclear polls <sqlclear>` -- アプリケーショ
-      ン用のテーブルのうち、データベース上に存在するものについて必要に応じ
-      て ``DROP TABLE`` 文を出力します。
+* :djadmin:`python manage.py sqlclear polls <sqlclear>` -- アプリケーショ
+  ン用のテーブルのうち、データベース上に存在するものについて必要に応じ
+  て ``DROP TABLE`` 文を出力します。
 
-    * :djadmin:`python manage.py sqlindexes polls <sqlindexes>` -- アプリケー
-      ション用の ``CREATE INDEX`` 文を出力します。
+* :djadmin:`python manage.py sqlindexes polls <sqlindexes>` -- アプリケー
+  ション用の ``CREATE INDEX`` 文を出力します。
 
-    * :djadmin:`python manage.py sqlall polls <sqlall>` -- 'sql',
-      'sqlcustom', 'sqlindexes' コマンドを合わせたものです。
-
+* :djadmin:`python manage.py sqlall polls <sqlall>` -- 'sql',
+  'sqlcustom', 'sqlindexes' コマンドを合わせたものです。
 
 これらのコマンドの出力を見れば、水面下で実際に行われていることを理解する助
 けになるでしょう。
@@ -502,7 +539,7 @@ Python コードの中で使いますし、データベースではカラム名�
 
 :djadmin:`syncdb` コマンドは :setting:`INSTALLED_APPS` に登録されているアプ
 リケーションのうち、データベース上にまだ存在しないものに対して
-:djadmin:`sqlall` で生成した SQL を生成します。こにれよって、最後に
+:djadmin:`sqlall` で生成した SQL を生成します。これによって、最後に
 :djadmin:`syncdb` を実行した時以後に新たにプロジェクトに追加されたアプリケー
 ションのテーブルと初期データ、インデクスを生成します。  :djadmin:`syncdb`
 はその都度存在しないテーブルだけを生成するので、繰り返し実行してもかまいま
@@ -510,7 +547,8 @@ Python コードの中で使いますし、データベースではカラム名�
 
 
 ``manage.py`` ユーティリティでできることについては
-:ref:`django-admin.py のドキュメント <ref-django-admin>` を読んで下さい。
+:doc:`django-admin.py のドキュメント </ref/django-admin>` を読んで下さい。
+
 
 API で遊んでみる
 ================
@@ -522,45 +560,37 @@ API で遊んでみる
 
     python manage.py shell
 
-単に "python" を実行しないのは、 ``manage.py`` でプロジェクトの環境を設定し
-ているからです。ここでいう「環境の設定」とは:
-
-    * ``mysite`` を ``sys.path`` に入れます。柔軟性を持たせるために、
-      Django を構成するコードの中には Python のドット表記 (例えば
-      ``'mysite.polls.models'``) でプロジェクトを参照するものがあります。
-      この表記でプロジェクトをうまく参照できるようにするには、 ``mysite``
-      パッケージは  ``sys.path`` 上になければなりません。
-
-      こうした表記法の例は、すでに見たことがあるはずです: 例えば
-      :setting:`INSTALLED_APPS` 設定は、ドット表記のパッケージ名からなるリ
-      ストです。
-
-    * 環境変数 ``DJANGO_SETTINGS_MODULE`` を設定して、 ``settings.py`` ファ
-      イルの在処を Django に教えます。
+単に "python" を実行しないのは、 Django に :file:`settings.py` ファイルへの
+import パスを与える ``DJANGO_SETTINGS_MODULE`` の環境変数を :file:`manage.py`
+で設定しているからです。
 
 .. admonition:: manage.py を使わずに済ませる方法
 
-    ``manage.py`` を使いたくなくても、問題はありません。 ``mysite`` が
-    Python パス上にあるように (``import mysite`` が通るように) して、環境変
-    数 ``DJANGO_SETTINGS_MODULE`` を  ``mysite.settings`` に設定してくださ
-    い。
+    :file:`manage.py` を使いたくなくても、問題はありません。環境変数
+    ``DJANGO_SETTINGS_MODULE`` を ``mysite.settings`` に設定して、
+    :file:`manage.py` と同じディレクトリで ``python`` を実行してください
+    (または ``import mysite`` が通るように、ディレクトリが Python のパス上
+    にあるようにしてください) 。
 
-    詳しくは :ref:`django-admin.py のドキュメント <ref-django-admin>` を参
+    詳しくは :doc:`django-admin.py のドキュメント </ref/django-admin>` を参
     照してください。
 
-シェルに入ったら、 :ref:`データベース API <topics-db-queries>` の世界を探検
+シェルに入ったら、 :doc:`データベース API </topics/db/queries>` の世界を探検
 してみましょう::
 
-    
-    >>> from mysite.polls.models import Poll, Choice # モデルクラスを import します。
+    >>> from polls.models import Poll, Choice # モデルクラスを import します。
 
     # まだ Poll は一つもできていません。
     >>> Poll.objects.all()
     []
 
     # 新たな Poll を作成しましょう。
-    >>> import datetime
-    >>> p = Poll(question="What's up?", pub_date=datetime.datetime.now())
+    # デフォルト設定ファイルでタイムゾーンへのサポートが使用可能になって
+    # いるので、 Django は pub_date に対して tzinfo を伴った datetime を
+    # 期待します。 datetime.datetime.now() の代わりに timezone.now() を使用
+    # してください。
+    >>> from django.utils import timezone
+    >>> p = Poll(question="What's up?", pub_date=timezone.now())
 
     # 出来たオブジェクトをデータベースに保存します。 save() は明示的に呼ば
     # ねばなりません。
@@ -575,12 +605,12 @@ API で遊んでみる
 
     # データベースの各カラムに Python の属性としてアクセスします。
     >>> p.question
-    "What's up?"
+    "What's new?"
     >>> p.pub_date
-    datetime.datetime(2007, 7, 15, 12, 00, 53)
+    datetime.datetime(2012, 2, 26, 13, 0, 0, 775217, tzinfo=<UTC>)
 
     # 属性を変更して save() を呼び出すとカラムの値を変更します。
-    >>> p.pub_date = datetime.datetime(2007, 4, 1, 0, 0)
+    >>> p.question = "What's up?"
     >>> p.save()
 
     # objects.all() はデータベース上の全ての Poll を返します。
@@ -603,20 +633,6 @@ polls 関係のモデルを少し修正して、 ``Poll`` と ``Choice`` に
         def __unicode__(self):
             return self.choice
 
-.. admonition:: \ :meth:`~django.db.models.Model.__unicode__` がうまく動かない場合には
-
-   モデルに :meth:`~django.db.models.Model.__unicode__` メソッドを追加した
-   のに、オブジェクトの表示が何も変化しないのなら、古いバージョンの Django
-   を使っているはずです。(チュートリアルのこのバージョンは、最新の開発版
-   Django に準拠しています) Subversion を使って開発版の Django をチェックア
-   ウトしている場合 (詳しい方法は :ref:`インストール方法 <topics-install>`
-   を参照してください) 、うまく動作するはずです。
-
-   古いバージョンの Django を使わねばならない場合、
-   `バージョン 0.96 用のチュートリアル`_ を参照するよう勧めます。というのも、
-   このチュートリアルでは、開発版の Django にしかない機能をカバーしているか
-   らです。
-
 :meth:`~django.db.models.Model.__unicode__` をモデルに追加しておく重要性は、
 対話プロンプトで扱うときに精神的によいだけでなく、Django が自動生成する管理
 インタフェースのいたるところでオブジェクトの表現 (representation) が使われ
@@ -637,7 +653,7 @@ polls 関係のモデルを少し修正して、 ``Poll`` と ``Choice`` に
     :meth:`~django.db.models.Model.__unicode__` を呼び出して、得た結果を
     UTF-8 のバイト文字列に変換しています。従って、 ``unicode(p)`` は
     Unicode 文字列を返し、 ``str(p)`` は UTF-8 でエンコードされた通常の文字
-    列を返します。この仕様がよくわからなければ、とにかく 
+    列を返します。この仕様がよくわからなければ、とにかく
     :meth:`~django.db.models.Model.__unicode__` をモデルに追加するのだと覚
     えておいてください。なにはともあれ、それでうまく動作します。
 
@@ -645,18 +661,22 @@ polls 関係のモデルを少し修正して、 ``Poll`` と ``Choice`` に
 ことに注意してください。デモ用にカスタムのメソッドを追加してみましょう::
 
     import datetime
+    from django.utils import timezone
     # ...
     class Poll(models.Model):
         # ...
-        def was_published_today(self):
-            return self.pub_date.date() == datetime.date.today()
+        def was_published_recently(self):
+            return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
 
-``import datetime`` で Python の標準モジュール ``datetime`` を参照している
-ことに注意してください。
+``import datetime`` と ``from django.utils import timezone`` で Python の
+標準モジュール :mod:`datetime` と Django のタイムゾーン関連ユーティリティの
+:mod:`django.utils.timezone` を参照していることに注意してください。もし
+Python でタイムゾーンを取り扱うことに不慣れな場合は、
+:doc:`タイムゾーン </topics/i18n/timezones>` で勉強できます。
 
 ``python manage.py shell`` を実行して、Python 対話シェルに戻りましょう::
 
-    >>> from mysite.polls.models import Poll, Choice
+    >>> from polls.models import Poll, Choice
 
     # __unicode__() がきちんと働いていることを確認します。
     >>> Poll.objects.all()
@@ -669,9 +689,8 @@ polls 関係のモデルを少し修正して、 ``Poll`` と ``Choice`` に
     >>> Poll.objects.filter(question__startswith='What')
     [<Poll: What's up?>]
 
-    # 2007 年の Poll を取り出しましょう。あなたがこのチュートリアルを実行
-    # しているのが 2007 年でないのなら、適当に値を読みかえてください。
-    >>> Poll.objects.get(pub_date__year=2007)
+    # 2012 年の Poll を取り出しましょう。
+    >>> Poll.objects.get(pub_date__year=2012)
     <Poll: What's up?>
 
     >>> Poll.objects.get(id=2)
@@ -689,14 +708,21 @@ polls 関係のモデルを少し修正して、 ``Poll`` と ``Choice`` に
 
     # カスタムメソッドが動作するか確かめてみましょう。
     >>> p = Poll.objects.get(pk=1)
-    >>> p.was_published_today()
-    False
+    >>> p.was_published_recently()
+    True
 
     # Poll に二つの Choice を指定しましょう。 create を呼び出すと、新たな
     # Choice オブジェクトを生成し、 INSERT 文を実行し、 Poll からアクセス可
     # 能な Choice オブジェクトの集合に追加して、新たに作成された Choice オ
-    # ブジェクトを返します。
+    # ブジェクトを返します。 Django は API を通してアクセス出来る "あちら側"
+    # の外部キー (例えば poll の choice) を保持する set を作ります。
     >>> p = Poll.objects.get(pk=1)
+
+    # 関連するオブジェクトの set から choice を表示します。現在は空です。
+    >>>> p.choice_set.all()
+    []
+
+    # 3つの choice を作ります。
     >>> p.choice_set.create(choice='Not much', votes=0)
     <Choice: Not much>
     >>> p.choice_set.create(choice='The sky', votes=0)
@@ -717,18 +743,23 @@ polls 関係のモデルを少し修正して、 ``Poll`` と ``Choice`` に
 
     # API は必要に応じて自動的にリレーションを追跡します。リレーションを辿
     # るには二重アンダースコアを使います。この表記法には制限がなく、何段階
-    # でも連鎖できます。以下の例では、 pub_date が 2007 の全ての Poll に関
+    # でも連鎖できます。以下の例では、 pub_date が 2012 の全ての Poll に関
     # 連づけられている Choice を返します。
-    >>> Choice.objects.filter(poll__pub_date__year=2007)
+    >>> Choice.objects.filter(poll__pub_date__year=2012)
     [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]
 
     # choice を一つ削除しましょう。 delete() を使います。
     >>> c = p.choice_set.filter(choice__startswith='Just hacking')
     >>> c.delete()
 
+リレーションモデルの詳細は、
+:doc:`リレーションオブジェクトリファレンス </ref/models/relations>` を
+参照してください。 API を通じたフィールドの照合のためのダブルアンダースコア
+の使い方の詳細は、
+:ref:`フィールドの照合 <field-lookups-intro>` を参照してください。
 データベース API の詳細は、 
-:ref:`データベース API リファレンス <topics-db-queries>` を参照してください。
+:doc:`データベース API リファレンス </topics/db/queries>` を参照してください。
 
 API を使いこなせるようになったら、 
-:ref:`チュートリアル第 2 部 <intro-tutorial02>` に進んで、Django が自動生成
+:doc:`チュートリアルその 2 </intro/tutorial02>` に進んで、Django が自動生成
 する管理インタフェースを動かしてみましょう。
