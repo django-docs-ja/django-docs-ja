@@ -690,7 +690,7 @@ Python でタイムゾーンを取り扱うことに不慣れな場合は、
     [<Poll: What's up?>]
 
     # 2012 年の Poll を取り出しましょう。
-    >>> Poll.objects.get(pub_date__year=2007)
+    >>> Poll.objects.get(pub_date__year=2012)
     <Poll: What's up?>
 
     >>> Poll.objects.get(id=2)
