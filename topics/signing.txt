@@ -1,0 +1,147 @@
+==============
+暗号による署名
+==============
+
+:revision-up-to: 17812 (1.4)
+
+.. module:: django.core.signing
+   :synopsis: Django 署名フレームワーク
+
+.. versionadded:: 1.4
+
+Web アプリケーションセキュリティの黄金律は、信頼できないソースからのデータを決
+して信頼しないということです。しかし時には信頼できない媒体にデータを通すことが
+便利かもしれません。暗号により署名された値を使えば、どんな改ざんも検出されると
+いう知識のもとで、信頼できない経路を安全に通過できます。
+
+Django は値を署名するための低レベル API と、署名つきクッキーを設定したり読み込
+むための高レベル API を提供しています。署名つきクッキーは Web アプリケーション
+で最もよく使われる署名の一つです。
+
+また、次のような場合に署名が使えることにお気づきでしょうか:
+
+* パスワードを紛失したユーザに送るために「アカウント復旧」用 URL を生成する。
+
+* フォームの hidden フィールドに格納されたデータが改ざんされていないことを確認
+  する。
+
+* 保護されたリソース (例えば料金を支払ってダウンロードできるファイル) に一時的
+  にアクセスするためのワンタイム URL を生成する。
+
+SECRET_KEY の保護
+=================
+
+:djadmin:`startproject` を使って新しく Django プロジェクトを作成すると、
+``settings.py`` ファイルが自動的に生成され :setting:`SECRET_KEY` にはランダム
+値がセットされます。この値はデータを安全に署名するためのキーなので、このキーを
+秘密に保つことが不可欠です。そうしなければ攻撃者がキーを使って自分の署名された
+値を生成できてしまうでしょう。
+
+低レベル API を使う
+===================
+
+.. class:: Signer
+
+Django の署名メソッドは ``django.core.signing`` モジュールにあります。値を署名
+するには、最初に ``Signer`` インスタンスを生成します::
+
+    >>> from django.core.signing import Signer
+    >>> signer = Signer()
+    >>> value = signer.sign('My string')
+    >>> value
+    'My string:GdMGD6HNQ_qdgxYP8yBZAdAIV1w'
+
+署名は、文字列の最後でコロンの後に付け足されます。 ``unsign`` メソッドを使うと
+元の値を取得できます::
+
+    >>> original = signer.unsign(value)
+    >>> original
+    u'My string'
+
+署名または値が何らかの方法で変更されると、 ``django.core.signing.BadSignature``
+例外が送出されます::
+
+    >>> value += 'm'
+    >>> try:
+    ...    original = signer.unsign(value)
+    ... except signing.BadSignature:
+    ...    print "Tampering detected!"
+
+デフォルトでは ``Signer`` クラスは :setting:`SECRET_KEY` 設定を署名の生成に使
+います。 ``Signer`` コンストラクタに別の秘密鍵を渡して使うこともできます。
+
+    >>> signer = Signer('my-other-secret')
+    >>> value = signer.sign('My string')
+    >>> value
+    'My string:EkfQJafvGyiofrdGnuthdxImIJw'
+
+ソルト (salt) 引数を使う
+------------------------
+
+同じ文字列に対して毎回同じ署名ハッシュを取得したくないなら、オプションの
+``salt`` 引数を ``Signer`` クラスに使うことができます。ソルトを使うと 署名ハッ
+シュ関数はソルトと :setting:`SECRET_KEY` の両方を使ってハッシュを生成します::
+
+    >>> signer = Signer()
+    >>> signer.sign('My string')
+    'My string:GdMGD6HNQ_qdgxYP8yBZAdAIV1w'
+    >>> signer = Signer(salt='extra')
+    >>> signer.sign('My string')
+    'My string:Ee7vGi-ING6n02gkcJ-QLHg6vFw'
+    >>> signer.unsign('My string:Ee7vGi-ING6n02gkcJ-QLHg6vFw')
+    u'My string'
+
+このようにソルトを使うと、署名が別々の名前空間に置かれます。同じプレーンテキス
+トの検証でも、特定のソルト値を使ったある名前空間から得られた署名を、別のソルト
+を設定した名前空間で使うことはできません。この結果により、コードのある場所で生
+成された署名つき文字列を、違うソルトを使って生成 (検証) している別の場所への入
+力として攻撃者が使うことを防げます。
+
+:setting:`SECRET_KEY` と違って、ソルト引数は秘密にする必要がありません。
+
+タイムスタンプつきの値を検証する
+--------------------------------
+
+.. class:: TimestampSigner
+
+``TimestampSigner`` は :class:`~Signer` のサブクラスで、署名つきタイムスタンプ
+を値に付け加えます。これによって署名された値が特定の期間に作られたことを確認で
+きます::
+
+    >>> from django.core.signing import TimestampSigner
+    >>> signer = TimestampSigner()
+    >>> value = signer.sign('hello')
+    >>> value
+    'hello:1NMg5H:oPVuCqlJWmChm1rA2lyTUtelC-c'
+    >>> signer.unsign(value)
+    u'hello'
+    >>> signer.unsign(value, max_age=10)
+    ...
+    SignatureExpired: Signature age 15.5289158821 > 10 seconds
+    >>> signer.unsign(value, max_age=20)
+    u'hello'
+
+複雑なデータ構造を保護する
+--------------------------
+
+リストやタプルや辞書を保護したいのであれば、 signing モジュールの ``dumps`` と
+``loads`` 関数を使ってください。これらの関数は Python の pickle モジュールを
+真似た動きをします。ただし舞台裏では JSON シリアライズを使います。 JSON は
+:setting:`SECRET_KEY` が盗まれた時でさえ、攻撃者が pickle フォーマットを利用し
+て任意のコマンドを実行できないことを保証します::
+
+    >>> from django.core import signing
+    >>> value = signing.dumps({"foo": "bar"})
+    >>> value
+    'eyJmb28iOiJiYXIifQ:1NMg1b:zGcDE4-TCkaeGzLeW9UQwZesciI'
+    >>> signing.loads(value)
+    {'foo': 'bar'}
+
+.. function:: dumps(obj, key=None, salt='django.core.signing', compress=False)
+
+    sha1 で署名され base64 で圧縮された URL を安全に使える JSON 文字列を返しま
+    す。
+
+.. function:: loads(string, key=None, salt='django.core.signing', max_age=None)
+
+    dumps() の逆です。署名が間違っていると ``BadSignature`` を送出します。
