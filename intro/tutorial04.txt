@@ -159,7 +159,7 @@
 :doc:`チュートリアルその 3 </intro/tutorial03>` で触れたように、
 ``request`` は :class:`~django.http.HTTPRequest` オブジェクトです。
 :class:`~django.http.HTTPRequest` の詳細は
-:ref:`リクエスト・レスポンスオブジェクトのドキュメント <ref-request-response>`
+:doc:`リクエスト・レスポンスオブジェクトのドキュメント </ref/request-response>`
 を参照してください。
 
 投票者が Poll に投票すると、 ``vote()`` ビューは開票結果ページにリダイレク
