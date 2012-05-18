@@ -1222,9 +1222,6 @@ URLconf に次の行を足すとこのビューを有効にできます::
 という名前のクッキーに言語設定を保存します。 (この名前は
 :setting:`LANGUAGE_COOKIE_NAME` 設定で変更できます。)
 
-After setting the language choice, Django redirects the user, following this
-algorithm:
-
 選ばれた言語を設定したら、 Django はユーザを以下のアルゴリズムでリダイレクトし
 ます:
 
