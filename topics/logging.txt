@@ -1,0 +1,505 @@
+========
+ロギング
+========
+
+:revision-up-to: 17812 (1.4)
+
+.. versionadded:: 1.3
+
+.. module:: django.utils.log
+   :synopsis: Django アプリケーションのためのロギングツール
+
+クイックロギング入門
+====================
+
+Django は Python の組込モジュール :mod:`logging` を使ってシステムのログ出力を
+行います。このモジュールの使用法は Python 自体のドキュメントで詳しく議論され
+ています。しかし、 Python のロギングフレームワークを使ったことがなければ (あ
+っても) このクイック入門を読んでみてください。
+
+プレイヤーの配役
+----------------
+
+Python のロギング設定は 4 つの部分からなります:
+
+* :ref:`topic-logging-parts-loggers`
+* :ref:`topic-logging-parts-handlers`
+* :ref:`topic-logging-parts-filters`
+* :ref:`topic-logging-parts-formatters`
+
+.. _topic-logging-parts-loggers:
+
+ロガー
+~~~~~~
+
+ロガー (logger) はロギングシステムのエントリポイントです。ロガーはメッセージが
+処理のために書き込まれる名前つきの容れ物です。
+
+個々のロガーは *ログレベル* を持つように設定されます。ログレベルは、そのロガー
+が処理するメッセージの深刻度を表します。 Python は以下のログレベルを定義してい
+ます:
+
+* ``DEBUG``: デバッグ目的で低いレベルのシステム情報
+
+* ``INFO``: 一般的なシステム情報
+
+* ``WARNING``: 発生した小さな問題についての情報
+
+* ``ERROR``: 発生した大きな問題についての情報
+
+* ``CRITICAL``: 発生した致命的な問題についての情報
+
+ロガーに書き込まれるメッセージは *ログレコード* です。個々のログレコードも特定
+のメッセージの深刻度を示す *ログレベル* を持ちます。ログレコードは記録されるイ
+ベントを説明する有益なメタデータを含むこともできます。スタックトレースやエラー
+コードのような詳細を含みます。
+
+メッセージがロガーに渡されると、メッセージのログレベルとロガーのログレベルが比
+較されます。メッセージのログレベルが、ロガーのログレベルと同じかそれより高けれ
+ば、メッセージは処理に進みます。そうでなければメッセージは無視されます。
+
+ロガーがメッセージを処理すべきと決定したなら、メッセージは *ハンドラ* に渡され
+ます。
+
+.. _topic-logging-parts-handlers:
+
+ハンドラ
+~~~~~~~~
+
+ハンドラ (handler) はロガーの持つ個々のメッセージに何が起こるかを決定するエン
+ジンです。ハンドラは、メッセージを画面やファイルやネットワークソケットに出力し
+たりといった、ロギングの決まった動作を示します。
+
+ロガーと同様に、ハンドラもまたログレベルを持っています。ログレコードのログレベ
+ルがハンドラのレベルより低ければ、ハンドラはメッセージを無視します。
+
+ロガーは複数のハンドラを持つことができます。それぞれのハンドラは異なるログレベ
+ルに設定できます。こうすることで、メッセージの重要性に従って、異なる通知の形式
+を提供することが可能になります。例えば、ページ出力サービスに ``ERROR``
+と ``CRITICAL`` メッセージを渡すハンドラを設定し、別のハンドラでは ``ERROR``
+と ``CRITICAL`` を含む全てのメッセージを、後で分析するためにファイルに記録す
+る、といったことができます。
+
+.. _topic-logging-parts-filters:
+
+フィルタ
+~~~~~~~~
+
+フィルタ (filter) はロガーからハンドラに渡されるログレコードに対する追加の操作
+を提供するために使われます。
+
+デフォルトでは必要なログレベルを満たす全てのログメッセージが処理されます。しか
+しフィルタを設定することでロギングプロセスに追加の基準を作ることができます。例
+えば、特定のソースからの ``ERROR`` メッセージだけを発行することを許可するフィ
+ルタを作れます。
+
+フィルタはまたログレコードの発行される優先度を変更するために使うことができま
+す。例えば、決まった一連の基準を満たすと ``ERROR`` ログレコードを ``WARNING``
+に落とすフィルタを作ることができます。
+
+フィルタはロガーまたはハンドラに対して設定することができます。複数のアクション
+を実行するために、複数のフィルタをチェーンとして使うことができます。
+
+.. _topic-logging-parts-formatters:
+
+フォーマッタ
+~~~~~~~~~~~~
+
+ログレコードは究極的にはテキストとして描画されます。フォーマッタ (formatter)
+はそのテキストの正確な形式を表します。フォーマッタは普通 Python のフォーマット
+文字列からなります。しかし、特定のフォーマット動作を実装したカスタムのフォー
+マッタを作ることもできます。
+
+ロギングを使う
+==============
+
+ロガー、ハンドラ、フィルタ、フォーマッタを設定したら、コードの中にロギングの呼
+び出しを入れなければなりません。ロギングフレームワークの使い方はとてもシンプル
+です。例を挙げましょう::
+
+    # logging ライブラリをインポートする
+    import logging
+
+    # ロガーインスタンスを取得
+    logger = logging.getLogger(__name__)
+
+    def my_view(request, arg1, arg):
+        ...
+        if bad_mojo:
+            # エラーメッセージをログ出力
+            logger.error('Something went wrong!')
+
+これだけです ! ``bad_mojo`` 条件が満たされるたびにエラーログレコードが書き出さ
+れます。
+
+ロガーの命名
+------------
+
+:meth:`logging.getLogger()` の呼び出しによりロガーインスタンスが取得 (必要な場
+合は生成) されます。ロガーインスタンスは名前により特定されます。この名前は設定
+でロガーを特定するためにも使われます。
+
+慣習的に、ロガーの名前は通常 ``__name__`` を使います。これはロガーを含む
+Python モジュール名です。こうするとロギングの呼び出しをモジュール単位でフィル
+タしたりハンドルできます。しかしながら、ロギングメッセージを整理する別の方法が
+あるなら、ロガーを特定するためにドットで分割された任意の名前を使うことができま
+す::
+
+    # 特定の名前のロガーインスタンスを取得
+    logger = logging.getLogger('project.interesting.stuff')
+
+ロガー名のドットパスによって階層が定義されます。 ``project.interesting`` ロガ
+ーは ``project.interesting.stuff`` ロガーの親と見なされます。 ``project`` ロ
+ガーは ``project.interesting`` ロガーの親です。
+
+なぜ階層が重要なのでしょう。それは、ロガーの呼び出しをロガーが親に *伝播させる
+(propagate)* ことができるようにするためです。この方法で、ロガー階層のルートに
+1 つのハンドラの集合を定義できます。 ``project`` 名前空間で定義されたロガーハ
+ンドラは、 ``project.interesting`` および ``project.interesting.stuff`` ロガー
+から発行された全てのロギングメッセージをつかまえることになります。
+
+伝播はロガー単位で制御できます。特定のロガーでは親に伝播させたくないなら、この
+動作をオフにすることができます。
+
+ロギングの実行
+--------------
+
+ロガーインスタンスはデフォルトログレベルのそれぞれに対するメソッドを持っていま
+す:
+
+* ``logger.critical()``
+* ``logger.error()``
+* ``logger.warning()``
+* ``logger.info()``
+* ``logger.debug()``
+
+他に 2 つの呼び出し方法があります:
+
+* ``logger.log()``: 指定したログレベルでロギングメッセージを発行します。
+
+* ``logger.exception()``: 現在の例外スタックトレースをラップした ``ERROR`` レ
+  ベルのログメッセージを作成します。
+
+ロギングの設定
+==============
+
+当然ながらコードにロギングの実行を入れただけでは不十分です。ロガー、ハンドラ、
+フィルタ、フォーマッタを設定してログ出力がされることを確認しなければなりませ
+ん。
+
+Python の logging ライブラリはロギングを設定する方法を複数用意しています。その
+方法はプログラムによるインタフェースから設定ファイルまで多岐にわたります。
+デフォルトでは Django は `dictConfig フォーマット`_ を使います。
+
+.. note::
+    ``logging.dictConfig`` は Python 2.7 の組込ライブラリです。もっと古いバー
+    ジョンの Python を使っている場合にこのライブラリを使えるようにするため、
+    Django は ``django.utils.log`` の一部としてそれをコピーしています。 Python
+    2.7 を使っているなら、システムのネイティブライブラリが使われますが、 2.6
+    以前では Django 内のコピーが使われます。
+
+ロギング設定をするためには :setting:`LOGGING` を使ってロギング設定の辞書を定義
+してください。この設定にはセットアップしたいロガー、ハンドラ、フィルタ、フォー
+マッタを記述し、ログレベルやコンポーネントに持たせたい他の設定を書きます。
+
+ロギングは設定ファイルがロードされた後直接設定されます。設定ファイルのロードは
+Django が一番最初にすることの 1 つなので、プロジェクトコードではロガーが準備済
+になっていることを確信してかまいません。
+
+.. _dictConfig フォーマット: http://docs.python.org/library/logging.config.html#configuration-dictionary-schema
+
+.. _a third-party library: http://bitbucket.org/vinay.sajip/dictconfig
+
+例
+--
+
+`dictConfig フォーマット`_ の全体ドキュメントはロギング設定辞書の一番良い情報
+源です。しかしながら、その可能性を味わっていただくために、ここでは
+:meth:`logging.dictConfig` を使ったかなり複雑なロギングセットアップ例を示しま
+す::
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': True,
+        'formatters': {
+            'verbose': {
+                'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+            },
+            'simple': {
+                'format': '%(levelname)s %(message)s'
+            },
+        },
+        'filters': {
+            'special': {
+                '()': 'project.logging.SpecialFilter',
+                'foo': 'bar',
+            }
+        },
+        'handlers': {
+            'null': {
+                'level':'DEBUG',
+                'class':'django.utils.log.NullHandler',
+            },
+            'console':{
+                'level':'DEBUG',
+                'class':'logging.StreamHandler',
+                'formatter': 'simple'
+            },
+            'mail_admins': {
+                'level': 'ERROR',
+                'class': 'django.utils.log.AdminEmailHandler',
+                'filters': ['special']
+            }
+        },
+        'loggers': {
+            'django': {
+                'handlers':['null'],
+                'propagate': True,
+                'level':'INFO',
+            },
+            'django.request': {
+                'handlers': ['mail_admins'],
+                'level': 'ERROR',
+                'propagate': False,
+            },
+            'myproject.custom': {
+                'handlers': ['console', 'mail_admins'],
+                'level': 'INFO',
+                'filters': ['special']
+            }
+        }
+    }
+
+このロギング設定は以下のことを行います:
+
+* 設定が 'dictConfig version 1' フォーマットであることを特定します。現在のとこ
+  ろこれは dictConfig フォーマットの唯一のバージョンです。
+
+* 既存のロギング設定を全て無効にします。
+
+* フォーマッタを 2 つ定義します:
+
+  * ``simple`` はログレベル名 (``DEBUG`` など) とログメッセージだけを出力しま
+    す。
+
+    `format` 文字列は通常の Python のフォーマット文字列で、各ロギング行で出力
+    される詳細を記述します。出力できる詳細の完全なリストは
+    `フォーマッタドキュメント`_ にあります。
+
+  * ``verbose`` はログレベル名、ログメッセージに加えて、時間、プロセス、スレッ
+    ド、ログメッセージを生成したモジュールを出力します。
+
+* フィルタを 1 つ、 :class:`project.logging.SpecialFilter` を定義し、別名を
+  ``special`` とします。このフィルタを作成する時に追加の引数が必要であれば、
+  フィルタ設定辞書にそれらを追加のキーとして含めます。今の場合だと
+  :class:`SpecialFilter` のインスタンスが作られる時 ``foo`` 引数に値 ``bar``
+  が与えられます。
+
+* ハンドラを 3 つ定義します:
+
+  * ``null`` NullHandler です。 ``DEBUG`` 以上の全てのメッセージを
+    ``/dev/null`` に捨てます。
+
+  * ``console`` StreamHandler です。 ``DEBUG`` 以上の全てのメッセージを標準エ
+    ラー出力に出力します。このハンドラは `simple` 出力フォーマットを使います。
+
+  * ``mail_admins`` AdminEmailHandler です。 ``ERROR`` 以上の全てのメッセージ
+    をサイト管理者にメール送信します。このハンドラは ``special`` フィルタを使
+    います。
+
+* ロガーを 3 つ定義します:
+
+  * ``django`` は ``INFO`` 以上のメッセージを ``null`` ハンドラに渡します。
+
+  * ``django.request`` は全ての ``ERROR`` メッセージを ``mail_admins`` ハンド
+    ラに渡します。さらに、このロガーはメッセージを伝播 *しない* ように印をつけ
+    られています。これにより ``django`` に書かれたログメッセージを ``django``
+    ロガーは扱わないことになります。
+
+  * ``myproject.custom`` は ``INFO`` 以上の全てのメッセージと ``special`` フィ
+    ルタを 2 つのハンドラ ``console`` と ``mail_admins`` に渡します。全ての
+    ``INFO`` レベル以上のメッセージはコンソールに出力され、 ``ERROR`` と
+    ``CRITICAL`` メッセージはメール経由で出力されることになります。
+
+.. admonition:: カスタムハンドラと循環インポート
+
+    もし ``settings.py`` がカスタムハンドラクラスを指定していて、そのクラスを
+    定義したファイルが ``settings.py`` をインポートしていたら、循環インポート
+    が起こります。
+
+    例えば、 ``settings.py`` は :setting:`LOGGING` に以下の設定をしているとし
+    ます::
+
+        LOGGING = {
+          'version': 1,
+          'handlers': {
+            'custom_handler': {
+              'level': 'INFO',
+              'class': 'myproject.logconfig.MyHandler',
+            }
+          }
+        }
+
+    そして ``myproject/logconfig.py`` で ``MyHandler`` の定義より前に以下の行
+    があるとします::
+
+        from django.conf import settings
+
+    すると ``dictconfig`` は以下のような例外を起こすでしょう::
+
+        ValueError: Unable to configure handler 'custom_handler':
+        Unable to configure handler 'custom_handler':
+        'module' object has no attribute 'logconfig'
+
+.. _フォーマッタドキュメント: http://docs.python.org/library/logging.html#formatter-objects
+
+カスタムロギング設定
+--------------------
+
+自分のロガーを設定するのに Python の dictConfig フォーマットを使うことを望まな
+いなら、自分自身の設定スキームを指定することができます。
+
+:setting:`LOGGING_CONFIG` 設定は Django のロガーが使う呼び出し可能オブジェクト
+(callable) を定義します。デフォルトでは Python の :meth:`logging.dictConfig()`
+メソッドを指しています。しかし、別の設定プロセスを使いたいなら、引数を 1 つと
+るどんな呼び出し可能オブジェクトでも使えます。ロギングが設定される時に
+:setting:`LOGGING` の内容がその引数の値として渡されます。
+
+ロギング設定の無効化
+--------------------
+
+ロギングを設定することを全く望んでいない (または自分のアプローチによって手動で
+設定をしたい) なら、 :setting:`LOGGING_CONFIG` に ``None`` をセットしてくださ
+い。設定プロセスが無効になります。
+
+.. note::
+    :setting:`LOGGING_CONFIG` に ``None`` をセットすることは設定プロセスを無効
+    化するだけで、ロギングそのものは無効化されません。設定プロセスを無効にして
+    も Django は依然としてロギングを実行し続け、定義されているデフォルトのロギ
+    ング動作にフォールバックします。
+
+Django によるロギング拡張
+=========================
+
+Django は Web サーバ環境でのロギング固有の要求をハンドルするユーティリティを数
+多く提供しています。
+
+ロガー
+------
+
+Django には 3 つの組込ロガーがあります。
+
+``django``
+~~~~~~~~~~
+
+``django`` は全てをキャッチするロガーです。どんなメッセージもこのロガーに直接
+投稿されることはありません。
+
+``django.request``
+~~~~~~~~~~~~~~~~~~
+
+リクエストのハンドリングに関係するログメッセージです。 5XX レスポンスは
+``ERROR`` メッセージとして送出され、 4XX レスポンスは ``WARNING`` メッセージと
+して送出されます。
+
+このロガーへのメッセージは以下の追加されたコンテクストを持ちます:
+
+* ``status_code``: リクエストに対応する HTTP レスポンスコード
+
+* ``request``: ロギングメッセージを生成したリクエストオブジェクト
+
+``django.db.backends``
+~~~~~~~~~~~~~~~~~~~~~~
+
+コードとデータベースの相互作用に関するメッセージ。例えばリクエストによって実行
+された SQL 文は ``DEBUG`` レベルでこのロガーに記録されます。
+
+このロガーへのメッセージは以下の追加されたコンテクストを持ちます:
+
+* ``duration``: SQL 文の実行にかかった時間
+* ``sql``: 実行された SQL 文
+* ``params``: SQL 呼び出しで使われたパラメータ
+
+パフォーマンス上の理由により、 SQL ロギングはロギングレベルや使用させるハンド
+ラに関わりなく ``settings.DEBUG`` が ``True`` の時にだけ有効になります。
+
+ハンドラ
+--------
+
+Django は Python の logging モジュールが提供するものに加えて 1 つのログハンド
+ラを提供します。
+
+.. class:: AdminEmailHandler([include_html=False])
+
+    このハンドラは受け取ったログメッセージごとにサイト管理者に E メールを送信
+    します。
+
+    ログレコードが ``request`` 属性を持っていれば、リクエストの全ての詳細が E
+    メールに含まれることになります。
+
+    ログレコードがスタックトレース情報を含んでいたら、そのスタックトレースが E
+    メールに含まれます。
+
+    ``AdminEmailHandler`` の ``include_html`` は :setting:`DEBUG` が ``True``
+    だった時に用意されるデバッグ用 Web ページの全ての内容を HTML で添付するか
+    どうかを制御します。この値をセットするには
+    ``django.utils.log.AdminEmailHandler`` のハンドラ定義に含めてください。こ
+    んな具合です::
+
+        'handlers': {
+            'mail_admins': {
+                'level': 'ERROR',
+                'class': 'django.utils.log.AdminEmailHandler',
+                'include_html': True,
+            }
+        },
+
+    E メールの HTML 版はスタックトレースの各レベルでのローカル変数名と値、さら
+    に Django 設定の値を含むことに注意してください。この情報は潜在的にとてもセ
+    ンシティブなもので、 E メールで送りたくないかもしれません。完全なスタック
+    トレースの豊富な情報と、 E メールで情報を送らないことの安全性、この両方の
+    世界の一番良いところを取るには、 `django-sentry`_ のようなものを使うことを
+    検討してください。また、エラーリポートから確実にセンシティブな情報を除外す
+    るように、明示的に設計することもできます。
+    :ref:`エラーリポートのフィルタリング<filtering-error-reports>` でもっと多
+    くのことを学んでください。
+
+.. _django-sentry: http://pypi.python.org/pypi/django-sentry
+
+
+フィルタ
+--------
+
+Django は Python の logging モジュールが提供するものに加えて 2 つのログフィル
+タを提供します。
+
+.. class:: CallbackFilter(callback)
+
+   .. versionadded:: 1.4
+
+   このフィルタはコールバック関数 (1 つの引数でログレコードを受け取れる必要が
+   あります) を受け取り、フィルタを通るレコードごとにそれを実行します。コール
+   バックが False を返すと、そのレコードのハンドリングは中止されます。
+
+.. class:: RequireDebugFalse()
+
+   .. versionadded:: 1.4
+
+   このフィルタは settings.DEBUG が False の時にだけレコードを通します。
+
+   このフィルタは、以下のようにデフォルトの :setting:`LOGGING` 設定で、
+   :setting:`DEBUG` が `False` の時にだけエラーメールを送ることを保証するため
+   に使われています::
+
+       'filters': {
+            'require_debug_false': {
+                '()': 'django.utils.log.RequireDebugFalse',
+            }
+        },
+        'handlers': {
+            'mail_admins': {
+                'level': 'ERROR',
+                'filters': ['require_debug_false'],
+                'class': 'django.utils.log.AdminEmailHandler'
+            }
+        },
