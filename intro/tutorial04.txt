@@ -1,12 +1,10 @@
-.. _intro-tutorial04:
-
 =====================================
 はじめての Django アプリ作成、その 4
 =====================================
 
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
 
-このチュートリアルは :ref:`チュートリアルその 3 <intro-tutorial03>` の続き
+このチュートリアルは :doc:`チュートリアルその 3 </intro/tutorial03>` の続き
 です。ここでは、引続き Web 投票アプリケーションの開発を例にして、簡単なフォー
 ム処理とコードの縮小化を中心に解説します。
 
@@ -24,6 +22,7 @@
     {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
     <form action="/polls/{{ poll.id }}/vote/" method="post">
+    {% csrf_token %}
     {% for choice in poll.choice_set.all %}
         <input type="radio" name="choice" id="choice{{ forloop.counter }}" 
          value="{{ choice.id }}" />
@@ -34,35 +33,61 @@
 
 簡単に説明しましょう:
 
-    * 上のテンプレートでは、 Poll の選択肢ごとにラジオボタンを表示していま
-      す。各ラジオボタンの ``value`` は Choice の ID に関連づけられています。
-      ラジオボタンの ``name`` はいずれも ``"choice"`` です。つまり、投票者
-      がラジオボタンのいずれかを選択してフォームを提出 (submit) すると、
-      ``choice=3`` という内容のPOST データを送信します。これは HTML フォー
-      ムの基本ですね。
+* 上のテンプレートでは、 Poll の選択肢ごとにラジオボタンを表示していま
+  す。各ラジオボタンの ``value`` は Choice の ID に関連づけられています。
+  ラジオボタンの ``name`` はいずれも ``"choice"`` です。つまり、投票者
+  がラジオボタンのいずれかを選択してフォームを提出 (submit) すると、
+  ``choice=3`` という内容のPOST データを送信します。これは HTML フォー
+  ムの基本ですね。
 
-    * フォームの ``action`` を ``/polls/{{ poll.id }}/vote/`` に設定し、
-      ``method="post"`` にしています。 (``method="get"`` ではなく)
-      ``method="post"`` を使っている点は極めて重要です。というのも、このフォー
-      ムの提出はサーバ側のデータの更新につながるからです。サーバ側のデータ
-      を更新するようなフォームを作成するときは、常に ``method="post"`` を使
-      いましょう。これは Django 固有の話ではなく、いわば Web 開発の王道です。
+* フォームの ``action`` を ``/polls/{{ poll.id }}/vote/`` に設定し、
+  ``method="post"`` にしています。 (``method="get"`` ではなく)
+  ``method="post"`` を使っている点は極めて重要です。というのも、このフォー
+  ムの提出はサーバ側のデータの更新につながるからです。サーバ側のデータ
+  を更新するようなフォームを作成するときは、常に ``method="post"`` を使
+  いましょう。これは Django 固有の話ではなく、いわば Web 開発の王道です。
 
-    * ``forloop.counter`` は、 :ttag:`for` タグのループが何度実行されたかを
-      表す値です。
+* ``forloop.counter`` は、 :ttag:`for` タグのループが何度実行されたかを
+  表す値です。
+
+* データが改ざんされる恐れのある POST のフォームを作成しているので、クロス
+  サイトリクエストフォージェリ (Cross Site Request Forgeries) のことを心配
+  する必要があります。
+  ありがたいことに、 Django がこれに対応するとても使いやすい仕組みを提供し
+  てくれているので、あまり心配する必要はありません。手短に言うと、全ての
+  自サイトへ向けての POST フォームに対しては
+  :ttag:`{% csrf_token %}<csrf_token>` テンプレートタグを使いましょう。
+
+:ttag:`{% csrf_token %}<csrf_token>`  タグは、テンプレートコンテキストから
+はアクセスできないようなリクエストオブジェクトの情報を必要とします。このた
+めに、少し ``detail`` ビューに変更を加える必要があります。変更を加えた後は
+以下のようになります::
+
+    from django.template import RequestContext
+    # ...
+    def detail(request, poll_id):
+        p = get_object_or_404(Poll, pk=poll_id)
+        return render_to_response('polls/detail.html', {'poll': p},
+                                   context_instance=RequestContext(request))
+
+これがどのように動くかについての詳細は、
+:ref:`RequestContext <subclassing-context-requestcontext>` で詳しく説明し
+ています。
 
 さあ、今度は提出されたデータを処理するための Django ビューを作成しましょう。
-:ref:`チュートリアルその 3 <intro-tutorial03>` で、以下のような行を polls
+:doc:`チュートリアルその 3 </intro/tutorial03>` で、以下のような行を polls
 アプリケーションの URLconf に入れたことを思い出しましょう::
 
     (r'^(?P<poll_id>\d+)/vote/$', 'vote'),
 
-そういうわけで、 ``mysite/polls/views.py`` に ``vote()`` 関数を作ります::
+また、 ``vote()`` 関数のダミーの実装も作成しました。今度は本物を作成しま
+しょう。以下を ``polls/views.py`` に追加してください::
 
     from django.shortcuts import get_object_or_404, render_to_response
-    from django.http import HttpResponseRedirect
+    from django.http import HttpResponseRedirect, HttpResponse
     from django.core.urlresolvers import reverse
-    from mysite.polls.models import Choice, Poll
+    from django.template import RequestContext
+    from polls.models import Choice, Poll
     #...
     def vote(request, poll_id):
         p = get_object_or_404(Poll, pk=poll_id)
@@ -73,68 +98,68 @@
             return render_to_response('polls/detail.html', {
                 'poll': p,
                 'error_message': "選択肢を選んでいません。",
-            })
+            }, context_instance=RequestContext(request))
         else:
             selected_choice.votes += 1
             selected_choice.save()
             # ユーザが Back ボタンを押して同じフォームを提出するのを防ぐ
             # ため、POST データを処理できた場合には、必ず
             # HttpResponseRedirect を返すようにします。
-            return HttpResponseRedirect(reverse('mysite.polls.views.results', args=(p.id,)))
+            return HttpResponseRedirect(reverse('polls.views.results', args=(p.id,)))
 
 このコードには、これまでのチュートリアルで扱っていなかったことがいくつか
 入っています:
 
-    * :attr:`request.POST <django.http.HttpRequest.POST>` は辞書ライクなオ
-      ブジェクトです。このオブジェクトを使うと、キー名を使って入力されたデー
-      タにアクセスできます。この例では、 ``request.POST['choice']``
-      で投票者の選んだ選択肢を文字列で返させています。 
-      :attr:`request.POST <django.http.HttpRequest.POST>` に入っている値は
-      常に文字列です。
+* :attr:`request.POST <django.http.HttpRequest.POST>` は辞書ライクなオ
+  ブジェクトです。このオブジェクトを使うと、キー名を使って入力されたデー
+  タにアクセスできます。この例では、 ``request.POST['choice']``
+  で投票者の選んだ選択肢を文字列で返させています。 
+  :attr:`request.POST <django.http.HttpRequest.POST>` に入っている値は
+  常に文字列です。
 
-      Django では、 POST と同様、 GET データにアクセスするための
-      :attr:`request.GET <django.http.HttpRequest.GET>` も提供しています。
-      ただし、このコードでは、POST を経由した呼び出しでないとデータを更新さ
-      せないようにするために、
-      :attr:`request.POST <django.http.HttpRequest.POST>` を明示的に使って
-      います。
+  Django では、 POST と同様、 GET データにアクセスするための
+  :attr:`request.GET <django.http.HttpRequest.GET>` も提供しています。
+  ただし、このコードでは、POST を経由した呼び出しでないとデータを更新さ
+  せないようにするために、
+  :attr:`request.POST <django.http.HttpRequest.POST>` を明示的に使って
+  います。
 
-    * ``choice`` が POST データ上になければ、 ``request.POST['choice']`` は
-      :exc:`KeyError` を送出します。上のコードでは :exc:`KeyError` をチェッ
-      クして、 ``choice`` がない場合にはエラーメッセージ付きの Poll フォー
-      ムを再表示しています。
+* ``choice`` が POST データ上になければ、 ``request.POST['choice']`` は
+  :exc:`KeyError` を送出します。上のコードでは :exc:`KeyError` をチェッ
+  クして、 ``choice`` がない場合にはエラーメッセージ付きの Poll フォー
+  ムを再表示しています。
 
-    * choice のカウントを増やした後で、 :class:`~django.http.HttpResponse`
-      ではなく :class:`~django.http.HttpResponseRedirect` を返しています。
-      :class:`~django.http.HttpResponseRedirect` はリダイレクト先の URL 一
-      つだけを引数にとります (ここでは
-      :func:`~django.core.urlresolvers.reverse` を使って URL を生成していま
-      すが、これについては後で説明します)。
+* choice のカウントを増やした後で、 :class:`~django.http.HttpResponse`
+  ではなく :class:`~django.http.HttpResponseRedirect` を返しています。
+  :class:`~django.http.HttpResponseRedirect` はリダイレクト先の URL 一
+  つだけを引数にとります (ここでは
+  :func:`~django.core.urlresolvers.reverse` を使って URL を生成していま
+  すが、これについては後で説明します)。
 
-      上のコードの Python コメント文で指摘しているように、 POST データの処
-      理に成功したときは常に :class:`~django.http.HttpResponseRedirect` を
-      返してください。これは Django 固有の話ではなく、 Web 開発の王道です。
+  上のコードの Python コメント文で指摘しているように、 POST データの処
+  理に成功したときは常に :class:`~django.http.HttpResponseRedirect` を
+  返してください。これは Django 固有の話ではなく、 Web 開発の王道です。
 
-    * 例では、 :class:`~django.http.HttpResponseRedirect` のコンストラクタ
-      の中で :func:`~django.core.urlresolvers.reverse` という関数を使ってい
-      ます。この関数を使うと、ビュー関数中での URL のハードコードを防げます。
-      :func:`~django.core.urlresolvers.reverse` にはビューの名前を渡し、同
-      時に URL パターンからビューにマップするときに取り出される変数を指定し
-      ます。上の例では、 :func:`~django.core.urlresolvers.reverse` は
-      :ref:`チュートリアルその 3 <intro-tutorial03>` で設定した URLconfに従っ
-      て::
+* 例では、 :class:`~django.http.HttpResponseRedirect` のコンストラクタ
+  の中で :func:`~django.core.urlresolvers.reverse` という関数を使ってい
+  ます。この関数を使うと、ビュー関数中での URL のハードコードを防げます。
+  :func:`~django.core.urlresolvers.reverse` にはビューの名前を渡し、同
+  時に URL パターンからビューにマップするときに取り出される変数を指定し
+  ます。上の例では、 :func:`~django.core.urlresolvers.reverse` は
+  :ref:`チュートリアルその 3 <intro-tutorial03>` で設定した URLconfに従っ
+  て::
 
-        '/polls/3/results/'
+    '/polls/3/results/'
 
-      のような URL を返します。 ``3`` は ``p.id`` の値です。リダイレクト先
-      の URL は ``'results'`` ビューを呼び出し、最終的なページを表示します。
-      (プレフィクスを含めた) ビューの完全な名前を指定せねばならないので注意
-      してください。
+  のような URL を返します。 ``3`` は ``p.id`` の値です。リダイレクト先
+  の URL は ``'results'`` ビューを呼び出し、最終的なページを表示します。
+  (プレフィクスを含めた) ビューの完全な名前を指定せねばならないので注意
+  してください。
 
-:ref:`チュートリアルその 3 <intro-tutorial03>` で触れたように、 ``request``
-は :class:`~django.http.HTTPRequest` オブジェクトです。
+:doc:`チュートリアルその 3 </intro/tutorial03>` で触れたように、
+``request`` は :class:`~django.http.HTTPRequest` オブジェクトです。
 :class:`~django.http.HTTPRequest` の詳細は
-:ref:`リクエスト・レスポンスオブジェクトのドキュメント <ref-request-response>`
+:doc:`リクエスト・レスポンスオブジェクトのドキュメント </ref/request-response>`
 を参照してください。
 
 投票者が Poll に投票すると、 ``vote()`` ビューは開票結果ページにリダイレク
@@ -145,7 +170,7 @@
         return render_to_response('polls/results.html', {'poll': p})
 
 テンプレート名が違うことだけを除き、 
-:ref:`チュートリアルその 3 <intro-tutorial03>` の ``detail()`` とほとんど同
+:doc:`チュートリアルその 3 </intro/tutorial03>` の ``detail()`` とほとんど同
 じですね。この冗長さは後で修正することにします。
 
 今度は ``results.html`` テンプレートを作成します:
@@ -160,6 +185,8 @@
     {% endfor %}
     </ul>
 
+    <a href="/polls/{{ poll.id }}/">Vote again?</a>
+
 さあ、ブラウザで ``/polls/1/`` を表示して、投票してみましょう。票を入れるた
 びに、結果のページが更新されていることがわかるはずです。選択肢を選ばずにフォー
 ムを提出すると、エラーメッセージを表示するはずです。
@@ -167,7 +194,7 @@
 汎用ビューを使う: コードが少ないのはいいことだ
 ==============================================
 
-:ref:`チュートリアルその 3 <intro-tutorial03>` の ``detail()`` と
+:doc:`チュートリアルその 3 </intro/tutorial03>` の ``detail()`` と
 ``results()`` という二つのビューはバカバカしいくらいに単純で、先程も述べた
 ように冗長です。(これまた :ref:`チュートリアルその 3 <intro-tutorial03>` の)
 Poll のリストを表示する ``index()`` ビューも同様です。
@@ -185,13 +212,11 @@ Poll のリストを表示する ``index()`` ビューも同様です。
 コードをばっさり捨てられるようにしましょう。変換にはほんの数ステップしかか
 かりません。そのステップとは:
 
-    1. URLconf を変換する。
+1. URLconf を変換する。
 
-    2. テンプレートの名前をいくつか変更する。
+2. 不要になった古いビューを削除する。
 
-    3. 不要になった古いビューを削除する。
-
-    4. 新しいビュー用に URL のハンドリングを修正する。
+3. 新しいビュー用に URL のハンドリングを修正する。
 
 です。詳しく見てゆきましょう。
 
@@ -208,107 +233,92 @@ Poll のリストを表示する ``index()`` ビューも同様です。
 まず polls の URLconf である ``polls/urls.py`` を開きます。チュートリアルで
 のこれまでの作業から、中身は以下のようになっているはずです::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, include, url
 
-    urlpatterns = patterns('mysite.polls.views',
-        (r'^$', 'index'),
-        (r'^(?P<poll_id>\d+)/$', 'detail'),
-        (r'^(?P<poll_id>\d+)/results/$', 'results'),
-        (r'^(?P<poll_id>\d+)/vote/$', 'vote'),
+    urlpatterns = patterns('polls.views',
+        url(r'^$', 'index'),
+        url(r'^(?P<poll_id>\d+)/$', 'detail'),
+        url(r'^(?P<poll_id>\d+)/results/$', 'results'),
+        url(r'^(?P<poll_id>\d+)/vote/$', 'vote'),
     )
 
 これを以下のように変更しましょう::
 
-    from django.conf.urls.defaults import *
-    from mysite.polls.models import Poll
-
-    info_dict = {
-        'queryset': Poll.objects.all()
-    }
+    from django.conf.urls import patterns, include, url
+    from django.views.generic import DetailView, ListView
+    from polls.models import Poll
 
     urlpatterns = patterns('',
-        (r'^$', 'django.views.generic.list_detail.object_list', info_dict),
-        (r'^(?P<object_id>\d+)/$', 
-         'django.views.generic.list_detail.object_detail', info_dict),
-        url(r'^(?P<object_id>\d+)/results/$', 
-         'django.views.generic.list_detail.object_detail', 
-         dict(info_dict, template_name='polls/results.html'), 'poll_results'),
-        (r'^(?P<poll_id>\d+)/vote/$', 'mysite.polls.views.vote'),
+        url(r'^$',
+            ListView.as_view(
+                queryset=Poll.objects.order_by('-pub_date')[:5],
+                context_object_name='latest_poll_list',
+                template_name='polls/index.html')),
+        url(r'^(?P<pk>\d+)/$',
+            DetailView.as_view(
+                model=Poll,
+                template_name='polls/detail.html')),
+        url(r'^(?P<pk>\d+)/results/$',
+            DetailView.as_view(
+                model=Poll,
+                template_name='polls/results.html'),
+            name='poll_results'),
+        url(r'^(?P<poll_id>\d+)/vote/$', 'polls.views.vote'),
     )
 
 この例では二つの汎用ビュー、
-:func:`~django.views.generic.list_detail.object_list` と
-:func:`~django.views.generic.list_detail.object_detail` を使っています。こ
+:class:`~django.views.generic.list.ListView` と
+:class:`~django.views.generic.detail.DetailView` を使っています。こ
 れらのビューはそれぞれ、「オブジェクトのリストを表示する」および「あるタイ
 プのオブジェクトの詳細ページを表示する」という二つの概念を抽象化しています。
 
-    * 各汎用ビューは自分がどのデータに対して動作するのか知っておく必要があ
-      ります。データは辞書の形式で渡されます。辞書内の ``queryset`` という
-      うキーが、この汎用ビューで操作するオブジェクトのリストを指しています。
+* 各汎用ビューは自分がどのモデルに対して動作するのか知っておく必要があ
+  ります。これは ``model`` パラメタによって提供されます。
 
-    * :func:`~django.views.generic.list_detail.object_detail` 汎用ビューに
-      は、 ``"object_id"`` という名前で URL から ID をキャプチャして渡すこ
-      とになっています。そこで、汎用ビュー向けに ``poll_id`` を
-      ``object_id`` に書き換えてあります。
+* :class:`~django.views.generic.detail.DetailView` 汎用ビューには、
+  ``"pk"`` という名前で URL から プライマリキー をキャプチャ
+  して渡すことになっています。そこで、汎用ビュー向けに ``poll_id`` を
+  ``pk`` に書き換えてあります。
 
-    * 結果を表示するビューに ``poll_results`` という名前をつけてあります。
-      こうすると、このビューを呼び出すような URL を後で生成できます
-      (詳しくは「 `名前付きパターン <naming-url-patterns>` 」の説明を参照し
-      てください。)また、 :mod:`django.conf.urls.defaults` モジュールの
-      :func:`~django.conf.urls.defaults.url` 関数を使っています。上の例のよ
-      うに、パターン名を指定する場合には、
-      :func:`~django.conf.urls.defaults.url` を使うよう薦めます。
-      
-デフォルトでは、 :func:`~django.views.generic.list_detail.object_detail` 汎
-用ビューは ``<app name>/<model name>_detail.html`` という名前のテンプレート
+* 結果を表示するビューに ``poll_results`` という名前をつけてあります。
+  こうすると、このビューを呼び出すような URL を後で生成できます
+  (詳しくは「 `名前付きパターン <naming-url-patterns>` 」の説明を参照し
+  てください。)また、 :mod:`django.conf.urls` モジュールの
+  :func:`~django.conf.urls.url` 関数を使っています。上の例のように、
+  パターン名を指定する場合には、 :func:`~django.conf.urls.url` を使う
+  よう薦めます。
+
+デフォルトでは、 :class:`~django.views.generic.detail.DetailView` 汎用
+ビューは ``<app name>/<model name>_detail.html`` という名前のテンプレート
 を使います。私達のアプリケーションでは、テンプレートの名前は
-``"polls/poll_detail.html"`` です。そこで、 ``vote()`` の
-:func:`~django.shortcuts.render_to_response` の行に書かれている
-``polls/detail.html`` テンプレートを  ``polls/poll_detail.html`` に変更しま
-す。
+``"polls/poll_detail.html"`` です。
+``template_name`` 引数は Django に自動生成されたデフォルトのテンプレート名
+ではなく、指定した名前を使うように伝えるために使われます。また、
+``result`` リストビューにも ``template_name`` を指定します。これは結果
+(result) ビューと詳細 (detail) ビューが、お互い実は
+:class:`~django.views.generic.detail.DetailView` であるにも関わらず、
+レンダリングされたときに違った外観を持っているためです。
 
-同様に、 :func:`~django.views.generic.list_detail.object_list` 汎用ビューも
+同様に、 :class:`~django.views.generic.list.ListView` 汎用ビューも
 ``<app name>/<model name>_list.html`` という名前のテンプレートを使うので、
-``polls/index.html`` を ``polls/poll_list.html`` にしておきます。
-
-一つの polls アプリケーションの URLconf に
-:func:`~django.views.generic.list_detail.object_detail` テンプレートを使う
-エントリが複数あるので、開票結果ビューの方のテンプレート名は手動で
-``template_name='polls/results.html'`` と指定してやります。そうしないと、二
-つのビューが両方とも同じテンプレートを使おうとしてしまいます。 ``dict()``
-を使って新たな辞書を置き換えで返していることに注意して下さい。
-
-.. note:: :meth:`django.db.models.QuerySet.all`` は遅延呼び出しされます
-
-    詳細 (detail) ビューを使う際、たった一つの ``Poll`` オブジェクトが必要
-    にすぎないにもかかわらず、 ``Poll.objects.all()`` が使われていることに
-    ぎょっとしたかもしれませんね。でも心配はいりません。
-    ``Poll.objects.all()`` は実際には「クエリセット (
-    :class:`~django.db.models.QuerySet`)」と呼ばれる特殊なオブジェクトで、
-    その実行は「遅延 (lazy)」型です。すなわち、実際に必要になるまでデータベー
-    スを操作しないのです。データベースクエリが実行される際、汎用ビュー
-    :func:`~django.views.generic.list_detail.object_detail` はクエリの範囲
-    を単一のオブジェクトにまで狭めるので、結果的にクエリはデータベースから
-    ただ一行のレコードしか選択しません。
-    
-    この仕組みをもっと詳しく理解したければ、データベース API ドキュメントの
-    `QuerySet オブジェクトの遅延実行の説明 <querysets-are-lazy>` を参照して
-    ください。
+``template_name`` を使って :class:`~django.views.generic.list.ListView`
+に既存の ``polls/index.html`` テンプレートを使用するように伝えます。
 
 このチュートリアルの前の部分では、 ``poll`` や ``latest_poll_list``
 といった変数の入ったコンテキスト (context) をテンプレートに渡していました。
-しかしながら、汎用ビューはコンテキストに ``object`` や ``object_list`` とい
-う変数を提供するようになっているので、コンテキスト変数に合わせてテンプレー
-トを変更する必要があります。テンプレートを編集して、 ``latest_poll_list``
-を ``object_list`` に、 ``poll`` を ``object`` に変更しておいてください。
+DetailView には、 ``poll`` という変数が自動的に渡されます。なぜなら、今
+私達は Django モデル (``Poll``) を使用していて、 Django はコンテキスト
+変数にふさわしい名前を決めることができるからです。一方で、 ListView では、
+自動的に生成されるコンテキスト変数は ``poll_list`` となります。これを上書
+きするには、 ``context_object_name`` オプションを与えて、
+``latest_poll_list`` を代わりに使用すると指定します。この代替アプローチと
+して、新しいデフォルトのコンテキスト変数と一致するようにテンプレートを変
+えることもできます。しかし、ただ Django に使用したい変数名を伝えるほうが
+簡単でしょう。
 
 さて、 ``index()``, ``detail()`` および ``results()`` ビューのコードを
 ``polls/views.py`` から削除できるようになりました。これらのビュー関数は汎用
 ビューで置き換わったので、もう必要ありません。
-
-``vote()`` ビューはまだ必要ですが、新たなコンテキスト変数に合わせて修正せね
-ばなりません。 :func:`~django.shortcuts.render_to_response`` の中の
-``poll`` コンテキスト変数を ``object`` に変更してください。
 
 最後に、 URL が汎用ビューを指すように修正します。上の ``vote`` ビューでは、
 :func:`~django.core.urlresolvers.reverse` 関数を使って URL のハードコードを
@@ -325,8 +335,8 @@ Poll のリストを表示する ``index()`` ビューも同様です。
 みましょう。
 
 汎用ビューの詳細は
-:ref:`汎用ビューのドキュメント <topics-http-generic-views>` を参照してくだ
-さい。
+:doc:`汎用ビューのドキュメント </topics/http/generic-views>` を参照してく
+ださい。
 
 次回予告
 ===========
@@ -334,12 +344,12 @@ Poll のリストを表示する ``index()`` ビューも同様です。
 このチュートリアルはここでしばらく中断します。今後は以下のような内容をカバー
 する予定です:
 
-    * 高度なフォーム処理
-    * RSS フレームワークを使う
-    * キャッシュフレームワークを使う
-    * コメントフレームワークを使う
-    * 管理サイトの高度な機能: パーミッション
-    * 管理サイトの高度な機能:カスタム JavaScript
+* 高度なフォーム処理
+* RSS フレームワークを使う
+* キャッシュフレームワークを使う
+* コメントフレームワークを使う
+* 管理サイトの高度な機能: パーミッション
+* 管理サイトの高度な機能:カスタム JavaScript
 
-さしあたっては、 :ref:`次のステップへ <intro-whatsnext>` に進むとよいでしょ
+さしあたっては、 :doc:`次のステップへ </intro/whatsnext>` に進むとよいでしょ
 う。
