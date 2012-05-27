@@ -4,7 +4,7 @@
 Django バージョン 0.96 リリースノート
 =====================================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 17812 (1.4)
 
 Django 0.96 の世界へようこそ!
 
@@ -59,12 +59,9 @@ MySQLdb バージョンの制約
 き、ほとんどメンテナンスされることはなく、将来のバージョンで削除される予定
 です。
 
-また、 :setting:`DATABASE_OPTIONS` のような設定 (詳細は 
-`データベースのドキュメント`_ を参照してください) は、 "mysql" バックエンド
-でのみ利用でき、 "mysql_old" では使えません。
-
-.. _databases documentation: http://www.djangoproject.com/documentation/0.96/databases/
-.. _`データベースのドキュメント`: `databases documentation`_
+また、 :setting:`DATABASE_OPTIONS` のような設定 (詳細は
+:doc:`データベースのドキュメント </ref/databases>` を参照してください) は、
+"mysql" バックエンドでのみ利用でき、 "mysql_old" では使えません。
 
 .. _Database constraint names changed:
 
@@ -83,11 +80,11 @@ Django が外部キー参照を生成するときに使う制約名が少し変�
 
 この問題を回避するには 2 通りの方法があります:
 
-    1. ``manage.py *`` の出力をファイルにリダイレクトし、生成された SQL
-       を編集して正しい制約名に直してから実行します。
+1. ``manage.py *`` の出力をファイルにリダイレクトし、生成された SQL
+   を編集して正しい制約名に直してから実行します。
 
-    2. ``manage.py sqlall`` の出力から新たな制約名がどうなっているかを調べ
-       て、データベース上の既存の制約名を変更する手がかりにします。
+2. ``manage.py sqlall`` の出力から新たな制約名がどうなっているかを調べ
+   て、データベース上の既存の制約名を変更する手がかりにします。
 
 .. _Names changes in manage.py:
 
@@ -97,18 +94,18 @@ Django が外部キー参照を生成するときに使う制約名が少し変�
 フィクスチャのサポートのために、 ``manage.py`` のオプションのうち、いくつか
 を変更しました:
 
-    * ``dumpdata`` および ``loaddata`` コマンドが追加されました。これらのコ
-      マンドは、それぞれデータベースに対してデータをダンプしたりロードした
-      りするためのコマンドです。このコマンドは、 Django のサポートする全て
-      のシリアライズ形式を扱えます。
+* ``dumpdata`` および ``loaddata`` コマンドが追加されました。これらのコ
+  マンドは、それぞれデータベースに対してデータをダンプしたりロードした
+  りするためのコマンドです。このコマンドは、 Django のサポートする全て
+  のシリアライズ形式を扱えます。
 
-    * ``sqlinitialdata`` コマンドは、 ``sqlcustom`` に名称変更しました。こ
-      れは、データ関係の操作は ``loaddata`` を使うべきであることを強調する
-      意味もあります (``sqlcustom`` はビューやストアドプロシジャなどのカ
-      スタム SQL 定義に使ってください)。
-      
-    * 以前のバージョンの名残であった ``install`` コマンドを除去しました。
-      アプリケーションのインストールには ``syncdb`` を使ってください。
+* ``sqlinitialdata`` コマンドは、 ``sqlcustom`` に名称変更しました。こ
+  れは、データ関係の操作は ``loaddata`` を使うべきであることを強調する
+  意味もあります (``sqlcustom`` はビューやストアドプロシジャなどのカ
+  スタム SQL 定義に使ってください)。
+  
+* 以前のバージョンの名残であった ``install`` コマンドを除去しました。
+  アプリケーションのインストールには ``syncdb`` を使ってください。
 
 .. _Backslash escaping changed:
 
@@ -162,29 +159,27 @@ Django 0.96 は 1000 以上の新規コミットと、 400 以上のバグフィ
 
 新たなフォームライブラリへの移行のポイントは 3 つあります:
 
-    * 現在の ``django.forms`` の実体は ``django.oldforms`` にコピーしました。
-      これで、互換性のない変更を座して待つことなく、 *今すぐ* コードの修正
-      に取り掛かれます。修正は、各アプリケーションのコードを以下のように書
-      き換えるだけです::
+* 現在の ``django.forms`` の実体は ``django.oldforms`` にコピーしました。
+  これで、互換性のない変更を座して待つことなく、 *今すぐ* コードの修正
+  に取り掛かれます。修正は、各アプリケーションのコードを以下のように書
+  き換えるだけです::
 
-          from django import forms             # 0.95 スタイル
-          from django import oldforms as forms # 0.96 スタイル
+      from django import forms             # 0.95 スタイル
+      from django import oldforms as forms # 0.96 スタイル
 
-    * 次の Django の公式リリースで、現在の ``django.newforms`` を
-      ``django.forms`` に移動します。これは互換性のない変更なので、以前の
-      ``django.forms`` を使い続けたい人は、上記に従って import 文を変更する
-      必要があります。
+* 次の Django の公式リリースで、現在の ``django.newforms`` を
+  ``django.forms`` に移動します。これは互換性のない変更なので、以前の
+  ``django.forms`` を使い続けたい人は、上記に従って import 文を変更する
+  必要があります。
 
-    * さらに次のリリースで、 ``django.oldforms`` を完全に除去します。
+* さらに次のリリースで、 ``django.oldforms`` を完全に除去します。
 
 ``newforms`` ライブラリは現在も改良が続いていますが、すでに一般的な利用に耐
 える状態です。Django でのフォーム処理に入門する人は、旧来のフォームを学ぶの
 はやめて、新たなフォームから学び始めましょう。
 
 ``django.newforms`` の詳細は 
-`newforms のドキュメント
-<http://www.djangoproject.com/documentation/0.96/newforms/`_ を参照してくだ
-さい。
+:doc:`newforms のドキュメント </topics/forms/index>` を参照してください。
 
 .. _URLconf improvements:
 
@@ -198,7 +193,7 @@ URLconf のコールバックに呼出し可能オブジェクトを使えるよ
 
     from django.conf.urls.defaults import *
     
-    urlpatterns = patterns('', 
+    urlpatterns = patterns('',
         ('^myview/$', 'mysite.myapp.views.myview')
     )
     
@@ -207,7 +202,7 @@ URLconf のコールバックに呼出し可能オブジェクトを使えるよ
     from django.conf.urls.defaults import *
     from mysite.myapp.views import myview
     
-    urlpatterns = patterns('', 
+    urlpatterns = patterns('',
         ('^myview/$', myview)
     )
         
@@ -225,7 +220,7 @@ URLconf のコールバックに呼出し可能オブジェクトを使えるよ
         "queryset" : MyModel.objects.all(),
     }
     
-    urlpatterns = patterns('', 
+    urlpatterns = patterns('',
         ('^myview/$', login_required(object_list), info)
     )
 
@@ -240,21 +235,15 @@ URLconf のコールバックに呼出し可能オブジェクトを使えるよ
 ついに Django にテストフレームワークが導入されました。 (テストファーストの
 推進者 Kent Beck には悪いですが) これで、「心配を退屈な作業に」変えられます。
 テストは 
-`doctest`_ か `unittest`_ を使って作成でき、簡単なテストクライアントを使った
+:mod:`doctest` か :mod:`unittest` を使って作成でき、簡単なテストクライアントを使った
 ビューのテストもできます。
 
 また、「フィクスチャ」のサポートも追加されました。フィクスチャは Django の
-サポートする `シリアライゼーション形式
-<http://www.djangoproject.com/documentation/0.96/serialization/>`_ で保存さ
+サポートする :doc:`シリアライゼーション形式 </topics/serialization>` で保存さ
 れた初期データで、テストの開始時に自動的にデータベースにロードされます。フィ
 クスチャによって、実際のデータを使ったテストが一層簡単になります。
 
-詳しくは `テストのドキュメント
-<http://www.djangoproject.com/documentation/0.96/testing/>`_ を参照してくだ
-さい。
-
-.. _doctest: http://docs.python.org/lib/module-doctest.html
-.. _unittest: http://docs.python.org/lib/module-unittest.html
+詳しくは :doc:`テストのドキュメント</topics/testing>` を参照してください。
 
 .. _Improvements to the admin interface:
 
@@ -273,22 +262,22 @@ admin インタフェースの改良
 0.95 以後、何人もの人達が進み出て、 Django の開発における主要な役割を果たす
 ようになりました。ここに彼らの尽力に対して謝意を表します:
 
-    * Russell Keith-Magee と Malcolm Tredinnick は多くのコードに寄与してい
-      ます。 0.96 のリリースは彼らなしでは実現しませんでした。
-      
-    * 新たなリリースマネジャ、 James Bennett は、 0.95.1 や 0.96, のリリー
-      スを推進してくれました。(そしておそらく将来のリリースでもお世話にな
-      ることでしょう。)
+* Russell Keith-Magee と Malcolm Tredinnick は多くのコードに寄与してい
+  ます。 0.96 のリリースは彼らなしでは実現しませんでした。
+  
+* 新たなリリースマネジャ、 James Bennett は、 0.95.1 や 0.96, のリリー
+  スを推進してくれました。(そしておそらく将来のリリースでもお世話にな
+  ることでしょう。)
 
-    * チケットマネジャ Chris Beaven (通称 SmileyChris), Simon Greenhill,
-      Michael Radziej, Gary Wilson に感謝します。彼らは全てのチケットの世話
-      をして、カタログ化するという偉大な仕事をなしとげました。そのおかげで、
-      どのチケットに注力すべきかを決める作業が 1000000 倍にも楽になりました。
-      ほんとうにありがとう。
-            
-    * バグ報告、パッチ、そしてチケットへのコメントを提出してくださった皆さ
-      んにも感謝します。0.96 に取り込まれたパッチの作者は 200 名以上にもの
-      ぼるので、全ての人の名前を挙げるのは無理ですが、名前を AUTHORS_ に掲
-      載させていただきました。
-      
+* チケットマネジャ Chris Beaven (通称 SmileyChris), Simon Greenhill,
+  Michael Radziej, Gary Wilson に感謝します。彼らは全てのチケットの世話
+  をして、カタログ化するという偉大な仕事をなしとげました。そのおかげで、
+  どのチケットに注力すべきかを決める作業が 1000000 倍にも楽になりました。
+  ほんとうにありがとう。
+        
+* バグ報告、パッチ、そしてチケットへのコメントを提出してくださった皆さ
+  んにも感謝します。0.96 に取り込まれたパッチの作者は 200 名以上にもの
+  ぼるので、全ての人の名前を挙げるのは無理ですが、名前を AUTHORS_ に掲
+  載させていただきました。
+  
 .. _AUTHORS: http://code.djangoproject.com/browser/django/trunk/AUTHORS
