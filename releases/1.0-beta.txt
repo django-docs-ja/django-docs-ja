@@ -140,7 +140,7 @@ django-developers メーリングリスト:
 
 Django プロジェクトへの貢献方法は、オンラインドキュメントにも記載しています:
 
-    :doc:`Django に貢献する </internals/contributing/index>`
+* :doc:`Django に貢献する </internals/contributing/index>`
 
 コードの開発、ドキュメントの作成、そしてチケットのトリアージや、誰かの提出
 したバグフィクスのテストなど、どんなレベルの貢献でも歓迎します。

@@ -4,7 +4,7 @@
 Django 1.0 beta 2 リリースノート
 =================================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 17812 (1.4)
 
 Django 1.0 beta 2 にようこそ!
 
@@ -21,11 +21,11 @@ Django 1.0 beta 2 で新たに登場した機能
 
 ここ数年、我々は Django の trunk ソースツリーでほぼずっと活発に開発を続け、
 0.96 リリース以降、大きな機能をいくつも投入してきました。 Django 1.0 alpha
-1 で新たに登場した機能は、 :ref:`1.0 alpha 1 リリースノート
-<releases-1.0-alpha-1>` を参照してください。 Django 1.0 alpha 2 で新たに登
-場した機能は、 :ref:`1.0 alpha 2 リリースノート <releases-1.0-alpha-2>` を
-参照してください。 Django 1.0 beta 1 で新たに登場した機能は、 :ref:`1.0
-beta 1 リリースノート <releases-1.0-alpha-2>` を参照してください。 
+1 で新たに登場した機能は、 :doc:`1.0 alpha 1 リリースノート</releases/1.0-alpha-1>`
+を参照してください。 Django 1.0 alpha 2 で新たに登
+場した機能は、 :doc:`1.0 alpha 2 リリースノート </releases/1.0-alpha-2>` を
+参照してください。 Django 1.0 beta 1 で新たに登場した機能は、 
+:doc:`1.0 beta 1 リリースノート </releases/1.0-alpha-2>` を参照してください。 
 
 このベータリリースでは、以下の主な機能を追加しました:
 
@@ -34,8 +34,9 @@ beta 1 リリースノート <releases-1.0-alpha-2>` を参照してください
     が Django にバンドルされているコメントシステムを大幅にリライト／リファ
     クタし、フレキシビリティとカスタマイズ性をすばらしく向上させました。
     :ref:`詳細なドキュメント <ref-contrib-comments-index>` と、以前のコメン
-    トアプリケーションを使っていた人のための :ref:`アップグレードガイド
-    <ref-contrib-comments-upgrade>` も読めるようになりました。
+    トアプリケーションを使っていた人のための
+    :doc:`アップグレードガイド</ref/contrib/comments/upgrade>` も読めるように
+    なりました。
 
 ドキュメントのリファクタ
     Django にバンドルされているオンラインドキュメントを大々的にリファクタし
@@ -55,8 +56,8 @@ beta 1 リリースノート <releases-1.0-alpha-2>` を参照してください
 
 また、古い機能の撤廃作業の一環として、 Django の古いフォーム処理システムを
 除去しました。 ``django.oldforms`` はなくなり、 (自動マニピュレータなどの)
-様々な API フックも除去されました。フォームは ``django.forms`` の :ref:`新
-しいフォーム処理システム <topics-forms-index>` と完全に入れ替わりました。
+様々な API フックも除去されました。フォームは ``django.forms`` の :doc:`新
+しいフォーム処理システム </topics/forms/index>` と完全に入れ替わりました。
 
 Django 1.0 のロードマップ
 ==========================
@@ -83,7 +84,7 @@ Django のコードベース内で翻訳対象にマークしている文字列�
 さい。自分の発見した問題がすでに明らかでないか、 Django のチケットトラッカ
 を使って探してください:
 
-    http://code.djangoproject.com/timeline
+* https://code.djangoproject.com/timeline
 
 発見した問題に対応するチケットが見付からなければ、新たなチケットをオープン
 してください。
@@ -91,7 +92,7 @@ Django のコードベース内で翻訳対象にマークしている文字列�
 また、 1.0 リリースに向けての進捗を含め、 Django の開発に関する議論は、
 django-developers メーリングリスト:
 
-    http://groups.google.com/group/django-developers
+* http://groups.google.com/group/django-developers
 
 と、IRC サーバ ``irc.freenode.net`` の ``#django-dev`` チャネルで常時行って
 います。 Django の開発を手伝いたいのなら、ぜひ参加して、議論に加わってくだ
@@ -99,7 +100,7 @@ django-developers メーリングリスト:
 
 Django プロジェクトへの貢献方法は、オンラインドキュメントにも記載しています:
 
-    :ref:`contributing to Django <internals-contributing>`
+* :doc:`Django に貢献する </internals/contributing/index>`
 
 コードの開発、ドキュメントの作成、そしてチケットのトリアージや、誰かの提出
 したバグフィクスのテストなど、どんなレベルの貢献でも歓迎します。
