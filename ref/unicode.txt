@@ -4,9 +4,7 @@
 Django での Unicode の扱い
 ==========================
 
-:revision-up-to: 11321 (1.0)
-
-.. versionadded:: 1.0
+:revision-up-to: 17812 (1.4)
 
 Django はネイティブで Unicode データをサポートしています。データベースの設
 定を正しく行っている限り、テンプレートやモデル、データベース間で Unicode 文
@@ -23,16 +21,16 @@ Django はネイティブで Unicode データをサポートしています。�
 (iso8859-1) のような、より文字セットの制約が強いエンコーディングを使ってい
 ると、一部の文字をデータベースに保存できず、情報が失われるかもしれません。
 
- * MySQL ユーザは `MySQL 5.1 マニュアルの原文 10.3.2 節`_ 、または 
-   `和訳 9.3.2 節`_  を参考に、データベースの文字セットエンコーディングの設
-   定や変更を行ってください。
+* MySQL ユーザは `MySQL 5.1 マニュアルの原文 10.3.2 節`_ 、または 
+`和訳 9.3.2 節`_  を参考に、データベースの文字セットエンコーディングの設
+定や変更を行ってください。
 
- * PostgreSQL ユーザは `PostgreSQL 8 マニュアルの原文 21.2.2 節`_ 、
-   または `和訳 20.2.2 節`_ を参考にして、正しいエンコーディングでデータベー
-   スを作成してください。
+* PostgreSQL ユーザは `PostgreSQL 8 マニュアルの原文 21.2.2 節`_ 、
+または `和訳 20.2.2 節`_ を参考にして、正しいエンコーディングでデータベー
+スを作成してください。
 
- * SQLite ユーザは何もする必要がありません。 SQLite は常に内部のエンコーディ
-   ングに UTF-8 を使うからです。
+* SQLite ユーザは何もする必要がありません。 SQLite は常に内部のエンコーディ
+ングに UTF-8 を使うからです。
 
 .. _MySQL manual: 
   http://www.mysql.org/doc/refman/5.1/en/charset-database.html
@@ -105,7 +103,7 @@ Django を使っていると、 Unicode 文字列とバイト文字列の他に�
 の引数に遅延翻訳オブジェクトを指定して呼び出すと、現在のロケールでの翻訳結
 果を Unicode 文字列で返すということも覚えておいてください。
 
-遅延翻訳オブジェクトの詳細は、 :ref:`国際化のドキュメント <topics-i18n>` を
+遅延翻訳オブジェクトの詳細は、 :doc:`国際化のドキュメント </topics/i18n/index>` を
 参照してください。
 
 便利なユーティリティ関数
@@ -121,44 +119,44 @@ Django を使っていると、 Unicode 文字列とバイト文字列の他に�
 ``django.utils.encoding`` モジュールには、 Unicode 文字列とバイト文字列との
 間で相互に変換を行うための関数が入っています。
 
-    * ``smart_unicode(s, encoding='utf-8', string_only=False, errors='strict')``
-      は、入力 ``s`` を Unicode 文字列に変換します。 ``encoding`` パラメタ
-      には入力文字列のエンコーディングを指定します。(例えば、 Django はフォー
-      ムから入力された UTF-8 でエンコードされていないデータを内部的に処理す
-      る際にこの関数を使っています。) ``strings_only`` パラメタが ``True``
-      の場合、数値型、ブール型、 ``None`` といった値を ``s`` に渡しても文字列
-      に変換しません (もとの型のままで値を返します) 。 ``errors`` はエラー
-      処理時の動作を指定するためのパラメタで、Python の ``unicode()`` 関数
-      で使われているのと同じ値を受け取ります。
+* ``smart_unicode(s, encoding='utf-8', string_only=False, errors='strict')``
+  は、入力 ``s`` を Unicode 文字列に変換します。 ``encoding`` パラメタ
+  には入力文字列のエンコーディングを指定します。(例えば、 Django はフォー
+  ムから入力された UTF-8 でエンコードされていないデータを内部的に処理す
+  る際にこの関数を使っています。) ``strings_only`` パラメタが ``True``
+  の場合、数値型、ブール型、 ``None`` といった値を ``s`` に渡しても文字列
+  に変換しません (もとの型のままで値を返します) 。 ``errors`` はエラー
+  処理時の動作を指定するためのパラメタで、Python の ``unicode()`` 関数
+  で使われているのと同じ値を受け取ります。
 
-      ``__unicode__`` メソッドを実装しているオブジェクトを
-      ``smart_unicode()`` に渡すと、 ``__unicode__`` メソッドを使って変換を
-      行います。
+  ``__unicode__`` メソッドを実装しているオブジェクトを
+  ``smart_unicode()`` に渡すと、 ``__unicode__`` メソッドを使って変換を
+  行います。
 
-    * ``force_unicode(s, encoding='utf-8', string_only=False, errors='strict')``
-      は、ほとんどの場合 ``smart_unicode()`` と同じように動作します。ただし、
-      第一引数が :ref:`遅延翻訳オブジェクト <lazy-translations>` の場合には
-      動作が異なります。
-      ``smart_unicode()`` は遅延翻訳オブジェクトをそのままにしておきますが、
-      ``force_unicode()`` を使うと、(その場で翻訳を行って) Unicode 文字列を
-      返します。通常は ``smart_unicode()`` を使った方がよいでしょう。とはい
-      え、テンプレートタグやフィルタは、「後で文字列になる何か」ではなく、
-      *「文字列」を扱わねばならない* ので、 ``force_unicode()`` を使った方
-      が有意義です。
+* ``force_unicode(s, encoding='utf-8', string_only=False, errors='strict')``
+  は、ほとんどの場合 ``smart_unicode()`` と同じように動作します。ただし、
+  第一引数が :ref:`遅延翻訳オブジェクト <lazy-translations>` の場合には
+  動作が異なります。
+  ``smart_unicode()`` は遅延翻訳オブジェクトをそのままにしておきますが、
+  ``force_unicode()`` を使うと、(その場で翻訳を行って) Unicode 文字列を
+  返します。通常は ``smart_unicode()`` を使った方がよいでしょう。とはい
+  え、テンプレートタグやフィルタは、「後で文字列になる何か」ではなく、
+  *「文字列」を扱わねばならない* ので、 ``force_unicode()`` を使った方
+  が有意義です。
 
-    * ``smart_str(s, encoding='utf-8', strings_only=False, errors='strict')``
-      は本質的に ``smart_unicode()`` の対極にあたるメソッドです。このメソッ
-      ドは、第一引数をバイト文字列に変換します。 ``strings_only`` パラメタ
-      の意味は、 ``smart_unicode()`` および ``force_unicode()`` の同名のパ
-      ラメタと同じです。これは Python の組み込み関数 ``str()`` と少し違った
-      仕様ですが、 Django 内部のいくつかの場所で必要な機能として実装されて
-      います。
+* ``smart_str(s, encoding='utf-8', strings_only=False, errors='strict')``
+  は本質的に ``smart_unicode()`` の対極にあたるメソッドです。このメソッ
+  ドは、第一引数をバイト文字列に変換します。 ``strings_only`` パラメタ
+  の意味は、 ``smart_unicode()`` および ``force_unicode()`` の同名のパ
+  ラメタと同じです。これは Python の組み込み関数 ``str()`` と少し違った
+  仕様ですが、 Django 内部のいくつかの場所で必要な機能として実装されて
+  います。
 
 普段は、 ``smart_unicode()`` しか必要ないでしょう。入力データが Unicode か
 バイト文字列であるような場合には、早い段階でこのメソッドを使って Unicode 化
 を行い、その後の操作ではつねに Unicode を扱うようにしてください。
 
-.. _ref-unicode-uri-and-iri:
+.. _-unicode-uri-and-iri:
 
 URI および IRI の処理
 ~~~~~~~~~~~~~~~~~~~~~
@@ -170,14 +168,14 @@ URL の必要条件の一つとして、 URL は全て ASCII 文字セットで�
 IRI から URI へのクオート処理や変換処理はやや厄介なので、 Django は補助にな
 る機能をいくつか提供しています。
 
-    * ``django.utils.encoding.iri_to_uri()`` は (`RFC 3987`_ 準拠の) IRI
-      から URI への変換を実装しています。
+* ``django.utils.encoding.iri_to_uri()`` は (`RFC 3987`_ 準拠の) IRI
+  から URI への変換を実装しています。
 
-    * ``django.utils.http.urlquote()`` および
-      ``django.utils.http.urlquote_plus()`` は、 Python の標準ライブラリで
-      提供している ``urllib.quote()`` および ``urllib.quote_plus()`` に手を
-      加えて、(データをエンコーディング前に UTF-8 文字列に変換することで)非
-      ASCII 文字を扱えるようにしています。
+* ``django.utils.http.urlquote()`` および
+  ``django.utils.http.urlquote_plus()`` は、 Python の標準ライブラリで
+  提供している ``urllib.quote()`` および ``urllib.quote_plus()`` に手を
+  加えて、(データをエンコーディング前に UTF-8 文字列に変換することで)非
+  ASCII 文字を扱えるようにしています。
 
 これらの関数は、それぞれのグループごとに少し違った目的があり、きちんとした
 使い分けが必要です。通常、IRI や URI パスを構成する個々の部分文字列には
@@ -314,17 +312,17 @@ UTF-8 です。
 
 テンプレートタグやフィルタを定義する場合、以下の 2 点に注意してください:
 
-    * テンプレートタグの ``render()`` メソッドやテンプレートフィルタの戻
-      り値には、常に Unicode 文字列を使ってください。
+* テンプレートタグの ``render()`` メソッドやテンプレートフィルタの戻
+  り値には、常に Unicode 文字列を使ってください。
 
-    * ``smart_unicode()`` よりも ``force_unicode()`` を使うようにしてくださ
-      い。タグのレンダリングやフィルタの呼び出しはテンプレートのレンダリン
-      グ中に行われるので、遅延翻訳オブジェクトから文字列への変換を遅らせる
-      意味がないからです。また、この時点では、 Unicode 文字列だけを扱うよう
-      にした方が簡単です。
+* ``smart_unicode()`` よりも ``force_unicode()`` を使うようにしてくださ
+  い。タグのレンダリングやフィルタの呼び出しはテンプレートのレンダリン
+  グ中に行われるので、遅延翻訳オブジェクトから文字列への変換を遅らせる
+  意味がないからです。また、この時点では、 Unicode 文字列だけを扱うよう
+  にした方が簡単です。
 
 電子メール
-===========
+==========
 
 Django の電子メール送信フレームワーク (``django.core.mail``) は、透過的に
 Unicode をサポートしており、メッセージ本体やヘッダに Unicode データを指定で
@@ -340,7 +338,9 @@ Unicode をサポートしており、メッセージ本体やヘッダに Unico
     sender = u'Arnbjörg Ráðormsdóttir <arnbjorg@example.com>'
     recipients = ['Fred <fred@example.com']
     body = u'...'
-    EmailMessage(subject, body, sender, recipients).send()
+    msg = EmailMessage(subject, body, sender, recipients)
+    msg.attach(u"Une pièce jointe.pdf", "%PDF-1.4.%...", mimetype="application/pdf")
+    msg.send()
 
 フォームから提出されたデータ
 ============================
