@@ -6,159 +6,167 @@ Django 1.1 alpha 1 release notes
 
 February 23, 2009
 
-Welcome to Django 1.1 alpha 1!
+ようこそ Django 1.1 alpha 1へ!
 
-This is the first in a series of preview/development releases leading up to the
-eventual release of Django 1.1, currently scheduled to take place in April 2009.
-This release is primarily targeted at developers who are interested in trying
-out new features and testing the Django codebase to help identify and resolve
-bugs prior to the final 1.1 release.
+これが Django 1.1 の2009年4月にする通常のリリースに追いつくまでの開発版です。
+このリリースが基本的にターゲットとしているのは、新しい機能を試したり、 
+1.1 のリリース前にDjangoのコードベースでバグを見つけたり解消することに興味を
+抱いている人たちです。
 
-As such, this release is *not* intended for production use, and any such use is
-discouraged.
+そのため、このリリースは 正式なサポートが含まれていないため、そのような
+使い方には向きません
 
-What's new in Django 1.1 alpha 1
-================================
+Django 1.1 アルファ 1 で新しくなったこと
+========================================
 
-ORM improvements
-----------------
+ORM の改善
+----------
 
-Two major enhancements have been added to Django's object-relational mapper
-(ORM):
+Django のオブジェクトリレーショナルマッパー(ORM)に二つほど大きな機能が
+追加されました。
 
-Aggregate support
-~~~~~~~~~~~~~~~~~
+アグリゲートのサポート
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. currentmodule:: django.db.models
 
-It's now possible to run SQL aggregate queries (i.e. ``COUNT()``, ``MAX()``,
-``MIN()``, etc.) from within Django's ORM. You can choose to either return the
-results of the aggregate directly, or else annotate the objects in a
-:class:`QuerySet` with the results of the aggregate query.
+SQL のアグリゲート( aggregate )、( ``COUNT()``, ``MAX()``, ``MIN()`` など)
+が Django の ORM で使えるようになりました。直接アグリゲートの結果を
+返すか、それとも アグリゲートしたクエリの結果と　:class:`QuerySet`
+の中のオブジェクトを添えることもできます。
 
-This feature is available as new :meth:`QuerySet.aggregate()`` and
-:meth:`QuerySet.annotate()`` methods, and is covered in detail in :ref:`the ORM
-aggregation documentation <topics-db-aggregation>`
+この機能は新しい :meth:`QuerySet.aggregate()`` で使うか、
+:meth:`QuerySet.annotate()`` メソッドで使えます。詳しくは、
+:doc:`the ORM アグリゲーションのドキュメント </topics/db/aggregation>`
+を見てください。
 
-Query expressions
-~~~~~~~~~~~~~~~~~
+クエリの表現
+~~~~~~~~~~~~
 
-Queries can now refer to a another field on the query and can traverse
-relationships to refer to fields on related models. This is implemented in the
-new :class:`F` object; for full details, including examples, consult the
-:ref:`documentation for F expressions <query-expressions>`.
+クエリは別のフィールドを参照することも、関係するモデルのフィールドへ
+関係性をまたいで参照することも出来ます。この機能は新しい  :class:`F`
+オブジェクトで実装されています、詳しくは、
+:ref:`F 表記のドキュメント <query-expressions>` を
+見てください。
 
-Performance improvements
-------------------------
+パフォーマンスの改善
+--------------------
 
 .. currentmodule:: django.test
 
-Tests written using Django's :ref:`testing framework <topics-testing>` now run
-dramatically faster (as much as 10 times faster in many cases).
+Django の :doc:`テストフレームワーク</topics/testing>` を使って書かれた
+テストは、劇的に早くなりました。(沢山のケースで、 10倍ほど早くなっています)
 
-This was accomplished through the introduction of transaction-based tests: when
-using :class:`django.test.TestCase`, your tests will now be run in a transaction
-which is rolled back when finished, instead of by flushing and re-populating the
-database. This results in an immense speedup for most types of unit tests. See
-the documentation for :class:`TestCase` and :class:`TransactionTestCase` for a
-full description, and some important notes on database support.
+これは、トランザクションベースドテストの解説のなかで達成されています。
+:class:`django.test.TestCase` を使う時に、テストはトランザクションの中で
+走っています、トランザクションはテスト終了時にロールバックされます、
+データベースのフラッシュとリポピュレートする代わりにこれを行います。
+この結果は莫大なスピードアップをほとんどの種類のユニットテストにもたらします。
+:class:`TestCase` と :class:`TransactionTestCase` のドキュメントを見てくださ
+い。詳しい解説とデータベースサポートについての重要な情報が載っています。
 
-Other improvements
-------------------
+その他の進歩
+------------
 
-Other new features and changes introduced since Django 1.0 include:
+Django 1.0 からの、その他の新しい機能と変更は:
 
-* The :ref:`CSRF protection middleware <ref-contrib-csrf>` has been split into
-  two classes -- ``CsrfViewMiddleware`` checks incoming requests, and
-  ``CsrfResponseMiddleware`` processes outgoing responses. The combined
-  ``CsrfMiddleware`` class (which does both) remains for
-  backwards-compatibility, but using the split classes is now recommended in
-  order to allow fine-grained control of when and where the CSRF processing
-  takes place.
+* :doc:`CSRF プロテクションミドルウェア </ref/contrib/csrf>` は二つのクラスに
+  分割されました。 ``CsrfViewMiddleware`` は入ってくるリクエストをチェック
+  します。 ``CsrfResponseMiddleware`` プロセスは返すレスポンスを扱います。
+  ``CsrfMiddleware`` クラス (上記両方機能を果たします)は、
+  後方互換性のために残しています。しかし、分割したクラスを使うことが推奨
+  されています。それは、 CSRF プロセスが何時、どこで生じるかをきめ細やかに
+  コントロールすることが出来るからです。
 
-* :func:`~django.core.urlresolvers.reverse` and code which uses it (e.g., the
-  ``{% url %}`` template tag) now works with URLs in Django's administrative
-  site, provided that the admin URLs are set up via ``include(admin.site.urls)``
-  (sending admin requests to the ``admin.site.root`` view still works, but URLs
-  in the admin will not be "reversible" when configured this way).
+* :func:`~django.core.urlresolvers.reverse` とコードを使う(すなわち、
+  ``{% url %}`` テンプレートタグのことです)と、今は Django の管理サイト
+  の URL と一緒に動きます、管理 URL は ``include(admin.site.urls)`` に
+  よって提供されています(アドミンへのリクエストを送るための
+  ``admin.site.root`` ビューはまだ動作します、しかしアドミンの URL
+  がこの方法で構成されていると " reverse 関数で引き戻せません")
 
-* The ``include()`` function in Django URLconf modules can now accept sequences
-  of URL patterns (generated by ``patterns()``) in addition to module names.
+* Django の URLConf モジュールは、``include()`` 関数はモジュール名に加えて、
+  URL パターンのシークエンスも受け付けられます(それは、 ``patterns()`` で生成
+  されます)　
 
-* Instances of Django forms (see `the forms overview <topics-forms-index>`_ now
-  have two additional methods, ``hidden_fields()`` and ``visible_fields()``,
-  which return the list of hidden -- i.e., ``<input type="hidden">`` -- and
-  visible fields on the form, respectively.
+* Django フォームのインスタンス( :doc:`フォームの概要 </topics/forms/index>`
+  を見てください。二つのメソッド ``hidden_fields()`` と、 ``visible_fields()``
+  が追加されました、これらは非表示のリストが返され、すなわち
+  ``<input type="hidden">`` です、加えてフォームの非表示でないフィールドも
+  返します。
 
-* The ``redirect_to`` generic view (see `the generic views documentation
-  <ref-generic-views>`_) now accepts an additional keyword argument
-  ``permanent``. If ``permanent`` is ``True``, the view will emit an HTTP
-  permanent redirect (status code 301). If ``False``, the view will emit an HTTP
-  temporary redirect (status code 302).
+* ``redirect_to`` 汎用ビュー( :doc:`汎用ビューのドキュメント 
+  </ref/generic/views>` を見てください)は、
+  追加としてキーワード引数 ``permanent`` を受け取れるようになりました。
+  もし、 ``permanent`` が ``True`` ならばビューは HTTP 恒久的な転送
+  をします(ステータスコードは 301です)。もし、 ``False`` ならば、
+  ビューは HTTP 一時的な転送をします。(ステータスコード
+  は302 です)
 
-* A new database lookup type -- ``week_day`` -- has been added for ``DateField``
-  and ``DateTimeField``. This type of lookup accepts a number between 1 (Sunday)
-  and 7 (Saturday), and returns objects where the field value matches that day
-  of the week. See `the full list of lookup types <field-lookups>`_ for details.
+* 新しいデータベースの照合の種類として ``week_day`` が ``DateField`` と、
+  ``DateTimeField`` に加えられました。この参照のタイプは数字
+  1(日曜日)から7(土曜日)までを受け取り、フィールドの値がマッチする
+  週の日付がオブジェクトを返します。
+  :ref:`照合種類のフルリスト <field-lookups>` に詳細があります。
 
-* The ``{% for %}`` tag in Django's template language now accepts an optional
-  ``{% empty %}`` clause, to be displayed when ``{% for %}`` is asked to loop
-  over an empty sequence. See :ref:`the list of built-in template tags
-  <ref-templates-builtins>` for examples of this.
+* Django のテンプレート言語の ``{% for %}`` タグはオプションとして、
+  ``{% empty %}`` 句を扱えるようになりました。これは、 ``{% for %}``
+  のループが空っぽになった時に表示されるものです。
+  :doc:`組み込みのテンプレートタグのリスト</ref/templates/builtins>`
+  に、これの例が載っています。
 
-The Django 1.1 roadmap
-======================
+Django 1.1 のロードマップ
+=========================
 
-Before Django 1.1 goes final, several other preview/development releases will be
-made available. The current schedule consists of at least the following:
+Django 1.1 の最後のアップデートを迎える前に、幾つか、他の開発版のリリースが
+利用できます。最新スケジュールはこのようになっています。
 
-* Week of *March 20, 2009:* Django 1.1 beta 1, at which point Django 1.1 will
-  be in "feature freeze": no new features will be implemented for 1.1
-  past that point, and all new feature work will be deferred to
-  Django 1.2.
+* *2009年 3月20日* に、 Django 1.1 のベータ1 が "機能が固まり" ます。:
+  何も新しい機能がこの時点から追加されません、新しい機能は Django 1.2
+  に延期されます。
 
-* Week of *April 2, 2009:* Django 1.1 release candidate. At this point all
-  strings marked for translation must freeze to allow translations to
-  be submitted in advance of the final release.
+* *2009年 4月2日* には、 Django 1.1 リリースの候補日でっす。この時点で、
+  全ての翻訳する文字列がマークされ、最終リリースに先立って翻訳がなされる
+  ことを決定します。
 
-* Week of *April 13, 2009:* Django 1.1 final.
+* *2009年4月13日* には、 Django 1.1 の最終版です。
 
-If deemed necessary, additional alpha, beta or release candidate packages will
-be issued prior to the final 1.1 release.
+必要ならば、アルファ版もこれに追加されます、ベータやリリース候補日の決定は
+1,1 の最終リリースより先に発表します。
 
-What you can do to help
-=======================
+Django の助けになるには何ができるか
+===================================
 
-In order to provide a high-quality 1.1 release, we need your help. Although this
-alpha release is, again, *not* intended for production use, you can help the
-Django team by trying out the alpha codebase in a safe test environment and
-reporting any bugs or issues you encounter. The Django ticket tracker is the
-central place to search for open issues:
+1.1 が高い質のものとして提供されるために、私たちは助けが必要です。
+だけれど、これはアルファ版なので *正式なものとしての使用は意図して
+いません* Django の開発チームを助けるためには、アルファ版を安全な
+テスト環境で使うことと、バグや発見した問題をレポートすることです。
+Django のチケットトラッカーは中央の場所でオープンになっているイシュー
+を見つけられます。
 
-    * http://code.djangoproject.com/timeline
+* http://code.djangoproject.com/timeline
 
-Please open new tickets if no existing ticket corresponds to a problem you're
-running into.
+あなたが Django を使っていて生じた問題が、存在するチケットによって解決
+するものでなさそうだったら、新しいチケットをオープンしてください。
 
-Additionally, discussion of Django development, including progress toward the
-1.1 release, takes place daily on the django-developers mailing list:
+加えて、 Django の開発ディスカッションも 1.1 のリリースへ向けたプロセスの
+一部で、 Django のデベロッパーメーリングリストにて日々行われています。
 
-    * http://groups.google.com/group/django-developers
+* http://groups.google.com/group/django-developers
 
-... and in the ``#django-dev`` IRC channel on ``irc.freenode.net``. If you're
-interested in helping out with Django's development, feel free to join the
-discussions there.
+... そして、 ``irc.freenode.net`` の ``#django-dev`` IRCチャンネルで
+Django の開発を助けたいと思ったら、ぜひディスカッションに加わってくだ
+さい。
 
-Django's online documentation also includes pointers on how to contribute to
-Django: 
+Django のオンラインドキュメントも、どうやって Django に貢献すればよいかを
+指し示してくれます。
 
-    * :ref:`How to contribute to Django <internals-contributing>`
+* :doc:`Django へどうやって貢献するか </internals/contributing/index>`
 
-Contributions on any level -- developing code, writing documentation or simply
-triaging tickets and helping to test proposed bugfixes -- are always welcome and
-appreciated.
+どのレベルで貢献するか、開発版のコードでも、ドキュメントを書くのでもチケット
+を報告するのでもバグの修正のためにテストをするのでも、いつでも Django は
+あなたたちを歓迎し、そしてありがたく思っています。
 
-Development sprints for Django 1.1 will also be taking place at PyCon US 2009,
-on the dedicated sprint days (March 30 through April 2), and anyone who wants to
-help out is welcome to join in, either in person at PyCon or virtually in the
-IRC channel or on the mailing list.
+Django 1.1 の開発スプリントは PyCon US 2009 でも行われます、スプリントの
+日は(3月30日から4月2日)誰でも加われます。また、 IRC チャンネルかメーリング
+リストでヴァーチャルに参加することもできます。
