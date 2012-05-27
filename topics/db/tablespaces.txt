@@ -1,0 +1,79 @@
+================
+テーブルスペース
+================
+
+:revision-up-to: 17812 (1.4)
+
+データベースシステムのパフォーマンスを最適化する一般的な方法は、
+`テーブルスペース`_ を使ってディスクレイアウトを整理することです。
+
+.. _`テーブルスペース`: http://en.wikipedia.org/wiki/Tablespace
+
+.. warning::
+    Django はテーブルスペースの作成は行いません。テーブルスペース作成、管理の
+    詳細については使っているデータベースエンジンのドキュメントを参照してくださ
+    い。
+
+
+テーブルのテーブルスペースを宣言する
+------------------------------------
+
+:attr:`~django.db.models.Options.db_tablespace` オプションをモデルの ``class
+Meta`` に渡すことによって、モデルが生成した特定のテーブルに対してテーブルス
+ペースを指定することができます。
+このオプションはモデルの :class:`~django.db.models.ManyToManyField` で自動的に
+作られたテーブルにも影響します。
+
+:setting:`DEFAULT_TABLESPACE` 設定で
+:attr:`~django.db.models.Options.db_tablespace` のデフォルト値を指定できます。
+ビルトインの Django アプリケーションやコードを自分で制御できない他のアプリケー
+ションにテーブルスペースを設定するのに便利です。
+
+インデックスのテーブルスペースを宣言する
+----------------------------------------
+
+:attr:`~django.db.models.Field.db_tablespace` オプションを
+``Field`` のコンストラクタに渡すことで、その ``Field`` のカラムインデックスの
+代替テーブルスペースを指定できます。そのカラムにインデックスが作られない場合は
+このオプションは無視されます。
+
+:setting:`DEFAULT_INDEX_TABLESPACE` 設定を使って
+:attr:`~django.db.models.Field.db_tablespace` のデフォルト値を指定することもで
+きます。
+
+もし :attr:`~django.db.models.Field.db_tablespace` が指定されず、
+:setting:`DEFAULT_INDEX_TABLESPACE` もセットしていない場合は、インデックスは
+テーブルと同じテーブルスペースに作られます。
+
+例
+--
+
+.. code-block:: python
+
+    class TablespaceExample(models.Model):
+        name = models.CharField(max_length=30, db_index=True, db_tablespace="indexes")
+        data = models.CharField(max_length=255, db_index=True)
+        edges = models.ManyToManyField(to="self", db_tablespace="indexes")
+
+        class Meta:
+            db_tablespace = "tables"
+
+この例では、 ``TablespaceExample`` モデルによって生成されるテーブル (モデル
+テーブルと多対多のテーブル) は ``tables`` テーブルスペースに保存されます。
+name フィールドのインデックスと多対多テーブルのインデックスは ``indexes`` テー
+ブルスペースに保存されます。 ``data`` フィールドもインデックスを生成しますが、
+テーブルスペースが指定されていないので、デフォルトのモデルテーブルスペースであ
+る ``tables`` に保存されることになります。
+
+データベースサポート
+--------------------
+
+PostgreSQL と Oracle はテーブルスペースをサポートしています。 SQLite と MySQL
+はサポートしていません。
+
+テーブルスペースをサポートしていないバックエンドを使う場合は、 Djang はテーブ
+ルスペース関連の全てのオプションを無視します。
+
+.. versionchanged:: 1.4
+    Django 1.4 から PostgreSQL バックエンドがテーブルスペースをサポートするよ
+    うになりました。
