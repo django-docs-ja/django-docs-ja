@@ -21,9 +21,10 @@ Django 1.0 beta 1 で新たに登場した機能
 
 ここ数年、我々は Django の trunk ソースツリーでほぼずっと活発に開発を続け、
 0.96 リリース以降、大きな機能をいくつも投入してきました。 Django 1.0 alpha
-1 で新たに登場した機能は、 :ref:`1.0 alpha 1 リリースノート
-<releases-1.0-alpha-1>` を参照してください。 Django 1.0 alpha 2 で新たに登
-場した機能は、 :ref:`1.0 alpha 2 リリースノート <releases-1.0-alpha-2>` を
+1 で新たに登場した機能は、
+:doc:`1.0 alpha 1 リリースノート</releases/1.0-alpha-1>`
+を参照してください。 Django 1.0 alpha 2 で新たに登
+場した機能は、 :doc:`1.0 alpha 2 リリースノート </releases/1.0-alpha-2>` を
 参照してください。 
 
 この beta リリースでは主要な新機能は追加していませんが、変更点や改良点がい
@@ -40,7 +41,7 @@ admin のフレキシビリティ向上
     (``django.contrib.admin``) のリファクタリングに続いて、2 つのフックを追
     加し、admin でモデルインスタンスを操作するときに pre-svave および
     post-save 処理をカスタマイズできるようにしました。詳しくは 
-    :ref:`admin のドキュメント <ref-contrib-admin>` を参照してください。
+    :doc:`admin のドキュメント </ref/contrib/admin/index>` を参照してください。
 
 ``INSERT``/``UPDATE`` の使い分け
     Django で ``save()`` メソッドを呼び出したとき、SQL レベルで ``INSERT``
@@ -56,7 +57,7 @@ admin のフレキシビリティ向上
     実際には二つの別々のミドルウェア (キャッシュにデータを入れるミドルウェ
     アと、キャッシュからデータを取り出すミドルウェア) からなっていて、一つ
     のミドルウェアにまとまっていると起きる問題を回避できます。正しい使い方
-    などの詳細は:ref:`キャッシュのドキュメント <topics-cache>` に記載してい
+    などの詳細は:doc:`キャッシュのドキュメント </topics/cache>` に記載してい
     ます。
 
 撤廃された機能の除去
@@ -75,7 +76,7 @@ Django に一意なセッション識別子を生成させるメソッドの頑�
 改良やバグフィクスが入っています。
 
 .. _the documentation for generic relations: ../contenttypes/#generic-relations
-.. _the Django wiki: http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges#Removedseveralmoredeprecatedfeaturesfor1.0
+.. _the Django wiki: https://code.djangoproject.com/wiki/BackwardsIncompatibleChanges#Removedseveralmoredeprecatedfeaturesfor1.0
 .. _`Django の wiki`: `the Django wiki`_
 
 
@@ -111,7 +112,7 @@ Django 1.0 のロードマップ
 もちろん、予定のタイムラインなので、状況によって変更する可能性もあります。
 最新情報は Django プロジェクトの wiki に掲載します:
 
-    http://code.djangoproject.com/wiki/VersionOneRoadmap
+* https://code.djangoproject.com/wiki/VersionOneRoadmap
 
 
 リリース作業で手伝えること
@@ -123,7 +124,7 @@ Django 1.0 のロードマップ
 さい。自分の発見した問題がすでに明らかでないか、 Django のチケットトラッカ
 を使って探してください:
 
-    http://code.djangoproject.com/timeline
+* https://code.djangoproject.com/timeline
 
 発見した問題に対応するチケットが見付からなければ、新たなチケットをオープン
 してください。
@@ -131,7 +132,7 @@ Django 1.0 のロードマップ
 また、 1.0 リリースに向けての進捗を含め、 Django の開発に関する議論は、
 django-developers メーリングリスト:
 
-    http://groups.google.com/group/django-developers
+* https://groups.google.com/group/django-developers
 
 と、IRC サーバ ``irc.freenode.net`` の ``#django-dev`` チャネルで常時行って
 います。 Django の開発を手伝いたいのなら、ぜひ参加して、議論に加わってくだ
@@ -139,7 +140,7 @@ django-developers メーリングリスト:
 
 Django プロジェクトへの貢献方法は、オンラインドキュメントにも記載しています:
 
-    :ref:`contributing to Django <internals-contributing>`
+    :doc:`Django に貢献する </internals/contributing/index>`
 
 コードの開発、ドキュメントの作成、そしてチケットのトリアージや、誰かの提出
 したバグフィクスのテストなど、どんなレベルの貢献でも歓迎します。
