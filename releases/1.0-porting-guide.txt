@@ -18,7 +18,7 @@ Django 1.0 は、いくつかの点で 0.96 との互換性を失っています
 .. seealso::
 
     このポーティングガイドでは、コードを手早く移行することに焦点を絞ってい
-    ますが、 :ref:`1.0 リリースノート <releases-1.0>` では、 1.0 で登場した
+    ますが、 :doc:`1.0 リリースノート </releases/1.0>` では、 1.0 で登場した
     新しい機能をより詳しく解説しています。
 
 一般的な変更
@@ -37,7 +37,7 @@ Unicode を使う
 所で、通常の文字列はそのまま使えますが、 Unicode リテラルを明示的に使ってお
 けば、ややこしい問題が発生するのを防げます。
 
-詳しくは :ref:`ref-unicode` を参照してください。
+詳しくは :doc:`/ref/unicode` を参照してください。
 
 .. _models-chagnes:
 
@@ -62,9 +62,19 @@ Unicode を使う
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 モデルフィールドから ``prepopulated_from`` 引数をなくしてください。この引数
-はもう有効でなく、 ``AdminModel`` クラスの ``admin.py`` に移されました。
+はもう有効でなく、 ``ModelAdmin`` クラスの ``admin.py`` に移されました。
 admin に関する詳しい変更内容は、後述の `admin の変更 <#the-admin>`_ を参照し
 てください。
+
+``core`` の削除
+~~~~~~~~~~~~~~~
+
+``core`` 引数がモデルフィールドより削除されました。これは、
+同様の関数( :doc:`インラインエディット </admin/inlines>` )が
+アドミンインターフェースによって、別に動作するようになったため
+もう必要なくなったからです。インラインエディットについて心配する必要は
+ありません。 `the admin` セクションで ``core`` へ参照していた全ての
+除去されたものたちについて解説しています。
 
 ``class Admin:`` を ``admin.py`` と置き換える
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -73,6 +83,15 @@ admin に関する詳しい変更内容は、後述の `admin の変更 <#the-ad
 いても影響はありませんが、何の効果もありません。アプリケーションを admin に
 登録するには、 ``admin.py`` ファイルに宣言を移す必要があります。詳しくは
 `admin の変更 <#the-admin>`_ を参照してください。
+
+.. seealso::
+
+    djangosnippets__ のコントリビュータの一人が、 
+    `models.py をスキャンして admin.py を生成するスクリプト`__ を書いていま
+    す。
+
+    __ http://www.djangosnippets.org/
+    __ http://www.djangosnippets.org/snippets/603/
 
 admin の変更例
 ~~~~~~~~~~~~~~~~~
@@ -132,15 +151,6 @@ admin の定義は完全にモデル定義から脱カップリングされ、ad
 出しへの変更方法は、 `モデルの変更 <#models-changes>`_ ですでに触れました。
 以下では、 ``Admin`` 宣言を新たな書式に書き換える上で必要な細かい点について
 説明します。
-
-.. seealso::
-
-    djangosnippets__ のコントリビュータの一人が、 
-    `models.py をスキャンして admin.py を生成するスクリプト`__ を書いていま
-    す。
-
-    __ http://www.djangosnippets.org/
-    __ http://www.djangosnippets.org/snippets/603/
 
 インラインの宣言方法
 ~~~~~~~~~~~~~~~~~~~~~
@@ -214,9 +224,9 @@ admin の定義は完全にモデル定義から脱カップリングされ、ad
       で説明しています。
 
     * 新しい admin には、他にもたくさんの機能があります。詳しくは
-      :ref:`admin のドキュメント <ref-contrib-admin>` を参照してください。
+      :doc:`admin のドキュメント </ref/contrib/admin/index>` を参照してください。
 
-    __ http://code.djangoproject.com/wiki/NewformsAdminBranch
+    __ https://code.djangoproject.com/wiki/NewformsAdminBranch
 
 URLs
 ----
@@ -276,7 +286,7 @@ admin サイトをルートの ``urls.py`` に組み込んでいるのなら、�
 
 古いフォームシステム (以前は ``django.forms`` と呼ばれていた
 ``django.oldforms``)を使っているのなら、フォームを書き直す必要があります。
-まずは :ref:`forms のドキュメント <#topics-forms-index>` を読むところから始
+まずは :doc:`forms のドキュメント </topics/forms/index>` を読むところから始
 めてください。
 
 アップロードファイルの処理に新しい API を使う
@@ -302,6 +312,40 @@ admin サイトをルートの ``urls.py`` に組み込んでいるのなら、�
 ``f['filename']``      ``f.name``
 ``f['content-type']``  ``f.content_type``
 ====================== =====================
+
+新しい API を使って、ファイルフィールドを手がける
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:class:`django.db.models.FileField` の内部の実装が変わりました。
+これが返すビジブルな結果はこれらのモデルフィールドが変えた、
+特別な要素に対してアクセスする方法となります。
+( URL, ファイルネーム, イメージサイズ, 等)
+次の変更をする必要があります、
+モデルの :class:`~django.db.models.FileField` が ``myfile`` と
+呼ばれているとして:
+
+=================================== ========================
+Old (0.96)                           New (1.0)
+=================================== ========================
+``myfile.get_content_filename()``   ``myfile.content.path``
+``myfile.get_content_url()``        ``myfile.content.url``
+``myfile.get_content_size()``       ``myfile.content.size``
+``myfile.save_content_file()``      ``myfile.content.save()``
+``myfile.get_content_width()``      ``myfile.content.width``
+``myfile.get_content_height()``     ``myfile.content.height``
+=================================== ========================
+
+``width`` と ``height`` アトリビュートは、ただ
+:class:`~django.db.models.ImageField` を通したフィールドです。
+もっと詳しいことは、 :doc:`model API </ref/models/fields>`
+ドキュメントに載っています。
+
+``ObjectPaginator`` の代わりとして ``Paginator`` を使う
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+0.96 の ``ObjectPaginator`` は取り除かれ、代わりに進歩したバージョンの
+ものに取って代わられました、それが :class:`django.core.paginator.Paginator`
+です。
 
 テンプレート
 --------------
@@ -353,7 +397,7 @@ admin サイトをルートの ``urls.py`` に組み込んでいるのなら、�
   取りたければ、 ``sender=None`` としてください。
 
 * カスタムシグナルを定義するときは、無名オブジェクトでなく、
-  :class:`django.dispatch.Signal`` を使ってください。
+  :class:`django.dispatch.Signal` を使ってください。
 
 必要な変更点を手短にまとめた表を以下に示します:
 
@@ -372,7 +416,7 @@ admin サイトをルートの ``urls.py`` に組み込んでいるのなら、�
 
 Django 0.96 の  ``django.contrib.comments`` アプリケーションを使っているの
 なら、 1.0 で登場した新たなコメントアプリケーションに移行してください。詳し
-くは :ref:`ref-contrib-comments-upgrade` で解説しています。
+くは :doc:`/ref/contrib/comments/upgrade` で解説しています。
 
 テンプレートタグ
 -------------------
@@ -424,10 +468,10 @@ U.S. ローカルフレーバ
 られなかった場合などに、 :exc:`RuntimeError` はすでに設定をロードした後に設
 定を変更しようとした場合などに送出されます。
 
-``LOGIN_URL`` の移動
+:setting:`LOGIN_URL` の移動
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-``LOGIN_URL`` 定数が、 ``django.contrib.auth`` から ``settings`` モジュール
+:setting:`LOGIN_URL` 定数が、 ``django.contrib.auth`` から ``settings`` モジュール
 に移動しました。 ``from django.contrib.auth import LOGIN_URL`` を使うのでは
 なく、 :setting:`settings.LOGIN_URL <LOGIN_URL>` を参照してください。
 
@@ -435,9 +479,10 @@ U.S. ローカルフレーバ
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 0.96 では、 URL がスラッシュで終っておらず、パスの最後の部分にピリオドもな
-い場合、 ``APPEND_SLASH`` が ``True`` だと、末尾にスラッシュを付加した URL
-にリダイレクトしていました。 1.0 では、明示的にスラッシュのないパターンを
-URL パターンでキャッチできるように、末尾にスラッシュのない URL に対して、
+い場合、 :setting:`APPEND_SLASH` が ``True`` だと、
+末尾にスラッシュを付加した URLにリダイレクトしていました。
+1.0 では、明示的にスラッシュのないパターンをURL パターンでキャッチできるように、
+末尾にスラッシュのない URL に対して、
 まず URL パターン中に一致するエントリがないか調べ、あればリダイレクトしなく
 なりました。
 
@@ -529,7 +574,7 @@ Django をアップデートした後に行ってください。
   **データベースを先にバックアップしてください!** 
 
   SQLite を使っている場合、データベースのバックアップするには、単にデータベー
-  スの保存されているファイル (``settings.py`` の ``DATABASE_NAME`` に指定し
+  スの保存されているファイル (``settings.py`` の :setting:`DATABASE_NAME` に指定し
   ているファイル名) をコピーします。
 
 ``DecimalField`` を使う全てのアプリケーションについて、 ``<app>`` をアプリ
@@ -543,17 +588,17 @@ Django をアップデートした後に行ってください。
 
 注意:
 
-  1. 作業の最初のステップでは、必ずダンプ形式に XML を指定してください。と
-     いうのも、このステップでは、 XML データダンプによって、 float データが
-     SQLite で扱える decimal に変換されるという仕様を使っているからです。
+1. 作業の最初のステップでは、必ずダンプ形式に XML を指定してください。と
+   いうのも、このステップでは、 XML データダンプによって、 float データが
+   SQLite で扱える decimal に変換されるという仕様を使っているからです。
 
-  2. 二つめのステップでは、アプリケーションのデータが失われてもよいか尋ねら
-     れます。 yes と答えてください。もちろん、三つ目のステップでデータを復
-     元しますからね。
+2. 二つめのステップでは、アプリケーションのデータが失われてもよいか尋ねら
+   れます。 yes と答えてください。もちろん、三つ目のステップでデータを復
+   元しますからね。
 
-  3. ``DecimalField`` に関する仕様変更前からある Django 付属のアプリケーショ
-     ンは、全て影響を受けません。したがって、標準の Django モデルに対してこ
-     の操作を行う必要はありません。
+3. ``DecimalField`` に関する仕様変更前からある Django 付属のアプリケーショ
+   ンは、全て影響を受けません。したがって、標準の Django モデルに対してこ
+   の操作を行う必要はありません。
 
 上のプロセスでうまく行かないようなら、バックアップしておいたデータベースファ
 イルをデータベースファイルに上書きして、Django を再起動してください。
@@ -572,7 +617,7 @@ Django をアップデートした後に行ってください。
 くなりました。
 
 ``_()`` は組み込みでなくなりました
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 以前は、モンキーパッチによって ``_()`` (名前がアンダースコア一文字の呼び出
 し可能オブジェクト)を組み込み名前空間に入れていましたが、これをやめたため、
@@ -587,12 +632,32 @@ Django をアップデートした後に行ってください。
 HTTP リクエスト／レスポンスオブジェクト
 ------------------------------------------
 
+``HttpRequest`` への辞書的なアクセス
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``HttpRequest`` オブジェクトはもはや直接的に辞書式にアクセスすることを
+サポートしなくなりました、 ``GET`` と ``POST`` 両方のデータは
+直接的に ``HttpRequest`` オブジェクトで扱えました(すなわち、
+HttpRequest`` object (すなわち、 ``if 'some_form_key' in request``
+を使うか、 ``request['some_form_key']`` を読み込むことで、
+フォームデータ一つをチェックすることができました。これはもう、
+サポートされていません。 もし、組み込みの ``GET`` や ``POST`` データに
+アクセスする必要があるなら、 ``request.REQUEST``　を代わりに使って
+ください。
+
+これは強く推奨されています、しかしながら、受け取ることを期待した
+リクエストの種類が、常に適切なディクショナリとなっているかを、
+常に明確にする( ``request.GET`` か ``request.POST`` )があります。
+組み込みの ``request.REQUEST`` ディクショナリは入ってくるデータの
+オリジンを隠すことができます。
+
 ``HTTPResponse`` ヘッダへのアクセス
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``django.http.HttpResponse.headers`` は ``_headers`` にリネームされ、
-:class:`HttpResponse`` はヘッダの包含チェックを直接サポートするようになりま
-した。従って、 ``if header in response.headers:`` ではなく
+:class:`django.http.HttpResponse`` はヘッダの包含チェックを
+直接サポートするようになりました。
+従って、 ``if header in response.headers:`` ではなく
 ``if header in response:`` と書いてください。
 
 一般化リレーション
@@ -689,14 +754,14 @@ HTTP リクエスト／レスポンスオブジェクト
 
 コードを変更するには、以下のように書き換えてください:
 
-     1. ``django.newforms.forms.SortedDictFromList`` を使っている部分を
-        :class:`django.utils.datastructures.SortedDict` に書き換えてくださ
-        い。
+1. ``django.newforms.forms.SortedDictFromList`` を使っている部分を
+   :class:`django.utils.datastructures.SortedDict` に書き換えてくださ
+   い。
 
-     2. :meth:`django.utils.datastructures.SortedDict.copy` は
-        ``SortedDictFromList`` メソッドとは違って深いコピーを返さないので、
-	コードを deepcopy に対応して書き換える必要があります。深いコピーを
-        作成するには、 ``copy.deepcopy`` を直接呼び出します。
+2. :meth:`django.utils.datastructures.SortedDict.copy` は
+   ``SortedDictFromList`` メソッドとは違って深いコピーを返さないので、
+   コードを deepcopy に対応して書き換える必要があります。深いコピーを
+   作成するには、 ``copy.deepcopy`` を直接呼び出します。
 
 データベースバックエンドの関数
 ---------------------------------
