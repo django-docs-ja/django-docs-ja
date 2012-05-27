@@ -4,7 +4,7 @@
 Django 1.0 alpha リリースノート
 ================================
 
-:revision-up-to: 8961 (1.0)
+:revision-up-to: 17812 (1.4)
 
 Django 1.0 alpha にようこそ!
 
@@ -33,7 +33,7 @@ admin アプリケーションのリファクタ (newforms-admin)
     また、思い通りに拡張したりカスタマイズしたりできるようになりました。
     admin アプリケーションのドキュメントは、以下の Django 標準ドキュメント:
 
-        :ref:`admin インタフェース <ref-contrib-admin>`
+    :doc:`admin インタフェース </ref/contrib/admin/index>`
 
     にあります。
 
@@ -44,7 +44,7 @@ Unicode 処理の改善
     システムとの相互運用を楽にするためのユーティリティも提供しました。
     詳細は、 Django の Unicode 処理ドキュメント:
 
-         :ref:`Unicode リファレンス <ref-unicode>`
+    :doc:`Unicode リファレンス </ref/unicode>`
 
     にあります。
 
@@ -57,7 +57,7 @@ Django ORM の改善
     の内部コードに対して施されています。このリファクタのもたらす、以前のバー
     ジョンと互換性のない変更や新たな機能は、 Django の wiki ページ:
     
-         http://code.djangoproject.com/wiki/QuerysetRefactorBranch
+    * https://code.djangoproject.com/wiki/QuerysetRefactorBranch
 
     に掲載しています。
 
@@ -83,7 +83,7 @@ Django ORM の改善
 したりしたい人のために、以前のバージョンと互換性のない変更の全容を Django
 の wiki ページにまとめています:
 
-    http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
+* https://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
 
 
 Django 1.0 のロードマップ
@@ -119,7 +119,7 @@ Django 1.0 のロードマップ
 もちろん、予定のタイムラインなので、状況によって変更する可能性もあります。
 最新情報は Django プロジェクトの wiki に掲載します:
 
-    http://code.djangoproject.com/wiki/VersionOneRoadmap
+* https://code.djangoproject.com/wiki/VersionOneRoadmap
 
 
 リリース作業で手伝えること
@@ -131,7 +131,7 @@ Django 1.0 のロードマップ
 さい。自分の発見した問題がすでに明らかでないか、 Django のチケットトラッカ
 を使って探してください:
 
-    http://code.djangoproject.com/timeline
+* https://code.djangoproject.com/timeline
 
 発見した問題に対応するチケットが見付からなければ、新たなチケットをオープン
 してください。
@@ -139,7 +139,7 @@ Django 1.0 のロードマップ
 また、 1.0 リリースに向けての進捗を含め、 Django の開発に関する議論は、
 django-developers メーリングリスト:
 
-    http://groups.google.com/group/django-developers
+* https://groups.google.com/group/django-developers
 
 と、IRC サーバ ``irc.freenode.net`` の ``#django-dev`` チャネルで常時行って
 います。 Django の開発を手伝いたいのなら、ぜひ参加して、議論に加わってくだ
@@ -147,7 +147,7 @@ django-developers メーリングリスト:
 
 Django プロジェクトへの貢献方法は、オンラインドキュメントにも記載しています:
 
-    :ref:`contributing to Django <internals-contributing>`
+* :doc:`Django に貢献する </internals/contributing/index>`
 
 コードの開発、ドキュメントの作成、そしてチケットのトリアージや、誰かの提出
 したバグフィクスのテストなど、どんなレベルの貢献でも歓迎します。
