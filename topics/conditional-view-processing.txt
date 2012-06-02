@@ -1,73 +1,136 @@
-.. _topics-conditional-processing:
+.. ===========================
+   Conditional View Processing
+   ===========================
 
-===========================
-Conditional View Processing
-===========================
+====================
+ビューの条件付き処理
+====================
 
-:revision-up-to: 11321 (1.1) unfinished
+:revision-up-to: 17812 (1.4)
 
-.. versionadded:: 1.1
+.. HTTP clients can send a number of headers to tell the server about copies of a
+   resource that they have already seen. This is commonly used when retrieving a
+   Web page (using an HTTP ``GET`` request) to avoid sending all the data for
+   something the client has already retrieved. However, the same headers can be
+   used for all HTTP methods (``POST``, ``PUT``, ``DELETE``, etc).
 
-HTTP clients can send a number of headers to tell the server about copies of a
-resource that they have already seen. This is commonly used when retrieving a
-web page (using an HTTP ``GET`` request) to avoid sending all the data for
-something the client has already retrieved. However, the same headers can be
-used for all HTTP methods (``POST``, ``PUT``, ``DELETE``, etc).
+HTTP クライアントは様々なヘッダを送信することで、すでに閲覧されたリソースについ
+てサーバに伝えられます。 Web ページが (HTTP の ``GET`` リクエストを使って) 取得
+されるとき、クライアントが既に取得しているデータを送信しないために使われます。
+同じハンドラはすべての HTTP メソッド (``POST`` 、 ``PUT`` 、 ``DELETE`` など)
+に使われます。
 
-For each page (response) that Django sends back from a view, it might provide
-two HTTP headers: the ``ETag`` header and the ``Last-Modified`` header. These
-headers are optional on HTTP responses. They can be set by your view function,
-or you can rely on the :class:`~django.middleware.common.CommonMiddleware`
-middleware to set the ``ETag`` header.
+.. For each page (response) that Django sends back from a view, it might provide
+   two HTTP headers: the ``ETag`` header and the ``Last-Modified`` header. These
+   headers are optional on HTTP responses. They can be set by your view function,
+   or you can rely on the :class:`~django.middleware.common.CommonMiddleware`
+   middleware to set the ``ETag`` header.
 
-When the client next requests the same resource, it might send along a header
-such as `If-modified-since`_, containing the date of the last modification
-time it was sent, or `If-none-match`_, containing the ``ETag`` it was sent.
-If there is no match with the ETag, or if the resource has not been modified,
-a 304 status code can be sent back, instead of a full response, telling the
-client that nothing has changed.
+Django がビューから返す、各ページ (レスポンス) は HTTP ヘッダを 2 つ提供します。
+``ETag`` ヘッダと ``Last-Modified`` です。これらのヘッダは HTTP レスポンスの
+オプションです。ビュー関数によって設定するか、 ``ETag`` ヘッダを設定する
+:class:`~django.middleware.common.CommonMiddleware` ミドルウェアを使ってでき
+ます。
+
+.. When the client next requests the same resource, it might send along a header
+   such as `If-modified-since`_, containing the date of the last modification
+   time it was sent, or `If-none-match`_, containing the ``ETag`` it was sent.
+   If the current version of the page matches the ``ETag`` sent by the client, or
+   if the resource has not been modified, a 304 status code can be sent back,
+   instead of a full response, telling the client that nothing has changed.
+
+クライアントが同じリソースを次にリクエストしたとき送られるヘッダは例えば、
+`If-modified-since`_ や、 `If-none-match`_ などになるでしょう。
+`If-modified-since`_ はリソースが送られたときの最終変更日時を保持し、
+`If-none-match`_ はリソースが送られたときの ``ETag`` を保持しています。ページの
+現在のバージョンがクライアントに送信された ``ETag`` に一致するか、リソースが変更
+されていない場合は、 304 ステータスコードが返されます。クライアントにリソースの
+変更が無いことを伝えるため、フルレスポンスの代わりに返されます。
 
 .. _If-none-match: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.26
 .. _If-modified-since: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.25
 
-When you need more fine-grained control you may use per-view conditional
-processing functions.
+.. When you need more fine-grained control you may use per-view conditional
+   processing functions.
+
+より細かいコントロールが必要なら、ビューごとに条件付き処理関数を使ってください。
 
 .. conditional-decorators:
 
-The ``condition`` decorator
-===========================
+.. The ``condition`` decorator
+   ===========================
 
-Sometimes (in fact, quite often) you can create functions to rapidly compute the ETag_
-value or the last-modified time for a resource, **without** needing to do all
-the computations needed to construct the full view. Django can then use these
-functions to provide an "early bailout" option for the view processing.
-Telling the client that the content has not been modified since the last
-request, perhaps.
+``condition`` デコレータ
+========================
+
+.. Sometimes (in fact, quite often) you can create functions to rapidly compute the ETag_
+   value or the last-modified time for a resource, **without** needing to do all
+   the computations needed to construct the full view. Django can then use these
+   functions to provide an "early bailout" option for the view processing.
+   Telling the client that the content has not been modified since the last
+   request, perhaps.
+
+リソースへの ETag_ の値、最終変更日時を素早く算出する関数を、ビューをすべて
+コーディングする必要 *なしに* 作れます。ときおり (実際には頻繁に) 役立ちます。
+Django ではそれらの関数を使用することで、ビューの処理のための "早期救済
+(early bailout)" オプションを提供できます。クライアントに、コンテンツの内容が
+最後のリクエスト以来修正されていないと伝えます。
 
 .. _ETag: http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.11
 
-These two functions are passed as parameters the
-``django.views.decorators.http.condition`` decorator. This decorator uses
-the two functions (you only need to supply one, if you can't compute both
-quantities easily and quickly) to work out if the headers in the HTTP request
-match those on the resource. If they don't match, a new copy of the resource
-must be computed and your normal view is called.
+.. The two functions, to compute the ETag and the last modified time, will be
+   passed the incoming ``request`` object and the same parameters, in the same
+   order, as the view function they are helping to wrap. The function passed
+   ``last_modified_func`` should return a standard datetime value specifying the
+   last time the resource was modified, or ``None`` if the resource doesn't
+   exist. The function passed to the ``etag`` decorator should return a string
+   representing the `Etag`_ for the resource, or ``None`` if it doesn't exist.
 
-The ``condition`` decorator's signature looks like this::
+これら 2 つの関数は、パラメータとして ``django.views.decorators.http.condition``
+デコレータに渡されます。HTTP リクエストのヘッダがコンテンツ上のものとマッチする
+とき、このデコレータは 2 つの関数を使って解決します。 (両者を素早く、容易に
+計算できない場合、どちらか 1 つを提供する必要があります) 。マッチしない場合は、
+リソースの新しいコピーができ、通常のビューが呼ばれます。
+
+.. The ``condition`` decorator's signature looks like this::
+
+       condition(etag_func=None, last_modified_func=None)
+
+``condition`` デコレータは以下のようになります::
 
     condition(etag_func=None, last_modified_func=None)
 
-The two functions, to compute the ETag and the last modified time, will be
-passed the incoming ``request`` object and the same parameters, in the same
-order, as the view function they are helping to wrap. The function passed
-``last_modified_func`` should return a standard datetime value specifying the
-last time the resource was modified, or ``None`` if the resource doesn't
-exist. The function passed to the ``etag`` decorator should return a string
-representing the `Etag`_ for the resource, or ``None`` if it doesn't exist.
+.. The two functions, to compute the ETag and the last modified time, will be
+   passed the incoming ``request`` object and the same parameters, in the same
+   order, as the view function they are helping to wrap. The function passed
+   ``last_modified_func`` should return a standard datetime value specifying the
+   last time the resource was modified, or ``None`` if the resource doesn't
+   exist. The function passed to the ``etag`` decorator should return a string
+   representing the `Etag`_ for the resource, or ``None`` if it doesn't exist.
 
-Using this feature usefully is probably best explained with an example.
-Suppose you have this pair of models, representing a simple blog system::
+ETag と最終変更日時を計算する 2 つの関数は、 ``request`` オブジェクトとその他の
+同じ引数を、同じ順序で、ラップされるビュー関数と同様に受け取ります。
+``last_modified_func`` に渡される関数が返すべき値は、リソースが変更された時間を
+特定する標準の datetime 値です。リソースが存在しないなら ``None`` です。
+``etag`` デコレータに渡される関数が返すべき値は、リソースへの `Etag`_ を表す
+文字列です。リソースが存在しないなら ``None`` です。
+
+.. Using this feature usefully is probably best explained with an example.
+   Suppose you have this pair of models, representing a simple blog system::
+
+       import datetime
+           from django.db import models
+
+       class Blog(models.Model):
+           ...
+
+       class Entry(models.Model):
+           blog = models.ForeignKey(Blog)
+           published = models.DateTimeField(default=datetime.datetime.now)
+           ...
+
+例で、この機能の有用な使い方を説明します。以下のような 2 つのモデルがあると仮定
+します。これは単純なブログシステムを表現しています::
 
     import datetime
     from django.db import models
@@ -80,16 +143,32 @@ Suppose you have this pair of models, representing a simple blog system::
         published = models.DateTimeField(default=datetime.datetime.now)
         ...
 
-If the front page, displaying the latest blog entries, only changes when you
-add a new blog entry, you can compute the last modified time very quickly. You
-need the latest ``published`` date for every entry associated with that blog.
-One way to do this would be::
+.. If the front page, displaying the latest blog entries, only changes when you
+   add a new blog entry, you can compute the last modified time very quickly. You
+   need the latest ``published`` date for every entry associated with that blog.
+   One way to do this would be::
+
+       def latest_entry(request, blog_id):
+           return Entry.objects.filter(blog=blog_id).latest("published").published
+
+最新のブログ記事を表示するフロントページが、新しいブログ記事を追加したときのみ
+変更されるとすると、このときの最終変更日時は非常に素早く計算できます。 その
+ブログに関連付けられた全エントリのうち、最新の ``published`` 日時が必要です。
+以下のようになります::
 
     def latest_entry(request, blog_id):
         return Entry.objects.filter(blog=blog_id).latest("published").published
 
-You can then use this function to provide early detection of an unchanged page
-for your front page view::
+.. You can then use this function to provide early detection of an unchanged page
+   for your front page view::
+
+       from django.views.decorators.http import condition
+
+       @condition(last_modified_func=latest_entry)
+       def front_page(request, blog_id):
+        ...
+
+この関数を使って、フロントページビューが変更されていないことを知らせられます::
 
     from django.views.decorators.http import condition
 
@@ -97,114 +176,192 @@ for your front page view::
     def front_page(request, blog_id):
         ...
 
-Of course, if you're using Python 2.3 or prefer not to use the decorator
-syntax, you can write the same code as follows, there is no difference::
+.. Shortcuts for only computing one value
+   ======================================
 
-    def front_page(request, blog_id):
-        ...
-    front_page = condition(last_modified_func=latest_entry)(front_page)
-
-Shortcuts for only computing one value
+1 つの値を計算するだけのショートカット
 ======================================
 
-As a general rule, if you can provide functions to compute *both* the ETag and
-the last modified time, you should do so. You don't know which headers any
-given HTTP client will send you, so be prepared to handle both. However,
-sometimes only one value is easy to compute and Django provides decorators
-that handle only ETag or only last-modified computations.
+.. As a general rule, if you can provide functions to compute *both* the ETag and
+   the last modified time, you should do so. You don't know which headers any
+   given HTTP client will send you, so be prepared to handle both. However,
+   sometimes only one value is easy to compute and Django provides decorators
+   that handle only ETag or only last-modified computations.
 
-The ``django.views.decorators.http.etag`` and
-``django.views.decorators.http.last_modified`` decorators are passed the same
-type of functions as the ``condition`` decorator. Their signatures are::
+一般的なルールとして、 ETag と最終変更日時の *両方を* 計算する関数を提供できる
+なら、そうするべきです。任意の HTTP クライアントがどのヘッダを送るかは分からない
+ので、両方を扱えるよう用意すべきです。しかし、 1 つの値だけを計算するのは簡単
+なので、 Django は ETag か最終変更日時の 1 つだけを計算するデコレータを提供して
+います。
+
+.. The ``django.views.decorators.http.etag`` and
+   ``django.views.decorators.http.last_modified`` decorators are passed the same
+   type of functions as the ``condition`` decorator. Their signatures are::
+
+       etag(etag_func)
+       last_modified(last_modified_func)
+
+``django.views.decorators.http.etag`` と
+``django.views.decorators.http.last_modified`` デコレータには同じ種類の関数を
+渡します。 ``condition`` デコレータと同じです。こんな感じです::
 
     etag(etag_func)
     last_modified(last_modified_func)
 
-We could write the earlier example, which only uses a last-modified function,
-using one of these decorators::
+.. We could write the earlier example, which only uses a last-modified function,
+   using one of these decorators::
+
+       @last_modified(latest_entry)
+       def front_page(request, blog_id):
+           ...
+
+両デコレータのうちの、 last-modified 関数を使用して前述の例を書けます::
 
     @last_modified(latest_entry)
     def front_page(request, blog_id):
         ...
 
-...or::
+.. ...or::
+
+       def front_page(request, blog_id):
+           ...
+       front_page = last_modified(latest_entry)(front_page)
+
+...あるいは::
 
     def front_page(request, blog_id):
         ...
     front_page = last_modified(latest_entry)(front_page)
 
-Use ``condition`` when testing both conditions
-------------------------------------------------
+.. Use ``condition`` when testing both conditions
+   ------------------------------------------------
 
-It might look nicer to some people to try and chain the ``etag`` and
-``last_modified`` decorators if you want to test both preconditions. However,
-this would lead to incorrect behavior.
+両条件を検査するのに ``condition`` を使う
+-----------------------------------------
+
+.. It might look nicer to some people to try and chain the ``etag`` and
+   ``last_modified`` decorators if you want to test both preconditions. However,
+   this would lead to incorrect behavior.
+
+両方の前提条件を検査するとき、 ``etag`` 、 ``last_modified`` デコレータを
+繋いで使うば良いと思えるかもしれません。しかしこれは不正な動作を起こします。
 
 ::
 
-    # Bad code. Don't do this!
+    # ダメコード。マネしないでね！
     @etag(etag_func)
     @last_modified(last_modified_func)
     def my_view(request):
         # ...
 
-    # End of bad code.
+    # ダメコード終了
 
-The first decorator doesn't know anything about the second and might
-answer that the response is not modified even if the second decorators would
-determine otherwise. The ``condition`` decorator uses both callback functions
-simultaneously to work out the right action to take.
+.. The first decorator doesn't know anything about the second and might
+   answer that the response is not modified even if the second decorators would
+   determine otherwise. The ``condition`` decorator uses both callback functions
+   simultaneously to work out the right action to take.
 
-Using the decorators with other HTTP methods
-============================================
+1 つめのデコレータは 2 つめについては何も知りません。 2 つめのデコレータが違う
+方法で答えを出したとしても、 1 つめのデコレータはレスポンスが修正されないと
+答えます。 ``condition`` デコレータは正しい動作をさせるために同時に両コール
+バック関数を使います。
 
-The ``condition`` decorator is useful for more than only ``GET`` and
-``HEAD`` requests (``HEAD`` requests are the same as ``GET`` in this
-situation). It can be used also to be used to provide checking for ``POST``,
-``PUT`` and ``DELETE`` requests. In these situations, the idea isn't to return
-a "not modified" response, but to tell the client that the resource they are
-trying to change has been altered in the meantime.
+.. Using the decorators with other HTTP methods
+   ============================================
 
-For example, consider the following exchange between the client and server:
+このデコレータを他の HTTP メソッドに使う
+========================================
 
-    1. Client requests ``/foo/``.
-    2. Server responds with some content with an ETag of ``"abcd1234"``.
-    3. Client sends an HTTP ``PUT`` request to ``/foo/`` to update the
-       resource. It also sends an ``If-Match: "abcd1234"`` header to specify
-       the version it is trying to update.
-    4. Server checks to see if the resource has changed, by computing the ETag
-       the same way it does for a ``GET`` request (using the same function).
-       If the resource *has* changed, it will return a 412 status code code,
-       meaning "precondition failed".
-    5. Client sends a ``GET`` request to ``/foo/``, after receiving a 412
-       response, to retrieve an updated version of the content before updating
-       it.
+.. The ``condition`` decorator is useful for more than only ``GET`` and
+   ``HEAD`` requests (``HEAD`` requests are the same as ``GET`` in this
+   situation). It can be used also to be used to provide checking for ``POST``,
+   ``PUT`` and ``DELETE`` requests. In these situations, the idea isn't to return
+   a "not modified" response, but to tell the client that the resource they are
+   trying to change has been altered in the meantime.
 
-The important thing this example shows is that the same functions can be used
-to compute the ETag and last modification values in all situations. In fact,
-you **should** use the same functions, so that the same values are returned
-every time.
+``condition`` デコレータは ``GET`` 、 ``HEAD`` リクエスト以外にも使えます (この
+場合 ``HEAD`` リクエストは ``GET`` と同じです) 。 ``POST`` 、 ``PUT`` 、
+``DELETE`` リクエストのチェックを提供するために使えます。この場合、
+"not modified" レスポンスは返されません。変更しようとしたリソースが、その間に
+すでに変わっていたことをクライアントに伝えます。
 
-Comparison with middleware conditional processing
-=================================================
+.. For example, consider the following exchange between the client and server:
 
-You may notice that Django already provides simple and straightforward
-conditional ``GET`` handling via the
-:class:`django.middleware.http.ConditionalGetMiddleware` and
-:class:`~django.middleware.common.CommonMiddleware`. Whilst certainly being
-easy to use and suitable for many situations, those pieces of middleware
-functionality have limitations for advanced usage:
+例えば、次のクライアントとサーバのやりとりを考えてみましょう:
 
-    * They are applied globally to all views in your project
-    * They don't save you from generating the response itself, which may be
-      expensive
-    * They are only appropriate for HTTP ``GET`` requests.
+.. 1. Client requests ``/foo/``.
+   2. Server responds with some content with an ETag of ``"abcd1234"``.
+   3. Client sends an HTTP ``PUT`` request to ``/foo/`` to update the
+      resource. It also sends an ``If-Match: "abcd1234"`` header to specify
+      the version it is trying to update.
+   4. Server checks to see if the resource has changed, by computing the ETag
+      the same way it does for a ``GET`` request (using the same function).
+      If the resource *has* changed, it will return a 412 status code code,
+      meaning "precondition failed".
+   5. Client sends a ``GET`` request to ``/foo/``, after receiving a 412
+      response, to retrieve an updated version of the content before updating
+      it.
 
-You should choose the most appropriate tool for your particular problem here.
-If you have a way to compute ETags and modification times quickly and if some
-view takes a while to generate the content, you should consider using the
-``condition`` decorator described in this document. If everything already runs
-fairly quickly, stick to using the middleware and the amount of network
-traffic sent back to the clients will still be reduced if the view hasn't
-changed.
+1. クライアントが ``/foo/`` をリクエストします。
+2. サーバがコンテンツと ETag ``"abcd1234"`` を返します。
+3. クライアントが ``/foo/`` の更新に HTTP ``PUT`` リクエストを送信します。更新
+   しようとしているバージョンを特定する ``If-Match: "abcd1234"`` ヘッダも送信
+   します。
+4. サーバはリソースが変更されたかどうかチェックします。 ``GET`` リクエストのとき
+   と同じ方法 (同じ関数) で ETag を計算します。リソースが変更 *されていた*
+   ときは、"前提条件失敗 (precondition failed)" を意味する 412 ステータスコード
+   が返されます。
+5. 412 レスポンスを受信した後に、クライアントは ``/foo/`` に ``GET`` リクエスト
+   を送信します。コンテンツの変更前に、すでに変更されていたバージョンを取得
+   します。
 
+.. The important thing this example shows is that the same functions can be used
+   to compute the ETag and last modification values in all situations. In fact,
+   you **should** use the same functions, so that the same values are returned
+   every time.
+
+この例が示す重要なことは、すべての状況において ETag および最終変更日時を計算する
+ために、同じ関数を使用できるということです。実際には同じ関数を *使うべき* です。
+そうすることで、いつでも同じ値が返されます。
+
+.. Comparison with middleware conditional processing
+   =================================================
+
+ミドルウェアによる条件処理との比較
+==================================
+
+.. You may notice that Django already provides simple and straightforward
+   conditional ``GET`` handling via the
+   :class:`django.middleware.http.ConditionalGetMiddleware` and
+   :class:`~django.middleware.common.CommonMiddleware`. Whilst certainly being
+   easy to use and suitable for many situations, those pieces of middleware
+   functionality have limitations for advanced usage:
+
+Django は、簡単で分かりやすい条件付き ``GET`` 処理を
+:class:`django.middleware.http.ConditionalGetMiddleware` と
+:class:`~django.middleware.common.CommonMiddleware` によって提供しています。
+確かに使いやすく、多くの状況に適していますが、それらミドルウェア機能性の一部には
+高度な使用法に制限があります:
+
+.. * They are applied globally to all views in your project
+   * They don't save you from generating the response itself, which may be
+     expensive
+   * They are only appropriate for HTTP ``GET`` requests.
+
+* プロジェクトの全てのビューに適応されます。
+* レスポンスそのものの生成の助けになりません。重い処理になることがあります。
+* HTTP ``GET`` リクエストにのみ使えます。
+
+.. You should choose the most appropriate tool for your particular problem here.
+   If you have a way to compute ETags and modification times quickly and if some
+   view takes a while to generate the content, you should consider using the
+   ``condition`` decorator described in this document. If everything already runs
+   fairly quickly, stick to using the middleware and the amount of network
+   traffic sent back to the clients will still be reduced if the view hasn't
+   changed.
+
+問題にあわせて適したものを選ぶべきです。 ETag と変更日時を素早く計算でき、ある
+ビューがコンテンツの生成に時間がかかる場合、先述した ``condition`` デコレータの
+使用を考慮すべきです。すべてがすでに高速化されているなら、ミドルウェアの使用が
+相応しいでしょう。ビューが変更されていなければクライアントに送信されるネット
+ワークのトラフィック量は、さらに小さくなります。
