@@ -1,0 +1,1090 @@
+.. ==================
+   Multiple databases
+   ==================
+
+=======================================
+マルチデータベース (Multiple databases)
+=======================================
+
+:revision-up-to: 17812 (1.4)
+
+.. versionadded:: 1.2
+
+.. This topic guide describes Django's support for interacting with
+   multiple databases. Most of the rest of Django's documentation assumes
+   you are interacting with a single database. If you want to interact
+   with multiple databases, you'll need to take some additional steps.
+
+このトピックガイドでは、 Django がマルチデータベースをサポートしたことについて
+述べられています。他の多くの Django ドキュメントでは単一のデータベースを扱う
+ことを想定しています。マルチデータベースを扱いたいなら、いくつか追加の手順を行う
+必要があります。
+
+.. Defining your databases
+   =======================
+
+データベースを定義する
+======================
+
+.. The first step to using more than one database with Django is to tell
+   Django about the database servers you'll be using. This is done using
+   the :setting:`DATABASES` setting. This setting maps database aliases,
+   which are a way to refer to a specific database throughout Django, to
+   a dictionary of settings for that specific connection. The settings in
+   the inner dictionaries are described fully in the :setting:`DATABASES`
+   documentation.
+
+Django で複数のデータベースを扱うための最初のステップは、使用したいデータベース
+サーバについて Django に伝えることです。これには :setting:`DATABASES` 設定を使い
+ます。データベースへのエイリアスを設定し、 Django 全体にわたって特定のデータ
+ベースを参照できるようにします。特定のデータベースとの接続を設定する辞書です。
+内部の辞書の設定については、すべて :setting:`DATABASES` ドキュメントで述べられて
+います。
+
+.. Databases can have any alias you choose. However, the alias
+   ``default`` has special significance. Django uses the database with
+   the alias of ``default`` when no other database has been selected. If
+   you don't have a ``default`` database, you need to be careful to
+   always specify the database that you want to use.
+
+データベースにはどんなエイリアスでも設定できます。しかし、 ``default`` は特別な
+意味を持っています。Django は他のデータベースが一切選ばれていない場合に、
+``default`` によってデータベースを使います。 ``default`` データベースが無い
+場合は、常に使うデータベースの指定に気をつけてください。
+
+.. The following is an example ``settings.py`` snippet defining two
+   databases -- a default PostgreSQL database and a MySQL database called
+   ``users``:
+
+以下の例は ``settings.py`` の一部で、 2 つのデータベースを定義しています。デフォ
+ルトが PostgreSQL データベースで、 ``users`` は MySQL データベースを呼び出し
+ます:
+
+.. code-block:: python
+
+    DATABASES = {
+        'default': {
+            'NAME': 'app_data',
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'USER': 'postgres_user',
+            'PASSWORD': 's3krit'
+        },
+        'users': {
+            'NAME': 'user_data',
+            'ENGINE': 'django.db.backends.mysql',
+            'USER': 'mysql_user',
+            'PASSWORD': 'priv4te'
+        }
+    }
+
+.. If you attempt to access a database that you haven't defined in your
+   :setting:`DATABASES` setting, Django will raise a
+   ``django.db.utils.ConnectionDoesNotExist`` exception.
+
+:setting:`DATABASES` 設定に定義していないデータベースにアクセスすると、
+``django.db.utils.ConnectionDoesNotExist`` 例外が送出されます。
+
+.. Synchronizing your databases
+   ============================
+
+データベースの同期
+==================
+
+.. The :djadmin:`syncdb` management command operates on one database at a
+   time. By default, it operates on the ``default`` database, but by
+   providing a :djadminopt:`--database` argument, you can tell syncdb to
+   synchronize a different database. So, to synchronize all models onto
+   all databases in our example, you would need to call::
+
+       $ ./manage.py syncdb
+       $ ./manage.py syncdb --database=users
+
+:djadmin:`syncdb` 管理コマンドは 1 度に 1 つのデータベースを操作します。デフォ
+ルトでは ``default`` データベースが操作されます。 :djadminopt:`--database` 引数
+を与えることで、 syncdb に他のデータベースを同期するよう指示できます。例における
+全データベースの全モデルを同期するには、以下を実行する必要があります::
+
+    $ ./manage.py syncdb
+    $ ./manage.py syncdb --database=users
+
+.. If you don't want every application to be synchronized onto a
+   particular database, you can define a :ref:`database
+   router<topics-db-multi-db-routing>` that implements a policy
+   constraining the availability of particular models.
+
+どのアプリケーションも特定のデータベースに同期させたくないときは、
+:ref:`database router<topics-db-multi-db-routing>` を定義できます。これによって
+特定のモデルに利用制限を設けられます。
+
+.. Alternatively, if you want fine-grained control of synchronization,
+   you can pipe all or part of the output of :djadmin:`sqlall` for a
+   particular application directly into your database prompt, like this::
+
+       $ ./manage.py sqlall sales | ./manage.py dbshell
+
+他にも、粒度の小さい同期の制御をしたいなら、特定アプリケーションの
+:djadmin:`sqlall` の出力のすべてか一部を、直接データベースプロンプトにパイプし
+ます。こんなかんじです::
+
+    $ ./manage.py sqlall sales | ./manage.py dbshell
+
+.. Using other management commands
+   -------------------------------
+
+他の管理コマンドを使う
+----------------------
+
+.. The other ``django-admin.py`` commands that interact with the database
+   operate in the same way as :djadmin:`syncdb` -- they only ever operate
+   on one database at a time, using :djadminopt:`--database` to control
+   the database used.
+
+データベースを扱う他の ``django-admin.py`` コマンドは、 :djadmin:`syncdb` と
+同じように動作します。今までと同じく、データベースを制御するための
+:djadminopt:`--database` を使用します。は一度に 1 つのデータベース上でのみ動作し
+ます。
+
+.. _topics-db-multi-db-routing:
+
+.. Automatic database routing
+   ==========================
+
+自動データベースルーティング
+============================
+
+.. The easiest way to use multiple databases is to set up a database
+   routing scheme. The default routing scheme ensures that objects remain
+   'sticky' to their original database (i.e., an object retrieved from
+   the ``foo`` database will be saved on the same database). The default
+   routing scheme ensures that if a database isn't specified, all queries
+   fall back to the ``default`` database.
+
+マルチデータベースを扱う最も簡単な方法は、データベースルーティングスキーム
+(a database routing scheme) を設定することです。デフォルトのルーティングスキーム
+は、オブジェクトが元のデータベースに 'ベットリ (sticky)' なままであることを保証
+します (例えば ``foo`` データベースから取ってきたオブジェクトが、同じ ``foo``
+データベースに保存されるということ) 。デフォルトのルーティングスキームは、データ
+ベースが特定されていないと、全クエリを ``default`` データベースに返します。
+
+.. You don't have to do anything to activate the default routing scheme
+   -- it is provided 'out of the box' on every Django project. However,
+   if you want to implement more interesting database allocation
+   behaviors, you can define and install your own database routers.
+
+デフォルトのルーティングスキームを有効にする必要はありません。 '設定する必要なく
+(out of the box)' 全 Django プロジェクトで提供されています。より面白いデータ
+ベースの割り当てをしたいなら、個別のデータベースルータを定義、導入しましょう。
+
+.. Database routers
+   ----------------
+
+データベースルータ
+------------------
+
+.. A database Router is a class that provides up to four methods:
+
+データベースルータは、 4 つのメソッドを提供するクラスです。
+
+.. method:: db_for_read(model, **hints)
+
+    .. Suggest the database that should be used for read operations for
+       objects of type ``model``.
+
+    ``model`` タイプのオブジェクトの読み込み操作に使われるデータベースを提示
+    します。
+
+    .. If a database operation is able to provide any additional
+       information that might assist in selecting a database, it will be
+       provided in the ``hints`` dictionary. Details on valid hints are
+       provided :ref:`below <topics-db-multi-db-hints>`.
+
+    データベース操作においてデータベースを選ぶ助けになる追加の情報を提示できる
+    なら、 ``hints`` 辞書に提供します。妥当なヒントの詳細は
+    :ref:`こちら <topics-db-multi-db-hints>` に書かれています。
+
+    .. Returns None if there is no suggestion.
+
+    提示するものが無い場合は None を返します。
+
+.. method:: db_for_write(model, **hints)
+
+    .. Suggest the database that should be used for writes of objects of
+       type Model.
+
+    Model タイプのオブジェクトの書き込みに使われるデータベースを提示します。
+
+    .. If a database operation is able to provide any additional
+       information that might assist in selecting a database, it will be
+       provided in the ``hints`` dictionary. Details on valid hints are
+       provided :ref:`below <topics-db-multi-db-hints>`.
+
+    データベース操作においてデータベースを選ぶ助けになる追加の情報を提示できる
+    なら、 ``hints`` 辞書に提供します。妥当なヒントの詳細は
+    :ref:`こちら <topics-db-multi-db-hints>` に書かれています。
+
+    .. Returns None if there is no suggestion.
+
+    提示するものが無い場合は None を返します。
+
+.. method:: allow_relation(obj1, obj2, **hints)
+
+    .. Return True if a relation between obj1 and obj2 should be
+       allowed, False if the relation should be prevented, or None if
+       the router has no opinion. This is purely a validation operation,
+       used by foreign key and many to many operations to determine if a
+       relation should be allowed between two objects.
+
+    obj1 、 obj2 間のリレーションが許可されている場合 True 、リレーションが
+    許可されていない場合 False 、 ルータに設定がない場合 None を返します。単なる
+    検証の操作です。外部キー、多対多の操作において、リレーションが 2 オブジェク
+    ト間で許可されているかどうか判別するために使用されます。
+
+.. method:: allow_syncdb(db, model)
+
+    .. Determine if the ``model`` should be synchronized onto the
+       database with alias ``db``. Return True if the model should be
+       synchronized, False if it should not be synchronized, or None if
+       the router has no opinion. This method can be used to determine
+       the availability of a model on a given database.
+
+    ``model`` が ``db`` で与えられたデータベースと同期されるべきかどうかを判別し
+    ます。モデルが同期されるべきとき True 、 そうでないとき False 、 ルータに
+    設定がない場合 None を返します。このメソッドは与えられたデータベース上に
+    モデルが存在するかどうかを判別するのに使えます。
+
+.. A router doesn't have to provide *all* these methods -- it may omit one
+   or more of them. If one of the methods is omitted, Django will skip
+   that router when performing the relevant check.
+
+ルータはこれら *すべて* のメソッドを提供する必要はありません。 1 つかそれ以上は
+省略されるでしょう。あるメソッドが省略されれば、 Django は該当のチェックを行う
+とき、そのルータをスキップします。
+
+.. _topics-db-multi-db-hints:
+
+.. Hints
+   ~~~~~
+
+ヒント
+~~~~~~
+
+.. The hints received by the database router can be used to decide which
+   database should receive a given request.
+
+データベースルータから受け取ったヒントによって、与えられたリクエストをどのデータ
+ベースで受け取るべきかを決めます。
+
+.. At present, the only hint that will be provided is ``instance``, an
+   object instance that is related to the read or write operation that is
+   underway. This might be the instance that is being saved, or it might
+   be an instance that is being added in a many-to-many relation. In some
+   cases, no instance hint will be provided at all. The router checks for
+   the existence of an instance hint, and determine if that hint should be
+   used to alter routing behavior.
+
+今のところ、提供される唯一のヒントは ``instance`` です。実行中の読み込み、もしく
+は書き込み操作に関連づけられたオブジェクトのインスタンスです。これは保存された
+インスタンスか、多対多のリレーションに追加されたインスタンスになります。場合に
+よっては、インスタンスヒントは全く提供されません。ルータはインスタンスヒントの
+存在をチェックします。ルーティングの振る舞いを変えるためにヒントが使われるべきか
+どうか判断します。
+
+.. Using routers
+   -------------
+
+ルータを使う
+------------
+
+.. Database routers are installed using the :setting:`DATABASE_ROUTERS`
+   setting. This setting defines a list of class names, each specifying a
+   router that should be used by the master router
+   (``django.db.router``).
+
+データベースルータは :setting:`DATABASE_ROUTERS` 設定によって導入されます。
+この設定ではクラス名のリストを定義します。マスタールータ (``django.db.router``)
+に使われるべきルータを指定します。
+
+.. The master router is used by Django's database operations to allocate
+   database usage. Whenever a query needs to know which database to use,
+   it calls the master router, providing a model and a hint (if
+   available). Django then tries each router in turn until a database
+   suggestion can be found. If no suggestion can be found, it tries the
+   current ``_state.db`` of the hint instance. If a hint instance wasn't
+   provided, or the instance doesn't currently have database state, the
+   master router will allocate the ``default`` database.
+
+マスタールータは Django のデータベース操作に使われます。これはデータベースに処理
+を割り当てるために使われます。クエリがどのデータベースを使うべきか知る必要がある
+ときは常にマスタールータが呼び出されます。その際モデルと (有効な場合は) ヒントが
+ルータに提供されます。データベースが提示されるまで、 Django は順番に各ルータを
+試します。提示されない場合、現在のヒントインスタンスの ``_state.db`` を試し
+ます。ヒントインスタンスが提供されないか、インスタンスがデータベースステートを
+保持していない場合、マスタールータは ``default`` データベースを割り当てます。
+
+.. An example
+   ----------
+
+例
+---
+
+.. .. admonition:: Example purposes only!
+
+       This example is intended as a demonstration of how the router
+       infrastructure can be used to alter database usage. It
+       intentionally ignores some complex issues in order to
+       demonstrate how routers are used.
+
+       This example won't work if any of the models in ``myapp`` contain
+       relationships to models outside of the ``other`` database.
+       :ref:`Cross-database relationships <no_cross_database_relations>`
+       introduce referential integrity problems that Django can't
+       currently handle.
+
+       The master/slave configuration described is also flawed -- it
+       doesn't provide any solution for handling replication lag (i.e.,
+       query inconsistencies introduced because of the time taken for a
+       write to propagate to the slaves). It also doesn't consider the
+       interaction of transactions with the database utilization strategy.
+
+.. admonition:: 例の狙い!
+
+   この例はデモンストレーションを意図しています。ルータインフラストラクチャ
+   (the router infrastructure) が、データベースの使い方を変えるために、どの
+   ように使えるかのデモンストレーションです。デモンストレーションに際して、
+   いくつかの複雑な問題はあえて無視します。
+
+   ``myapp`` 中のモデルのうちのどれかが ``other`` データベース外のモデルとの関係
+   を含んでいれば、この例は動きません。
+   :ref:`Cross-database relationships <no_cross_database_relations>` では、
+   Django が今のところ扱えない参照整合性の問題を紹介しています。
+
+   記載されているマスター/スレーブ構成にも欠陥があります。応答の遅延を扱う上で、
+   なんの解法も提供しません (つまり、クエリ不一致によって、スレーブに伝播させる
+   ための書き込みに時間が取られるからです) 。
+
+.. So - what does this mean in practice? Say you want ``myapp`` to
+   exist on the ``other`` database, and you want all other models in a
+   master/slave relationship between the databases ``master``, ``slave1`` and
+   ``slave2``. To implement this, you would need 2 routers::
+
+       class MyAppRouter(object):
+           """A router to control all database operations on models in
+           the myapp application"""
+   
+           def db_for_read(self, model, **hints):
+               "Point all operations on myapp models to 'other'"
+               if model._meta.app_label == 'myapp':
+                   return 'other'
+               return None
+
+           def db_for_write(self, model, **hints):
+               "Point all operations on myapp models to 'other'"
+               if model._meta.app_label == 'myapp':
+                   return 'other'
+               return None
+
+           def allow_relation(self, obj1, obj2, **hints):
+               "Allow any relation if a model in myapp is involved"
+               if obj1._meta.app_label == 'myapp' or obj2._meta.app_label == 'myapp':
+                   return True
+               return None
+
+           def allow_syncdb(self, db, model):
+               "Make sure the myapp app only appears on the 'other' db"
+               if db == 'other':
+                   return model._meta.app_label == 'myapp'
+               elif model._meta.app_label == 'myapp':
+                   return False
+               return None
+
+       class MasterSlaveRouter(object):
+           """A router that sets up a simple master/slave configuration"""
+
+           def db_for_read(self, model, **hints):
+               "Point all read operations to a random slave"
+               return random.choice(['slave1','slave2'])
+
+           def db_for_write(self, model, **hints):
+               "Point all write operations to the master"
+               return 'master'
+
+           def allow_relation(self, obj1, obj2, **hints):
+               "Allow any relation between two objects in the db pool"
+               db_list = ('master','slave1','slave2')
+               if obj1._state.db in db_list and obj2._state.db in db_list:
+                   return True
+               return None
+
+           def allow_syncdb(self, db, model):
+               "Explicitly put all models on all databases."
+               return True
+
+実際どんな意味があるのでしょう？ ``myapp`` が ``other`` データベースに存在し、
+その他のモデルは ``master`` 、 ``slave1`` 、 ``slave2`` 間の、マスター/スレーブ
+構成に存在して欲しいとしましょう。これを実現するには、 2 つのルータが必要です::
+
+     class MyAppRouter(object):
+        """myapp アプリケーションのモデルの全データベース操作を制御するルータ"""
+
+        def db_for_read(self, model, **hints):
+            "myapp モデルの全操作を 'other' に向ける"
+            if model._meta.app_label == 'myapp':
+                return 'other'
+            return None
+
+         def db_for_write(self, model, **hints):
+            "myapp モデルの全操作を 'other' に向ける"
+            if model._meta.app_label == 'myapp':
+                return 'other'
+            return None
+
+         def allow_relation(self, obj1, obj2, **hints):
+            "myqpp 中のモデルが含まれている場合、全リレーションを許可"
+            if obj1._meta.app_label == 'myapp' or obj2._meta.app_label == 'myapp':
+                return True
+            return None
+
+         def allow_syncdb(self, db, model):
+            "myapp アプリケーションが 'other' DB にのみあることを確かなものとする"
+            if db == 'other':
+                return model._meta.app_label == 'myapp'
+            elif model._meta.app_label == 'myapp':
+                return False
+            return None
+
+     class MasterSlaveRouter(object):
+        """単純なマスター/スレーブ構成を設けるルータ"""
+
+        def db_for_read(self, model, **hints):
+            "全読み込み操作をランダムなスレーブに向ける"
+            return random.choice(['slave1','slave2'])
+
+         def db_for_write(self, model, **hints):
+            "全書き込み操作をマスターに向ける"
+            return 'master'
+
+         def allow_relation(self, obj1, obj2, **hints):
+            "DB プール内で 2 オブジェクト間のリレーションを許可"
+            db_list = ('master','slave1','slave2')
+            if obj1._state.db in db_list and obj2._state.db in db_list:
+                return True
+            return None
+
+         def allow_syncdb(self, db, model):
+            "全データベース上に全モデルを明示的に配置する"
+            return True
+
+.. Then, in your settings file, add the following (substituting ``path.to.`` with
+   the actual python path to the module where you define the routers)::
+
+       DATABASE_ROUTERS = ['path.to.MyAppRouter', 'path.to.MasterSlaveRouter']
+
+ここで設定ファイルに、以下を追加します (``path.to.`` は、ルータを定義した
+モジュールへの実際の Python パスで置き換えます)::
+
+    DATABASE_ROUTERS = ['path.to.MyAppRouter', 'path.to.MasterSlaveRouter']
+
+.. The order in which routers are processed is significant. Routers will
+   be queried in the order the are listed in the
+   :setting:`DATABASE_ROUTERS` setting . In this example, the
+   ``MyAppRouter`` is processed before the ``MasterSlaveRouter``, and as a
+   result, decisions concerning the models in ``myapp`` are processed
+   before any other decision is made. If the :setting:`DATABASE_ROUTERS`
+   setting listed the two routers in the other order,
+   ``MasterSlaveRouter.allow_syncdb()`` would be processed first. The
+   catch-all nature of the MasterSlaveRouter implementation would mean
+   that all models would be available on all databases.
+
+ルータが処理される順序は重要です。ルータは :setting:`DATABASE_ROUTERS` 設定に
+記述されている順序で問い合わせされます。この例では ``MyAppRouter`` が
+``MasterSlaveRouter`` よりも前に処理されます。結果として、 ``myapp`` 中のモデル
+に関する決定は、他の決定が行われるより前に処理されます。もし
+:setting:`DATABASE_ROUTERS` 設定が、違う順序で 2 つのルータを並べている場合、
+``MasterSlaveRouter.allow_syncdb()`` が最初に処理されるでしょう。
+MasterSlaveRouter の多目的な性質が示すのは、全モデルが全データベース上で利用可能
+であろうということです。
+
+.. With this setup installed, lets run some Django code::
+
+       >>> # This retrieval will be performed on the 'credentials' database
+       >>> fred = User.objects.get(username='fred')
+       >>> fred.first_name = 'Frederick'
+
+       >>> # This save will also be directed to 'credentials'
+       >>> fred.save()
+
+       >>> # These retrieval will be randomly allocated to a slave database
+       >>> dna = Person.objects.get(name='Douglas Adams')
+
+       >>> # A new object has no database allocation when created
+       >>> mh = Book(title='Mostly Harmless')
+
+       >>> # This assignment will consult the router, and set mh onto
+       >>> # the same database as the author object
+       >>> mh.author = dna
+
+       >>> # This save will force the 'mh' instance onto the master database...
+       >>> mh.save()
+
+       >>> # ... but if we re-retrieve the object, it will come back on a slave
+       >>> mh = Book.objects.get(title='Mostly Harmless')
+
+このセットアップが導入できたら、 Django コードをいくつか走らせてみましょう::
+
+    >>> # この検索は 'credentials' データベース上で行われるでしょう
+    >>> fred = User.objects.get(username='fred')
+    >>> fred.first_name = 'Frederick'
+
+    >>> # この保存も 'credentials' に直接行われます
+    >>> fred.save()
+
+    >>> # これらの検索はスレーブデータベースにランダムに割り当てられます
+    >>> dna = Person.objects.get(name='Douglas Adams')
+
+    >>> # 新しいオブジェクトが作られた際はデータベースに対する割り当てがありません
+    >>> mh = Book(title='Mostly Harmless')
+
+    >>> # この割り当てはルータに助言を求め、 mh を author オブジェクトと同様に、
+        # 同じデータベースに割り当てます
+    >>> mh.author = dna
+
+    >>> # この保存は、マスターデータベース上に 'mh' インスタンス強制します
+    >>> mh.save()
+
+    >>> # しかし再度オブジェクトを取り出すと、再びスレーブに戻ってきます
+    >>> mh = Book.objects.get(title='Mostly Harmless')
+
+
+.. Manually selecting a database
+   =============================
+
+データベースの手動選択
+======================
+
+.. Django also provides an API that allows you to maintain complete control
+   over database usage in your code. A manually specified database allocation
+   will take priority over a database allocated by a router.
+
+さらに Django は、コードの中でデータベース処理を完全にコントロールできる API を
+提供しています。手動でのデータベース割り当ては、ルータによるデータベース割り当て
+よりも優先されます。
+
+.. Manually selecting a database for a ``QuerySet``
+   ------------------------------------------------
+
+``QuerySet`` のためのデータベース手動選択
+-----------------------------------------
+
+.. You can select the database for a ``QuerySet`` at any point in the
+   ``QuerySet`` "chain." Just call ``using()`` on the ``QuerySet`` to get
+   another ``QuerySet`` that uses the specified database.
+
+``QuerySet`` "チェーン (chain)" のどの点に置いても、 ``QuerySet`` のためにデータ
+ベースを選択できます。ただ、 ``QuerySet`` から ``using()`` を呼び出すだけで、
+特定のデータベースを使う他の ``QuerySet`` を取得できます。
+
+.. ``using()`` takes a single argument: the alias of the database on
+   which you want to run the query. For example::
+
+       >>> # This will run on the 'default' database.
+       >>> Author.objects.all()
+
+       >>> # So will this.
+       >>> Author.objects.using('default').all()
+
+       >>> # This will run on the 'other' database.
+       >>> Author.objects.using('other').all()
+
+``using()`` は引数を 1 つだけ受け取ります。クエリを走らせたいデータベースへ名を
+受け取ります。例えば::
+
+    >>> # これは 'default' データベースで実行されます
+    >>> Author.objects.all()
+
+    >>> # So will this.
+    >>> Author.objects.using('default').all()
+
+    >>> # これは 'other' データベースで実行されます
+    >>> Author.objects.using('other').all()
+
+.. Selecting a database for ``save()``
+   -----------------------------------
+
+``save()`` のためのデータベース選択
+-----------------------------------
+
+.. Use the ``using`` keyword to ``Model.save()`` to specify to which
+   database the data should be saved.
+
+``Model.save()`` で ``using`` キーワードを使って、どのデータベースにデータを
+保存するかを特定できます。
+
+.. For example, to save an object to the ``legacy_users`` database, you'd
+   use this::
+
+       >>> my_object.save(using='legacy_users')
+
+例えば、 ``legacy_users`` データベースへオブジェクトを保存としたいとすると、
+このようにします::
+
+    >>> my_object.save(using='legacy_users')
+
+.. If you don't specify ``using``, the ``save()`` method will save into
+   the default database allocated by the routers.
+
+``using`` によって特定しない場合は、 ``save()`` はルータに割り当てられたデフォル
+トのデータベースに保存します。
+
+.. Moving an object from one database to another
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+あるデータベースから他のデータベースにオブジェクを移動する
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. If you've saved an instance to one database, it might be tempting to
+   use ``save(using=...)`` as a way to migrate the instance to a new
+   database. However, if you don't take appropriate steps, this could
+   have some unexpected consequences.
+
+あるデータベースにインスタンスをセーブした場合は、新しいデータベースにインスタ
+ンスを移行する手段として、 ``save(using=...)`` を使うためことは魅了的かもしれ
+ません。
+
+.. Consider the following example::
+
+       >>> p = Person(name='Fred')
+       >>> p.save(using='first')  # (statement 1)
+       >>> p.save(using='second') # (statement 2)
+
+以下の例を考えてください::
+
+    >>> p = Person(name='Fred')
+    >>> p.save(using='first')  # (命令 1)
+    >>> p.save(using='second') # (命令 2)
+
+.. In statement 1, a new ``Person`` object is saved to the ``first``
+   database. At this time, ``p`` doesn't have a primary key, so Django
+   issues a SQL ``INSERT`` statement. This creates a primary key, and
+   Django assigns that primary key to ``p``.
+
+命令 1 において、新しい ``Person`` オブジェクトは ``first`` データベースに保存
+されています。この場合、 ``p`` はプライマリキーを持たないので、 Django は SQL の
+``INSERT`` 命令を発行します。これはプライマリキーを生成し、 Django は ``p`` に
+プライマリキーを付与します。
+
+.. When the save occurs in statement 2, ``p`` already has a primary key
+   value, and Django will attempt to use that primary key on the new
+   database. If the primary key value isn't in use in the ``second``
+   database, then you won't have any problems -- the object will be
+   copied to the new database.
+
+命令 2 によって保存が行われるとき、 ``p`` はすでにプライマリキーの値を保持して
+おり、 Djagno はそのプライマリキーを新しいデータベースで使用しようとしています。
+そのプライマリキーが ``second`` データベースで使われていない場合は、何の問題は
+ありません。新しいデータベースにそのオブジェクトがコピーされます。
+
+.. However, if the primary key of ``p`` is already in use on the
+   ``second`` database, the existing object in the ``second`` database
+   will be overridden when ``p`` is saved.
+
+しかし、 ``p`` のプライマリキーがすでに ``second`` データベースで使われている
+場合は、 ``second`` データベースの現行のオブジェクトは ``p`` が保存された際に
+上書きされます。
+
+.. You can avoid this in two ways. First, you can clear the primary key
+   of the instance. If an object has no primary key, Django will treat it
+   as a new object, avoiding any loss of data on the ``second``
+   database::
+
+       >>> p = Person(name='Fred')
+       >>> p.save(using='first')
+       >>> p.pk = None # Clear the primary key.
+       >>> p.save(using='second') # Write a completely new object.
+
+これ避けるには 2 つの方法があります。 1 つめは、インスタンスのプライマリキーを
+消してしまうことです。オブジェクトにプライマリキーが無い場合は、 Django はそれを
+新しいオブジェクトとして扱います。これによって ``second`` データベースからは
+何も消えません::
+
+    >>> p = Person(name='Fred')
+    >>> p.save(using='first')
+    >>> p.pk = None # Clear the primary key.
+    >>> p.save(using='second') # Write a completely new object.
+
+.. The second option is to use the ``force_insert`` option to ``save()``
+   to ensure that Django does a SQL ``INSERT``::
+
+       >>> p = Person(name='Fred')
+       >>> p.save(using='first')
+       >>> p.save(using='second', force_insert=True)
+
+2 つめの選択肢は、 ``save()`` で  ``force_insert`` オプションを使うことです。
+これは Django に SQL ``INSERT`` を実行させます。
+
+    >>> p = Person(name='Fred')
+    >>> p.save(using='first')
+    >>> p.save(using='second', force_insert=True)
+
+.. This will ensure that the person named ``Fred`` will have the same
+   primary key on both databases. If that primary key is already in use
+   when you try to save onto the ``second`` database, an error will be
+   raised.
+
+これは ``Fred`` という名の人物 (person) が、同じプライマリキーを両方のデータ
+ベース上で保有していることを保証します。その ``second`` データベースに書き込もう
+としたときにプライマリキーがすでに使われている場合、エラーが送出されます。
+
+.. Selecting a database to delete from
+   -----------------------------------
+
+削除用のデータベースを選択する
+------------------------------
+
+.. By default, a call to delete an existing object will be executed on
+   the same database that was used to retrieve the object in the first
+   place::
+
+       >>> u = User.objects.using('legacy_users').get(username='fred')
+       >>> u.delete() # will delete from the `legacy_users` database
+
+デフォルトでは、既存のオブジェクトを削除するという要求は、オブジェクトの取得に
+使用されたデータベース上で実行されます::
+
+    >>> u = User.objects.using('legacy_users').get(username='fred')
+    >>> u.delete() # will delete from the `legacy_users` database
+
+.. To specify the database from which a model will be deleted, pass a
+   ``using`` keyword argument to the ``Model.delete()`` method. This
+   argument works just like the ``using`` keyword argument to ``save()``.
+
+モデルを削除するデータベースを特定するために、 ``using`` キーワード引数を
+``Model.delete()`` メソッドに渡します。この引数は ``save()`` の ``using``
+キーワード引数と似たように機能します。
+
+.. For example, if you're migrating a user from the ``legacy_users``
+   database to the ``new_users`` database, you might use these commands::
+
+       >>> user_obj.save(using='new_users')
+       >>> user_obj.delete(using='legacy_users')
+
+例えば、 ``legacy_users`` データベースから ``new_users`` データベースへ移行して
+いるとすると、以下のコマンドが使えます::
+
+    >>> user_obj.save(using='new_users')
+    >>> user_obj.delete(using='legacy_users')
+
+
+.. Using managers with multiple databases
+   --------------------------------------
+
+マルチデータベースでマネジャを使う
+----------------------------------
+
+.. Use the ``db_manager()`` method on managers to give managers access to
+   a non-default database.
+
+マネジャの ``db_manager()`` メソッドを使って、マネジャアクセスを非デフォルト
+データベースに渡してください。
+
+.. For example, say you have a custom manager method that touches the
+   database -- ``User.objects.create_user()``. Because ``create_user()``
+   is a manager method, not a ``QuerySet`` method, you can't do
+   ``User.objects.using('new_users').create_user()``. (The
+   ``create_user()`` method is only available on ``User.objects``, the
+   manager, not on ``QuerySet`` objects derived from the manager.) The
+   solution is to use ``db_manager()``, like this::
+
+       User.objects.db_manager('new_users').create_user(...)
+
+例えば ``User.objects.create_user()`` という、データベースに関するカスタムマネ
+ジャメソッドを持ってるとします。 ``create_user()`` はマネジャメソッドであって
+``QuerySet`` メソッドではないので、
+``User.objects.using('new_users').create_user()`` とはできません
+(``create_user()`` メソッドは ``User.objects`` で上のみ有効です。マネジャで
+あって、マネジャから得られた ``QuerySet`` オブジェクト上ではありません) 。この
+解法は以下のようになります::
+
+    User.objects.db_manager('new_users').create_user(...)
+
+.. ``db_manager()`` returns a copy of the manager bound to the database you specify.
+
+``db_manager()`` は指定したデータベースに紐づけたマネジャのコピーを返します。
+
+.. Using ``get_query_set()`` with multiple databases
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+マルチデータベースで ``get_query_set()`` を使う
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. If you're overriding ``get_query_set()`` on your manager, be sure to
+   either call the method on the parent (using ``super()``) or do the
+   appropriate handling of the ``_db`` attribute on the manager (a string
+   containing the name of the database to use).
+
+マネジャの ``get_query_set()`` をオーバーライドする際には、 (``super()`` を
+使って) 親を呼び出すか、マネージャの ``_db`` のつく属性  (使うデータベース名
+を含む文字列) を適切に扱ってください。
+
+.. For example, if you want to return a custom ``QuerySet`` class from
+   the ``get_query_set`` method, you could do this::
+
+       class MyManager(models.Manager):
+           def get_query_set(self):
+               qs = CustomQuerySet(self.model)
+               if self._db is not None:
+                   qs = qs.using(self._db)
+               return qs
+
+例えば ``get_query_set`` メソッドからカスタムされた ``QuerySet`` クラスを返し
+たいなら、こうしてください::
+
+    class MyManager(models.Manager):
+        def get_query_set(self):
+            qs = CustomQuerySet(self.model)
+            if self._db is not None:
+                qs = qs.using(self._db)
+            return qs
+
+.. Exposing multiple databases in Django's admin interface
+   =======================================================
+
+Django admin インタフェースにマルチデータベースを表示する
+=========================================================
+
+.. Django's admin doesn't have any explicit support for multiple
+   databases. If you want to provide an admin interface for a model on a
+   database other than that specified by your router chain, you'll
+   need to write custom :class:`~django.contrib.admin.ModelAdmin` classes
+   that will direct the admin to use a specific database for content.
+
+Django の admin は、マルチデータベースの明示的なサポートはしていません。ルータ
+チェインによって指定された他のデータベス上のモデルのため、 admin インタフェース
+を提供したいなら、カスタム :class:`~django.contrib.admin.ModelAdmin` クラスを
+書く必要があります。特定のデータベースを admin インタフェースのコンテンツに
+使用するように命令します。
+
+.. ``ModelAdmin`` objects have five methods that require customization for
+   multiple-database support::
+
+       class MultiDBModelAdmin(admin.ModelAdmin):
+           # A handy constant for the name of the alternate database.
+           using = 'other'
+
+           def save_model(self, request, obj, form, change):
+               # Tell Django to save objects to the 'other' database.
+               obj.save(using=self.using)
+
+           def delete_model(self, request, obj):
+               # Tell Django to delete objects from the 'other' database
+               obj.delete(using=self.using)
+
+           def queryset(self, request):
+               # Tell Django to look for objects on the 'other' database.
+               return super(MultiDBModelAdmin, self).queryset(request).using(self.using)
+
+           def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+               # Tell Django to populate ForeignKey widgets using a query
+               # on the 'other' database.
+               return super(MultiDBModelAdmin, self).formfield_for_foreignkey(db_field, request=request, using=self.using, **kwargs)
+
+           def formfield_for_manytomany(self, db_field, request=None, **kwargs):
+               # Tell Django to populate ManyToMany widgets using a query
+               # on the 'other' database.
+               return super(MultiDBModelAdmin, self).formfield_for_manytomany(db_field, request=request, using=self.using, **kwargs)
+
+``ModelAdmin`` オブジェクトは 5 つのメソッドを持っています。マルチデータベースを
+サポートするためカスタマイズできます::
+
+    class MultiDBModelAdmin(admin.ModelAdmin):
+        # A handy constant for the name of the alternate database.
+        using = 'other'
+
+        def save_model(self, request, obj, form, change):
+            # Tell Django to save objects to the 'other' database.
+            obj.save(using=self.using)
+
+        def delete_model(self, request, obj):
+            # Tell Django to delete objects from the 'other' database
+            obj.delete(using=self.using)
+
+        def queryset(self, request):
+            # Tell Django to look for objects on the 'other' database.
+            return super(MultiDBModelAdmin, self).queryset(request).using(self.using)
+
+        def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+            # Tell Django to populate ForeignKey widgets using a query
+            # on the 'other' database.
+            return super(MultiDBModelAdmin, self).formfield_for_foreignkey(db_field, request=request, using=self.using, **kwargs)
+
+        def formfield_for_manytomany(self, db_field, request=None, **kwargs):
+            # Tell Django to populate ManyToMany widgets using a query
+            # on the 'other' database.
+            return super(MultiDBModelAdmin, self).formfield_for_manytomany(db_field, request=request, using=self.using, **kwargs)
+
+.. The implementation provided here implements a multi-database strategy
+   where all objects of a given type are stored on a specific database
+   (e.g., all ``User`` objects are in the ``other`` database). If your
+   usage of multiple databases is more complex, your ``ModelAdmin`` will
+   need to reflect that strategy.
+
+この実装はここでは、マルチデータベースストラテジー機能を提供します。与えられた
+タイプのすべてのオブジェクトが、特定のデータベースに格納されます (例えば、
+全 ``User`` オブジェクトを ``other`` データベースに)。 マルチデータベースの
+使い方がより複雑なら、 ``ModelAdmin`` にそのストラテジーの反映が必要になります。
+
+.. Inlines can be handled in a similar fashion. They require three customized methods::
+
+       class MultiDBTabularInline(admin.TabularInline):
+           using = 'other'
+
+           def queryset(self, request):
+               # Tell Django to look for inline objects on the 'other' database.
+               return super(MultiDBTabularInline, self).queryset(request).using(self.using)
+
+           def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+               # Tell Django to populate ForeignKey widgets using a query
+               # on the 'other' database.
+               return super(MultiDBTabularInline, self).formfield_for_foreignkey(db_field, request=request, using=self.using, **kwargs)
+
+           def formfield_for_manytomany(self, db_field, request=None, **kwargs):
+               # Tell Django to populate ManyToMany widgets using a query
+               # on the 'other' database.
+               return super(MultiDBTabularInline, self).formfield_for_manytomany(db_field, request=request, using=self.using, **kwargs)
+
+インラインは同様の方法で処理できます。メソッドを 3 つカスタマイズします::
+
+    class MultiDBTabularInline(admin.TabularInline):
+        using = 'other'
+
+        def queryset(self, request):
+            # Tell Django to look for inline objects on the 'other' database.
+            return super(MultiDBTabularInline, self).queryset(request).using(self.using)
+
+        def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+            # Tell Django to populate ForeignKey widgets using a query
+            # on the 'other' database.
+            return super(MultiDBTabularInline, self).formfield_for_foreignkey(db_field, request=request, using=self.using, **kwargs)
+
+        def formfield_for_manytomany(self, db_field, request=None, **kwargs):
+            # Tell Django to populate ManyToMany widgets using a query
+            # on the 'other' database.
+            return super(MultiDBTabularInline, self).formfield_for_manytomany(db_field, request=request, using=self.using, **kwargs)
+
+.. Once you've written your model admin definitions, they can be
+   registered with any ``Admin`` instance::
+
+       from django.contrib import admin
+
+       # Specialize the multi-db admin objects for use with specific models.
+       class BookInline(MultiDBTabularInline):
+           model = Book
+
+       class PublisherAdmin(MultiDBModelAdmin):
+           inlines = [BookInline]
+
+       admin.site.register(Author, MultiDBModelAdmin)
+       admin.site.register(Publisher, PublisherAdmin)
+
+       othersite = admin.Site('othersite')
+       othersite.register(Publisher, MultiDBModelAdmin)
+
+モデル admin 定義を書いた後は、それらは任意の ``Admin`` インスタンスに登録でき
+ます::
+
+    from django.contrib import admin
+
+    # Specialize the multi-db admin objects for use with specific models.
+    class BookInline(MultiDBTabularInline):
+        model = Book
+
+    class PublisherAdmin(MultiDBModelAdmin):
+        inlines = [BookInline]
+
+    admin.site.register(Author, MultiDBModelAdmin)
+    admin.site.register(Publisher, PublisherAdmin)
+
+    othersite = admin.Site('othersite')
+    othersite.register(Publisher, MultiDBModelAdmin)
+
+.. This example sets up two admin sites. On the first site, the
+   ``Author`` and ``Publisher`` objects are exposed; ``Publisher``
+   objects have an tabular inline showing books published by that
+   publisher. The second site exposes just publishers, without the
+   inlines.
+
+この例は 2 つの admin サイトをセットアップします。 1 つめのサイトでは、
+``Author`` 、 ``Publisher`` オブジェクトが見られます。 ``Publisher`` オブジェクト
+は、その出版社が発行した書籍を表示するインライン表を持っています。
+
+.. Using raw cursors with multiple databases
+   =========================================
+
+マルチデータベースで生のカーソルを使う
+======================================
+
+.. If you are using more than one database you can use
+   ``django.db.connections`` to obtain the connection (and cursor) for a
+   specific database. ``django.db.connections`` is a dictionary-like
+   object that allows you to retrieve a specific connection using its
+   alias::
+
+       from django.db import connections
+       cursor = connections['my_db_alias'].cursor()
+
+2 つ以上のデータベースを使っているなら、 ``django.db.connections`` を、特定の
+データベースへの接続（およびカーソル）を取得するために使えます。
+``django.db.connections`` は辞書ライクオブジェクトです。これによってエイリアスを
+使用して特定の接続を取得できます::
+
+    from django.db import connections
+    cursor = connections['my_db_alias'].cursor()
+
+.. Limitations of multiple databases
+   =================================
+
+マルチデータベースの制限
+========================
+
+.. _no_cross_database_relations:
+
+クロスデータベースリレーション
+------------------------------
+
+.. Django doesn't currently provide any support for foreign key or
+   many-to-many relationships spanning multiple databases. If you
+   have used a router to partition models to different databases,
+   any foreign key and many-to-many relationships defined by those
+   models must be internal to a single database.
+
+Django は今のところ、複数のデータベースに及ぶ外部キーか多対多リレーションを
+サポートを提供していません。別のデータベースにモデルを分配するルータを使って
+いたなら、それらのモデルに定義される、すべての外部キーと多対多リレーションは
+1 つのデータベースに入れられます。
+
+.. This is because of referential integrity. In order to maintain a
+   relationship between two objects, Django needs to know that the
+   primary key of the related object is valid. If the primary key is
+   stored on a separate database, it's not possible to easily evaluate
+   the validity of a primary key.
+
+これは参照整合のためです。2 オブジェクト間のリレーションを維持するために、
+Django は正当に参照されたオブジェクトのプライマリキー知る必要があります。簡単に
+プライマリキーの妥当性を評価することはできません。
+
+.. If you're using Postgres, Oracle, or MySQL with InnoDB, this is
+   enforced at the database integrity level -- database level key
+   constraints prevent the creation of relations that can't be validated.
+
+InnoDB で Postgres 、 Oracle 、 MySQL を使っているなら、データベースの整合性
+レベルで強制されます。データベースレベルのキーの制約は、検証できないリレーション
+の生成を防ぎます
+
+.. However, if you're using SQLite or MySQL with MyISAM tables, there is
+   no enforced referential integrity; as a result, you may be able to
+   'fake' cross database foreign keys. However, this configuration is not
+   officially supported by Django
+
+MyISAM テーブルで SQLite か MySQL を使っているなら、強制される参照整合性はあり
+ません。結果として、 '偽の (fake)' クロスデータベースの外部キーができるかも
+しれません。しかしこの設定は Django で公式にサポートされているものではありま
+せん。
