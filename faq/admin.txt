@@ -1,82 +1,160 @@
-.. _faq-admin:
+.. FAQ: The admin
+   ==============
 
 管理サイトの FAQ
-====================
+================
 
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
+
+.. I can't log in. When I enter a valid username and password, it just brings up the login page again, with no error messages.
+   ---------------------------------------------------------------------------------------------------------------------------
 
 ログインできません。正しいユーザ名とパスワードを入力したのに、再度ログインページが表示されます。エラーメッセージも出ません。
 ------------------------------------------------------------------------------------------------------------------------------
+
+.. The login cookie isn't being set correctly, because the domain of the cookie
+   sent out by Django doesn't match the domain in your browser. Try these two 
+   things:
 
 Django の発行するクッキーのドメインと、ブラウザに格納されたドメインが一致し
 ていないために、ログインクッキーが正しく設定されていない場合に起きる症状で
 す。以下の二つの対策を試してみて下さい:
 
-    * 設定ファイルの ``SESSION_COOKIE_DOMAIN`` に正しいドメインを設定してく
-      ださい。例えば、Django のサイトにアクセスするときに、ブラウザで
-      "http://www.example.com/admin/" と入力しているのなら、
-      "myproject.settings" には ``SESSION_COOKIE_DOMAIN = 'www.example.com'``
-      と設定せねばなりません。
+.. * Set the :setting:`SESSION_COOKIE_DOMAIN` setting in your admin config
+     file to match your domain. For example, if you're going to
+     "http://www.example.com/admin/" in your browser, in
+     "myproject.settings" you should set ``SESSION_COOKIE_DOMAIN = 'www.example.com'``.
 
-    * ブラウザの中には (Firefox かな?) ドットの入っていないドメインからのクッ
-      キーを受け取りたがらないものがあります。管理サイトを "localhost" など
-      のようなドットを含まないドメインで立てているのなら、
-      "localhost.localdomain" や "127.0.0.1" を試してください。また、
-      ``SESSION_COOKIE_DOMAIN`` もドメイン名に合わせて変更してください。
+* 設定ファイルの ``SESSION_COOKIE_DOMAIN`` に正しいドメインを設定してく
+  ださい。例えば、Django のサイトにアクセスするときに、ブラウザで
+  "http://www.example.com/admin/" と入力しているのなら、
+  "myproject.settings" には ``SESSION_COOKIE_DOMAIN = 'www.example.com'``
+  と設定せねばなりません。
+
+.. * Some browsers (Firefox?) don't like to accept cookies from domains that
+     don't have dots in them. If you're running the admin site on "localhost"
+     or another domain that doesn't have a dot in it, try going to
+     "localhost.localdomain" or "127.0.0.1". And set
+     :setting:`SESSION_COOKIE_DOMAIN` accordingly.
+
+* ブラウザの中には (Firefox かな?) ドットの入っていないドメインからのクッ
+  キーを受け取りたがらないものがあります。管理サイトを "localhost" など
+  のようなドットを含まないドメインで立てているのなら、
+  "localhost.localdomain" や "127.0.0.1" を試してください。また、
+  ``SESSION_COOKIE_DOMAIN`` もドメイン名に合わせて変更してください。
+
+.. I can't log in. When I enter a valid username and password, it brings up the login page again, with a "Please enter a correct username and password" error.
+   -----------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ログインできません。正しいユーザ名とパスワードを入力したところ、「正しいユーザ名とパスワードを入力してください」というエラーメッセージつきでログインページを表示します。
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+.. If you're sure your username and password are correct, make sure your user
+   account has ``is_active`` and ``is_staff`` set to True. The admin site only
+   allows access to users with those two fields both set to True.
 
 ユーザネームとパスワードが本当に正しいのなら、ユーザアカウントが
 ``is_active`` で、かつ ``is_staff`` が ``True`` であるか確かめて下さい。
 管理サイトにアクセスできるのは、 ``is_active`` と ``is_staff`` が共に
 ``True`` のユーザだけです。
 
+.. How can I prevent the cache middleware from caching the admin site?
+   -------------------------------------------------------------------
+
 キャッシュミドルウェアに管理サイトをキャッシュさせたくないのですが？
 ---------------------------------------------------------------------
 
+.. Set the :setting:`CACHE_MIDDLEWARE_ANONYMOUS_ONLY` setting to ``True``. See the
+   :doc:`cache documentation </topics/cache>` for more information.
+
 :setting:`CACHE_MIDDLEWARE_ANONYMOUS_ONLY` 設定を ``True`` にしてください。
-詳しくは :ref:`キャッシュのドキュメント <topics-cache>` を参照してください。
+詳しくは :doc:`キャッシュのドキュメント </topics/cache>` を参照してください。
+
+.. How do I automatically set a field's value to the user who last edited the object in the admin?
+   -----------------------------------------------------------------------------------------------
 
 管理サイト上でオブジェクトを編集するときに、あるフィールドに、そのオブジェクトを最後に編集したユーザの情報を自動的に入れる方法はないですか？
 --------------------------------------------------------------------------------------------------------------------------------------------------
 
-:class:`ModelAdmin` クラスの用意しているカスタマイズ用のフックを使えば、
-オブジェクトを保存するときに、リクエストから取り出した情報に基づいてフィー
-ルドの値を変更できます。具体的には、 :meth:`ModelAdmin.save_model` フックを
-カスタマイズして、オブジェクトのフィールド値にリクエストから取り出した現在
-のユーザを反映させます。
-:ref:`ModelAdmin メソッドのドキュメント <model-admin-methods>` にサンプルが
-あります。
+.. The :class:`~django.contrib.admin.ModelAdmin` class provides customization hooks
+   that allow you to transform an object as it saved, using details from the
+   request. By extracting the current user from the request, and customizing the
+   :meth:`~django.contrib.admin.ModelAdmin.save_model` hook, you can update an
+   object to reflect the user that edited it. See :ref:`the documentation on
+   ModelAdmin methods <model-admin-methods>` for an example.
+
+:class:`~django.contrib.admin.ModelAdmin` クラスの用意しているカスタマイズ用
+のフックを使えば、オブジェクトを保存するときに、リクエストから取り出した情報
+に基づいてフィールドの値を変更できます。具体的には、
+:meth:`~django.contrib.admin.ModelAdmin.save_model` フックをカスタマイズして、
+オブジェクトのフィールド値にリクエストから取り出した現在のユーザを反映させま
+す。 :ref:`ModelAdmin メソッドのドキュメント <model-admin-methods>` にサン
+プルがあります。
+
+.. How do I limit admin access so that objects can only be edited by the users who created them?
+   ---------------------------------------------------------------------------------------------
 
 管理サイト上でオブジェクトを編集するときに、オブジェクトを最初に作成したユーザだけが編集できるよう制限するにはどうすればよいですか？
 ----------------------------------------------------------------------------------------------------------------------------------------
 
-:class:`ModelAdmin` の用意しているフックには、オブジェクトを管理サイト上
-に表示するかどうかと編集可能かどうかを制御できるものがあります。
-:meth:`ModelAdmin.queryset` および :meth:`ModelAdmin.has_change_permission`
+.. The :class:`~django.contrib.admin.ModelAdmin` class also provides customization
+   hooks that allow you to control the visibility and editability of objects in the
+   admin. Using the same trick of extracting the user from the request, the
+   :meth:`~django.contrib.admin.ModelAdmin.queryset` and
+   :meth:`~django.contrib.admin.ModelAdmin.has_change_permission` can be used to
+   control the visibility and editability of objects in the admin.
+
+:class:`~django.contrib.admin.ModelAdmin` の用意しているフックには、オブ
+ジェクトを管理サイト上に表示するかどうかと編集可能かどうかを制御できるもの
+があります。 :meth:`~django.contrib.admin.ModelAdmin.queryset` および
+:meth:`~django.contrib.admin.ModelAdmin.has_change_permission`
 フックをカスタマイズすれば、上の質問の答えと同様、リクエストから取り出した
 現在のユーザの情報に基づいて、オブジェクトの表示や編集を制御できます。
 
-開発サーバでは管理サイトの CSS や画像がうまく表示されるのに、 mod_python を使うと表示されません。
+.. My admin-site CSS and images showed up fine using the development server, but they're not displaying when using mod_wsgi.
+   ---------------------------------------------------------------------------------------------------------------------------
+
+開発サーバでは管理サイトの CSS や画像がうまく表示されるのに、 mod_wsgi を使うと表示されません。
 ----------------------------------------------------------------------------------------------------
 
-「mod_python で Django を使う」というドキュメントの 
-:ref:`管理サイト用のファイルを公開する方法 <howto-deployment-modpython-serving-the-admin-files>`
+.. See :ref:`serving the admin files <serving-the-admin-files>`
+   in the "How to use Django with mod_wsgi" documentation.
+
+「mod_wsgi で Django を使う」というドキュメントの
+:ref:`管理サイト用のファイルを公開する方法 <serving-the-admin-files>`
 を参照してください。
+
+.. My "list_filter" contains a ManyToManyField, but the filter doesn't display.
+   ----------------------------------------------------------------------------
 
 "list_filter" に ManyToManyField を入れたのに、管理サイトがフィルタを表示しません。
 ------------------------------------------------------------------------------------
 
+.. Django won't bother displaying the filter for a ``ManyToManyField`` if there
+   are fewer than two related objects.
+
 Django が ``ManyToManyField`` に対してフィルタを表示するのは、リレーション
 先のオブジェクトが複数のときだけです。
+
+.. For example, if your ``list_filter`` includes ``sites``, and there's only one
+   site in your database, it won't display a "Site" filter. In that case,
+   filtering by site would be meaningless.
 
 例えば、 ``list_filter`` に ``sites`` が入っており、データベースにたった一
 つしかサイトが登録されていなければ、 "Site" フィルタは表示されません。この
 状況では、サイトによるフィルタは無意味だからです。
 
+.. How can I customize the functionality of the admin interface?
+   -------------------------------------------------------------
+
 管理サイトの機能をカスタマイズするにはどうすればよいですか？
 --------------------------------------------------------------
+
+.. You've got several options. If you want to piggyback on top of an add/change
+   form that Django automatically generates, you can attach arbitrary JavaScript
+   modules to the page via the model's ``class Admin`` ``js`` parameter. That
+   parameter is a list of URLs, as strings, pointing to JavaScript modules that
+   will be included within the admin form via a ``<script>`` tag.
 
 方法はいくつかあります。Django が自動生成する add/change フォームを利用して
 楽をしたければ、モデルの ``class Admin`` の ``js`` パラメタを使ってページに
@@ -84,21 +162,58 @@ Django が ``ManyToManyField`` に対してフィルタを表示するのは、�
 モジュールの URL をリストにして指定します。管理画面は、指定した JavaScript
 を ``<script>`` タグでフォームと一緒に出力します。
 
+.. If you want more flexibility than simply tweaking the auto-generated forms,
+   feel free to write custom views for the admin. The admin is powered by Django
+   itself, and you can write custom views that hook into the authentication
+   system, check permissions and do whatever else they need to do.
+
 単に自動生成されるフォームをいじる以上の柔軟さが必要な場合には、管理サイト
 用のカスタムビューを書いて下さい。管理サイトはそれ自体 Django で作られてい
 るので、認証システムやパーミッションのチェックなどを行うビューを自作できま
 す。
 
+.. If you want to customize the look-and-feel of the admin interface, read the
+   next question.
+
 管理サイトのルック & フィールをカスタマイズしたいのなら、次の項目を読んで下
 さい。
+
+.. The dynamically-generated admin site is ugly! How can I change it?
+   ------------------------------------------------------------------
 
 管理サイトのデザインが気に入りません！どうすれば変更できますか？
 ------------------------------------------------------------------
 
+.. We like it, but if you don't agree, you can modify the admin site's
+   presentation by editing the CSS stylesheet and/or associated image files. The
+   site is built using semantic HTML and plenty of CSS hooks, so any changes you'd
+   like to make should be possible by editing the stylesheet. We've got a
+   :doc:`guide to the CSS used in the admin </obsolete/admin-css>` to get you started.
+
 私達は好きなんですが、そうは思わないのなら、 CSS スタイルシートや画像ファイ
 ルを編集して、管理サイトのプレゼンテーションを変更できます。サイトはセマ
 ンティックな HTML を使って書かれているので、やりたい変更は全て CSS スタイル
-シートの編集で実現できます。てほどきに 
-:ref:`管理サイトの CSS ガイド <obsolete-admin-css>`
-を用意してあります。
+シートの編集で実現できます。てほどきに
+:ref:`管理サイトの CSS ガイド </obsolete/admin-css>` を用意してあります。
+
+.. What browsers are supported for using the admin?
+   ------------------------------------------------
+
+管理サイトはどのブラウザでサポートされていますか？
+--------------------------------------------------
+
+.. The admin provides a fully-functional experience to `YUI's A-grade`_ browsers,
+   with the notable exception of IE6, which is not supported.
+
+管理サイトは IE6 以外 (サポート対象外) のすべての `YUI's A-grade`_ ブラウザで、
+完全な機能を提供しており、問題なく表示されます。
+
+.. There *may* be minor stylistic differences between supported browsers—for
+   example, some browsers may not support rounded corners. These are considered
+   acceptable variations in rendering.
+
+角丸表示をサポートしていないなど、各々のブラウザで多少の違いはあるかもし
+れません。これらは、許容範囲であると考えられています。
+
+.. _YUI's A-grade: http://yuilibrary.com/yui/docs/tutorials/gbs/
 

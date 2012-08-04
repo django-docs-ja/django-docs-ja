@@ -1,16 +1,27 @@
-.. _faq-help:
+.. FAQ: Getting Help
+   =================
 
 FAQ: 助けを求める
 =================
 
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
+
+.. How do I do X? Why doesn't Y work? Where can I go to get help?
+   --------------------------------------------------------------
 
 何かをしたいとき、うまくいかないときは、どこで助けを求めればよいですか？
 -------------------------------------------------------------------------
 
+.. If this FAQ doesn't contain an answer to your question, you might want to
+   try the `django-users mailing list`_. Feel free to ask any question related
+   to installing, using, or debugging Django.
+
 疑問の答えが FAQ に書かれていないのなら、 `django-users メーリングリスト`_
 で質問するとよいでしょう。インストール方法、使い方、デバッグ方法に関する質
 問は遠慮なくどうぞ。
+
+.. If you prefer IRC, the `#django IRC channel`_ on the Freenode IRC network is an
+   active community of helpful individuals who may be able to solve your problem.
 
 IRC の方がよいなら、 freenode IRC ネットワークの `#django IRC チャネル`_
 をお勧めします。便りになるメンバのいる活発なコミュニティで、あなたの問題を
@@ -21,12 +32,26 @@ IRC の方がよいなら、 freenode IRC ネットワークの `#django IRC チ
 .. _`#django IRC channel`: irc://irc.freenode.net/django
 .. _`#django IRC チャネル`: `#django IRC channel`_
 
+.. Why hasn't my message appeared on django-users?
+   -----------------------------------------------
+
 メッセージを django-users に送ったのに表示されないのはなぜですか？
 --------------------------------------------------------------------
+
+.. django-users_ has a lot of subscribers. This is good for the community, as
+   it means many people are available to contribute answers to questions.
+   Unfortunately, it also means that django-users_ is an attractive target for
+   spammers.
 
 django-users_ にはたくさんの読者がいます。質問に答えてくれる人が沢山いると
 いう点ではいいことですが、残念ながら、それは同時に django-users_ がスパム屋
 の格好の標的たりえることも意味しています。
+
+.. In order to combat the spam problem, when you join the django-users_ mailing
+   list, we manually moderate the first message you send to the list. This means
+   that spammers get caught, but it also means that your first question to the
+   list might take a little longer to get answered. We apologize for any
+   inconvenience that this policy may cause.
 
 スパムに対抗するため、私たちは新たに参加したメンバの送信した最初のメッセー
 ジを手動で検査しています。これにより、スパム屋は排除できますが、同時にあな
@@ -35,16 +60,34 @@ django-users_ にはたくさんの読者がいます。質問に答えてくれ
 
 .. _django-users: http://groups.google.com/group/django-users
 
+.. Nobody on django-users answered my question! What should I do?
+   --------------------------------------------------------------
+
 django-users で質問したのに誰も答えてくれません。どうすればよいですか？
 -------------------------------------------------------------------------
 
+.. Try making your question more specific, or provide a better example of your
+   problem.
+
 質問をもっと具体的に説明するか、もっと分かりやすい例を示しましょう。
+
+.. As with most open-source mailing lists, the folks on django-users_ are
+   volunteers. If nobody has answered your question, it may be because nobody
+   knows the answer, it may be because nobody can understand the question, or it
+   may be that everybody that can help is busy. One thing you might try is to ask
+   the question on IRC -- visit the `#django IRC channel`_ on the Freenode IRC
+   network.
 
 たいていのオープンソースプロジェクトのメーリングリストと同様、
 django-users_ の中の人はボランティアです。誰も質問に答えないときは、だれも
 答えを知らないか、質問の意図を理解できないか、答えを知っている人が忙しくて
 答えられないのでしょう。そんなときは、 IRC で質問してみてもよいでしょう。
 freenode IRC ネットワークの `#django IRC チャネル`_ に行ってみてください。
+
+.. You might notice we have a second mailing list, called django-developers_ --
+   but please don't email support questions to this mailing list. This list is
+   for discussion of the development of Django itself. Asking a tech support
+   question there is considered quite impolite.
 
 参考までに、 django-developers_ というメーリングリストもあります。ただ、こ
 のメーリングリストにはサポート質問のメールを送信しないでください。
@@ -54,24 +97,44 @@ django-developers は Django 自体の開発に関する議論のためのメー
 
 .. _django-developers: http://groups.google.com/group/django-developers
 
+.. I think I've found a bug! What should I do?
+   -------------------------------------------
+
 バグを見つけたように思います。どうすればよいですか？
 ------------------------------------------------------
 
-明らかなバグを発見したときの手順は、 
+.. Detailed instructions on how to handle a potential bug can be found in our
+   :ref:`Guide to contributing to Django <reporting-bugs>`.
+
+明らかなバグを発見したときの手順は、
 :ref:`Django プロジェクトに貢献するためのガイドライン <reporting-bugs>`
 で詳しく解説しています。
 
+.. I think I've found a security problem! What should I do?
+   --------------------------------------------------------
+
 セキュリティホールを見つけたように思います。どうすればよいですか？
 ---------------------------------------------------------------------
+
+.. If you think you've found a security problem with Django, please send a message
+   to security@djangoproject.com. This is a private list only open to long-time,
+   highly trusted Django developers, and its archives are not publicly readable.
 
 Django のセキュリティ上の問題を発見したと思ったら、
 security@djangoproject.com にメッセージを送信してください。このアドレスは、
 長い間 Django に関わっている信頼の篤い開発者だけに公開されているメーリング
 リストで、アーカイブも一般の人には読めません。
 
+.. Due to the sensitive nature of security issues, we ask that if you think you
+   have found a security problem, *please* don't send a message to one of the
+   public mailing lists. Django has a
+   :ref:`policy for handling security issues <reporting-security-issues>`;
+   while a defect is outstanding, we would like to minimize any damage that
+   could be inflicted through public knowledge of that defect.
+
 セキュリティ問題は極めてデリケートなので、セキュリティ上の問題を発見したと
 きは *決して* 公開のメーリングリストにメッセージを送信しないでください。
-Django プロジェクトでは 
+Django プロジェクトでは
 :ref:`セキュリティ上の問題に関するポリシ <reporting-security-issues>` を定
 め、欠陥が解決されないうちは、その欠陥が公知になることを防ぐことでダメージ
 を最小限にとどめたいと考えています。
