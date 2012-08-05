@@ -1,73 +1,158 @@
-.. _faq-install:
+.. FAQ: Installation
+   =================
 
 インストールに関する FAQ
 ===========================
 
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
+
+.. How do I get started?
+   ---------------------
 
 まずは何をすればよいですか？
 ----------------------------
 
-    #. `コードをダウンロード`_ してください。
-    #. Django をインストールしてください (
-       :ref:`インストールガイド <intro-install>` を読みましょう)。
-    #. :ref:`チュートリアル <intro-tutorial01>` を一通りやってみてください。
-    #. 他の `ドキュメント <index>` にも目を通して下さい。何か問題が起きたら、
-       `質問`_ してみましょう。
+.. #. `Download the code`_.
+   #. Install Django (read the :doc:`installation guide </intro/install>`).
+   #. Walk through the :doc:`tutorial </intro/tutorial01>`.
+   #. Check out the rest of the :doc:`documentation </index>`, and `ask questions`_ if you
+      run into trouble.
 
-.. _`Download the code`: http://www.djangoproject.com/download/
-.. _ask questions: http://www.djangoproject.com/community/
+#. `コードをダウンロード`_ してください。
+#. Django をインストールしてください (
+   :doc:`インストールガイド </intro/install>` を読みましょう)。
+#. :doc:`チュートリアル </intro/tutorial01>` を一通りやってみてください。
+#. 他の :doc:`ドキュメント </index>` にも目を通して下さい。何か問題が起きたら、
+   `質問`_ してみましょう。
+
+.. _`Download the code`: https://www.djangoproject.com/download/
+.. _ask questions: https://www.djangoproject.com/community/
 .. _`コードをダウンロード`: `Download the code`_
 .. _`質問`: `ask questions`_
+
+.. What are Django's prerequisites?
+   --------------------------------
 
 Django を動かすには何が必要ですか？
 -------------------------------------
 
-Django を動かすには、バージョン 2.3 以上 2.6 以下の Python_ が必要です。
+.. Django requires Python_, specifically any version of Python from 2.5
+   through 2.7. No other Python libraries are required for basic Django
+   usage.
+
+Django を動かすには、バージョン 2.5 以上 2.7 以下の Python_ が必要です。
 Django の基本的な機能を使う限り、他の Python ライブラリは不要です。
+
+.. For a development environment -- if you just want to experiment with Django --
+   you don't need to have a separate Web server installed; Django comes with its
+   own lightweight development server. For a production environment, Django follows
+   the WSGI spec, :pep:`3333`, which means it can run on a variety of server
+   platforms. See :doc:`Deploying Django </howto/deployment/index>` for some
+   popular alternatives. Also, the `server arrangements wiki page`_ contains
+   details for several deployment strategies.
 
 開発環境を使う場合、つまり Django を試したいだけの場合は、 Web サーバを別に
 インストールしておく必要はありません。 Django には簡単な開発用サーバが付属
-しています。 Django は WSGI_ 仕様に準拠しています。従って、様々なサーバプラッ
-トフォームで運用環境を構築できます。いくつか選択肢を紹介しているので、
-:ref:`Django のデプロイ方法 <howto-deployment-index>` を参照してください。
+しています。 Django は WSGI 仕様 (:pep:`3333`) に準拠しています。
+従って、様々なサーバプラットフォームで運用環境を構築できます。
+いくつか選択肢を紹介しているので、
+:doc:`Django のデプロイ方法 </howto/deployment/index>` を参照してください。
 また、 `サーバの構成方法をまとめた wiki ページ`_ には、詳しい運用戦略が書か
 れています。
+
+.. If you want to use Django with a database, which is probably the case, you'll
+   also need a database engine. PostgreSQL_ is recommended, because we're
+   PostgreSQL fans, and MySQL_, `SQLite 3`_, and Oracle_ are also supported.
 
 Django をデータベースと合わせて使うならデータベースエンジンも必要です。
 我々は PostgreSQL_ ファンなので PostgreSQL をお勧めしますが、 MySQL_ や
 `SQLite 3`_, Oracle_ もサポートしています。
 
 .. _Python: http://www.python.org/
-.. _WSGI: http://www.python.org/peps/pep-0333.html
-.. _server arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
+.. _server arrangements wiki page: https://code.djangoproject.com/wiki/ServerArrangements
 .. _`サーバの構成方法をまとめた wiki ページ`: `server arrangements wiki page`_
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
 .. _`SQLite 3`: http://www.sqlite.org/
 .. _Oracle: http://www.oracle.com/
 
-Python 2.3 を使うのは、 2.5 のような新しいバージョンを使うよりも不利ですか？
-----------------------------------------------------------------------------
+.. Do I lose anything by using Python 2.5 versus newer Python versions, such as Python 2.6 or 2.7?
+   -----------------------------------------------------------------------------------------------
+
+Python 2.5 を使うのは、 2.6 や 2.7 のような新しいバージョンを使うよりも不利ですか？
+-----------------------------------------------------------------------------------
+
+.. Not in the core framework. Currently, Django itself officially supports any
+   version of Python from 2.5 through 2.7, inclusive. However, newer versions of
+   Python are often faster, have more features, and are better supported. If you
+   use a newer version of Python you will also have access to some APIs that
+   aren't available under older versions of Python. For example, since Python 2.6,
+   you can use the advanced string formatting described in :pep:`3101`.
 
 フレームワークのコアの機能を使う限りは、特に不利はありません。 Django 自体
-は、2.3 から 2.6 まで間の全てのバージョンの Python をサポートしています。
-ただし、アドオンのコンポーネントには、新しいバージョンの Python を必要とす
-るものがあります。例えば、 ``django.contrib.gis`` を使うには Python 2.4 以
-降が必要です。また、 Django を使っているサードパーティ製のアプリケーション
-は、必ずしも Django と同じバージョンの Python を動作条件としているわけでは
-ありません。
+は、2.5 から 2.7 まで間の全てのバージョンの Python をサポートしています。
+ただし、新しいバージョンの Python の方が早いですし、より多くの機能があり、
+またよりよいサポートがなされています。もし新しいバージョンの Python を使っ
+ていれば、古いバージョンでは使用できないような API も使用できるでしょう。
+例えば、 Python 2.6 からは、 :pep:`3101` で定義されている進化した文字列
+フォーマットが使用できます。
 
-とはいえ、現時点で注意して欲しいことがあります。ここ数年の間に、 Django は
-Python 3.0 で動作するよう移行を進め、その課程で古いバージョンの Python での
-動作をサポートしなくなる予定です (詳しくは次の質問を読んでください)。
-従って、これから Python を使い始めるのなら、最新の 2.x リリース (今なら
-2.6) を使うよう勧めます。最新版を使えば、バージョン 2.3 以後に登場した様々
-な改良や最適化の恩恵を受けられますし、 3.0 への移行に伴って撤廃される機能の
-影響も受けにくいからです。
+.. Third-party applications for use with Django are, of course, free to set their
+   own version requirements.
 
-Django を Python 3.0 で使えますか？
-------------------------------------
+Django を使っているサードパーティ製のアプリケーションには、もちろん、
+各自で必要な Django のバージョンを設定してもらって構いません。
+
+.. Over the next year or two Django will begin dropping support for older Python
+   versions as part of a migration which will end with Django running on Python 3
+   (see below for details).
+
+ここ数年の間に、 Django は Python 3.0 で動作するよう移行を勧め、その過程
+で古いバージョンの Python での動作をサポートしなくなる予定です (詳しくは
+この下の質問を読んでください)。
+
+.. All else being equal, we recommend that you use the latest 2.x release
+   (currently Python 2.7). This will let you take advantage of the numerous
+   improvements and optimizations to the Python language since version 2.5, and
+   will help ease the process of dropping support for older Python versions on
+   the road to Python 3.
+
+これらをふまえ、最新の 2.x リリース (今なら 2.7) を使うことを勧めます。
+最新版を使えば、バージョン 2.5 以降に登場した様々な改良や最適化の恩恵を
+受けられますし、 3.0 への移行に伴って撤廃される機能の影響も受けにくいか
+らです。
+
+.. What Python version can I use with Django?
+   ------------------------------------------
+
+どのバージョンの Python でどのバージョンの Django が使えますか?
+---------------------------------------------------------------
+
+================= =================
+Django バージョン Python バージョン
+================= =================
+1.0               2.3, 2.4, 2.5, 2.6
+1.1               2.3, 2.4, 2.5, 2.6
+1.2               2.4, 2.5, 2.6, 2.7
+1.3               2.4, 2.5, 2.6, 2.7
+**1.4**           **2.5, 2.6, 2.7**
+*1.5 (予定)*      *2.6, 2.7, 3.x (試験的)*
+================= =================
+
+.. Can I use Django with Python 3?
+   -------------------------------
+
+Django を Python 3 で使えますか？
+---------------------------------
+
+.. Not at the moment. Python 3.0 introduced a number of
+   backwards-incompatible changes to the Python language, and although
+   these changes are generally a good thing for Python's future, it will
+   be a while before most Python software catches up and is able to run
+   on Python 3.0. For larger Python-based software like Django, the
+   transition is expected to take at least a year or two (since it
+   involves dropping support for older Python releases and so must be
+   done gradually).
 
 今のところ、使えません。 Python 3.0 では、過去のバージョンと互換性のない
 変更がたくさん行われました。この変更は総じて Python の未来のために必要なよ
@@ -77,23 +162,44 @@ Django を Python 3.0 で使えますか？
 バージョンの Python のサポートもやめなければならないので、段階的に進める必
 要があるのです)。
 
+.. In the meantime, Python 2.x releases will be supported and provided
+   with bug fixes and security updates by the Python development team, so
+   continuing to use a Python 2.x release during the transition should
+   not present any risk.
+
 Python の開発チームは 2.x のリリースを当面継続して、バグフィクスやセキュリ
 ティアップデートを行うので、 Python 2.x を使い続けるリスクは全くないはずで
 す。
 
+.. Will Django run under shared hosting (like TextDrive or Dreamhost)?
+   -------------------------------------------------------------------
+
 Django は共有ホスティングサービス (TextDrive や Dreamhost) で動きますか？
 -------------------------------------------------------------------------
 
+.. See our `Django-friendly Web hosts`_ page.
+
 `Django を使える Web ホスト`_ のページをごらん下さい。
 
-.. _`Django を使える Web ホスト`: http://code.djangoproject.com/wiki/DjangoFriendlyWebHosts
-.. _`Django-friendly Web hosts`: http://code.djangoproject.com/wiki/DjangoFriendlyWebHosts
+.. _`Django-friendly Web hosts`: https://code.djangoproject.com/wiki/DjangoFriendlyWebHosts
+.. _`Django を使える Web ホスト`: `Django-friendly Web hosts`_
 
-公式リリースと開発版のどちらを使うべきなのでしょうか？
-------------------------------------------------------
+.. Should I use the stable version or development version?
+   -------------------------------------------------------
 
-Django の開発者達は毎日 Django 改良を重ねており、壊れたコードをチェックイン
-しないよう上手く計らっています。私達は自分のサーバに (Subversion レポジトリ
-上の) 開発中のコードを直接使っており、安定に運用できています。このことを考
-えると、一般論として。「公式の」リリースよりはより多くの機能と少ないバグを
-持つ最新の開発版を使うように勧めます。
+安定版と開発版のどちらを使うべきなのでしょうか？
+------------------------------------------------
+
+.. Generally, if you're using code in production, you should be using a
+   stable release. The Django project publishes a full stable release
+   every nine months or so, with bugfix updates in between. These stable
+   releases contain the API that is covered by our backwards
+   compatibility guarantees; if you write code against stable releases,
+   you shouldn't have any problems upgrading when the next official
+   version is released.
+
+一般的に、もしあなたがコードを製品で使っているのなら、安定版を使うべきで
+しょう。 Django はおよそ 9 ヶ月ごとに、バグフィックスを含めた安定版をリ
+リースしています。これらの安定版は後方互換を保証した API も提供しています
+ので、もし次の新しい安定版では使用できないコードを書いていても、アップ
+グレードにおいて問題は無いはずです。

@@ -1,14 +1,16 @@
-.. _faq-index:
+.. ==========
+   Django FAQ
+   ==========
 
 =============
 よくある質問
 =============
 
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
 
 .. toctree::
    :maxdepth: 2
-   
+
    general
    install
    usage
