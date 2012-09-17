@@ -42,6 +42,7 @@ Django の :term:`プロジェクト` (:term:`project`) を構成するコード
 実行してください。
 
 .. code-block:: bash
+
    django-admin.py startproject mysite
 
 現在のディレクトリに ``mysite`` ディレクトリが作成されます。
