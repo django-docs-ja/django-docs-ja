@@ -4,18 +4,17 @@
 Django ドキュメント
 ===================
 
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
 
 .. rubric:: Django を使いこなすための全てがここにあります。
 
 .. admonition:: 和訳について
 
-    このドキュメントは、 `Django の標準ドキュメント`_ の和訳です。現在、和
-    訳は Yasushi Masuda によって進められており、 Takanao Endoh をはじめとす
-    る日本 Django ユーザ会の有志の手でメンテナンスされています。和訳に関す
-    る問い合わせは、 **Django プロジェクトのトラッカではなく** 、 Yasushi
-    Masuda (whosaysni-at-gmail.com) または django-ja メーリングリストにお寄
-    せください。
+    このドキュメントは、 `Django の標準ドキュメント`_ の和訳です。和訳は当
+    初 Yasushi Masuda によって進められ、現在は日本 Django ユーザ会の有志の
+    手でメンテナンスされています。和訳に関する問い合わせは、
+    **Django プロジェクトのトラッカではなく** 、 django-ja メーリングリスト
+    にお寄せください。
 
     .. _`Django の標準ドキュメント`: http://docs.djangoproject.com/
 
@@ -24,201 +23,211 @@ Django ドキュメント
 
 困り事ですか？手を貸しましょう！
 
-* :ref:`FAQ <faq-index>` を探しましょう。よくある質問への答えなら、ここで見
+* :doc:`FAQ <faq/index>` を探しましょう。よくある質問への答えなら、ここで見
   つかります。
 
-* 特定のトピックについて情報を探しているなら、 :ref:`genindex` や 
-  :ref:`modindex` 、 :ref:`contents` を見てください。
+* 特定のトピックについて情報を探しているなら、 :doc:`genindex` や 
+  :doc:`modindex` 、 :doc:`内容の詳細な表 <contents>` を見てください。
 
 * `django-users メーリングリストのアーカイブ`_ を探したり、
   `質問をポスト`_ したりしてみましょう。
-  
-* `IRC の #django チャネル`_ で質問したり、 `IRC のログ`_ を探したりしてみ
-  ましょう。
+
+* `IRC の #django チャネル`_ で質問したり、質問する前に `IRC のログ`_ を探
+  したりしてみましょう。
 
 * Django のバグを見つけたら、 `チケットトラッカ`_ で報告してください。
 
 .. _`django-users メーリングリストのアーカイブ`: http://groups.google.com/group/django-users/
 .. _`質問をポスト`: http://groups.google.com/group/django-users/
 .. _`IRC の #django チャネル`: irc://irc.freenode.net/django
-.. _`IRC のログ`: http://oebfare.com/logger/django/
-.. _`チケットトラッカ`: http://code.djangoproject.com/
+.. _`IRC のログ`: http://django-irc-logs.com/
+.. _`チケットトラッカ`: https://code.djangoproject.com/
 
 最初のステップ
 ==============
 
-    * **何もないところから始めるなら:**
-      :ref:`概要 <intro-overview>` |
-      :ref:`インストール <intro-install>`
+* **何もないところから始めるなら:**
+  :doc:`概要 <intro/overview>` |
+  :doc:`インストール <intro/install>`
 
-    * **チュートリアルはこちら:**
-      :ref:`その 1 <intro-tutorial01>` |
-      :ref:`その 2 <intro-tutorial02>` |
-      :ref:`その 3 <intro-tutorial03>` |
-      :ref:`その 4 <intro-tutorial04>`
+* **チュートリアルはこちら:**
+  :doc:`その 1 <intro/tutorial01>` |
+  :doc:`その 2 <intro/tutorial02>` |
+  :doc:`その 3 <intro/tutorial03>` |
+  :doc:`その 4 <intro/tutorial04>`
 
 モデル層
 ========
 
-    * **モデルとは:**
-      :ref:`Model の定義方法 <topics-db-models>` |
-      :ref:`フィールド型 <ref-models-fields>` |
-      :ref:`Meta オプション <ref-models-options>`
+* **モデルとは:**
+  :doc:`Model の定義方法 <topics/db/models>` |
+  :doc:`フィールド型 <ref/models/fields>` |
+  :doc:`Meta オプション <ref/models/options>`
 
-    * **クエリセット (QuerySet) とは:**
-      :ref:`クエリの実行 <topics-db-queries>` |
-      :ref:`QuerySet メソッドリファレンス <ref-models-querysets>`
+* **クエリセット (QuerySet) とは:**
+  :doc:`クエリの実行 <topics/db/queries>` |
+  :doc:`QuerySet メソッドリファレンス <ref/models/querysets>`
 
-    * **モデルインスタンス詳説:**
-      :ref:`インスタンスメソッド解説 <ref-models-instances>` |
-      :ref:`リレーション先オブジェクトへのアクセス <ref-models-relations>`
+* **モデルインスタンス詳説:**
+  :doc:`インスタンスメソッド解説 <ref/models/instances>` |
+  :doc:`リレーション先オブジェクトへのアクセス <ref/models/relations>`
 
-    * **モデルの高度な話題:**
-      :ref:`マネジャ (Manager) <topics-db-managers>` |
-      :ref:`素の SQL を扱うには <topics-db-sql>` |
-      :ref:`トランザクション <topics-db-transactions>` |
-      :ref:`アグリゲーション <topics-db-aggregation>` |
-      :ref:`フィールド型を自作するには <howto-custom-model-fields>`
+* **モデルの高度な話題:**
+  :doc:`マネジャ (Manager) <topics/db/managers>` |
+  :doc:`素の SQL を扱うには <topics/db/sql>` |
+  :doc:`トランザクション <topics/db/transactions>` |
+  :doc:`アグリゲーション <topics/db/aggregation>` |
+  :doc:`フィールド型を自作するには <howto/custom/model/fields>`
 
-    * **その他:**
-      :ref:`データベースのサポート状況 <ref-databases>` |
-      :ref:`レガシーなデータベースを扱う <howto-legacy-databases>` |
-      :ref:`初期データを投入するには <howto-initial-data>`
+* **その他:**
+  :doc:`データベースのサポート状況 <ref/databases>` |
+  :doc:`レガシーなデータベースを扱う <howto/legacy/databases>` |
+  :doc:`初期データを投入するには <howto/initial/data>`
 
 テンプレート層
 ==============
 
-    * **デザイナ向けの情報:**
-      :ref:`テンプレートの書き方 <topics-templates>` |
-      :ref:`組み込みタグとフィルタ <ref-templates-builtins>`
+* **デザイナ向けの情報:**
+  :doc:`テンプレートの書き方 <topics/templates>` |
+  :doc:`組み込みタグとフィルタ <ref/templates/builtins>`
 
-    * **プログラマ向けの情報:**
-      :ref:`テンプレート API <ref-templates-api>` |
-      :ref:`タグやフィルタを自作するには <howto-custom-template-tags>`
+* **プログラマ向けの情報:**
+  :doc:`テンプレート API <ref/templates/api>` |
+  :doc:`タグやフィルタを自作するには <howto/custom/template/tags>`
 
 ビュー層
 ========
 
-    * **ビューの基本:**
-      :ref:`URLconf とは <topics-http-urls>` |
-      :ref:`ビュー関数とは <topics-http-views>` |
-      :ref:`便利なショートカット <topics-http-shortcuts>`
+* **ビューの基本:**
+  :doc:`URLconf とは <topics/http/urls>` |
+  :doc:`ビュー関数とは <topics/http/views>` |
+  :doc:`便利なショートカット <topics/http/shortcuts>`
+  :doc:`デコレータ <topics/http/decorators>`
 
-    * **リファレンス:**  :ref:`リクエスト/レスポンスオブジェクト <ref-request-response>`
+* **リファレンス:**
+  :doc:`リクエスト/レスポンスオブジェクト <ref/request/response>`
+  :doc:`テンプレートレスポンスオブジェクト <ref/template-response>`
 
-    * **ファイルアップロードに対応するには:**
-      :ref:`ファイルアップロード対応の概要 <topics-http-file-uploads>` |
-      :ref:`File オブジェクトリファレンス <ref-files-file>` |
-      :ref:`ストレージ API <ref-files-storage>` |
-      :ref:`ファイルの管理 <topics-files>` |
-      :ref:`ストレージを自作するには <howto-custom-file-storage>`
+* **ファイルアップロードに対応するには:**
+  :doc:`ファイルアップロード対応の概要 <topics/http/file/uploads>` |
+  :doc:`File オブジェクトリファレンス <ref/files/file>` |
+  :doc:`ストレージ API <ref/files/storage>` |
+  :doc:`ファイルの管理 <topics/files>` |
+  :doc:`ストレージを自作するには <howto/custom/file/storage>`
 
-    * **汎用ビュー:**
-      :ref:`汎用ビューとは <topics-generic-views>` |
-      :ref:`組み込みの汎用ビュー <ref-generic-views>`
+* **汎用ビュー:**
+  :doc:`汎用ビューとは <topics/generic-views>` |
+  :doc:`組み込みの汎用ビュー <ref/generic-views>`
 
-    * **より高度なビューの話題:**
-      :ref:`CSV を出力するには <howto-outputting-csv>` |
-      :ref:`PDF を出力するには <howto-outputting-pdf>`
+* **より高度なビューの話題:**
+  :doc:`CSV を出力するには <howto/outputting-csv>` |
+  :doc:`PDF を出力するには <howto/outputting-pdf>`
 
-    * **ミドルウェア:**
-      :ref:`ミドルウェアとは <topics-http-middleware>` |
-      :ref:`組み込みのミドルウェアクラス <ref-middleware>`
+* **ミドルウェア:**
+  :doc:`ミドルウェアとは <topics/http/middleware>` |
+  :doc:`組み込みのミドルウェアクラス <ref/middleware>`
 
 フォーム
 ========
 
-    * **フォームの基礎:**
-      :ref:`フォーム機能の概要 <topics-forms-index>` |
-      :ref:`フォーム API <ref-forms-api>` |
-      :ref:`組み込みフォームフィールドリファレンス <ref-forms-fields>` |
-      :ref:`組み込みウィジェットリファレンス <ref-forms-widgets>`
+* **フォームの基礎:**
+  :doc:`フォーム機能の概要 <topics/forms/index>` |
+  :doc:`フォーム API <ref/forms/api>` |
+  :doc:`組み込みフォームフィールドリファレンス <ref/forms/fields>` |
+  :doc:`組み込みウィジェットリファレンス <ref/forms/widgets>`
 
-    * **高度な話題:**
-      :ref:`モデルに対応したフォームを生成するには <topics-forms-modelforms>` |
-      :ref:`メディアファイルを組み込むには <topics-forms-media>` |
-      :ref:`フォームセットを扱うには <topics-forms-formsets>` |
-      :ref:`バリデータを自作するには <ref-forms-validation>`
+* **高度な話題:**
+  :doc:`モデルに対応したフォームを生成するには <topics/forms/modelforms>` |
+  :doc:`メディアファイルを組み込むには <topics/forms/media>` |
+  :doc:`フォームセットを扱うには <topics/forms/formsets>` |
+  :doc:`バリデータを自作するには <ref/forms/validation>`
 
-    * **その他:**
-      :ref:`フォームプレビュー <ref-contrib-formtools-form-preview>` |
-      :ref:`フォームウィザード <ref-contrib-formtools-form-wizard>`
+* **その他:**
+  :doc:`フォームプレビュー <ref/contrib/formtools/form/preview>` |
+  :doc:`フォームウィザード <ref/contrib/formtools/form/wizard>`
 
 アプリケーション開発のツール
 ============================
 
-    * **設定:**
-      :ref:`設定ファイルとは <topics-settings>` |
-      :ref:`設定項目リファレンス <ref-settings>`
+* **設定:**
+  :doc:`設定ファイルとは <topics/settings>` |
+  :doc:`設定項目リファレンス <ref/settings>`
 
-    * **django-admin.py と manage.py:**
-      :ref:`概要 <ref-django-admin>` |
-      :ref:`自作の管理コマンドを追加するには <howto-custom-management-commands>`
+* **例外:**
+  :doc:`例外の概要 <ref/exceptions>`
 
-    * **テスト:**  :ref:`テストを書くには <topics-testing>`
+* **django-admin.py と manage.py:**
+  :doc:`概要 <ref/django-admin>` |
+  :doc:`自作の管理コマンドを追加するには <howto/custom-management-commands>`
 
-    * **デプロイ:**
-      :ref:`デプロイの概要 <howto-deployment-index>` |
-      :ref:`Apache/mod_wsgi <howto-deployment-modwsgi>` |
-      :ref:`Apache/mod_python <howto-deployment-modpython>` |
-      :ref:`FastCGI/SCGI/AJP <howto-deployment-fastcgi>` |
-      :ref:`Apache の認証に Django を使うには <howto-apache-auth>` |
-      :ref:`静的ファイルの公開方法 <howto-static-files>` |
-      :ref:`エラーの発生をメールで追跡するには <howto-error-reporting>`
+* **テスト:**
+  :doc:`テストを書くには <topics/testing>`
+
+* **デプロイ:**
+  :doc:`デプロイの概要 <howto/deployment/index>` |
+  :doc:`WSGI サーバ <howto/deployment/wsgi/index>` |
+  :doc:`FastCGI/SCGI/AJP <howto/deployment/fastcgi>` |
+  :doc:`Apache/mod_python (非推奨) <howto/deployment/modpython>` |
+  :doc:`Apache の認証に Django を使うには <howto/apache/auth>` |
+  :doc:`静的ファイルの公開方法 <howto/static-files>` |
+  :doc:`エラーの発生をメールで追跡するには <howto/error-reporting>`
 
 その他の Django 付属の機能
 ==========================
 
-    * :ref:`管理サイト <ref-contrib-admin>` | 
-      :ref:`管理アクションを組み込むには <ref-contrib-admin-actions>`
-    * :ref:`認証 <topics-auth>`
-    * :ref:`キャッシュシステム <topics-cache>`
-    * :ref:`条件付きリクエストの処理 <topics-conditional-processing>`
-    * :ref:`コメントフレームワーク <ref-contrib-comments-index>` | 
-      :ref:`コメントのモデレーション機能 <ref-contrib-comments-moderation>` |
-      :ref:`コメント機能の自作 <ref-contrib-comments-custom>`
-    * :ref:`コンテンツタイプ <ref-contrib-contenttypes>`
-    * :ref:`CSRF 対策 <ref-contrib-csrf>`
-    * :ref:`databrowse: データの一覧表示 <ref-contrib-databrowse>`
-    * :ref:`電子メールの送信 <topics-email>`
-    * :ref:`flatpages: フラットページコンテンツの管理 <ref-contrib-flatpages>`
-    * :ref:`humanize: 人間にやさしい出力生成 <ref-contrib-humanize>`
-    * :ref:`国際化 <topics-i18n>`
-    * :ref:`Jython で動かす <howto-jython>`
-    * :ref:`「ローカルフレーバ（地域固有の機能）」 <ref-contrib-localflavor>`
-    * :ref:`ページ分割表示 <topics-pagination>`
-    * :ref:`リクエストのリダイレクト <ref-contrib-redirects>`
-    * :ref:`データのシリアライズ <topics-serialization>`
-    * :ref:`セッションデータの操作 <topics-http-sessions>`
-    * :ref:`イベントシグナル <topics-signals>`
-    * :ref:`サイトマップ <ref-contrib-sitemaps>`
-    * :ref:`サイト <ref-contrib-sites>`
-    * :ref:`配信フィード (RSS/Atom) <ref-contrib-syndication>`
-    * :ref:`Unicode の扱い方 <ref-unicode>`
-    * :ref:`Web デザイナーのためのヘルパ <ref-contrib-webdesign>`
+* :doc:`管理サイト <ref/contrib/admin/index>` | :doc:`管理アクションを組み込むには <ref/contrib/admin/actions>` | :doc:`管理サイトのドキュメントを生成する<ref/contrib/admin/admindocs>`
+* :doc:`認証 <topics/auth>`
+* :doc:`キャッシュシステム <topics/cache>`
+* :doc:`クリックジャッキング対策 <ref/clickjacking>`
+* :doc:`コメントフレームワーク <ref/contrib/comments/index>` | :doc:`コメントのモデレーション機能 <ref/contrib/comments/moderation>` | :doc:`コメント機能の自作 <ref/contrib/comments/custom>`
+* :doc:`条件付きリクエストの処理 <topics/conditional-processing>`
+* :doc:`コンテンツタイプと汎用リレーション <ref/contrib/contenttypes>`
+* :doc:`CSRF 対策 <ref/contrib/csrf>`
+* :doc:`暗号による署名 <topics/signing>`
+* :doc:`databrowse: データの一覧表示 <ref/contrib/databrowse>`
+* :doc:`電子メールの送信 <topics/email>`
+* :doc:`flatpages: フラットページコンテンツの管理 <ref/contrib/flatpages>`
+* :doc:`GeoDjango <ref/contrib/gis/index>`
+* :doc:`humanize: 人間にやさしい出力生成 <ref/contrib/humanize>`
+* :doc:`国際化 <topics/i18n>`
+* :doc:`Jython で動かす <howto/jython>`
+* :doc:`「ローカルフレーバ（地域固有の機能）」 <ref/contrib/localflavor>`
+* :doc:`ログ出力 <topics/logging>`
+* :doc:`メッセージ <ref/contrib/messages>`
+* :doc:`ページ分割表示 <topics/pagination>`
+* :doc:`リクエストのリダイレクト <ref/contrib/redirects>`
+* :doc:`セキュリティ <topics/security>`
+* :doc:`データのシリアライズ <topics/serialization>`
+* :doc:`セッションデータの操作 <topics/http/sessions>`
+* :doc:`イベントシグナル <topics/signals>`
+* :doc:`サイトマップ <ref/contrib/sitemaps>`
+* :doc:`サイト <ref/contrib/sites>`
+* :doc:`静的なファイルの扱い方 <ref/contrib/staticfiles>`
+* :doc:`配信フィード (RSS/Atom) <ref/contrib/syndication>`
+* :doc:`Unicode の扱い方 <ref/unicode>`
+* :doc:`Web デザイナーのためのヘルパ <ref/contrib/webdesign>`
+* :doc:`バリデータ <ref/validators>`
+* 関数ベースの汎用ビュー (廃止予定) :doc:`概要<topics/generic-views>` | :doc:`組込の汎用ビュー <ref/generic-views>` | :doc:`汎用ビューの移行ガイド<topics/generic-views-migration>`
 
-オープンソースプロジェクトとしての Django 
+オープンソースプロジェクトとしての Django
 =========================================
 
-    * **開発コミュニティ:**
-      :ref:`開発に参加するには <internals-contributing>` |
-      :ref:`リリースプロセス <internals-release-process>` |
-      :ref:`コミッタ紹介 <internals-committers>`
+* **開発コミュニティ:**
+  :doc:`開発に参加するには <internals/contributing>` |
+  :doc:`リリースプロセス <internals/release-process>` |
+  :doc:`コミッタ紹介 <internals/committers>` |
+  :doc:`ソースコードリポジトリ <internals/svn>`
 
-    * **設計哲学:**
-      :ref:`概要 <misc-design-philosophies>`
+* **設計哲学:**
+  :doc:`概要 <misc/design-philosophies>`
 
-    * **ドキュメントの仕組み:**
-      :ref:`ドキュメントの仕組みと書き方 <internals-documentation>`
+* **ドキュメントの仕組み:**
+  :doc:`ドキュメントの仕組みと書き方 <internals/documentation>`
 
-    * **サードパーティが配布している Django:**
-      :ref:`概要と、ディストリビュータへのお願い <misc-distributions>`
+* **サードパーティが配布している Django:**
+  :doc:`概要と、ディストリビュータへのお願い <misc/distributions>`
 
-    * **Django と長く付き合うために:**
-      :ref:`どの API が安定なのか <misc-api-stability>` |
-      :ref:`リリースノート一覧 <releases-index>` | `互換性のない変更`_ |
-      :ref:`不要な機能の撤廃・削除スケジュール <internals-deprecation>`
-
-.. _`互換性のない変更`: http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
-
-
+* **Django と長く付き合うために:**
+  :doc:`どの API が安定なのか <misc/api-stability>` |
+  :doc:`リリースノート一覧とアップグレードの手順 <releases/index>` |
+  :doc:`不要な機能の撤廃・削除スケジュール <internals/deprecation>`
