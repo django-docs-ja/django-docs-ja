@@ -591,7 +591,7 @@ import パスを与える ``DJANGO_SETTINGS_MODULE`` の環境変数を :file:`m
     # 期待します。 datetime.datetime.now() の代わりに timezone.now() を使用
     # してください。
     >>> from django.utils import timezone
-    >>> p = Poll(question="What's up?", pub_date=timezone.now())
+    >>> p = Poll(question="What's new?", pub_date=timezone.now())
 
     # 出来たオブジェクトをデータベースに保存します。 save() は明示的に呼ば
     # ねばなりません。
