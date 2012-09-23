@@ -401,50 +401,95 @@ Django にはこの設定値をテンプレートで使うための複数の方�
 
 .. _staticfiles-development:
 
-Serving static files in development
-===================================
+.. Serving static files in development
+   ===================================
 
-The static files tools are mostly designed to help with getting static files
-successfully deployed into production. This usually means a separate,
-dedicated static file server, which is a lot of overhead to mess with when
-developing locally. Thus, the ``staticfiles`` app ships with a
-**quick and dirty helper view** that you can use to serve files locally in
-development.
+開発中の静的ファイルの扱い方
+============================
 
-This view is automatically enabled and will serve your static files at
-:setting:`STATIC_URL` when you use the built-in
-:ref:`runserver<staticfiles-runserver>` management command.
+.. The static files tools are mostly designed to help with getting static files
+   successfully deployed into production. This usually means a separate,
+   dedicated static file server, which is a lot of overhead to mess with when
+   developing locally. Thus, the ``staticfiles`` app ships with a
+   **quick and dirty helper view** that you can use to serve files locally in
+   development.
 
-To enable this view if you are using some other server for local development,
-you'll add a couple of lines to your URLconf. The first line goes at the top
-of the file, and the last line at the bottom::
+このツールは基本的に、運用環境にうまく静的ファイルをデプロイするのを補助するた
+めに設計されています。これは普通、別途専用で用意された静的ファイルサーバのこと
+ですが、ローカルでの開発時に使うには大きなオーバーヘッドがかかります。そこで
+``staticfiles`` アプリは **手軽でダーティなヘルパービュー** を導入します。これ
+によって開発中にローカルのファイルを使えるようになります。
+
+.. This view is automatically enabled and will serve your static files at
+   :setting:`STATIC_URL` when you use the built-in
+   :ref:`runserver<staticfiles-runserver>` management command.
+
+ヘルパービューは自動で有効になっています。
+:ref:`runserver<staticfiles-runserver>` コマンドを使った時に
+:setting:`STATIC_URL` で静的ファイルを配信できます。
+
+.. To enable this view if you are using some other server for local development,
+   you'll add a couple of lines to your URLconf. The first line goes at the top
+   of the file, and the last line at the bottom::
+
+       from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+
+       # ... the rest of your URLconf goes here ...
+
+       urlpatterns += staticfiles_urlpatterns()
+
+ローカル開発で他のサーバを使っている場合、このビューを有効にするには
+URLconf に 2 行追加する必要があります。 1 つめの行はファイルの先頭に、 2 つめ
+の行は末尾に書きます::
 
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
-    # ... the rest of your URLconf goes here ...
+    # ... URLconf の他の行がここに入ります
 
     urlpatterns += staticfiles_urlpatterns()
 
-This will inspect your :setting:`STATIC_URL` setting and wire up the view
-to serve static files accordingly. Don't forget to set the
-:setting:`STATICFILES_DIRS` setting appropriately to let
-``django.contrib.staticfiles`` know where to look for files additionally to
-files in app directories.
+.. This will inspect your :setting:`STATIC_URL` setting and wire up the view
+   to serve static files accordingly. Don't forget to set the
+   :setting:`STATICFILES_DIRS` setting appropriately to let
+   ``django.contrib.staticfiles`` know where to look for files additionally to
+   files in app directories.
+
+この関数は :setting:`STATIC_URL` 設定を調べ、静的ファイルを適切に配信できるよ
+うにビューを設定します。アプリケーションディレクトリの中でどこを探せばいいかを
+``django.contrib.staticfiles`` に教えるために、 :setting:`STATICFILES_DIRS` を
+設定するのを忘れないでください。
+
+.. .. warning::
+
+       This will only work if :setting:`DEBUG` is ``True``.
+
+       That's because this view is **grossly inefficient** and probably
+       **insecure**. This is only intended for local development, and should
+       **never be used in production**.
+
+       Additionally, when using ``staticfiles_urlpatterns`` your
+       :setting:`STATIC_URL` setting can't be empty or a full URL, such as
+       ``http://static.example.com/``.
 
 .. warning::
 
-    This will only work if :setting:`DEBUG` is ``True``.
+    ローカル環境でのファイル配信は :setting:`DEBUG` が ``True`` の時にだけ動作
+    します。
 
-    That's because this view is **grossly inefficient** and probably
-    **insecure**. This is only intended for local development, and should
-    **never be used in production**.
+    それはこのビューが **ひどく非効率** で、おそらく **セキュアでない** ためで
+    す。このビューはローカル環境での開発だけを意図しており、 **決して運用環境
+    で使うべきではありません** 。
 
-    Additionally, when using ``staticfiles_urlpatterns`` your
-    :setting:`STATIC_URL` setting can't be empty or a full URL, such as
-    ``http://static.example.com/``.
+    加えて、 ``staticfiles_urlpatterns`` を使うと、
+    :setting:`STATIC_URL` 設定は空であったり ``http://static.example.com/`` 完
+    全な URL であったりできなくなります。
 
-For a few more details on how the ``staticfiles`` can be used during
-development, see :ref:`staticfiles-development-view`.
+
+.. For a few more details on how the ``staticfiles`` can be used during
+   development, see :ref:`staticfiles-development-view`.
+
+開発中の ``staticfiles`` の使い方についてもっと詳しく知るには
+:ref:`staticfiles-development-view` を参照してください。
 
 .. _staticfiles-other-directories:
 
