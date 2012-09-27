@@ -128,9 +128,9 @@ Django の開発者は、ビューや、リクエストごとに新しくレン�
    とを確認してください。
 
    :ref:`ローカル環境での開発<staticfiles-development>` で
-   :ref:`runserver<staticfiles-runserver>` を使っているなら、
+   :ref:`runserver<staticfiles-runserver>` を使っているか、
    :ref:`staticfiles_urlpatterns<staticfiles-development>` を URLconf に追加し
-   てください。これでセットアップは終わりです。
+   てあるなら、これでセットアップは終わりです。
    自動的に :setting:`STATIC_URL` で静的ファイルが公開されます。
    ( :djadmin:`newly created<startproject>` プロジェクトでは ) デフォルト設定が
    ``/static/`` です。
