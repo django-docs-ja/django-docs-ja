@@ -493,27 +493,43 @@ URLconf に 2 行追加する必要があります。 1 つめの行はファイ
 
 .. _staticfiles-other-directories:
 
-Serving other directories
--------------------------
+.. Serving other directories
+   -------------------------
+
+他のディレクトリを配信する
+--------------------------
 
 .. currentmodule:: django.views.static
 .. function:: serve(request, path, document_root, show_indexes=False)
 
-There may be files other than your project's static assets that, for
-convenience, you'd like to have Django serve for you in local development.
-The :func:`~django.views.static.serve` view can be used to serve any directory
-you give it. (Again, this view is **not** hardened for production
-use, and should be used only as a development aid; you should serve these files
-in production using a real front-end webserver).
+.. There may be files other than your project's static assets that, for
+   convenience, you'd like to have Django serve for you in local development.
+   The :func:`~django.views.static.serve` view can be used to serve any directory
+   you give it. (Again, this view is **not** hardened for production
+   use, and should be used only as a development aid; you should serve these files
+   in production using a real front-end webserver).
 
-The most likely example is user-uploaded content in :setting:`MEDIA_ROOT`.
-``staticfiles`` is intended for static assets and has no built-in handling
-for user-uploaded files, but you can have Django serve your
-:setting:`MEDIA_ROOT` by appending something like this to your URLconf::
+プロジェクト内に含まれているものとは別のファイルもあるかもしれません。利便性の
+ため、ローカル環境での開発で Django に配信させたいでしょう。
+:func:`~django.views.static.serve` ビューは指定したどんなディレクトリも配信で
+きます。 (繰り返しますが、このビューは運用には耐えません。開発の補助としてだけ
+使ってください。運用環境ではこれらのファイルは実際のフロントエンドサーバで配信
+すべきです)
+
+.. The most likely example is user-uploaded content in :setting:`MEDIA_ROOT`.
+   ``staticfiles`` is intended for static assets and has no built-in handling
+   for user-uploaded files, but you can have Django serve your
+   :setting:`MEDIA_ROOT` by appending something like this to your URLconf::
+
+よくある例は :setting:`MEDIA_ROOT` にユーザがアップロードしたコンテンツです。
+``staticfiles`` は静的アセットを意図していて、ユーザがアップロードしたファイル
+のハンドリングは含まれていませんが、 URLconf に以下のような記述を追加すること
+で :setting:`MEDIA_ROOT` を Django に配信させることができます::
 
     from django.conf import settings
 
-    # ... the rest of your URLconf goes here ...
+    .. # ... the rest of your URLconf goes here ...
+    # ... URLconf の他の部分がここに入ります ...
 
     if settings.DEBUG:
         urlpatterns += patterns('',
@@ -522,23 +538,35 @@ for user-uploaded files, but you can have Django serve your
             }),
        )
 
-Note, the snippet assumes your :setting:`MEDIA_URL` has a value of
-``'/media/'``. This will call the :func:`~django.views.static.serve` view,
-passing in the path from the URLconf and the (required) ``document_root``
-parameter.
+.. Note, the snippet assumes your :setting:`MEDIA_URL` has a value of
+   ``'/media/'``. This will call the :func:`~django.views.static.serve` view,
+   passing in the path from the URLconf and the (required) ``document_root``
+   parameter.
+
+このスニペットは :setting:`MEDIA_URL` が ``'/media/'`` という値になっているこ
+とを仮定しています。 :func:`~django.views.static.serve` を呼び出し、 URLconf
+と ( 必須の ) ``document_root`` パラメータをパスに渡します。
 
 .. currentmodule:: django.conf.urls.static
 .. function:: static(prefix, view='django.views.static.serve', **kwargs)
 
-Since it can become a bit cumbersome to define this URL pattern, Django
-ships with a small URL helper function
-:func:`~django.conf.urls.static.static` that takes as parameters the prefix
-such as :setting:`MEDIA_URL` and a dotted path to a view, such as
-``'django.views.static.serve'``. Any other function parameter will be
-transparently passed to the view.
+.. Since it can become a bit cumbersome to define this URL pattern, Django
+   ships with a small URL helper function
+   :func:`~django.conf.urls.static.static` that takes as parameters the prefix
+   such as :setting:`MEDIA_URL` and a dotted path to a view, such as
+   ``'django.views.static.serve'``. Any other function parameter will be
+   transparently passed to the view.
 
-An example for serving :setting:`MEDIA_URL` (``'/media/'``) during
-development::
+この URL パターンを定義するのはいささか大変になってくるので、 Django は小さな
+URL ヘルパー関数 :func:`~django.conf.urls.static.static` を持っています。
+これは :setting:`MEDIA_URL` のようなプレフィックスと、
+``'django.views.static.serve'`` のようなドット区切りのビューへのパスをパラメー
+タにとります。他の関数パラメータは透過的にビューに渡されます。
+
+.. An example for serving :setting:`MEDIA_URL` (``'/media/'``) during
+   development::
+
+開発中に  :setting:`MEDIA_URL` (``'/media/'``) を配信する例です::
 
     from django.conf import settings
     from django.conf.urls.static import static
@@ -549,23 +577,39 @@ development::
 
 .. note::
 
-    This helper function will only be operational in debug mode and if
-    the given prefix is local (e.g. ``/static/``) and not a URL (e.g.
-    ``http://static.example.com/``).
+..     This helper function will only be operational in debug mode and if
+       the given prefix is local (e.g. ``/static/``) and not a URL (e.g.
+       ``http://static.example.com/``).
+
+    このヘルパー関数は、デバッグモードの中で、与えられたプレフィックスが
+    ( 例 ``/static/``) ローカルであって URL
+    ( 例 ``http://static.example.com/``) ではない時にだけ操作できます。
 
 .. _staticfiles-production:
 
-Serving static files in production
-==================================
+.. Serving static files in production
+   ==================================
 
-The basic outline of putting static files into production is simple: run the
-:djadmin:`collectstatic` command when static files change, then arrange for
-the collected static files directory (:setting:`STATIC_ROOT`) to be moved to
-the static file server and served.
+運用環境での静的ファイル配信
+============================
 
-Of course, as with all deployment tasks, the devil's in the details. Every
-production setup will be a bit different, so you'll need to adapt the basic
-outline to fit your needs. Below are a few common patterns that might help.
+.. The basic outline of putting static files into production is simple: run the
+   :djadmin:`collectstatic` command when static files change, then arrange for
+   the collected static files directory (:setting:`STATIC_ROOT`) to be moved to
+   the static file server and served.
+
+運用環境に静的ファイルを置くための基本原則はシンプルです。静的ファイルが変
+更された時には :djadmin:`collectstatic` コマンドを実行し、集められた静的ファイ
+ルのディレクトリ (:setting:`STATIC_ROOT`) を静的ファイルサーバに移動し、配信す
+るために整理します。
+
+.. Of course, as with all deployment tasks, the devil's in the details. Every
+   production setup will be a bit different, so you'll need to adapt the basic
+   outline to fit your needs. Below are a few common patterns that might help.
+
+もちろん、あらゆるデプロイタスクと同様、細部には悪魔がいます。運用環境ごとに
+セットアップには小さな違いがあり、基本原則を必要に合うように変えなければならな
+いでしょう。以下はその助けになるかもしれないいくつかの共通パターンです。
 
 Serving the app and your static files from the same server
 ----------------------------------------------------------
