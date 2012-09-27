@@ -2,11 +2,11 @@
    Managing static files
    ====================
 
-====================
-静的なファイルの管理
-====================
+======================
+静的ファイルの公開方法
+======================
 
-:revision-up-to: 17812 (1.4) unfinished
+:revision-up-to: 17812 (1.4)
 
 .. versionadded:: 1.3
 
@@ -15,11 +15,11 @@
    web applications have other parts: the static files (images, CSS,
    Javascript, etc.) that are needed to render a complete web page.
 
-Django の開発者は、ビューやリクエストごとに新しくレンダリングされるテンプレー
-トといった Web アプリケーションの動的な部分にもっぱら関心を持っています。しか
-し、 Web アプリケーションには静的なファイル ( 画像、CSS、JavaScriptなど ) も含
-まれています。完全な Web ページをレンダリングするためにはこういったファイルが
-必要です。
+Django の開発者は、ビューや、リクエストごとに新しくレンダリングされるテンプ
+レートといった、 Web アプリケーションの動的な部分にもっぱら関心を持っていま
+す。しかし、 Web アプリケーションには静的なファイル ( 画像、CSS、JavaScriptな
+ど ) も含まれています。完全な Web ページをレンダリングするためにはこういった
+ファイルが必要です。
 
 .. For small projects, this isn't a big deal, because you can just keep the
    static files somewhere your web server can find it. However, in bigger
@@ -38,7 +38,7 @@ Django の開発者は、ビューやリクエストごとに新しくレンダ�
 
 ``django.contrib.staticfiles`` はまさにそのためにあります。これは静的なファイ
 ルを各アプリケーションから (さらに指定した別の場所からも) 一つの場所に集め、運
-用環境で配信しやすくするものです。
+用環境で公開しやすくするものです。
 
 .. .. note::
 
@@ -131,7 +131,7 @@ Django の開発者は、ビューやリクエストごとに新しくレンダ�
    :ref:`runserver<staticfiles-runserver>` を使っているなら、
    :ref:`staticfiles_urlpatterns<staticfiles-development>` を URLconf に追加し
    てください。これでセットアップは終わりです。
-   自動的に :setting:`STATIC_URL` で静的ファイルが配信されます。
+   自動的に :setting:`STATIC_URL` で静的ファイルが公開されます。
    ( :djadmin:`newly created<startproject>` プロジェクトでは ) デフォルト設定が
    ``/static/`` です。
 
@@ -193,7 +193,7 @@ Django の開発者は、ビューやリクエストごとに新しくレンダ�
    :setting:`STATIC_ROOT` で与えられたディレクトリにコピーします。
 
 4. :setting:`STATIC_ROOT` に含まれるファイルが :setting:`STATIC_URL` の場所で
-   配信されるように Web サーバを設定しデプロイしてください。
+   公開されるように Web サーバを設定しデプロイしてください。
 
    :ref:`staticfiles-production` はいくつかのよくある静的ファイルのデプロイ手
    法に言及しています。
@@ -228,15 +228,15 @@ Django の開発者は、ビューやリクエストごとに新しくレンダ�
 
    Django の以前のバージョンでは、ユーザがアップロードしたファイルを置くための
    :setting:`MEDIA_ROOT` に静的なファイルも一緒に置かれ、どちらも
-   :setting:`MEDIA_URL` で配信されていました。 ``staticfiles`` アプリケーショ
+   :setting:`MEDIA_URL` で公開されていました。 ``staticfiles`` アプリケーショ
    ンを使う目的の 1 つは、静的ファイルとユーザがアップロードしたファイルとを分
    けて管理することを簡単にするためです。
 
    この理由から、 :setting:`MEDIA_ROOT` および :setting:`MEDIA_URL` は
    :setting:`STATIC_ROOT` および :setting:`STATIC_URL` とは別の値にしなければ
-   なりません。 :setting:`MEDIA_ROOT` に含まれるファイルを配信するには、自分で
+   なりません。 :setting:`MEDIA_ROOT` に含まれるファイルを公開するには、自分で
    整理する必要があります。 ``staticfiles`` はユーザがアップロードしたファイル
-   を全く扱わないのです。ただし、 :setting:`MEDIA_ROOT` のファイルを配信するた
+   を全く扱わないのです。ただし、 :setting:`MEDIA_ROOT` のファイルを公開するた
    めに :func:`django.views.static.serve` ビューを使うことはできます。
    :ref:`staticfiles-other-directories` を参照してください。
 
@@ -265,7 +265,7 @@ Django の開発者は、ビューやリクエストごとに新しくレンダ�
    template.
 
 当然ながら、これでは深刻な問題がいくつかあります。開発環境ではうごきませんし、
-静的ファイルを配信する場所を変更するのが *非常に* 困難です。例えばもし、 コン
+静的ファイルを公開する場所を変更するのが *非常に* 困難です。例えばもし、 コン
 テンツデリバリーネットワーク (CDN) を使うように切り替えたい場合、テンプレート
 全てを一つ一つ変更することになってしまいます。
 
@@ -426,7 +426,7 @@ Django にはこの設定値をテンプレートで使うための複数の方�
 
 ヘルパービューは自動で有効になっています。
 :ref:`runserver<staticfiles-runserver>` コマンドを使った時に
-:setting:`STATIC_URL` で静的ファイルを配信できます。
+:setting:`STATIC_URL` で静的ファイルを公開できます。
 
 .. To enable this view if you are using some other server for local development,
    you'll add a couple of lines to your URLconf. The first line goes at the top
@@ -454,7 +454,7 @@ URLconf に 2 行追加する必要があります。 1 つめの行はファイ
    ``django.contrib.staticfiles`` know where to look for files additionally to
    files in app directories.
 
-この関数は :setting:`STATIC_URL` 設定を調べ、静的ファイルを適切に配信できるよ
+この関数は :setting:`STATIC_URL` 設定を調べ、静的ファイルを適切に公開できるよ
 うにビューを設定します。アプリケーションディレクトリの中でどこを探せばいいかを
 ``django.contrib.staticfiles`` に教えるために、 :setting:`STATICFILES_DIRS` を
 設定するのを忘れないでください。
@@ -473,7 +473,7 @@ URLconf に 2 行追加する必要があります。 1 つめの行はファイ
 
 .. warning::
 
-    ローカル環境でのファイル配信は :setting:`DEBUG` が ``True`` の時にだけ動作
+    ローカル環境でのファイル公開は :setting:`DEBUG` が ``True`` の時にだけ動作
     します。
 
     それはこのビューが **ひどく非効率** で、おそらく **セキュアでない** ためで
@@ -496,7 +496,7 @@ URLconf に 2 行追加する必要があります。 1 つめの行はファイ
 .. Serving other directories
    -------------------------
 
-他のディレクトリを配信する
+他のディレクトリを公開する
 --------------------------
 
 .. currentmodule:: django.views.static
@@ -510,10 +510,10 @@ URLconf に 2 行追加する必要があります。 1 つめの行はファイ
    in production using a real front-end webserver).
 
 プロジェクト内に含まれているものとは別のファイルもあるかもしれません。利便性の
-ため、ローカル環境での開発で Django に配信させたいでしょう。
-:func:`~django.views.static.serve` ビューは指定したどんなディレクトリも配信で
+ため、ローカル環境での開発で Django に公開させたいのではないでしょうか。
+:func:`~django.views.static.serve` ビューは指定したどんなディレクトリも公開で
 きます。 (繰り返しますが、このビューは運用には耐えません。開発の補助としてだけ
-使ってください。運用環境ではこれらのファイルは実際のフロントエンドサーバで配信
+使ってください。運用環境ではこれらのファイルは実際のフロントエンドサーバで公開
 すべきです)
 
 .. The most likely example is user-uploaded content in :setting:`MEDIA_ROOT`.
@@ -521,14 +521,24 @@ URLconf に 2 行追加する必要があります。 1 つめの行はファイ
    for user-uploaded files, but you can have Django serve your
    :setting:`MEDIA_ROOT` by appending something like this to your URLconf::
 
+       from django.conf import settings
+
+       # ... the rest of your URLconf goes here ...
+
+       if settings.DEBUG:
+           urlpatterns += patterns('',
+               url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {
+                   'document_root': settings.MEDIA_ROOT,
+               }),
+          )
+
 よくある例は :setting:`MEDIA_ROOT` にユーザがアップロードしたコンテンツです。
 ``staticfiles`` は静的アセットを意図していて、ユーザがアップロードしたファイル
 のハンドリングは含まれていませんが、 URLconf に以下のような記述を追加すること
-で :setting:`MEDIA_ROOT` を Django に配信させることができます::
+で :setting:`MEDIA_ROOT` を Django に公開させることができます::
 
     from django.conf import settings
 
-    .. # ... the rest of your URLconf goes here ...
     # ... URLconf の他の部分がここに入ります ...
 
     if settings.DEBUG:
@@ -566,7 +576,7 @@ URL ヘルパー関数 :func:`~django.conf.urls.static.static` を持ってい�
 .. An example for serving :setting:`MEDIA_URL` (``'/media/'``) during
    development::
 
-開発中に  :setting:`MEDIA_URL` (``'/media/'``) を配信する例です::
+開発中に  :setting:`MEDIA_URL` (``'/media/'``) を公開する例です::
 
     from django.conf import settings
     from django.conf.urls.static import static
@@ -590,7 +600,7 @@ URL ヘルパー関数 :func:`~django.conf.urls.static.static` を持ってい�
 .. Serving static files in production
    ==================================
 
-運用環境での静的ファイル配信
+運用環境での静的ファイル公開
 ============================
 
 .. The basic outline of putting static files into production is simple: run the
@@ -600,7 +610,7 @@ URL ヘルパー関数 :func:`~django.conf.urls.static.static` を持ってい�
 
 運用環境に静的ファイルを置くための基本原則はシンプルです。静的ファイルが変
 更された時には :djadmin:`collectstatic` コマンドを実行し、集められた静的ファイ
-ルのディレクトリ (:setting:`STATIC_ROOT`) を静的ファイルサーバに移動し、配信す
+ルのディレクトリ (:setting:`STATIC_ROOT`) を静的ファイルサーバに移動し、公開す
 るために整理します。
 
 .. Of course, as with all deployment tasks, the devil's in the details. Every
@@ -611,52 +621,96 @@ URL ヘルパー関数 :func:`~django.conf.urls.static.static` を持ってい�
 セットアップには小さな違いがあり、基本原則を必要に合うように変えなければならな
 いでしょう。以下はその助けになるかもしれないいくつかの共通パターンです。
 
-Serving the app and your static files from the same server
-----------------------------------------------------------
+.. Serving the app and your static files from the same server
+   ----------------------------------------------------------
 
-If you want to serve your static files from the same server that's already
-serving your site, the basic outline gets modified to look something like:
+一つのサーバでアプリケーションと静的ファイルを扱う
+--------------------------------------------------
 
-* Push your code up to the deployment server.
-* On the server, run :djadmin:`collectstatic` to copy all the static files
-  into :setting:`STATIC_ROOT`.
-* Point your web server at :setting:`STATIC_ROOT`. For example, here's
-  :ref:`how to do this under Apache and mod_wsgi <serving-files>`.
+.. If you want to serve your static files from the same server that's already
+   serving your site, the basic outline gets modified to look something like:
 
-You'll probably want to automate this process, especially if you've got
-multiple web servers. There's any number of ways to do this automation, but
-one option that many Django developers enjoy is `Fabric`__.
+   * Push your code up to the deployment server.
+   * On the server, run :djadmin:`collectstatic` to copy all the static files
+     into :setting:`STATIC_ROOT`.
+   * Point your web server at :setting:`STATIC_ROOT`. For example, here's
+     :ref:`how to do this under Apache and mod_wsgi <serving-files>`.
+
+既にサイトを公開しているのと同じサーバで静的ファイルを公開したい場合、基本原則
+は以下のように変更されます:
+
+* デプロイサーバにコードを展開します。
+* そのサーバ上で :djadmin:`collectstatic` を実行し、全ての静的ファイルを
+  :setting:`STATIC_ROOT` 内にコピーします。
+* Web サーバに :setting:`STATIC_ROOT` を教えます。例えば
+  :ref:`Apache と mod_wsgi での方法<serving-files>` があります。
+
+.. You'll probably want to automate this process, especially if you've got
+   multiple web servers. There's any number of ways to do this automation, but
+   one option that many Django developers enjoy is `Fabric`__.
+
+このプロセスはきっと自動化したくなるでしょう。特に複数の Web サーバを管理して
+いる時はそうです。この自動化を行う方法には色々ありますが、 Django を使う開発者
+には嬉しいであろう一つの方法が `Fabric`__ です。
 
 __ http://fabfile.org/
 
-Below, and in the following sections, we'll show off a few example fabfiles
-(i.e. Fabric scripts) that automate these file deployment options. The syntax
-of a fabfile is fairly straightforward but won't be covered here; consult
-`Fabric's documentation`__, for a complete explanation of the syntax..
+.. Below, and in the following sections, we'll show off a few example fabfiles
+   (i.e. Fabric scripts) that automate these file deployment options. The syntax
+   of a fabfile is fairly straightforward but won't be covered here; consult
+   `Fabric's documentation`__, for a complete explanation of the syntax..
+
+以下とそれに続くセクションでは、いくつかの fabfiles (Fabric scripts のこと )
+を示します。それらはファイルのデプロイ方法を自動化してくれます。 fabfile の文
+法はかなり直感的ですが、ここで網羅することはできません。
+`Fabric ドキュメント`__ を読めば、文法の完全な説明が得られます。
 
 __ http://docs.fabfile.org/
 
-So, a fabfile to deploy static files to a couple of web servers might look
-something like::
+.. So, a fabfile to deploy static files to a couple of web servers might look
+   something like::
+
+       from fabric.api import *
+
+       # Hosts to deploy onto
+       env.hosts = ['www1.example.com', 'www2.example.com']
+
+       # Where your project code lives on the server
+       env.project_root = '/home/www/myproject'
+
+       def deploy_static():
+           with cd(env.project_root):
+               run('./manage.py collectstatic -v0 --noinput')
+
+静的ファイルを 2 つの Web サーバにデプロイする fabfile はこのようになるでしょ
+う::
 
     from fabric.api import *
 
-    # Hosts to deploy onto
+    # デプロイ先のホスト
     env.hosts = ['www1.example.com', 'www2.example.com']
 
-    # Where your project code lives on the server
+    # プロジェクトコードが格納される場所
     env.project_root = '/home/www/myproject'
 
     def deploy_static():
         with cd(env.project_root):
             run('./manage.py collectstatic -v0 --noinput')
 
-Serving static files from a dedicated server
---------------------------------------------
+.. Serving static files from a dedicated server
+   --------------------------------------------
 
-Most larger Django apps use a separate Web server -- i.e., one that's not also
-running Django -- for serving static files. This server often runs a different
-type of web server -- faster but less full-featured. Some good choices are:
+専用のサーバで静的ファイルを公開する
+------------------------------------
+
+.. Most larger Django apps use a separate Web server -- i.e., one that's not also
+   running Django -- for serving static files. This server often runs a different
+   type of web server -- faster but less full-featured. Some good choices are:
+
+大きな Django アプリケーションはたいてい別の Web サーバを静的ファイルの公開に
+使っているでしょう。そのサーバでは Django は動いていません。
+このサーバは別の種類の Web サーバ、速いがフル機能ではないものを使っていること
+が多いです。いくつか良い選択肢を挙げると:
 
 * lighttpd_
 * Nginx_
@@ -670,19 +724,31 @@ type of web server -- faster but less full-featured. Some good choices are:
 .. _Apache: http://httpd.apache.org/
 .. _Cherokee: http://www.cherokee-project.com/
 
-Configuring these servers is out of scope of this document; check each
-server's respective documentation for instructions.
+.. Configuring these servers is out of scope of this document; check each
+   server's respective documentation for instructions.
 
-Since your static file server won't be running Django, you'll need to modify
-the deployment strategy to look something like:
+これらのサーバの設定方法はこのドキュメントの範囲を超えますので、説明はそれぞれ
+のサーバの相当するドキュメントを調べてください。
 
-* When your static files change, run :djadmin:`collectstatic` locally.
-* Push your local :setting:`STATIC_ROOT` up to the static file server
-  into the directory that's being served. ``rsync`` is a good
-  choice for this step since it only needs to transfer the
-  bits of static files that have changed.
+.. Since your static file server won't be running Django, you'll need to modify
+   the deployment strategy to look something like:
 
-Here's how this might look in a fabfile::
+   * When your static files change, run :djadmin:`collectstatic` locally.
+   * Push your local :setting:`STATIC_ROOT` up to the static file server
+     into the directory that's being served. ``rsync`` is a good
+     choice for this step since it only needs to transfer the
+     bits of static files that have changed.
+
+静的ファイルサーバでは Django を動かせないでしょうから、デプロイ戦略を次のよう
+に変更する必要があります:
+
+* 静的ファイルが変更された時、 :djadmin:`collectstatic` をローカルで実行しま
+  す。
+* ローカルの :setting:`STATIC_ROOT` を静的ファイルサーバの公開ディレクトリに
+  アップロードします。 ``rsync`` は変更されたファイルのビットだけを転送するだ
+  けで済むので、この手順の良い選択肢です。
+
+.. Here's how this might look in a fabfile::
 
     from fabric.api import *
     from fabric.contrib import project
@@ -702,81 +768,175 @@ Here's how this might look in a fabfile::
             delete = True
         )
 
+fabfile はこのようになるでしょう::
+
+    from fabric.api import *
+    from fabric.contrib import project
+
+    # 静的ファイルがローカル環境で集められる場所
+    env.local_static_root = '/tmp/static'
+
+    # 静的ファイルがリモートで置かれる場所
+    env.remote_static_root = '/home/www/static.example.com'
+
+    @roles('static')
+    def deploy_static():
+        local('./manage.py collectstatic')
+        project.rysnc_project(
+            remote_dir = env.remote_static_root,
+            local_dir = env.local_static_root,
+            delete = True
+        )
+
 .. _staticfiles-from-cdn:
 
-Serving static files from a cloud service or CDN
-------------------------------------------------
+.. Serving static files from a cloud service or CDN
+   ------------------------------------------------
 
-Another common tactic is to serve static files from a cloud storage provider
-like Amazon's S3__ and/or a CDN (content delivery network). This lets you
-ignore the problems of serving static files, and can often make for
-faster-loading webpages (especially when using a CDN).
+クラウドサービスや CDN での静的ファイル公開
+-------------------------------------------
 
-When using these services, the basic workflow would look a bit like the above,
-except that instead of using ``rsync`` to transfer your static files to the
-server you'd need to transfer the static files to the storage provider or CDN.
+.. Another common tactic is to serve static files from a cloud storage provider
+   like Amazon's S3__ and/or a CDN (content delivery network). This lets you
+   ignore the problems of serving static files, and can often make for
+   faster-loading webpages (especially when using a CDN).
 
-There's any number of ways you might do this, but if the provider has an API a
-:doc:`custom file storage backend </howto/custom-file-storage>` will make the
-process incredibly simple. If you've written or are using a 3rd party custom
-storage backend, you can tell :djadmin:`collectstatic` to use it by setting
-:setting:`STATICFILES_STORAGE` to the storage engine.
+もう一つの一般的な手法は、静的ファイルを Amazon S3__ のようなクラウドストレー
+ジプロバイダや、 CDN (content delivery network) で公開することです。これにより
+静的ファイル公開の問題を気にせずにすみ、またしばしば (CDN を使う場合は特に )
+Web ページを高速にロードさせることができます。
 
-For example, if you've written an S3 storage backend in
-``myproject.storage.S3Storage`` you could use it with::
+.. When using these services, the basic workflow would look a bit like the above,
+   except that instead of using ``rsync`` to transfer your static files to the
+   server you'd need to transfer the static files to the storage provider or CDN.
+
+これらのサービスを使う場合、基本的なワークフローは上の話と少し似ていますが、
+``rsync`` を使ってファイルをサーバに転送する代わりに、ストレージプロバイダや
+CDN に送らなければならないところが違います。
+
+.. There's any number of ways you might do this, but if the provider has an API a
+   :doc:`custom file storage backend </howto/custom-file-storage>` will make the
+   process incredibly simple. If you've written or are using a 3rd party custom
+   storage backend, you can tell :djadmin:`collectstatic` to use it by setting
+   :setting:`STATICFILES_STORAGE` to the storage engine.
+
+これを行う方法は様々ですが、プロバイダに API がある場合、
+:doc:`カスタムファイルストレージバックエンド </howto/custom-file-storage>` を
+使えば、手順が信じられないほどシンプルになります。
+:setting:`STATICFILES_STORAGE` に、自分が書いた、あるいはサードパーティ製のカ
+スタムストレージバックエンドを設定することにより、 :djadmin:`collectstatic` に
+そのバックエンドを使うように教えることができます。
+
+.. For example, if you've written an S3 storage backend in
+   ``myproject.storage.S3Storage`` you could use it with::
+
+例えば、 S3 ストレージバックエンドを ``myproject.storage.S3Storage`` に書いた
+とすると、このように使うことができます::
 
     STATICFILES_STORAGE = 'myproject.storage.S3Storage'
 
-Once that's done, all you have to do is run :djadmin:`collectstatic` and your
-static files would be pushed through your storage package up to S3. If you
-later needed to switch to a different storage provider, it could be as simple
-as changing your :setting:`STATICFILES_STORAGE` setting.
+.. Once that's done, all you have to do is run :djadmin:`collectstatic` and your
+   static files would be pushed through your storage package up to S3. If you
+   later needed to switch to a different storage provider, it could be as simple
+   as changing your :setting:`STATICFILES_STORAGE` setting.
 
-For details on how you'd write one of these backends,
-:doc:`/howto/custom-file-storage`.
+こうすれば、 :djadmin:`collectstatic` をするだけで、静的ファイルはあなたのスト
+レージパッケージを経て S3 にアップロードされます。もし後で別のストレージプロバ
+イダに変更しなければならなくなっても、単に :setting:`STATICFILES_STORAGE` 設定
+を変更するだけで済みます。
+
+.. For details on how you'd write one of these backends,
+   :doc:`/howto/custom-file-storage`.
+
+カスタムファイルストレージバックエンドを書く方法の詳細は
+:doc:`/howto/custom-file-storage` にあります。
+
+.. .. seealso::
+
+       The `django-storages`__ project is a 3rd party app that provides many
+       storage backends for many common file storage APIs (including `S3`__).
 
 .. seealso::
 
-    The `django-storages`__ project is a 3rd party app that provides many
-    storage backends for many common file storage APIs (including `S3`__).
+    `django-storages`__ はサードパーティーアプリケーションで、 `S3`__ を含む多
+    くな一般的なストレージ API のために、数多くのストレージバックエンドを提供
+    しています。
 
 __ http://s3.amazonaws.com/
 __ http://code.larlet.fr/django-storages/
 __ http://django-storages.readthedocs.org/en/latest/backends/amazon-S3.html
 
-Upgrading from ``django-staticfiles``
-=====================================
+.. Upgrading from ``django-staticfiles``
+   =====================================
 
-``django.contrib.staticfiles`` began its life as `django-staticfiles`_. If
-you're upgrading from `django-staticfiles`_ older than 1.0 (e.g. 0.3.4) to
-``django.contrib.staticfiles``, you'll need to make a few changes:
+``django-staticfiles`` からアップグレードする
+=============================================
 
-* Application files should now live in a ``static`` directory in each app
-  (`django-staticfiles`_ used the name ``media``, which was slightly
-  confusing).
+.. ``django.contrib.staticfiles`` began its life as `django-staticfiles`_. If
+   you're upgrading from `django-staticfiles`_ older than 1.0 (e.g. 0.3.4) to
+   ``django.contrib.staticfiles``, you'll need to make a few changes:
 
-* The management commands ``build_static`` and ``resolve_static`` are now
-  called :djadmin:`collectstatic` and :djadmin:`findstatic`.
+``django.contrib.staticfiles`` は元々 `django-staticfiles`_ として生まれまし
+た。もし `django-staticfiles`_ 1.0 以前 (0.3.4 など) から
+``django.contrib.staticfiles`` にアップグレードしようとすると、いくつかの変更
+をしなければなりません:
 
-* The settings ``STATICFILES_PREPEND_LABEL_APPS``,
-  ``STATICFILES_MEDIA_DIRNAMES`` and ``STATICFILES_EXCLUDED_APPS`` were
-  removed.
+.. * Application files should now live in a ``static`` directory in each app
+    (`django-staticfiles`_ used the name ``media``, which was slightly
+    confusing).
 
-* The setting ``STATICFILES_RESOLVERS`` was removed, and replaced by the
-  new :setting:`STATICFILES_FINDERS`.
+   * The management commands ``build_static`` and ``resolve_static`` are now
+     called :djadmin:`collectstatic` and :djadmin:`findstatic`.
 
-* The default for :setting:`STATICFILES_STORAGE` was renamed from
-  ``staticfiles.storage.StaticFileStorage`` to
-  ``staticfiles.storage.StaticFilesStorage``
+   * The settings ``STATICFILES_PREPEND_LABEL_APPS``,
+     ``STATICFILES_MEDIA_DIRNAMES`` and ``STATICFILES_EXCLUDED_APPS`` were
+     removed.
 
-* If using :ref:`runserver<staticfiles-runserver>` for local development
-  (and the :setting:`DEBUG` setting is ``True``), you no longer need to add
-  anything to your URLconf for serving static files in development.
+   * The setting ``STATICFILES_RESOLVERS`` was removed, and replaced by the
+     new :setting:`STATICFILES_FINDERS`.
 
-Learn more
-==========
+   * The default for :setting:`STATICFILES_STORAGE` was renamed from
+     ``staticfiles.storage.StaticFileStorage`` to
+     ``staticfiles.storage.StaticFilesStorage``
 
-This document has covered the basics and some common usage patterns. For
-complete details on all the settings, commands, template tags, and other pieces
-include in ``django.contrib.staticfiles``, see :doc:`the staticfiles reference
-</ref/contrib/staticfiles>`.
+   * If using :ref:`runserver<staticfiles-runserver>` for local development
+     (and the :setting:`DEBUG` setting is ``True``), you no longer need to add
+     anything to your URLconf for serving static files in development.
+
+* アプリケーションの静的ファイルはそれぞれのアプリケーションの ``static`` ディ
+  レクトリになければなりません。 (`django-staticfiles`_ は ``media`` という
+  少々混乱させる名前を使っていました)
+
+* コマンド ``build_static`` と ``resolve_static`` は今では
+  :djadmin:`collectstatic` と :djadmin:`findstatic` という名前になっています。
+
+* 設定 ``STATICFILES_PREPEND_LABEL_APPS``,
+  ``STATICFILES_MEDIA_DIRNAMES``, ``STATICFILES_EXCLUDED_APPS`` は削除されまし
+  た。
+
+* 設定 ``STATICFILES_RESOLVERS`` は削除され、新しい
+  :setting:`STATICFILES_FINDERS` に置き換えられました。
+
+* :setting:`STATICFILES_STORAGE` のデフォルトは
+  ``staticfiles.storage.StaticFileStorage`` から
+  ``staticfiles.storage.StaticFilesStorage`` にリネームされました。
+
+* ローカル環境で :ref:`runserver<staticfiles-runserver>` を使う時
+  (:setting:`DEBUG` 設定が ``True`` の時) 、開発中の静的ファイル公開のために
+  URLconf に何も追加する必要がなくなりました。
+
+.. Learn more
+   ==========
+
+さらに学ぶためには
+==================
+
+.. This document has covered the basics and some common usage patterns. For
+   complete details on all the settings, commands, template tags, and other pieces
+   include in ``django.contrib.staticfiles``, see :doc:`the staticfiles reference
+   </ref/contrib/staticfiles>`.
+
+このドキュメントでは基本といくつかのよくある使用パターンについて説明しました。
+``django.contrib.staticfiles`` に含まれる全ての設定、コマンド、テンプレートタ
+グ、その他について、完全な詳細を知るには :doc:`staticfiles リファレンス
+</ref/contrib/staticfiles>` を参照してください。
