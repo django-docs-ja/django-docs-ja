@@ -1,31 +1,57 @@
-.. _howto-deployment-index:
+.. Deploying Django
+   ================
 
 Django のデプロイ
 ===================
 
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
+
+.. Django's chock-full of shortcuts to make Web developer's lives easier, but all
+   those tools are of no use if you can't easily deploy your sites. Since Django's
+   inception, ease of deployment has been a major goal. There's a number of good
+   ways to easily deploy Django:
 
 Django には、ウェブ開発者の負担を軽くするショートカットがぎっしりつまってい
 ますが、作ったサイトをデプロイできなければ元も子もありません。 Django プロ
 ジェクトの開始当時から、簡単なデプロイは大きな目標の一つでした。Django を簡
 単にデプロイするいい方法はいくつもあります:
 
+.. .. toctree::
+      :maxdepth: 1
+
+      wsgi/index
+      fastcgi
+      mod_python (deprecated) <modpython>
+
 .. toctree::
    :maxdepth: 1
 
-   modwsgi      
-   modpython
+   wsgi/index
    fastcgi
-   
+   mod_python (非推奨) <modpython>
+
+.. If you're new to deploying Django and/or Python, we'd recommend you try
+   :doc:`mod_wsgi </howto/deployment/wsgi/modwsgi>` first. In most cases it'll be
+   the easiest, fastest, and most stable deployment choice.
+
 はじめて Django や Python で作った Web アプリケーションをデプロイするのなら、
 まずは :ref:`mod_wsgi を使う方法 <howto-deployment-modpython>` をお勧めしま
 す。 mod_wsgi を使えば、ほとんどの場合もっとも簡単で、高速で、安定したデプ
 ロイを実現できます。
 
+.. .. seealso::
+
+       * `Chapter 12 of the Django Book (second edition)`_ discusses deployment
+         and especially scaling in more detail. However, note that this edition
+         was written against Django version 1.1 and has not been updated since
+         :doc:`mod_python </howto/deployment/modpython>` was deprecated.
+
 .. seealso::
 
-    * `Django Book の 12 章`_ では、デプロイ方法と、とりわけスケールアウト
-      について詳しく解説しています。
-      
-.. _chapter 12 of the django book: http://djangobook.com/en/2.0/chapter12/
-.. _`Django Book の 12 章`: `chapter 12 of the django book`_
+    * `Django Book (2nd エディション) の 12 章`_ では、デプロイ方法と、とりわ
+      けスケールアウトについて詳しく解説しています。しかしながら、このエディ
+      ションは Django バージョン 1.1 に対して書かれていて、
+      :doc:`mod_python </howto/deployment/modpython>` が非推奨とされてからは更
+      新されていないことに気をつけてください。
+
+.. _django book (2nd エディション) の 12 章: http://djangobook.com/en/2.0/chapter12/
