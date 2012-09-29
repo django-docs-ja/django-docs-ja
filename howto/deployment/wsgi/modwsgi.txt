@@ -1,0 +1,285 @@
+.. ==========================================
+   How to use Django with Apache and mod_wsgi
+   ==========================================
+
+============================================
+Apache と mod_wsgi 環境で Django を使う方法
+============================================
+
+:revision-up-to: 17812 (1.4)
+
+.. Deploying Django with Apache_ and `mod_wsgi`_ is a tried and tested way to get
+   Django into production.
+
+Apache_ と `mod_wsgi`_ の組み合わせは、推奨の Django の実運用環境です。
+
+.. _Apache: http://httpd.apache.org/
+.. _mod_wsgi: http://code.google.com/p/modwsgi/
+
+.. mod_wsgi is an Apache module which can host any Python WSGI_ application,
+   including Django. Django will work with any version of Apache which supports
+   mod_wsgi.
+
+mod_wsgi は、 Django を含む WSGI_ インタフェース をサポートする Python アプリ
+ケーションを運用するときに使う Apache のモジュールです。
+Django は mod_wsgi をサポートするすべてのバージョンの Apache 上で動作します。
+
+.. _WSGI: http://www.wsgi.org
+
+.. The `official mod_wsgi documentation`_ is fantastic; it's your source for all
+   the details about how to use mod_wsgi. You'll probably want to start with the
+   `installation and configuration documentation`_.
+
+`mod_wsgi の公式ドキュメント`_ はすばらしい出来で、 mod_wsgi を使う上で必要
+なことがすべて書かれています。まずは `インストールと設定のガイド`_ から読み
+始めるとよいでしょう。
+
+.. .. _official mod_wsgi documentation: http://www.modwsgi.org/
+   .. _installation and configuration documentation: http://www.modwsgi.org/wiki/InstallationInstructions
+
+.. _`mod_wsgi の公式ドキュメント`: http://www.modwsgi.org/
+.. _`インストールと設定のガイド`: http://www.modwsgi.org/wiki/InstallationInstructions
+
+.. Basic configuration
+   ===================
+
+基本的な設定
+==============
+
+.. Once you've got mod_wsgi installed and activated, edit your Apache server's
+   ``httpd.conf`` file and add::
+
+mod_wsgi をインストールして有効にしたら、 ``httpd.conf`` ファイルを編集して、
+以下の宣言を追加してください::
+
+    WSGIScriptAlias / /path/to/mysite.com/mysite/wsgi.py
+    WSGIPythonPath /path/to/mysite.com
+
+    <Directory /path/to/mysite.com/mysite>
+    <Files wsgi.py>
+    Order deny,allow
+    Allow from all
+    </Files>
+    </Directory>
+
+.. The first bit in the ``WSGIScriptAlias`` line is the base URL path you want to
+   serve your application at (``/`` indicates the root url), and the second is the
+   location of a "WSGI file" -- see below -- on your system, usually inside of
+   your project package (``mysite`` in this example). This tells Apache to serve
+   any request below the given URL using the WSGI application defined in that
+   file.
+
+``WSGIScriptAlias`` の行の最初の引数は、アプリケーションを公開する場所 (``/``
+はルート URL を表しています)、二つ目の引数はシステム上の「WSGI ファイル（後
+述）」の場所です。 WSGI は通常、プロジェクトパッケージ (この例では ``mysite``)
+の中に置きます。これで、 Apache はルート URL 以下のすべてのリクエストを、指定
+の WSGI ファイルを使って処理します。
+
+.. The ``WSGIPythonPath`` line ensures that your project package is available for
+   import on the Python path; in other words, that ``import mysite`` works.
+
+``WSGIPythonPath`` の行は、プロジェクトのパッケージが Python パスでのインポー
+トで使えることを保証します。
+
+.. The ``<Directory>`` piece just ensures that Apache can access your
+   :file:`wsgi.py` file.
+
+``<Directory>`` の部分は Apache が :file:`wsgi.py` ファイルにアクセスできるこ
+とを保証します。
+
+.. Next we'll need to ensure this :file:`wsgi.py` with a WSGI application object
+   exists. As of Django version 1.4, :djadmin:`startproject` will have created one
+   for you; otherwise, you'll need to create it. See the :doc:`WSGI overview
+   documentation</howto/deployment/wsgi/index>` for the default contents you
+   should put in this file, and what else you can add to it.
+
+次に :file:`wsgi.py` に WSGI application オブジェクトが含まれていることを保証
+する必要があります。
+Django 1.4 では、 :djadmin:`startproject` がそのファイルを作ってくれるでしょ
+う。それ以前のバージョンでは、自分で作成する必要があります。
+このファイルに書くべき内容と、追加できる内容については :doc:`WSGI 概要ドキュメ
+ント </howto/deployment/wsgi/index>` を参照してください。
+
+.. Using a virtualenv
+   ==================
+
+virtualenv を使う
+=================
+
+.. If you install your project's Python dependencies inside a `virtualenv`_,
+   you'll need to add the path to this virtualenv's ``site-packages`` directory to
+   your Python path as well. To do this, you can add another line to your
+   Apache configuration::
+
+`virtualenv`_ の中にプロジェクトが依存する Python モジュールをインストールして
+いるなら、 virtualenv の ``site-packages`` ディレクトリも Python パスに追加す
+る必要があります。そのためには、 Apache の設定にもう一行追加してください::
+
+    WSGIPythonPath /path/to/your/venv/lib/python2.X/site-packages
+
+.. Make sure you give the correct path to your virtualenv, and replace
+   ``python2.X`` with the correct Python version (e.g. ``python2.7``).
+
+virtualenv への正しいパスを設定しているか、 ``python2.X`` を正しい Python バー
+ジョン (``python2.7`` のような) で置き換えているかを確認してください。
+
+.. _virtualenv: http://www.virtualenv.org
+
+.. Using mod_wsgi daemon mode
+   ==========================
+
+mod_wsgi のデーモンモードを使う
+===============================
+
+.. "Daemon mode" is the recommended mode for running mod_wsgi (on non-Windows
+   platforms). See the `official mod_wsgi documentation`_ for details on setting
+   up daemon mode. The only change required to the above configuration if you use
+   daemon mode is that you can't use ``WSGIPythonPath``; instead you should use
+   the ``python-path`` option to ``WSGIDaemonProcess``, for example::
+
+「デーモンモード」は mod_wsgi を (Windows 以外のプラットフォームで) 動かすとき
+にお勧めのモードです。デーモンモードでの設定方法の詳細は
+`mod_wsgi の公式ドキュメント`_ を参照してください。デーモンモードを使う時に唯
+一必要になる変更は、上の設定の ``WSGIPythonPath`` は使えず、代わりに
+``python-path`` オプションを ``WSGIDaemonProcess`` に渡す必要があることです。
+例::
+
+    WSGIDaemonProcess example.com python-path=/path/to/mysite.com:/path/to/venv/lib/python2.7/site-packages
+
+.. _serving-files:
+
+メディアファイルの公開
+=======================
+
+.. Django doesn't serve files itself; it leaves that job to whichever Web
+   server you choose.
+
+Django 自身には、メディアファイルを自動的に公開する機能はありません。メディ
+アファイルの公開は Web サーバの仕事です。
+
+.. We recommend using a separate Web server -- i.e., one that's not also running
+   Django -- for serving media. Here are some good choices:
+
+メディアファイルの公開には、別個の Web サーバ、つまり Django を動作させてい
+ない別のサーバを使うよう勧めます。以下のようなサーバが、選択肢としておすす
+めです:
+
+* lighttpd_
+* Nginx_
+* TUX_
+* Apache_ のチューニング版
+* Cherokee_
+
+.. If, however, you have no option but to serve media files on the same Apache
+  ``VirtualHost`` as Django, you can set up Apache to serve some URLs as
+  static media, and others using the mod_wsgi interface to Django.
+
+メディアファイルを Django が稼働しているのと同じ ``VirtualHost`` で公開せざ
+るを得ない場合には、 Apache を設定して、ある URL では静的なメディアを公開し、
+別の URL では mod_wsgi インタフェースを介して Django に処理させるよう設定で
+きます。
+
+.. This example sets up Django at the site root, but explicitly serves
+   ``robots.txt``, ``favicon.ico``, any CSS file, and anything in the
+   ``/static/`` and ``/media/`` URL space as a static file. All other URLs
+   will be served using mod_wsgi::
+
+以下の例では、 Django にサイトルート以下へのリクエストを処理させながら、
+``robots.txt``, ``favicon.ico``, CSS ファイル、および ``/media/`` URL空間以
+下のすべてのファイルは静的ファイルとして mod_wsgi に処理させます::
+
+    Alias /robots.txt /path/to/mysite.com/static/robots.txt
+    Alias /favicon.ico /path/to/mysite.com/static/favicon.ico
+
+    AliasMatch ^/([^/]*\.css) /path/to/mysite.com/static/styles/$1
+
+    Alias /media/ /path/to/mysite.com/media/
+    Alias /static/ /path/to/mysite.com/static/
+
+    <Directory /path/to/mysite.com/static>
+    Order deny,allow
+    Allow from all
+    </Directory>
+
+    <Directory /path/to/mysite.com/media>
+    Order deny,allow
+    Allow from all
+    </Directory>
+
+    WSGIScriptAlias / /path/to/mysite.com/mysite/wsgi.py
+
+    <Directory /path/to/mysite.com/mysite>
+    <Files wsgi.py>
+    Order allow,deny
+    Allow from all
+    </Files>
+    </Directory>
+
+.. _lighttpd: http://www.lighttpd.net/
+.. _Nginx: http://wiki.nginx.org/Main
+.. _TUX: http://en.wikipedia.org/wiki/TUX_web_server
+.. _Apache: http://httpd.apache.org/
+.. _Cherokee: http://www.cherokee-project.com/
+
+.. More details on configuring a mod_wsgi site to serve static files can be found
+.. in the mod_wsgi documentation on `hosting static files`_.
+
+.. _`静的ファイルのホスティング`: http://code.google.com/p/modwsgi/wiki/ConfigurationGuidelines#Hosting_Of_Static_Files
+
+.. _serving-the-admin-files:
+
+.. Serving the admin files
+   =======================
+
+admin のファイルを公開する
+==========================
+
+.. Note that the Django development server automatically serves the static files
+   of the admin app (and any other installed apps), but this is not the case when
+   you use any other server arrangement. You're responsible for setting up Apache,
+   or whichever media server you're using, to serve the admin files.
+
+Django の開発サーバは自動的に admin アプリケーションの静的ファイル (他のインス
+トールされたアプリケーションも) を公開しますが、他のサーバ編成を使っている時は
+そうなりません。 Apache や使用しているメディアサーバを設定し、 admin のファイ
+ルを公開できるようにしなければなりません。
+
+.. The admin files live in (:file:`django/contrib/admin/static/admin`) of the
+   Django distribution.
+
+admin ファイルは Django ディストリビューションの
+(:file:`django/contrib/admin/static/admin`) にあります。
+
+.. We **strongly** recommend using :mod:`django.contrib.staticfiles` to handle the
+   admin files (along with a Web server as outlined in the previous section; this
+   means using the :djadmin:`collectstatic` management command to collect the
+   static files in :setting:`STATIC_ROOT`, and then configuring your Web server to
+   serve :setting:`STATIC_ROOT` at :setting:`STATIC_URL`), but here are three
+   other approaches:
+
+:mod:`django.contrib.staticfiles` を使って admin ファイルを扱うことを強くお勧
+めします。 (前のセクションで概要を説明したように Web サーバを設定します。つま
+り :djadmin:`collectstatic` 管理コマンドを使って静的ファイルを
+:setting:`STATIC_ROOT` に集め、 Web サーバが :setting:`STATIC_ROOT` を
+:setting:`STATIC_URL` の場所で公開するよう設定します) しかし以下では別の方法を
+3 つ挙げましょう:
+
+.. 1. Create a symbolic link to the admin static files from within your
+      document root (this may require ``+FollowSymLinks`` in your Apache
+      configuration).
+
+   2. Use an ``Alias`` directive, as demonstrated above, to alias the appropriate
+      URL (probably :setting:`STATIC_URL` + `admin/`) to the actual location of
+      the admin files.
+
+   3. Copy the admin static files so that they live within your Apache
+      document root.
+
+1. ドキュメントルートに admin の静的ファイルへのシンボリックを作ります。
+   (Apache の設定に ``+FollowSymLinks`` が必要になるでしょう)
+
+2. 上で示したように ``Alias`` ディレクティブを使って、適切な URL (おそらく
+   :setting:`STATIC_URL` + `admin/`) から admin ファイルがある実際の場所へのエ
+   イリアスを作ります。
+
+3. admin の静的ファイルをコピーし、 Apache のドキュメントルートに置きます。
