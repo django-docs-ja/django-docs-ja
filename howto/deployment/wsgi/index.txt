@@ -1,0 +1,131 @@
+.. =======================
+   How to deploy with WSGI
+   =======================
+
+=======================
+WSGI にデプロイする方法
+=======================
+
+:revision-up-to: 17812 (1.4)
+
+.. Django's primary deployment platform is WSGI_, the Python standard for web
+   servers and applications.
+
+Django の主要なデプロイプラットフォームは、 Web サーバと Web アプリケーション
+に関して Python の標準である WSGI_ です。
+
+.. _WSGI: http://www.wsgi.org
+
+.. Django's :djadmin:`startproject` management command sets up a simple default
+   WSGI configuration for you, which you can tweak as needed for your project, and
+   direct any WSGI-compliant webserver to use. Django includes getting-started
+   documentation for the following WSGI servers:
+
+Django の :djadmin:`startproject` 管理コマンドはシンプルなデフォルトの WSGI 設
+定をセットアップします。プロジェクトと WSGI 準拠の Web サーバに合わせて、必要
+なら微調整することができます。 Django には以下の WSGI サーバのための手引きとな
+るドキュメントが用意されています:
+
+.. toctree::
+   :maxdepth: 1
+
+   modwsgi
+   gunicorn
+   uwsgi
+
+.. The ``application`` object
+   --------------------------
+
+``application`` オブジェクト
+----------------------------
+
+.. One key concept of deploying with WSGI is to specify a central ``application``
+   callable object which the webserver uses to communicate with your code. This is
+   commonly specified as an object named ``application`` in a Python module
+   accessible to the server.
+
+WSGI デプロイでのキー概念の一つは、中心となる ``application`` という呼び出し可
+能オブジェクトを設定することです。 Web サーバはこれをあなたのコードとの連絡の
+ために使います。これはサーバにアクセスできる Python モジュールのなかで一般に
+``application`` という名前のオブジェクトとして設定されるものです。
+
+.. versionchanged:: 1.4
+
+.. The :djadmin:`startproject` command creates a :file:`projectname/wsgi.py` that
+   contains such an application callable.
+
+:djadmin:`startproject` コマンドは、そのような application オブジェクトを含む
+:file:`projectname/wsgi.py` ファイルを作ります。
+
+.. .. note::
+
+      Upgrading from a previous release of Django and don't have a :file:`wsgi.py`
+      file in your project? You can simply add one to your project's top-level
+      Python package (probably next to :file:`settings.py` and :file:`urls.py`)
+      with the contents below. If you want :djadmin:`runserver` to also make use
+      of this WSGI file, you can also add ``WSGI_APPLICATION =
+      "mysite.wsgi.application"`` in your settings (replacing ``mysite`` with the
+      name of your project).
+
+.. note::
+
+   以前のバージョンの Django からのアップデートして、 :file:`wsgi.py` ファイル
+   がプロジェクト内にない場合は、単にプロジェクトのトップレベルパッケージに
+   (おそらく :file:`settings.py` と :file:`urls.py` の次に) 下記の内容を含む
+   ファイルを追加できます。
+   :djadmin:`runserver` がこの WSGI ファイルを使うようにしたければ、
+   ``WSGI_APPLICATION = "mysite.wsgi.application"`` を settings に追加します。
+   (``mysite`` をプロジェクト名に置き換えてください)
+
+.. Initially this file contains::
+
+       import os
+
+       os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
+
+       # This application object is used by the development server
+       # as well as any WSGI server configured to use this file.
+       from django.core.wsgi import get_wsgi_application
+       application = get_wsgi_application()
+
+最初の状態ではこのファイルは次のようになっています::
+
+    import os
+
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
+
+    # This application object is used by the development server
+    # as well as any WSGI server configured to use this file.
+    from django.core.wsgi import get_wsgi_application
+    application = get_wsgi_application()
+
+.. The ``os.environ.setdefault`` line just sets the default settings module to
+   use, if you haven't explicitly set the :envvar:`DJANGO_SETTINGS_MODULE`
+   environment variable. You'll need to edit this line to replace ``mysite`` with
+   the name of your project package, so the path to your settings module is
+   correct.
+
+``os.environ.setdefault`` の行は、明示的に :envvar:`DJANGO_SETTINGS_MODULE` 環
+境変数が設定されていなければ、デフォルトの設定を使うようにセットします。
+settings モジュールへのパスが正しくなるように、この行の ``mysite`` をプロジェ
+クトのパッケージ名で置き換える必要があるでしょう。
+
+.. To apply `WSGI middleware`_ you can simply wrap the application object
+   in the same file::
+
+`WSGI middleware`_ を適用するために、同じファイルの中で application オブジェク
+トを単純にラップすることができます::
+
+    from helloworld.wsgi import HelloWorldApplication
+    application = HelloWorldApplication(application)
+
+.. You could also replace the Django WSGI application with a custom WSGI
+   application that later delegates to the Django WSGI application, if you want to
+   combine a Django application with a WSGI application of another framework.
+
+また、Django アプリケーションと他のフレームワークの WSGI アプリケーションと
+を組み合わせたければ、あとで Django の WSGI application に処理を委譲するような
+カスタムの WSGI application を用意して Django の WSGI application を置き換える
+こともできます。
+
+.. _`WSGI middleware`: http://www.python.org/dev/peps/pep-3333/#middleware-components-that-play-both-sides
