@@ -1,0 +1,124 @@
+.. ===============================
+   How to use Django with Gunicorn
+   ===============================
+
+=============================
+Gunicorn で Django を使う方法
+=============================
+
+:revision-up-to: 17812 (1.4)
+
+.. highlight:: bash
+
+.. Gunicorn_ ('Green Unicorn') is a pure-Python WSGI server for UNIX. It has no
+   dependencies and is easy to install and use.
+
+Gunicorn_ (Green Unicorn) は UNIX 向けのピュア Python 製 WSGI サーバです。他の
+ライブラリへの依存関係がなく、簡単にインストールして使うことができます。
+
+.. _Gunicorn: http://gunicorn.org/
+
+.. There are two ways to use Gunicorn with Django. One is to have Gunicorn treat
+   Django as just another WSGI application. The second is to use Gunicorn's
+   special `integration with Django`_.
+
+Gunicorn で Django を使う方法は 2 通りあります。 1 つは Gunicorn に Django を
+単なる 1 つの WSGI アプリケーションとして扱わせる方法です。もう 1 つは
+Gunicorn に特別に用意された `Django インテグレーション機能`_ を使う方法です。
+
+.. _`Django インテグレーション機能`: http://gunicorn.org/run.html#django-manage-py_
+
+.. Installing Gunicorn
+   ===================
+
+Gunicorn のインストール
+=======================
+
+.. Installing gunicorn is as easy as ``sudo pip install gunicorn``. For more
+   details, see the `gunicorn documentation`_.
+
+Gunicorn のインストールは ``sudo pip install gunicorn`` だけで済みます。もっと
+詳しいことが知りたければ `Gunicorn ドキュメント`_ を参照してください。
+
+.. .. _`gunicorn documentation`: http://gunicorn.org/install.html
+
+.. _`gunicorn ドキュメント`: http://gunicorn.org/install.html
+
+.. Running Django in Gunicorn as a generic WSGI application
+   ========================================================
+
+Gunicorn で Django を一般的な WSGI アプリケーションとして動かす
+===============================================================
+
+.. When Gunicorn is installed, a ``gunicorn`` command is available which starts
+   the Gunicorn server process. At its simplest, gunicorn just needs to be called
+   with a the location of a WSGI application object.::
+
+Gunicorn をインストールすると、 ``gunicorn`` コマンドで Gunicorn のサーバプロ
+セスを起動できるようになります。もっともシンプルな方法では、 Gunicorn は WSGI
+アプリケーションオブジェクトの場所を指定するだけで起動できます::
+
+    gunicorn [OPTIONS] APP_MODULE
+
+.. Where ``APP_MODULE`` is of the pattern ``MODULE_NAME:VARIABLE_NAME``. The
+   module name should be a full dotted path. The variable name refers to a WSGI
+   callable that should be found in the specified module.
+
+ここで ``APP_MODULE`` は ``モジュール名:変数名`` というパターンになります。モ
+ジュール名はドット区切りのフルパスでなければなりません。変数名はモジュールの中
+で探されるべき WSGI 呼び出し可能オブジェクトを指します。
+
+.. So for a typical Django project, invoking gunicorn would look like::
+
+典型的な Django プロジェクトでは、 Gunicorn の起動は次のようになります::
+
+    gunicorn myproject.wsgi:application
+
+.. (This requires that your project be on the Python path; the simplest way to
+   ensure that is to run this command from the same directory as your
+   ``manage.py`` file.)
+
+(このためにはプロジェクトが Python パス上にあることが必要です。それを確実にす
+るもっとも簡単な方法は、 ``manage.py`` ファイルがあるのと同じディレクトリでこ
+のコマンドを実行することです。)
+
+.. Using Gunicorn's Django integration
+   ===================================
+
+Gunicorn の Django インテグレーション機能を使う
+===============================================
+
+.. To use Gunicorn's built-in Django integration, first add ``"gunicorn"`` to
+   :setting:`INSTALLED_APPS`. Then run ``python manage.py run_gunicorn``.
+
+Gunicorn に組み込まれた Django インテグレーション機能を使うには、まず
+``"gunicorn"`` を :setting:`INSTALLED_APPS` に追加します。そして ``python
+manage.py run_gunicorn`` を実行します。
+
+.. This provides a few Django-specific niceties:
+
+.. * sets the gunicorn process name to be that of the project
+
+   * validates installed models
+
+   * allows an ``--adminmedia`` option for passing in the location of the
+     admin media files, mimicing the behavior of runserver.
+
+この方法は Django 向けの素敵な特徴を提供します:
+
+* Gunicorn のプロセス名にプロジェクト名をセットします
+
+* インストールされたモデルを検証します
+
+* admin のメディアファイルの場所を渡す ``--adminmedia`` オプションが使えます。
+  これは runserver の動作をまねします。
+
+.. See Gunicorn's `deployment documentation`_ for additional tips on starting and
+   maintaining the Gunicorn server.
+
+Gunicorn の `デプロイドキュメント`_ を読むと、 Gunicorn サーバを起動し、維持す
+るためのさらなるヒントが得られます。
+
+.. .. _deployment documentation: http://gunicorn.org/deploy.html
+
+.. _`デプロイドキュメント`: http://gunicorn.org/deploy.html

@@ -1,0 +1,185 @@
+.. ============================
+   How to use Django with uWSGI
+   ============================
+
+==========================
+uWSGI で Django を使う方法
+==========================
+
+:revision-up-to: 17812 (1.4)
+
+.. highlight:: bash
+
+.. uWSGI_ is a fast, self-healing and developer/sysadmin-friendly application
+   container server coded in pure C.
+
+uWSGI_ は、ピュア C で書かれた、高速で自己回復機能のある、開発者とシステム管理
+者に優しいアプリケーションコンテナサーバです。
+
+.. _uWSGI: http://projects.unbit.it/uwsgi/
+
+.. Prerequisite: uWSGI
+   ===================
+
+uWSGI の必要条件
+================
+
+.. The uWSGI wiki describes several `installation procedures`_. Using pip, the
+   Python package manager, you can install any uWSGI version with a single
+   command. For example:
+
+   .. code-block:: bash
+
+       # Install current stable version.
+       $ sudo pip install uwsgi
+
+       # Or install LTS (long term support).
+       $ sudo pip install http://projects.unbit.it/downloads/uwsgi-lts.tar.gz
+
+uWSGI の Wiki にはいくつかの `インストール条件`_ が書かれています。 Python の
+パッケージマネージャである pip を使うと、 uWSGI のどのバージョンのインストール
+も 1 つのコマンドでインストールできます。例えば:
+
+.. code-block:: bash
+
+    # 現在の安定バージョンをインストールします
+    $ sudo pip install uwsgi
+
+    # または LTS (long term support) バージョンをインストールします
+    $ sudo pip install http://projects.unbit.it/downloads/uwsgi-lts.tar.gz
+
+.. .. _installation procedures: http://projects.unbit.it/uwsgi/wiki/Install
+
+.. _`インストール条件`: http://projects.unbit.it/uwsgi/wiki/Install
+
+.. uWSGI model
+   -----------
+
+uWSGI の動作モデル
+------------------
+
+.. uWSGI operates on a client-server model. Your Web server (e.g., nginx, Apache)
+   communicates with a django-uwsgi "worker" process to serve dynamic content.
+   See uWSGI's `background documentation`_ for more detail.
+
+uWSGI はクライアント・サーバモデルで動作します。 Web サーバ (例えば Nginx,
+Apache など) は、動的なコンテンツを配信する Django-uWSGI の「ワーカー」プロセ
+スと通信します。もっと詳しく知るには、WSGI の `バックグラウンドドキュメント`_
+を見てください。
+
+.. .. _background documentation: http://projects.unbit.it/uwsgi/wiki/Background
+
+.. _`バックグラウンドドキュメント`: http://projects.unbit.it/uwsgi/wiki/Background
+
+.. Configuring and starting the uWSGI server for Django
+   ----------------------------------------------------
+
+uWSGI サーバに Django 向けの設定をし起動する
+--------------------------------------------
+
+.. uWSGI supports multiple ways to configure the process. See uWSGI's
+   `configuration documentation`_ and `examples`_
+
+uWSGI はプロセスを設定する複数の方法をサポートしています。 uWSGI の
+`設定ドキュメント`_ と `設定例`_ を見てください。
+
+.. .. _configuration documentation: http://projects.unbit.it/uwsgi/wiki/Doc
+   .. _examples: http://projects.unbit.it/uwsgi/wiki/Example
+
+.. _`設定ドキュメント`: http://projects.unbit.it/uwsgi/wiki/Doc
+.. _`設定例`: http://projects.unbit.it/uwsgi/wiki/Example
+
+.. Here's an example command to start a uWSGI server::
+
+       uwsgi --chdir=/path/to/your/project
+           --module='mysite.wsgi:application' \
+           --env DJANGO_SETTINGS_MODULE=mysite.settings \
+           --master --pidfile=/tmp/project-master.pid \
+           --socket=127.0.0.1:49152 \      # can also be a file
+           --processes=5 \                 # number of worker processes
+           --uid=1000 --gid=2000 \         # if root, uwsgi can drop privileges
+           --harakiri=20 \                 # respawn processes taking more than 20 seconds
+           --limit-as=128 \                # limit the project to 128 MB
+           --max-requests=5000 \           # respawn processes after serving 5000 requests
+           --vacuum \                      # clear environment on exit
+           --home=/path/to/virtual/env \   # optional path to a virtualenv
+           --daemonize=/var/log/uwsgi/yourproject.log      # background the process
+
+以下は uWSGI サーバを起動するコマンドの例です::
+
+    uwsgi --chdir=/path/to/your/project
+        --module='mysite.wsgi:application' \
+        --env DJANGO_SETTINGS_MODULE=mysite.settings \
+        --master --pidfile=/tmp/project-master.pid \
+        --socket=127.0.0.1:49152 \      # ソケットファイルも使えます
+        --processes=5 \                 # ワーカープロセスの数
+        --uid=1000 --gid=2000 \         # もし root で実行する場合、 uwsgi は権限を落とせます
+        --harakiri=20 \                 # 20 秒以上かかるプロセスを再生成します
+        --limit-as=128 \                # プロジェクトを 128 MB に制限します
+        --max-requests=5000 \           # 5000 リクエストに応答したらプロセスを再生成します
+        --vacuum \                      # exit する時に環境をクリアします
+        --home=/path/to/virtual/env \   # virtualenv への追加パス
+        --daemonize=/var/log/uwsgi/yourproject.log      # プロセスをバックグラウンドで実行します
+
+.. This assumes you have a top-level project package named ``mysite``, and
+   within it a module :file:`mysite/wsgi.py` that contains a WSGI ``application``
+   object. This is the layout you'll have if you ran ``django-admin.py
+   startproject mysite`` (using your own project name in place of ``mysite``) with
+   a recent version of Django. If this file doesn't exist, you'll need to create
+   it. See the :doc:`/howto/deployment/wsgi/index` documentation for the default
+   contents you should put in this file and what else you can add to it.
+
+ここでは ``mysite`` という名前のトップレベルプロジェクトパッケージがあり、その
+中に WSGI の ``application`` を含む :file:`mysite/wsgi.py` があることを仮定し
+ています。このレイアウトは、 Django の最近のバージョンで ``django-admin.py
+startproject mysite`` (``mysite`` の箇所にはプロジェクト名が入ります) を実行し
+た時に作られるものです。このファイルがない場合、自分で作る必要があります。この
+ファイルに書くべきデフォルトの内容と、追加できる内容については
+:doc:`/howto/deployment/wsgi/index` ドキュメントを参照してください。
+
+.. The Django-specific options here are:
+
+   * ``chdir``: The path to the directory that needs to be on Python's import
+     path -- i.e., the directory containing the ``mysite`` package.
+   * ``module``: The WSGI module to use -- probably the ``mysite.wsgi`` module
+     that :djadmin:`startproject` creates.
+   * ``env``: Should probably contain at least ``DJANGO_SETTINGS_MODULE``.
+   * ``home``: Optional path to your project virtualenv.
+
+この例で Django 用のオプションは以下の通りです:
+
+* ``chdir``: Python の import パスに必要なディレクトリのパスです。 --
+  例では ``mysite`` パッケージを含むディレクトリです。
+* ``module``: 使われる WSGI モジュール -- おそらく :djadmin:`startproject` が
+  作った ``mysite.wsgi`` モジュールです。
+* ``env``: 少なくとも ``DJANGO_SETTINGS_MODULE`` を含める必要があります。
+* ``home``: プロジェクトの virtualenv への追加パスです。
+
+.. Example ini configuration file::
+
+以下は ini ファイルでの設定例です::
+
+    [uwsgi]
+    chdir=/path/to/your/project
+    module='mysite.wsgi:application'
+    master=True
+    pidfile=/tmp/project-master.pid
+    vacuum=True
+    max-requests=5000
+    daemonize=/var/log/uwsgi/yourproject.log
+
+.. Example ini configuration file usage::
+
+以下は設定ファイルの使い方の例です::
+
+    uwsgi --ini uwsgi.ini
+
+.. See the uWSGI docs on `managing the uWSGI process`_ for information on
+   starting, stoping and reloading the uWSGI workers.
+
+uWSGI ワーカーの起動、停止、リロードについて情報を得るには、
+`uWSGI プロセスの管理`_ ドキュメントを参照してください。
+
+.. .. _managing the uWSGI process: http://projects.unbit.it/uwsgi/wiki/Management
+
+.. _`uWSGI プロセスの管理`: http://projects.unbit.it/uwsgi/wiki/Management
