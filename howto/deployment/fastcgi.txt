@@ -4,15 +4,14 @@
 FastCGI, SCGI, AJP で Django を使う
 ===================================
 
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
 
 .. highlight:: bash
 
-Django を動作させる構成として現在推奨しているのは、 
-:ref:`Apache と mod_wsgi <howto-deployment-modwsgi>` の組合せですが、多くの
+Django を動作させるプラットフォームとして現在推奨しているのは
+:doc:`WSGI </howto/deployment/wsgi/index>` ですが、多くの
 人々が使っている共有ホスティングサービスには、 FastCGI や SCGI, AJP といっ
-たプロトコルしか選択肢がありません。また、構成によっては、これらのプロトコ
-ルの方が、 mod_wsgi_ よりも高いパフォーマンスを実現することがあります。
+たプロトコルしか選択肢がありません。
 
 .. admonition:: Note
 
@@ -27,13 +26,13 @@ FastCGI は、いわば外部アプリケーションによって Web サーバ�
 Web サーバに返します。 Web サーバはその内容をクライアントのWeb ブラウザに返
 すというわけです。
 
-mod_python と同様、 FastCGI はコードをメモリ上に残すので、リクエストはスク
-リプトの起動時間を伴わずに処理されます。 mod_python_ (や `mod_perl`_) と違
-うのは、 FastCGI プロセスは Web サーバプロセスの中ではなく、別の永続的プロ
-セスの中で実行されるということです。
+WSGI と同様、 FastCGI はコードをメモリ上に残すので、リクエストはスクリプトの起
+動時間を伴わずに処理されます。 ただし、例えば
+:doc:`mod_wsgi</howto/deployment/wsgi/modwsgi>` が Apache Web サーバプロセスの
+中に組み込まれるか、別のデーモンプロセスとして実行されるかを設定できるのに対
+し、 FastCGI プロセスは Web サーバプロセスの中ではなく、別の永続的プロセスの中
+で実行されます。
 
-.. _mod_wsgi: http://code.google.com/p/modwsgi/
-.. _mod_python: http://www.modpython.org/
 .. _mod_perl: http://perl.apache.org/
 
 .. admonition:: なぜ別のプロセスでコードを実行するのですか？
@@ -42,9 +41,7 @@ mod_python と同様、 FastCGI はコードをメモリ上に残すので、リ
     内に様々なスクリプト言語 (有名なのは PHP, Python, Perl です) を埋め込ん
     で実行します。この構成は、リクエストのたびにプログラムコードをディスク
     から読み出さなくてもよくなるため、起動時間を減らせるという利点がありま
-    す --- その反面、メモリの消費は莫大になります。例えば、 mod_python の場
-    合、 Apache の全てのプロセスに Python インタプリタの実行イメージが埋め
-    込まれることになり、かなりの量の RAM を消費するのです。
+    す --- その反面、メモリの消費は莫大になります。
 
     FastCGI の性質上、Web サーバプロセスと別のユーザアカウントでプロセスを
     実行できます。この特徴は、自分のコードを他のユーザから守れるという点で、
@@ -81,7 +78,7 @@ Unix ドメインソケット (Win32 システムにおける「名前付きパ�
 から、通常は TCP ソケットの方が簡単です。
 
 サーバを起動するには、プロジェクトのあるディレクトリ (``manage.py`` のある
-場所) に移動して、 :ref:`manage.py <ref-django-admin>` の
+場所) に移動して、 :doc:`manage.py </ref/django-admin>` の
 :djadmin:`runfcgi` コマンドを実行します::
 
     ./manage.py runfcgi [options]
@@ -89,17 +86,18 @@ Unix ドメインソケット (Win32 システムにおける「名前付きパ�
 :djadmin:`runfcgi` に ``help`` オプションだけを指定すると、利用可能な全ての
 オプションを表示します。
 
-引数として、 ``socket``, ``protocol``, または、 ``host`` および ``port`` を
-指定せねばなりません。さらに、 Web サーバをセットアップする際に、FastCGI サー
-バを起動するときに使ったソケット名か、ホスト/ポート番号の組合せを指定せねば
-なりません。後述の `実行例`_ を参照してください。
+引数として、 :djadminopt:`socket`, :djadminopt:`protocol`, または、
+:djadminopt:`host` および :djadminopt:`port` を指定せねばなりません。さらに、
+Web サーバをセットアップする際に、FastCGI サーバを起動するときに使ったソケット
+名か、ホスト/ポート番号の組合せを指定せねばなりません。後述の `実行例`_ を参照
+してください。
 
 プロトコル
 ----------
 
 Django は flup_ のサポートしている全てのプロトコル、すなわち fastcgi_,
 SCGI_, `AJP1.3`_ (Apache JServ プロトコルバージョン 1.3) をサポートしていま
-す。使いたいプロトコルを指定するには、 ``protocol=<protocl_name>`` を
+す。使いたいプロトコルを指定するには、 :djadminopt:`protocol=<protocl_name>` を
 ``./manage.py runfcgi`` のオプションに指定します。 ``<protocol_name>`` は
 ``fcgi`` (デフォルト)、 ``scgi`` または ``ajp`` のいずれかです。例を以下に
 示します::
@@ -122,6 +120,21 @@ Unix ドメインソケットを使い、 prefork モードでサーバを起動
 
     ./manage.py runfcgi method=prefork socket=/home/user/mysite.sock pidfile=django.pid
 
+.. .. admonition:: Socket security
+
+       Django's default umask requires that the webserver and the Django fastcgi
+       process be run with the same group **and** user. For increased security,
+       you can run them under the same group but as different users. If you do
+       this, you will need to set the umask to 0002 using the ``umask`` argument
+       to ``runfcgi``.
+
+.. admonition:: ソケットのセキュリティ
+
+    Django のデフォルトの umask では Web サーバと Django の fastcgi が同じグ
+    ループ **かつ** 同じユーザで実行されることが必要です。セキュリティを強固に
+    するには同じグループの別のユーザで実行させることができます。こうする場合は
+    ``runfcgi`` の ``umask`` 引数を使って umask に 0002 をセットします。
+
 デーモン化 (バックグラウンド化) させずにプロセスを起動する場合 (デバッグ時
 に便利です)::
 
@@ -134,8 +147,8 @@ FastCGI デーモンを止める
 ``Ctrl-C`` を押して FastCGI サーバを止めるだけですみます。バックグラウンド
 プロセスを使っているのなら、 Unix の ``kill`` コマンドを使わねばなりません。
 
-``pidfile`` オプションを指定して :djadmin:`runfcgi` を起動しているのなら、
-以下のようにして起動中の FastCGI デーモンを殺せます::
+:djadminopt:`pidfile` オプションを指定して :djadmin:`runfcgi` を起動しているの
+なら、以下のようにして起動中の FastCGI デーモンを殺せます::
 
     kill `cat $PIDFILE`
 
@@ -172,10 +185,10 @@ mod_fastcgi の構成が終ったら、 ``httpd.conf`` ファイルを編集し�
 に Django の FastCGI インスタンスを教えます。以下の二つの設定を行わねばなり
 ません:
 
-    * ``FastCGIExternalServer`` ディレクティブを使って、 FastCGI サーバの場
-      所を指定します。
-    * ``mod_rewrite`` を使って、リクエストが適切な FastCGI に向くようにしま
-      す。
+* ``FastCGIExternalServer`` ディレクティブを使って、 FastCGI サーバの場
+  所を指定します。
+* ``mod_rewrite`` を使って、リクエストが適切な FastCGI に向くようにしま
+  す。
 
 .. _mod_fastcgi: http://www.fastcgi.com/mod_fastcgi/docs/mod_fastcgi.html
 
@@ -227,8 +240,39 @@ URL を ``mysite.fcgi`` (または ``FastCGIExternalServer`` ディレクティ�
 
 .. _mod_rewrite: http://httpd.apache.org/docs/2.0/mod/mod_rewrite.html
 
-Django は、 ``{% url %}`` テンプレートタグ (や、同様のメソッド) で URL を構
-築する際、自動的にリライト前の URL を使います。
+Django は、 :ttag:`{% url %}<url>` テンプレートタグ (や、同様のメソッド) で
+URL を構築する際、自動的にリライト前の URL を使います。
+
+.. Using mod_fcgid as alternative to mod_fastcgi
+   ----------------------------------------------
+
+mod_fastcgi の代わりに mod_fcgid を使う
+---------------------------------------
+
+.. Another way to serve applications through FastCGI is by using Apache's
+   `mod_fcgid`_ module. Compared to mod_fastcgi mod_fcgid handles FastCGI
+   applications differently in that it manages the spawning of worker processes
+   by itself and doesn't offer something like ``FastCGIExternalServer``. This
+   means that the configuration looks slightly different.
+
+FastCGI 経由でアプリケーションを提供する別の方法が、 Apache の `mod_fcgid` モ
+ジュールを使うことです。 mod_fastcgi と比べると、 mod_fcgid の FastCGI アプリ
+ケーションの扱い方は、ワーカープロセスを自分自身で生成し、
+``FastCGIExternalServer`` のような何かを提供するのではないところが異なります。
+このため設定が少し違った外見になります。
+
+.. In effect, you have to go the way of adding a script handler similar to what
+   is described later on regarding running Django in a :ref:`shared-hosting
+   environment <apache_shared_hosting>`. For further details please refer to the
+   `mod_fcgid reference`_
+
+実際には、後ほど :ref:`共有ホスティング環境 <apache_shared_hosting>` での
+Django の動作について説明するのと同じように、スクリプトハンドラを追加すること
+になります。もっと詳しく知るには、どうぞ `mod_fcgid リファレンス`_ を参照して
+ください。
+
+.. _mod_fcgid: http://httpd.apache.org/mod_fcgid/
+.. _`mod_Fcgid リファレンス`: http://httpd.apache.org/mod_fcgid/mod/mod_fcgid.html
 
 lighttpd での FastCGI 構成
 ==========================
@@ -315,6 +359,8 @@ Cherokee プロジェクトのページには、 `Cherokee で Django を運用�
 .. _setting up Django: http://www.cherokee-project.com/doc/cookbook_django.html
 .. _`Cherokee で Django を運用する`: `setting up Django`_
 
+.. _apache_shared_hosting:
+
 Apache を使っている共有ホスティングプロバイダ上で Django を使う
 ===============================================================
 
@@ -359,6 +405,23 @@ Web コンテンツのルートディレクトリ下に、以下のような内�
     from django.core.servers.fastcgi import runfastcgi
     runfastcgi(method="threaded", daemonize="false")
 
+.. This works if your server uses mod_fastcgi. If, on the other hand, you are
+   using mod_fcgid the setup is mostly the same except for a slight change in the
+   ``.htaccess`` file. Instead of adding a fastcgi-script handler, you have to
+   add a fcgid-handler:
+
+これはサーバが mod_fastcgi を使っている場合に動作します。一方、 mod_fcgid を
+使っている場合、 ``.htaccess`` ファイルでの少しの変更を除けば、セットアップは
+ほとんど同じです。 fastcgi-script ハンドラを追加する代わりに、 fcgi-handler を
+追加する必要があります:
+
+.. code-block:: apache
+
+    AddHandler fcgid-script .fcgi
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ mysite.fcgi/$1 [QSA,L]
+
 起動中のサーバを再起動する
 --------------------------
 
@@ -378,7 +441,7 @@ Admin メディアファイルの提供
 ============================
 
 サーバやその設定がどうあれ、何らかの形で admin メディアファイルを提供する方
-法を考えておかねばなりません。 :ref:`modpython <serving-the-admin-files>`
+法を考えておかねばなりません。 :ref:`modwsgi <serving-the-admin-files>`
 のドキュメントには、上記の構成でも使えるアドバイスがあります。
 
 URL のプレフィクス部分を特定の値にする
@@ -387,9 +450,9 @@ URL のプレフィクス部分を特定の値にする
 FastCGI を使った設置方法は、ほとんどが URL をリライトしてウェブサーバ内部の
 別の場所を指すようにしています。このとき、 Django から見えるパス情報には、
 もともとの URL が反映されません。そのため、 Django アプリケーションを特定の
-プレフィクスの下で動かしていて、 ``{% url %}`` タグで表示される URL を、
-``mysite.fcgi`` のようなリライト後のものでなく、プレフィクスのついた URL に
-したいときに問題が生じます。
+プレフィクスの下で動かしていて、 :ttag:`{% url %}<url>` タグで表示される
+URL を、 ``mysite.fcgi`` のようなリライト後のものでなく、プレフィクスのついた
+URL にしたいときに問題が生じます。
 
 Django は実際のスクリプト名プレフィクスが何だったかをそれなりにうまく調べよ
 うとします。特に、ウェブサーバが ``SCRIPT_URL`` を設定する場合(Apache の
