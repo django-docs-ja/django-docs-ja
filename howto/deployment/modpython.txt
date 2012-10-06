@@ -4,14 +4,29 @@
 Apache と mod_python で Django を動かす
 =========================================
 
-.. highlight:: apache
+:revision-up-to: 17812 (1.4)
 
-:revision-up-to: 11321 (1.1)
+.. .. warning::
+
+       Support for mod_python has been deprecated, and will be removed in
+       Django 1.5. If you are configuring a new deployment, you are
+       strongly encouraged to consider using :doc:`mod_wsgi
+       </howto/deployment/wsgi/modwsgi>` or any of the other :doc:`supported
+       servers </howto/deployment/index>`.
+
+.. warning::
+
+    mod_python のサポートは非推奨となっており Django 1.5 で取り除かれる予定
+    です。新しいデプロイ設定をするなら :doc:`mod_wsgi
+    </howto/deployment/wsgi/modwsgi>` または他の :doc:`サポートされている
+    サーバ </howto/deployment/index>` を使うことを強くお勧めします。
+
+.. highlight:: apache
 
 Apache_ の `mod_python`_ モジュールを使えば、本番環境で Django をデプロイで
 きます。ただし、この方法は、よりシンプルな
-:ref:`mod_wsgi による運用 <howto-deployment-modwsgi` を使う方法に取って代わ
-られつつあります。
+:doc:`mod_wsgi による運用 </howto/deployment/wsgi/modwsgi>` を使う方法に取
+って代わられつつあります。
 
 mod_python は `mod_perl`_ とよく似ていて (影響を受けていて)、 Apache の中に
 Python を埋め込み、サーバ起動時に Python のコードをメモリ上に読み込みます。
@@ -28,9 +43,8 @@ Django を mod_python で動かす場合、 Apache 2.x と mod_python 3.x が必
       ことのほんの表面的なことしか解説していません。もっと詳しい情報を知り
       たければ、 `Apache の公式ドキュメント`_ がなによりの情報源です。
 
-    * 興味があれば
-      `FastCGI, SCGI, AJP で Django を動かす <howto-deplyment-fastcgi>`
-      もどうぞ。
+    * 興味があれば :doc:`FastCGI, SCGI, AJP で Django を動かす
+      </howto/deployment/fastcgi>` もどうぞ。
 
 .. _Apache: http://httpd.apache.org/
 .. _mod_python: http://www.modpython.org/
@@ -52,7 +66,7 @@ mod_python モジュールが有効になっていることを確かめます。
         SetHandler python-program
         PythonHandler django.core.handlers.modpython
         SetEnv DJANGO_SETTINGS_MODULE mysite.settings
-	PythonOption django.root /mysite
+        PythonOption django.root /mysite
         PythonDebug On
     </Location>
 
@@ -63,9 +77,6 @@ import パスになるよう、自分の環境に合わせて置き換えて下�
 処理には Django mod_python ハンドラを使うように」命令します。また、
 :ref:`DJANGO_SETTINGS_MODULE <django-settings-module>` を渡して、
 mod_python にどこに設定ファイルがあるのか教えます。
-
-.. versionadded:: 1.0
-    ``PythonOption django.root ...`` が新たに登場しました。
 
 mod_python は、サイトを ``/mysite/`` プレフィクスの下で提供していることを自
 動的に検出できないので、 ``PythonOption django.root ...`` を使ってハンドラ
@@ -159,7 +170,7 @@ Django によって提供されているはずです。 Django の URLconf は `
 Django で作られたサイトを mod_python 上で運営している場合、 Python コードに
 対して変更を加える度に Apache を再起動する必要があります。
 
-.. _multiple-django-installation-on-the-same-apache:
+.. _`mod_python のドキュメント`: http://modpython.org/live/current/doc-html/directives.html
 
 ひとつの Apache に複数の Django をインストールする
 ==================================================
@@ -213,19 +224,35 @@ mod_python 上で開発用サーバを動かす
 と、 Django ならではの恩恵が失われてしまいます。
 
 あなたが ``print`` 文を散りばめてデバッグするタイプのプログラマなら、
-``print`` 文は mod_python では何の効果も及ぼさないということに注意しましょ
-う。 ``print`` 文を使っても、 Apache のログには何も出力されません。
-mod_python を使った設定でデバッグ情報を出力したいのなら::
+``stdout`` への出力は Apache のログには何も出力されず、
+`レスポンスエラーの原因になる` ことさえある点に注意しましょう。
 
-    assert False, the_value_i_want_to_see
+.. _`レスポンスエラーの原因になる`: http://blog.dscpl.com.au/2009/04/wsgi-and-printing-to-standard-output.html
 
-と書いておくか、ページのテンプレートにデバッグ情報を追加してください。
+.. If you have the need to print debugging information in a mod_python setup, you
+   have a few options. You can print to ``stderr`` explicitly, like so::
 
-.. _mod_python のドキュメント: 
-    http://www.python.jp/doc/contrib/modpython/directives.html
-.. _mod_python documentation: http://modpython.org/live/current/doc-html/directives.html
+mod_python のセットアップでデバッグ情報を出力する必要があるなら、いくつかの方
+法があります。次のように ``stderr`` に明示的に print することができます::
 
-.. _serving-media-files:
+    print >> sys.stderr, 'debug text'
+    sys.stderr.flush()
+
+.. (note that ``stderr`` is buffered, so calling ``flush`` is necessary if you wish
+   debugging information to be displayed promptly.)
+
+(``stderr`` はバッファされるので、即座にデバッグ情報を表示されたいなら
+``flush`` の呼び出しが必要なことに注意してください)
+
+.. A more compact approach is to use an assertion::
+
+もっと簡潔なアプローチはアサーション (assertion) を使うことです::
+
+    assert False, 'debug text'
+
+.. Another alternative is to add debugging information to the template of your page.
+
+もう一つの方法は、ページのテンプレートにデバッグ情報を追加することです。
 
 メディアファイルの提供
 ========================
@@ -236,15 +263,15 @@ Django は、自分ではメディアファイルの提供を行わず、ユー�
 メディアの提供には、別のウェブサーバ、すなわち Django を動かしていないサー
 バを使うよう勧めます。お勧めはいくつかあります:
 
-    * lighttpd_
-    * Nginx_
-    * TUX_
-    * Apache_ の軽量化 (stripped-down) 版
-    * Cherokee_
+* lighttpd_
+* Nginx_
+* TUX_
+* Apache_ の軽量化 (stripped-down) 版
+* Cherokee_
 
 とはいえ、Django を動作させているのと同じ Apache の ``VirtualHost`` でメディ
-アファイルを提供せざるを得ない場合には、以下のようにして特定の場所でだけ
-mod_python を切ります::
+アファイルや静的ファイルを提供せざるを得ない場合には、以下のようにして特定の
+場所でだけ mod_python を切ります::
 
     <Location "/media">
         SetHandler None
@@ -254,9 +281,9 @@ mod_python を切ります::
 ト URL に置き換えて下さい。 ``<LocationMatch>`` を使って、正規表現に一致さ
 せるようにもできます。
 
-以下の例では、 Django をサイトのルートで設定し、 ``media`` サブディレクトリ
-の下と、 ``.jpg`` 、 ``.gif`` 、および ``.png`` で終わる URL だけでは明示的
-に Django を無効にしています::
+以下の例では、 Django をサイトのルートで設定し、 ``media`` と ``static`` サ
+ブディレクトリの下と、 ``.jpg`` 、 ``.gif`` 、および ``.png`` で終わる URL
+だけでは明示的に Django を無効にしています::
 
     <Location "/">
         SetHandler python-program
@@ -268,39 +295,48 @@ mod_python を切ります::
         SetHandler None
     </Location>
 
+    <Location "/static">
+        SetHandler None
+    </Location>
+
     <LocationMatch "\.(jpg|gif|png)$">
         SetHandler None
     </LocationMatch>
 
 
 .. _lighttpd: http://www.lighttpd.net/
-.. _Nginx: http://wiki.codemongers.com/Main
+.. _Nginx: http://wiki.nginx.org/Main
 .. _TUX: http://en.wikipedia.org/wiki/TUX_web_server
 .. _Apache: http://httpd.apache.org/
 .. _Cherokee: http://www.cherokee-project.com/
 
-.. _howto-deployment-modpython-serving-the-admin-files:
-.. _serving-the-admin-files:
-
 管理サイト用メディアファイルの提供
 ==================================
 
-Django の開発サーバは自動的に管理サイトのメディアファイルを提供しますが、他
+Django の開発サーバは自動的に管理サイトの静的ファイルを提供しますが、他
 の構成では提供しません。管理サイトのメディアファイルを提供するには、 Apache
 なりその他のメディアサーバなりで設定を行う必要があります。
 
 管理サイトのメディアファイルは Django 配布物の
-(:file:`django/contrib/admin/media`) ディレクトリ下に入っています。
+(:file:`django/contrib/admin/static/admin`) ディレクトリ下に入っています。
 
-お勧めのアプローチは二つあります:
+.. We **strongly** recommend using :mod:`django.contrib.staticfiles` to handle the
+   admin files (this means using the :djadmin:`collectstatic` management command
+   to collect the static files in :setting:`STATIC_ROOT`, and then configuring
+   your Web server to serve :setting:`STATIC_ROOT` at :setting:`STATIC_URL`), but
+   here are two other approaches:
 
-    1. ドキュメントルートから admin メディアファイルへのシンボリックリンク
-       を作ります。そうすれば、リンクを張った Django 関係のファイル (コード
-       **と** テンプレート) を一箇所にまとめられるので、自分のコードを
-       ``svn update`` するだけで admin テンプレートを最新の状態に保てます。
+:mod:`django.contrib.staticfiles` を使って admin のファイルを扱うことを
+**強く** お勧めします。 (これは :djadmin:`collectstatic` 管理コマンドで
+:setting:`STATIC_ROOT` にファイルを集め、
+:setting:`STATIC_ROOT` を Web サーバに :setting:`STATIC_URL` で提供させるよう
+に設定するということです) しかし、ここでは別の方法を 2 つ述べておきます:
 
-    2. または、 admin メディアファイルをコピーして Apache のドキュメントルー
-       トに入れます。
+1. ドキュメントルートから admin メディアファイルへのシンボリックリンク
+   を作ります。
+
+2. または、 admin メディアファイルをコピーして Apache のドキュメントルー
+   トに入れます。
 
 mod_python 上で "egg" パッケージを使う
 =======================================
@@ -320,7 +356,7 @@ Django を Python egg_ でインストールしたり、 Django から egg 化�
 
 次に、 mod_python の PythonImport_ ディレクティブを使って、 mod_python が一
 番最初にこのファイルを import するよう指定します。まず、前述の
-「 :ref:`multiple-django-installation-on-the-same-apache` 」の節で説明した
+`上の節`__ で説明した
 ``PythonInterpreter`` ディレクティブを設定しておきます (複数の Django をイ
 ンストールしない場合でも必要です)。
 次に、メインのサーバ設定 (``Location`` や ``VirtualHost`` セクションの外)
@@ -339,6 +375,7 @@ Python パスを変更する操作がまだ完了していないからです。
 .. _PythonImport: http://www.python.jp/doc/contrib/modpython/dir-other-pimp.html
 .. _mod_python manual: PythonImport_
 .. _`mod_python マニュアル`: `mod_python manual`_
+__ `ひとつの Apache に複数の Django をインストールする`_
 
 エラー処理
 ==========
@@ -359,14 +396,14 @@ mod_python のやり方なので仕方ありません)。
 Apache がセグメンテーション違反 (segumentation fault) を引き起こす場合、 2
 種類の原因が考えられます。いずれも Django 自体とは関係のない原因です。
 
-    1. Python コードが "pyexpat" モジュールを import している場合。
-       "pyexpat" は Apache に埋め込まれているバージョンと衝突する場合があり
-       ます。詳しくは、 `Expat Causing Apache Crash`_ を参照してください。
+1. Python コードが "pyexpat" モジュールを import している場合。
+   "pyexpat" は Apache に埋め込まれているバージョンと衝突する場合があり
+   ます。詳しくは、 `Expat Causing Apache Crash`_ を参照してください。
 
-    2. mod_python と mod_php を同じ Apache のインスタンスで動作させ、バック
-       エンドに MySQL を使っている場合。PHP と Python MySQL バックエンドと
-       のバージョン衝突で引き起こされる既知の問題かもしれません。これについ
-       ては `mod_python FAQ entry`_ に詳しく書かれています。
+2. mod_python と mod_php を同じ Apache のインスタンスで動作させ、バック
+   エンドに MySQL を使っている場合。PHP と Python MySQL バックエンドと
+   のバージョン衝突で引き起こされる既知の問題かもしれません。これについ
+   ては `mod_python FAQ entry`_ に詳しく書かれています。
 
 mod_python を使った設定で問題を解決できない場合、まずは Django フレームワー
 クなしの素の mod_python サイトを動かすようにしてみるとよいでしょう。そうす
@@ -382,15 +419,14 @@ Django コードの import が問題の原因だということになります�
 定してください。原因のモジュールを調べて、中で import しているモジュールを
 必要に応じて調べて下さい。
 
-
-.. _Expat Causing Apache Crash: http://www.dscpl.com.au/articles/modpython-006.html
+.. _Expat Causing Apache Crash: http://www.dscpl.com.au/wiki/ModPython/Articles/ExpatCausingApacheCras
 .. _mod_python FAQ entry: http://modpython.org/FAQ/faqw.py?req=show&file=faq02.013.htp
-.. _Getting mod_python Working: http://www.dscpl.com.au/articles/modpython-001.html
+.. _Getting mod_python Working: http://www.dscpl.com.au/wiki/ModPython/Articles/GettingModPythonWorking
 
 UnicodeEncodeError が出る場合
 ===============================
 
-Django の国際化機能 (:ref:`topics-i18n` 参照) を使っていて、ユーザにファイ
+Django の国際化機能 (:doc:`/topics/i18n/index` 参照) を使っていて、ユーザにファイ
 ルアップロードをさせたいなら、 Apache が非 ASCII のファイルを受け入れるよ
 うに、 Apache を起動する環境変数をしかるべく設定してください。環境変数が正
 しく設定されていないと、非 ASCII のファイル名を ``os.path()`` に渡したとき
