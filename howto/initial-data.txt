@@ -4,7 +4,7 @@
 モデルに初期データを投入する
 =================================
 
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
 
 アプリケーションを最初にセットアップするときに、データベースにハードコード
 されたデータを投入できると便利なことがあります。 Django に自動的に初期デー
@@ -19,12 +19,11 @@
 
 フィクスチャ (fixture) とは、 Django のデータベースに投入できるよう準備済み
 のデータの集まりです。すでにデータの入ったデータベースを持っているなら、フィ
-クスチャの生成には :djadmin:`manage.py dumpdata` コマンドを使うのが一番簡単
-です。フィクスチャは手でも書けます。フィクスチャは XML, YAML または JSON ド
-キュメント形式で書けます。サポートされている
-:ref:`シリアライゼーションフォーマット <serialization-formats>` の詳細は
-:ref:`シリアライゼーションのドキュメント <topics-serialization>` を参照して
-ください。
+クスチャの生成には :djadmin:`manage.py dumpdata <dumpdata>` コマンドを使うのが
+一番簡単です。フィクスチャは手でも書けます。フィクスチャは XML, YAML または
+JSON ドキュメント形式で書けます。サポートされている :ref:`シリアライゼーション
+フォーマット <serialization-formats>` の詳細は :doc:`シリアライゼーションのド
+キュメント </topics/serialization>` を参照してください。
 
 とはいえ、一例として、 JSON で書かれた ``Person`` モデルのフィクスチャを示
 しておきます:
@@ -67,12 +66,12 @@ YAML で書くと以下のようになります:
 
 フィクスチャデータはアプリケーションの ``fixture`` ディレクトリに保存します。
 
-データのロードは簡単で、単に :djadmin:`manage.py loaddata fixturename
-<loaddata>` を実行するだけです。 *fixturename* はフィクスチャファイルの名前
-です。 :djadmin:`loaddata` を実行するたびに、フィクスチャデータが読み出され、
-データベースにリロードされます。つまり、フィクスチャによって生成されたレコー
-ド行を変更して :djadmin:`loaddata` を再度実行すると、変更後のデータは消去さ
-れてしまうのです。注意してください。
+データのロードは簡単で、単に :djadmin:`manage.py loaddata <fixturename>
+<loaddata>` を実行するだけです。 ``<fixturename>`` はフィクスチャファイルの名
+前です。 :djadmin:`loaddata` を実行するたびに、フィクスチャデータが読み出さ
+れ、データベースにリロードされます。つまり、フィクスチャによって生成されたレ
+コード行を変更して :djadmin:`loaddata` を再度実行すると、変更後のデータは消去
+されてしまうのです。注意してください。
 
 初期データフィクスチャの自動ロード
 -----------------------------------
@@ -82,6 +81,27 @@ YAML で書くと以下のようになります:
 便利なのですが、一つだけ注意が必要です。というのも、 :djadmin:`syncdb`
 を実行するたびに *毎回* データがリフレッシュされるからです。ですから、
 変更する予定のデータに ``initial_data`` を使ってはなりません。
+
+.. Where Django finds fixture files
+   --------------------------------
+
+Django がフィクスチャファイルを探す場所
+---------------------------------------
+
+.. By default, Django looks in the ``fixtures`` directory inside each app for
+   fixtures. You can set the :setting:`FIXTURE_DIRS` setting to a list of
+   additional directories where Django should look.
+
+デフォルトでは Django は各アプリケーション内の ``fixtures`` ディレクトリから
+フィクスチャを探します。 :setting:`FIXTURE_DIRS` に Django が調べるべき追加
+ディレクトリのリストを設定することができます。
+
+.. When running :djadmin:`manage.py loaddata <loaddata>`, you can also
+   specify an absolute path to a fixture file, which overrides searching
+   the usual directories.
+
+:djadmin:`manage.py loaddata <loaddata>` を実行する時にフィクスチャの絶対パス
+を指定することもできます。これは通常のディレクトリからの探索を上書きします。
 
 .. seealso::
 
@@ -116,15 +136,37 @@ SQL関数やビュー、トリガなどを作成したりできます。
 (すなわち、正しくフォーマットされた ``INSERT`` 文をセミコロンで区切って) 入
 れておかねばなりません。 
 
-SQL ファイルは :ref:`manage.py <ref-django-admin>` の :djadmin:`sqlcustom`
+SQL ファイルは :doc:`manage.py </ref/django-admin>` の :djadmin:`sqlcustom`
 :djadmin:`sqlreset`, :djadmin:`sqlall` および :djadmin:`reset` コマンドの実
-行時に参照されます。詳しくは :ref:`manage.py のドキュメント
-<ref-django-admin>` を参照してください。
+行時に参照されます。詳しくは
+:doc:`manage.py のドキュメント </ref/django-admin>` を参照してください。
 
 複数の SQL データファイルがある場合、個々のファイルを実行する順番は保証され
 ていないので注意して下さい。仮定していてよいのは、カスタムの SQL データファ
 イルを実行する前に、必ずデータベーステーブルは作成されているということだけ
 です。
+
+.. .. admonition:: Initial SQL data and testing
+
+       This technique *cannot* be used to provide initial data for
+       testing purposes. Django's test framework flushes the contents of
+       the test database after each test; as a result, any data added
+       using the custom SQL hook will be lost.
+
+       If you require data for a test case, you should add it using
+       either a :ref:`test fixture <topics-testing-fixtures>`, or
+       programatically add it during the ``setUp()`` of your test case.
+
+.. admonition:: 初期 SQL データとテスト
+
+    テスト用の初期データを提供するためにこのテクニックを使うことは
+    *できません* 。 Django のテストフレームワークは、全てのテストの後ごとにテ
+    ストデータベースの内容をクリアします。結果として、カスタム SQL フックを
+    使って追加した全てのデータが失われることになります。
+
+    テストケースのためにデータが必要なら、
+    :ref:`テストフィクスチャ <topics-testing-fixtures>` を使って追加するか、
+    テストケースの ``setUp()`` でプログラム的に追加する必要があります。
 
 データベースバックエンド特有の SQL データ
 -----------------------------------------
@@ -134,12 +176,12 @@ SQL ファイルは :ref:`manage.py <ref-django-admin>` の :djadmin:`sqlcustom`
 Django は ``<appname>/sql/<modelname>.<backend>.sql`` というファイルを探し
 ます。 ``<appname>`` はアプリケーションディレクトリの名前、 ``<modelname>``
 はモデル名を小文字にした文字列、 ``<backend>`` は設定ファイルの
-:setting:`DATABASE_ENGINE` に指定するバックエンドの名前 (``postgresql``,
-``mysql`` など) です。
+:setting:`ENGINE` に指定するモジュール名の最後の部分です。
+(:setting:`ENGINE` の値に ``django.db.backends.sqlite3`` に定義したなら Django
+は ``<appname>/sql/<modelname>.sqlite3.sql`` を探します)
 
 バックエンド固有の SQL データは、バックエンド非固有の SQL データよりも前に
 実行されます。例えば、アプリケーション中に ``sql/person.sql`` および
-``sql/person.postgresql.sql`` が入っていて、 PostgreSQL をバックエンドにし
-てインストールを行った場合、 Django はまず ``sql/person.postgresql.sql`` の
-内容を実行してから ``sql/person.sql`` を実行します。
-
+``sql/person.sqlite3.sql`` が入っていて、 SQLite をバックエンドにしてインス
+トールを行った場合、 Django はまず ``sql/person.sqlite.sql`` の内容を実行して
+から ``sql/person.sql`` を実行します。
