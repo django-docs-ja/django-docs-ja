@@ -4,7 +4,7 @@
 Django で PDF を出力する
 ===========================
 
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
 
 このドキュメントでは、 Django のビューを使って動的に PDF ファイルを生成する
 方法について説明します。 PDF を生成するには、優れたオープンソースの Python
@@ -17,14 +17,14 @@ Django で PDF を出力する
 を使ってカスタマイズ可能な印刷むきの NCAA トーナメント試合表を PDF で生成し
 ていました。
 
-.. _ReportLab: http://www.reportlab.org/rl_toolkit.html
+.. _ReportLab: http://www.reportlab.org/oss/rl-toolkit/
 .. _kusports.com: http://www.kusports.com/
 
 ReportLab のインストール
 ========================
 
-ReportLab ライブラリは http://www.reportlab.org/downloads.html からダウンロー
-ドしてインストールします。
+ReportLab ライブラリは http://www.reportlab.org/oss/rl-toolkit/downlods/ から
+ダウンロードしてインストールします。
 
 インストール方法は `ユーザガイド`_ (はからずも PDF ファイルですが) に書かれ
 ています。
@@ -74,46 +74,50 @@ Django を使った PDF 動的生成の鍵は、ファイル ReportLab の API �
 コードとコメントを読めば一目瞭然ですが、いくつか注意しておいたほうがよいで
 しょう:
 
-    * レスポンスの MIME タイプは ``application/pdf`` にします。これにより、
-      ブラウザにドキュメントが PDF であると指示します。 MIME タイプを指定し
-      ないと、出力を HTML として解釈するので、ブラウザウィンドウに見苦しい
-      ごみのような出力が表示されてしまいます。
+* レスポンスの MIME タイプは :mimetype:`application/pdf` にします。これによ
+  り、ブラウザにドキュメントが PDF であると指示します。 MIME タイプを指定しな
+  いと、出力を HTML として解釈するので、ブラウザウィンドウに見苦しいごみのよう
+  な出力が表示されてしまいます。
 
-    * さらに、レスポンスオブジェクトには ``Content-Disposition`` ヘッダを指
-      定しています。このヘッダは PDF ファイルの名前にします。ファイル名には
-      何を指定しても構いません。この名前は、ブラウザが「名前を付けて保存」
-      ダイアログなどで使います。
+* さらに、レスポンスオブジェクトには ``Content-Disposition`` ヘッダを指
+  定しています。このヘッダは PDF ファイルの名前にします。ファイル名には
+  何を指定しても構いません。この名前は、ブラウザが「名前を付けて保存」
+  ダイアログなどで使います。
 
-    * 上の例では、 ``Content-Disposition`` ヘッダは ``'attachment; '`` から
-      始まっています。ヘッダを ``'attachment; '`` で始めると、ウェブブラウ
-      ザは ``application/pdf`` に対するデフォルトの操作を指定していても、
-      ダイアログパネルを出して、ドキュメントの処理方法を選択するようユーザ
-      に促します。以下のように ``'attachment;'`` を入れない場合、ブラウザは
-      デフォルトの設定を使って PDF を処理します::
+* 上の例では、 ``Content-Disposition`` ヘッダは ``'attachment; '`` から
+  始まっています。ヘッダを ``'attachment; '`` で始めると、ウェブブラウ
+  ザは ``application/pdf`` に対するデフォルトの操作を指定していても、
+  ダイアログパネルを出して、ドキュメントの処理方法を選択するようユーザ
+  に促します。以下のように ``'attachment;'`` を入れない場合、ブラウザは
+  デフォルトの設定を使って PDF を処理します::
 
-          response['Content-Disposition'] = 'filename=somefilename.pdf'
+      response['Content-Disposition'] = 'filename=somefilename.pdf'
 
-    * ReportLab API のフックは簡単です: ``response`` を ``canvas.Canvas``
-      の第一引数に指定します。 ``Canvas`` クラスはファイルライクオブジェク
-      トを扱うようになっているので、 :class:`django.http.HttpResponse` オブ
-      ジェクトを使えます。
+* ReportLab API のフックは簡単です: ``response`` を ``canvas.Canvas``
+  の第一引数に指定します。 ``Canvas`` クラスはファイルライクオブジェク
+  トを扱うようになっているので、 :class:`django.http.HttpResponse` オブ
+  ジェクトを使えます。
 
-    * PDF オブジェクト (ここでは ``p``) を生成した後は、 ``response`` では
-      なく ``p`` を使って PDF 生成メソッドを呼び出していることに注意して下
-      さい。
+* PDF オブジェクト (ここでは ``p``) を生成した後は、 ``response`` では
+  なく ``p`` を使って PDF 生成メソッドを呼び出していることに注意して下
+  さい。
 
-    * 最後に必ず ``showPage()`` を呼び出し、 PDF ファイルを ``save()`` して
-      ください。
+* 最後に必ず ``showPage()`` を呼び出し、 PDF ファイルを ``save()`` して
+  ください。
 
 複雑な PDF の生成
 =================
 
 ReportLab を使って複雑な PDF を作成したければ、一時的なファイルの保存に
-cStringIO_ ライブラリを使ってください。 cStringIO ライブラリはこのような
-目的に対してとても効率的なファイルライクオブジェクトを提供します。
-``cStringIO`` で書き直した上の "Hello World" の例を示します::
+:mod:`cStringIO` ライブラリを使ってください。 :mod:`cStringIO` ライブラリはこ
+のような目的に対してとても効率的なファイルライクオブジェクトを提供します。
+:mod:`cStringIO` で書き直した上の "Hello World" の例を示します::
 
-    from cStringIO import StringIO
+    # cStringIO が使えない環境では StringIO にフォールバックします
+    try:
+        from cStringIO import StringIO
+    except ImportError:
+        from StringIO import StringIO
     from reportlab.pdfgen import canvas
     from django.http import HttpResponse
 
@@ -144,26 +148,21 @@ cStringIO_ ライブラリを使ってください。 cStringIO ライブラリ�
         response.write(pdf)
         return response
 
-.. _cStringIO: http://www.python.jp/doc/release/lib/module-cStringIO.html
-.. cStringIO: http://www.python.org/doc/current/lib/module-cStringIO.html
-
 その他のリソース
 =================
 
-    * Python バインディングを持つ別の PDF 生成ライブラリに PDFlib_ がありま
-      す。 Django から使うには、このドキュメントで述べたのと同じ方法を使い
-      ます。
-    * `Pisa HTML2PDF`_ もまた、 PDF 生成のためのライブラリです。 Pisa には、
-      Django と Pisa を組み合わせ方の例が付属しています。
-    * HTMLdoc_ は HTML を PDF に変換できるコマンドラインスクリプトです。
-      HTMLdoc に Python インタフェースはありませんが、 ``system`` や
-      ``popen`` のようなシェルを実行して、出力を Python から取り出せます。
-    * `forge_fdf in Python`_ はファイルを PDF 形式にするライブラリです。
+* Python バインディングを持つ別の PDF 生成ライブラリに PDFlib_ がありま
+  す。 Django から使うには、このドキュメントで述べたのと同じ方法を使い
+  ます。
+* `Pisa XHTML2PDF`_ もまた、 PDF 生成のためのライブラリです。 Pisa には、
+  Django と Pisa を組み合わせ方の例が付属しています。
+* HTMLdoc_ は HTML を PDF に変換できるコマンドラインスクリプトです。
+  HTMLdoc に Python インタフェースはありませんが、 ``system`` や
+  ``popen`` のようなシェルを実行して、出力を Python から取り出せます。
 
 .. _PDFlib: http://www.pdflib.org/
-.. _`Pisa HTML2PDF`: http://www.htmltopdf.org/
+.. _`Pisa XHTML2PDF`: http://www.xhtml2pdf.com/
 .. _HTMLdoc: http://www.htmldoc.org/
-.. _forge_fdf in Python: http://www.accesspdf.com/article.php/20050421092951834
 
 その他のフォーマット
 =====================
@@ -172,4 +171,4 @@ cStringIO_ ライブラリを使ってください。 cStringIO ライブラリ�
 PDF に関する部分といえば ``reportlab`` くらいのものです。同じようなテクニッ
 クを使えば、 Python のライブラリが扱えるどんなフォーマットのデータでも生成
 できるのです。もう一つの例として、テキストベースの出力をしている
-:ref:`howto-outputting-csv` も参照してください。
+:doc:`/howto/outputting-csv` も参照してください。
