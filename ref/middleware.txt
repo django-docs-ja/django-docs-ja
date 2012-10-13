@@ -1,17 +1,15 @@
-.. _ref-middleware:
+============
+ミドルウェア
+============
 
-=====================================
-組み込みミドルウェアリファレンス
-=====================================
-
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
 
 .. module:: django.middleware
    :synopsis: Django の組み込みミドルウェアクラスです。
 
 このドキュメントでは、 Django に付属している全ミドルウェアコンポーネントに
-ついて解説しています。ミドルウェアの使い方や自作のミドルウェアの書き方はm
-:ref:`ミドルウェアの使い方ガイド <topics-http-middleware>` を参照してくださ
+ついて解説しています。ミドルウェアの使い方や自作のミドルウェアの書き方は
+:doc:`ミドルウェアの使い方ガイド </topics/http/middleware>` を参照してくださ
 い。
 
 利用できるミドルウェア
@@ -23,14 +21,14 @@
 .. module:: django.middleware.cache
    :synopsis: サイト単位のキャッシュを実現するミドルウェアです。
    
-.. class:: django.middleware.cache.UpdateCacheMiddleware
+.. class:: UpdateCacheMiddleware
 
-.. class:: django.middleware.cache.FetchFromCacheMiddleware
+.. class:: FetchFromCacheMiddleware
 
 サイト全体にわたるキャッシュを有効にします。キャッシュを有効にすると、
 Django の管理下にあるページは :setting:`CACHE_MIDDLEWARE_SECONDS` 設定に定
 義した時間のキャッシュされます。
-:ref:`キャッシュのドキュメント <topics-cache>` を参照してください。
+:doc:`キャッシュのドキュメント </topics/cache>` を参照してください。
 
 コモンミドルウェア
 -------------------
@@ -38,46 +36,44 @@ Django の管理下にあるページは :setting:`CACHE_MIDDLEWARE_SECONDS` 設
 .. module:: django.middleware.common
    :synopsis: 完全主義者むけに、「一般的な」便宜機能を追加するミドルウェアです。
    
-.. class:: django.middleware.common.CommonMiddleware
+.. class:: CommonMiddleware
 
 リクエスト処理に完全主義者むけの便宜機能を追加するミドルウェアです:
 
-    * :setting:`DISALLOWED_USER_AGENTS` に設定されたユーザエージェントから
-      のアクセスを禁止します。 :setting:`DISALLOWED_USER_AGENTS` には文字列
-      のリストを指定します。
+* :setting:`DISALLOWED_USER_AGENTS` に設定されたユーザエージェントから
+  のアクセスを禁止します。 :setting:`DISALLOWED_USER_AGENTS` には文字列
+  のリストを指定します。
 
-    * :setting:`APPEND_SLASH` および :setting:`PREPEND_WWW` に基づいて URL
-      の書き換えを行います。 
+* :setting:`APPEND_SLASH` および :setting:`PREPEND_WWW` に基づいて URL
+  の書き換えを行います。 
 
-      :setting:`APPEND_SLASH` が ``True`` の場合、リクエストの URL の末尾が
-      スラッシュで終わっておらず、 URLconf 上でもマッチしなければ、 スラッ
-      シュを付加した URL を作成して、 URLconf でマッチするか確かめます。マッ
-      チすれば、スラッシュつきの URL にリダイレクトします。そうでなければ、
-      URL を通常の手順に従って処理します。
+  :setting:`APPEND_SLASH` が ``True`` の場合、リクエストの URL の末尾が
+  スラッシュで終わっておらず、 URLconf 上でもマッチしなければ、 スラッ
+  シュを付加した URL を作成して、 URLconf でマッチするか確かめます。マッ
+  チすれば、スラッシュつきの URL にリダイレクトします。そうでなければ、
+  URL を通常の手順に従って処理します。
 
-      例えば、 ``foo.com/bar`` に一致するパターンがなく、 ``foo.com/bar/``
-      に一致するパターンが *あれば* 、 ``foo.com/bar`` は ``foo.com/bar/``
-      にリダイレクトされます。
+  例えば、 ``foo.com/bar`` に一致するパターンがなく、 ``foo.com/bar/``
+  に一致するパターンが *あれば* 、 ``foo.com/bar`` は ``foo.com/bar/``
+  にリダイレクトされます。
 
-      .. versionchanged:: 1.0
-          開発版では、 :setting:`APPEND_SLASH` の挙動が若干変更されました。
-          以前のバージョンでは、リクエストの URL が URLconf とマッチするか
-          どうかに関係なくスラッシュを付加していました。
+  :setting:`PREPEND_WWW` が ``True`` であれば、先頭に,  "www." のない
+  URL は先頭に"www." を付けた URL にリダイレクトします。
 
-      :setting:`PREPEND_WWW` が ``True`` であれば、先頭に,  "www." のない
-      URL は先頭に"www." を付けた URL にリダイレクトします。
+  それぞれのオプションは URL を正規化するためのものです。これは、 URL
+  (Uniform Resorce Location) がただひとつの、真にただひとつの場所
+  (Location) を表すべきであるという哲学に基づいています。技術的には、
+  ``foo.com/bar`` は ``foo.com/bar/`` とは別物です -- 例えば、検索エン
+  ジンはこの二つの URL を別々の URL として扱うかもしれません -- ですか
+  ら、 URL を正規化しておく方が得策なのです。
 
-      それぞれのオプションは URL を正規化するためのものです。これは、 URL
-      (Uniform Resorce Location) がただひとつの、真にただひとつの場所
-      (Location) を表すべきであるという哲学に基づいています。技術的には、
-      ``foo.com/bar`` は ``foo.com/bar/`` とは別物です -- 例えば、検索エン
-      ジンはこの二つの URL を別々の URL として扱うかもしれません -- ですか
-      ら、 URL を正規化しておく方が得策なのです。
+* :setting:`SEND_BROKEN_LINK_EMAILS` が ``True`` の場合、
+  :setting:`MANAGERS` にリンク切れ報告のメールを送信します。
 
-    * :setting:`USE_ETAGS` 設定に基づいて ETag を処理します。
-      :setting:`USE_ETAGS` を ``True`` に設定すると、 Django は各リクエスト
-      ごとにページ内容の MD-5 ハッシュを計算して ETag にし、必要なら 
-      ``Not Modified`` 応答を返します。
+* :setting:`USE_ETAGS` 設定に基づいて ETag を処理します。
+  :setting:`USE_ETAGS` を ``True`` に設定すると、 Django は各リクエスト
+  ごとにページ内容の MD-5 ハッシュを計算して ETag にし、必要なら 
+  ``Not Modified`` 応答を返します。
 
 ビューメタデータミドルウェア
 --------------------------------
@@ -85,29 +81,46 @@ Django の管理下にあるページは :setting:`CACHE_MIDDLEWARE_SECONDS` 設
 .. module:: django.middleware.doc
    :synopsis: アプリケーションの自動ドキュメントを補助するミドルウェアです。
 
-.. class:: django.middleware.doc.XViewMiddleware
+.. class:: XViewMiddleware
 
 :setting:`INTERNAL_IPS` 設定に定義されている IP アドレスから来た HEAD リク
 エストに対してカスタムの ``X-View`` HTTP ヘッダを送信します。このミドルウェ
-アはDjango の自動ドキュメントシステムで使われています。
+アはDjango の :doc:`自動ドキュメントシステム </ref/contrib/admin/admindocs>`
+で使われています。
+これは :class:`~django.contrib.auth.middleware.AuthenticationMiddleware` に依存
+しています。
 
-GZIP ミドルウェア
----------------------
+GZip ミドルウェア
+-----------------
 
 .. module:: django.middleware.gzip
-   :synopsis: コンテンツを gzip 圧縮してパフォーマンスを向上させるミドルウェ
+   :synopsis: コンテンツを GZip 圧縮してパフォーマンスを向上させるミドルウェ
               アです。
-   
-.. class:: django.middleware.gzip.GZipMiddleware
 
-gzip 圧縮を受け付けるブラウザ (最近のほとんどのブラウザがそうです) 向けに、
+.. class:: GZipMiddleware
+
+GZip 圧縮を受け付けるブラウザ (最近のほとんどのブラウザがそうです) 向けに、
 コンテンツを圧縮して送ります。
 
-このミドルウェアは、ミドルウェアリストの先頭に置くよう勧めます。なぜなら、
-コンテンツの圧縮は最後に行うべきものだからです。このミドルウェアは、 200 バ
-イト未満のコンテンツを圧縮しません。また、状態コード 200 以外のレスポンス内
-のコンテンツ、Javascript ファイル (IE との互換性のため)、
-``Content-Encoding`` が指定されているレスポンスも圧縮しません。
+このミドルウェアは、ミドルウェアリストの先頭に置くよう勧めます。なのでレスポンス
+コンテンツの圧縮は最後に行われます。
+
+以下のいずれかの場合にはコンテンツを圧縮しません:
+
+* コンテンツボディーが 200 バイト長未満の場合。
+
+* レスポンスに ``Content-Encoding`` ヘッダがすでに設定されている場合。
+
+* (ブラウザの) リクエストが、 ``gzip`` を含む ``Accept-Encoding`` ヘッダーを
+  送らなかった場合。
+
+* Internet Explorer からのリクエストで、 ``Content-Type`` ヘッダが
+  ``javascript`` か、 ``text/`` 以外から始まるものを持っている場合。
+  IE の古いバージョンにあるバグを避けるためです。特定のコンテンツタイプで
+  実行されるべきではない解凍を引き起こすからです。
+
+個別のビュー GZip 圧縮 を使いたい場合は
+:func:`~django.views.decorators.http.gzip_page()` デコレータを使いましょう。
 
 条件付き GET ミドルウェア
 --------------------------
@@ -115,7 +128,7 @@ gzip 圧縮を受け付けるブラウザ (最近のほとんどのブラウザ�
 .. module:: django.middleware.http
    :synopsis: 高度な HTTP 機能を扱うためのミドルウェアです。
 
-.. class:: django.middleware.http.ConditionalGetMiddleware
+.. class:: ConditionalGetMiddleware
 
 条件付き GET 操作を処理します。レスポンスに  ``ETag`` または
 ``Last-Modified`` ヘッダがあり、リクエストに ``If-None-Match`` または
@@ -127,12 +140,13 @@ gzip 圧縮を受け付けるブラウザ (最近のほとんどのブラウザ�
 リバースプロキシミドルウェア
 ------------------------------
 
-.. class:: django.middleware.http.SetRemoteAddrFromForwardedFor
+.. class:: SetRemoteAddrFromForwardedFor
 
 .. versionchanged: 1.1
 
-This middleware was removed in Django 1.1. See :ref:`the release notes
-<removed-setremoteaddrfromforwardedfor-middleware>` for details.
+このミドルウェアは Django 1.1 で廃止されました。詳細は
+:ref:`リリースノート <removed-setremoteaddrfromforwardedfor-middleware>` を
+参照してください。
 
 ロケールミドルウェア
 ---------------------
@@ -140,11 +154,25 @@ This middleware was removed in Django 1.1. See :ref:`the release notes
 .. module:: django.middleware.locale
    :synopsis: リクエストに基づいて言語設定を選択するミドルウェアです。
    
-.. class:: django.middleware.locale.LocaleMiddleware
+.. class:: LocaleMiddleware
 
 リクエストに基づいて言語の選択を行います。言語の選択によって、ユーザごとに
 提供するコンテンツをカスタマイズできます。 
-:ref:`国際化のドキュメント <topics-i18n>` を参照してください。
+:doc:`国際化のドキュメント </topics/i18n/index>` を参照してください。
+
+メッセージミドルウェア
+----------------------
+
+.. module:: django.contrib.messages.middleware
+   :synopsis: Message middleware.
+
+.. class:: MessageMiddleware
+
+.. versionadded:: 1.2
+   ``MessageMiddleware`` が追加されました。
+
+クッキー、セッションベースのメッセージがサポートされました。
+:doc:`messages documentation </ref/contrib/messages>` を参照してください。
 
 セッションミドルウェア
 -------------------------
@@ -152,10 +180,10 @@ This middleware was removed in Django 1.1. See :ref:`the release notes
 .. module:: django.contrib.sessions.middleware
    :synopsis: セッションミドルウェアです。
 
-.. class:: django.contrib.sessions.middleware.SessionMiddleware
+.. class:: SessionMiddleware
 
 セッションのサポートを有効にします。
-:ref:`セッションのドキュメント <topics-http-sessions>` も参照してください。
+:doc:`セッションのドキュメント </topics/http/sessions>` も参照してください。
 
 認証ミドルウェア
 ------------------
@@ -163,27 +191,25 @@ This middleware was removed in Django 1.1. See :ref:`the release notes
 .. module:: django.contrib.auth.middleware
   :synopsis: 認証ミドルウェアです。
   
-.. class:: django.contrib.auth.middleware.AuthenticationMiddleware
+.. class:: AuthenticationMiddleware
 
 入力される ``HttpRequest`` オブジェクト全てに、現在ログインしているユーザを
 表す ``user`` 属性を追加します。 
-:ref:`Web リクエストの認証 <topics-auth>` を参照してください。
+:doc:`Web リクエストの認証 </topics/auth>` を参照してください。
 
 CSRF 対策ミドルウェア
 -----------------------
 
-.. module:: django.contrib.csrf.middleware
+.. module:: django.middleware.csrf
    :synopsis: クロスサイトリクエストフォージェリ (Cross Site Request
               Forgery) 対策のためのミドルウェアです。
 
-.. class:: django.contrib.csrf.middleware.CsrfMiddleware
-
-.. versionadded:: 1.0
+.. class:: CsrfViewMiddleware
 
 POST フォームに隠しフォームフィールドを追加し、リクエストデータに正しい値が
 設定されているかチェックすることによりクロスサイトリクエストフォージェリ
 (CSRF) を防ぎます。詳しくは
-:ref:`クロスサイトリクエストフォージェリからの保護 <ref-contrib-csrf>` を参
+:doc:`クロスサイトリクエストフォージェリからの保護 </ref/contrib/csrf>` を参
 照してください。
 
 トランザクションミドルウェア
@@ -193,7 +219,7 @@ POST フォームに隠しフォームフィールドを追加し、リクエス
    :synopsis: 各 Web リクエストにデータベーストランザクションを結びつけるミ
              ドルウェアです。
 
-.. class:: django.middleware.transaction.TransactionMiddleware
+.. class:: TransactionMiddleware
 
 リクエスト／レスポンス処理フェイズに commit と rollback をバインドします。
 あるビュー関数の実行に成功した場合に commit を、例外を送出して失敗した場合
@@ -205,6 +231,18 @@ POST フォームに隠しフォームフィールドを追加し、リクエス
 クの後ろに位置している) ミドルウェアは、ビュー関数と同じトランザクション制
 御下に置かれます。
 
-:ref:`トランザクション管理のドキュメント <topics-db-transactions>` を参照し
+:doc:`トランザクション管理のドキュメント </topics/db/transactions>` を参照し
 てください。
 
+X-Frame-Options middleware
+--------------------------
+
+.. module:: django.middleware.clickjacking
+   :synopsis: クリックジャッキング対策
+
+.. class:: XFrameOptionsMiddleware
+
+.. versionadded:: 1.4
+   ``XFrameOptionsMiddleware`` が追加されました。
+
+単純な :doc:`X-Frame-Options ヘッダによるクリックジャッキング対策 </ref/clickjacking/>` 。
