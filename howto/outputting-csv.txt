@@ -4,20 +4,18 @@
 Django で CSV を出力する
 ==========================
 
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
 
 このドキュメントでは、 Django のビューを使って動的に CSV (Comma Separated
 Values: カンマ区切りのフィールドデータ) ファイルを生成する方法について説明
-します。  CSV の生成には `Python CSV ライブラリ`_ 、 **または** Django テン
-プレートシステムが必要です。
-
-.. _`Python CSV ライブラリ`: http://www.python.jp/doc/release/lib/module-csv.html
+します。  CSV の生成には Python CSV ライブラリ、または Django テンプレートシス
+テムが使えます。
 
 CSV ライブラリを使う方法
 =========================
 
-Python には CSV ライブラリモジュール ``csv`` がついてきます。Django で
-``csv`` を使う上での鍵は、モジュールの CSV 生成機能がファイルライクオ
+Python には CSV ライブラリモジュール :mod:`csv` がついてきます。Django で
+:mod:`csv` を使う上での鍵は、モジュールの CSV 生成機能がファイルライクオ
 ブジェクトを扱えることと、 Django の :class:`~django.http.HttpResponse` オ
 ブジェクトがファイルライクオブジェクトであることです。
 
@@ -40,33 +38,73 @@ Python には CSV ライブラリモジュール ``csv`` がついてきます�
 コードとコメントを読めば一目瞭然ですが、いくつか注意しておいたほうがよいで
 しょう:
 
-    * レスポンスの MIME タイプを ``text/csv`` にしておき、ブラウザにドキュ
-      メントが CSV であると伝えます。 MIME タイプを指定しないと、出力を
-      HTML として解釈するので、ブラウザウィンドウに見苦しいごみのような出力
-      が表示されてしまいます。
+* レスポンスの MIME タイプを :mimetype:`text/csv` にしておき、ブラウザにド
+  キュメントが CSV であると伝えます。 MIME タイプを指定しないと、出力をHTML と
+  して解釈するので、ブラウザウィンドウに見苦しいごみのような出力が表示されてし
+  まいます。
 
-    * さらに、レスポンスオブジェクトには ``Content-Disposition`` ヘッダを指
-      定しています。このヘッダは CSV ファイルの名前にします。ファイル名には
-      何を指定しても構いません。この名前は、ブラウザが「名前を付けて保存」
-      ダイアログなどで使います。
+* さらに、レスポンスオブジェクトには ``Content-Disposition`` ヘッダを指
+  定しています。このヘッダは CSV ファイルの名前にします。ファイル名には
+  何を指定しても構いません。この名前は、ブラウザが「名前を付けて保存」
+  ダイアログなどで使います。
 
-    * CSV 生成 API のフックは簡単です: ``response`` を ``csv.writer`` の第
-      一引数に指定します。 ``csv.writer`` クラスはファイルライクオブジェク
-      トを扱うようになっているので、 :class:`~django.http.HttpResponse` オ
-      ブジェクトを使えます。
+* CSV 生成 API のフックは簡単です: ``response`` を ``csv.writer`` の第
+  一引数に指定します。 ``csv.writer`` クラスはファイルライクオブジェク
+  トを扱うようになっているので、 :class:`~django.http.HttpResponse` オ
+  ブジェクトを使えます。
 
-    * CSV ファイルの各行ごとにリストやタプルのようなイテレーション可能オブ
-      ジェクトを渡して ``writer.writerow`` を呼び出します。
+* CSV ファイルの各行ごとにリストやタプルのようなイテレーション可能オブ
+  ジェクトを渡して ``writer.writerow`` を呼び出します。
 
-    * CSV モジュールはクオート処理を行ってくれるので、文字列中にクオートや
-      カンマがあっても心配することはありません。出力したい値を
-      ``writerow()`` に渡せば、モジュールが正しく処理してくれます。
+* CSV モジュールはクオート処理を行ってくれるので、文字列中にクオートや
+  カンマがあっても心配することはありません。出力したい値を
+  ``writerow()`` に渡せば、モジュールが正しく処理してくれます。
+
+.. Handling Unicode
+   ~~~~~~~~~~~~~~~~
+
+Unicode を扱うには
+~~~~~~~~~~~~~~~~~~
+
+.. Python's :mod:`csv` module does not support Unicode input. Since Django uses
+   Unicode internally this means strings read from sources such as
+   :class:`~django.http.HttpRequest` are potentially problematic. There are a few
+   options for handling this:
+
+Python の :mod:`csv` モジュールは Unicode の入力をサポートしていません。
+Django は内部的に Unicode を使うので :class:`~django.http.HttpRequest` のよう
+なソースから文字列を読み込むことは潜在的に問題を抱えていることになります。この
+問題の対処方法はいくつかあります:
+
+.. * Manually encode all Unicode objects to a compatible encoding.
+
+* 全ての Unicode オブジェクトを互換性のあるエンコーディングに手動でエンコード
+  します。
+
+.. * Use the ``UnicodeWriter`` class provided in the `csv module's examples
+     section`_.
+
+* `csv モジュールの例セクション`_ に書かれている ``UnicodeWriter`` クラスを使
+  います。
+
+.. * Use the `python-unicodecsv module`_, which aims to be a drop-in
+     replacement for :mod:`csv` that gracefully handles Unicode.
+
+* `python-unicodecsv モジュール`_ を使う。これは Unicode を上品に扱うモジュー
+  ルで、 :mod:`csv` モジュールを容易に置き換えることを目的にしています。
+
+.. For more information, see the Python documentation of the :mod:`csv` module.
+
+もっと情報が必要なら :mod:`csv` モジュールのドキュメントを参照してください。
+
+.. _`csv モジュールの例セクション`: http://docs.python.org/library/csv.html#examples
+.. _`python-unicodecsv モジュール`: https://github.com/jdunck/python-unicodecsv
 
 テンプレートシステムを使う方法
 ===============================
 
-``csv`` を使う代りに :ref:`Django テンプレートシステム <topics-templates>`
-を使っても CSV を生成できます。この方法よりも ``csv`` モジュールを使った方
+``csv`` を使う代りに :doc:`Django テンプレートシステム </topics/templates>`
+を使っても CSV を生成できます。この方法よりも :mod:`csv`` モジュールを使った方
 がより高水準で実現できますが、完全さのために紹介しておきます。
 
 基本的な考え方は、テンプレートに要素リストを渡し、テンプレート上の
@@ -121,5 +159,5 @@ Python には CSV ライブラリモジュール ``csv`` がついてきます�
 CSV に関する部分といえば、出力形式くらいのものです。同じようなテクニックを
 使えば、 どんなテキスト形式のデータでも生成できるのです。バイナリデータを生
 成するときにも、同じようなテクニックを使えます。
-:ref:`howto-outputting-pdf` を参照してください。
+:doc:`/howto/outputting-pdf` を参照してください。
 
