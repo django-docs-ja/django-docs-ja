@@ -7,7 +7,12 @@ Django ドキュメント 目次
 :revision-up-to: 11321 (1.1)
 
 .. toctree::
-   :maxdepth: 2
+    :hidden:
+
+    index
+
+.. toctree::
+   :maxdepth: 3
 
    intro/index
    topics/index
@@ -34,5 +39,5 @@ Django ドキュメント 目次
 
 .. toctree::
    :maxdepth: 2
-   
+
    obsolete/index
