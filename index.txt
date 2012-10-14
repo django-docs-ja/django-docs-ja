@@ -76,12 +76,12 @@ Django ドキュメント
   :doc:`素の SQL を扱うには <topics/db/sql>` |
   :doc:`トランザクション <topics/db/transactions>` |
   :doc:`アグリゲーション <topics/db/aggregation>` |
-  :doc:`フィールド型を自作するには <howto/custom/model/fields>`
+  :doc:`フィールド型を自作するには <howto/custom-model-fields>`
 
 * **その他:**
   :doc:`データベースのサポート状況 <ref/databases>` |
-  :doc:`レガシーなデータベースを扱う <howto/legacy/databases>` |
-  :doc:`初期データを投入するには <howto/initial/data>`
+  :doc:`レガシーなデータベースを扱う <howto/legacy-databases>` |
+  :doc:`初期データを投入するには <howto/initial-data>`
 
 テンプレート層
 ==============
@@ -92,7 +92,7 @@ Django ドキュメント
 
 * **プログラマ向けの情報:**
   :doc:`テンプレート API <ref/templates/api>` |
-  :doc:`タグやフィルタを自作するには <howto/custom/template/tags>`
+  :doc:`タグやフィルタを自作するには <howto/custom-template-tags>`
 
 ビュー層
 ========
@@ -104,15 +104,15 @@ Django ドキュメント
   :doc:`デコレータ <topics/http/decorators>`
 
 * **リファレンス:**
-  :doc:`リクエスト/レスポンスオブジェクト <ref/request/response>`
+  :doc:`リクエスト/レスポンスオブジェクト <ref/request-response>`
   :doc:`テンプレートレスポンスオブジェクト <ref/template-response>`
 
 * **ファイルアップロードに対応するには:**
-  :doc:`ファイルアップロード対応の概要 <topics/http/file/uploads>` |
+  :doc:`ファイルアップロード対応の概要 <topics/http/file-uploads>` |
   :doc:`File オブジェクトリファレンス <ref/files/file>` |
   :doc:`ストレージ API <ref/files/storage>` |
   :doc:`ファイルの管理 <topics/files>` |
-  :doc:`ストレージを自作するには <howto/custom/file/storage>`
+  :doc:`ストレージを自作するには <howto/custom-file-storage>`
 
 * **汎用ビュー:**
   :doc:`汎用ビューとは <topics/generic-views>` |
@@ -142,8 +142,8 @@ Django ドキュメント
   :doc:`バリデータを自作するには <ref/forms/validation>`
 
 * **その他:**
-  :doc:`フォームプレビュー <ref/contrib/formtools/form/preview>` |
-  :doc:`フォームウィザード <ref/contrib/formtools/form/wizard>`
+  :doc:`フォームプレビュー <ref/contrib/formtools/form-preview>` |
+  :doc:`フォームウィザード <ref/contrib/formtools/form-wizard>`
 
 アプリケーション開発のツール
 ============================
@@ -167,7 +167,7 @@ Django ドキュメント
   :doc:`WSGI サーバ <howto/deployment/wsgi/index>` |
   :doc:`FastCGI/SCGI/AJP <howto/deployment/fastcgi>` |
   :doc:`Apache/mod_python (非推奨) <howto/deployment/modpython>` |
-  :doc:`Apache の認証に Django を使うには <howto/apache/auth>` |
+  :doc:`Apache の認証に Django を使うには <howto/apache-auth>` |
   :doc:`静的ファイルの公開方法 <howto/static-files>` |
   :doc:`エラーの発生をメールで追跡するには <howto/error-reporting>`
 
@@ -188,7 +188,7 @@ Django ドキュメント
 * :doc:`flatpages: フラットページコンテンツの管理 <ref/contrib/flatpages>`
 * :doc:`GeoDjango <ref/contrib/gis/index>`
 * :doc:`humanize: 人間にやさしい出力生成 <ref/contrib/humanize>`
-* :doc:`国際化 <topics/i18n>`
+* :doc:`国際化 <topics/i18n/index>`
 * :doc:`Jython で動かす <howto/jython>`
 * :doc:`「ローカルフレーバ（地域固有の機能）」 <ref/contrib/localflavor>`
 * :doc:`ログ出力 <topics/logging>`
