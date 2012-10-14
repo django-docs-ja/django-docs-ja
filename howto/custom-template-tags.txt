@@ -67,7 +67,6 @@ Django テンプレートシステムには、いろいろな :doc:`組み込み
 
 
 .. admonition:: 舞台裏
-    :class: admonition-behind-the-scenes
 
     Django のデフォルトのフィルタやタグのソースコードには大量のサンプルが
     収まっています。ソースコードはそれぞれ
@@ -173,8 +172,6 @@ Django テンプレートシステムには、いろいろな :doc:`組み込み
 こうすれば、例えばフィルタに整数型を渡したとしても、(整数型に ``lower()``
 がないために) ``AttributeError`` が送出されるようなことはありません。
 
-.. _Registering custom filters:
-
 .. _filters-auto-escaping:
 
 フィルタと自動エスケープ
@@ -245,10 +242,9 @@ Django テンプレートシステムには、いろいろな :doc:`組み込み
 
    .. code-block:: python
 
-       @register.filter
+       @register.filter(is_safe=True)
        def add_xx(value):
            return '%sxx' % value
-       add_xx.is_safe = True
 
    このフィルタをテンプレート上の自動エスケープが有効な部分で使うと、
    Django は "safe" にマークされていない入力の時にフィルタの出力をエス
@@ -336,7 +332,7 @@ Django テンプレートシステムには、いろいろな :doc:`組み込み
 .. versionchanged:: 1.4
 
 ``is_safe`` と ``needs_autoescape`` はフィルタ関数の属性として使われていまし
-た。この文法は廃止されています。
+た。この構文は廃止されています。
 
 .. code-block:: python
 
@@ -554,6 +550,8 @@ Django テンプレートシステムには、いろいろな :doc:`組み込み
 :ttag:`{% autoescape off %}<autoescape>` ブロック内で使った場合の出力が期待
 とは違うものになってしまいます。
 
+.. _template_tag_thread_safety:
+
 .. Thread-safety considerations
    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -568,11 +566,11 @@ Django テンプレートシステムには、いろいろな :doc:`組み込み
    requests. Therefore, it's important to make sure your template tags are thread
    safe.
 
-ノードがパージングされると、 ``render`` メソッドは任意の回数呼び出される可能性
-があります。 Django はマルチスレッド環境で実行されることがあるので、 2 つの別
-のリクエストに対して 1 つのノードが異なるレスポンスコンテキストで同時にレンダ
-リングされることがありえます。それ故、テンプレートタグをスレッドセーフにしてお
-くことが大切です。
+ノードがパージングされると、そのノードの ``render`` メソッドは何度も呼び出され
+る可能性があります。 Django はマルチスレッド環境で実行されることがあるので、 2
+つの別のリクエストに対して 1 つのノードが異なるレスポンスコンテキストで同時に
+レンダリングされることがありえます。それ故、テンプレートタグをスレッドセーフに
+しておくことが大切です。
 
 .. To make sure your template tags are thread safe, you should never store state
    information on the node itself. For example, Django provides a builtin
@@ -580,9 +578,9 @@ Django テンプレートシステムには、いろいろな :doc:`組み込み
    it's rendered:
 
 テンプレートタグがスレッドセーフかどうかを確認するには、ノード自身に決して状態
-の情報を保存してはいけません。例えば、 Django は組込の :ttag:`cycle` テンプ
-レートタグを提供しています。これはレンダされるたびに与えられた文字列のリストを
-循環させます:
+情報を保存してはいけません。例えば、 Django は組込の :ttag:`cycle` テンプレー
+トタグを提供しています。これはレンダされるたびに与えられた文字列のリストを循環
+させます:
 
 .. code-block:: html+django
 
@@ -640,10 +638,10 @@ CycleNode は繰り返し実行されますが、その繰り返しはグロー�
    ``render_context`` behaves like a Python dictionary, and should be used to
    store ``Node`` state between invocations of the ``render`` method.
 
-この問題に対応するために Django は ``render_context`` を提供しています。これは
-現在レンダされているテンプレートの ``context`` に関連づけられたものです。
-``render_context`` は Python の辞書のように振る舞い、 ``render`` メソッドの実
-行ごとに ``Node`` の状態を保存するために使われます。
+この問題に対応するために Django は、現在レンダされているテンプレートのコンテキ
+ストに関連づけられた ``render_context`` を提供します。 ``render_context`` は
+Python の辞書と同じように振る舞い、 ``render`` メソッドの実行ごとに ``Node``
+の状態を保存するために使われます。
 
 .. Let's refactor our ``CycleNode`` implementation to use the ``render_context``:
 
@@ -669,11 +667,11 @@ CycleNode は繰り返し実行されますが、その繰り返しはグロー�
    like the current iteration of the ``CycleNode``, should be stored in the
    ``render_context``.
 
-ある ``Node`` が存在するあいだ属性として変化しないであろうグローバルな情報の保
-存については完全に安全であることに注意してください。 ``CycleNode`` の場合、
-``cyclevars`` 引数が ``Node`` がインスタンス化された後に変化しないので、それを
-``render_context`` に入れる必要はありません。しかし、 ``CycleNode`` の現在の繰
-り返しのような、現在レンダされているテンプレートに特有の状態情報は、
+あるノードが存在するあいだに属性として変化しないであろうグローバルな情報の保存
+については完全に安全であることに注意してください。 ``CycleNode`` の場合、
+``cyclevars`` 引数はノードがインスタンス化された後に変化しないので、それを
+``render_context`` に入れる必要はありません。しかし、 ``CycleNode`` の繰り返し
+状態のような、現在レンダされているテンプレートに特有の状態情報は、
 ``render_context`` に保存されるべきです。
 
 .. .. note::
@@ -687,10 +685,10 @@ CycleNode は繰り返し実行されますが、その繰り返しはグロー�
 .. note::
     ``render_context`` のなかで ``CycleNode`` 特有の情報を取得するために
     ``self`` を使ったことに注目してください。複数の ``CycleNodes`` が同じテン
-    プレートのなかで存在するかもしれないので、別のノードの状態情報をひどい目に
-    あわせないように気をつけなければいけません。そのための最も簡単な方法は、
-    ``render_context`` のキーとして ``self`` を使うことです。いくつかの状態変
-    更を追跡しつづけたければ、 ``render_context[self]`` を辞書にしてください。
+    プレートのなかに存在するかもしれないので、別のノードの状態情報をめちゃく
+    ちゃにしないように気をつけなければいけません。そのための最も簡単な方法は、
+    ``render_context`` のキーとして ``self`` を使うことです。複数の状態変更を
+    追跡したければ、 ``render_context[self]`` に辞書を格納してください。
 
 タグの登録
 ~~~~~~~~~~
@@ -763,7 +761,10 @@ CycleNode は繰り返し実行されますが、その繰り返しはグロー�
 
 レンダラの方も変更して、 ``blog_entry`` オブジェクトの ``date_updated`` プ
 ロパティの実際の中身を取り出せるようにせねばなりません。これは
-``django.template`` の ``Varialbe()`` クラスで実現します。従って:
+``django.template`` の ``Variable()`` クラスで実現します。
+
+``Variable`` クラスの使い方は、単に解決されるべき変数名を渡してインスタンスを
+作り、それから ``variable.resolve(context)`` を呼びます。従って:
 
 .. code-block:: python
 
@@ -872,7 +873,7 @@ CycleNode は繰り返し実行されますが、その繰り返しはグロー�
 
 .. If you need to rename your tag, you can provide a custom name for it:
 
-タグの名前を変更したければ、カスタム名を与えることができます:
+タグの名前を変更したければ、カスタムの名前を与えることができます:
 
 .. code-block:: python
 
@@ -1114,17 +1115,17 @@ CycleNode は繰り返し実行されますが、その繰り返しはグロー�
 
 .. .. admonition:: Variable scope in context
 
-.. admonition:: コンテキストにおける変数のスコープ
-
-..     Any variable set in the context will only be available in the same
+       Any variable set in the context will only be available in the same
        ``block`` of the template in which it was assigned. This behavior is
        intentional; it provides a scope for variables so that they don't conflict
        with context in other blocks.
 
-    コンテキストでセットされるいかなる変数も、テンプレートでそれが定義された同
-    じ ``block`` の中でしか使うことができません。この挙動は意図的なもので、変
-    数のスコープを提供しているため、異なるブロックでコンテキストが衝突すること
-    がありません。
+.. admonition:: コンテキストにおける変数のスコープ
+
+    コンテキストにセットされるいかなる変数も、でそれが定義されたのと同じテンプ
+    レートブロック (``block``) の中でしか使うことができません。この挙動は意図
+    的なもので、変数のスコープを提供しています。そのため異なるブロックのコンテ
+    キストが変数が衝突することがありません。
 
 ところで、 ``CurrentTimeNode2`` には問題があります: 変数名 ``current_time``
 がハードコードされているのです。これはすなわち、テンプレートの他の部分で
