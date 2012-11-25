@@ -1,103 +1,270 @@
-.. _ref-contrib-csrf:
-
 ==============================================
 クロスサイトリクエストフォージェリ (CSRF) 対策
 ==============================================
 
-:revision-up-to: 11321 (1.1) unfinished
+.. module:: django.middleware.csrf
+   :synopsis: Protects against Cross Site Request Forgeries
 
-.. module:: django.contrib.csrf
-   :synopsis: サイトをクロスサイトリクエストフォージェリから守ります。
+CSRF ミドルウェアとテンプレートタグは、簡単に使える
+`クロスサイトリクエストフォージェリ　(Cross Site Request Forgeries)`_ 
+対策を提供しています。このタイプの攻撃は、悪意のあるウェブサイトを訪れたユーザー
+のログイン済みの権限で、あなたのサイトに対して何らかの操作を行うことを目的とした
+リンクやフォームボタン、 JavaScript を設置したウェブサイトによって行われます。
+また、関連する攻撃として、ユーザーを騙して別のユーザー権限でログインさせる
+ログイン CSRF と呼ばれる攻撃もありますが、これも含まれます。
 
-CsrfMiddleware クラスは、簡単に使える `クロスサイトリクエストフォージェリ`_ 
-対策を提供しています。このタイプの攻撃は、悪意あるウェブサイトが、あなたの
-ウェブサイトに対して、ログイン済みユーザの権限で何らかの操作を行うように作
-られたリンクやフォームボタンを自分のサイトに設置しておき、ログイン済みのユー
-ザがユーザが自分のブラウザを使ってボタンやリンクをクリックするように仕向け
-ることで起こります。
+CSRF 攻撃に対する第一の防御は、 GET (と、9.1.1 Safe Methods,HTTP 1.1, 
+:rfc:`2616#section-9.1.1` で定義された '安全な' メソッド) リクエストから副作用を
+取り除くというものです。そして、 POST, PUT, DELETE のような、'安全でない' メソッ
+ドによるリクエストについては、下記の手順に従うことで保護することができます。
 
-CSRF 攻撃に対する第一の防御は、 GET リクエストから副作用を取り除くというも
-のです。 POST リクエストに対する防御は、このミドルウェアをインストール済み
-ミドルウェアリストに追加して実現できます。
+9.1.1 Safe Methods,HTTP 1.1, 
+:rfc:`2616#section-9.1.1` で定義された '安全な' メソッド) リクエストから副作用を
+取り除くというものです。そして、 POST, PUT, DELETE のような、'安全でない' メソッ
+ドによるリクエストについては、下記の手順に従うことで保護することができます。
 
 .. _Cross Site Request Forgeries:
     http://www.squarefree.com/securitytips/web-developers.html#CSRF
-.. _`クロスサイトリクエストフォージェリ`: `Cross Site Request Forgeries`_
+.. _`クロスサイトリクエストフォージェリ (Cross Site Request Forgeries)`:
+    `Cross Site Request Forgeries`_
+
+.. _using-csrf:
 
 使い方
-======
+=============
 
-``'django.contrib.csrf.middleware.CsrfMiddleware'`` ミドルウェアを
-:setting:`MIDDLEWARE_CLASSES` に追加してください。このミドルウェアは
-SessionMiddleware よりも後にレスポンスを処理せねばならないので、リスト中の
-SessionMiddleware よりも前に配置します。また、圧縮のような操作が入る前のレ
-スポンスを処理せねばならないので、 GZipMiddleware よりも後に配置します。
+CSRF 対策をあなたのビューで有効にするには、以下の手順に従ってください。:
 
-The ``CsrfMiddleware`` class is actually composed of two middleware:
-``CsrfViewMiddleware`` which performs the checks on incoming requests,
-and ``CsrfResponseMiddleware`` which performs post-processing of the
-result.  This allows the individual components to be used and/or
-replaced instead of using ``CsrfMiddleware``.
+1. ``'django.middleware.csrf.CsrfViewMiddleware'`` ミドルウェアを
+   :setting:`MIDDLEWARE_CLASSES` に追加してください。 (このミドルウェアは、
+   CSRF攻撃から保護されていることを前提として動作するどのミドルウェアよりも前に
+   追加します。)
 
-.. versionchanged:: 1.1
-    (previous versions of Django did not provide these two components
-    of ``CsrfMiddleware`` as described above)
+   また、代わりに 保護したい特定のビューに対して、
+   :func:`~django.views.decorators.csrf.csrf_protect` デコレータを使用することも
+   できます (下記参照)
 
-Exceptions
-----------
+2. 自身のサイト内で POST リクエストを送るすべてのフォームの ``<form>`` タグ内
+   で、 :ttag:`csrf_token` テンプレートタグを使用します。例::
+           
+      <form action="." method="post">{% csrf_token %}
 
-.. versionadded:: 1.1
+   外部のサイトに対してリクエストを送るフォームについては使用すべきではあり
+   ません。 CSRF トークンが流出し、脆弱性を生むからです。
 
-To manually exclude a view function from being handled by the
-CsrfMiddleware, you can use the ``csrf_exempt`` decorator, found in
-the ``django.contrib.csrf.middleware`` module. For example::
+3. 対応するビューの内部で、 ``'django.core.context_processors.csrf'``
+   コンテキストプロセッサーを使用出来るようにします。通常、2つの方法のうち、
+   どちらかの方法を選択します。:
 
-    from django.contrib.csrf.middleware import csrf_exempt
+   1. RequestContext を使用する。 RequestContext は、
+      (TEMPLATE_CONTEXT_PROCESSORS の設定によらず)
+      ``'django.core.context_processors.csrf'`` を常に使用します。もし、ジェ
+      ネリックビューや Django 付属のアプリを使用している場合は、あなたは既に
+      この方法を使用しています。なぜなら、これらのアプリは常にRequestContext
+      を使用しているからです。
 
-    def my_view(request):
-        return HttpResponse('Hello world')
-    my_view = csrf_exempt(my_view)
+   2. 手動でインポートし、プロセッサーを使って CSRF トークンを生成して、
+      テンプレートのコンテキストに追加する。例::
 
-Like the middleware itself, the ``csrf_exempt`` decorator is composed
-of two parts: a ``csrf_view_exempt`` decorator and a
-``csrf_response_exempt`` decorator, found in the same module.  These
-disable the view protection mechanism (``CsrfViewMiddleware``) and the
-response post-processing (``CsrfResponseMiddleware``) respectively.
-They can be used individually if required.
+         from django.core.context_processors import csrf
+         from django.shortcuts import render_to_response
+ 
+         def my_view(request):
+             c = {}
+             c.update(csrf(request))
+             # ... view code here
+             return render_to_response("a_template.html", c)
 
-You don't have to worry about doing this for most AJAX views. Any
-request sent with "X-Requested-With: XMLHttpRequest" is automatically
-exempt. (See the next section.)
+      このような処理を行う、 :func:`~django.shortcuts.render_to_response()` 
+      のラッパー関数を作成しても良いかもしれません。
+
+補助スクリプトの ``extras/csrf_migration_helper.py`` を使えば、これらの手順を
+行わなければならないテンプレートやコードを自動的に見つけてくれます。
+また、どうやって使えばよいかのヘルプも完全に含まれています。
+
+.. _csrf-ajax:
+
+AJAX
+----
+
+上記の手順を AJAX を用いた POST リクエストで行う際のは、少々不便です。あなたは、
+すべての POST リクエストについて、 CSRF トークンを POST するデータに含めることを
+覚えておかなければなりません。なので、別の方法が用意されています。それは、各
+XMLHttpRequest に対して、 `X-CSRFToken` という独自ヘッダーに CSRF トークンの
+値を設定することです。多くの JavaScript のフレームワークはすべてのリクエストに
+ついて、ヘッダーを設定するようなフック機能を提供しているので、この操作は多くの
+場合、簡単に行うことができます。 jQuery の場合、 ``ajaxSend`` イベントを以下の
+ように記述します:
+
+.. code-block:: javascript
+
+    jQuery(document).ajaxSend(function(event, xhr, settings) {
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie != '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        function sameOrigin(url) {
+            // url could be relative or scheme relative or absolute
+            var host = document.location.host; // host + port
+            var protocol = document.location.protocol;
+            var sr_origin = '//' + host;
+            var origin = protocol + sr_origin;
+            // Allow absolute or scheme relative URLs to same origin
+            return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+                (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+                // or any other URL that isn't scheme relative or absolute i.e relative.
+                !(/^(\/\/|http:|https:).*/.test(url));
+        }
+        function safeMethod(method) {
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        if (!safeMethod(settings.type) && sameOrigin(settings.url)) {
+            xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        }
+    });
+
+.. note::
+
+   jQuery 1.5 ではバグがあるため、上記の例は正しく動作しません。使用している
+   jQuery のバージョンが 1.5.1 以上であることを確認してください。
+
+これを サイトで使用される JavaScript のファイルに追加すれば、 jQuery 経由で
+送信された AJAX POST リクエストは、CSRF 対策に引っかかることはなくなります。
+
+上記のコードは、 `jQuery cookie plugin
+<http://plugins.jquery.com/project/Cookie>`_ を用いて、 ``getCookie`` を置き換え
+、jQuery 1.5 以降で追加された `settings.crossDomain
+<http://api.jquery.com/jQuery.ajax>`_ を用いて ``sameOrigin`` を置き換えることに
+よって、さらに簡略化できます。
+
+加えて、 :ttag:`csrf_token` によって、クライアントに CSRF クッキーを送れなかった場合、
+ユーザーがクッキーを受け取っているかを
+:func:`~django.views.decorators.csrf.ensure_csrf_cookie` を用いて、確認する
+必要があるかもしれません。
+
+別のテンプレートエンジン
+------------------------------
+
+Django の組み込みではないテンプレートエンジンを使用する場合、テンプレートの
+コンテキストからトークンが取得できることを確認した上で、フォームに手動で追加して
+ください。
+
+例えば、 Cheetah テンプレート言語を使用する場合、フォームは以下のコードを含む
+でしょう。:
+
+.. code-block:: html
+
+    <div style="display:none">
+        <input type="hidden" name="csrfmiddlewaretoken" value="$csrf_token"/>
+    </div>
+
+
+JavaScript に関しては、 取得した CSRF トークンの値を使用することによって、上記と
+同じ方法で使用することができます。
+
+デコレータ
+--------------------
+
+.. module:: django.views.decorators.csrf
+
+``CsrfViewMiddlewre`` を追加して、サイト全体を保護する代わりに、まったく同じ機能
+を保護が必要な特定のビューのみに持たせたいという場合には、 ``csrf_protect`` 
+デコレータを使用することができます。ただし、 CSRF トークンを出力に埋め込むビュー
+と、フォームから POST されたデータを受け取るビュー (これらは、同じビューの
+時も多いですが、違うビューの時もあります) の **両方で** 使用しなけれなりません。
+
+デコレータのみを使用することは **推奨されません** 。なぜなら、もし、あなたが
+デコレータをつけ忘れてしまった場合、それがセキュリティホールを生むことになる
+からです。'念には念を (belt and blaces)' の原則から両方を使用することは良いこと
+ですし、使用してもわずかなオーバーヘッドにしかならないでしょう。
+
+.. function:: csrf_protect(view)
+
+    ``CsrfViewMiddleware`` の保護機能をビューに付加するデコレータ
+
+    使い方::
+
+        from django.views.decorators.csrf import csrf_protect
+        from django.shortcuts import render
+
+        @csrf_protect
+        def my_view(request):
+            c = {}
+            # ...
+            return render(request, "a_template.html", c)
+
+拒否されたリクエスト
+--------------------
+
+受け取ったリクエストが ``CsrfViewMiddleware`` によって行われる認証に失敗した場合
+、デフォルトでは、ユーザに '403 Forbidden' が送信されます。これは普通、本当に
+CSRF が行われたか、プログラマのミスによって、 POST フォームに CSRF トークンを
+含め忘れたかでない限りは起こりません。
+
+けれども、エラーページがあまり親切でないと感じるのならば、この状態を処理する
+ために、自作のビューを設定することができます。 そうするには、単に settings の
+:setting:`CSRF_FAILURE_VIEW` を設定してください。
+
+.. _how-csrf-works:
 
 仕組み
 ======
 
-CsrfMiddleware は以下のような処理を行います:
+CSRF 保護は以下の要素からなります :
 
-1. CsrfMiddleware は、サーバから出てゆくレスポンス内の 'POST' フォーム全て
-   に対して 'csrfmiddlewaretoken' という名前の隠しフィールドを追加します。
-   このフィールドの値はセッション ID とシークレット文字列の和をハッシュした
-   ものになります。セッション ID が設定されていない場合、レスポンスに対する
-   変更は行いません。このため、セッションをともなわないリクエストに対しては
-   非常にわずかなパフォーマンスペナルティしかもたらしません。
-   (実際には ``CsrfResponseMiddleware`` がこの処理を担当します。)
+1. ランダムな値 (いわゆる、独立一時セッション (session independent nonce) ) 
+   が設定されており、外部のサイトから参照できない CSRF クッキー。
 
-2. セッションクッキーのセットされた全ての POST リクエストに対し、
-   'csrfmiddlewaretoken' がセットされていて、かつ正しい値になっているか調べ
-   ます。正しい値でなければ、 403 エラーを返します。
-   (実際には ``CsrfViewMiddleware`` がこの処理を担当します。)
+   このクッキーは ``CsrfViewMiddleware`` によって設定されます。これは、クッ
+   キーが永続化されていることを意味しますが、絶対に破棄されないクッキーを作成
+   することは不可能なので、 ``django.middleware.csrf.get_token()`` (この関数
+   は、内部的に CSRF トークンを取り出すために使用されています。) が呼び出された
+   すべてのレスポンスについて、 CSRF クッキーが送信されます。
 
-これらの処理により、あなたのウェブサイト由来のフォームだけが POST を送り返
-せるようになります。
+2. すべての POST リクエストを送信するフォームに含まれる、 'csrfmiddlewaretoken' 
+   という名前を持つ hidden フィールド。この値フィールドの値には、 CSRF クッキー
+   の値が使われます。
+   
+   この処理は、テンプレートタグによって行われます。
 
-このミドルウェアは、 HTTP POST リクエスト (と POST フォーム) だけを対象にし
-ています。 GET リクエストには危険な副作用を持たないはず
-(`RFC 2616: HTTP 1.1 の 9.1.1 節、「安全なメソッド」`_ を参照) なので、
-GET リクエストを使った CSRF 攻撃は威力を持たないのです。
+3. HTTP GET, HEAD, OPTIONS, TRACE メソッドを除く、すべてのメソッドについて、
+   CSRF クッキーと 'csrfmiddlewaretoken' フィールドを保持しており、なおかつ
+   正しい値を保持しているリクエスト。もし、そうでないならば、ユーザーは 403
+   エラーを受け取ることになります。
+   
+   この確認は、 ``CsrfViewMiddleware`` によって行われます。
 
-セッションクッキーを伴わない POST リクエストは保護されませんが、セッション
-クッキーを伴わないようなフォームに対しては、攻撃側のウェブサイトはリクエス
-トをどのようにでも作れてしまうので、そもそも保護する意味はありません。
+4. 加えて、 HTTPS リクエストの場合は、 リファラ (referer) が
+   ``CsrfViewMiddleware`` によって厳密にチェックされます。これは、 独立一時
+   セッションを用いた HTTPS 通信における中間者攻撃(Man-In-The-Middle atack)
+   に対応する必要があるからです。これは、(不幸にも) HTTPS を使用しているサイト
+   においても、 HTTP の'Set-Cookie' ヘッダーが認められてしまうという事実により
+   ます。(HTTP では、リファラヘッダの内容は十分に信頼出来ないため、リファラの
+   チェックは行われません。)
+   
+これらの処理により、あなたのウェブサイト由来のフォームだけが POST を送り返せる
+ようになります。
+
+ここでは、わざと GET リクエスト (と、その他 '安全' と :rfc:`2616` によって定義
+されたリクエスト) を無視しています。 これらのリクエストは危険な副作用を持た
+ないはずなので、 GET リクエストを使った CSRF 攻撃は威力を持たないのです。
+:rfc:`2616` では、POST, PUT, DELETE が '安全でない' ものとして定義されており、
+その他のメソッドについては、安全でないものとみなして、最大限の保護を行なって
+います。
+
+
 
 CsrfMiddleware はレスポンスを変更する前に Content-Type をチェックし、
 'text/html' または 'application/xml+xhtml' のページだけを変更します。
