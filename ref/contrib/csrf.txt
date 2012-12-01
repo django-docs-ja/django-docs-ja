@@ -305,29 +305,129 @@ CSRF 保護は以下の要素からなります :
 制限
 ====
 
-CsrfMiddleware を動作させるには、 Django のセッションフレームワークが必要で
-す。手動でクッキーを設定するカスタムの認証システムなどを使っている場合には
-うまく動作しません。
+サイト内のサブドメインは、ドメイン全体に対してクッキーを設定することができる
+でしょう。クッキーをセットたり、対応するトークンを使用することによって、サブ
+ドメインからは CSRF 対策を巧みにすり抜けることができるかもしれません。この問題を
+回避するための唯一の手段は、サブドメインを信用できるユーザーによって管理させる
+(もしくは、最低でもクッキーを設定させないようにする) ことです。特筆すべき点は、
+信用出来ない人間にサブドメインを与えることは、 CSRF 以外にも、セッションフィク
+セーション (session fixation) のような他の脆弱性も生むため、良い案ではありま
+せんし、この脆弱性は現在一般に使用されているブラウザにおいて簡単に修正できるも
+のではないことです。
 
-アプリケーションで HTML ページやフォームを普通とは違うやり方で生成している
-場合 (JavaScript の document.write 文などで HTML フラグメントを送信するよう
-な場合)、フォームの隠しフィールドを追加するフィルタを回避してしまうかもしれ
-ません。そのような場合、フォームの提出は常に失敗してしまいます。ただし、
-CSRF 対策トークンを取得し、提出されるフォームに必ずトークンが入るようにすれ
-ば、このミドルウェアを使う余地はあるでしょう。
+特殊な場合
+==========
+
+ある特定のビューでは、ここで紹介した通常のパターンに当てはまらないような特殊な
+使い方が必要になることがあるでしょう。これらの状況では、いくつかのユーティリティ
+が役に立つでしょう。これらが必要になると思われるシナリオは、以下の節に書かれて
+います。
+
+ユーティリティ
+--------------
+
+.. function:: csrf_exempt(view)
+
+    このデコレータは、CSRF 対策のチェックが無効化されるビューを表します。例::
+
+        from django.views.decorators.csrf import csrf_exempt
+
+        @csrf_exempt
+        def my_view(request):
+            return HttpResponse('Hello world')
+
+.. function:: requires_csrf_token(view)
+
+    通常、 :ttag:`csrf_token` テンプレートタグは 
+    ``CsrfViewMiddleware.process_view`` や、それに準ずる ``csrf_protect`` の
+    ようなものが実行されない限りは、動作しません。ビューに対するデコレータの 
+    ``requires_csrf_token`` は、このテンプレートタグが動作することを保証する
+    ために使用されます。このデコレータは ``csrf_protect`` に似ていますが、到達
+    したリクエストを拒否することは決してありません。
+
+    例::
+
+        from django.views.decorators.csrf import requires_csrf_token
+        from django.shortcuts import render
+
+        @requires_csrf_token
+        def my_view(request):
+            c = {}
+            # ...
+            return render(request, "a_template.html", c)
+
+.. function:: ensure_csrf_cookie(view)
+
+    .. versionadded:: 1.4
+
+    このデコレータはビューに対して、強制的にCSRFクッキーを送出させます。
+
+シナリオ
+--------
+
+いくつかのビューでは CSRF 対策を解除しなければならない
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ほとんどのビューでは CSRF 対策が必要としますが、いくつかだけはそうでない場合
+です。
+
+解決策: ミドルウェアを無効化し、必要とするビューすべてに対して ``csrf_protect``
+を付加するよりも、ミドルウェアを有効にした上で
+:func:`~django.views.decorators.csrf.csrf_exempt` を使用する方が良いでしょう。
 
 
-CsrfMiddleware はレスポンスを変更する前に Content-Type をチェックし、
-'text/html' または 'application/xml+xhtml' のページだけを変更します。
+CsrfViewMiddleware.process_view が使用されていない
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The middleware tries to be smart about requests that come in via AJAX. Many
-JavaScript toolkits send an "X-Requested-With: XMLHttpRequest" HTTP header;
-these requests are detected and automatically *not* handled by this middleware.
-We can do this safely because, in the context of a browser, the header can only
-be added by using ``XMLHttpRequest``, and browsers already implement a
-same-domain policy for ``XMLHttpRequest``. (Note that this is not secure if you
-don't trust content within the same domain or subdomains.)
+ビューが実行される前に、``CsrfViewMiddleware.process_view`` が実行されていない
+かもしれない場合があります。 - 例としては、404 や 500 のエラーハンドラーです。 -
+そのような状況でも CSRF トークンがフォーム内に必要になる場合です。
 
-.. _9.1.1 Safe Methods, HTTP 1.1, RFC 2616: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
-.. _`RFC 2616: HTTP 1.1 の 9.1.1 節、「安全なメソッド」`: `9.1.1 Safe Methods, HTTP 1.1, RFC 2616`_
+解決策: :func:`~django.views.decorators.csrf.requires_csrf_token` を使用して
+ください。
+
+CSRF 対策が無効化されているビューにおいて、CSRF トークンが必要になる
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+いくつかのビューでは ``csrf_exempt`` によって、対策が解除され、無効化されている
+かもしれません。そのような状況でも、 CSRF トークンが必要になる場合です。
+
+解決策: :func:`~django.views.decorators.csrf.csrf_exempt` を
+:func:`~django.views.decorators.csrf.requires_csrf_token` に続けて使用して
+ください。 (すなわち、 ``requires_csrf_token`` が最も内側のデコレータになると
+いうことです)
+
+ビュー内の特定の経路で対策が必要になる
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+あるビューにおいて、特定の状態でのみ CSRF 対策が必要になり、なおかつ、
+他の場合には CSRF 対策を行えない場合です。
+
+解決策: :func:`~django.views.decorators.csrf.csrf_exempt` をビュー全体では使用
+し、対策が必要な経路にのみ :func:`~django.views.decorators.csrf.csrf_protect` を
+使用してください。例::
+
+    from django.views.decorators.csrf import csrf_exempt, csrf_protect
+
+    @csrf_exempt
+    def my_view(request):
+
+        @csrf_protect
+        def protected_path(request):
+            do_something()
+
+        if some_condition():
+           return protected_path(request)
+        else:
+           do_something_else()
+
+ページが HTML フォームではなく AJAX を使用している
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+あるページにおいて、 POST リクエストを AJAX 経由で送信し、なおかつ、ページが
+CSRF クッキーが送出されるために必要な:ttag:`csrf_token` を含むHTML 上のフォーム
+を持たない場合です。
+
+解決策: そのページを生成するビューに対して、
+:func:`~django.views.decorators.csrf.ensure_csrf_cookie` を使用してください。
 
