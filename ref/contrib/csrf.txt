@@ -18,11 +18,6 @@ CSRF 攻撃に対する第一の防御は、 GET (と、9.1.1 Safe Methods,HTTP 
 取り除くというものです。そして、 POST, PUT, DELETE のような、'安全でない' メソッ
 ドによるリクエストについては、下記の手順に従うことで保護することができます。
 
-9.1.1 Safe Methods,HTTP 1.1, 
-:rfc:`2616#section-9.1.1` で定義された '安全な' メソッド) リクエストから副作用を
-取り除くというものです。そして、 POST, PUT, DELETE のような、'安全でない' メソッ
-ドによるリクエストについては、下記の手順に従うことで保護することができます。
-
 .. _Cross Site Request Forgeries:
     http://www.squarefree.com/securitytips/web-developers.html#CSRF
 .. _`クロスサイトリクエストフォージェリ (Cross Site Request Forgeries)`:
@@ -80,7 +75,7 @@ CSRF 対策をあなたのビューで有効にするには、以下の手順に
 
 補助スクリプトの ``extras/csrf_migration_helper.py`` を使えば、これらの手順を
 行わなければならないテンプレートやコードを自動的に見つけてくれます。
-また、どうやって使えばよいかのヘルプも完全に含まれています。
+また、どうやって使えばよいかのヘルプもすべて用意されています。
 
 .. _csrf-ajax:
 
@@ -264,6 +259,62 @@ CSRF 保護は以下の要素からなります :
 その他のメソッドについては、安全でないものとみなして、最大限の保護を行なって
 います。
 
+キャッシュする
+==============
+
+:ttag:`csrf_token` がテンプレート内で使用されている (もしくは、 ``get_token`` 
+関数が何らかの別の方法で呼び出されていた) 場合、 ``CsrfViewMiddleware`` は、
+クッキーと ``Vary: Cookie`` ヘッダをレスポンスに付加するでしょう。これは、この
+ミドルウェアがキャッシュの扱い方を教えれば、キャッシュを扱うミドルウェアがうまく
+処理してくれることを期待することを意味しています (``UpdateCacheMiddleware`` は
+他のどのミドルウェアよりも後に置きます)。
+
+けれども、あなたが特定のビューに対してキャッシュを設定するデコレータを使用した
+場合、 CSRF ミドルウェアは、まだ Vary ヘッダーや CSRF クッキーを設定できていない
+はずなので、レスポンスはこれらを含まないままキャッシュされてしまいます。この
+場合、 CSRF トークンを必要とするであろうビューには、すべて
+:func:`django.views.decorators.csrf.csrf_protect` デコレータを先に使用しておくべき
+です。::
+
+  from django.views.decorators.cache import cache_page
+  from django.views.decorators.csrf import csrf_protect
+
+  @cache_page(60 * 15)
+  @csrf_protect
+  def my_view(request):
+      # ...
+
+テストする
+==========
+
+``CsrfViewMiddleware`` は、すべてのPOSTリクエストについて CSRF トークンを必要と
+するため、普通、ビュー関数のテストの大きな障害になるでしょう。そのため、 Django
+のテスト用の HTTP クライアントは、 このミドルウェアと ``csrf_protect`` デコレ
+ータの制限を緩めるフラグを各リクエストに付加するため、これらがリクエスト拒否する
+ことはなくなります。その他のすべての処理 (例えば、 クッキーの送信など) は、通常
+と同様に働きます。
+
+もし、何らかの理由で CSRF のチェックを *有効にしたい* と考えるのであれば、 CSRF
+のチェックを有効にしたテストクライアントを作成することができます。::
+
+    >>> from django.test import Client
+    >>> csrf_client = Client(enforce_csrf_checks=True)
+
+.. _csrf-limitations:
+
+制限
+====
+
+CsrfMiddleware を動作させるには、 Django のセッションフレームワークが必要で
+す。手動でクッキーを設定するカスタムの認証システムなどを使っている場合には
+うまく動作しません。
+
+アプリケーションで HTML ページやフォームを普通とは違うやり方で生成している
+場合 (JavaScript の document.write 文などで HTML フラグメントを送信するよう
+な場合)、フォームの隠しフィールドを追加するフィルタを回避してしまうかもしれ
+ません。そのような場合、フォームの提出は常に失敗してしまいます。ただし、
+CSRF 対策トークンを取得し、提出されるフォームに必ずトークンが入るようにすれ
+ば、このミドルウェアを使う余地はあるでしょう。
 
 
 CsrfMiddleware はレスポンスを変更する前に Content-Type をチェックし、
@@ -279,18 +330,4 @@ don't trust content within the same domain or subdomains.)
 
 .. _9.1.1 Safe Methods, HTTP 1.1, RFC 2616: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
 .. _`RFC 2616: HTTP 1.1 の 9.1.1 節、「安全なメソッド」`: `9.1.1 Safe Methods, HTTP 1.1, RFC 2616`_
-
-制限
-====
-
-CsrfMiddleware を動作させるには、 Django のセッションフレームワークが必要で
-す。手動でクッキーを設定するカスタムの認証システムなどを使っている場合には
-うまく動作しません。
-
-アプリケーションで HTML ページやフォームを普通とは違うやり方で生成している
-場合 (JavaScript の document.write 文などで HTML フラグメントを送信するよう
-な場合)、フォームの隠しフィールドを追加するフィルタを回避してしまうかもしれ
-ません。そのような場合、フォームの提出は常に失敗してしまいます。ただし、
-CSRF 対策トークンを取得し、提出されるフォームに必ずトークンが入るようにすれ
-ば、このミドルウェアを使う余地はあるでしょう。
 
