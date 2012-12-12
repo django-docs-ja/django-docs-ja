@@ -520,6 +520,11 @@ Django のテスト用の HTTP クライアントは、 このミドルウェア
 特殊な場合
 ==========
 
+.. Certain views can have unusual requirements that mean they don't fit the normal
+   pattern envisaged here. A number of utilities can be useful in these
+   situations. The scenarios they might be needed in are described in the following
+   section.
+
 ある特定のビューでは、ここで紹介した通常のパターンに当てはまらないような特殊な
 使い方が必要になることがあるでしょう。これらの状況では、いくつかのユーティリティ
 が役に立つでしょう。これらが必要になると思われるシナリオは、以下の節に書かれて
