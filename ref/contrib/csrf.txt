@@ -2,8 +2,18 @@
 クロスサイトリクエストフォージェリ (CSRF) 対策
 ==============================================
 
+:revision-up-to: 17812 (1.4)
+
 .. module:: django.middleware.csrf
    :synopsis: Protects against Cross Site Request Forgeries
+
+.. The CSRF middleware and template tag provides easy-to-use protection against
+   `Cross Site Request Forgeries`_.  This type of attack occurs when a malicious
+   Web site contains a link, a form button or some javascript that is intended to
+   perform some action on your Web site, using the credentials of a logged-in user
+   who visits the malicious site in their browser.  A related type of attack,
+   'login CSRF', where an attacking site tricks a user's browser into logging into
+   a site with someone else's credentials, is also covered.
 
 CSRF ミドルウェアとテンプレートタグは、簡単に使える
 `クロスサイトリクエストフォージェリ　(Cross Site Request Forgeries)`_ 
@@ -12,6 +22,12 @@ CSRF ミドルウェアとテンプレートタグは、簡単に使える
 リンクやフォームボタン、 JavaScript を設置したウェブサイトによって行われます。
 また、関連する攻撃として、ユーザーを騙して別のユーザー権限でログインさせる
 ログイン CSRF と呼ばれる攻撃もありますが、これも含まれます。
+
+.. The first defense against CSRF attacks is to ensure that GET requests (and other
+   'safe' methods, as defined by 9.1.1 Safe Methods, HTTP 1.1,
+   :rfc:`2616#section-9.1.1`) are side-effect free. Requests via 'unsafe' methods,
+   such as POST, PUT and DELETE, can then be protected by following the steps
+   below.
 
 CSRF 攻撃に対する第一の防御は、 GET (と、9.1.1 Safe Methods,HTTP 1.1, 
 :rfc:`2616#section-9.1.1` で定義された '安全な' メソッド) リクエストから副作用を
@@ -28,7 +44,19 @@ CSRF 攻撃に対する第一の防御は、 GET (と、9.1.1 Safe Methods,HTTP 
 使い方
 =============
 
+.. To enable CSRF protection for your views, follow these steps:
+
 CSRF 対策をあなたのビューで有効にするには、以下の手順に従ってください。:
+
+.. 1. Add the middleware
+      ``'django.middleware.csrf.CsrfViewMiddleware'`` to your list of
+      middleware classes, :setting:`MIDDLEWARE_CLASSES`.  (It should come
+      before any view middleware that assume that CSRF attacks have
+      been dealt with.)
+         
+      Alternatively, you can use the decorator
+      :func:`~django.views.decorators.csrf.csrf_protect` on particular views
+      you want to protect (see below).
 
 1. ``'django.middleware.csrf.CsrfViewMiddleware'`` ミドルウェアを
    :setting:`MIDDLEWARE_CLASSES` に追加してください。 (このミドルウェアは、
@@ -39,6 +67,14 @@ CSRF 対策をあなたのビューで有効にするには、以下の手順に
    :func:`~django.views.decorators.csrf.csrf_protect` デコレータを使用することも
    できます (下記参照)
 
+.. 2. In any template that uses a POST form, use the :ttag:`csrf_token` tag inside
+      the ``<form>`` element if the form is for an internal URL, e.g.::
+        
+        <form action="." method="post">{% csrf_token %}
+      
+      This should not be done for POST forms that target external URLs, since
+      that would cause the CSRF token to be leaked, leading to a vulnerability.
+
 2. 自身のサイト内で POST リクエストを送るすべてのフォームの ``<form>`` タグ内
    で、 :ttag:`csrf_token` テンプレートタグを使用します。例::
            
@@ -47,9 +83,19 @@ CSRF 対策をあなたのビューで有効にするには、以下の手順に
    外部のサイトに対してリクエストを送るフォームについては使用すべきではあり
    ません。 CSRF トークンが流出し、脆弱性を生むからです。
 
+.. 3. In the corresponding view functions, ensure that the
+      ``'django.core.context_processors.csrf'`` context processor is
+      being used. Usually, this can be done in one of two ways:
+
 3. 対応するビューの内部で、 ``'django.core.context_processors.csrf'``
    コンテキストプロセッサーを使用出来るようにします。通常、2つの方法のうち、
    どちらかの方法を選択します。:
+
+   .. 1. Use RequestContext, which always uses
+      ``'django.core.context_processors.csrf'`` (no matter what your
+      TEMPLATE_CONTEXT_PROCESSORS setting).  If you are using
+      generic views or contrib apps, you are covered already, since these
+      apps use RequestContext throughout.
 
    1. RequestContext を使用する。 RequestContext は、
       (TEMPLATE_CONTEXT_PROCESSORS の設定によらず)
@@ -57,6 +103,9 @@ CSRF 対策をあなたのビューで有効にするには、以下の手順に
       ネリックビューや Django 付属のアプリを使用している場合は、あなたは既に
       この方法を使用しています。なぜなら、これらのアプリは常に RequestContext
       を使用しているからです。
+
+   .. 2. Manually import and use the processor to generate the CSRF token and
+      add it to the template context. e.g.::
 
    2. 手動でインポートし、プロセッサーを使って CSRF トークンを生成して、
       テンプレートのコンテキストに追加する。例::
@@ -70,8 +119,16 @@ CSRF 対策をあなたのビューで有効にするには、以下の手順に
              # ... view code here
              return render_to_response("a_template.html", c)
 
+      .. You may want to write your own
+         :func:`~django.shortcuts.render_to_response()` wrapper that takes care
+         of this step for you.
+
       このような処理を行う、 :func:`~django.shortcuts.render_to_response()` 
       のラッパー関数を作成しても良いかもしれません。
+
+.. The utility script ``extras/csrf_migration_helper.py`` can help to automate the
+   finding of code and templates that may need these steps. It contains full help
+   on how to use it.
 
 補助スクリプトの ``extras/csrf_migration_helper.py`` を使えば、これらの手順を
 行わなければならないテンプレートやコードを自動的に見つけてくれます。
@@ -79,8 +136,19 @@ CSRF 対策をあなたのビューで有効にするには、以下の手順に
 
 .. _csrf-ajax:
 
+.. AJAX
+   ----
+
 AJAX
 ----
+
+.. While the above method can be used for AJAX POST requests, it has some
+   inconveniences: you have to remember to pass the CSRF token in as POST data with
+   every POST request. For this reason, there is an alternative method: on each
+   XMLHttpRequest, set a custom `X-CSRFToken` header to the value of the CSRF
+   token. This is often easier, because many javascript frameworks provide hooks
+   that allow headers to be set on every request. In jQuery, you can use the
+   ``ajaxSend`` event as follows:
 
 上記の手順を AJAX を用いた POST リクエストで行うのは、少し不便です。あなたは、
 すべての POST リクエストについて、 CSRF トークンを POST するデータに含めることを
@@ -132,11 +200,23 @@ XMLHttpRequest に対して、 `X-CSRFToken` という独自ヘッダーに CSRF
 
 .. note::
 
+   .. Due to a bug introduced in jQuery 1.5, the example above will not work
+      correctly on that version. Make sure you are running at least jQuery 1.5.1.
+
    jQuery 1.5 ではバグがあるため、上記の例は正しく動作しません。使用している
    jQuery のバージョンが 1.5.1 以上であることを確認してください。
 
+.. Adding this to a javascript file that is included on your site will ensure that
+   AJAX POST requests that are made via jQuery will not be caught by the CSRF
+   protection.
+
 これを サイトで使用される JavaScript のファイルに追加すれば、 jQuery 経由で
 送信された AJAX POST リクエストは、CSRF 対策に引っかかることはなくなります。
+
+.. The above code could be simplified by using the `jQuery cookie plugin
+   <http://plugins.jquery.com/project/Cookie>`_ to replace ``getCookie``, and
+   `settings.crossDomain <http://api.jquery.com/jQuery.ajax>`_ in jQuery 1.5 and
+   later to replace ``sameOrigin``.
 
 上記のコードは、 `jQuery cookie plugin
 <http://plugins.jquery.com/project/Cookie>`_ を用いて、 ``getCookie`` を置き換え
@@ -144,17 +224,31 @@ XMLHttpRequest に対して、 `X-CSRFToken` という独自ヘッダーに CSRF
 <http://api.jquery.com/jQuery.ajax>`_ を用いて ``sameOrigin`` を置き換えることに
 よって、さらに簡略化できます。
 
+.. In addition, if the CSRF cookie has not been sent to the client by use of
+   :ttag:`csrf_token`, you may need to ensure the client receives the cookie by
+   using :func:`~django.views.decorators.csrf.ensure_csrf_cookie`.
+
 加えて、 :ttag:`csrf_token` を使用して、クライアントに CSRF クッキーを送って
 いなかった場合、ユーザーがクッキーを受け取っていることを
 :func:`~django.views.decorators.csrf.ensure_csrf_cookie` を用いて、保証する
 必要があるかもしれません。
 
+.. Other template engines
+   ----------------------
+
 別のテンプレートエンジン
 ------------------------------
+
+.. When using a different template engine than Django's built-in engine, you can
+   set the token in your forms manually after making sure it's available in the
+   template context.
 
 Django の組み込みではないテンプレートエンジンを使用する場合、テンプレートの
 コンテキストからトークンが取得できることを確認した上で、フォームに手動で追加して
 ください。
+
+.. For example, in the Cheetah template language, your form could contain the
+   following:
 
 例えば、 Cheetah テンプレート言語を使用する場合、フォームは以下のコードを含む
 でしょう。:
@@ -166,19 +260,35 @@ Django の組み込みではないテンプレートエンジンを使用する�
     </div>
 
 
+.. You can use JavaScript similar to the :ref:`AJAX code <csrf-ajax>` above to get
+   the value of the CSRF token.
+
 JavaScript に関しては、 取得した CSRF トークンの値を使用することによって、上記と
 同じ方法で使用することができます。
 
-デコレータ
+.. The decorator method
+   --------------------
+
+デコレータメソッド
 --------------------
 
 .. module:: django.views.decorators.csrf
+
+.. Rather than adding ``CsrfViewMiddleware`` as a blanket protection, you can use
+   the ``csrf_protect`` decorator, which has exactly the same functionality, on
+   particular views that need the protection. It must be used **both** on views
+   that insert the CSRF token in the output, and on those that accept the POST form
+   data. (These are often the same view function, but not always).
 
 ``CsrfViewMiddlewre`` を追加して、サイト全体で対策する代わりに、まったく同じ機能
 を保護が必要な特定のビューのみに持たせたいという場合には、 ``csrf_protect`` 
 デコレータを使用することができます。ただし、 CSRF トークンを出力に埋め込むビュー
 と、フォームから POST されたデータを受け取るビュー (これらは、同じビューの
 時も多いですが、違うビューの時もあります) の **両方で** 使用しなけれなりません。
+
+.. Use of the decorator by itself is **not recommended**, since if you forget to
+   use it, you will have a security hole. The 'belt and braces' strategy of using
+   both is fine, and will incur minimal overhead.
 
 デコレータのみを使用することは **推奨されません** 。なぜなら、もし、あなたが
 デコレータをつけ忘れてしまった場合、それがセキュリティホールを生むことになる
@@ -200,13 +310,26 @@ JavaScript に関しては、 取得した CSRF トークンの値を使用す�
             # ...
             return render(request, "a_template.html", c)
 
+.. Rejected requests
+   =================
+
 拒否されたリクエスト
 --------------------
+
+.. By default, a '403 Forbidden' response is sent to the user if an incoming
+   request fails the checks performed by ``CsrfViewMiddleware``.  This should
+   usually only be seen when there is a genuine Cross Site Request Forgery, or
+   when, due to a programming error, the CSRF token has not been included with a
+   POST form.
 
 受け取ったリクエストが ``CsrfViewMiddleware`` によって行われる認証に失敗した場合
 、デフォルトでは、ユーザに '403 Forbidden' が送信されます。これは普通、本当に
 CSRF が行われたか、プログラマのミスによって、 POST フォームに CSRF トークンを
 含め忘れたかでない限りは起こりません。
+
+.. The error page, however, is not very friendly, so you may want to provide your
+   own view for handling this condition.  To do this, simply set the
+   :setting:`CSRF_FAILURE_VIEW` setting.
 
 けれども、エラーページがあまり親切でないと感じるのならば、このような場面を処理
 するために、自作のビューを設定することができます。 そうするには、単に settings
@@ -217,10 +340,20 @@ CSRF が行われたか、プログラマのミスによって、 POST フォー
 仕組み
 ======
 
-CSRF 保護は以下の要素からなります :
+.. The CSRF protection is based on the following things:
+
+CSRF 対策は以下の要素からなります :
+
+.. 1. A CSRF cookie that is set to a random value (a session independent nonce, as
+      it is called), which other sites will not have access to.
 
 1. ランダムな値 (いわゆる、独立一時セッション (session independent nonce) ) 
    が設定されており、外部のサイトから参照できない CSRF クッキー。
+
+   .. This cookie is set by ``CsrfViewMiddleware``.  It is meant to be permanent,
+      but since there is no way to set a cookie that never expires, it is sent with
+      every response that has called ``django.middleware.csrf.get_token()``
+      (the function used internally to retrieve the CSRF token).
 
    このクッキーは ``CsrfViewMiddleware`` によって設定されます。これは、クッキー
    がずっと保持されることを前提としていますが、絶対に破棄されないクッキーを作成
@@ -228,18 +361,38 @@ CSRF 保護は以下の要素からなります :
    は、内部的に CSRF トークンを取り出すために使用されています。) が呼び出された
    すべてのレスポンスについて、 CSRF クッキーが送信されます。
 
+.. 2. A hidden form field with the name 'csrfmiddlewaretoken' present in all
+      outgoing POST forms.  The value of this field is the value of the CSRF
+      cookie.
+
 2. すべての POST リクエストを送信するフォームに含まれる、 'csrfmiddlewaretoken' 
    という名前を持つ hidden フィールド。この値フィールドの値には、 CSRF クッキー
    の値が使われます。
+
+   .. This part is done by the template tag.
    
    この処理は、テンプレートタグによって行われます。
+
+.. 3. For all incoming requests that are not using HTTP GET, HEAD, OPTIONS or
+      TRACE, a CSRF cookie must be present, and the 'csrfmiddlewaretoken' field
+      must be present and correct. If it isn't, the user will get a 403 error.
 
 3. HTTP GET, HEAD, OPTIONS, TRACE メソッドを除く、すべてのメソッドについて、
    CSRF クッキーと 'csrfmiddlewaretoken' フィールドを保持しており、なおかつ
    正しい値を保持しているリクエスト。もし、そうでないならば、ユーザーは 403
    エラーを受け取ることになります。
+
+   .. This check is done by ``CsrfViewMiddleware``.
    
    この確認は、 ``CsrfViewMiddleware`` によって行われます。
+
+.. 4. In addition, for HTTPS requests, strict referer checking is done by
+      ``CsrfViewMiddleware``.  This is necessary to address a Man-In-The-Middle
+      attack that is possible under HTTPS when using a session independent nonce,
+      due to the fact that HTTP 'Set-Cookie' headers are (unfortunately) accepted
+      by clients that are talking to a site under HTTPS.  (Referer checking is not
+      done for HTTP requests because the presence of the Referer header is not
+      reliable enough under HTTP.)
 
 4. 加えて、 HTTPS リクエストの場合は、 リファラ (referer) が
    ``CsrfViewMiddleware`` によって厳密にチェックされます。これは、 独立一時
@@ -248,19 +401,37 @@ CSRF 保護は以下の要素からなります :
    ても、 HTTP の'Set-Cookie' ヘッダーが認められてしまうという事実によります。
    (HTTP では、リファラヘッダの内容は十分に信頼出来ないため、リファラのチェック
    は行われません。)
+
+.. This ensures that only forms that have originated from your Web site can be used
+   to POST data back.
    
 これらの処理により、あなたのウェブサイト由来のフォームだけが POST を送り返せる
 ことを保証できます。
 
-ここでは、わざと GET リクエスト (と、その他 '安全' と :rfc:`2616` によって定義
+.. It deliberately ignores GET requests (and other requests that are defined as
+   'safe' by :rfc:`2616`). These requests ought never to have any potentially
+   dangerous side effects , and so a CSRF attack with a GET request ought to be
+   harmless. :rfc:`2616` defines POST, PUT and DELETE as 'unsafe', and all other
+   methods are assumed to be unsafe, for maximum protection.
+
+ここでは、故意に GET リクエスト (と、その他 '安全' と :rfc:`2616` によって定義
 されたリクエスト) を無視しています。 これらのリクエストは危険な副作用を持た
 ないはずなので、 GET リクエストを使った CSRF 攻撃は威力を持たないのです。
 :rfc:`2616` では、POST, PUT, DELETE が '安全でない' ものとして定義されており、
 その他のメソッドについては、安全でないものとみなして、最大限の対策を行なって
 います。
 
+.. Caching
+   =======
+
 キャッシュする
 ==============
+
+.. If the :ttag:`csrf_token` template tag is used by a template (or the
+   ``get_token`` function is called some other way), ``CsrfViewMiddleware`` will
+   add a cookie and a ``Vary: Cookie`` header to the response. This means that the
+   middleware will play well with the cache middleware if it is used as instructed
+   (``UpdateCacheMiddleware`` goes before all other middleware).
 
 :ttag:`csrf_token` がテンプレート内で使用されている (もしくは、 ``get_token`` 
 関数が何らかの別の方法で呼び出されていた) 場合、 ``CsrfViewMiddleware`` は、
@@ -268,6 +439,12 @@ CSRF 保護は以下の要素からなります :
 ミドルウェアがキャッシュの扱い方を教えれば、キャッシュを扱うミドルウェアがうまく
 処理してくれることを期待することを意味しています (``UpdateCacheMiddleware`` は
 他のどのミドルウェアよりも後に置きます)。
+
+.. However, if you use cache decorators on individual views, the CSRF middleware
+   will not yet have been able to set the Vary header or the CSRF cookie, and the
+   response will be cached without either one. In this case, on any views that
+   will require a CSRF token to be inserted you should use the
+   :func:`django.views.decorators.csrf.csrf_protect` decorator first::
 
 けれども、あなたが特定のビューに対してキャッシュを設定するデコレータを使用した
 場合、 CSRF ミドルウェアは、まだ Vary ヘッダーや CSRF クッキーを設定できていない
@@ -284,8 +461,18 @@ CSRF 保護は以下の要素からなります :
   def my_view(request):
       # ...
 
+.. Testing
+   =======
+
 テストする
 ==========
+
+.. The ``CsrfViewMiddleware`` will usually be a big hindrance to testing view
+   functions, due to the need for the CSRF token which must be sent with every POST
+   request.  For this reason, Django's HTTP client for tests has been modified to
+   set a flag on requests which relaxes the middleware and the ``csrf_protect``
+   decorator so that they no longer rejects requests.  In every other respect
+   (e.g. sending cookies etc.), they behave the same.
 
 ``CsrfViewMiddleware`` は、すべての POST リクエストについて CSRF トークンを
 必要とするため、普通、ビュー関数のテストの大きな障害になるでしょう。そのため、
@@ -293,6 +480,10 @@ Django のテスト用の HTTP クライアントは、 このミドルウェア
 デコレータの制限を緩めるフラグを各リクエストに付加するので、これらがリクエストを
 拒否することはなくなります。その他のすべての処理 (例えば、 クッキーの送信など)
 は、通常と同様に働きます。
+
+.. If, for some reason, you *want* the test client to perform CSRF
+   checks, you can create an instance of the test client that enforces
+   CSRF checks::
 
 もし、何らかの理由で CSRF のチェックを *有効にしたい* と考えるのであれば、 CSRF
 のチェックを有効にしたテストクライアントを作成することができます。::
@@ -305,6 +496,14 @@ Django のテスト用の HTTP クライアントは、 このミドルウェア
 制限
 ====
 
+.. Subdomains within a site will be able to set cookies on the client for the whole
+   domain.  By setting the cookie and using a corresponding token, subdomains will
+   be able to circumvent the CSRF protection.  The only way to avoid this is to
+   ensure that subdomains are controlled by trusted users (or, are at least unable
+   to set cookies).  Note that even without CSRF, there are other vulnerabilities,
+   such as session fixation, that make giving subdomains to untrusted parties a bad
+   idea, and these vulnerabilities cannot easily be fixed with current browsers.
+
 サイト内のサブドメインは、ドメイン全体に対してクッキーを設定することができる
 でしょう。クッキーをセットしたり、対応するトークンを使用することによって、サブ
 ドメインからは CSRF 対策を巧みにすり抜けることができるでしょう。この問題を回避
@@ -315,6 +514,9 @@ Django のテスト用の HTTP クライアントは、 このミドルウェア
 せんし、この脆弱性は現在一般に使用されているブラウザにおいて簡単に修正できるも
 のではないことです。
 
+.. Edge cases
+   ==========
+
 特殊な場合
 ==========
 
@@ -323,8 +525,14 @@ Django のテスト用の HTTP クライアントは、 このミドルウェア
 が役に立つでしょう。これらが必要になると思われるシナリオは、以下の節に書かれて
 います。
 
+.. Utilities
+   ---------
+
 ユーティリティ
 --------------
+
+.. This decorator marks a view as being exempt from the protection ensured by
+   the middleware. Example::
 
 .. function:: csrf_exempt(view)
 
@@ -335,6 +543,12 @@ Django のテスト用の HTTP クライアントは、 このミドルウェア
         @csrf_exempt
         def my_view(request):
             return HttpResponse('Hello world')
+
+.. Normally the :ttag:`csrf_token` template tag will not work if
+   ``CsrfViewMiddleware.process_view`` or an equivalent like ``csrf_protect``
+   has not run. The view decorator ``requires_csrf_token`` can be used to
+   ensure the template tag does work. This decorator works similarly to
+   ``csrf_protect``, but never rejects an incoming request.
 
 .. function:: requires_csrf_token(view)
 
@@ -356,52 +570,94 @@ Django のテスト用の HTTP クライアントは、 このミドルウェア
             # ...
             return render(request, "a_template.html", c)
 
+.. This decorator forces a view to send the CSRF cookie.
+
 .. function:: ensure_csrf_cookie(view)
 
     .. versionadded:: 1.4
 
     このデコレータはビューに対して、強制的に CSRF クッキーを送出させます。
 
+.. Scenarios
+   ---------
+
 シナリオ
 --------
+
+.. CSRF protection should be disabled for just a few views
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 いくつかのビューでは CSRF 対策を解除しなければならない
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. Most views requires CSRF protection, but a few do not.
+
 ほとんどのビューでは CSRF 対策が必要としますが、いくつかだけはそうでない場合
 です。
+
+.. Solution: rather than disabling the middleware and applying ``csrf_protect`` to
+   all the views that need it, enable the middleware and use
+   :func:`~django.views.decorators.csrf.csrf_exempt`.
 
 解決策: ミドルウェアを無効化し、必要とするビューすべてに対して ``csrf_protect``
 を付加するよりも、ミドルウェアを有効にした上で
 :func:`~django.views.decorators.csrf.csrf_exempt` を使用する方が良いでしょう。
 
 
+.. CsrfViewMiddleware.process_view not used
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 CsrfViewMiddleware.process_view が使用されていない
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. There are cases when ``CsrfViewMiddleware.process_view`` may not have run
+   before your view is run - 404 and 500 handlers, for example - but you still
+   need the CSRF token in a form.
 
 ビューが実行される前に、``CsrfViewMiddleware.process_view`` が実行されていない
 かもしれない場合があります。 - 例としては、404 や 500 のエラーハンドラーです。 -
 そのような状況でも CSRF トークンがフォーム内に必要になる場合です。
 
+.. Solution: use :func:`~django.views.decorators.csrf.requires_csrf_token`
+
 解決策: :func:`~django.views.decorators.csrf.requires_csrf_token` を使用して
 ください。
+
+.. Unprotected view needs the CSRF token
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 CSRF 対策が無効化されているビューにおいて、CSRF トークンが必要になる
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. There may be some views that are unprotected and have been exempted by
+   ``csrf_exempt``, but still need to include the CSRF token.
+
 いくつかのビューでは ``csrf_exempt`` によって、対策が解除され、無効化されている
 かもしれません。そのような状況でも、 CSRF トークンが必要になる場合です。
+
+.. Solution: use :func:`~django.views.decorators.csrf.csrf_exempt` followed by
+   :func:`~django.views.decorators.csrf.requires_csrf_token`. (i.e. ``requires_csrf_token``
 
 解決策: :func:`~django.views.decorators.csrf.csrf_exempt` を
 :func:`~django.views.decorators.csrf.requires_csrf_token` の後に使用してくだ
 さい。 (すなわち、 ``requires_csrf_token`` が最も内側のデコレータになるという
 ことです)
 
+.. View needs protection for one path
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 ビュー内の特定の経路で対策が必要になる
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. A view needs CRSF protection under one set of conditions only, and mustn't have
+   it for the rest of the time.
+
 あるビューにおいて、特定の状態でのみ CSRF 対策が必要になり、なおかつ、
 他の場合には CSRF 対策を行えない場合です。
+
+.. Solution: use :func:`~django.views.decorators.csrf.csrf_exempt` for the whole
+   view function, and :func:`~django.views.decorators.csrf.csrf_protect` for the
+   path within it that needs protection. Example::
 
 解決策: :func:`~django.views.decorators.csrf.csrf_exempt` をビュー全体では使用
 し、対策が必要な経路にのみ :func:`~django.views.decorators.csrf.csrf_protect` を
@@ -421,18 +677,36 @@ CSRF 対策が無効化されているビューにおいて、CSRF トークン�
         else:
            do_something_else()
 
+.. Page uses AJAX without any HTML form
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 ページが HTML フォームではなく AJAX を使用している
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. A page makes a POST request via AJAX, and the page does not have an HTML form
+   with a :ttag:`csrf_token` that would cause the required CSRF cookie to be sent.
 
 あるページにおいて、 POST リクエストを AJAX 経由で送信し、なおかつ、ページが
 CSRF クッキーが送出されるために必要な :ttag:`csrf_token` を含む HTML 上のフォ
 ームを持たない場合です。
 
+.. Solution: use :func:`~django.views.decorators.csrf.ensure_csrf_cookie` on the
+   view that sends the page.
+
 解決策: そのページを生成するビューに対して、
 :func:`~django.views.decorators.csrf.ensure_csrf_cookie` を使用してください。
 
+.. Contrib and reusable apps
+   =========================
+
 組み込みアプリと再利用されるアプリ
 ================================
+
+.. Because it is possible for the developer to turn off the ``CsrfViewMiddleware``,
+   all relevant views in contrib apps use the ``csrf_protect`` decorator to ensure
+   the security of these applications against CSRF.  It is recommended that the
+   developers of other reusable apps that want the same guarantees also use the
+   ``csrf_protect`` decorator on their views.
 
 開発者は ``CsrfViewMiddleware`` を無効化することができるので、組み込みアプリ
 のうち、 CSRF に対する安全性を保証する必要があるすべてのアプリには
@@ -440,9 +714,13 @@ CSRF クッキーが送出されるために必要な :ttag:`csrf_token` を含�
 作成する開発者は、これと同じ保証が必要なビューに対しては ``csrf_protect`` デコ
 レータを使用することが推奨されています。
 
+.. Settings
+   ========
 
 設定
 ====
+
+.. A number of settings can be used to control Django's CSRF behavior.
 
 Django の CSRF の動作を調整するためのいくつかの設定があります。
 
@@ -453,11 +731,20 @@ CSRF_COOKIE_DOMAIN
 
 デフォルト値: ``None``
 
+.. The domain to be used when setting the CSRF cookie.  This can be useful for
+   easily allowing cross-subdomain requests to be excluded from the normal cross
+   site request forgery protection.  It should be set to a string such as
+   ``".lawrence.com"`` to allow a POST request from a form on one subdomain to be
+   accepted by a view served from another subdomain.
+
 CSRF クッキーを設定する際に使用されるドメインです。これを利用すれば、サブドメ
 イン間のリクエストを通常の CSRF 対策から除外することを手軽に行うために便利です。
 この項目には、サブドメイン上のフォームから送信されたリクエストのうち、ビューが
 受け取ることを認めるサブドメインについて ``".lawrence.com"`` のような文字列で
 設定します。
+
+.. Please note that, with or without use of this setting, this CSRF protection
+   mechanism is not safe against cross-subdomain attacks -- see `Limitations`_.
 
 ただし、この設定を使っても使わなくても、この CSRF 対策のメカニズムはサブドメ
 イン間の攻撃に対しては安全ではないことに注意してください。 --- 詳しくは、
@@ -470,6 +757,9 @@ CSRF_COOKIE_NAME
 
 デフォルト値: ``'csrftoken'``
 
+.. The name of the cookie to use for the CSRF authentication token. This can be
+   whatever you want.
+
 CSRF 認証トークンとして使用されるクッキーの名前です。この値には、好きな値を
 自由に設定できます。
 
@@ -480,8 +770,15 @@ CSRF_COOKIE_PATH
 
 デフォルト値: ``'/'``
 
+.. The path set on the CSRF cookie. This should either match the URL path of your
+   Django installation or be a parent of that path.
+
 CSRF クッキーに設定されるパスです。この値はあなたの Django が設置されている URL
 のパスとその親のパスにマッチするはずです。
+
+.. This is useful if you have multiple Django instances running under the same
+   hostname. They can use different cookie paths, and each instance will only see
+   its own CSRF cookie.
 
 これは、同じホスト名でいくつもの Django のインスタンスを起動する場合に便利です。
 それぞれが、別のクッキーのパスを使用することができ、それぞれのインスタンスは自分
@@ -494,6 +791,10 @@ CSRF_COOKIE_SECURE
 
 デフォルト値: ``False``
 
+.. Whether to use a secure cookie for the CSRF cookie. If this is set to ``True``,
+   the cookie will be marked as "secure," which means browsers may ensure that the
+   cookie is only sent under an HTTPS connection.
+
 CSRF クッキーにセキュアクッキー (secure cookie) を使用するかどうかを設定します。
 ``True`` を設定すると、クッキーは "secure" に設定されます。これは、ブラウザが
 HTTPS 接続でのみ、このクッキーを送信することを保証するであろうことを意味します。
@@ -505,10 +806,16 @@ CSRF_FAILURE_VIEW
 
 デフォルト値: ``'django.views.csrf.csrf_failure'``
 
+.. A dotted path to the view function to be used when an incoming request
+   is rejected by the CSRF protection.  The function should have this signature::
+
 到達したリクエストが CSRF 対策によって拒否された場合に使用されるビュー関数への
 ドット区切りのパスです。 ビュー関数は以下の引数を取ります::
 
   def csrf_failure(request, reason="")
+
+.. where ``reason`` is a short message (intended for developers or logging, not for
+   end users) indicating the reason the request was rejected.
 
 ``reason`` は、リクエストが拒否された理由を表す短いメッセージです。 (開発者や
 ログをとるのためのもので、一般のユーザーのためのものではありません)
