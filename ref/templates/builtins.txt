@@ -745,14 +745,14 @@ DRY 則の侵犯を避けられます::
 
 例えば、 ``app_views.client`` という名前のビューがあり、クライアントの ID
 を引数に取るとしましょう (``client()`` は ``app_views.py`` で定義されている
-メソッドです)。 URLconf は以下のようになるはずです::
+メソッドです)。 URLconf は以下のようになるはずです:
 
 .. code-block:: python
 
     ('^client/(\d+)/$', 'app_views.client')
 
 あるアプリケーションの URLconf が、プロジェクトの URLconf に以下のような形
-で include されていたとします::
+で include されていたとします:
 
 .. code-block:: python
 
