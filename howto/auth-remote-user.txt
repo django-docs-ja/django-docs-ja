@@ -1,10 +1,10 @@
-.. _howto-auth-remote-user:
-
 ====================================
 ``REMOTE_USER`` を使った認証
 ====================================
 
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
+
+.. currentmodule:: django.contrib.auth.backends
 
 このドキュメントでは、 (Web サーバが環境変数 ``REMOTE_USER`` を設定するよう
 な環境で) Django から外部の認証ソースを利用する方法について解説します。
@@ -14,7 +14,7 @@ Apache と ``mod_authz_ldap`` , `CAS`_, `Cosign`_, `WebAuth`_,
 `mod_auth_sspi`_ などを使う場合です。
 
 .. _mod_authnz_ldap: http://httpd.apache.org/docs/2.2/mod/mod_authnz_ldap.html
-.. _CAS: http://www.ja-sig.org/products/cas/
+.. _CAS: http://www.jasig.org/cas
 .. _Cosign: http://weblogin.org
 .. _WebAuth: http://www.stanford.edu/services/webauth/
 .. _mod_auth_sspi: http://sourceforge.net/projects/mod-auth-sspi
@@ -61,7 +61,7 @@ Apache と ``mod_authz_ldap`` , `CAS`_, `Cosign`_, `WebAuth`_,
 認証メカニズムが ``REMOTE_USER`` 以外のカスタムの HTTP ヘッダを使っていてい
 る場合には、以下の例のように、 ``RemoteUserMiddleware`` をサブクラス化して、
 クラスの ``header`` アトリビュートを適切な ``request.META`` のキー名に設定
-してくださ::
+してください::
 
     from django.contrib.auth.middleware import RemoteUserMiddleware
 
@@ -72,7 +72,7 @@ Apache と ``mod_authz_ldap`` , `CAS`_, `Cosign`_, `WebAuth`_,
 ``RemoteUserBackend``
 =====================
 
-.. class:: django.contrib.backends.RemoteUserBackend
+.. class:: django.contrib.auth.backends.RemoteUserBackend
 
 認証メカニズムをより細かく制御したいなら、 ``RemoteUserBackend`` を継承する
 独自の認証バックエンドクラスを作成して、以下のメソッドをオーバライドしてく

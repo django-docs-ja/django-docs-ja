@@ -1,22 +1,32 @@
-.. _howto-apache-auth:
-
 ===================================================
 Apache での認証に Django のユーザデータベースを使う
 ===================================================
 
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
+
+.. warning::
+
+    .. Support for mod_python has been deprecated within Django. At that
+       time, this method of authentication will no longer be provided by
+       Django. The community is welcome to offer its own alternate
+       solutions using WSGI middleware or other approaches.
+
+    mod_python のサポートは、 Django で廃止予定です。廃止された時点で、
+    認証用のメソッドは Django で提供されなくなります。コミュニティーとして
+    は、 WSGI ミドルウェアやその他のアプローチを使用した代替案を提案して
+    います。
 
 Apache を使っていると、同期を保ちながら複数の認証データベースを維持するとい
 う問題によくぶつかります。 Apache の認証を Django の 
-:ref:`認証システム <topics-auth>` で行えば、以下のような処理を実現できます:
+:doc:`認証システム </topics/auth>` で行えば、以下のような処理を実現できます:
 
-    * 認証ユーザだけを対象に、静的ファイル／メディアファイルを Apache から
-      直接提供できます。
+* 認証ユーザだけを対象に、静的ファイル／メディアファイルを Apache から
+  直接提供できます。
 
-    * 特定のパーミッションを持つ Django ユーザだけに Subversion_ リポジト
-      リへのアクセスを許すよう認証をかけられます。
+* 特定のパーミッションを持つ Django ユーザだけに Subversion_ リポジト
+  リへのアクセスを許すよう認証をかけられます。
 
-    * mod_dav_ で作成した WebDAV 共有への接続を特定ユーザに許可できます。
+* mod_dav_ で作成した WebDAV 共有への接続を特定ユーザに許可できます。
 
 .. _Subversion: http://subversion.tigris.org/
 .. _mod_dav: http://httpd.apache.org/docs/2.0/mod/mod_dav.html
@@ -88,30 +98,30 @@ mod_python の標準の ``Auth*`` および ``Require`` ディレクティブと
 ``/example/`` へのアクセスを制限します。この挙動を変更したければ、
 以下の ``PythonOption`` ディレクティブを使います:
 
-    ================================  =========================================
-    ``PythonOption``                  説明
-    ================================  =========================================
-    ``DjangoRequireStaffStatus``      ``on`` に設定すると、 "staff" ユーザ
-                                      (``is_staff`` フラグの立っているユーザ)
-                                      だけにアクセスを許可します。
+================================  =========================================
+``PythonOption``                  説明
+================================  =========================================
+``DjangoRequireStaffStatus``      ``on`` に設定すると、 "staff" ユーザ
+                                  (``is_staff`` フラグの立っているユーザ)
+                                  だけにアクセスを許可します。
 
-                                      デフォルトの設定値は ``on`` です。
+                                  デフォルトの設定値は ``on`` です。
 
-    ``DjangoRequireSuperuserStatus``  ``on`` に設定すると、スーパユーザ
-                                      (``is_superuser`` フラグの立っている
-                                      ユーザ) だけにアクセスを許可します。
+``DjangoRequireSuperuserStatus``  ``on`` に設定すると、スーパユーザ
+                                  (``is_superuser`` フラグの立っている
+                                  ユーザ) だけにアクセスを許可します。
 
-                                      デフォルトの設定値は ``off`` です。
+                                  デフォルトの設定値は ``off`` です。
 
-    ``DjangoPermissionName``          アクセスに必要なパーミッションの名前
-                                      です。詳しくは 
-                                      :ref:`カスタムのパーミッション
-                                      <custom-permissions>` を参照
-                                      してください。
+``DjangoPermissionName``          アクセスに必要なパーミッションの名前
+                                  です。詳しくは 
+                                  :ref:`カスタムのパーミッション
+                                  <custom-permissions>` を参照
+                                  してください。
 
-                                      デフォルトの設定では、
-                                      特定のパーミッションを必要としません。
-    ================================  =========================================
+                                  デフォルトの設定では、
+                                  特定のパーミッションを必要としません。
+================================  =========================================
 
 場合によって、 ``SetEnv`` が mod_python の設定としてうまく働きません。
 この原因はよくわかっていません。 mod_python が ``DJANGO_SETTINGS_MODULE``

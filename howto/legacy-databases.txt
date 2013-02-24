@@ -1,31 +1,29 @@
-.. _howto-legacy-databases:
-
 =====================================
 古いデータベースを Django に組み込む
 =====================================
 
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
 
 Django が最も得意とするのは新たなアプリケーションですが、古いデータベースの
 組み込みも可能です。 Django には組み込み作業を可能な限り自動化するための二
 つのユーティリティが付属しています。
 
-このドキュメントでは、読者は :ref:`公式チュートリアル <intro-tutorial01>`
+このドキュメントでは、読者は :doc:`公式チュートリアル </intro/tutorial01>`
 のカバーしている Django の基礎を良く知っているものと仮定しています。
 
 Django にデータベースパラメタを指定する
 =======================================
 
 まず、データベースへの接続パラメタとデータベース名を Django に指示する必要
-があります。 :ref:`設定ファイル <topics-settings>` の以下の設定を編集してく
-ださい:
+があります。 :setting:`DATABASES` 設定を編集し、 ``'default'`` コネクション
+に次をキーとして値を設定してください:
 
-    * :setting:`DATABASE_NAME`
-    * :setting:`DATABASE_ENGINE`
-    * :setting:`DATABASE_USER`
-    * :setting:`DATABASE_PASSWORD`
-    * :setting:`DATABASE_HOST`
-    * :setting:`DATABASE_PORT`
+* :setting:`NAME`
+* :setting:`ENGINE`
+* :setting:`USER`
+* :setting:`PASSWORD`
+* :setting:`HOST`
+* :setting:`PORT`
 
 モデルの自動生成
 ================
