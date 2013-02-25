@@ -1,12 +1,10 @@
-.. _misc-api-stability:
-
 ============
 API の安定性
 ============
 
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
 
-:ref:`Django 1.0 のリリース <releases-1.0>` によって、 API の安定性と互換性
+:doc:`Django 1.0 のリリース </releases/1.0>` によって、 API の安定性と互換性
 に一定の保証が与えられました。これはつまり、 Django 1.0 用に書いたコードは
 何も変更せずに 1.1 でも動作し、以後の 1.X リリースではほんのわずかな変更し
 か必要ないということです。
@@ -16,86 +14,86 @@ APIの安定性とは
 
 ここでいう「安定」とは、以下のような意味です:
 
-   - 公開 API -- リンクからたどれるドキュメント内で開設されていて、メソッド
-     名がアンダースコアで始まらないもの -- の配置や名前を変更する場合には、
-     以前のバージョンとの互換性のための別名のメソッドを提供します。
-     
-   - API に新たな機能を追加する場合 -- これはよくあることですが -- でも、
-     既存のメソッドの意味を無くしたり、変えたりすることはありません。換言す
-     れば、「安定」していても (必ずしも) 「完全」ではない、ということです。
-     
-   - すでに安定と宣言されている API を何らかの理由で削除したり移動したりせ
-     ねばならない場合、それらのメソッドは撤廃 (deprecated) とみなされ、少な
-     くとも二つのマイナーバージョン変更までは API 中に残します。撤廃された
-     メソッドを呼び出した場合には警告メッセージを表示します。
+- 公開 API -- リンクからたどれるドキュメント内で開設されていて、メソッド
+  名がアンダースコアで始まらないもの -- の配置や名前を変更する場合には、
+  以前のバージョンとの互換性のための別名のメソッドを提供します。
+  
+- API に新たな機能を追加する場合 -- これはよくあることですが -- でも、
+  既存のメソッドの意味を無くしたり、変えたりすることはありません。換言す
+  れば、「安定」していても (必ずしも) 「完全」ではない、ということです。
+  
+- すでに安定と宣言されている API を何らかの理由で削除したり移動したりせ
+  ねばならない場合、それらのメソッドは撤廃 (deprecated) とみなされ、少な
+  くとも二つのマイナーバージョン変更までは API 中に残します。撤廃された
+  メソッドを呼び出した場合には警告メッセージを表示します。
 
-     Django のバージョン番号の定義と、どの機能が撤廃されているかは、
-     :ref:`official-releases` を参照してください。
-     
-   - 深刻なバグやセキュリティホールによってやむを得ない場合に限り、これらの
-     API に対して互換性のない変更を行います。
+  Django のバージョン番号の定義と、どの機能が撤廃されているかは、
+  :ref:`official-releases` を参照してください。
+  
+- 深刻なバグやセキュリティホールによってやむを得ない場合に限り、これらの
+  API に対して互換性のない変更を行います。
 
 安定な API
 ==========
 
-全般的に、 :ref:`内部仕様 <internals-index>` の中にあるドキュメントを除き、
+全般的に、 :ref:`内部仕様 </internals/index>` の中にあるドキュメントを除き、
 ドキュメント中でカバーされている機能は、 1.0 の時点で安定な API と考えてか
 まいません。安定な API を以下に示します:
 
-    - :ref:`認証 <topics-auth>`
+- :doc:`認証 </topics/auth>`
 
-    - :ref:`キャッシュ <topics-cache>`.
-    
-    - :ref:`モデルの定義、マネジャ、クエリ、トランザクション <topics-db-index>`
-    
-    - :ref:`e-mail の送信 <topics-email>`.
-    
-    - :ref:`ファイル操作とストレージ <topics-files>`
-    
-    - :ref:`フォーム <topics-forms-index>`
-    
-    - ファイルアップロード、ミドルウェア、セッション、 URL ディスパッチ、
-      ビュー、ショートカット API などを含む、
-      :ref:`HTTP リクエスト／レスポンスの操作 <topics-http-index>`
-    
-    - :ref:`汎用ビュー <topics-http-generic-views>`.
+- :doc:`キャッシュ </topics/cache>`.
 
-    - :ref:`国際化 <topics-i18n>`.
-    
-    - :ref:`ペジネーション <topics-pagination>`
-    
-    - :ref:`シリアライゼーション <topics-serialization>`
-    
-    - :ref:`シグナル <topics-signals>`
-    
-    - :ref:`テンプレート <topics-templates>` 。テンプレート言語、 Python の
-      :ref:`テンプレート API <ref-templates-index>` 、
-      :ref:`カスタムテンプレートタグとライブラリ、 <howto-custom-template-tags>`
-      今後、新たなテンプレートタグが登場すると、ユーザが定義したタグと名前
-      が衝突する可能性があります。そのため、新たなタグを追加するときは、同
-      じ名前のタグを他のテンプレートライブラリからロードしようとした時点で
-      Django にエラーを送出させます。
-      
-    - :ref:`テストフレームワーク <topics-testing>`
+- :doc:`モデルの定義、マネジャ、クエリ、トランザクション </topics/db/index>`
 
-    - :ref:`django-admin ユーティリティ <ref-django-admin>`.
-    
-    - :ref:`組み込みミドルウェア <ref-middleware>`
-    
-    - :ref:`リクエスト／レスポンスオブジェクト <ref-request-response>`.
-    
-    - :ref:`設定ファイル <ref-settings>` 。ただし、現在の
-      :ref:`組み込みの設定一覧 <ref-settings>` はほぼ完成版だとは考えていま
-      すが、将来新たな設定を登場させるかもしれません。これはまさに「安定」
-      だけれども「完璧」ではない例ですね。
-      
-    - :ref:`組み込みシグナル <ref-signals>` 設定と同様、将来新たなシグナル
-      を登場させるかもしれませんが、既存のシグナルをなくすことはないでしょ
-      う。
-      
-    - :ref:`Unicode の操作 <ref-unicode>` 。
-        
-    - :ref:`HOWTO ガイド <howto-index>` に書かれている内容。
+- :doc:`e-mail の送信 </topics/email>`.
+
+- :doc:`ファイル操作とストレージ </topics/files>`
+
+- :doc:`フォーム </topics/forms/index>`
+
+- ファイルアップロード、ミドルウェア、セッション、 URL ディスパッチ、
+  ビュー、ショートカット API などを含む、
+  :doc:`HTTP リクエスト／レスポンスの操作 </topics/http/index>`
+
+- :doc:`汎用ビュー </topics/http/generic-views>`.
+
+- :doc:`国際化 </topics/i18n/index>`.
+
+- :doc:`ペジネーション </topics/pagination>`
+
+- :doc:`シリアライゼーション </topics/serialization>`
+
+- :doc:`シグナル </topics/signals>`
+
+- :doc:`テンプレート </topics/templates>` 。テンプレート言語、 Python の
+  :doc:`テンプレート API </ref/templates/index>` 、
+  :doc:`カスタムテンプレートタグとライブラリ、 </howto/custom-template-tags>`
+  今後、新たなテンプレートタグが登場すると、ユーザが定義したタグと名前
+  が衝突する可能性があります。そのため、新たなタグを追加するときは、同
+  じ名前のタグを他のテンプレートライブラリからロードしようとした時点で
+  Django にエラーを送出させます。
+
+- :doc:`テストフレームワーク </topics/testing>`
+
+- :doc:`django-admin ユーティリティ </ref/django-admin>`.
+
+- :doc:`組み込みミドルウェア </ref/middleware>`
+
+- :doc:`リクエスト／レスポンスオブジェクト </ref/request-response>`.
+
+- :doc:`設定ファイル </ref/settings>` 。ただし、現在の
+  :doc:`組み込みの設定一覧 </ref/settings>` はほぼ完成版だとは考えていま
+  すが、将来新たな設定を登場させるかもしれません。これはまさに「安定」
+  だけれども「完璧」ではない例ですね。
+
+- :doc:`組み込みシグナル </ref/signals>` 設定と同様、将来新たなシグナル
+  を登場させるかもしれませんが、既存のシグナルをなくすことはないでしょ
+  う。
+
+- :doc:`Unicode の操作 </ref/unicode>` 。
+
+- :doc:`HOWTO ガイド </howto/index>` に書かれている内容。
 
 ``django.utils``
 ----------------
@@ -103,16 +101,16 @@ APIの安定性とは
 ``django.utils`` 以下のモジュールの大半は内部使用向けに設計されています。以
 下のモジュールのみが、安定とされています:
 
-    - ``django.utils.cache``
-    - ``django.utils.datastructures.SortedDict`` -- ``SortedDict`` クラスの
-      み。モジュールの他の部分は内部使用向けです。
-    - ``django.utils.encoding``
-    - ``django.utils.feedgenerator``
-    - ``django.utils.http``
-    - ``django.utils.safestring``
-    - ``django.utils.translation``
-    - ``django.utils.tzinfo``
-    
+- ``django.utils.cache``
+- ``django.utils.datastructures.SortedDict`` -- ``SortedDict`` クラスの
+  み。モジュールの他の部分は内部使用向けです。
+- ``django.utils.encoding``
+- ``django.utils.feedgenerator``
+- ``django.utils.http``
+- ``django.utils.safestring``
+- ``django.utils.translation``
+- ``django.utils.tzinfo``
+
 例外
 =====
 
@@ -152,11 +150,112 @@ Django 1.4 版の ``django.contrib.flatpages`` も Django 1.5 で使えるよう
 API の中には、以下の二つの理由から「内部使用 (internal)」とマークされている
 ものがあります:
 
-    - ドキュメント内で、内部使用の API について触れていることがあります。
-      ドキュメント上で内部使用であると書かれていれば、将来変更される余地が
-      あると考えてください。 
-      
-    - アンダースコア (``_``) で始まる関数、メソッド、その他のオブジェクト。
-      アンダースコアを先頭に付けるのは、 Python でプライベートなものを示す
-      のに使われる方法です。メソッドが ``_`` 一つで開始していたら、内部 API
-      です。
+- ドキュメント内で、内部使用の API について触れていることがあります。
+  ドキュメント上で内部使用であると書かれていれば、将来変更される余地が
+  あると考えてください。
+
+- アンダースコア (``_``) で始まる関数、メソッド、その他のオブジェクト。
+  アンダースコアを先頭に付けるのは、 Python でプライベートなものを示す
+  のに使われる方法です。メソッドが ``_`` 一つで開始していたら、内部 API
+  です。
+
+.. _misc-api-stability-localflavor:
+
+.. Local flavors
+   -------------
+
+ローカルフレーバ
+-------------
+
+.. versionchanged:: 1.3
+
+.. :mod:`django.contrib.localflavor` contains assorted pieces of code
+   that are useful for particular countries or cultures. This data is
+   local in nature, and is subject to change on timelines that will
+   almost never correlate with Django's own release schedules. For
+   example, a common change is to split a province into two new
+   provinces, or to rename an existing province.
+
+:mod: `django.contrib.localflavor` は様々な国や文化のための有用なコードが
+寄せ集められています。このデータは本質的にローカルであり、時代の移り変わり
+によって変化しがちで、これはほぼ Django のリリーススケジュールと相関するこ
+とはありません。例えば、よくある変更としては、州などが2つに分かれたり、名
+前が変更されることが挙げられます。
+
+.. These changes present two competing compatibility issues. Moving
+   forward, displaying the names of deprecated, renamed and dissolved
+   provinces in a selection widget is bad from a user interface
+   perspective. However, maintaining full backwards compatibility
+   requires that we support historical values that may be stored in a
+   database -- including values that may no longer be valid.
+
+この変更は2つの競合する互換性の問題を提起します。将来 、
+廃止予定の、名前が変更された、または消滅した州などを選択ウェジェット
+に表示することは、ユーザーインターフェースの観点から良くないことです。
+しかしながら、すべての後方互換を維持するためには、我々が値 - もう有効
+でないものも含めて - の履歴をデータベースなどで保存しておくような
+サポートが必要です。
+
+.. Therefore, Django has the following policy with respect to changes in
+   local flavor:
+
+そのため、ローカルフレーバでの変更に関して Django は以下のポリシーを
+持っています:
+
+.. * At the time of a Django release, the data and algorithms
+     contained in :mod:`django.contrib.localflavor` will, to the best
+     of our ability, reflect the officially gazetted policies of the
+     appropriate local government authority. If a province has been
+     added, altered, or removed, that change will be reflected in
+     Django's localflavor.
+
+* Django のリリース時に、 :mod:`django.contrib.localflavor` に含まれる
+  データとアルゴリズムは、できるかぎり、その地域の適切な政府当局から
+  公式に公示されたものを反映します。もし州などが追加、変更、または削除
+  された場合は、その変更は Django の localflavor に反映されます。
+
+.. * These changes will *not* be backported to the previous stable
+     release. Upgrading a minor version of Django should not require
+     any data migration or audits for UI changes; therefore, if you
+     want to get the latest province list, you will either need to
+     upgrade your Django install, or backport the province list you
+     need.
+
+* この変更は以前の安定リリースに移植されることは *ありません*。
+  Django のマイナーバージョンのアップデートは、データのマイグレーション
+  や UI が変更されたかどうかの監査を必要とするべきではありません。その
+  ため、もし最新の州のリストを入手したい場合は、 Django のバージョンをあ
+  げるか、必要なリストを移植する必要があります。
+
+.. * For one release, the affected localflavor module will raise a
+     ``RuntimeWarning`` when it is imported.
+
+* リリースごとに、アップデートされた localflavor モジュールはインポート
+  された時に ``RuntimeWarning`` をレイズします。
+
+.. * The change will be announced in the release notes as a backwards
+    incompatible change requiring attention. The change will also be
+    annotated in the documentation for the localflavor module.
+
+* 変更はリリースノートにて、注意が必要な後方互換が保証されない変更と
+  して告知されます。この変更は localflavor モジュールのドキュメント
+  でも告知されます。
+
+.. * Where necessary and feasible, a migration script will be provided
+     to aid the migration process.
+
+* 必要かつ可能であれば、マイグレーションスクリプトはマイグレーション
+  作業補助のために提供されます。
+
+.. For example, Django 1.2 contains an Indonesian localflavor. It has a
+   province list that includes "Nanggroe Aceh Darussalam (NAD)" as a
+   province. The Indonesian government has changed the official name of
+   the province to "Aceh (ACE)". As a result, Django 1.3 does *not*
+   contain "Nanggroe Aceh Darussalam (NAD)" in the province list, but
+   *does* contain "Aceh (ACE)".
+
+例えば、 Django 1.2 はインドネシアのローカルフレーバを含んでいます。これ
+は "Nanggroe Aceh Darussalam (NAD)" を州として含む州のリストを持っていま
+す。インドネシア政府は、この州の公式名称を "Aceh (ACE)" へと変更しました。
+結果として、 Django 1.3 は "Nanggroe Aceh Darussalam (NAD)" を含んで
+*おらず* 、 "Aceh (ACE)" を含んで *います* 。

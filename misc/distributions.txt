@@ -1,10 +1,8 @@
-.. _misc-distributions:
-
 ==================================================
 サードパーティによる Django ディストリビューション
 ==================================================
 
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
 
 最近、サードパーティのディストリビューションプロバイダの中に、パッケージ管
 理システムで Django を提供するものが出てきました。パッケージ管理システムを
@@ -23,7 +21,7 @@ Linux や、 OpenSolaris のような Unix を使っているのなら、ディ�
 なら、いい機会なので勉強しましょう。 Django の Wiki には便利な
 `サードパーティディストリビューション`_ の一覧があります。
 
-.. _`Third Party Distributions`: http://code.djangoproject.com/wiki/Distributions
+.. _`Third Party Distributions`: https://code.djangoproject.com/wiki/Distributions
 .. _`サードパーティディストリビューション`: `Third Party Distributions`_
 
 ディストリビューション作成者のための情報
