@@ -1,0 +1,550 @@
+.. ======================
+   The messages framework
+   ======================
+
+========================
+メッセージフレームワーク
+========================
+
+.. module:: django.contrib.messages
+   :synopsis: Provides cookie- and session-based temporary message storage.
+
+.. Quite commonly in web applications, you need to display a one-time
+   notification message (also known as "flash message") to the user after
+   processing a form or some other types of user input.
+
+Web アプリケーションでは一般的に、フォーム処理などのユーザによる入力の後に、一
+度だけのメッセージ表示(フラッシュメッセージとも呼ばれる)を行いたいことが有りま
+す。
+
+.. For this, Django provides full support for cookie- and session-based
+   messaging, for both anonymous and authenticated users. The messages framework
+   allows you to temporarily store messages in one request and retrieve them for
+   display in a subsequent request (usually the next one). Every message is
+   tagged with a specific ``level`` that determines its priority (e.g., ``info``,
+   ``warning``, or ``error``).
+
+このために、Django はクッキー及びセッションベースのメッセージ処理を、匿名ユーザ
+と認証済みユーザの両方に対してサポートしています。このメッセージ機能 (messages)
+は、その後の(通常は次の)リクエストで表示するための、一時的なメッセージの保存と
+取得を可能にします。全てのメッセージは特定の ``メッセージレベル`` (level) と共
+にタグ付けされます(例えば、``info``、``warning`` または ``error`` など)。
+
+.. Enabling messages
+   =================
+
+メッセージ機能を有効にする
+==========================
+
+.. Messages are implemented through a :doc:`middleware </ref/middleware>`
+   class and corresponding :doc:`context processor </ref/templates/api>`.
+
+メッセージ機能は :doc:`ミドルウェア </ref/middleware>` クラスと :doc:`コンテキ
+ストプロセッサ </ref/templates/api>` を介して実装されています。
+
+.. The default ``settings.py`` created by ``django-admin.py startproject``
+   already contains all the settings required to enable message functionality:
+
+``django-admin.py startproject`` によって作られるデフォルトの ``settings.py``
+には、メッセージ機能を有効にするための以下の全ての設定が既に含まれています。
+
+.. * ``'django.contrib.messages'`` is in :setting:`INSTALLED_APPS`.
+
+* :setting:`INSTALLED_APPS` へ ``'django.contrib.messages'`` を含める
+
+.. * :setting:`MIDDLEWARE_CLASSES` contains
+     ``'django.contrib.sessions.middleware.SessionMiddleware'`` and
+     ``'django.contrib.messages.middleware.MessageMiddleware'``.
+
+..   The default :ref:`storage backend <message-storage-backends>` relies on
+     :doc:`sessions </topics/http/sessions>`. That's why ``SessionMiddleware``
+     must be enabled and appear before ``MessageMiddleware`` in
+     :setting:`MIDDLEWARE_CLASSES`.
+
+* :setting:`MIDDLEWARE_CLASSES` へ
+  ``'django.contrib.sessions.middleware.SessionMiddleware'`` と
+  ``'django.contrib.messages.middleware.MessageMiddleware'`` を含める
+
+  デフォルトの :ref:`ストレージバックエンド <message-storage-backends>`
+  (storage backends) は :doc:`セッション機能 </topics/http/sessions>` に依存し
+  ています。そのため、 ``SessionMiddleware`` は :setting:`MIDDLEWARE_CLASSES`
+  内で ``MessageMiddleware`` より前に置いて有効にする必要があります。
+
+.. * :setting:`TEMPLATE_CONTEXT_PROCESSORS`   contains
+     ``'django.contrib.messages.context_processors.messages'``.
+
+* :setting:`TEMPLATE_CONTEXT_PROCESSORS` へ
+  ``'django.contrib.messages.context_processors.messages'`` を含める
+
+.. If you don't want to use messages, you can remove
+   ``'django.contrib.messages'`` from your :setting:`INSTALLED_APPS`, the
+   ``MessageMiddleware`` line from :setting:`MIDDLEWARE_CLASSES`, and the
+   ``messages`` context processor from :setting:`TEMPLATE_CONTEXT_PROCESSORS`.
+
+もし、メッセージ機能を使いたくない場合は、 :setting:`INSTALLED_APPS` から
+``'django.contrib.messages'`` を、 :setting:`MIDDLEWARE_CLASSES` から
+``MessageMiddleware`` の行を、そして :setting:`TEMPLATE_CONTEXT_PROCESSORS` から
+``messages`` を削除して下さい。
+
+.. Configuring the message engine
+   ==============================
+
+メッセージ処理の設定をする
+==========================
+
+.. _message-storage-backends:
+
+.. Storage backends
+   ----------------
+
+ストレージバックエンド
+----------------------
+
+.. The messages framework can use different backends to store temporary messages.
+
+このメッセージフレームワークでは、一時的にデータを保存するバックエンドとして、
+さまざまなものを使うことができます。
+
+.. Django provides three built-in storage classes:
+
+Django は、3 つの組み込みストレージクラスを提供しています。
+
+.. class:: django.contrib.messages.storage.session.SessionStorage
+
+    .. This class stores all messages inside of the request's session. Therefore
+       it requires Django's ``contrib.sessions`` application.
+
+    このクラスは、リクエストのセッション内に全てのメッセージを保存します。
+    つまり、Django の ``contrib.sessions`` アプリケーションが必要になります。
+
+.. class:: django.contrib.messages.storage.cookie.CookieStorage
+
+    .. This class stores the message data in a cookie (signed with a secret hash
+       to prevent manipulation) to persist notifications across requests. Old
+       messages are dropped if the cookie data size would exceed 2048 bytes.
+
+    このクラスは、メッセージデータをクッキー内(secret hash 認証による改ざん対策
+    がされている)に保存することで、リクエスト間をまたがった通知を行います。古い
+    メッセージは、クッキーのデータサイズが 2048 バイトを超えた際に削除されます。
+
+.. class:: django.contrib.messages.storage.fallback.FallbackStorage
+
+    .. This class first uses ``CookieStorage``, and falls back to using
+       ``SessionStorage`` for the messages that could not fit in a single cookie.
+       It also requires Django's ``contrib.sessions`` application.
+
+    このクラスは、最初に ``CookieStorage`` を使い、メッセージがひとつのクッキー
+    内に収まらない場合は ``SessionStorage`` を使います。これもまた Django の
+    ``contrib.sessions`` アプリケーションを必要とします。
+
+    .. This behavior avoids writing to the session whenever possible. It should
+       provide the best performance in the general case.
+
+    この仕様によって、可能な限りセッションへの記録を行いません。これは一般的な
+    ケースにおいて、最も良いパフォーマンスを提供するでしょう。
+
+.. :class:`~django.contrib.messages.storage.fallback.FallbackStorage` is the
+   default storage class. If it isn't suitable to your needs, you can select
+   another storage class by setting :setting:`MESSAGE_STORAGE` to its full import
+   path, for example::
+
+:class:`~django.contrib.messages.storage.fallback.FallbackStorage` がデフォルト
+のストレージクラスです。もしこれがあなたの要件に適していないなら、他のストレー
+ジクラスへのインポートパスを以下の例の様に :setting:`MESSAGE_STORAGE` へ設定し
+て下さい::
+
+    MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
+
+.. To write your own storage class, subclass the ``BaseStorage`` class in
+   ``django.contrib.messages.storage.base`` and implement the ``_get`` and
+   ``_store`` methods.
+
+あなた独自のストレージクラスを書くには、``django.contrib.messages.storage.base``
+にある ``BaseStorage`` クラスのサブクラスを定義し、``_get`` と ``_store`` メソ
+ッドを実装して下さい。
+
+.. _message-level:
+
+.. Message levels
+   --------------
+
+メッセージレベル
+----------------
+
+.. The messages framework is based on a configurable level architecture similar
+   to that of the Python logging module. Message levels allow you to group
+   messages by type so they can be filtered or displayed differently in views and
+   templates.
+
+メッセージフレームワークは、Python の logging モジュールに似た設定可能なレベル
+の仕組みを基本としています。メッセージレベル (message levels) は、タイプによっ
+てグループ化することで、メッセージがフィルタリングされ、各ビューやテンプレート
+で違う表示になるようにします。
+
+.. The built-in levels, which can be imported from ``django.contrib.messages``
+   directly, are:
+
+``django.contrib.messages`` から直接読み込まれる組み込みレベルは:
+
+.. =========== ========
+   Constant    Purpose
+   =========== ========
+   ``DEBUG``   Development-related messages that will be ignored (or removed) in a production deployment
+   ``INFO``    Informational messages for the user
+   ``SUCCESS`` An action was successful, e.g. "Your profile was updated successfully"
+   ``WARNING`` A failure did not occur but may be imminent
+   ``ERROR``   An action was **not** successful or some other failure occurred
+   =========== ========
+
+=========== ========
+定数名      目的
+=========== ========
+``DEBUG``   開発用のメッセージ、本番環境では無視される(または削除される)
+``INFO``    ユーザーに対して情報を伝えるためのメッセージ
+``SUCCESS`` アクションが成功した、例) "あなたのプロフィールの更新が成功しました"
+``WARNING`` 失敗ではないが、その危険性がある
+``ERROR``   アクションが成功して\ **いない**\ か、何かの失敗がある
+=========== ========
+
+
+.. The :setting:`MESSAGE_LEVEL` setting can be used to change the minimum recorded level
+   (or it can be `changed per request`_). Attempts to add messages of a level less
+   than this will be ignored.
+
+:setting:`MESSAGE_LEVEL` の設定は、メッセージを記録するレベルの最小値 (minimum
+recorded level) を変更するために使われます(また、 `リクエスト別の設定`_ が可能
+です)。試しにこれより低いレベルのメッセージを追加してみると、無視されることでし
+ょう。
+
+.. _`リクエスト別の設定`: `Changing the minimum recorded level per-request`_
+
+.. Message tags
+   ------------
+
+メッセージタグ
+--------------
+
+.. Message tags are a string representation of the message level plus any
+   extra tags that were added directly in the view (see
+   `Adding extra message tags`_ below for more details). Tags are stored in a
+   string and are separated by spaces. Typically, message tags
+   are used as CSS classes to customize message style based on message type. By
+   default, each level has a single tag that's a lowercase version of its own
+   constant:
+
+メッセージタグ (message tags) とは、メッセージレベルを文字列によって表現したも
+のです。加えて、ビュー内で直接追加される拡張タグがあります(詳細は
+`拡張メッセージタグを追加する`_ を参照)。複数のタグはひとつの文字列内に格納され
+、スペースによって分割されています。一般的に、メッセージタグは、メッセージタイ
+プによるスタイルのカスタマイズを行う際のCSSクラス名として使われます。デフォルト
+では、各々のレベルには、定数名を小文字に変換した文字列のタグが付与されています。
+
+==============  ===========
+レベル定数名    タグ文字列
+==============  ===========
+``DEBUG``       ``debug``
+``INFO``        ``info``
+``SUCCESS``     ``success``
+``WARNING``     ``warning``
+``ERROR``       ``error``
+==============  ===========
+
+.. To change the default tags for a message level (either built-in or custom),
+   set the :setting:`MESSAGE_TAGS` setting to a dictionary containing the levels
+   you wish to change. As this extends the default tags, you only need to provide
+   tags for the levels you wish to override::
+
+メッセージレベルのデフォルトタグ(組み込みとカスタムタグのどちらでも)を変更するに
+は、 :setting:`MESSAGE_TAGS` へ変更したいレベルを含めた辞書を設定します。
+As this extends the default tags,
+上書きしたいレベルへあなたのタグを設定する必要があります::
+
+    from django.contrib.messages import constants as messages
+    MESSAGE_TAGS = {
+        messages.INFO: '',
+        50: 'critical',
+    }
+
+.. Using messages in views and templates
+   =====================================
+
+ビューとテンプレート内でメッセージを使う
+========================================
+
+.. function:: add_message(request, level, message, extra_tags='', fail_silently=False)
+
+.. Adding a message
+   ----------------
+
+メッセージを追加する
+--------------------
+
+.. To add a message, call::
+
+メッセージの追加::
+
+    from django.contrib import messages
+    messages.add_message(request, messages.INFO, 'Hello world.')
+
+.. Some shortcut methods provide a standard way to add messages with commonly
+   used tags (which are usually represented as HTML classes for the message)::
+
+いくつかのショートカットメソッドは、一般に使われるタグ(通常はHTMLのクラス名になる
+)と共にメッセージ追加の標準的な手段を提供します::
+
+    messages.debug(request, '%s SQL statements were executed.' % count)
+    messages.info(request, 'Three credits remain in your account.')
+    messages.success(request, 'Profile details updated.')
+    messages.warning(request, 'Your account expires in three days.')
+    messages.error(request, 'Document deleted.')
+
+.. _message-displaying:
+
+.. Displaying messages
+   -------------------
+
+メッセージを表示する
+--------------------
+
+.. In your template, use something like::
+
+テンプレート内で、このような使い方をします::
+
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+.. If you're using the context processor, your template should be rendered with a
+   ``RequestContext``. Otherwise, ensure ``messages`` is available to
+   the template context.
+
+もし、あなたがコンテキストプロセッサを使っている場合、あなたのテンプレートは
+``RequestContext`` を使ってレンダリングされないといけません。そうでないならば、
+``message`` をテンプレート内で使えるようにして下さい。
+
+.. Even if you know there is only just one message, you should still iterate over
+   the ``messages`` sequence, because otherwise the message storage will not be cleared
+   for the next request.
+
+たとえ、メッセージが一つであったとしても、それでも ``messages`` をイテレートし
+なければなりません、なぜなら、そうしなければ、そのメッセージのデータが次のリク
+エストで削除されないからです。
+
+.. Creating custom message levels
+   ------------------------------
+
+カスタムメッセージレベルを作成する
+----------------------------------
+
+.. Messages levels are nothing more than integers, so you can define your own
+   level constants and use them to create more customized user feedback, e.g.::
+
+メッセージレベルは単なる整数に過ぎません、だから、あなたは独自のレベルの定数を
+定義して、 use them to create more customized user feedback, 例えば::
+
+    CRITICAL = 50
+
+    def my_view(request):
+        messages.add_message(request, CRITICAL, 'A serious error occurred.')
+
+.. When creating custom message levels you should be careful to avoid overloading
+   existing levels. The values for the built-in levels are:
+
+.. _message-level-constants:
+
+カスタムメッセージレベルを作成した時、存在するレベルのオーバーロードをしないよ
+うに注意しないといけません。以下は組み込みレベルが使用している値です:
+
+==============  =====
+レベル定数名    値
+==============  =====
+``DEBUG``       10
+``INFO``        20
+``SUCCESS``     25
+``WARNING``     30
+``ERROR``       40
+==============  =====
+
+.. If you need to identify the custom levels in your HTML or CSS, you need to
+   provide a mapping via the :setting:`MESSAGE_TAGS` setting.
+
+もしカスタムレベルに対してHTMLやCSS内で使うためのIDが欲しいなら、
+:setting:`MESSAGE_TAGS` で設定をする必要があります。
+
+.. .. note::
+      If you are creating a reusable application, it is recommended to use
+      only the built-in `message levels`_ and not rely on any custom levels.
+
+.. note::
+   再利用可能なアプリケーションを作る場合は、組み込みの\ `メッセージレベル`_
+   のみを使い、カスタムレベルに頼らないことが推奨されています。
+
+.. Changing the minimum recorded level per-request
+   -----------------------------------------------
+
+リクエスト別に記録するレベルの最小値を変更する
+----------------------------------------------
+
+.. The minimum recorded level can be set per request via the ``set_level``
+   method::
+
+記録するレベルの最小値 (minimum recorded level) は、 ``set_level`` メソッドを使
+うことでリクエスト別に設定をすることが出来ます::
+
+    from django.contrib import messages
+
+    # Change the messages level to ensure the debug message is added.
+    messages.set_level(request, messages.DEBUG)
+    messages.debug(request, 'Test message...')
+
+    # In another request, record only messages with a level of WARNING and higher
+    messages.set_level(request, messages.WARNING)
+    messages.success(request, 'Your profile was updated.') # ignored
+    messages.warning(request, 'Your account is about to expire.') # recorded
+
+    # Set the messages level back to default.
+    messages.set_level(request, None)
+
+.. Similarly, the current effective level can be retrieved with ``get_level``::
+
+同様に、現在のレベルを ``get_level`` で取得することが出来ます::
+
+    from django.contrib import messages
+    current_level = messages.get_level(request)
+
+.. For more information on how the minimum recorded level functions, see
+   `Message levels`_ above.
+
+記録するレベルの最小値についての情報は、先に `メッセージレベル`_ を参照して下さ
+い。
+
+.. Adding extra message tags
+   -------------------------
+
+拡張メッセージタグを追加する
+----------------------------
+
+.. For more direct control over message tags, you can optionally provide a string
+   containing extra tags to any of the add methods::
+
+直接メッセージタグの操作をするには、各種追加用のメソッドにて任意で拡張メッセー
+ジタグ (extra tags) の文字列を設定することができます::
+
+    messages.add_message(request, messages.INFO, 'Over 9000!',
+                         extra_tags='dragonball')
+    messages.error(request, 'Email box full', extra_tags='email')
+
+.. Extra tags are added before the default tag for that level and are space
+   separated.
+
+拡張メッセージタグは、そのメッセージレベルのデフォルトタグの前に追加され、スペ
+ースで分割されます。
+
+.. Failing silently when the message framework is disabled
+   -------------------------------------------------------
+
+メッセージフレームワークが無効でもエラーを発生しない
+----------------------------------------------------
+
+.. If you're writing a reusable app (or other piece of code) and want to include
+   messaging functionality, but don't want to require your users to enable it
+   if they don't want to, you may pass an additional keyword argument
+   ``fail_silently=True`` to any of the ``add_message`` family of methods. For
+   example::
+
+再利用可能なアプリケーション(またはコード片)を書く際に、あなたにはメッセージ機
+能が必要だがアプリケーションのユーザには必要でなかった場合、以下の例のように、
+``add_message`` とそれに類するメソッドへ ``fail_silently=True`` をキーワード引
+数で追加すればエラーの発生を抑止することが出来ます::
+
+    messages.add_message(request, messages.SUCCESS, 'Profile details updated.',
+                         fail_silently=True)
+    messages.info(request, 'Hello world.', fail_silently=True)
+
+.. .. note::
+      Setting ``fail_silently=True`` only hides the ``MessageFailure`` that would
+      otherwise occur when the messages framework disabled and one attempts to
+      use one of the ``add_message`` family of methods. It does not hide failures
+      that may occur for other reasons.
+
+.. note::
+   ``fail_silently=True`` の設定は、メッセージフレームワークが無効の状態で
+   ``add_message`` などのメソッドを使った時の ``MessageFailure`` エラーのみを隠
+   蔽し、その他のエラーは発生させます。他の原因で発生するエラーを隠蔽しません。
+
+.. Expiration of messages
+   ======================
+
+メッセージの有効期限
+====================
+
+.. The messages are marked to be cleared when the storage instance is iterated
+   (and cleared when the response is processed).
+
+メッセージのデータは、ストレージのインスタンスをイテレートした時に、削除対象と
+してマークされます(そして、レスポンスが実行された際に削除されます)。
+
+.. To avoid the messages being cleared, you can set the messages storage to
+   ``False`` after iterating::
+
+メッセージが削除されないようにするためには、イテレート後にストレージインスタン
+スへ ``False`` を設定します::
+
+    storage = messages.get_messages(request)
+    for message in storage:
+        do_something_with(message)
+    storage.used = False
+
+.. Behavior of parallel requests
+   =============================
+
+並列リクエスト時の挙動
+======================
+
+.. Due to the way cookies (and hence sessions) work, **the behavior of any
+   backends that make use of cookies or sessions is undefined when the same
+   client makes multiple requests that set or get messages in parallel**. For
+   example, if a client initiates a request that creates a message in one window
+   (or tab) and then another that fetches any uniterated messages in another
+   window, before the first window redirects, the message may appear in the
+   second window instead of the first window where it may be expected.
+
+クッキー(とセッション)を使用している対価として、 **いかなるバックエンドを使って
+も、複数のリクエストが並列で実行された時には、それらのクッキーやセッションの動
+きは不安定になります**\ 。例えば、もしクライアントがあるウィンドウ(またはタブ)
+でメッセージを生成するリクエストを行って、そして次に別ウィンドウで、その未処理
+のメッセージを取得するリクエストを最初のウィンドウがリダイレクトする前に行ったら
+、予想されるメッセージの表示場所は、最初のウィンドウではなく二番目のウィンドウ
+です。
+
+.. In short, when multiple simultaneous requests from the same client are
+   involved, messages are not guaranteed to be delivered to the same window that
+   created them nor, in some cases, at all. Note that this is typically not a
+   problem in most applications and will become a non-issue in HTML5, where each
+   window/tab will have its own browsing context.
+
+短い間に、複数のリクエストが同じクライアントから送信されると、ほとんどの場合に
+おいて、メッセージがウィンドウに表示されることも作成されることも保証されません
+。また、覚えておくこととして、この点は一般的なアプリケーションでは問題にならず
+、そして HTML5 では、ウィンドウ/タブのそれぞれがコンテキストを持つようになるの
+で、 全く問題にならなくなるでしょう。
+
+.. Settings
+   ========
+
+設定
+====
+
+.. A few :ref:`settings<settings-messages>` give you control over message
+   behavior:
+
+少しの\ :ref:`設定<settings-messages>`\ でメッセージの動きを操作出来ます:
+
+* :setting:`MESSAGE_LEVEL`
+* :setting:`MESSAGE_STORAGE`
+* :setting:`MESSAGE_TAGS`
+* :ref:`SESSION_COOKIE_DOMAIN<messages-session_cookie_domain>`
