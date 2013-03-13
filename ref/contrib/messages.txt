@@ -256,8 +256,7 @@ recorded level) を変更するために使われます(また、 `リクエス�
 
 メッセージレベルのデフォルトタグ(組み込みとカスタムタグのどちらでも)を変更するに
 は、 :setting:`MESSAGE_TAGS` へ変更したいレベルを含めた辞書を設定します。
-As this extends the default tags,
-上書きしたいレベルへあなたのタグを設定する必要があります::
+その場合は、上書きしたいレベルだけを指定してタグを設定します。::
 
     from django.contrib.messages import constants as messages
     MESSAGE_TAGS = {
@@ -331,8 +330,8 @@ As this extends the default tags,
    for the next request.
 
 たとえ、メッセージが一つであったとしても、それでも ``messages`` をイテレートし
-なければなりません、なぜなら、そうしなければ、そのメッセージのデータが次のリク
-エストで削除されないからです。
+なければなりません、なぜなら、そうしなければ、そのメッセージのストレージが次の
+リクエストまでに削除されないからです。
 
 .. Creating custom message levels
    ------------------------------
@@ -344,7 +343,7 @@ As this extends the default tags,
    level constants and use them to create more customized user feedback, e.g.::
 
 メッセージレベルは単なる整数に過ぎません、だから、あなたは独自のレベルの定数を
-定義して、 use them to create more customized user feedback, 例えば::
+定義して、よりカスタムされたユーザのフィードバックを生成できます。例えば::
 
     CRITICAL = 50
 
