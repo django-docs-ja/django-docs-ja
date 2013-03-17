@@ -6,6 +6,8 @@
 メッセージフレームワーク
 ========================
 
+:revision-up-to: 17812 (1.4)
+
 .. module:: django.contrib.messages
    :synopsis: Provides cookie- and session-based temporary message storage.
 
