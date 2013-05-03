@@ -207,7 +207,7 @@ CSS ファイルのリストを指定してください。以下の例では、�
 パスが ``'/'``, ``'http://'``, ``'https://'`` のいずれかで開始していれば、
 絶対パス指定として、値をそのまま使います。それ以外のパスの前には適切な
 プレフィクス(prefix)を指定します。
-:doc:`staticfiles app </ref/contrib/staticfiles> の部分的な紹介として、
+:doc:`staticfiles app </ref/contrib/staticfiles>` の部分的な紹介として、
 "静的なファイル"(イメージや CSS, JavaScript, など)に完全な Web ページを
 表示するための二つの新しい設定が追加されました。:
 :setting:`STATIC_URL` and :setting:`STATIC_ROOT` がそれです。

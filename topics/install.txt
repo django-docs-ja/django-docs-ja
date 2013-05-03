@@ -331,7 +331,8 @@ Django のコードを更新して最新のバグフィクスや改良を適用�
    ``django-trunk`` ディレクトリへのフルpathをシステムの ``site-packages``
    ディレクトリまで追加することです。例えば Unixライクなシステムでは
 
-   .. code-brock:: bash
+   .. code-block:: bash
+
        echo WORKING=DIR/django-trunk > SITE-PACKAGES-DIR/django.pth
 
 

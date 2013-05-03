@@ -100,7 +100,7 @@ Django が実行している生の SQL クエリを見られますか？
    <http://djangopackages.com/grids/g/database-migration/>`_, of which the current
    defacto standard is `south <http://south.aeracode.org/>`_.
 
-`スキーマのアップデートを扱う外部プロジェクト<http://djangopackages.com/grids/g/database-migration/>`_
+`スキーマのアップデートを扱う外部プロジェクト <http://djangopackages.com/grids/g/database-migration/>`_
 のデファクトスタンダードは `south <http://south.aeracode.org/>`_ です。
 
 .. Do Django models support multiple-column primary keys?

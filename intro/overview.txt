@@ -516,7 +516,7 @@ API を使う必然性もありません。別のデータベース抽象化レ�
 ==============================
 
 .. This has been only a quick overview of Django's functionality. Some more useful
-features:
+   features:
 
 以上、 Django の機能についてざっと紹介してきました。 Django は他にもまだま
 だ便利な機能を備えています:
