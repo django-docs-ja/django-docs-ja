@@ -79,8 +79,8 @@ http://www.python.org から Python を取ってきましょう。 Linux や Mac
 もかまいません。
 
 .. If not, or if you'd like to work with a "large" database engine like PostgreSQL,
-MySQL, or Oracle, consult the :ref:`database installation information
-<database-installation>`.
+   MySQL, or Oracle, consult the :ref:`database installation information
+   <database-installation>`.
 
 バージョン 2.5 よりも前の Python を使っているか、 PostgreSQL や MySQL,
 Oracle といった、SQLite 以外の「大掛かりな」データベースエンジンを扱いたけ

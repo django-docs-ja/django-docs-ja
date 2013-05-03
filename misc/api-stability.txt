@@ -165,7 +165,7 @@ API の中には、以下の二つの理由から「内部使用 (internal)」�
    -------------
 
 ローカルフレーバ
--------------
+----------------
 
 .. versionchanged:: 1.3
 
@@ -176,7 +176,7 @@ API の中には、以下の二つの理由から「内部使用 (internal)」�
    example, a common change is to split a province into two new
    provinces, or to rename an existing province.
 
-:mod: `django.contrib.localflavor` は様々な国や文化のための有用なコードが
+:mod:`django.contrib.localflavor` は様々な国や文化のための有用なコードが
 寄せ集められています。このデータは本質的にローカルであり、時代の移り変わり
 によって変化しがちで、これはほぼ Django のリリーススケジュールと相関するこ
 とはありません。例えば、よくある変更としては、州などが2つに分かれたり、名

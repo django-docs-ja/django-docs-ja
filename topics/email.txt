@@ -409,7 +409,7 @@ MIME タイプは ``"text/plain"`` です。実践的には、このパラメタ
 .. _topic-email-smtp-backend:
 
 SMTP バックエンド
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 これはデフォルトのバックエンドです。メールは SMTP サーバを通して送信されます。
 サーバのアドレスと認証情報は :setting:`EMAIL_HOST` 、 :setting:`EMAIL_PORT` 、

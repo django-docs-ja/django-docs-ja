@@ -469,7 +469,7 @@ U.S. ローカルフレーバ
 定を変更しようとした場合などに送出されます。
 
 :setting:`LOGIN_URL` の移動
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :setting:`LOGIN_URL` 定数が、 ``django.contrib.auth`` から ``settings`` モジュール
 に移動しました。 ``from django.contrib.auth import LOGIN_URL`` を使うのでは
@@ -638,11 +638,11 @@ HTTP リクエスト／レスポンスオブジェクト
 ``HttpRequest`` オブジェクトはもはや直接的に辞書式にアクセスすることを
 サポートしなくなりました、 ``GET`` と ``POST`` 両方のデータは
 直接的に ``HttpRequest`` オブジェクトで扱えました(すなわち、
-HttpRequest`` object (すなわち、 ``if 'some_form_key' in request``
+``HttpRequest`` object (すなわち、 ``if 'some_form_key' in request``
 を使うか、 ``request['some_form_key']`` を読み込むことで、
 フォームデータ一つをチェックすることができました。これはもう、
 サポートされていません。 もし、組み込みの ``GET`` や ``POST`` データに
-アクセスする必要があるなら、 ``request.REQUEST``　を代わりに使って
+アクセスする必要があるなら、 ``request.REQUEST`` を代わりに使って
 ください。
 
 これは強く推奨されています、しかしながら、受け取ることを期待した

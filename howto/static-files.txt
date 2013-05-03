@@ -585,11 +585,13 @@ URL ヘルパー関数 :func:`~django.conf.urls.static.static` を持ってい�
         # ... the rest of your URLconf goes here ...
     ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-.. note::
+.. .. note::
 
-..     This helper function will only be operational in debug mode and if
+       This helper function will only be operational in debug mode and if
        the given prefix is local (e.g. ``/static/``) and not a URL (e.g.
        ``http://static.example.com/``).
+
+.. note::
 
     このヘルパー関数は、デバッグモードの中で、与えられたプレフィックスが
     ( 例 ``/static/``) ローカルであって URL

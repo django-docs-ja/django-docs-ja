@@ -279,7 +279,7 @@ API リファレンス
         ます。もしくはユーザがプロファイルを持っていなければ
         :exc:`django.core.exceptions.ObjectDoesNotExtis` を送出します。
         サイト固有のユーザプロファイルを定義するには、後述の
-	    `追加のユーザ情報の保存`_ を参照して下さい。
+        `追加のユーザ情報の保存`_ を参照して下さい。
 
 .. _storing additional user information: #storing-additional-information-about-users
 .. _`追加のユーザ情報の保存`: `storing additional user information`_
@@ -502,10 +502,10 @@ PDKDF2 と、 bcrypt アルゴリズムは、沢山のイテレーションと�
 増したい時もあれば減らしたい時もあるでしょう、セキュリティ環境に応じて、
 または実行環境に応じて。そうするために、サブクラスを作り適切なアルゴリズム
 と ``iterations`` パラメータの上書きをするでしょう。たとえば、イテレーション
-の回数を PBKDF2 で増加させるには::
+の回数を PBKDF2 で増加させるには:
 
 1. サブクラスを ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` という
-名前で作ります。::
+   名前で作ります。::
 
          from django.contrib.auth.hashers import PBKDF2PasswordHasher
 
@@ -805,7 +805,7 @@ Django では、 :mod:`django.contrib.auth` の中で、
 
 .. function:: check_password()
 
-    .. versionaddd:: 1.4
+    .. versionadded:: 1.4
 
     ユーザ認証を手動で行うために平文パスワードとデータベース上のハッシュ化
     パスワードを比較したい場合には、
@@ -1007,7 +1007,7 @@ login_required デコレータ
     * ``POST`` で呼び出されると、ユーザのログイン処理を試みます。ログイ
       ンに成功すると、ビューは ``next`` に示された URL にリダイレクトし
       ます。 ``next`` を指定しない場合、
-	  :setting:`settings.LOGIN_REDIRECT_URL <LOGIN_REDIRECT_URL>`
+      :setting:`settings.LOGIN_REDIRECT_URL <LOGIN_REDIRECT_URL>`
       (デフォルト値は ``/accounts/profile/``) にリダイレクトします。ロ
       グインに失敗すると、ログインフォームを再度表示します。
 
@@ -1172,7 +1172,7 @@ login_required デコレータ
 
     * ``template_name``: パスワード変更ページのテンプレートの完全な名前
       です。この引数を省略すると、デフォルト値の
-	  :file:`registration/password_change_form.html` を使います。
+      :file:`registration/password_change_form.html` を使います。
 
     * ``post_change_redirect``: パスワードの変更に成功した場合の
       URLリダイレクト先です。
@@ -1199,7 +1199,7 @@ login_required デコレータ
 
     * ``template_name``: パスワード変更完了ページのテンプレートの完全な
       名前です。この引数を省略すると、デフォルト値の
-	  :file:`registration/password_change_done.html` を使います。
+      :file:`registration/password_change_done.html` を使います。
 
 .. function:: password_reset(request[, is_admin_site, template_name, email_template_name, password_reset_form, token_generator, post_reset_redirect, from_email])
 
@@ -1280,7 +1280,7 @@ login_required デコレータ
 
     * ``uid``: ユーザのIDは36進数でエンコードされます。
 
-    *``token``: トークンはパスワードが有効なものかをチェックします。
+    * ``token``: トークンはパスワードが有効なものかをチェックします。
 
     ``registration/password_reset_email.html`` （ email ボディテンプレー
     ト）にサンプルがあります:
@@ -1371,8 +1371,8 @@ login_required デコレータ
 
     **オプション 引数:**
 
-    *``login_url``: リダイレクトするログインページの URL です。
-     デフォルトでは :setting:`settings.LOGIN_URL <LOGIN_URL>` となります。
+    * ``login_url``: リダイレクトするログインページの URL です。
+      デフォルトでは :setting:`settings.LOGIN_URL <LOGIN_URL>` となります。
 
     * ``redirect_field_name``: ``GET`` フィールドに含まれているログアウト後
       にリダイレクトする先の URL です。 ``GET`` パラメータが渡されていれば
@@ -1584,7 +1584,7 @@ Django には単純なパーミッション機構がついてきます。この�
 
 * add: ``user.has_perm('foo.add_bar')``
 * change: ``user.has_perm('foo.change_bar')``
-* delete: ``user.has_perm('foo.delete_bar')`
+* delete: ``user.has_perm('foo.delete_bar')``
 
 .. _custom-permissions:
 
@@ -1651,7 +1651,7 @@ API リファレンス
 :doc:`Django モデル </ref/models/instances>` と同じく、標準的なデータアクセスメソッ
 ドを備えています。
 
-.. currrentmodule:: django.contrib.auth
+.. currentmodule:: django.contrib.auth
 
 プログラム的にパーミッションを作る
 ----------------------------------
@@ -1699,7 +1699,7 @@ API リファレンス
 ンスであっても :class:`~django.contrib.auth.models.AnonymousUser` インスタ
 ンスであっても、テンプレート変数 ``{{ user }}`` に入ります:
 
-.. code-block:: html + django
+.. code-block:: html+django
 
     {% if user.is_authenticated %}
         <p>Welcome, {{ user.username }}. Thanks for logging in.</p>
@@ -1975,8 +1975,7 @@ Django の admin システムは、冒頭で説明した Django の ``User`` オ
 バックエンドはデフォルトのバックエンドであり、ほとんどの場合
 ``auth_permission`` にパーミッションを問い合わせます。
 
-.. _django/contrib/auth/backends.py:
-https://code.djangoproject.com/browser/django/trunk/django/contrib/auth/backends.py
+.. _django/contrib/auth/backends.py: https://code.djangoproject.com/browser/django/trunk/django/contrib/auth/backends.py
 
 .. _anonymous_auth:
 
@@ -2003,7 +2002,7 @@ Django のパーミッションフレームワークは、匿名ユーザに対�
 
 .. versionadded:: 1.3
 
-アクティブでないユーザは、認証されていても ``is_active`` が ``False``に
+アクティブでないユーザは、認証されていても ``is_active`` が ``False`` に
 セットされているユーザです。しかし、これは何も認証されていないという意味で
 はありません。例えば、そのようなユーザは自身のアカウントをアクティブにする
 ことができます。

@@ -172,6 +172,7 @@ TemplateResponseMixin
     .. method:: render_to_response(context, **response_kwargs)
 
         .. Returns a ``self.response_class`` instance.
+
         ``self.response_class`` のインスタンスを返します。
 
         .. If any keyword arguments are provided, they will be
@@ -423,8 +424,10 @@ SingleObjectTemplateResponseMixin
 
 .. MultipleObjectMixin
    ~~~~~~~~~~~~~~~~~~~
+
 MultipleObjectMixin
 ~~~~~~~~~~~~~~~~~~~
+
 .. class:: MultipleObjectMixin()
 
     .. A mixin that can be used to display a list of objects.
@@ -1335,8 +1338,10 @@ DateMixin
 
 .. BaseDateListView
    ~~~~~~~~~~~~~~~~
+
 BaseDateListView
 ~~~~~~~~~~~~~~~~
+
 .. class:: BaseDateListView()
 
     .. A base class that provides common behavior for all date-based views. There

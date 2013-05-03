@@ -704,7 +704,7 @@ CSRF クッキーが送出されるために必要な :ttag:`csrf_token` を含�
    =========================
 
 組み込みアプリと再利用されるアプリ
-================================
+==================================
 
 .. Because it is possible for the developer to turn off the ``CsrfViewMiddleware``,
    all relevant views in contrib apps use the ``csrf_protect`` decorator to ensure
