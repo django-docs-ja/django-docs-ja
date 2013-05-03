@@ -296,9 +296,9 @@ Django 1.3より前では、 素のSQL呼び出しを使う際、
 接続とカーソル
 -----------------------
 
-``connection`` と ``cursor`` をは :pep:`249` で説明されている Python DB-API
+``connection`` と ``cursor`` は :pep:`249` で説明されている Python DB-API
 標準をほとんど実装しています
-(ただし `トランザクション処理 </topics/db/transactions>`_ を除く)。
+(ただし :doc:`トランザクション処理 </topics/db/transactions>` を除く)。
 Python DB-APIに精通していないのであれば ``cursor.execute()`` のSQL文は
 SQL文にパラメータを直接追加するのではなく、プレースホルダーとして ``"%s"`` 
 を使うということを知っておいてください。
