@@ -1390,6 +1390,6 @@ Assignment タグ
 されたコンセプトを表しています。
 
 複雑なレンダリングについて他にも例を見たければ、 :ttag:`{% if %}<if>` や
-:ttag:`{% for %}<for>`, :ttag:`{% ifequal %}<ifequal>` , :ttag:`{% ifchanged
-%}<ifchanged>` のソースを参照してください。ソースは
-%``django/template/defaulttags.py`` にあります。
+:ttag:`{% for %}<for>`, :ttag:`{% ifequal %}<ifequal>`,
+:ttag:`{% ifchanged %}<ifchanged>` のソースを参照してください。ソースは
+``django/template/defaulttags.py`` にあります。
