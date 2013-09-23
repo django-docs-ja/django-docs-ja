@@ -109,6 +109,10 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
         self._table_row_index = 0 # Needed by Sphinx
         self.body.append(self.starttag(node, 'table', CLASS='docutils'))
 
+    # avoid error with docutils 0.11 or later
+    def depart_table(self, node):
+        self.body.append('</table>\n')
+
     # <big>? Really?
     def visit_desc_parameterlist(self, node):
         self.body.append('(')
