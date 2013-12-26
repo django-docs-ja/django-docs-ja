@@ -1,9 +1,7 @@
-.. _howto-error-reporting:
+エラー通知
+==========
 
-電子メールによるエラー通知
-==========================
-
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
 
 サイトを公開しているときには、 :setting:`DEBUG` を常に切りましょう。
 :setting:`DEBUG` を切ると、サーバの動作は軽くなり、エラーページを介して悪意
@@ -12,10 +10,13 @@
 その代わり、 :setting:`DEBUG` を ``False`` にすると、サイト上で発生したエラー
 を一切表示できません。ユーザはみな、公開用に作られたエラーページを見るだけ
 です。実運用のサイトで発生したエラーを追跡したい場合のために、 Django はエ
-ラーの詳細をメールで送信するように設定できます。
+ラーの詳細について通知するように設定できます。
+
+メールでの通知
+--------------
 
 サーバのエラー
---------------
+~~~~~~~~~~~~~~
 
 :setting:`DEBUG` を ``False`` にすると、コード内で例外が送出され、その例外
 が捕捉されず、結果的に 500 エラーになった場合に、 Django は
@@ -23,6 +24,26 @@
 これは、管理者が何らかのエラーにすぐに気づけるようにするためで
 す。 :setting:`ADMINS` はエラーの説明文と、 Python トレースバックと、エラー
 を引き起こした HTTP リクエストの詳細情報を受け取ります。
+
+.. .. note::
+
+      In order to send email, Django requires a few settings telling it
+      how to connect to your mail server. At the very least, you'll need
+      to specify :setting:`EMAIL_HOST` and possibly
+      :setting:`EMAIL_HOST_USER` and :setting:`EMAIL_HOST_PASSWORD`,
+      though other settings may be also required depending on your mail
+      server's configuration. Consult :doc:`the Django settings
+      documentation </ref/settings>` for a full list of email-related
+      settings.
+
+.. note::
+
+    メールを送るためにはメールサーバへの接続方法についていくつかの設定をする
+    ことが必要です。最低限、 :setting:`EMAIL_HOST` とおそらく
+    :setting:`EMAIL_HOST_USER` と :setting:`EMAIL_HOST_PASSWORD` が必要でし
+    ょう。他の設定もメールサーバの設定によっては必要になるかもしれません。
+    メール関連の全ての設定のリストは
+    :doc:`Django 設定ドキュメント </ref/settings>` をあたってください。
 
 デフォルトの設定では、 Django はメールの送信元に root@localhost を使います。
 メールを処理するプロバイダの中には、 root@localhost から送信されたメールを
@@ -32,36 +53,393 @@
 メール通知機能を無効にするには、 :setting:`ADMINS` 設定から全てのユーザを削
 除してください。
 
+.. .. seealso::
+
+      .. versionadded:: 1.3
+
+      Server error emails are sent using the logging framework, so you can
+      customize this behavior by :doc:`customizing your logging configuration
+      </topics/logging>`.
+
+.. seealso::
+
+   .. versionadded:: 1.3
+
+   サーバエラーのメール通知はロギングフレームワークを使っているので、
+   :doc:`ロギング設定のカスタマイズ </topics/logging>` によって動作を変更でき
+   ます。
+
 404 エラー
-----------
+~~~~~~~~~~
 
 Django は、サイトのリンクが切れている (404 "page not found" エラーが発生す
 る) 時にメールを送信するよう設定できます。 404 エラーメールは、以下の条件下
 で送信されます:
 
-    * :setting:`DEBUG` が ``False`` に設定されている。
-    
-    * :setting:`SEND_BROKEN_LINK_EMAILS` が ``True`` に設定されている。
-    
-    * :setting:`MIDDLEWARE_CLASSES` 設定に ``CommonMiddleware`` が登録され
-      ている (デフォルトの設定です)
-    
+* :setting:`DEBUG` が ``False`` に設定されている。
+
+* :setting:`SEND_BROKEN_LINK_EMAILS` が ``True`` に設定されている。
+
+* :setting:`MIDDLEWARE_CLASSES` 設定に ``CommonMiddleware`` が登録され
+  ている (デフォルトの設定です)
+
 これらの条件が揃っていると、コード中で 404 例外が生じ、かつリクエストにリファ
 ラが設定されているときに、 Django は :setting:`MANAGERS` 設定に登録された全
 てのユーザにメールを送信します (リファラ付きが条件なのは、リファラのないリ
 クエストに対する404 エラーで管理者を煩わせないためです)。
 
-:setting:`IGNORABLE_404_ENDS` や :setting:`IGNORABLE_404_STARTS` を使えば、
-特定の 404 に対するレポート送信を抑制できます。例えば::
+:setting:`IGNORABLE_404_URLS` を使えば、特定の 404 に対するレポート送信を抑
+制できます。例えば::
 
-    IGNORABLE_404_ENDS = ('.php', '.cgi')
-    IGNORABLE_404_STARTS = ('/phpmyadmin/',)
+    import re
+    IGNORABLE_404_URLS = (
+        re.compile(r'\.(php|cgi)$'),
+        re.compile(r'^/phpmyadmin/'),
+    )
 
 のようにすると、 URL が ``.php`` や ``.cgi`` で終わるような URL や
 ``/phpmyadmin/`` で始まる URL に対する 404 は報告 *されません* 。
 
+.. The following example shows how to exclude some conventional URLs that browsers and
+   crawlers often request::
+
+以下は、ブラウザやクローラがよくリクエストする慣習的な URL を除外する例です::
+
+    import re
+    IGNORABLE_404_URLS = (
+        re.compile(r'^/apple-touch-icon.*\.png$'),
+        re.compile(r'^/favicon\.ico$'),
+        re.compile(r'^/robots\.txt$'),
+    )
+
+.. (Note that these are regular expressions, so we put a backslash in front of
+   periods to escape them.)
+
+(正規表現のため、ピリオドの前にエスケープのためのバックスラッシュを置いている
+ことに注意してください)
+
 この機能を無効にしたければ、 :setting:`SEND_BROKEN_LINK_EMAILS` を
 ``False`` に設定してください。
+
+.. .. seealso::
+
+     .. versionadded:: 1.3
+
+      404 errors are logged using the logging framework. By default, these log
+      records are ignored, but you can use them for error reporting by writing a
+      handler and :doc:`configuring logging </topics/logging>` appropriately.
+
+.. seealso::
+
+   .. versionadded:: 1.3
+
+   404 エラーはロギングフレームワークを使って記録されます。デフォルトではこれ
+   らのログレコードは無視されますが、ハンドラを書き、
+   :doc:`ロギングの設定 </topics/logging>` を適切に行うことで、エラーレポート
+   に使うことができます。
+
+.. .. seealso::
+
+   .. versionchanged:: 1.4
+
+      Previously, two settings were used to control which URLs not to report:
+      :setting:`IGNORABLE_404_STARTS` and :setting:`IGNORABLE_404_ENDS`. They
+      were replaced by :setting:`IGNORABLE_404_URLS`.
+
+.. seealso::
+
+   .. versionchanged:: 1.4
+
+   URL を通知対象外にするために、以前は 2 つの設定
+   :setting:`IGNORABLE_404_STARTS` と :setting:`IGNORABLE_404_ENDS` が使われて
+   いました。これらは :setting:`IGNORABLE_404_URLS` に置き換えられました。
+
+.. _filtering-error-reports:
+
+.. Filtering error reports
+   -----------------------
+
+エラー通知のフィルタリング
+--------------------------
+
+.. versionadded:: 1.4
+
+.. Filtering sensitive information
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+センシティブ（機微）な情報をフィルタリングする
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. Error reports are really helpful for debugging errors, so it is generally
+   useful to record as much relevant information about those errors as possible.
+   For example, by default Django records the `full traceback`_ for the
+   exception raised, each `traceback frame`_'s local variables, and the
+   :class:`HttpRequest`'s :ref:`attributes<httprequest-attributes>`.
+
+エラー通知はエラーをデバッグするのに実に役立ちます。一般的に、エラーに関係する
+情報は可能な限り多く記録しておくと便利です。例えば、例外が起こった時、 Django
+はデフォルトで `フルトレースバック`_ と、それぞれの `トレースバックフレーム`_
+のローカル変数、 :class:`HttpRequest` の :ref:`属性<httprequest-attributes>`
+を記録します。
+
+.. However, sometimes certain types of information may be too sensitive and thus
+   may not be appropriate to be kept track of, for example a user's password or
+   credit card number. So Django offers a set of function decorators to help you
+   control which information should be filtered out of error reports in a
+   production environment (that is, where :setting:`DEBUG` is set to ``False``):
+   :func:`sensitive_variables` and :func:`sensitive_post_parameters`.
+
+しかし、時にはある種の情報はセンシティブすぎて、追跡するのが適切ではないことが
+あります。例えば、ユーザーのパスワードやクレジットカードナンバーがそうです。そ
+のため Django は一揃いの関数デコレータ :func:`sensitive_variables` と
+:func:`sensitive_post_parameters`.を提供しています。
+これらは運用環境 (つまり :setting:`DEBUG` が ``False`` にセットされた環境) でど
+の情報をエラーレポートから除外すべきかを制御するのに役立ちます。
+
+.. .. _`full traceback`: http://en.wikipedia.org/wiki/Stack_trace
+   .. _`traceback frame`: http://en.wikipedia.org/wiki/Stack_frame
+
+.. _`フルトレースバック`: http://en.wikipedia.org/wiki/Stack_trace
+.. _`トレースバックフレーム`: http://en.wikipedia.org/wiki/Stack_frame
+
+.. .. function:: sensitive_variables(*variables)
+
+       If a function (either a view or any regular callback) in your code uses
+       local variables susceptible to contain sensitive information, you may
+       prevent the values of those variables from being included in error reports
+       using the ``sensitive_variables`` decorator::
+
+        from django.views.decorators.debug import sensitive_variables
+
+        @sensitive_variables('user', 'pw', 'cc')
+        def process_info(user):
+            pw = user.pass_word
+            cc = user.credit_card_number
+            name = user.name
+            ...
+
+       In the above example, the values for the ``user``, ``pw`` and ``cc``
+       variables will be hidden and replaced with stars (`**********`) in the
+       error reports, whereas the value of the ``name`` variable will be
+       disclosed.
+
+       To systematically hide all local variables of a function from error logs,
+       do not provide any argument to the ``sensitive_variables`` decorator::
+
+        @sensitive_variables()
+        def my_function():
+            ...
+
+.. function:: sensitive_variables(*variables)
+
+    もしあなたのコードの関数 (ビューや他の通常のコールバック) がセンシティブな
+    情報を含みうる変数を使っているなら、 ``sensitive_variables`` デコレータを
+    使うことで、それらの変数の値がエラーレポートに含まれることを避けることがで
+    きます::
+
+        from django.views.decorators.debug import sensitive_variables
+
+        @sensitive_variables('user', 'pw', 'cc')
+        def process_info(user):
+            pw = user.pass_word
+            cc = user.credit_card_number
+            name = user.name
+            ...
+
+    上の例で、 ``user``, ``pw``, ``cc`` 変数はエラーレポートでは隠され、アスタ
+    リスク (`**********`) に置き換えられます。一方、 ``name`` 変数の値は表示さ
+    れます。
+
+    ある関数の全てのローカル変数を、一律にエラーログから隠すには、
+    ``sensitive_variables`` デコレータに何も引数を渡さないようにします::
+
+        @sensitive_variables()
+        def my_function():
+            ...
+
+.. .. function:: sensitive_post_parameters(*parameters)
+
+       If one of your views receives an :class:`HttpRequest` object with
+       :attr:`POST parameters<HttpRequest.POST>` susceptible to contain sensitive
+       information, you may prevent the values of those parameters from being
+       included in the error reports using the ``sensitive_post_parameters``
+       decorator::
+
+        from django.views.decorators.debug import sensitive_post_parameters
+
+        @sensitive_post_parameters('pass_word', 'credit_card_number')
+        def record_user_profile(request):
+            UserProfile.create(user=request.user,
+                               password=request.POST['pass_word'],
+                               credit_card=request.POST['credit_card_number'],
+                               name=request.POST['name'])
+            ...
+
+       In the above example, the values for the ``pass_word`` and
+       ``credit_card_number`` POST parameters will be hidden and replaced with
+       stars (`**********`) in the request's representation inside the error
+       reports, whereas the value of the ``name`` parameter will be disclosed.
+
+       To systematically hide all POST parameters of a request in error reports,
+       do not provide any argument to the ``sensitive_post_parameters`` decorator::
+
+        @sensitive_post_parameters()
+        def my_view(request):
+            ...
+
+.. function:: sensitive_post_parameters(*parameters)
+
+    もしあなたのビューがセンシティブな情報を含みうる
+    :attr:`POST パラメータ<HttpRequest.POST>` を持つ :class:`HttpRequest` オブ
+    ジェクトを受け取るなら、 ``sensitive_post_parameters`` デコレータを使うこ
+    とでそういったパラメータの値がエラーレポートに含まれることを防ぐことができ
+    ます::
+
+        from django.views.decorators.debug import sensitive_post_parameters
+
+        @sensitive_post_parameters('pass_word', 'credit_card_number')
+        def record_user_profile(request):
+            UserProfile.create(user=request.user,
+                               password=request.POST['pass_word'],
+                               credit_card=request.POST['credit_card_number'],
+                               name=request.POST['name'])
+            ...
+
+    上の例では、 POST パラメータの ``pass_word`` と ``credit_card_number`` の
+    値がエラーレポート内のリクエストの表現では隠され、アスタリスク
+    (`**********`) で置き換えられます。一方、 ``name`` パラメータの値は開示さ
+    れます。
+
+    あるリクエストの全ての POST パラメータを、一律にエラーレポートから隠すに
+    は、 ``sensitive_post_variables`` デコレータに何も引数を渡さないようにしま
+    す::
+
+        @sensitive_post_parameters()
+        def my_view(request):
+            ...
+
+.. .. note::
+
+       .. versionchanged:: 1.4
+
+       Since version 1.4, all POST parameters are systematically filtered out of
+       error reports for certain :mod:`contrib.views.auth` views (``login``,
+       ``password_reset_confirm``, ``password_change``, and ``add_view`` and
+       ``user_change_password`` in the ``auth`` admin) to prevent the leaking of
+       sensitive information such as user passwords.
+
+.. note::
+
+    .. versionchanged:: 1.4
+
+    バージョン 1.4 以降、ユーザーパスワードのようなセンシティブな情報が漏れる
+    のを防ぐために、特定の :mod:`contrib.views.auth` のビュー (``login``,
+    ``password_reset_confirm``, ``password_change`` および ``auth`` admin の
+    ``add_view`` と ``user_change_password``) のエラーレポートから、全ての
+    POST パラメータが一律に除外されるようになりました。
+
+.. _custom-error-reports:
+
+.. Custom error reports
+   ~~~~~~~~~~~~~~~~~~~~
+
+カスタムエラー通知
+~~~~~~~~~~~~~~~~~~
+
+.. All :func:`sensitive_variables` and :func:`sensitive_post_parameters` do is,
+   respectively, annotate the decorated function with the names of sensitive
+   variables and annotate the ``HttpRequest`` object with the names of sensitive
+   POST parameters, so that this sensitive information can later be filtered out
+   of reports when an error occurs. The actual filtering is done by Django's
+   default error reporter filter:
+   :class:`django.views.debug.SafeExceptionReporterFilter`. This filter uses the
+   decorators' annotations to replace the corresponding values with stars
+   (`**********`) when the error reports are produced. If you wish to override or
+   customize this default behavior for your entire site, you need to define your
+   own filter class and tell Django to use it via the
+   :setting:`DEFAULT_EXCEPTION_REPORTER_FILTER` setting::
+
+:func:`sensitive_variables` と :func:`sensitive_post_parameters` が行っている
+のは、それぞれ、エラーが起こった時のレポートからセンシティブな情報が除外される
+ように、デコレートした関数をセンシティブな変数名で注釈づけておくことと、
+``HttpRequest`` オブジェクトをセンシティブな POST パラメータの名前で注釈づける
+ことです。実際のフィルタリングは Django のデフォルトのエラー通知フィルタ
+:class:`django.views.debug.SafeExceptionReporterFilter` で行われます。このフィ
+ルタは、エラーレポートが生成される時、デコレータによる注釈に対応する値をアスタ
+リスク (`**********`) で置換します。もし、このデフォルトの動作をサイト全体で上
+書きしたい、またはカスタマイズしたいなら、自分自身のフィルタクラスを定義し、
+:setting:`DEFAULT_EXCEPTION_REPORTER_FILTER` 設定を通じて Django にそれを使う
+よう指示しなければなりません::
+
+    DEFAULT_EXCEPTION_REPORTER_FILTER = 'path.to.your.CustomExceptionReporterFilter'
+
+.. You may also control in a more granular way which filter to use within any
+   given view by setting the ``HttpRequest``'s ``exception_reporter_filter``
+   attribute::
+
+あるいは ``HttpRequest`` の ``exception_reporter_filter`` 属性にフィルタを設定
+することで、任意のビューで使うフィルタをもっと細かく制御できます::
+
+    def my_view(request):
+        if request.user.is_authenticated():
+            request.exception_reporter_filter = CustomExceptionReporterFilter()
+        ...
+
+.. Your custom filter class needs to inherit from
+   :class:`django.views.debug.SafeExceptionReporterFilter` and may override the
+   following methods:
+
+カスタムフィルタは :class:`django.views.debug.SafeExceptionReporterFilter` を
+継承しなければならず、以下のメソッドをオーバーライドできます。
+
+.. class:: django.views.debug.SafeExceptionReporterFilter
+
+.. .. method:: SafeExceptionReporterFilter.is_active(self, request)
+
+       Returns ``True`` to activate the filtering operated in the other methods.
+       By default the filter is active if :setting:`DEBUG` is ``False``.
+
+.. method:: SafeExceptionReporterFilter.is_active(self, request)
+
+    他のメソッドで実行されるフィルタリングを有効化するなら ``True`` を返しま
+    す。デフォルトでは、 :settings:`DEBUG` が ``False`` の時にフィルタが有効に
+    なります。
+
+.. .. method:: SafeExceptionReporterFilter.get_request_repr(self, request)
+
+       Returns the representation string of the request object, that is, the
+       value that would be returned by ``repr(request)``, except it uses the
+       filtered dictionary of POST parameters as determined by
+       :meth:`SafeExceptionReporterFilter.get_post_parameters`.
+
+.. method:: SafeExceptionReporterFilter.get_request_repr(self, request)
+
+    リクエストオブジェクトの文字列表現を返します。つまり、その値は
+    ``repr(request)`` によって返される値になるでしょう。ただし、
+    :meth:`SafeExceptionReporterFilter.get_post_parameters` メソッドによって取
+    得される POST パラメータのフィルタされた辞書を使います。
+
+.. .. method:: SafeExceptionReporterFilter.get_post_parameters(self, request)
+
+       Returns the filtered dictionary of POST parameters. By default it replaces
+       the values of sensitive parameters with stars (`**********`).
+
+.. method:: SafeExceptionReporterFilter.get_post_parameters(self, request)
+
+    POST パラメータのフィルタされた辞書を返します。デフォルトでは、センシティ
+    ブなパラメータの値をアスタリスク (`**********`) によって置き換えます。
+
+.. .. method:: SafeExceptionReporterFilter.get_traceback_frame_variables(self, request, tb_frame)
+
+       Returns the filtered dictionary of local variables for the given traceback
+       frame. By default it replaces the values of sensitive variables with stars
+       (`**********`).
+
+.. method:: SafeExceptionReporterFilter.get_traceback_frame_variables(self, request, tb_frame)
+
+    トレースバックフレームによって与えられたローカル変数の、フィルタされた辞書
+    を返します。デフォルトでは、センシティブなパラメータの値をアスタリスク
+    (`**********`) によって置き換えます。
 
 .. seealso::
 

@@ -196,7 +196,7 @@ mail_managers()
 EmailMessage クラス
 ===================
 
-Django の :meth:`~django.core.mail.send_mail()`` および
+Django の :meth:`~django.core.mail.send_mail()` および
 :meth:`~django.core.mail.send_mass_mail()` 関数は、実際には
 :class:`~django.core.mail.EmailMessage` クラスに対して薄いラッパをかぶせたものに
 すぎません。
