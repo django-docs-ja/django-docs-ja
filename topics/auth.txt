@@ -659,7 +659,7 @@ PDKDF2 と、 bcrypt アルゴリズムは、沢山のイテレーションと�
 ``accounts`` というアプリケーションで定義されているなら、設定値は以下のよう
 になるでしょう::
 
-    AUTH_PROFILE_MODULE = 'accounts.userprofile'
+    AUTH_PROFILE_MODULE = 'accounts.UserProfile'
 
 ユーザプロファイルモデルが定義されていて、この規則通りになっていた場合、
 :class:`~django.contrib.auth.models.User` のオブジェクトは、
@@ -675,7 +675,7 @@ PDKDF2 と、 bcrypt アルゴリズムは、沢山のイテレーションと�
 
     # models.py の中で
 
-    from django.contrib,.auth.models import User
+    from django.contrib.auth.models import User
     from django.db.models.signals import post_save
 
     # 上のユーザプロファイルの定義
@@ -683,7 +683,7 @@ PDKDF2 と、 bcrypt アルゴリズムは、沢山のイテレーションと�
 
     def create_user_profile(sender, instance, created, **kwargs):
         if created:
-            USerProfile.objects.create(user=instance)
+            UserProfile.objects.create(user=instance)
 
     post_save.connect(create_user_profile, sender=User)
 
