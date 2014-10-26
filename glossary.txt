@@ -12,26 +12,35 @@
         :term:`model` 内のアトリビュートです。通常、一つのフィールドが一つ
         のデータベースカラムに対応しています。
         
-        :ref:`topics-db-models` を参照してください。
+        :doc:`/topics/db/models` を参照してください。
 
     generic view
         ビューを開発するときによくあるロジックやパターンを抽象化・一般化
 	して実装した、高水準の :term:`ビュー` 関数です。
         
-        :ref:`ref-generic-views` を参照してください。
+        :doc:`/ref/generic-views` を参照してください。
 
     model
         モデル (Model) は、アプリケーションのデータを保存します。
         
-        :ref:`topics-db-models` を参照してください。
+        :doc:`/topics/db/models` を参照してください。
 
     MTV
-        :ref:`mtv` を参照してください。
+        .. "Model-template-view"; a software pattern, similar in style to MVC, but
+           a better description of the way Django does things.
+
+        ソフトウェアパターンの「モデル・テンプレート・ビュー
+        (Model-template-view)」の略で、 MVC スタイルに似ていますが Django のやり
+        方をより良く表現しています。
+
+        .. See :ref:`the FAQ entry <faq-mtv>`.
+
+        :ref:`関連 FAQ エントリ<faq-mtv>` も参照してください。
 
     MVC
         ソフトウェアパターンの「 `モデル・ビュー・コントローラ`__ 
 	(Model-view-controller)」の略です。
-	Django は :ref:`ある程度 MVC 的です <mtv>` 。
+	Django は :ref:`ある程度 MVC 的です <faq-mtv>` 。
 
         __ http://ja.wikipedia.org/wiki/Model_View_Controller
 
@@ -42,28 +51,22 @@
         ン固有の設定などが収められています。
 
     property
-        Python バージョン 2.2 から導入された機能で、「マネージドアトリビュー
-        ト (managed attribute)」ともいいます。詳しくは
-	`プロパティのドキュメント`__ を参照してください。
- 
-          あるオブジェクトのアトリビュートを実装するときに、アトリビュート
-          としての使い方は変えないで、アトリビュートを参照したときに何らか
-          のメソッドを呼び出したい場合があります。プロパティは、そんな場合
-          に便利な手法です。 ``__getattr__`` や ``__setattr__`` をオーバラ
-          イドすれば同様の機能を実現できますが、 ``__setattr__`` をオーバラ
-          イドすると、オブジェクトの全てのアトリビュートへのアクセスが遅く
-          なりますし、 ``__getattr__`` をオーバライドして正しい動作を実現す
-          るのは結構大変です。プロパティを使えば、 ``__getattr__`` や
-          ``__setattr__`` をオーバライドせずに、マネージドアトリビュートを
-          楽に実装できるのです。
+        .. Also known as "managed attributes", and a feature of Python since
+           version 2.2. This is a neat way to implement attributes whose usage
+           resembles attribute access, but whose implementation uses method calls.
 
-        __ http://www.python.org/download/releases/2.2/descrintro/#property
+        Python バージョン 2.2 から導入された機能で、「マネージドアトリビュー
+        ト (managed attribute)」ともいいます。これはアトリビュートそっくりに
+        アクセスできるのに実はメソッド呼び出しで実装されているアトリビュートを
+        実装する上品な方法です。
+
+        :func:`property` を参照してください。
 
     queryset
         データベースから取り出した一連のレコード行を表現するオブジェクトで
         す。
         
-        :ref:`topics-db-queries` を参照してください。
+        :doc:`/topics/db/queries` を参照してください。
 
     slug
         英文字と数字、アンダースコア、ハイフンだけからなる短いラベル文字列
@@ -71,7 +74,7 @@
         
         .. parsed-literal::
         
-            http://www.djangoproject.com/weblog/2008/apr/12/**spring**/
+            https://www.djangoproject.com/weblog/2008/apr/12/**spring**/
             
         の中で、最後の部分 (``spring``) がスラグです。
 
@@ -80,7 +83,7 @@
         トを使えば、データの表現方法を抽象化して、データ自体から切り離せま
         す。
         
-        :ref:`topics-templates` を参照してください。
+        :doc:`/topics/templates` を参照してください。
         
     view
         ページのレンダリングを実行する関数です。
