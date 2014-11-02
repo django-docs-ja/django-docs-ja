@@ -1,20 +1,35 @@
+.. ==========
+   Validators
+   ==========
 ==========
-Validators
+バリデータ
 ==========
+
+:revision-up-to: 17812 (1.4)
 
 .. versionadded:: 1.2
 .. module:: django.core.validators
-    :synopsis: Validation utilities and base classes
+    :synopsis: 検証ユーティリティとベースクラス
 
-Writing validators
-==================
+.. Writing validators
+   ==================
 
-A validator is a callable that takes a value and raises a
-:exc:`~django.core.exceptions.ValidationError` if it doesn't meet some
-criteria. Validators can be useful for re-using validation logic between
-different types of fields.
+バリデータを書く
+================
 
-For example, here's a validator that only allows even numbers::
+.. A validator is a callable that takes a value and raises a
+   :exc:`~django.core.exceptions.ValidationError` if it doesn't meet some
+   criteria. Validators can be useful for re-using validation logic between
+   different types of fields.
+
+バリデータ (validator) は、一つの値を引数に取り、何らかの条件に合わなければ
+:exc:`~django.core.exceptions.ValidationError` を送出する呼び出し可能オブジェク
+トです。異なる種類のフィールド間で検証処理を再利用するためにバリデータを使うこと
+もできます。
+
+.. For example, here's a validator that only allows even numbers::
+
+たとえば、偶数だけを許可するバリデータは次のようになります::
 
     from django.core.exceptions import ValidationError
 
@@ -22,113 +37,185 @@ For example, here's a validator that only allows even numbers::
         if value % 2 != 0:
             raise ValidationError(u'%s is not an even number' % value)
 
-You can add this to a model field via the field's :attr:`~django.db.models.Field.validators`
-argument::
+.. You can add this to a model field via the field's :attr:`~django.db.models.Field.validators`
+   argument::
+
+これは、フィールドの :attr:`~django.db.models.Field.validators` 引数を使って、
+モデルのフィールドに追加できます::
 
     from django.db import models
 
     class MyModel(models.Model):
         even_field = models.IntegerField(validators=[validate_even])
 
-Because values are converted to Python before validators are run, you can even
-use the same validator with forms::
+.. Because values are converted to Python before validators are run, you can even
+   use the same validator with forms::
+
+バリデータが実行されるより前に値は Python に変換されるので、
+同じバリデータをフォームに対して使うことすら可能です::
 
     from django import forms
 
     class MyForm(forms.Form):
         even_field = forms.IntegerField(validators=[validate_even])
 
-How validators are run
-======================
+.. How validators are run
+   ======================
 
-See the :doc:`form validation </ref/forms/validation>` for more information on
-how validators are run in forms, and :ref:`Validating objects
-<validating-objects>` for how they're run in models. Note that validators will
-not be run automatically when you save a model, but if you are using a
-:class:`~django.forms.ModelForm`, it will run your validators on any fields
-that are included in your form. See the
-:doc:`ModelForm documentation </topics/forms/modelforms>` for information on
-how model validation interacts with forms.
+バリデータの実行方法
+====================
 
-Built-in validators
-===================
+.. See the :doc:`form validation </ref/forms/validation>` for more information on
+   how validators are run in forms, and :ref:`Validating objects
+   <validating-objects>` for how they're run in models. Note that validators will
+   not be run automatically when you save a model, but if you are using a
+   :class:`~django.forms.ModelForm`, it will run your validators on any fields
+   that are included in your form. See the
+   :doc:`ModelForm documentation </topics/forms/modelforms>` for information on
+   how model validation interacts with forms.
 
-The :mod:`django.core.validators` module contains a collection of callable
-validators for use with model and form fields. They're used internally but
-are available for use with your own fields, too. They can be used in addition
-to, or in lieu of custom ``field.clean()`` methods.
+バリデータがフォームでどのように実行されるかについては :doc:`フォームの検証
+</ref/forms/validation>` を、モデルでどのように実行されるかについては
+:ref:`オブジェクトの検証 <validating-objects>` を参照してください。なおモデルの
+保存時にバリデータが自動的に実行されることはありませんが、
+:class:`~django.forms.ModelForm` を使っている場合は、バリデータがフォーム中の
+全フィールドにて実行されます。モデルの検証とフォームとの連携については
+:doc:`ModelForm のドキュメント </topics/forms/modelforms>` を参照してください。
+
+.. Built-in validators
+   ===================
+
+組み込みバリデータ
+==================
+
+.. The :mod:`django.core.validators` module contains a collection of callable
+   validators for use with model and form fields. They're used internally but
+   are available for use with your own fields, too. They can be used in addition
+   to, or in lieu of custom ``field.clean()`` methods.
+
+:mod:`django.core.validators` モジュールにはモデルとフォームフィールドに使える
+呼び出し可能なバリデータが含まれています。それらは内部的に使われるものですが、
+あなたのフィールドで使うこともできます。独自の ``field.clean()`` メソッドに
+加えて、あるいは代わりに使うことも可能です。
 
 ``RegexValidator``
 ------------------
+
 .. class:: RegexValidator([regex=None, message=None, code=None])
 
-    :param regex: If not ``None``, overrides :attr:`regex`. Can be a regular
-        expression string or a pre-compiled regular expression.
-    :param message: If not ``None``, overrides :attr:`.message`.
-    :param code: If not ``None``, overrides :attr:`code`.
+    .. :param regex: If not ``None``, overrides :attr:`regex`. Can be a regular
+           expression string or a pre-compiled regular expression.
+       :param message: If not ``None``, overrides :attr:`.message`.
+       :param code: If not ``None``, overrides :attr:`code`.
+
+    :param regex: ``None`` でなければ、 :attr:`regex` をオーバーライドします。
+        正規表現文字列か、コンパイル済み正規表現オブジェクトを使用できます。
+    :param message: ``None`` でなければ、 :attr:`.message` をオーバーライド
+        します。
+    :param code: ``None`` でなければ、 :attr:`code` をオーバーライドします。
 
     .. attribute:: regex
 
-        The regular expression pattern to search for the provided ``value``,
-        or a pre-compiled regular expression. Raises a
-        :exc:`~django.core.exceptions.ValidationError` with :attr:`message`
-        and :attr:`code` if no match is found. By default, matches any string
-        (including an empty string).
+        .. The regular expression pattern to search for the provided ``value``,
+           or a pre-compiled regular expression. Raises a
+           :exc:`~django.core.exceptions.ValidationError` with :attr:`message`
+           and :attr:`code` if no match is found. By default, matches any string
+           (including an empty string).
+
+        指定された ``value`` を検索するための、正規表現文字列またはコンパイル
+        済み正規表現オブジェクトです。もし何もマッチしなかった場合、
+        :attr:`message` と :attr:`code` を設定した
+        :exc:`~django.core.exceptions.ValidationError` を送出します。デフォルト
+        では、あらゆる文字列にマッチします (空文字列にもマッチします)。
 
     .. attribute:: message
 
-        The error message used by
-        :exc:`~django.core.exceptions.ValidationError` if validation fails.
-        Defaults to ``"Enter a valid value"``.
+        .. The error message used by
+           :exc:`~django.core.exceptions.ValidationError` if validation fails.
+           Defaults to ``"Enter a valid value"``.
+
+        検証に失敗したときに :exc:`~django.core.exceptions.ValidationError` が
+        使うエラーメッセージです。デフォルトでは ``"Enter a valid value"``
+        になります。
 
     .. attribute:: code
 
-        The error code used by :exc:`~django.core.exceptions.ValidationError`
-        if validation fails. Defaults to ``"invalid"``.
+        .. The error code used by :exc:`~django.core.exceptions.ValidationError`
+           if validation fails. Defaults to ``"invalid"``.
+
+        検証に失敗したときに :exc:`~django.core.exceptions.ValidationError` が
+        使うエラーコードです。デフォルトでは ``"invalid"`` になります。
 
 ``URLValidator``
 ----------------
 .. class:: URLValidator([verify_exists=False, validator_user_agent=URL_VALIDATOR_USER_AGENT])
 
-    A :class:`RegexValidator` that ensures a value looks like a URL and
-    optionally verifies that the URL actually exists (i.e., doesn't return a
-    404 status code). Raises an error code of ``'invalid'`` if it doesn't look
-    like a URL, and a code of ``'invalid_link'`` if it doesn't exist.
+    .. A :class:`RegexValidator` that ensures a value looks like a URL and
+       optionally verifies that the URL actually exists (i.e., doesn't return a
+       404 status code). Raises an error code of ``'invalid'`` if it doesn't look
+       like a URL, and a code of ``'invalid_link'`` if it doesn't exist.
 
-    :param verify_exists: Sets :attr:`verify_exists`. Defaults to ``False``.
-    :param validator_user_agent: Sets :attr:`validator_user_agent`. Defaults to
-        :setting:`URL_VALIDATOR_USER_AGENT` or, if that setting is set to a
-        null value, ``"Django (https://www.djangoproject.com/)"``.
+    値が URL に見えること、またオプションでその URL が実際に存在する (つまり 404
+    ステータスコードが返らない) ことを確認する :class:`RegexValidator` です。
+    値が URL に見えない場合はエラーコード ``'invalid'`` で、その URL が実際に
+    存在しない場合はエラーコード ``'invalid_link'`` で送出します。
+
+    .. :param verify_exists: Sets :attr:`verify_exists`. Defaults to ``False``.
+       :param validator_user_agent: Sets :attr:`validator_user_agent`. Defaults to
+           :setting:`URL_VALIDATOR_USER_AGENT` or, if that setting is set to a
+           null value, ``"Django (https://www.djangoproject.com/)"``.
+
+    :param verify_exists: :attr:`verify_exists` を設定します。デフォルトでは
+        ``False`` になります。
+    :param validator_user_agent: :attr:`validator_user_agent` を設定します。
+        デフォルトでは :setting:`URL_VALIDATOR_USER_AGENT` になります。ただし
+        もしその設定に null 値が設定されている場合は
+        ``"Django (https://www.djangoproject.com/)"`` になります。
 
     .. attribute:: verify_exists
 
-        If set to ``True``, this validator checks that the URL actually exists.
+        .. If set to ``True``, this validator checks that the URL actually exists.
+
+        ``True`` に設定すると、このバリデータは URL が実際に存在するか確認
+        します。
 
     .. attribute:: validator_user_agent
 
-        If :attr:`verify_exists` is ``True``, Django uses this value as the
-        "User-agent" for the request.
+        .. If :attr:`verify_exists` is ``True``, Django uses this value as the
+           "User-agent" for the request.
+
+        :attr:`verify_exists` が ``True`` の場合、 Django は URL の存在を確認
+        するリクエストの "User-agent" としてこの値を使用します。
 
 ``validate_email``
 ------------------
 .. data:: validate_email
 
-    A :class:`RegexValidator` instance that ensures a value looks like an
-    email address.
+    .. A :class:`RegexValidator` instance that ensures a value looks like an
+       email address.
+
+    値がメールアドレスに見えることを確認する :class:`RegexValidator` のインスタ
+    ンスです。
 
 ``validate_slug``
 -----------------
 .. data:: validate_slug
 
-    A :class:`RegexValidator` instance that ensures a value consists of only
-    letters, numbers, underscores or hyphens.
+    .. A :class:`RegexValidator` instance that ensures a value consists of only
+       letters, numbers, underscores or hyphens.
+
+    値がアルファベット、数字、アンダースコア、ハイフンだけで構成されていることを
+    確認する :class:`RegexValidator` のインスタンスです。
 
 ``validate_ipv4_address``
 -------------------------
 .. data:: validate_ipv4_address
 
-    A :class:`RegexValidator` instance that ensures a value looks like an IPv4
-    address.
+    .. A :class:`RegexValidator` instance that ensures a value looks like an IPv4
+       address.
+
+    値が IPv4 アドレスのように見えることを確認する :class:`RegexValidator` の
+    インスタンスです。
 
 ``validate_ipv6_address``
 -------------------------
@@ -136,7 +223,9 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 .. data:: validate_ipv6_address
 
-    Uses :mod:`django.utils.ipv6` to check the validity of an IPv6 address.
+    .. Uses :mod:`django.utils.ipv6` to check the validity of an IPv6 address.
+
+    :mod:`django.utils.ipv6` を使って IPv6 アドレスの妥当性を確認します。
 
 ``validate_ipv46_address``
 --------------------------
@@ -144,40 +233,58 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 .. data:: validate_ipv46_address
 
-    Uses both ``validate_ipv4_address`` and ``validate_ipv6_address`` to
-    ensure a value is either a valid IPv4 or IPv6 address.
+    .. Uses both ``validate_ipv4_address`` and ``validate_ipv6_address`` to
+       ensure a value is either a valid IPv4 or IPv6 address.
+
+    ``validate_ipv4_address`` と ``validate_ipv6_address`` の両方を使って
+    値が有効な IPv4 または IPv6 アドレスであることを確認します。
 
 ``validate_comma_separated_integer_list``
 -----------------------------------------
 .. data:: validate_comma_separated_integer_list
 
-    A :class:`RegexValidator` instance that ensures a value is a
-    comma-separated list of integers.
+    .. A :class:`RegexValidator` instance that ensures a value is a
+       comma-separated list of integers.
+
+    値がカンマで区切られた整数のリストであることを確認する
+    :class:`RegexValidator` のインスタンスです。
 
 ``MaxValueValidator``
 ---------------------
 .. class:: MaxValueValidator(max_value)
 
-    Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
-    ``'max_value'`` if ``value`` is greater than ``max_value``.
+    .. Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
+       ``'max_value'`` if ``value`` is greater than ``max_value``.
+
+    ``value`` が ``max_value`` より大きい場合にコード ``'max_value'`` の
+    :exc:`~django.core.exceptions.ValidationError` を送出します。
 
 ``MinValueValidator``
 ---------------------
 .. class:: MinValueValidator(min_value)
 
-    Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
-    ``'min_value'`` if ``value`` is less than ``min_value``.
+    .. Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
+       ``'min_value'`` if ``value`` is less than ``min_value``.
+
+    ``value`` が ``min_value`` より小さい場合にコード ``'min_value'`` の
+    :exc:`~django.core.exceptions.ValidationError` を送出します。
 
 ``MaxLengthValidator``
 ----------------------
 .. class:: MaxLengthValidator(max_length)
 
-    Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
-    ``'max_length'`` if the length of ``value`` is greater than ``max_length``.
+    .. Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
+       ``'max_length'`` if the length of ``value`` is greater than ``max_length``.
+
+    ``value`` の長さが ``max_length`` より長い場合にコード ``'max_length'`` の
+    :exc:`~django.core.exceptions.ValidationError` を送出します。
 
 ``MinLengthValidator``
 ----------------------
 .. class:: MinLengthValidator(min_length)
 
-    Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
-    ``'min_length'`` if the length of ``value`` is less than ``min_length``.
+    .. Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
+       ``'min_length'`` if the length of ``value`` is less than ``min_length``.
+
+    ``value`` の長さが ``min_length`` より短い場合にコード ``'min_length'`` の
+    :exc:`~django.core.exceptions.ValidationError` を送出します。
