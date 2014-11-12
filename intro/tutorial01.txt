@@ -206,7 +206,7 @@ Database の設定
 * :setting:`ENGINE <DATABASE-ENGINE>` --
   ``'django.db.backends.postgresql_psycopg2'``,
   ``'django.db.backends.mysql'``, ``'django.db.backends.sqlite3'`` または
-  ``'django.db.backends.oracle'`` のいすれかです。
+  ``'django.db.backends.oracle'`` のいずれかです。
   他にも :setting:`いくつか <DATABASE-ENGINE>` あります。
 
 * :setting:`NAME`` -- データベースの名前です。 SQLite を使っている場合には
