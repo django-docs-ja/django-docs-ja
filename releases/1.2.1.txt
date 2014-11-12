@@ -1,0 +1,20 @@
+.. ==========================
+   Django 1.2.1 release notes
+   ==========================
+
+===========================
+Django 1.2.1 リリースノート
+===========================
+
+:revision-up-to: 17812 (1.4)
+
+.. Django 1.2.1 was released almost immediately after 1.2.0 to correct two small
+   bugs: one was in the documentation packaging script, the other was a bug_ that
+   affected datetime form field widgets when localisation was enabled.
+
+Django 1.2.1 は 1.2.0 をリリースした直後に 2 つの小さなバグを修正するために
+リリースされました。1 つはドキュメントのパッケージ用スクリプトに存在し、
+もう 1 つはローカライズが有効化された日付フィールド用フォームウィジェットに
+影響を与える バグ_ でした。
+
+.. _バグ: https://code.djangoproject.com/ticket/13560
