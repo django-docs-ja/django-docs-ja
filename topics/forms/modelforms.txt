@@ -122,13 +122,13 @@
 お気付きかもしれませんが、 ``ForeignKey`` や ``ManyToManyField`` といったモ
 デルフィールドは特別扱いされています:
 
-* ``ForeignKey`` は ``django.forms.ModelChoiceField`` で表現されてお
+* ``ForeignKey`` は ``django.forms.ModelChoiceField`` で表現されて
   います。 ``ModelChoiceField`` は、選択肢がモデルの ``QuerySet`` であ
   るような ``ChoiceField`` です。
 
 * ``ManyToManyField`` は ``django.forms.ModelMultipleChoiceField``
-   で表現されています。 ``ModelMultipleChoiceField`` は、選択肢がモデル
-   の ``QuerySet`` であるような ``MultipleChoiceField`` です。
+  で表現されています。 ``ModelMultipleChoiceField`` は、選択肢がモデル
+  の ``QuerySet`` であるような ``MultipleChoiceField`` です。
 
 さらに、生成されるフォームフィールドには、以下の属性が付加されます:
 
@@ -260,15 +260,20 @@ form.errors が True であると評価されると、 ``save()`` は ``ValueErr
 :ref:`モデルオブジェクトを保存したい <ref-models-force-insert>` 場合に便利
 です。 ``commit`` はデフォルトでは  ``True`` に設定されています。
 
-モデルが他のモデルに対する多対多のリレーションをはっている場合、
+モデルが他のモデルに対する多対多のリレーションを持っている場合、
 ``commit=False`` を使うともう一つの副作用があります。多対多のリレーションを
 持つモデルから生成したフォームを保存する際、 Django は多対多のリレーション
 に対するデータをすぐに保存できません。なぜなら、 ``save(commit=False)`` の
 対象であるオブジェクトはまだデータベースに保存されていないため、オブジェク
 トに対する多対多の関係を保存するためのテーブルを更新できないからです。
 
+.. To work around this problem, every time you save a form using ``commit=False``,
+   Django adds a ``save_m2m()`` method to your ``ModelForm`` subclass. After
+   you've manually saved the instance produced by the form, you can invoke
+   ``save_m2m()`` to save the many-to-many form data. For example::
+
 この問題を回避するために、Django は ``commit=False`` でフォームを保存した直
-後に、モデルフォームクラス ``save_m2m()`` メソッドを追加します。フォームの
+後に、 ``save_m2m()`` メソッドを ``ModelForm`` のサブクラスへ追加します。フォーム
 から生成したインスタンスを手動で保存した後で ``save_m2m()`` を呼び出せば、
 多対多のフォームデータを保存できます。以下に例を示します::
 
@@ -299,12 +304,19 @@ form.errors が True であると評価されると、 ``save()`` は ``ValueErr
     # 新たな Author インスタンスを生成して保存。他にはなにもしなくてよい
     >>> new_author = f.save()
 
-``save()`` および ``save_m2m()`` メソッド以外は、 ``ModelForm``
+.. Other than the ``save()`` and ``save_m2m()`` methods, a ``ModelForm`` works
+   exactly the same way as any other ``forms`` form. For example, the
+   ``is_valid()`` method is used to check for validity, the ``is_multipart()``
+   method is used to determine whether a form requires multipart file upload (and
+   hence whether ``request.FILES`` must be passed to the form), etc. See
+   :ref:`binding-uploaded-files` for more information.
+
+``save()`` および ``save_m2m()`` メソッド以外は、 ``ModelForm`` は他の
 ``forms`` で作られたフォームと全く同じように動作します。例えば、
 データの検証は ``is_valid()`` で行えますし、 ``is_multipart()``
 メソッドを使えばフォームがマルチパートのファイルアップロードを要求している
-かどうか (そして ``request.FILES`` をフォームに渡さなければならないかどうか)判
-別できます。詳しくは、 :ref:`binding-uploaded-files` を参照してください。
+かどうか (そして ``request.FILES`` をフォームに渡さなければならないかどうか)
+判別できます。詳しくは、 :ref:`binding-uploaded-files` を参照してください。
 
 モデルの一部のフィールドだけからフォームを生成する
 ---------------------------------------------------
@@ -498,11 +510,11 @@ clean() メソッドのオーバライド
 In this regard, model forms have two specific characteristics when compared to
 forms:
 
-デフォルトの``clean()`` メソッドは、モデルの ``unique`` や
-``unique_together`` に指定した内容に従って、オブジェクトの一意性をチェック
-します。従って、 ``clean()`` をオーバライドして、なおかつデフォルトのバリデー
-ションも行いたいときは、親クラスの ``clean()`` メソッドを必ず呼び出してくだ
-さい。
+デフォルトの``clean()`` メソッドは、モデルの ``unique`` や ``unique_together``
+、あるいは ``unique_for_date|month|year`` に指定した内容に従って、オブジェクトの
+一意性をチェックします。従って、 ``clean()`` をオーバライドして、なおかつ
+デフォルトのバリデーションも行いたいときは、親クラスの ``clean()`` メソッドを
+必ず呼び出してください。
 
 Also, a model form instance bound to a model object will contain a
 ``self.instance`` attribute that gives model form methods access to that
