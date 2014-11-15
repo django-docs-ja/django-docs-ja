@@ -86,7 +86,7 @@ Django のデータベースモデルによく似た方法でフォームのフ�
 ``CharField`` や ``EmailField``, ``BooleanField`` はフィールド型です。
 フィールド型の一覧は :doc:`/ref/forms/fields` を参照してください。
 
-:ref:`ModelForm </topics/forms/modelforms>` を使えば、フォームを使って
+:doc:`ModelForm </topics/forms/modelforms>` を使えば、フォームを使って
 Django のモデルを直接追加したり編集したりしたいときに、モデルと重複する記述
 をせずにすみます。
 
