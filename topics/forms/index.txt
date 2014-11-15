@@ -106,20 +106,20 @@ Django のモデルを直接追加したり編集したりしたいときに、�
                return HttpResponseRedirect('/thanks/') # POST 後のリダイレクト
        else:
            form = ContactForm() # 非束縛フォーム
-   
+
        return render_to_response('contact.html', {
            'form': form,
        })
 
 このパターンには、 3 つのコードパスがあります:
 
-    1. フォームデータが提出されていなければ、非束縛の ``ContactForm`` イン
-       スタンスを生成して、テンプレートに渡します。
-    2. フォームデータが提出されていれば、 ``request.POST`` を使って束縛フォー
-       ムを生成します。入力データのバリデーションに成功したら、フォームデー
-       タを処理して、ユーザを「ありがとう」ページにリダイレクトします。
-    3. フォームデータが提出され、バリデーションに成功しなければ、束縛フォー
-       ムインスタンスをテンプレートに渡します。
+1. フォームデータが提出されていなければ、非束縛の ``ContactForm`` イン
+   スタンスを生成して、テンプレートに渡します。
+2. フォームデータが提出されていれば、 ``request.POST`` を使って束縛フォー
+   ムを生成します。入力データのバリデーションに成功したら、フォームデー
+   タを処理して、ユーザを「ありがとう」ページにリダイレクトします。
+3. フォームデータが提出され、バリデーションに成功しなければ、束縛フォー
+   ムインスタンスをテンプレートに渡します。
 
 **束縛** フォームと **非束縛** フォームの違いはとても重要です。非束縛フォー
 ムには、何らデータが結び付いていません。非束縛フォームをレンダしてユーザに
@@ -193,7 +193,7 @@ Django のモデルを直接追加したり編集したりしたいときに、�
 
   Djangoは使いやすい :doc:`クロスサイトリクエストフォージェリプロテクション
   </ref/contrib/csrf>` を搭載してます. 前述した例のように、 CSRF 保護機能を有
-  効にした POST を経由して送信するとき、テンプレートタグの :ttag:`csrf_token` 
+  効にした POST を経由して送信するとき、テンプレートタグの :ttag:`csrf_token`
   を使うべきです。しかしながら、 CSRF 保護はテンプレート内のフォームに直接紐づ
   いていないため、このタグは、このドキュメント内の以下の例では、省略されてい
   ます。
@@ -298,19 +298,19 @@ Django のモデルを直接追加したり編集したりしたいときに、�
 す。
 
 ``{{ field.label }}``
-    フィールドのラベルです。例 ``Email address`` 
+    フィールドのラベルです。例 ``Email address``
 
 ``{{ field.label_tag }}``
     フィールドの label をHTML の ``<label>`` タグに適した形式にラッピング
-    します。例 ``<label for="id_email">Email address</label>`` 
+    します。例 ``<label for="id_email">Email address</label>``
 
-``{{ field.value }}`` 
+``{{ field.value }}``
     フィールドの値です。例 ``someone@example.com``
 
 ``{{ field.help_text }}``
     フィールドに関連付けられている任意のヘルプテキストです。
 
-``{{ field.errors }}``    
+``{{ field.errors }}``
     このフィールドに一致する複数のバリデーションエラーを含んでいる
     ``<ul class="errorlist">`` が表示されます。
     ``{% for error in field.errors %}`` ループを利用してエラーの表示をカス
@@ -332,7 +332,7 @@ Django のモデルを直接追加したり編集したりしたいときに、�
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 もしテンプレート内で、フォームを手動で表示しているなら、 つまり Django のデフ
-ォルトフォームレイアウトに反対するとき、非表示ではないフィールドより 
+ォルトフォームレイアウトに反対するとき、非表示ではないフィールドより
 ``<input type="hidden">`` フィールドは注意深くを処理するべきです。
 例えば、非表示フィールドは何も表示しないので、エラーメッセージをそのフィールド
 の横に表示した場合、ユーザの混乱の原因になるでしょう。よって、それらの非表示フ
@@ -344,12 +344,12 @@ Django は非表示、表示フィールドに対して、ループを可能に�
 のとおりである。::
 
     <form action="/contact/" method="post">
-         {# Include the hidden fields #}
-         {% for hidden in form.hidden_fields %}
-         {{ hidden }}
-         {% endfor %}
-         {# Include the visible fields #}
-         {% for field in form.visible_fields %}
+        {# Include the hidden fields #}
+        {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+        {% endfor %}
+        {# Include the visible fields #}
+        {% for field in form.visible_fields %}
             <div class="fieldWrapper">
                 {{ field.errors }}
                 {{ field.label_tag }}: {{ field }}
@@ -413,7 +413,7 @@ Django は非表示、表示フィールドに対して、ループを可能に�
    formsets
    modelforms
    media
-   
+
 .. seealso::
 
     :doc:`フォーム API リファレンス </ref/forms/index>`
