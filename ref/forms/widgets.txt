@@ -8,7 +8,7 @@
 
 .. module:: django.forms.widgets
    :synopsis: Django の組み込みフォームウィジェットです。
-   
+
 .. currentmodule:: django.forms
 
 ウィジェットとは、Django で HTML の入力エレメントを表現するためのオブジェク
@@ -45,7 +45,7 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
     Date input as a simple text box: ``<input type='text' ...>``
 
     Takes one optional argument:
-    
+
     .. attribute:: DateInput.format
 
         The format in which this field's initial value will be displayed.
@@ -60,11 +60,11 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
     ``<input type='text' ...>`` です。
 
     Takes one optional argument:
-    
+
     .. attribute:: DateTimeInput.format
-    
+
         The format in which this field's initial value will be displayed.
-    
+
     If no ``format`` argument is provided, the default format is ``'%Y-%m-%d
     %H:%M:%S'``.
 
@@ -73,11 +73,11 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
     Time input as a simple text box: ``<input type='text' ...>``
 
     Takes one optional argument:
-    
+
     .. attribute:: TimeInput.format
-    
+
         The format in which this field's initial value will be displayed.
-    
+
     If no ``format`` argument is provided, the default format is ``'%H:%M:%S'``.
 
     .. versionchanged:: 1.1
@@ -104,16 +104,16 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
 .. class:: SelectMultiple
 
     複数選択の可能なセレクタ: ``<select multiple='multiple'>...</select>``
-    です。 
+    です。
 
     Requires that your field provides :attr:`~Field.choices`.
 
 .. class:: RadioSelect
 
     ラジオボタンのリストです。以下のようにレンダされます:
-    
+
     .. code-block:: html
-    
+
         <ul>
           <li><input type='radio' ...></li>
           ...
@@ -124,9 +124,9 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
 .. class:: CheckboxSelectMultiple
 
     チェックボックスのリストです。以下のようにレンダされます:
-    
+
     .. code-block:: html
-    
+
         <ul>
           <li><input type='checkbox' ...></li>
           ...
@@ -143,7 +143,7 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
 
     Takes two optional arguments, ``date_format`` and ``time_format``, which
     work just like the ``format`` argument for ``DateInput`` and ``TimeInput``.
-    
+
     .. versionchanged:: 1.1
        The ``date_format`` and ``time_format`` arguments were not supported in Django 1.0.
 
