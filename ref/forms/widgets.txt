@@ -4,7 +4,7 @@
 ウィジェット
 ==============
 
-:revision-up-to: 11321 (1.1) unfinished
+:revision-up-to: 17812 (1.4) unfinished
 
 .. module:: django.forms.widgets
    :synopsis: Django の組み込みフォームウィジェットです。
@@ -15,28 +15,57 @@
 トです。ウィジェットは、 HTML のレンダリングや、個々のウィジェットに対応す
 るデータをGET/POST 辞書から抽出する処理を行います。
 
+.. _built-in widgets:
+
+Built-in widgets
+----------------
+
 Django は、基本的な HTML ウィジェットすべてと、よく使われるウィジェットグルー
 プを提供しています:
+
+``Widget``
+~~~~~~~~~~
+
+``TextInput``
+~~~~~~~~~~~~~
 
 .. class:: TextInput
 
     テキスト入力: ``<input type='text' ...>`` です。
 
+``PasswordInput``
+~~~~~~~~~~~~~~~~~
+
 .. class:: PasswordInput
 
     パスワードテキスト入力: ``<input type='password' ...>`` です。
+
+``HiddenInput``
+~~~~~~~~~~~~~~~
 
 .. class:: HiddenInput
 
     hidden ウィジェット: ``<input type='hidden' ...>`` です。
 
+``MultipleHiddenInput``
+~~~~~~~~~~~~~~~~~~~~~~~
+
 .. class:: MultipleHiddenInput
 
     複数の hidden ウィジェット: ``<input type='hidden' ...>`` です。
 
+``FileInput``
+~~~~~~~~~~~~~
+
 .. class:: FileInput
 
     ファイルアップロード: ``<input type='file' ...>`` です。
+
+``ClearableFileInput``
+~~~~~~~~~~~~~~~~~~~~~~
+
+``DateInput``
+~~~~~~~~~~~~~
 
 .. class:: DateInput
 
@@ -51,6 +80,9 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
         The format in which this field's initial value will be displayed.
 
     If no ``format`` argument is provided, the default format is ``'%Y-%m-%d'``.
+
+``DateTimeInput``
+~~~~~~~~~~~~~~~~~
 
 .. class:: DateTimeInput
 
@@ -68,6 +100,9 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
     If no ``format`` argument is provided, the default format is ``'%Y-%m-%d
     %H:%M:%S'``.
 
+``TimeInput``
+~~~~~~~~~~~~~
+
 .. class:: TimeInput
 
     Time input as a simple text box: ``<input type='text' ...>``
@@ -83,13 +118,22 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
     .. versionchanged:: 1.1
        The ``format`` argument was not supported in Django 1.0.
 
+``Textarea``
+~~~~~~~~~~~~
+
 .. class:: Textarea
 
     テキストエリア: ``<textarea>...</textarea>`` です。
 
+``CheckboxInput``
+~~~~~~~~~~~~~~~~~
+
 .. class:: CheckboxInput
 
     チェックボックス: ``<input type='checkbox' ...>`` です。
+
+``Select``
+~~~~~~~~~~
 
 .. class:: Select
 
@@ -97,9 +141,15 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
 
     Requires that your field provides :attr:`~Field.choices`.
 
+``NullBooleanSelect``
+~~~~~~~~~~~~~~~~~~~~~
+
 .. class:: NullBooleanSelect
 
     「不明」, 「はい」, 「いいえ」 を選択肢とするセレクタです。
+
+``SelectMultiple``
+~~~~~~~~~~~~~~~~~~
 
 .. class:: SelectMultiple
 
@@ -107,6 +157,9 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
     です。
 
     Requires that your field provides :attr:`~Field.choices`.
+
+``RadioSelect``
+~~~~~~~~~~~~~~~
 
 .. class:: RadioSelect
 
@@ -121,6 +174,9 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
 
     Requires that your field provides :attr:`~Field.choices`.
 
+``CheckboxSelectMultiple``
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. class:: CheckboxSelectMultiple
 
     チェックボックスのリストです。以下のようにレンダされます:
@@ -132,9 +188,15 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
           ...
         </ul>
 
+``MultiWidget``
+~~~~~~~~~~~~~~~
+
 .. class:: MultiWidget
 
     複数のウィジェットをラップするウィジェットです。
+
+``SplitDateTimeWidget``
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. class:: SplitDateTimeWidget
 
@@ -146,6 +208,32 @@ Django は、基本的な HTML ウィジェットすべてと、よく使われ�
 
     .. versionchanged:: 1.1
        The ``date_format`` and ``time_format`` arguments were not supported in Django 1.0.
+
+``SplitHiddenDateTimeWidget``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. class:: SplitHiddenDateTimeWidget
+
+    Similar to :class:`SplitDateTimeWidget`, but uses :class:`HiddenInput` for
+    both date and time.
+
+.. currentmodule:: django.forms.extras.widgets
+
+``SelectDateWidget``
+~~~~~~~~~~~~~~~~~~~~
+
+.. class:: SelectDateWidget
+
+    Wrapper around three :class:`~django.forms.Select` widgets: one each for
+    month, day, and year. Note that this widget lives in a separate file from
+    the standard widgets.
+
+    Takes one optional argument:
+
+    .. attribute:: SelectDateWidget.years
+
+        An optional list/tuple of years to use in the "year" select box.
+        The default is a list containing the current year and the next 9 years.
 
 ウィジェットの指定
 ------------------
