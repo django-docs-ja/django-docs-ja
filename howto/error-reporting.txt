@@ -402,7 +402,7 @@ Django は、サイトのリンクが切れている (404 "page not found" エ�
 .. method:: SafeExceptionReporterFilter.is_active(self, request)
 
     他のメソッドで実行されるフィルタリングを有効化するなら ``True`` を返しま
-    す。デフォルトでは、 :settings:`DEBUG` が ``False`` の時にフィルタが有効に
+    す。デフォルトでは、 :setting:`DEBUG` が ``False`` の時にフィルタが有効に
     なります。
 
 .. .. method:: SafeExceptionReporterFilter.get_request_repr(self, request)
