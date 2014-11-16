@@ -1,12 +1,13 @@
-.. _ref-models-index:
-
+======
 モデル
 ======
 
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
 
-モデルの API リファレンスです。モデルの解説は :ref:`topics-db-models` を参
-照してください。
+.. Model API reference. For introductory material, see :doc:`/topics/db/models`.
+
+モデルの API リファレンスです。モデルの解説は :doc:`/topics/db/models` を
+参照してください。
 
 .. toctree::
    :maxdepth: 1
