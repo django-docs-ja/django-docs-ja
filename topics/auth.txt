@@ -1,5 +1,3 @@
-.. _topics-auth:
-
 =====================
 Django でのユーザ認証
 =====================
@@ -32,11 +30,11 @@ Django にはユーザ認証システムがついてきます。 Django のユ�
 認証のサポートは Django アプリケーションとして ``django.contrib.auth`` にバ
 ンドルされています。インストールするには、以下のようにします:
 
-    1. :setting:`INSTALLED_APPS` 設定に ``'django.contrib.auth'`` と、
-    ``'django.contrib.contenttypes'`` を加えます。
-    2. ``manage.py syncdb`` を実行します。
+1. :setting:`INSTALLED_APPS` 設定に ``'django.contrib.auth'`` と、
+   ``'django.contrib.contenttypes'`` を加えます。
+2. ``manage.py syncdb`` を実行します。
 
-:djadmin:`django-admin.py startproject<startproject>` が生成するデフォルトの
+:djadmin:`django-admin.py startproject <startproject>` が生成するデフォルトの
 :file:`settings.py` ファイルの :setting:`INSTALLED_APPS` には、簡便のため
 ``'django.contrib.auth'`` が最初から入っています。この場合は、単に
 :djadmin:`manage.py syncdb` するだけでかまいません。 
@@ -142,7 +140,7 @@ API リファレンス
     :class:`~django.contrib.auth.models.User` オブジェクトには ``groups``
     と ``user_permissions`` という二つの多対多のフィールドがあります。この
     関係性のために、 :class:`~django.contrib.auth.models.User` オブジェクト
-    は他の :ref:`Django モデル </topics/db/models>` と同じようにして、関連づ
+    は他の :doc:`Django モデル </topics/db/models>` と同じようにして、関連づ
     けされたオブジェクトにアクセスできます:
 
     .. code-block:: python
@@ -163,11 +161,11 @@ API リファレンス
     .. method:: models.User.is_anonymous()
 
         常に ``False`` を返します。
-	:class:`~django.contrib.auth.models.User` オブジェクトを
-	:class:`~django.contrib.auth.models.AnonymousUser` オブジェクトと
-	区別する手段の一つです。 通常は、
-	:meth:`~django.contrib.auth.models.User.is_authenticated()`` メソッ
-	ドを使うようにしてください。
+        :class:`~django.contrib.auth.models.User` オブジェクトを
+        :class:`~django.contrib.auth.models.AnonymousUser` オブジェクトと
+        区別する手段の一つです。 通常は、
+        :meth:`~django.contrib.auth.models.User.is_authenticated()` メソッ
+        ドを使うようにしてください。
 
     .. method:: models.User.is_authenticated()
 
@@ -179,19 +177,19 @@ API リファレンス
     .. method:: models.User.get_full_name()
 
         :attr:`~django.contrib.auth.models.User.first_name` と
-	:attr:`~django.contrib.auth.models.User.last_name` をスペースでつな
-	げた文字列を返します。 
+        :attr:`~django.contrib.auth.models.User.last_name` をスペースでつな
+        げた文字列を返します。 
 
     .. method:: models.User.set_password(raw_password)
 
         渡された文字列をハッシュ化し、ユーザのパスワードに設定します。
-	:class:`~django.contrib.auth.models.User` オブジェクトの保存は行い
-	ません。
+        :class:`~django.contrib.auth.models.User` オブジェクトの保存は行い
+        ません。
 
     .. method:: models.User.check_password(raw_password)
 
         渡された文字列がこのユーザの正しい文字列ならば ``True`` を返します。
-	(このメソッドは比較時にパスワードのハッシュ処理を行います)
+        (このメソッドは比較時にパスワードのハッシュ処理を行います)
 
     .. method:: models.User.set_unusable_password()
 
@@ -203,8 +201,8 @@ API リファレンス
         :class:`~django.contrib.auth.models.User` オブジェクトを直接保存し
         ません。
 
-	この機能は、 LDAP ディレクトリのような外部の認証ソースを使ってアプ
-	リケーションの認証を行いたい場合に必要です。
+        この機能は、 LDAP ディレクトリのような外部の認証ソースを使ってアプ
+        リケーションの認証を行いたい場合に必要です。
 
     .. method:: models.User.has_usable_password()
 
@@ -215,7 +213,7 @@ API リファレンス
     .. method:: models.User.get_group_permissions(obj=None)
 
         ユーザが自分の属するグループから得ているパーミッションを表す文字列
-	からなるリストを返します。
+        からなるリストを返します。
 
         .. versionadded:: 1.2
 
@@ -225,7 +223,7 @@ API リファレンス
     .. method:: models.User.get_all_permissions(obj=None)
 
         ユーザ自身のもつパーミッションと、ユーザの属するグループのパーミッ
-	ションの両方からなるリストを返します。
+        ションの両方からなるリストを返します。
 
         .. versionadded:: 1.2
 
@@ -275,7 +273,7 @@ API リファレンス
 
         ユーザのサイト固有のプロファイル (site-specific profile) を返します。
         プロファイルを使えないサイトでは 
-	:exc:`django.contrib.auth.models.SiteProfileNotAvailable` を送出し
+        :exc:`django.contrib.auth.models.SiteProfileNotAvailable` を送出し
         ます。もしくはユーザがプロファイルを持っていなければ
         :exc:`django.core.exceptions.ObjectDoesNotExtis` を送出します。
         サイト固有のユーザプロファイルを定義するには、後述の
@@ -301,7 +299,7 @@ API リファレンス
 
         ユーザを生成して保存し、生成された
         :class:`~django.contrib.auth.models.User` を返します。
-	:attr:`~django.contrib.auth.models.User.username`,
+        :attr:`~django.contrib.auth.models.User.username`,
         :attr:`~django.contrib.auth.models.User.email`
         は、自動的に小文字に変更され、
         :attr:`~django.contrib.auth.models.User.password` は指定した値にな
@@ -475,9 +473,9 @@ Bcrypt をデフォルトのアルゴリズムで使うには、以下に従っ�
             'django.contrib.auth.hashers.CryptPasswordHasher',
         )
 
-  (リストの中の他の項目は、そのままにしておいてください、または
-  Django がパスワードをアップグレードできないようにしてください。
-  下部を見てください)
+   (リストの中の他の項目は、そのままにしておいてください、または
+   Django がパスワードをアップグレードできないようにしてください。
+   下部を見てください)
 
 今、Django は Bcrypt をデフォルトの
 パスワード保存アルゴリズムとして使おうとします。
@@ -600,7 +598,7 @@ PDKDF2 と、 bcrypt アルゴリズムは、沢山のイテレーションと�
 :setting:`INSTALLED_APPS` に ``'django.contrib.auth'`` を追加した直後に
 :djadmin:`manage.py syncdb <syncdb>` を実行すると、スーパユーザの作成を促す
 プロンプトを表示します。後でスーパユーザを作成したい場合には、以下のように
-コマンドラインユーティリティを使います。
+コマンドラインユーティリティを使います::
 
     manage.py createsuperuser --username=joe --email=joe@example.com
 
@@ -631,7 +629,7 @@ PDKDF2 と、 bcrypt アルゴリズムは、沢山のイテレーションと�
 :class:`~django.contrib.auth.models.User` モデルへの ``user`` という名前で
 :class:`~django.db.models.Field.OneToOneField` を持ったモデルを定義します。
 :class:`~django.db.models.Field.OneToOneField` には
-`~django.contrib.auth.models.User` に対してユーザごとにモデルが一つだけ生成
+:class:`~django.contrib.auth.models.User` に対してユーザごとにモデルが一つだけ生成
 されるようにします。例をあげると::
 
     from django.contrib.auth.models import User
@@ -907,7 +905,7 @@ auth 認証のフレームワークは二つ :doc:`signals </topics/signals>`
 
 ``user``
     ログアウトしたユーザのインスタンスか、もし認証されていな
-    ければ `None`` を返します。
+    ければ ``None`` を返します。
 
 
 ログインユーザだけがアクセスできるように制限をかける
@@ -1160,9 +1158,9 @@ login_required デコレータ
 
     **オプション引数:**
 
-        * ``login_url``: ログインページへのリダイレクト先です。この引数を省
-          略すると、デフォルト値の :setting:`settings.LOGIN_URL <LOGIN_URL>`
-	  を使います。
+    * ``login_url``: ログインページへのリダイレクト先です。この引数を省
+      略すると、デフォルト値の :setting:`settings.LOGIN_URL <LOGIN_URL>`
+      を使います。
 
 .. function:: password_change(request[, template_name, post_change_redirect])
 
@@ -1177,7 +1175,7 @@ login_required デコレータ
     * ``post_change_redirect``: パスワードの変更に成功した場合の
       URLリダイレクト先です。
 
-        .. versionadded:: 1.2
+      .. versionadded:: 1.2
 
     * ``password_change_form``: "パスワードの変更" フォームのカスタマイズ
       は、 ``user`` のキーワード引数を受け取らなくてはいけません。
@@ -1193,7 +1191,7 @@ login_required デコレータ
 
     ユーザがパスワードを変更した後のページを表示するためのビューです。
 
-    ** URL name:** ``password_change_done``
+    **URL name:** ``password_change_done``
 
     **オプション引数:**
 
@@ -1215,7 +1213,7 @@ login_required デコレータ
        を見てください)は、パスワードのリセットをリクエストできません。
        外部の認証ソース、例えばLDAPのようなものを使う際の悪用を防ぐためです。
 
-    ** URL name:** ``password_reset``
+    **URL name:** ``password_reset``
 
     **オプション引数:**
 
@@ -1257,7 +1255,7 @@ login_required デコレータ
     * ``form``: パスワードリセットのためのフォームです。
       (上にある `password_reset_form`` を見てください)
 
-    ** Email テンプレートコンテキスト: **
+    **Email テンプレートコンテキスト:**
 
     * ``email`` : ``user.email`` の別名です。
 
@@ -1304,9 +1302,9 @@ login_required デコレータ
 
     **オプション引数:**
 
-        * ``template_name``: パスワードリセット完了ページのテンプレートの完
-          全な名前です。この引数を省略すると、デフォルト値の
-	  :file:`registration/password_reset_done.html` を使います。
+    * ``template_name``: パスワードリセット完了ページのテンプレートの完
+      全な名前です。この引数を省略すると、デフォルト値の
+      :file:`registration/password_reset_done.html` を使います。
 
 .. function:: password_reset_confirm(request[, uidb36, token, template_name, token_generator, set_password_form, post_reset_redirect])
 
@@ -1788,7 +1786,7 @@ API リファレンス
 .. attribute:: Group.name
 
     必須です。 80文字以下です。どんな文字でも使えます。例えば:
-    `` 'Awesome Users' `` このように。
+    ``'Awesome Users'`` このように。
 
 .. attribute:: Group.permissions
 
@@ -1819,14 +1817,14 @@ API リファレンス
 スキームをオーバライドしたり、デフォルトのシステムを他のシステムと並列して
 動作させたりできます。
 
-:doc:`authentication backend reference </ref/authbackends>` を見てください
+:doc:`authentication backend reference </ref/authbackends>` を見てください。
 もっと詳しい情報が載っています。
 
 他の認証バックエンドを指定する
 ------------------------------
 
 舞台裏では、 Django は認証に使う「認証バックエンド」のリストを維持していま
-す。前述の:ref:`「ユーザをログインさせる」
+す。前述の :ref:`「ユーザをログインさせる」
 <how-to-log-a-user-in>` で説明したように
 :func:`django.contrib.auth.authenticate()` を呼び出すと、Django は全ての認
 証バックエンドにわたって認証テストを試みます。最初の認証メソッドに失敗する
