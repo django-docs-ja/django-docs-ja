@@ -1,8 +1,6 @@
-.. _ref-contrib-auth:
-
 ``django.contrib.auth``
 =======================
 
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
 
-:ref:`topics-auth` を参照してください。
+:doc:`/topics/auth` を参照してください。
