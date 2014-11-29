@@ -100,11 +100,11 @@ Django ドキュメント
 * **ビューの基本:**
   :doc:`URLconf とは <topics/http/urls>` |
   :doc:`ビュー関数とは <topics/http/views>` |
-  :doc:`便利なショートカット <topics/http/shortcuts>`
+  :doc:`便利なショートカット <topics/http/shortcuts>` |
   :doc:`デコレータ <topics/http/decorators>`
 
 * **リファレンス:**
-  :doc:`リクエスト/レスポンスオブジェクト <ref/request-response>`
+  :doc:`リクエスト/レスポンスオブジェクト <ref/request-response>` |
   :doc:`テンプレートレスポンスオブジェクト <ref/template-response>`
 
 * **ファイルアップロードに対応するには:**
