@@ -30,15 +30,31 @@ Django にはユーザ認証システムがついてきます。 Django のユ�
 認証のサポートは Django アプリケーションとして ``django.contrib.auth`` にバ
 ンドルされています。インストールするには、以下のようにします:
 
+.. 1. Put ``'django.contrib.auth'`` and ``'django.contrib.contenttypes'`` in
+      your :setting:`INSTALLED_APPS` setting.
+      (The :class:`~django.contrib.auth.models.Permission` model in
+      :mod:`django.contrib.auth` depends on :mod:`django.contrib.contenttypes`.)
+
 1. :setting:`INSTALLED_APPS` 設定に ``'django.contrib.auth'`` と、
    ``'django.contrib.contenttypes'`` を加えます。
+   (:mod:`django.contrib.auth` モジュールのモデル
+   :class:`~django.contrib.auth.models.Permission` は
+   :mod:`django.contrib.contenttypes` に依存します)
 2. ``manage.py syncdb`` を実行します。
+
+.. Note that the default :file:`settings.py` file created by
+   :djadmin:`django-admin.py startproject <startproject>` includes
+   ``'django.contrib.auth'`` and ``'django.contrib.contenttypes'`` in
+   :setting:`INSTALLED_APPS` for convenience.  If your :setting:`INSTALLED_APPS`
+   already contains these apps, feel free to run :djadmin:`manage.py syncdb
+   <syncdb>` again; you can run that command as many times as you'd like, and each
+   time it'll only install what's needed.
 
 :djadmin:`django-admin.py startproject <startproject>` が生成するデフォルトの
 :file:`settings.py` ファイルの :setting:`INSTALLED_APPS` には、簡便のため
 ``'django.contrib.auth'`` が最初から入っています。この場合は、単に
-:djadmin:`manage.py syncdb` するだけでかまいません。
-:djadmin:`manage.py syncdb` はその都度必要なものだけをインストールするので、
+:djadmin:`manage.py syncdb <syncdb>` するだけでかまいません。
+このコマンドはその都度必要なものだけをインストールするので、
 何度実行してもかまいません。
 
 :djadmin:`syncdb` コマンドは必要なデータベーステーブルを作成し、インストー
@@ -530,7 +546,7 @@ PDKDF2 と、 bcrypt アルゴリズムは、沢山のイテレーションと�
         )
 
 
-これだけで -- DJango は PBKDF2 を使ってパスワードを保存する時に、もっと
+これだけで -- Django は PBKDF2 を使ってパスワードを保存する時に、もっと
 沢山のイテレーションを用いれるようになりました。
 
 パスワードのアップグレード
@@ -542,7 +558,7 @@ PDKDF2 と、 bcrypt アルゴリズムは、沢山のイテレーションと�
 なるということです、そしてまた新しく（そしてより良い）パスワードの
 保持アルゴリズムが作られるたびにそちらへ切り替えられるということです。
 
-しかしながら、 DJango がアップグレードできるパスワードはアルゴリズムとして
+しかしながら、 Django がアップグレードできるパスワードはアルゴリズムとして
 :setting:`PASSWORD_HASHERS` のなかで宣言されているものだけです。新しい
 システムにアップグレードする時には、 *以前使っていたものを削除しない* こと
 を気をつけてください。もし削除してしまうと、消去してしまったアルゴリズムを
@@ -1118,7 +1134,7 @@ login_required デコレータ
 
     **URL name:** ``logout``
 
-    :doc:`the URL documentation </topics/http/urls>` を見てください。もっと
+    :doc:`URL のドキュメント </topics/http/urls>` を見てください。もっと
     詳しく URL パターンを使う上での情報が載っています。
 
 
@@ -1345,7 +1361,7 @@ login_required デコレータ
 
    ユーザにパスワードの変更が成功したということを伝えるためのビューです。
 
-   ** URL name:** ``password_reset_complete``
+   **URL name:** ``password_reset_complete``
 
    **オプション引数:**
 
@@ -1385,7 +1401,7 @@ login_required デコレータ
 合のために、認証システムは組み込みのフォームを
 :mod:`django.contrib.auth.forms` でいくつか提供しています:
 
-.. class:: AdminPasswordChangeForm`
+.. class:: AdminPasswordChangeForm
 
     Admin インタフェースでユーザのパスワード変更に使われているフォームです。
 
