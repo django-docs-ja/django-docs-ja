@@ -1,10 +1,8 @@
-.. _ref-contrib-index:
+====================
+"contrib" パッケージ
+====================
 
-=============================
-"django.contrib" 下のアドオン
-=============================
-
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
 
 Django は Python の `"batteries included" 哲学`_ を目指しています。 Django
 には Web 開発における課題を解くための様々な外部オプションツールがついてきま
@@ -18,10 +16,10 @@ Django は Python の `"batteries included" 哲学`_ を目指しています。
 
     これらのアドオンの大半、特にモデルやテンプレートタグの定義が入っている
     アドオンを使うには、パッケージ名 (例えば ``'django.contrib.admin'``) を
-    ``INSTALLED_APPS`` 設定に追加して、 ``manage.py syncdb`` を再度実行する
-    必要があります。
+    :setting:`INSTALLED_APPS` 設定に追加して、 ``manage.py syncdb`` を
+    再度実行する必要があります。
 
-.. _`"batteries included" 哲学`: http://python.jp/doc/release/tut/node12.html#batteries-included                                                
+.. _`"batteries included" 哲学`: http://python.jp/doc/release/tutorial/stdlib.html#batteries-included
 
 .. toctree::
    :maxdepth: 1
@@ -34,11 +32,15 @@ Django は Python の `"batteries included" 哲学`_ を目指しています。
    databrowse
    flatpages
    formtools/index
+   gis/index
    humanize
    localflavor
+   markup
+   messages
    redirects
    sitemaps
    sites
+   staticfiles
    syndication
    webdesign
 
@@ -46,25 +48,24 @@ admin
 =====
 
 Django の自動化管理インタフェースです。詳しくは
-:ref:`チュートリアルその 2 <intro-tutorial02>` と
-:ref:`admin のドキュメント <ref-contrib-admin>` を参照してください。
+:doc:`チュートリアルその 2 </intro/tutorial02>` と
+:doc:`admin のドキュメント </ref/contrib/admin/index>` を参照してください。
 
 auth_ および contenttypes_ パッケージをインストールしておく必要があります。
 
 auth
 ====
 
-Django の認証フレームワークです。詳しくは :ref:`topics-auth` を参照して下さ
+Django の認証フレームワークです。詳しくは :doc:`/topics/auth` を参照して下さ
 い。
 
 comments
 ========
 
-.. versionchanged:: 1.0
-   comments アプリケーションは書き直されました。アップグレード方法は
-   :ref:`ref-contrib-comments-upgrade` を参照してください。
+.. A simple yet flexible comments system. See :doc:`/ref/contrib/comments/index`.
 
-:ref:`ref-contrib-comments-index` を参照してください。
+シンプルかつ柔軟なコメントシステムです。 :doc:`/ref/contrib/comments/index`
+を参照してください。
 
 contenttypes
 ============
@@ -72,7 +73,7 @@ contenttypes
 コンテンツの「タイプ」をフックしするための軽量フレームワークです。
 コンテンツタイプは、インストールされている Django の個々のモデルを指します。
 
-:ref:`contenttypes のドキュメント <ref-contrib-contenttypes>` を参照してください。
+:doc:`contenttypes のドキュメント </ref/contrib/contenttypes>` を参照してください。
 
 csrf
 ====
@@ -80,7 +81,7 @@ csrf
 クロスサイトリクエストフォージェリ (Cross Site Request Forgeries) を阻止す
 るためのミドルウェアです。
 
-:ref:`csrf のドキュメント <ref-contrib-csrf>` を参照してください。
+:doc:`csrf のドキュメント </ref/contrib/csrf>` を参照してください。
 
 
 flatpages
@@ -89,7 +90,7 @@ flatpages
 「フラット (flat) な」 HTML コンテンツをデータベースで扱うためのフレームワー
 クです。
 
-:ref:`flatpages のドキュメント <ref-contrib-flatpages>` を参照してください。
+:doc:`flatpages のドキュメント </ref/contrib/flatpages>` を参照してください。
 
 sites_ パッケージもインストールしておく必要があります。
 
@@ -105,16 +106,29 @@ django.contrib.formtools.preview
 「 HTML フォームを表示し、必ずプレビューを行ってからフォームデータを提出す
 る」というワークフローを抽象化したものです。
 
-:ref:`フォームプレビューのドキュメント <ref-contrib-formtools-form-preview>`
+:doc:`フォームプレビューのドキュメント </ref/contrib/formtools/form-preview>`
 を参照してください。
 
 django.contrib.formtools.wizard
---------------------------------
+-------------------------------
 
 フォームを複数の Web ページにわたるように分割します。
 
-:ref:`フォームウィザードのドキュメント <ref-contrib-formtools-form-wizard>`
+:doc:`フォームウィザードのドキュメント </ref/contrib/formtools/form-wizard>`
 を参照してください。
+
+gis
+====
+
+.. A world-class geospatial framework built on top of Django, that enables
+   storage, manipulation and display of spatial data.
+
+空間情報の保存、操作、表示を実現する、Django の上に構築された世界クラスの
+地理空間情報フレームワークです。
+
+.. See the :doc:`/ref/contrib/gis/index` documentation for more.
+
+詳細については :doc:`/ref/contrib/gis/index` のドキュメントを参照してください。
 
 humanize
 ========
@@ -122,7 +136,7 @@ humanize
 データに「人間くささ (human touch)」を与えるための Django テンプレートフィ
 ルタです。
 
-:ref:`humanize のドキュメント <ref-contrib-humanize>` を参照してください。
+:doc:`humanize のドキュメント </ref/contrib/humanize>` を参照してください。
 
 localflavor
 ===========
@@ -131,49 +145,49 @@ localflavor
 例えば、 ``django.contrib.localflavor.us.forms`` には、米国の郵便番号
 (U.S. zip code) を検証するための ``USZipCodeField`` が入っています。
 
-:ref:`localflavor のドキュメント <ref-contrib-localflavor>` を参照してくだ
+:doc:`localflavor のドキュメント </ref/contrib/localflavor>` を参照してくだ
 さい。
-
-.. _ref-contrib-markup:
 
 markup
 ======
 
-テンプレートフィルタのコレクションです。以下の 3 つのマークアップ言語に対す
-るフィルタを実装しています:
+.. A collection of template filters that implement common markup languages
 
-    * ``textile`` -- `Textile`_ 用の実装です
-    * ``markdown``  -- `Markdown`_ 用の実装です
-    * ``restructuredtext`` -- `ReST (ReStructured Text)`_ 用の実装です
+一般的なマークアップ言語を実装したテンプレートフィルタのコレクションです。
 
-どのフィルタも、各マークアップ言語で書かれたテキストの入った文字列を引数に
-とり、マークアップ処理済みのテキストの入った文字列を返します。例えば、
-``textile`` フィルタは Textile フォーマットで書かれたテキストを HTML に変換
-します。
+.. See the :doc:`markup documentation </ref/contrib/markup>`.
 
-フィルタを有効にするには、 ``'django.contrib.markup'`` を
-:setting:`INSTALLED_APPS` 設定に追加します。その上で ``{% load markup %}``
-をテンプレートに追加すれば、フィルタを使えるようになります。詳細は
-``django/contrib/markup/templatetags/markup.py`` のソースコードを参
-照してください。
+:doc:`markup のドキュメント </ref/contrib/markup>` を参照してください。
 
-.. _Textile: http://en.wikipedia.org/wiki/Textile_%28markup_language%29
-.. _Markdown: http://en.wikipedia.org/wiki/Markdown
-.. _ReST (ReStructured Text): http://en.wikipedia.org/wiki/ReStructuredText
+messages
+========
+
+.. versionchanged:: 1.2
+    messages フレームワークが追加されました。
+
+.. A framework for storing and retrieving temporary cookie- or session-based
+   messages
+
+クッキーまたはセッションベースの、一時的なメッセージを格納・取得する
+フレームワークです。
+
+.. See the :doc:`messages documentation </ref/contrib/messages>`.
+
+:doc:`messages のドキュメント </ref/contrib/messages>` を参照してください。
 
 redirects
 =========
 
 リダイレクトを管理するためのフレームワークです。
 
-:ref:`redirects のドキュメント <ref-contrib-redirects>` を参照してください。
+:doc:`redirects のドキュメント </ref/contrib/redirects>` を参照してください。
 
 sessions
 ========
 
 セッション管理のためのフレームワークです。
 
-:ref:`セッションのドキュメント <topics-http-sessions>` を参照してください。
+:doc:`セッションのドキュメント </topics/http/sessions>` を参照してください。
 
 sites
 =====
@@ -182,14 +196,14 @@ sites
 るための軽量フレームワークです。このフレームワークを使うと、オブジェクトを
 特定の (一つまたは複数の) サイトに関連づけできます。
 
-:ref:`sites のドキュメント <ref-contrib-sites>` を参照してください。
+:doc:`sites のドキュメント </ref/contrib/sites>` を参照してください。
 
 sitemaps
 ========
 
 Google サイトマップ XML ファイルを生成するためのフレームワークです。
 
-:ref:`sitemaps のドキュメント <ref-contrib-sitemaps>` を参照してください。
+:doc:`sitemaps のドキュメント </ref/contrib/sitemaps>` を参照してください。
 
 syndication
 ===========
@@ -197,7 +211,7 @@ syndication
 RSS および Atom 形式の配信フィード (syndication feed) をごく簡単に生成する
 ためのフレームワークです。
 
-:ref:`配信フィードフレームワークのドキュメント <ref-contrib-syndication>`
+:doc:`配信フィードフレームワークのドキュメント </ref/contrib/syndication>`
 を参照してください。
 
 webdesign
@@ -205,7 +219,7 @@ webdesign
 
 Web の *開発者* ではなく *デザイナ* のためのヘルパやユーティリティです。
 
-:ref:`webdesign のドキュメント <ref-contrib-webdesign>` を参照してください。
+:doc:`webdesign のドキュメント </ref/contrib/webdesign>` を参照してください。
 
 その他のアドオン
 =================
