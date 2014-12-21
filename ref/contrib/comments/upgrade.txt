@@ -1,10 +1,8 @@
-.. _ref-contrib-comments-upgrade:
-
 ===============================================
 Django の以前のコメントシステムからの移行
 ===============================================
 
-:revision-up-to: 11321 (1.1) unfinished
+:revision-up-to: 17812 (1.4) unfinished
 
 Django の以前のバージョンには、もう撤廃された、ドキュメント化されていないコ
 メントシステムがありました。このフレームワークをリバースエンジニアリングし
@@ -15,8 +13,8 @@ Django の以前のバージョンには、もう撤廃された、ドキュメ�
 
     * 新しいシステムにはドキュメントがあります。
     
-    * 新しいシステムは、 :ref:`forms <topics-forms-index>` や
-      :ref:`modelforms <topics-forms-modelforms>` のような新しく Django に
+    * 新しいシステムは、 :doc:`forms </topics/forms/index>` や
+      :doc:`modelforms </topics/forms/modelforms>` のような新しく Django に
       登場した機能を使っています。
 
     * コメントモデルは以前は ``FreeComment`` と ``Comment`` モデルに分かれ
@@ -32,12 +30,14 @@ Django の以前のバージョンには、もう撤廃された、ドキュメ�
       ``comments/form.html`` テンプレートを使ってフォームをレンダする
       ``{% render_comment_form %}`` の二つのタグが追加されました。
 
-    * The way comments are include in your URLconf have changed; you'll need to
-      replace::
+    .. * The way comments are include in your URLconf have changed; you'll need to
+         replace::
     
+    * URLconf へのインクルード方法が変わりました。次のように書いていたところを::
+
             (r'^comments/', include('django.contrib.comments.urls.comments')),
       
-      with::
+      次のように書き換えてください::
 
             (r'^comments/', include('django.contrib.comments.urls')),
 
@@ -46,7 +46,7 @@ Django の以前のバージョンには、もう撤廃された、ドキュメ�
 
 コメントシステムのデータモデルは、新しいモデルで変更され、テーブルの名前も
 代わりました。既存のデータを新たなコメントシステムに移す前に、
-:ref:`クイックスタートガイド <ref-contrib-comments-index>` に従って新たなコ
+:doc:`クイックスタートガイド </ref/contrib/comments/index>` に従って新たなコ
 メントシステムをインストールし、適切なテーブルを生成しておいてください。
 
 データを新たなコメントシステムに移行するには、以下のような SQL を直接実行し
