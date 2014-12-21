@@ -1,53 +1,53 @@
-===============================================
+=========================================
 Django の以前のコメントシステムからの移行
-===============================================
+=========================================
 
-:revision-up-to: 17812 (1.4) unfinished
+:revision-up-to: 17812 (1.4) finished
 
-Django の以前のバージョンには、もう撤廃された、ドキュメント化されていないコ
-メントシステムがありました。このフレームワークをリバースエンジニアリングし
-て使っていたユーザは、新たなコメントシステムに移行する必要があります。この
-ガイドでは、コメントシステムの移行方法を解説しています。
+Django の以前のバージョンには、もう撤廃された、ドキュメント化されていない
+コメントシステムがありました。このフレームワークをリバースエンジニアリング
+して使っていたユーザは、新たなコメントシステムに移行する必要があります。
+このガイドでは、コメントシステムの移行方法を解説しています。
 
 まず、新旧のコメントシステムの違いを示します:
 
-    * 新しいシステムにはドキュメントがあります。
-    
-    * 新しいシステムは、 :doc:`forms </topics/forms/index>` や
-      :doc:`modelforms </topics/forms/modelforms>` のような新しく Django に
-      登場した機能を使っています。
+* 新しいシステムにはドキュメントがあります。
 
-    * コメントモデルは以前は ``FreeComment`` と ``Comment`` モデルに分かれ
-      ていましたが、 ``Comment`` に統合されました。
+* 新しいシステムは、 :doc:`forms </topics/forms/index>` や
+  :doc:`modelforms </topics/forms/modelforms>` のような新しく Django に
+  登場した機能を使っています。
 
-    * コメントに "email" および "URL" フィールドが追加されました。
+* コメントモデルは以前は ``FreeComment`` と ``Comment`` モデルに分かれ
+  ていましたが、 ``Comment`` に統合されました。
 
-    * レーティング (rating)、写真 (photo)、カルマ (karma) といった機能がな
-      くなりました。これらは World Online でしか使っていなかったからです。
+* コメントに "email" および "URL" フィールドが追加されました。
 
-    * ``{% comment_form %}`` タグがなくなりました。その代り、新たなコメント
-      のポストに使うフォームを返す ``{% get_comment_form %}`` と、
-      ``comments/form.html`` テンプレートを使ってフォームをレンダする
-      ``{% render_comment_form %}`` の二つのタグが追加されました。
+* レーティング (rating)、写真 (photo)、カルマ (karma) といった機能がな
+  くなりました。これらは World Online でしか使っていなかったからです。
 
-    .. * The way comments are include in your URLconf have changed; you'll need to
-         replace::
-    
-    * URLconf へのインクルード方法が変わりました。次のように書いていたところを::
+* ``{% comment_form %}`` タグがなくなりました。その代り、新たなコメント
+  のポストに使うフォームを返す ``{% get_comment_form %}`` と、
+  ``comments/form.html`` テンプレートを使ってフォームをレンダする
+  ``{% render_comment_form %}`` の二つのタグが追加されました。
 
-            (r'^comments/', include('django.contrib.comments.urls.comments')),
-      
-      次のように書き換えてください::
+.. * The way comments are include in your URLconf have changed; you'll need to
+     replace::
 
-            (r'^comments/', include('django.contrib.comments.urls')),
+* URLconf へのインクルード方法が変わりました。次のように書いていたところを::
+
+        (r'^comments/', include('django.contrib.comments.urls.comments')),
+
+  次のように書き換えてください::
+
+        (r'^comments/', include('django.contrib.comments.urls')),
 
 データの移行
---------------
+------------
 
 コメントシステムのデータモデルは、新しいモデルで変更され、テーブルの名前も
-代わりました。既存のデータを新たなコメントシステムに移す前に、
-:doc:`クイックスタートガイド </ref/contrib/comments/index>` に従って新たなコ
-メントシステムをインストールし、適切なテーブルを生成しておいてください。
+変わりました。既存のデータを新たなコメントシステムに移す前に、
+:doc:`クイックスタートガイド </ref/contrib/comments/index>` に従って新たな
+コメントシステムをインストールし、適切なテーブルを生成しておいてください。
 
 データを新たなコメントシステムに移行するには、以下のような SQL を直接実行し
 てください:
@@ -56,7 +56,7 @@ Django の以前のバージョンには、もう撤廃された、ドキュメ�
 
     BEGIN;
 
-    INSERT INTO django_comments 
+    INSERT INTO django_comments
         (content_type_id, object_pk, site_id, user_name, user_email, user_url,
         comment, submit_date, ip_address, is_public, is_removed)
     SELECT
@@ -64,21 +64,21 @@ Django の以前のバージョンには、もう撤廃された、ドキュメ�
         submit_date, ip_address, is_public, not approved
     FROM comments_freecomment;
 
-    INSERT INTO django_comments 
+    INSERT INTO django_comments
         (content_type_id, object_pk, site_id, user_id, user_name, user_email,
         user_url, comment, submit_date, ip_address, is_public, is_removed)
-    SELECT 
+    SELECT
         content_type_id, object_id, site_id, user_id, '', '', '', comment,
         submit_date, ip_address, is_public, is_removed
     FROM comments_comment;
 
     UPDATE django_comments SET user_name = (
-        SELECT username FROM auth_user 
+        SELECT username FROM auth_user
         WHERE django_comments.user_id = auth_user.id
     ) WHERE django_comments.user_id is not NULL;
     UPDATE django_comments SET user_email = (
-        SELECT email FROM auth_user 
+        SELECT email FROM auth_user
         WHERE django_comments.user_id = auth_user.id
     ) WHERE django_comments.user_id is not NULL;
-    
+
     COMMIT;
