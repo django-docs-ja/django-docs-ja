@@ -1,82 +1,130 @@
-===========================
-The built-in comment models
-===========================
+.. ===========================
+   The built-in comment models
+   ===========================
 
-:revision-up-to: 17812 (1.4) unfinished
+========================
+組み込みのコメントモデル
+========================
+
+:revision-up-to: 17812 (1.4)
 
 .. module:: django.contrib.comments.models
    :synopsis: The built-in comment models
 
 .. class:: Comment
 
-    Django's built-in comment model. Has the following fields:
+    .. Django's built-in comment model. Has the following fields:
+
+    Django の組み込みコメントモデルです。次のフィールドを持ちます:
 
     .. attribute:: content_object
 
-        A :class:`~django.contrib.contettypes.generic.GenericForeignKey`
-        attribute pointing to the object the comment is attached to. You can use
-        this to get at the related object (i.e. ``my_comment.content_object``).
+        .. A :class:`~django.contrib.contettypes.generic.GenericForeignKey`
+           attribute pointing to the object the comment is attached to. You can use
+           this to get at the related object (i.e. ``my_comment.content_object``).
 
-        Since this field is a
-        :class:`~django.contrib.contettypes.generic.GenericForeignKey`, it's
-        actually syntactic sugar on top of two underlying attributes, described
-        below.
+        コメントが結びつけられたオブジェクトを指す
+        :class:`~django.contrib.contettypes.generic.GenericForeignKey`
+        属性です。これを使うことで関連づけられたオブジェクトを取得できます
+        (たとえば ``my_comment.content_object``)。
+
+        .. Since this field is a
+           :class:`~django.contrib.contettypes.generic.GenericForeignKey`, it's
+           actually syntactic sugar on top of two underlying attributes, described
+           below.
+
+        このフィールドは
+        :class:`~django.contrib.contettypes.generic.GenericForeignKey` なので、
+        実際には以下で説明する 2 つの属性のシンタックスシュガーです。
 
     .. attribute:: content_type
 
-        A :class:`~django.db.models.ForeignKey` to
-        :class:`~django.contrib.contenttypes.models.ContentType`; this is the
-        type of the object the comment is attached to.
+        .. A :class:`~django.db.models.ForeignKey` to
+           :class:`~django.contrib.contenttypes.models.ContentType`; this is the
+           type of the object the comment is attached to.
+
+        :class:`~django.contrib.contenttypes.models.ContentType` への
+        :class:`~django.db.models.ForeignKey` です。これはコメントが
+        結びつけられたオブジェクトのタイプです。
 
     .. attribute:: object_pk
 
-        A :class:`~django.db.models.TextField` containing the primary
-        key of the object the comment is attached to.
+        .. A :class:`~django.db.models.TextField` containing the primary
+           key of the object the comment is attached to.
+        
+        コメントが関連づけられたオブジェクトのプライマリキーを含んだ
+        :class:`~django.db.models.TextField` です。
 
     .. attribute:: site
 
-        A :class:`~django.db.models.ForeignKey` to the
-        :class:`~django.contrib.sites.models.Site` on which the comment was
-        posted.
+        .. A :class:`~django.db.models.ForeignKey` to the
+           :class:`~django.contrib.sites.models.Site` on which the comment was
+           posted.
+
+        コメントが投稿された :class:`~django.contrib.sites.models.Site` への
+        :class:`~django.db.models.ForeignKey` です。
 
     .. attribute:: user
 
-        A :class:`~django.db.models.ForeignKey` to the
-        :class:`~django.contrib.auth.models.User` who posted the comment.
-        May be blank if the comment was posted by an unauthenticated user.
+        .. A :class:`~django.db.models.ForeignKey` to the
+           :class:`~django.contrib.auth.models.User` who posted the comment.
+           May be blank if the comment was posted by an unauthenticated user.
+
+        コメントを投稿した :class:`~django.contrib.auth.models.User` への
+        :class:`~django.db.models.ForeignKey` です。コメントが認証されていない
+        ユーザによって登録された場合は空になるかもしれません。
 
     .. attribute:: user_name
 
-        The name of the user who posted the comment.
+        .. The name of the user who posted the comment.
+
+        コメントを投稿したユーザの名前です。
 
     .. attribute:: user_email
 
-        The email of the user who posted the comment.
+        .. The email of the user who posted the comment.
+
+        コメントを投稿したユーザの Email アドレスです。
 
     .. attribute:: user_url
 
-        The URL entered by the person who posted the comment.
+        .. The URL entered by the person who posted the comment.
+
+        コメントを投稿したユーザが入力した URL です。
 
     .. attribute:: comment
 
-        The actual content of the comment itself.
+        .. The actual content of the comment itself.
+
+        コメントの内容そのものです。
 
     .. attribute:: submit_date
 
-        The date the comment was submitted.
+        .. The date the comment was submitted.
+
+        コメントが送信された日付です。
 
     .. attribute:: ip_address
 
-        The IP address of the user posting the comment.
+        .. The IP address of the user posting the comment.
+
+        コメント投稿ユーザの IP アドレスです。
 
     .. attribute:: is_public
 
-        ``False`` if the comment is in moderation (see
-        :doc:`/ref/contrib/comments/moderation`); If ``True``, the comment will
-        be displayed on the site.
+        .. ``False`` if the comment is in moderation (see
+           :doc:`/ref/contrib/comments/moderation`); If ``True``, the comment will
+           be displayed on the site.
+
+        コメントがモデレーション待ち (:doc:`/ref/contrib/comments/moderation`
+        を参照してください) ならば ``False`` です。もし ``True`` ならば、
+        そのコメントはサイト上で表示されます。
 
     .. attribute:: is_removed
 
-        ``True`` if the comment was removed. Used to keep track of removed
-        comments instead of just deleting them.
+        .. ``True`` if the comment was removed. Used to keep track of removed
+           comments instead of just deleting them.
+
+        コメントが削除されたならば ``True`` になります。コメントを単純に
+        削除するかわりに、削除済みコメントを追跡する目的で使われます。
 
