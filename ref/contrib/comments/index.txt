@@ -1,10 +1,8 @@
-.. _ref-contrib-comments-index:
-
 ===========================
 コメントフレームワーク
 ===========================
 
-:revision-up-to: 11321 (1.1) unfinished
+:revision-up-to: 17812 (1.4) unfinished
 
 .. module:: django.contrib.comments
    :synopsis: Django のコメントフレームワークです。
@@ -19,8 +17,8 @@ Django には単純ながらカスタマイズ可能なコメントフレーム�
 .. note::
 
     Django の古い (ドキュメント化されなかった) コメントフレームワークを使っ
-    ていたのなら、アップグレードが必要です。 :ref:`アップグレードガイド
-    <ref-contrib-comments-upgrade>` を参照してください。
+    ていたのなら、アップグレードが必要です。 :doc:`アップグレードガイド
+    </ref/contrib/comments/upgrade>` を参照してください。
 
 クイックスタートガイド
 ==========================
@@ -47,7 +45,7 @@ Django には単純ながらカスタマイズ可能なコメントフレーム�
     #. :ref:`コメントテンプレートタグ <comment-template-tags>` を使って、
        コメント機能をテンプレートに埋め込みます。
 
-:ref:`ref-contrib-comments-settings` も調べておきましょう。
+:doc:`/ref/contrib/comments/settings` も調べておきましょう。
     
 .. _comment-template-tags:
 
@@ -97,13 +95,56 @@ Django のコメントは、全て何らかのオブジェクトに「結びつ�
        この例の ``blog.entry`` は、アプリケーションラベルと (小文字にした)
        モデルクラス名をつなげたものです。
 
-.. templatetag:: get_comment_list
-
 コメントを表示する
 -------------------
 
-オブジェクトに結びつけられたコメントを取得するには、
-:ttag:`get_comment_list` を使います::
+.. To display a list of comments, you can use the template tags
+   :ttag:`render_comment_list` or :ttag:`get_comment_list`.
+
+コメントの一覧を表示するには、テンプレートタグ :ttag:`render_comment_list`
+または :ttag:`get_comment_list` を使用します。
+
+.. templatetag:: render_comment_list
+
+.. Quickly rendering a comment list
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+手軽にコメント一覧をレンダリングする
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. The easiest way to display a list of comments for some object is by using
+   :ttag:`render_comment_list`::
+
+あるオブジェクトへのコメントを一覧表示する一番簡単な方法は
+:ttag:`render_comment_list` を使用する方法です::
+
+    {% render_comment_list for [object] %}
+
+.. For example::
+
+たとえば::
+
+    {% render_comment_list for event %}
+
+.. This will render comments using a template named ``comments/list.html``, a
+   default version of which is included with Django.
+
+これは ``comments/list.html`` という名前のテンプレートを使ってコメントを
+レンダリングします。このテンプレートのデフォルトバージョンは Django に標準で
+含まれています。
+
+.. templatetag:: get_comment_list
+
+.. Rendering a custom comment list
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+独自のコメントリストをレンダリングする
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. To get the list of comments for some object, use :ttag:`get_comment_list`::
+
+あるオブジェクトへのコメントのリストを取得するには :ttag:`get_comment_list`
+を使います::
 
     {% get_comment_list for [object] as [varname] %}
 
@@ -114,9 +155,78 @@ Django のコメントは、全て何らかのオブジェクトに「結びつ�
         ...
     {% endfor %}
 
-This returns a list of :class:`~django.contrib.comments.models.Comment` objects;
-see :ref:`the comment model documentation <ref-contrib-comments-models>` for
-details.
+.. This returns a list of :class:`~django.contrib.comments.models.Comment` objects;
+   see :doc:`the comment model documentation </ref/contrib/comments/models>` for
+   details.
+
+これは :class:`~django.contrib.comments.models.Comment` オブジェクトのリストを
+返します。詳細は :doc:`コメントモデルのドキュメント
+</ref/contrib/comments/models>` を参照してください。
+
+.. templatetag:: get_comment_permalink
+
+.. Linking to comments
+   -------------------
+
+コメントにリンクする
+--------------------
+
+.. versionadded:: 1.2
+
+.. To provide a permalink to a specific comment, use :ttag:`get_comment_permalink`::
+
+特定のコメントへのパーマリンク (permalink) を提供するには、
+:ttag:`get_comment_permalink` を使います::
+
+    {% get_comment_permalink comment_obj [format_string] %}
+
+.. By default, the named anchor that will be appended to the URL will be the letter
+   'c' followed by the comment id, for example 'c82'. You may specify a custom
+   format string if you wish to override this behavior::
+
+デフォルトでは URL の後ろに追加される名前付きアンカー (訳注: # に続けて記す
+フラグメント識別子) は、 'c82' のように、 'c' にコメント ID を続けたものに
+なります。この動作を変更したい場合、カスタム書式を指定することもできます::
+
+    {% get_comment_permalink comment "#c%(id)s-by-%(user_name)s"%}
+
+.. The format string is a standard python format string. Valid mapping keys
+   include any attributes of the comment object.
+
+この書式を指定する文字列は、 Python 標準の書式化用文字列です。有効なマップキー
+として、コメントオブジェクトの属性すべてが利用可能になっています。
+
+.. Regardless of whether you specify a custom anchor pattern, you must supply a
+   matching named anchor at a suitable place in your template.
+
+独自にカスタムしたアンカーのパターンを指定するかどうかに関わらず、
+テンプレートの適切な場所に対応した名前付きアンカーを配置する必要があります。
+
+.. For example::
+
+たとえば::
+
+    {% for comment in comment_list %}
+        <a name="c{{ comment.id }}"></a>
+        <a href="{% get_comment_permalink comment %}">
+            permalink for comment #{{ forloop.counter }}
+        </a>
+        ...
+    {% endfor %}
+
+.. .. warning::
+
+..     There's a known bug in Safari/Webkit which causes the named anchor to be
+       forgotten following a redirect. The practical impact for comments is that
+       the Safari/webkit browsers will arrive at the correct page but will not
+       scroll to the named anchor.
+
+.. warning::
+
+    Safari/Webkig にはリダイレクト後に名前付きアンカーが忘れられる既知のバグが
+    あります。これが実際問題としてコメントに与える影響は、 Safari/webkig
+    ブラウザは正しいページにたどり着くものの名前付きアンカーの位置にまで
+    スクロールしてくれない、というものです。
 
 .. templatetag:: get_comment_count
 
@@ -164,21 +274,26 @@ details.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 コメントフォームのルック&フィールを制御したければ、
-:ttag:`get_comment_form` を使って :ref:`フォームオブジェクト
-<topics-forms-index>` を取得し、テンプレート内で使います::
+:ttag:`get_comment_form` を使って :doc:`フォームオブジェクト
+</topics/forms/index>` を取得し、テンプレート内で使います::
 
     {% get_comment_form for [object] as [varname] %}
 
 これで、フォームは以下のように書けます::    
 
     {% get_comment_form for event as form %}
-    <form action="{% comment_form_target %}" method="POST">
-      {{ form }}
-      <tr>
-        <td></td>
-        <td><input type="submit" name="preview" class="submit-post" value="Preview"></td>
-      </tr>
-    </form>
+    <table>
+      <form action="{% comment_form_target %}" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <tr>
+          <td colspan="2">
+            <input type="submit" name="submit" value="Post">
+            <input type="submit" name="preview" value="Preview">
+          </td>
+        </tr>
+      </form>
+    </table>
 
 このアプローチをとるときには、いくつか考慮すべき点があります。後述の
 `コメントフォームに関する注意 <#notes-on-the-comment-form>`_ をよく読んでく
@@ -194,14 +309,20 @@ details.
 にコメントフォームのポスト先として正しい URL を返します。コメントフォームを
 使うときには、いつも以下のように書いてください::
 
-    <form action="{% comment_form_target %}" method="POST">
+    <form action="{% comment_form_target %}" method="post">
 
-Redirecting after the comment post
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. Redirecting after the comment post
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To specify the URL you want to redirect to after the comment has been posted,
-you can include a hidden form input called ``next`` in your comment form. For example::
- 
+コメント投稿後にリダイレクトする
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. To specify the URL you want to redirect to after the comment has been posted,
+   you can include a hidden form input called ``next`` in your comment form. For example::
+
+コメントが投稿された後にリダイレクトする URL を指定したい場合、 ``next``
+という名前の非表示の input 要素をフォームに含めることができます。たとえば::
+
     <input type="hidden" name="next" value="{% url my_comment_was_posted %}" />
 
 .. _notes-on-the-comment-form:
@@ -235,6 +356,19 @@ you can include a hidden form input called ``next`` in your comment form. For ex
       警告の文字列を入れます。カスタムのテンプレートでコメントフォームを使
       うときにも、同じようにしてください。
     
+.. The comments app also depends on the more general :doc:`Cross Site Request
+   Forgery protection </ref/contrib/csrf>` that comes with Django.  As described in
+   the documentation, it is best to use ``CsrfViewMiddleware``.  However, if you
+   are not using that, you will need to use the ``csrf_protect`` decorator on any
+   views that include the comment form, in order for those views to be able to
+   output the CSRF token and cookie.
+
+コメントアプリは Django に同梱されているより一般的な :doc:`CSRF 対策の機能
+</ref/contrib/csrf>` に依存しています。そちらのドキュメントに記載されている通り、
+``CsrfViewMiddleware`` を使うのがベストです。しかし、もしそれを使っていなければ、
+CSRF トークンとクッキーを出力できるよう、コメントフォームを含むすべてのビューで
+``csrf_protect`` デコレータを使う必要があります。
+
 .. _honeypot: http://en.wikipedia.org/wiki/Honeypot_(computing)
 .. _ハニーポット: http://ja.wikipedia.org/wiki/%E3%83%8F%E3%83%8B%E3%83%BC%E3%83%9D%E3%83%83%E3%83%88
 
@@ -251,3 +385,4 @@ you can include a hidden form input called ``next`` in your comment form. For ex
    custom
    forms
    moderation
+   example
