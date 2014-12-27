@@ -1,10 +1,8 @@
-.. _ref-contrib-comments-settings:
-
-================================
+============================
 コメントフレームワークの設定
-================================
+============================
 
-:revision-up-to: 11321 (1.1) unfinished
+:revision-up-to: 17812 (1.4)
 
 以下の設定を使うと、コメントフレームワークのふるまいを制御できます:
 
@@ -31,7 +29,12 @@ COMMENT_MAX_LENGTH
 COMMENTS_APP
 ------------
 
-An app which provides :ref:`customization of the comments framework
-<ref-contrib-comments-custom>`.  Use the same dotted-string notation
-as in :setting:`INSTALLED_APPS`.  Your custom :setting:`COMMENTS_APP`
-must also be listed in :setting:`INSTALLED_APPS`.
+.. An app which provides :doc:`customization of the comments framework
+   </ref/contrib/comments/custom>`.  Use the same dotted-string notation
+   as in :setting:`INSTALLED_APPS`.  Your custom :setting:`COMMENTS_APP`
+   must also be listed in :setting:`INSTALLED_APPS`.
+
+:doc:`コメントフレームワークのカスタマイズ機能 </ref/contrib/comments/custom>`
+を提供するアプリです。 :setting:`INSTALLED_APPS` と同じドット区切りの記法を
+使ってください。独自の :setting:`COMMENTS_APP` は :setting:`INSTALLED_APPS`
+にもリストアップしておく必要があります。
