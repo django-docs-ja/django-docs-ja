@@ -1,26 +1,42 @@
-.. _ref-contrib-comments-custom:
+.. ==================================
+   Customizing the comments framework
+   ==================================
 
-==================================
-Customizing the comments framework
-==================================
+========================================
+コメントフレームワークをカスタマイズする
+========================================
 
-:revision-up-to: 11321 (1.1) unfinished
+:revision-up-to: 17812 (1.4)
 
 .. currentmodule:: django.contrib.comments
 
-If the built-in comment framework doesn't quite fit your needs, you can extend
-the comment app's behavior to add custom data and logic. The comments framework
-lets you extend the built-in comment model, the built-in comment form, and the
-various comment views.
+.. If the built-in comment framework doesn't quite fit your needs, you can extend
+   the comment app's behavior to add custom data and logic. The comments framework
+   lets you extend the built-in comment model, the built-in comment form, and the
+   various comment views.
 
-The :setting:`COMMENTS_APP` setting is where this customization begins. Set
-:setting:`COMMENTS_APP` to the name of the app you'd like to use to provide
-custom behavior. You'll use the same syntax as you'd use for
-:setting:`INSTALLED_APPS`, and the app given must also be in the
-:setting:`INSTALLED_APPS` list.
+もし組み込みのコメントフレームワークがニーズに合わない場合、コメントアプリ
+の振る舞いを拡張して独自のデータやロジックを加えることができます。
+コメントフレームワークは組み込みのコメントモデル、組み込みのコメントフォーム、
+そして各種のコメントビューを拡張できるように作られています。
 
-For example, if you wanted to use an app named ``my_comment_app``, your
-settings file would contain::
+.. The :setting:`COMMENTS_APP` setting is where this customization begins. Set
+   :setting:`COMMENTS_APP` to the name of the app you'd like to use to provide
+   custom behavior. You'll use the same syntax as you'd use for
+   :setting:`INSTALLED_APPS`, and the app given must also be in the
+   :setting:`INSTALLED_APPS` list.
+
+カスタマイズは、まず設定 :setting:`COMMENTS_APP` から始めましょう。
+:setting:`COMMENTS_APP` に、あなたが使用したい、独自の振る舞いを提供するアプリの
+名前を設定してください。設定は :setting:`INSTALLED_APPS` で使う書式と同じ書式で
+行い、またそのアプリは :setting:`INSTALLED_APPS` の一覧に入っている必要が
+あります。
+
+.. For example, if you wanted to use an app named ``my_comment_app``, your
+   settings file would contain::
+
+たとえば、もし ``my_comment_app`` という名前のアプリを使いたければ、
+設定ファイルは次のようなコードを含むことになるでしょう::
 
     INSTALLED_APPS = [
         ...
@@ -30,39 +46,68 @@ settings file would contain::
 
     COMMENTS_APP = 'my_comment_app'
 
-The app named in :setting:`COMMENTS_APP` provides its custom behavior by
-defining some module-level functions in the app's ``__init__.py``. The
-:ref:`complete list of these functions <custom-comment-app-api>` can be found
-below, but first let's look at a quick example.
+.. The app named in :setting:`COMMENTS_APP` provides its custom behavior by
+   defining some module-level functions in the app's ``__init__.py``. The
+   :ref:`complete list of these functions <custom-comment-app-api>` can be found
+   below, but first let's look at a quick example.
 
-An example custom comments app
-==============================
+:setting:`COMMENTS_APP` で名前を指定したアプリは、アプリの ``__init__.py``
+でモジュールレベルの関数をいくつか定義することで独自の振る舞いを提供します。
+:ref:`これらの関数の完全な一覧 <custom-comment-app-api>` は以下に記載しますが、
+まずは簡単な例から見ていきましょう。
 
-One of the most common types of customization is modifying the set of fields
-provided on the built-in comment model. For example, some sites that allow
-comments want the commentator to provide a title for their comment; the built-in
-comment model has no field for that title.
+.. An example custom comments app
+   ==============================
 
-To make this kind of customization, we'll need to do three things:
+カスタムコメントアプリの例
+==========================
 
-    #. Create a custom comment :class:`~django.db.models.Model` that adds on the
-       "title" field.
+.. One of the most common types of customization is modifying the set of fields
+   provided on the built-in comment model. For example, some sites that allow
+   comments want the commentator to provide a title for their comment; the built-in
+   comment model has no field for that title.
 
-    #. Create a custom comment :class:`~django.forms.Form` that also adds this
-       "title" field.
+もっとも一般的なカスタマイズの一例は、組み込みコメントモデルが提供するフィールド
+を変更するものです。たとえば、コメントを許可しているあるサイトがコメント投稿者に
+コメントのタイトルを付けられるようにしたいとします。組み込みコメントモデルには、
+タイトルとして使えるフィールドはありません。
 
-    #. Inform Django of these objects by defining a few functions in a
-       custom :setting:`COMMENTS_APP`.
+.. To make this kind of customization, we'll need to do three things:
 
-So, carrying on the example above, we're dealing with a typical app structure in
-the ``my_custom_app`` directory::
+この種のカスタマイズを行うには、 3 つのことを行う必要があります:
+
+.. #. Create a custom comment :class:`~django.db.models.Model` that adds on the
+      "title" field.
+
+#. "title" フィールドを追加したカスタムのコメント
+   :class:`~django.db.models.Model` を作成
+
+.. #. Create a custom comment :class:`~django.forms.Form` that also adds this
+      "title" field.
+
+#. "title" フィールドを追加したカスタムのコメント :class:`~django.forms.Form`
+   を作成
+
+.. #. Inform Django of these objects by defining a few functions in a
+      custom :setting:`COMMENTS_APP`.
+
+#. いくつかの関数を独自の :setting:`COMMENTS_APP` で定義することで、 Django
+   にこれらのオブジェクトを使うよう伝える
+
+.. So, carrying on the example above, we're dealing with a typical app structure in
+   the ``my_custom_app`` directory::
+
+ということで、上の例を続けると、 ``my_custom_app`` ディレクトリの下に
+典型的なアプリの構造を作ることになります::
 
     my_custom_app/
         __init__.py
         models.py
         forms.py
 
-In the ``models.py`` we'll define a ``CommentWithTitle`` model::
+.. In the ``models.py`` we'll define a ``CommentWithTitle`` model::
+
+``models.py`` の中では ``CommentWithTitle`` モデルを定義します::
 
     from django.db import models
     from django.contrib.comments.models import Comment
@@ -70,16 +115,27 @@ In the ``models.py`` we'll define a ``CommentWithTitle`` model::
     class CommentWithTitle(Comment):
         title = models.CharField(max_length=300)
 
-Most custom comment models will subclass the :class:`Comment` model. However,
-if you want to substantially remove or change the fields available in the
-:class:`Comment` model, but don't want to rewrite the templates, you could
-try subclassing from :class:`BaseCommentAbstractModel`.
+.. Most custom comment models will subclass the :class:`Comment` model. However,
+   if you want to substantially remove or change the fields available in the
+   :class:`Comment` model, but don't want to rewrite the templates, you could
+   try subclassing from :class:`BaseCommentAbstractModel`.
 
-Next, we'll define a custom comment form in ``forms.py``. This is a little more
-tricky: we have to both create a form and override
-:meth:`CommentForm.get_comment_model` and
-:meth:`CommentForm.get_comment_create_data` to return deal with our custom title
-field::
+普通は :class:`Comment` モデルから派生したコメントモデルを作るでしょう。しかし、
+もし「:class:`Comment` モデルのフィールドを、物理的に削除あるいは変更したいが、
+テンプレートは書き換えたくない」という場合には、
+:class:`BaseCommentAbstractModel` から派生させることに挑戦しても良いかも
+しれません。
+
+.. Next, we'll define a custom comment form in ``forms.py``. This is a little more
+   tricky: we have to both create a form and override
+   :meth:`CommentForm.get_comment_model` and
+   :meth:`CommentForm.get_comment_create_data` to return deal with our custom title
+   field::
+
+次に、独自のコメントフォームを ``forms.py`` の中に定義します。これは少し
+厄介です。フォームを作成してそれを返すよう :meth:`CommentForm.get_comment_model`
+をオーバーライドし、また独自の title フィールドを処理するよう
+:meth:`CommentForm.get_comment_create_data` をオーバーライドする必要があります::
 
     from django import forms
     from django.contrib.comments.forms import CommentForm
@@ -98,12 +154,19 @@ field::
             data['title'] = self.cleaned_data['title']
             return data
 
-Django provides a couple of "helper" classes to make writing certain types of
-custom comment forms easier; see :mod:`django.contrib.comments.forms` for
-more.
+.. Django provides a couple of "helper" classes to make writing certain types of
+   custom comment forms easier; see :mod:`django.contrib.comments.forms` for
+   more.
 
-Finally, we'll define a couple of methods in ``my_custom_app/__init__.py`` to
-point Django at these classes we've created::
+Django は特定のカスタムコメントフォームを書きやすくする 2 つの「ヘルパー」
+クラスを提供しています。詳細は :mod:`django.contrib.comments.forms`
+を参照してください。
+
+.. Finally, we'll define a couple of methods in ``my_custom_app/__init__.py`` to
+   point Django at these classes we've created::
+
+最後に、作成したクラスを使うよう Django に指示する 2 つのメソッドを
+``my_custom_app/__init__.py`` の中で定義します::
 
     from my_comments_app.models import CommentWithTitle
     from my_comments_app.forms import CommentFormWithTitle
@@ -114,81 +177,167 @@ point Django at these classes we've created::
     def get_form():
         return CommentFormWithTitle
 
-The above process should take care of most common situations. For more
-advanced usage, there are additional methods you can define. Those are
-explained in the next section.
+
+.. .. warning::
+
+       Be careful not to create cyclic imports in your custom comments app.
+       If you feel your comment configuration isn't being used as defined --
+       for example, if your comment moderation policy isn't being applied --
+       you may have a cyclic import problem.
+
+       If you are having unexplained problems with comments behavior, check
+       if your custom comments application imports (even indirectly)
+       any module that itself imports Django's comments module.
+
+.. warning::
+
+    コメントアプリの中で循環インポートを作らないよう気を付けてください。
+    もし定義した通りにコメントの設定が使われていないように感じたなら --
+    たとえばコメントのモデレーションポリシーが適用されていないなど --
+    循環インポートの問題があるかもしれません。
+
+    もしコメントに関する説明できない振る舞いが現れたなら、独自のコメント
+    アプリケーションが Django のコメントモジュールをインポートするモジュールを
+    (間接的なインポートも含めて) インポートしていないか確認してください。
+
+.. The above process should take care of most common situations. For more
+   advanced usage, there are additional methods you can define. Those are
+   explained in the next section.
+
+上記のプロセスで、大半のシチュエーションに対応できるはずです。より高度な使い方
+として、さらに定義することのできるメソッドがあります。それらについては次の
+章で説明します。
 
 .. _custom-comment-app-api:
 
-Custom comment app API
-======================
+.. Custom comment app API
+   ======================
 
-The :mod:`django.contrib.comments` app defines the following methods; any
-custom comment app must define at least one of them. All are optional,
-however.
+カスタムコメントアプリの API
+============================
+
+.. The :mod:`django.contrib.comments` app defines the following methods; any
+   custom comment app must define at least one of them. All are optional,
+   however.
+
+:mod:`django.contrib.comments` アプリは以下のメソッドを定義しています。
+すべてのカスタムコメントアプリは、そのうち少なくとも一つを定義する必要が
+あります。しかし、どのメソッドも省略可能です。
 
 .. function:: get_model()
 
-    Return the :class:`~django.db.models.Model` class to use for comments. This
-    model should inherit from
-    :class:`django.contrib.comments.models.BaseCommentAbstractModel`, which
-    defines necessary core fields.
+    .. Return the :class:`~django.db.models.Model` class to use for comments. This
+       model should inherit from
+       :class:`django.contrib.comments.models.BaseCommentAbstractModel`, which
+       defines necessary core fields.
 
-    The default implementation returns
-    :class:`django.contrib.comments.models.Comment`.
+    コメントに使う :class:`~django.db.models.Model` クラスを返します。このモデル
+    は、必要な核となるフィールド群を定義した
+    :class:`django.contrib.comments.models.BaseCommentAbstractModel` を継承した
+    ものになるはずです。
+
+    .. The default implementation returns
+       :class:`django.contrib.comments.models.Comment`.
+
+    デフォルトの実装では :class:`django.contrib.comments.models.Comment`
+    を返します。
 
 .. function:: get_form()
 
-    Return the :class:`~django.forms.Form` class you want to use for
-    creating, validating, and saving your comment model.  Your custom
-    comment form should accept an additional first argument,
-    ``target_object``, which is the object the comment will be
-    attached to.
+    .. Return the :class:`~django.forms.Form` class you want to use for
+       creating, validating, and saving your comment model.  Your custom
+       comment form should accept an additional first argument,
+       ``target_object``, which is the object the comment will be
+       attached to.
 
-    The default implementation returns
-    :class:`django.contrib.comments.forms.CommentForm`.
+    コメントモデルの作成、検証、保存に使いたい :class:`~django.forms.Form`
+    クラスを返します。カスタムコメントフォームは最初に与えられる追加の引数
+    ``target_object`` を受け入れるべきです。これは、そのコメントに結びつけら
+    れることになるオブジェクトです。
+
+    .. The default implementation returns
+       :class:`django.contrib.comments.forms.CommentForm`.
+
+    デフォルトの実装では :class:`django.contrib.comments.forms.CommentForm`
+    を返します。
+
+    .. .. note::
+
+           The default comment form also includes a number of unobtrusive
+           spam-prevention features (see
+           :ref:`notes-on-the-comment-form`).  If replacing it with your
+           own form, you may want to look at the source code for the
+           built-in form and consider incorporating similar features.
 
     .. note::
 
-        The default comment form also includes a number of unobtrusive
-        spam-prevention features (see
-        :ref:`notes-on-the-comment-form`).  If replacing it with your
-        own form, you may want to look at the source code for the
-        built-in form and consider incorporating similar features.
+        デフォルトのコメントフォームはいくつもの押し付けがましくない
+        スパム防止機能を搭載しています (:ref:`notes-on-the-comment-form`
+        を参照してください)。もし独自のフォームに置き換えるのであれば、
+        組み込みフォームのソースコードを読んでみて、似たような機能を
+        導入した方が良いかもしれません。
 
 .. function:: get_form_target()
 
-    Return the URL for POSTing comments. This will be the ``<form action>``
-    attribute when rendering your comment form.
+    .. Return the URL for POSTing comments. This will be the ``<form action>``
+       attribute when rendering your comment form.
 
-    The default implementation returns a reverse-resolved URL pointing
-    to the :func:`post_comment` view.
+    コメントを POST する URL を返します。これはコメントフォームをレンダリング
+    するときに ``<form action>`` 属性になるでしょう。
+
+    .. The default implementation returns a reverse-resolved URL pointing
+       to the :func:`post_comment` view.
+
+    デフォルトの実装は :func:`post_comment` ビューを指すリバース解決した URL
+    を返します。
+
+    .. .. note::
+
+           If you provide a custom comment model and/or form, but you
+           want to use the default :func:`post_comment` view, you will
+           need to be aware that it requires the model and form to have
+           certain additional attributes and methods: see the
+           :func:`post_comment` view documentation for details.
 
     .. note::
 
-        If you provide a custom comment model and/or form, but you
-        want to use the default :func:`post_comment` view, you will
-        need to be aware that it requires the model and form to have
-        certain additional attributes and methods: see the
-        :func:`post_comment` view documentation for details.
+        もしカスタムコメントモデル・フォームを提供するけれどもデフォルトの
+        :func:`post_comment` ビューを使いたい場合、そのモデルとフォームが
+        特定の追加の属性とメソッドを持つ必要があることに気付く必要があります。
+        詳しくは :func:`post_comment` ビューのドキュメントを参照してください。
 
 .. function:: get_flag_url()
 
-    Return the URL for the "flag this comment" view.
+    .. Return the URL for the "flag this comment" view.
 
-    The default implementation returns a reverse-resolved URL pointing
-    to the :func:`django.contrib.comments.views.moderation.flag` view.
+    「このコメントをフラグする」ビューの URL を返します。
+
+    .. The default implementation returns a reverse-resolved URL pointing
+       to the :func:`django.contrib.comments.views.moderation.flag` view.
+
+    デフォルトの実装は :func:`django.contrib.comments.views.moderation.flag`
+    ビューを指すリバース解決した URL を返します。
 
 .. function:: get_delete_url()
 
-    Return the URL for the "delete this comment" view.
+    .. Return the URL for the "delete this comment" view.
 
-    The default implementation returns a reverse-resolved URL pointing
-    to the :func:`django.contrib.comments.views.moderation.delete` view.
+    「このコメントを削除する」ビューの URL を返します。
+
+    .. The default implementation returns a reverse-resolved URL pointing
+       to the :func:`django.contrib.comments.views.moderation.delete` view.
+
+    デフォルトの実装は :func:`django.contrib.comments.views.moderation.delete`
+    ビューを指すリバース解決した URL を返します。
 
 .. function:: get_approve_url()
 
-    Return the URL for the "approve this comment from moderation" view.
+    .. Return the URL for the "approve this comment from moderation" view.
 
-    The default implementation returns a reverse-resolved URL pointing
-    to the :func:`django.contrib.comments.views.moderation.approve` view.
+    「このコメントを承認する」ビューの URL を返します。
+
+    .. The default implementation returns a reverse-resolved URL pointing
+       to the :func:`django.contrib.comments.views.moderation.approve` view.
+
+    デフォルトの実装は :func:`django.contrib.comments.views.moderation.approve`
+    ビューを指すリバース解決した URL を返します。
