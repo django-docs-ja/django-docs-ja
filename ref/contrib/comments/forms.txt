@@ -1,48 +1,86 @@
-====================
-Comment form classes
-====================
+.. ====================
+   Comment form classes
+   ====================
 
-:revision-up-to: 17812 (1.4) unfinished
+======================
+コメントフォームクラス
+======================
+
+:revision-up-to: 17812 (1.4)
 
 .. module:: django.contrib.comments.forms
-   :synopsis: Forms for dealing with the built-in comment model.
+   :synopsis: 組み込みコメントモデルを処理するフォームです。
 
-The ``django.contrib.comments.forms`` module contains a handful of forms
-you'll use when writing custom views dealing with comments, or when writing
-:doc:`custom comment apps </ref/contrib/comments/custom>`.
+.. The ``django.contrib.comments.forms`` module contains a handful of forms
+   you'll use when writing custom views dealing with comments, or when writing
+   :doc:`custom comment apps </ref/contrib/comments/custom>`.
+
+``django.contrib.comments.forms`` モジュールはコメントを処理するビューを書く、
+あるいは :doc:`カスタムコメントアプリ </ref/contrib/comments/custom>` を書くとき
+に使うであろう、いくつかのフォームを含んでいます。
 
 .. class:: CommentForm
 
-   The main comment form representing the standard, built-in way of handling
-   submitted comments. This is the class used by all the views
-   :mod:`django.contrib.comments` to handle submitted comments.
+   .. The main comment form representing the standard, built-in way of handling
+      submitted comments. This is the class used by all the views
+      :mod:`django.contrib.comments` to handle submitted comments.
 
-   If you want to build custom views that are similar to Django's built-in
-   comment handling views, you'll probably want to use this form.
+   メインのコメントフォームで、送信されたコメントを処理する標準、組み込みの
+   方法を表現します。これは :mod:`django.contrib.comments` の全ビューが、
+   送信されたコメントを処理するために使うクラスです。
 
-Abstract comment forms for custom comment apps
+   .. If you want to build custom views that are similar to Django's built-in
+      comment handling views, you'll probably want to use this form.
+
+   もし Django の組み込みコメント処理用ビューに似たカスタムビューを作るので
+   あれば、このフォームを使うと便利かもしれません。
+
+.. Abstract comment forms for custom comment apps
+   ----------------------------------------------
+
+カスタムコメントアプリ用の抽象コメントフォーム
 ----------------------------------------------
 
-If you're building a :doc:`custom comment app </ref/contrib/comments/custom>`,
-you might want to replace *some* of the form logic but still rely on parts of
-the existing form.
+.. If you're building a :doc:`custom comment app </ref/contrib/comments/custom>`,
+   you might want to replace *some* of the form logic but still rely on parts of
+   the existing form.
 
-:class:`CommentForm` is actually composed of a couple of abstract base class
-forms that you can subclass to reuse pieces of the form handling logic:
+もし :doc:`カスタムコメントアプリ </ref/contrib/comments/custom>` を作っている
+のであれば、フォームの処理の *一部分だけ* を変更したいと思うと同時に
+既存のフォームの処理を流用したいと思うでしょう。
+
+.. :class:`CommentForm` is actually composed of a couple of abstract base class
+   forms that you can subclass to reuse pieces of the form handling logic:
+
+実は :class:`CommentForm` は、継承することでフォーム処理を部分的に再利用できる
+2 つの抽象クラスで構成されています:
 
 .. class:: CommentSecurityForm
 
-   Handles the anti-spoofing protection aspects of the comment form handling.
+   .. Handles the anti-spoofing protection aspects of the comment form handling.
 
-   This class contains the ``content_type`` and ``object_pk`` fields pointing
-   to the object the comment is attached to, along with a ``timestamp`` and a
-   ``security_hash`` of all the form data. Together, the timestamp and the
-   security hash ensure that spammers can't "replay" form submissions and
-   flood you with comments.
+   コメントフォーム処理における、なりすまし防止の観点での処理を行います。
+
+   .. This class contains the ``content_type`` and ``object_pk`` fields pointing
+      to the object the comment is attached to, along with a ``timestamp`` and a
+      ``security_hash`` of all the form data. Together, the timestamp and the
+      security hash ensure that spammers can't "replay" form submissions and
+      flood you with comments.
+
+   このクラスはそのコメントが結びつけられているオブジェクトを指す
+   ``content_type`` と ``object_pk`` フィールド、 ``timestamp`` 、そして
+   全フォームデータの ``security_hash`` を含んでいます。これらタイムスタンプと
+   セキュリティハッシュによって、スパマーがフォーム送信を「リプレイ」することを
+   防ぎ、コメントの洪水を起こさないようにします。
 
 .. class:: CommentDetailsForm
 
-   Handles the details of the comment itself.
+   .. Handles the details of the comment itself.
 
-   This class contains the ``name``, ``email``, ``url``, and the ``comment``
-   field itself, along with the associated validation logic.
+   コメント自体の詳細を処理します。
+
+   .. This class contains the ``name``, ``email``, ``url``, and the ``comment``
+      field itself, along with the associated validation logic.
+
+   このクラスは ``name``、 ``email``、 ``url``、そして ``comment`` フィールド
+   と、関連した検証ロジックを含んでいます。
