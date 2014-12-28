@@ -1,17 +1,15 @@
-.. _ref-contrib-comments-forms:
-
 ====================
 Comment form classes
 ====================
 
-:revision-up-to: 11321 (1.1) unfinished
+:revision-up-to: 17812 (1.4) unfinished
 
 .. module:: django.contrib.comments.forms
    :synopsis: Forms for dealing with the built-in comment model.
 
 The ``django.contrib.comments.forms`` module contains a handful of forms
 you'll use when writing custom views dealing with comments, or when writing
-:ref:`custom comment apps <ref-contrib-comments-custom>`.
+:doc:`custom comment apps </ref/contrib/comments/custom>`.
 
 .. class:: CommentForm
 
@@ -25,7 +23,7 @@ you'll use when writing custom views dealing with comments, or when writing
 Abstract comment forms for custom comment apps
 ----------------------------------------------
 
-If you're building a :ref:`custom comment app <ref-contrib-comments-custom>`,
+If you're building a :doc:`custom comment app </ref/contrib/comments/custom>`,
 you might want to replace *some* of the form logic but still rely on parts of
 the existing form.
 
@@ -47,4 +45,4 @@ forms that you can subclass to reuse pieces of the form handling logic:
    Handles the details of the comment itself.
 
    This class contains the ``name``, ``email``, ``url``, and the ``comment``
-   field itself, along with the associated valdation logic.
+   field itself, along with the associated validation logic.
