@@ -1,17 +1,15 @@
-.. _ref-contrib-comments-signals:
-
 ===================================
 コメントアプリケーションのシグナル
 ===================================
 
-:revision-up-to: 11321 (1.1)
+:revision-up-to: 17812 (1.4)
 
 .. module:: django.contrib.comments.signals
    :synopsis: コメントモジュールから送信されるシグナル
 
 コメントアプリケーションは、コメントのモデレーションやそれに類する処理を行
-えるよう、 :ref:`シグナル <topics-signals>` をいくつか定義しています。シグ
-ナルハンドラの登録方法や受信方法は :ref:`シグナルの解説 <topics-signals>`
+えるよう、 :doc:`シグナル </topics/signals>` をいくつか定義しています。シグ
+ナルハンドラの登録方法や受信方法は :doc:`シグナルの解説 </topics/signals>`
 を参照してください。
 
 comment_will_be_posted
@@ -32,38 +30,38 @@ comment_will_be_posted
 されます。
 
 シグナルは以下の引数を伴います:
-    
-    ``sender``
-        コメントモデルです。
-        
-    ``comment``
-        投稿処理中のコメントインスタンスです。まだデータベースには保存され
-        ていないので、プライマリキーはなく、リレーションも正しく動作しない
-        可能性があります。
-        
-    ``request``
-        コメントの投稿に使われた :class:`~django.http.HttpRequest` です。
-        
+
+``sender``
+    コメントモデルです。
+
+``comment``
+    投稿処理中のコメントインスタンスです。まだデータベースには保存され
+    ていないので、プライマリキーはなく、リレーションも正しく動作しない
+    可能性があります。
+
+``request``
+    コメントの投稿に使われた :class:`~django.http.HttpRequest` です。
+
 comment_was_posted
 ==================
 
 .. data:: django.contrib.comments.signals.comment_was_posted
    :module:
 
-コメントの保存直後に送信されるシグナルです。   
+コメントの保存直後に送信されるシグナルです。
 
 シグナルは以下の引数を伴います:
-    
-    ``sender``
-        コメントモデルです。
-        
-    ``comment``
-        投稿されたコメントインスタンスです。すでにデータベースに保存され
-        ているので、このオブジェクトを変更した場合、再度
-	:meth:`~django.db.models.Model.save` を呼び出す必要があります。
-        
-    ``request``
-        コメントの投稿に使われた :class:`~django.http.HttpRequest` です。
+
+``sender``
+    コメントモデルです。
+
+``comment``
+    投稿されたコメントインスタンスです。すでにデータベースに保存され
+    ているので、このオブジェクトを変更した場合、再度
+    :meth:`~django.db.models.Model.save` を呼び出す必要があります。
+
+``request``
+    コメントの投稿に使われた :class:`~django.http.HttpRequest` です。
 
 comment_was_flagged
 ===================
@@ -77,22 +75,22 @@ comment_was_flagged
 す。
 
 シグナルは以下の引数を伴います:
-    
-    ``sender``
-        コメントモデルです。
-        
-    ``comment``
-        投稿されたコメントインスタンスです。すでにデータベースに保存され
-        ているので、このオブジェクトを変更した場合、再度
-	:meth:`~django.db.models.Model.save` を呼び出す必要があります。
-        
-    ``flag``
-        コメントに結びつけられた
-        :class:`~django.contrib.comments.models.CommentFlag` です。
-        
-    ``created``
-        フラグが新たに結びつけられた場合は ``True``, 他のフラグと重複する場
-        合には ``False`` です。
-        
-    ``request``
-        コメントの投稿に使われた :class:`~django.http.HttpRequest` です。
+
+``sender``
+    コメントモデルです。
+
+``comment``
+    投稿されたコメントインスタンスです。すでにデータベースに保存され
+    ているので、このオブジェクトを変更した場合、再度
+    :meth:`~django.db.models.Model.save` を呼び出す必要があります。
+
+``flag``
+    コメントに結びつけられた
+    :class:`~django.contrib.comments.models.CommentFlag` です。
+
+``created``
+    フラグが新たに結びつけられた場合は ``True``, 他のフラグと重複する場
+    合には ``False`` です。
+
+``request``
+    コメントの投稿に使われた :class:`~django.http.HttpRequest` です。
