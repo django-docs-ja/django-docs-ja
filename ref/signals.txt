@@ -1,18 +1,26 @@
-.. _ref-signals:
+.. =======
+   Signals
+   =======
 
-=============================
-組み込みシグナルリファレンス
-=============================
+========
+シグナル
+========
 
-:revision-up-to: 11321 (1.0) unfinished
+:revision-up-to: 17812 (1.4) unfinished
 
 ここでは、 Django が送信する組み込みのシグナルについて解説します。
 
 .. seealso::
 
-    :ref:`コメントフレームワーク <ref-contrib-comments-index>` は、
-    :ref:`コメントに関するシグナル <ref-contrib-comments-signals>` を送信し
+    See the documentation on the :doc:`signal dispatcher </topics/signals>` for
+    information regarding how to register for and receive signals.
+
+    :doc:`コメントフレームワーク </ref/contrib/comments/index>` は、
+    :doc:`コメントに関するシグナル </ref/contrib/comments/signals>` を送信し
     ます。
+
+    The :doc:`authentication framework </topics/auth>` sends :ref:`signals when
+    a user is logged in / out <topics-auth-signals>`.
 
 モデル関連のシグナル
 ======================
@@ -32,9 +40,9 @@
     従って、これらのメソッドをオーバライドする場合、親クラスのメソッドを呼
     び出して、シグナルが送信されるようにせねばなりません。
 
-	Note also that Django stores signal handlers as weak references by default,
-	so if your handler is a local function, it may be garbage collected.  To
-	prevent this, pass ``weak=False`` when you call the signal's :meth:`~django.dispatch.Signal.connect`.
+    Note also that Django stores signal handlers as weak references by default,
+    so if your handler is a local function, it may be garbage collected.  To
+    prevent this, pass ``weak=False`` when you call the signal's :meth:`~django.dispatch.Signal.connect`.
 
 pre_init
 --------
@@ -49,18 +57,18 @@ Django モデルをインスタンス化するとき、モデルの
 
 シグナルの引数は以下の通りです:
 
-    ``sender``
-        インスタンスを作成したモデルクラスです。
+``sender``
+    インスタンスを作成したモデルクラスです。
 
-    ``args``
-        :meth:`~django.db.models.Model.__init__` に渡された固定引数のリスト
-        です。
+``args``
+    :meth:`~django.db.models.Model.__init__` に渡された固定引数のリスト
+    です。
 
-    ``kwargs``
-        :meth:`~django.db.models.Model.__init__` に渡されたキーワード引数の
-        リストです。
+``kwargs``
+    :meth:`~django.db.models.Model.__init__` に渡されたキーワード引数の
+    リストです。
 
-例えば、 :ref:`チュートリアル <intro-tutorial01>` には以下のような行があり
+例えば、 :doc:`チュートリアル </intro/tutorial01>` には以下のような行があり
 ます:
 
 .. code-block:: python
@@ -70,15 +78,15 @@ Django モデルをインスタンス化するとき、モデルの
 この行の中で送信されるシグナルを :data:`pre_init` ハンドラで受けたときの引
 数は以下の通りです:
 
-    ==========  ===============================================================
-    引数        値
-    ==========  ===============================================================
-    ``sender``  ``Poll`` (クラス自体)
+==========  ===============================================================
+引数        値
+==========  ===============================================================
+``sender``  ``Poll`` (クラス自体)
 
-    ``args``    ``[]`` (``__init__`` には固定引数がないので空)
+``args``    ``[]`` (``__init__`` には固定引数がないので空)
 
-    ``kwargs``  ``{'question': "What's up?", 'pub_date': datetime.now()}``
-    ==========  ===============================================================
+``kwargs``  ``{'question': "What's up?", 'pub_date': datetime.now()}``
+==========  ===============================================================
 
 post_init
 ---------
@@ -91,48 +99,70 @@ post_init
 
 引数は以下の通りです:
 
-    ``sender``
-        ``pre_init`` と同じ、インスタンスを生成したモデルクラスです。
+``sender``
+    ``pre_init`` と同じ、インスタンスを生成したモデルクラスです。
 
-    ``instance``
-        実際に生成されたモデルインスタンスです。
+``instance``
+    実際に生成されたモデルインスタンスです。
 
 pre_save
 --------
 
 .. data:: django.db.models.signals.pre_save
    :module:
-   
+
 モデルインスタンスの :meth:`~django.db.models.Model.save` の処理の最初に呼
 び出されます。
 
 引数は以下の通りです:
 
-    ``sender``
-        モデルクラスです。
+``sender``
+    モデルクラスです。
 
-    ``instance``
-        これから保存されるインスタンスです。
+``instance``
+    これから保存されるインスタンスです。
+
+``raw``
+    A boolean; ``True`` if the model is saved exactly as presented
+    (i.e. when loading a fixture). One should not query/modify other
+    records in the database as the database might not be in a
+    consistent state yet.
+
+.. versionadded:: 1.3
+
+``using``
+    The database alias being used.
 
 post_save
 ---------
 
 .. data:: django.db.models.signals.post_save
-   :module: 
-   
+   :module:
+
 :data:`pre_save` に似ていますが、 :meth:`~django.db.models.Model.save` メソッ
 ドの処理の最後に呼び出されます。
 
 引数は以下の通りです
 
-    ``sender``
-        モデルクラスです。
+``sender``
+    モデルクラスです。
 
-    ``instance``
-        保存されたインスタンスです。
+``instance``
+    保存されたインスタンスです。
 
-    ``created``
-        ブール値で、レコードが新たに作成されたときに ``True`` を返します。
+``created``
+    ブール値で、レコードが新たに作成されたときに ``True`` を返します。
+
+``raw``
+    A boolean; ``True`` if the model is saved exactly as presented
+    (i.e. when loading a fixture). One should not query/modify other
+    records in the database as the database might not be in a
+    consistent state yet.
+
+.. versionadded:: 1.3
+
+``using``
+    The database alias being used.
 
 pre_delete
 ----------
@@ -140,36 +170,185 @@ pre_delete
 .. data:: django.db.models.signals.pre_delete
    :module:
 
-モデルインスタンスの :meth:`~django.db.models.Model.delete` メソッドの処理
-の先頭で呼出されます。
+.. Sent at the beginning of a model's :meth:`~django.db.models.Model.delete`
+   method and a queryset's :meth:`~django.db.models.query.QuerySet.delete` method.
+
+モデルインスタンスの :meth:`~django.db.models.Model.delete` メソッド、
+およびクエリーセットの :meth:`~django.db.models.query.QuerySet.delete` メソッド
+の処理の先頭で呼出されます。
 
 引数は以下の通りです:
 
-    ``sender``
-        モデルクラスです。
+``sender``
+    モデルクラスです。
 
-    ``instance``
-        削除されるインスタンスです。
+``instance``
+    削除されるインスタンスです。
+
+.. versionadded:: 1.3
+
+``using``
+    The database alias being used.
 
 post_delete
 -----------
 
 .. data:: django.db.models.signals.post_delete
-   :module: 
-   
+   :module:
+
+.. Like :data:`pre_delete`, but sent at the end of a model's
+   :meth:`~django.db.models.Model.delete` method and a queryset's
+   :meth:`~django.db.models.query.QuerySet.delete` method.
+
 :data:`pre_delete` に似ていますが、 :meth:`~django.db.models.Model.delete`
+メソッドおよびクエリーセットの :meth:`~django.db.models.query.QuerySet.delete`
 メソッドの処理の最後に呼び出されます。
 
 引数は以下の通りです:
 
-    ``sender``
-        モデルクラスです。
+``sender``
+    モデルクラスです。
 
-    ``instance``
-        削除されたインスタンスです。
+``instance``
+    削除されたインスタンスです。
 
-        オブジェクトはもはやデータベース上に存在しないので、このインスタン
-	スの扱いには十分注意してください。
+    オブジェクトはもはやデータベース上に存在しないので、このインスタン
+    スの扱いには十分注意してください。
+
+.. versionadded:: 1.3
+
+``using``
+    The database alias being used.
+
+m2m_changed
+-----------
+
+.. data:: django.db.models.signals.m2m_changed
+   :module:
+
+.. versionadded:: 1.2
+
+Sent when a :class:`ManyToManyField` is changed on a model instance.
+Strictly speaking, this is not a model signal since it is sent by the
+:class:`ManyToManyField`, but since it complements the
+:data:`pre_save`/:data:`post_save` and :data:`pre_delete`/:data:`post_delete`
+when it comes to tracking changes to models, it is included here.
+
+Arguments sent with this signal:
+
+``sender``
+    The intermediate model class describing the :class:`ManyToManyField`.
+    This class is automatically created when a many-to-many field is
+    defined; you can access it using the ``through`` attribute on the
+    many-to-many field.
+
+``instance``
+    The instance whose many-to-many relation is updated. This can be an
+    instance of the ``sender``, or of the class the :class:`ManyToManyField`
+    is related to.
+
+``action``
+    A string indicating the type of update that is done on the relation.
+    This can be one of the following:
+
+    ``"pre_add"``
+        Sent *before* one or more objects are added to the relation.
+    ``"post_add"``
+        Sent *after* one or more objects are added to the relation.
+    ``"pre_remove"``
+        Sent *before* one or more objects are removed from the relation.
+    ``"post_remove"``
+        Sent *after* one or more objects are removed from the relation.
+    ``"pre_clear"``
+        Sent *before* the relation is cleared.
+    ``"post_clear"``
+        Sent *after* the relation is cleared.
+
+``reverse``
+    Indicates which side of the relation is updated (i.e., if it is the
+    forward or reverse relation that is being modified).
+
+``model``
+    The class of the objects that are added to, removed from or cleared
+    from the relation.
+
+``pk_set``
+    For the ``pre_add``, ``post_add``, ``pre_remove`` and ``post_remove``
+    actions, this is a list of primary key values that have been added to
+    or removed from the relation.
+
+    For the ``pre_clear`` and ``post_clear`` actions, this is ``None``.
+
+.. versionadded:: 1.3
+
+``using``
+    The database alias being used.
+
+For example, if a ``Pizza`` can have multiple ``Topping`` objects, modeled
+like this::
+
+    class Topping(models.Model):
+        # ...
+        pass
+
+    class Pizza(models.Model):
+        # ...
+        toppings = models.ManyToManyField(Topping)
+
+If we would do something like this:
+
+    >>> p = Pizza.object.create(...)
+    >>> t = Topping.objects.create(...)
+    >>> p.toppings.add(t)
+
+the arguments sent to a :data:`m2m_changed` handler would be:
+
+==============  ============================================================
+Argument        Value
+==============  ============================================================
+``sender``      ``Pizza.toppings.through`` (the intermediate m2m class)
+
+``instance``    ``p`` (the ``Pizza`` instance being modified)
+
+``action``      ``"pre_add"`` (followed by a separate signal with ``"post_add"``)
+
+``reverse``     ``False`` (``Pizza`` contains the :class:`ManyToManyField`,
+                so this call modifies the forward relation)
+
+``model``       ``Topping`` (the class of the objects added to the
+                ``Pizza``)
+
+``pk_set``      ``[t.id]`` (since only ``Topping t`` was added to the relation)
+
+``using``       ``"default"`` (since the default router sends writes here)
+==============  ============================================================
+
+And if we would then do something like this::
+
+    >>> t.pizza_set.remove(p)
+
+the arguments sent to a :data:`m2m_changed` handler would be:
+
+==============  ============================================================
+Argument        Value
+==============  ============================================================
+``sender``      ``Pizza.toppings.through`` (the intermediate m2m class)
+
+``instance``    ``t`` (the ``Topping`` instance being modified)
+
+``action``      ``"pre_remove"`` (followed by a separate signal with ``"post_remove"``)
+
+``reverse``     ``True`` (``Pizza`` contains the :class:`ManyToManyField`,
+                so this call modifies the reverse relation)
+
+``model``       ``Pizza`` (the class of the objects removed from the
+                ``Topping``)
+
+``pk_set``      ``[p.id]`` (since only ``Pizza p`` was removed from the
+                relation)
+
+``using``       ``"default"`` (since the default router sends writes here)
+==============  ============================================================
 
 class_prepared
 --------------
@@ -190,7 +369,7 @@ Django はこのシグナルを内部的に使っています。通常は、サ�
 管理コマンド関連のシグナル
 =============================
 
-:ref:`django-admin <ref-django-admin>` の送信するシグナルです。
+:doc:`django-admin </ref/django-admin>` の送信するシグナルです。
 
 post_syncdb
 -----------
@@ -198,41 +377,67 @@ post_syncdb
 .. data:: django.db.models.signals.post_syncdb
    :module:
 
-:djadmin:`syncdb` でアプリケーションがインストールされると送信されます。
+.. Sent by the :djadmin:`syncdb` command after it installs an application, and the
+   :djadmin:`flush` command.
+
+:djadmin:`syncdb` コマンドがアプリケーションをインストールした後、または
+:djadmin:`flush` コマンドによって送信されます。
+
+.. Any handlers that listen to this signal need to be written in a particular
+   place: a ``management`` module in one of your :setting:`INSTALLED_APPS`. If
+   handlers are registered anywhere else they may not be loaded by
+   :djadmin:`syncdb`. It is important that handlers of this signal perform
+   idempotent changes (e.g. no database alterations) as this may cause the
+   :djadmin:`flush` management command to fail if it also ran during the
+   :djadmin:`syncdb` command.
 
 このシグナルを待ち受けるハンドラは、 :setting:`INSTALLED_APPS` に登録されて
 いるいずれかのアプリケーションの ``management`` モジュール内に定義せねばな
-りません。それ以外の場所にハンドラを定義しても、 :djadmin:`syncdb` はハンド
-ラをロードしません。
+りません。それ以外の場所にハンドラを定義しても、 :djadmin:`syncdb` がそれらを
+ロードしないかもしれません。このシグナルのハンドラが行う変更がべき等である
+(つまりデータベースの変更を伴わない) ことは重要です。 :djadmin:`syncdb` コマンド
+の最中に実行されると :djadmin:`flush` 管理コマンドが失敗するかもしれない
+からです。
 
 引数は以下の通りです:
 
-    ``sender``
-        インストールされた ``models`` モジュールです。つまり、
-        :djadmin:`syncdb` が ``"foo.bar.myapp"`` という名前のアプリケーショ
-        ンをインストールすると、 ``sender`` には ``foo.bar.myapp.models``
-        モジュールが入ります。
+``sender``
+    インストールされた ``models`` モジュールです。つまり、
+    :djadmin:`syncdb` が ``"foo.bar.myapp"`` という名前のアプリケーショ
+    ンをインストールすると、 ``sender`` には ``foo.bar.myapp.models``
+    モジュールが入ります。
 
-    ``app``
-        ``sender`` と同じです。
+``app``
+    ``sender`` と同じです。
 
-    ``created_models``
-        :djadmin:`syncdb` が生成した全てのモデルクラスからなるリストです。
+``created_models``
+    :djadmin:`syncdb` が生成した全てのモデルクラスからなるリストです。
 
-    ``verbosity``
-        manage.py がどれくらいの情報をスクリーンに表示しているかを示す値で
-        す。詳しくは :djadminopt:`--verbosity`` フラグを参照してください。
+``verbosity``
+    manage.py がどれくらいの情報をスクリーンに表示しているかを示す値で
+    す。詳しくは :djadminopt:`--verbosity`` フラグを参照してください。
 
-        :data:`post_syncdb` を待ち受けている関数は、この引数の値に従って、
-	スクリーンに表示するメッセージの量を調整してください。
+    :data:`post_syncdb` を待ち受けている関数は、この引数の値に従って、
+    スクリーンに表示するメッセージの量を調整してください。
 
-    ``interactive``
-        ``interactive`` が ``True`` の場合、ユーザにコマンドプロンプトを提
-        示してもかまいません。 ``interactive`` が ``False`` であれば、シグ
-        ナルを待ち受ける関数は、ユーザにプロンプトを表示してはなりません。
+``interactive``
+    ``interactive`` が ``True`` の場合、ユーザにコマンドプロンプトを提
+    示してもかまいません。 ``interactive`` が ``False`` であれば、シグ
+    ナルを待ち受ける関数は、ユーザにプロンプトを表示してはなりません。
 
-        たとえば、 :mod:`django.contrib.auth` アプリケーションは、
-	``interactive`` が ``True`` の時にしかスーパユーザを作成しません。
+    たとえば、 :mod:`django.contrib.auth` アプリケーションは、
+    ``interactive`` が ``True`` の時にしかスーパユーザを作成しません。
+
+For example, ``yourapp/management/__init__.py`` could be written like::
+
+    from django.db.models.signals import post_syncdb
+    import yourapp.models
+
+    def my_callback(sender, **kwargs):
+        # Your specific logic here
+        pass
+
+    post_syncdb.connect(my_callback, sender=yourapp.models)
 
 リクエスト／レスポンス関連のシグナル
 =======================================
@@ -246,16 +451,19 @@ request_started
 ---------------
 
 .. data:: django.core.signals.request_started
-   :module: 
+   :module:
 
-Djang が HTTP リクエストを送信する直前に送信されます。   
+Djang が HTTP リクエストを送信する直前に送信されます。
 
 引数は以下の通りです:
 
-    ``sender``
-        リクエストを処理するハンドラクラス、すなわち
-        :class:`django.core.handlers.modpython.ModPythonHandler` や
-        :class:`django.core.handlers.wsgi.WsgiHandler` です。
+``sender``
+    .. The handler class -- e.g.
+       :class:`django.core.handlers.wsgi.WsgiHandler` -- that handled
+       the request.
+
+    リクエストを処理するハンドラクラス、たとえば
+    :class:`django.core.handlers.wsgi.WsgiHandler` です。
 
 request_finished
 ----------------
@@ -263,12 +471,12 @@ request_finished
 .. data:: django.core.signals.request_finished
    :module:
 
-Django が HTTP リクエストの処理を終了した直後に呼び出されます。   
+Django が HTTP リクエストの処理を終了した直後に呼び出されます。
 
 引数は以下の通りです:
 
-    ``sender``
-        上と同じく、ハンドラクラスです。
+``sender``
+    上と同じく、ハンドラクラスです。
 
 got_request_exception
 ---------------------
@@ -281,11 +489,11 @@ got_request_exception
 
 引数は以下の通りです:
 
-    ``sender``
-        上と同じく、ハンドラクラスです。
+``sender``
+    上と同じく、ハンドラクラスです。
 
-    ``request``
-        :class:`~django.http.HttpRequest` オブジェクトです。
+``request``
+    :class:`~django.http.HttpRequest` オブジェクトです。
 
 テスト関連のシグナル
 =====================
@@ -293,7 +501,34 @@ got_request_exception
 .. module:: django.test.signals
    :synopsis: テスト中に送信されるシグナルです。
 
-:ref:`テストの実行中 <topics-testing>` にのみ送信されるシグナルです。
+:doc:`テストの実行中 </topics/testing>` にのみ送信されるシグナルです。
+
+setting_changed
+---------------
+
+.. versionadded:: 1.4
+
+.. data:: django.test.signals.setting_changed
+   :module:
+
+This signal is sent when the value of a setting is changed through the
+:meth:`django.test.TestCase.setting` context manager or the
+:func:`django.test.utils.override_settings` decorator/context manager.
+
+It's actually sent twice: when the new value is applied ("setup") and when the
+original value is restored ("teardown").
+
+Arguments sent with this signal:
+
+``sender``
+    The settings handler.
+
+``setting``
+    The name of the setting.
+
+``value``
+    The value of the setting after the change. For settings that initially
+    don't exist, in the "teardown" phase, ``value`` is ``None``.
 
 template_rendered
 -----------------
@@ -306,13 +541,47 @@ template_rendered
 
 引数は以下の通りです:
 
-    ``sender``
-        これからレンダされる :class:`~django.template.Template` テンプレー
-        トオブジェクトです。
+``sender``
+    これからレンダされる :class:`~django.template.Template` テンプレー
+    トオブジェクトです。
 
-    ``template``
-        ``sender`` と同じ値です。
+``template``
+    ``sender`` と同じ値です。
 
-    ``context``
-        テンプレートをレンダするときに渡される
-        :class:`~django.template.Context` です。
+``context``
+    テンプレートをレンダするときに渡される
+    :class:`~django.template.Context` です。
+
+Database Wrappers
+=================
+
+.. module:: django.db.backends
+   :synopsis: Core signals sent by the database wrapper.
+
+Signals sent by the database wrapper when a database connection is
+initiated.
+
+connection_created
+------------------
+
+.. data:: django.db.backends.signals.connection_created
+   :module:
+
+.. versionchanged:: 1.2
+   The connection argument was added
+
+Sent when the database wrapper makes the initial connection to the
+database.  This is particularly useful if you'd like to send any post
+connection commands to the SQL backend.
+
+Arguments sent with this signal:
+
+``sender``
+    The database wrapper class -- i.e.
+    :class:`django.db.backends.postgresql_psycopg2.DatabaseWrapper` or
+    :class:`django.db.backends.mysql.DatabaseWrapper`, etc.
+
+``connection``
+    The database connection that was opened. This can be used in a
+    multiple-database configuration to differentiate connection signals
+    from different databases.
