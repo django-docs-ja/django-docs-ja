@@ -1,105 +1,109 @@
-.. _ref-models-relations:
-
 =====================================
 リレーションオブジェクトリファレンス
 =====================================
 
-:revision-up-to: 11321 (1.1) unfinished
+:revision-up-to: 17812 (1.4) unfinished
 
-.. currentmodule:: django.db.models
+.. currentmodule:: django.db.models.fields.related
 
-This document describes extra methods available on managers when used in a one-to-many or many-to-many related context. This happens in two cases:
+.. class:: RelatedManager
 
-    * The "other side" of a ``ForeignKey`` relation. That is::
-    
+    A "related manager" is a manager used in a one-to-many or many-to-many
+    related context. This happens in two cases:
+
+    * The "other side" of a :class:`~django.db.models.ForeignKey` relation.
+      That is::
+
             class Reporter(models.Model):
                 ...
-                
+
             class Article(models.Model):
                 reporter = models.ForeignKey(Reporter)
-            
+
       In the above example, the methods below will be available on
       the manager ``reporter.article_set``.
-      
-    * Both sides of a ``ManyToManyField`` relation::
-    
+
+    * Both sides of a :class:`~django.db.models.ManyToManyField` relation::
+
             class Topping(models.Model):
                 ...
-                
+
             class Pizza(models.Model):
                 toppings = models.ManyToManyField(Topping)
-                
+
       In this example, the methods below will be available both on
       ``topping.pizza_set`` and on ``pizza.toppings``.
 
+    These related managers have some extra methods:
 
-.. method:: QuerySet.add(obj1, [obj2, ...])
+    .. method:: add(obj1, [obj2, ...])
 
-    指定したモデルオブジェクトを、披リレーションのセットに追加し (リレーショ
-    ン先のオブジェクトからリレーションを張り)ます。
+        指定したモデルオブジェクトを、披リレーションのセットに追加し (リレーショ
+        ン先のオブジェクトからリレーションを張り) ます。
 
-    使い方::
+        使い方::
 
-        >>> b = Blog.objects.get(id=1)
-        >>> e = Entry.objects.get(id=234)
-        >>> b.entry_set.add(e) # Entry e を Blog b に関連づけます。
+            >>> b = Blog.objects.get(id=1)
+            >>> e = Entry.objects.get(id=234)
+            >>> b.entry_set.add(e) # Entry e を Blog b に関連づけます。
 
-.. method:: QuerySet.create(**kwargs)`
+    .. method:: create(**kwargs)`
 
-    新たなオブジェクトを生成し、保存して、披リレーションのセットに追加しま
-    す。新たに生成されたオブジェクトを返します::
+        新たなオブジェクトを生成し、保存して、披リレーションのセットに追加しま
+        す。新たに生成されたオブジェクトを返します::
 
-        >>> b = Blog.objects.get(id=1)
-        >>> e = b.entry_set.create(
-        ...     headline='Hello', 
-        ...     body_text='Hi', 
-        ...     pub_date=datetime.date(2005, 1, 1)
-        ... )
-        
-        # e は自動的に保存されるので、 e.save() は呼ばなくてかまいません
+            >>> b = Blog.objects.get(id=1)
+            >>> e = b.entry_set.create(
+            ...     headline='Hello',
+            ...     body_text='Hi',
+            ...     pub_date=datetime.date(2005, 1, 1)
+            ... )
 
-    上の例は、下記と同じ処理を実現します::
+            # e は自動的に保存されるので、 e.save() は呼ばなくてかまいません
 
-        >>> b = Blog.objects.get(id=1)
-        >>> e = Entry(
-        ....     blog=b, 
-        ....     headline='Hello', 
-        ....     body_text='Hi', 
-        ....     pub_date=datetime.date(2005, 1, 1)
-        .... )
-        >>> e.save()
+        上の例は、下記と同じ処理を実現します::
 
-    リレーションを定義するためのキーワード引数を指定する必要はないので注意
-    してください。上の例では、 ``create()`` に ``blog`` パラメタを渡してい
-    ません。 Django は ``Entry`` オブジェクトの ``blog`` フィールドに自動的
-    に ``b`` をセットします。
+            >>> b = Blog.objects.get(id=1)
+            >>> e = Entry(
+            ...      blog=b,
+            ...      headline='Hello',
+            ...      body_text='Hi',
+            ...      pub_date=datetime.date(2005, 1, 1)
+            ...  )
+            >>> e.save()
 
-.. method:: QuerySet.remove(obj1, [obj2, ...])
+        リレーションを定義するためのキーワード引数を指定する必要はないので注意
+        してください。上の例では、 ``create()`` に ``blog`` パラメタを渡してい
+        ません。 Django は ``Entry`` オブジェクトの ``blog`` フィールドに自動的
+        に ``b`` をセットします。
 
-    指定したオブジェクトを披リレーションセットから除去します::
-    
-        >>> b = Blog.objects.get(id=1)
-        >>> e = Entry.objects.get(id=234)
-        >>> b.entry_set.remove(e) # Disassociates Entry e from Blog b.
+    .. method:: remove(obj1, [obj2, ...])
 
-    データベースの一貫性を保持するために、このメソッドは ``null=True`` の
-    ``ForeignKey`` オブジェクトがリレーションを張っている先のモデルでしか使
-    えません。リレーションフィールドの値を ``None`` (``NULL``) にできなけれ
-    ば、あるオブジェクトを披リレーションセットから除去したときに、何らかの
-    他のオブジェクトに対してリレーションを張り直さなければならないからです。
-    上の例で、 ``b.entry_set()`` からの ``e`` の除去は ``e.blog = None`` に
-    相当しますが、 ``blog`` の ``ForeignKey`` には ``null=True`` が設定され
-    ていないので、これは無効な操作です。
+        指定したオブジェクトを披リレーションセットから除去します::
 
-.. method:: QuerySet.clear()
+            >>> b = Blog.objects.get(id=1)
+            >>> e = Entry.objects.get(id=234)
+            >>> b.entry_set.remove(e) # Disassociates Entry e from Blog b.
 
-    披リレーションセットから、全てのオブジェクトを除去します::
+        データベースの一貫性を保持するために、このメソッドは ``null=True`` の
+        :class:`~django.db.models.ForeignKey` オブジェクトがリレーションを
+        張っている先のモデルでしか使えません。リレーションフィールドの値を
+        ``None`` (``NULL``) にできなければ、あるオブジェクトを
+        披リレーションセットから除去したときに、何らかの他のオブジェクトに対して
+        リレーションを張り直さなければならないからです。上の例で、
+        ``b.entry_set()`` からの ``e`` の除去は ``e.blog = None`` に
+        相当しますが、 ``blog`` の :class:`~django.db.models.ForeignKey` には
+        ``null=True`` が設定されていないので、これは無効な操作です。
 
-        >>> b = Blog.objects.get(id=1)
-        >>> b.entry_set.clear()
+    .. method:: clear()
 
-    このメソッドは、リレーション元のオブジェクトを削除せず、ただ単にリレー
-    ションを解除するだけなので注意してください。
+        披リレーションセットから、全てのオブジェクトを除去します::
 
-    ``remove()`` と同様、 ``clear()`` は ``null=True`` の ``ForeignKey``
-    でしか使えません。
+            >>> b = Blog.objects.get(id=1)
+            >>> b.entry_set.clear()
+
+        このメソッドは、リレーション元のオブジェクトを削除せず、ただ単に
+        リレーションを解除するだけなので注意してください。
+
+        ``remove()`` と同様、 ``clear()`` は ``null=True`` の
+        :class:`~django.db.models.ForeignKey` でしか使えません。
