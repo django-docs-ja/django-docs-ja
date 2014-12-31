@@ -6,7 +6,7 @@
 リレーションオブジェクトリファレンス
 =====================================
 
-:revision-up-to: 17812 (1.4) unfinished
+:revision-up-to: 17812 (1.4)
 
 .. currentmodule:: django.db.models.fields.related
 
