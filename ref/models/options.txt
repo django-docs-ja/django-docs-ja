@@ -1,16 +1,18 @@
-.. _ref-models-options:
-
-===============================
+============================
 モデルの ``Meta`` オプション
-===============================
+============================
 
-:revision-up-to: 11321 (1.1) unfinished
+:revision-up-to: 17812 (1.4)
+
+.. This document explains all the possible :ref:`metadata options
+   <meta-options>` that you can give your model in its internal
+   ``class Meta``.
 
 このドキュメントでは、モデルの内部クラス ``Meta`` に指定できる
 :ref:`メタデータオプション <meta-options>` について解説しています。
 
 ``Meta`` オプション
-==========================
+===================
 
 .. currentmodule:: django.db.models
 
@@ -19,223 +21,376 @@
 
 .. attribute:: Options.abstract
 
-``True`` に設定すると、モデルを 
-:ref:`抽象ベースクラス <abstract-base-classes>` にします。
+    .. If ``abstract = True``, this model will be an
+       :ref:`abstract base class <abstract-base-classes>`.
+
+    ``abstract = True`` に設定すると、このモデルは :ref:`抽象ベースクラス
+    <abstract-base-classes>` になります。
+
+``app_label``
+-------------
+
+.. attribute:: Options.app_label
+
+    .. If a model exists outside of the standard :file:`models.py` (for instance,
+       if the app's models are in submodules of ``myapp.models``), the model must
+       define which app it is part of::
+
+    もしモデルが標準的な :file:`models.py` 以外の場所にある場合 (たとえば、
+    そのアプリのモデルがサブモジュール ``myapp.models`` にある場合)、
+    そのモデルがどのアプリに属しているのか定義する必要があります::
+
+        app_label = 'myapp'
 
 ``db_table``
 ------------
 
 .. attribute:: Options.db_table
 
-モデルの使うデータベーステーブルの名前です::
+    モデルの使うデータベーステーブルの名前です::
 
-    db_table = 'music_album'
+        db_table = 'music_album'
 
 .. _table-names:
 
 テーブル名
-~~~~~~~~~~~
+~~~~~~~~~~
 
-ユーザの手間を省くため、 Django はモデルクラスやアプリケーションの名前を元
-にデータベーステーブルの名前を導出します。モデルのデータベーステーブル名は、
-モデルの「アプリケーションラベル (app label)」、つまり
-``manage.py startapp`` で指定した名前と、モデルのクラス名をアンダースコアで
+.. To save you time, Django automatically derives the name of the database table
+   from the name of your model class and the app that contains it. A model's
+   database table name is constructed by joining the model's "app label" -- the
+   name you used in :djadmin:`manage.py startapp <startapp>` -- to the model's
+   class name, with an underscore between them.
+
+ユーザの手間を省くため、 Django はモデルクラスやアプリケーションの名前を
+元にデータベーステーブルの名前を導出します。モデルのデータベーステーブル名は、
+モデルの「アプリケーションラベル (app label)」、つまり :djadmin:`manage.py
+startapp <startapp>` で指定した名前と、モデルのクラス名をアンダースコアで
 結んで生成します。
 
 例えば、 (``manage.py startapp bookstore`` で作成した) ``bookstore`` という
-アプリケーションの中に ``class Book`` で定義したモデルがあった場合そのデー
-タベーステーブルの名前は ``bookstore_book`` です。
+アプリケーションの中に ``class Book`` で定義したモデルがあった場合その
+データベーステーブルの名前は ``bookstore_book`` です。
 
 データベーステーブル名をオーバライドしたければ、 ``class Meta`` に
 ``db_table`` パラメタを設定します。
 
 データベーステーブル名が SQL の予約語と一致している場合や、ハイフンのように
-Python の変数名として扱えない文字を含んでいても問題ありません。 Django はカ
-ラムとテーブル名を舞台裏でクオート処理するからです。
+Python の変数名として扱えない文字を含んでいても問題ありません。 Django は
+カラムとテーブル名を舞台裏でクオート処理するからです。
+
+.. .. admonition:: Use lowercase table names for MySQL
+
+.. admonition:: MySQL のために小文字のテーブル名を使うこと
+
+    .. It is strongly advised that you use lowercase table names when you override
+       the table name via ``db_table``, particularly if you are using the MySQL
+       backend. See the :ref:`MySQL notes <mysql-notes>` for more details.
+
+    MySQL バックエンドを使っている場合は特に、 ``db_table`` でテーブル名を
+    オーバーライドする際に小文字のテーブル名を使うよう強くお勧めします。
+    詳細は :ref:`MySQL に関する注意 <mysql-notes>` を参照してください。
+
 
 ``db_tablespace``
 -----------------
 
 .. attribute:: Options.db_tablespace
 
-.. versionadded:: 1.0
+    .. The name of the :doc:`database tablespace </topics/db/tablespaces>` to use
+       for this model. The default is the project's :setting:`DEFAULT_TABLESPACE`
+       setting, if set. If the backend doesn't support tablespaces, this option is
+       ignored.
 
-このフィールドをインデクス化する際に、データベースのテーブルスペース上での
-フィールドのインデクスの名前に使います。テーブルスペースをサポートしていな
-いバックエンドでは、このオプションは無視されます。
+    このモデルで使用する :doc:`データベースのテーブルスペース
+    </topics/db/tablespaces>` の名前です。デフォルトでは
+    :setting:`DEFAULT_TABLESPACE` が設定されていれば、それを使用します。
+    バックエンドがテーブルスペースをサポートしていない場合、このオプションは
+    無視されます。
 
 ``get_latest_by``
 -----------------
 
 .. attribute:: Options.get_latest_by
 
-モデル中の :class:`DateField` または :class:`DateTimeField` の名前です。こ
-のオプションは、モデルの :class:`Manager` の :class:`~QuerySet.latest` メソッ
-ドが使うデフォルトのフィールドを指定します。
+    モデル中の :class:`DateField` または :class:`DateTimeField` の名前です。
+    このオプションは、モデルの :class:`Manager` の :class:`~QuerySet.latest`
+    メソッドが使うデフォルトのフィールドを指定します。
 
-例えば::
+    例えば::
 
-    get_latest_by = "order_date"
+        get_latest_by = "order_date"
 
-詳しくは :meth:`~django.db.models.QuerySet.latest` を参照してください。
+    詳しくは :meth:`~django.db.models.query.QuerySet.latest` を参照してください。
 
 ``managed``
------------------------
+-----------
 
 .. attribute:: Options.managed
 
-.. versionadded:: 1.1
+    .. Defaults to ``True``, meaning Django will create the appropriate database
+       tables in :djadmin:`syncdb` and remove them as part of a :djadmin:`reset`
+       management command. That is, Django *manages* the database tables'
+       lifecycles.
 
-Defaults to ``True``, meaning Django will create the appropriate database
-tables in :ref:`django-admin-syncdb` and remove them as part of a :ref:`reset
-<django-admin-reset>` management command. That is, Django *manages* the
-database tables' lifecycles.
+    デフォルトでは ``True`` です。その場合 Django は適切なデータベーステーブルを
+    :djadmin:`syncdb` で作成し、 :djadmin:`reset` 管理コマンドの処理の中で
+    削除します。すなわち、 Django がデータベーステーブルのライフサイクルを
+    *"管理する (manage)"* ことになります。
 
-If ``False``, no database table creation or deletion operations will be
-performed for this model. This is useful if the model represents an existing
-table or a database view that has been created by some other means. This is
-the *only* difference when ``managed`` is ``False``. All other aspects of
-model handling are exactly the same as normal. This includes
+    .. If ``False``, no database table creation or deletion operations will be
+       performed for this model. This is useful if the model represents an existing
+       table or a database view that has been created by some other means. This is
+       the *only* difference when ``managed=False``. All other aspects of
+       model handling are exactly the same as normal. This includes
 
-    1. Adding an automatic primary key field to the model if you don't declare
-       it.  To avoid confusion for later code readers, it's recommended to
-       specify all the columns from the database table you are modeling when
-       using unmanaged models.
+    ``False`` の場合、データベーステーブルの作成や削除がこのモデルのために
+    行われることはありません。モデルが、他の手段で作成済みのテーブルや
+    データベースビューを表す場合に、役立つでしょう。これが ``managed=False``
+    とした場合に起こる *唯一の* 違いです。モデルの処理に関して、他はすべて
+    完全に普通通りです。以下についても同じです:
 
-    2. If a model with ``managed=False`` contains a
-       :class:`~django.db.models.ManyToManyField` that points to another
-       unmanaged model, then the intermediate table for the many-to-many join
-       will also not be created. However, a the intermediary table between one
-       managed and one unmanaged model *will* be created.
-       
-       If you need to change this default behavior, create the intermediary
-       table as an explicit model (with ``managed`` set as needed) and use the
-       :attr:`ManyToManyField.through` attribute to make the relation use your
-       custom model.
+    .. 1. Adding an automatic primary key field to the model if you don't
+          declare it.  To avoid confusion for later code readers, it's
+          recommended to specify all the columns from the database table you
+          are modeling when using unmanaged models.
 
-For tests involving models with ``managed=False``, it's up to you to ensure
-the correct tables are created as part of the test setup.
+    1. (訳注: どのフィールドが主キーであるかを) 宣言しない限り、自動的に
+       主キーフィールドをモデルに追加します。"管理しない" モデルを使っている
+       場合、後でコードを読む人が混乱しないように、モデリングしている
+       データベーステーブルの全カラムを指定することをお勧めします。
 
-If you're interested in changing the Python-level behavior of a model class,
-you *could* use ``managed=False`` and create a copy of an existing model.
-However, there's a better approach for that situation: :ref:`proxy-models`.
+    .. 2. If a model with ``managed=False`` contains a
+          :class:`~django.db.models.ManyToManyField` that points to another
+          unmanaged model, then the intermediate table for the many-to-many
+          join will also not be created. However, the intermediary table
+          between one managed and one unmanaged model *will* be created.
+
+    2. もし ``managed=False`` なモデルが他の "管理しない" モデルを指す
+       :class:`~django.db.models.ManyToManyField` を含んでいる場合、
+       many-to-many 結合用の中間テーブルも作成されません。しかし、 "管理する"
+       モデルと "管理しない" モデルの間の中間テーブルは *作成されます* 。
+
+       .. If you need to change this default behavior, create the intermediary
+          table as an explicit model (with ``managed`` set as needed) and use
+          the :attr:`ManyToManyField.through` attribute to make the relation
+          use your custom model.
+
+       このデフォルトの振る舞いを変更する必要がある場合、中間テーブル用の
+       明示的なモデルを (必要に応じて ``managed`` を指定して) 作成し、
+       :attr:`ManyToManyField.through` 属性を使ってそのカスタムモデルを
+       そのリレーションで使うように指定してください。
+
+    .. For tests involving models with ``managed=False``, it's up to you to ensure
+       the correct tables are created as part of the test setup.
+
+    ``managed=False`` としたモデルが関わるテストにおいて、テストのセットアップ
+    処理で正しいテーブルを作成するかどうかはユーザ次第です。
+
+    .. If you're interested in changing the Python-level behavior of a model class,
+       you *could* use ``managed=False`` and create a copy of an existing model.
+       However, there's a better approach for that situation: :ref:`proxy-models`.
+
+    もしモデルクラスの Python レベルでの振る舞いを変更してみたいのであれば、
+    ``managed=False`` としつつ既存のモデルのコピーを作成することも
+    *可能と言えば可能* です。しかし、その状況であればもっと良いアプローチが
+    あります: :ref:`proxy-models` です。
 
 ``order_with_respect_to``
 -------------------------
 
 .. attribute:: Options.order_with_respect_to
 
-オブジェクトを指定のフィールドで「並べ替え可能 (orderable)」にします。この
-オプションを使うのは、リレーションの張られたオブジェクトを、親オブジェクト
-に従って並べ替えたい場合がほとんどです。例えば、 ``Answer`` が ``Question``
-にリレーションを張っており、一つの ``Question`` に複数の ``Answer`` があっ
-て、 ``Answer`` の順番が重要である場合は以下のようにします::
+    .. Marks this object as "orderable" with respect to the given field. This is almost
+       always used with related objects to allow them to be ordered with respect to a
+       parent object. For example, if an ``Answer`` relates to a ``Question`` object,
+       and a question has more than one answer, and the order of answers matters, you'd
+       do this::
 
-    class Answer(models.Model):
-        question = models.ForeignKey(Question)
-        # ...
+    指定したフィールドでオブジェクトを「並べ替え可能 (orderable)」であると宣言します。
+    このオプションを使うのは、リレーションの張られたオブジェクトを、親オブジェクト
+    に従って並べ替えたい場合がほとんどです。例えば、 ``Answer`` が ``Question``
+    にリレーションを張っており、一つの ``Question`` に複数の ``Answer`` があっ
+    て、 ``Answer`` の順番が重要である場合は以下のようにします::
 
-        class Meta:
-            order_with_respect_to = 'question'
+        class Answer(models.Model):
+            question = models.ForeignKey(Question)
+            # ...
+
+            class Meta:
+                order_with_respect_to = 'question'
+
+    .. When ``order_with_respect_to`` is set, two additional methods are provided to
+       retrieve and to set the order of the related objects: ``get_RELATED_order()``
+       and ``set_RELATED_order()``, where ``RELATED`` is the lowercased model name. For
+       example, assuming that a ``Question`` object has multiple related ``Answer``
+       objects, the list returned contains the primary keys of the related ``Answer``
+       objects::
+
+    ``order_with_respect_to`` が設定されているとき、関係づけられたオブジェクトの
+    並び順を取得・設定する 2 つのメソッドが追加されます:
+    ``get_RELATED_order()`` と ``set_RELATED_order()`` という名前で、ただし
+    ``RELATED`` の部分は小文字化したモデル名になります。たとえば ``Question``
+    オブジェクトが複数の ``Answer`` オブジェクトと関係づけられているとしたら、
+    返されるリストには関係づけられた ``Answer`` オブジェクトの主キーが
+    格納されています::
+
+        >>> question = Question.objects.get(id=1)
+        >>> question.get_answer_order()
+        [1, 2, 3]
+
+    .. The order of a ``Question`` object's related ``Answer`` objects can be set by
+       passing in a list of ``Answer`` primary keys::
+
+    ``Question`` オブジェクトに関係づけられた ``Answer`` オブジェクトの並び順は
+    ``Answer`` の主キーのリストを渡せば設定できます::
+
+        >>> question.set_answer_order([3, 1, 2])
+
+    .. The related objects also get two methods, ``get_next_in_order()`` and
+       ``get_previous_in_order()``, which can be used to access those objects in their
+       proper order. Assuming the ``Answer`` objects are ordered by ``id``::
+
+    関係づけられたオブジェクトには、さらに 2 つメソッドが追加されます。
+    ``get_next_in_order()`` と ``get_previous_in_order()`` というメソッドで、
+    正しい順番でオブジェクトにアクセスするのに使えます。 ``Answer``
+    オブジェクトが ``id`` で並べられるとすると::
+
+        >>> answer = Answer.objects.get(id=2)
+        >>> answer.get_next_in_order()
+        <Answer: 3>
+        >>> answer.get_previous_in_order()
+        <Answer: 1>
+
+.. .. admonition:: Changing order_with_respect_to
+
+.. admonition:: order_with_respect_to を変更する
+
+        .. ``order_with_respect_to`` adds an additional field/database column
+           named ``_order``, so be sure to handle that as you would any other
+           change to your models if you add or change ``order_with_respect_to``
+           after your initial :djadmin:`syncdb`.
+
+        ``order_with_respect_to`` は ``_order`` という名前で追加のフィールド /
+        データベースカラムを追加します。そのため最初の :djadmin:`syncdb` の後に
+        ``order_with_respect_to`` を追加または変更するのであれば、モデルも
+        変更するなど、関連する変更を確実に行ってください。
 
 ``ordering``
 ------------
 
 .. attribute:: Options.ordering
 
-オブジェクトのリストを取得するときに使われる、オブジェクトのデフォルトの並
-び順規則です::
+    オブジェクトのリストを取得するときに使われる、オブジェクトのデフォルトの
+    並び順規則です::
 
-    ordering = ['-order_date']
+        ordering = ['-order_date']
 
-値は文字列のタプルやリストです。各文字列はフィールドの名前で、降順に並べる
-場合にはオプションの "-" を先頭に付けます。先頭に "-" のないフィールドは昇
-順に並べられます。順番をランダムにするには "?" を使って下さい。
+    値は文字列のタプルやリストです。各文字列はフィールドの名前で、降順に並べる
+    場合にはオプションの "-" を先頭に付けます。先頭に "-" のないフィールドは
+    昇順に並べられます。順番をランダムにするには "?" を使って下さい。
 
-.. note:: 
+    例えば、 ``pub_date`` フィールドで昇順に並べる場合には以下のようにします::
 
-    :attr:`~Options.ordering` にいくつフィールド名を指定しても、 admin は先
-    頭のフィールドだけを考慮します。
+        ordering = ['pub_date']
 
-例えば、 ``pub_date`` フィールドで昇順に並べる場合には以下のようにします::
+    ``pub_date`` フィールドで降順に並べる場合には以下のようにします::
 
-    ordering = ['pub_date']
+        ordering = ['-pub_date']
 
-``pub_date`` フィールドで降順に並べる場合には以下のようにします::
+    ``pub_date`` フィールドで降順に並べ、さらに ``author`` で昇順に場合には以下
+    のようにします::
 
-    ordering = ['-pub_date']
+        ordering = ['-pub_date', 'author']
 
-``pub_date`` フィールドで降順に並べ、さらに ``author`` で昇順に場合には以下
-のようにします::
+    .. .. versionchanged:: 1.4
+          The Django admin honors all elements in the list/tuple; before 1.4, only
+          the first one was respected.
 
-    ordering = ['-pub_date', 'author']
+    .. versionchanged:: 1.4
+       Django の admin はリスト・タプル中の全要素をちゃんと扱います。 1.4
+       以前は、最初の要素以外は無視されました。
 
 ``permissions``
 ---------------
 
 .. attribute:: Options.permissions
 
-オブジェクトの生成時にパーミッションテーブルに追加するパーミッションのリス
-トです。 ``admin`` セットをもつオブジェクトには、追加、削除、変更のパーミッ
-ションが自動的に生成されます。以下の例では、 ``can_deliver_pizzas`` という追
-加のパーミッションを定義しています::
+    オブジェクトの生成時にパーミッションテーブルに追加するパーミッションの
+    リストです。 ``admin`` セットをもつオブジェクトには、追加、削除、変更の
+    パーミッションが自動的に生成されます。以下の例では、 ``can_deliver_pizzas``
+    という追加のパーミッションを定義しています::
 
-    permissions = (("can_deliver_pizzas", "Can deliver pizzas"),)
+        permissions = (("can_deliver_pizzas", "Can deliver pizzas"),)
 
-``(permission_code, human_readable_permission_name)`` の形式をとる 2 要素の
-タプルからなるリストです。
+    ``(permission_code, human_readable_permission_name)`` の形式をとる 2 要素の
+    タプルからなるリストです。
 
 ``proxy``
 ---------
 
 .. attribute:: Options.proxy
 
-.. versionadded:: 1.1
+    .. If ``proxy = True``, a model which subclasses another model will be treated as
+       a :ref:`proxy model <proxy-models>`.
 
-If set to ``True``, a model which subclasses another model will be treated as
-a :ref:`proxy model <proxy-models>`.
+    ``proxy = True`` である場合、他のモデルをサブクラス化したモデルは
+    :ref:`プロキシモデル <proxy-models>` として扱われます。
 
 ``unique_together``
 -------------------
 
 .. attribute:: Options.unique_together
 
-組み合わせとして一意にしなければならないフィールドセットのリストです::
+    組み合わせとして一意にしなければならないフィールドセットのリストです::
 
-    unique_together = (("driver", "restaurant"),)
+        unique_together = (("driver", "restaurant"),)
 
-このリストは、フィールド名のリストからなるリストです。各要素のリストに入っ
-ているフィールドの値の組み合わは、データベース上で一意でなければなりません。
-この制約は Django の admin 上で使われるとともに、データベースレベルでも強制
-されます (すなわち、適切な ``UNIQUE`` 文が ``CREATE TABLE`` 文に入ります)。
+    このリストは、フィールド名のリストからなるリストです。各要素のリストに
+    入っているフィールドの値の組み合わせは、データベース上で一意でなければ
+    なりません。この制約は Django の admin 上で使われるとともに、データベース
+    レベルでも強制されます (すなわち、適切な ``UNIQUE`` 文が ``CREATE TABLE``
+    文に入ります)。
 
-.. versionadded:: 1.0
+    便宜上、 ``unique_together`` は一つのリストのときは単一セットのフィールド
+    として扱います::
 
-便宜上、 ``unique_together`` は一つのリストのときは単一セットのフィールドと
-して扱います::
+        unique_together = ("driver", "restaurant")
 
-    unique_together = ("driver", "restaurant")
+    .. A :class:`~django.db.models.ManyToManyField` cannot be included in
+       unique_together. (It's not clear what that would even mean!) If you
+       need to validate uniqueness related to a
+       :class:`~django.db.models.ManyToManyField`, try using a signal or
+       an explicit :attr:`through <ManyToManyField.through>` model.
+
+    unique_together に :class:`~django.db.models.ManyToManyField`
+    を含めることはできません。(何を意味しているのかハッキリしません!)
+    :class:`~django.db.models.ManyToManyField` に関係した一意性を検証する
+    必要があるのであれば、シグナルか、明示的な
+    :attr:`through <ManyToManyField.through>` モデルを使ってみてください。
 
 ``verbose_name``
 ----------------
 
 .. attribute:: Options.verbose_name
 
-人間可読なオブジェクト名の単数形です::
+    人間可読なオブジェクト名の単数形です::
 
-    verbose_name = "pizza"
+        verbose_name = "pizza"
 
-この引数を指定しない場合、Django はクラス名を解体した文字列を使います。例え
-ば ``CamelCase`` は ``camel case`` になります。
+    この引数を指定しない場合、Django はクラス名を解体した文字列を使います。
+    例えば ``CamelCase`` は ``camel case`` になります。
 
 ``verbose_name_plural``
 -----------------------
 
 .. attribute:: Options.verbose_name_plural
 
-オブジェクトの複数形名です::
+    オブジェクトの複数形名です::
 
-    verbose_name_plural = "stories"
+        verbose_name_plural = "stories"
 
-この引数を指定しない場合、Django は :attr:`~Options.verbose_name` + "s"``
-を使います。
+    .. If this isn't given, Django will use :attr:`~Options.verbose_name` + ``"s"``.
+
+    この引数を指定しない場合、Django は :attr:`~Options.verbose_name` + ``"s"``
+    を使います。
