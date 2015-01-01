@@ -46,7 +46,7 @@ def setup(app):
     app.add_crossref_type(
         directivename = "fieldlookup",
         rolename      = "lookup",
-        indextemplate = u"pair: %s, フィールド照合タイプ",
+        indextemplate = u"pair: %s; フィールド照合タイプ",
     )
     app.add_description_unit(
         directivename = "django-admin",
