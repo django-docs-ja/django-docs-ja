@@ -1,5 +1,3 @@
-.. _ref-models-instances:
-
 ===============================
 モデルインスタンスリファレンス
 ===============================
@@ -9,11 +7,11 @@
 .. currentmodule:: django.db.models
 
 このドキュメントでは、モデル API の詳細を解説します。このドキュメントは、
-:ref:`モデル <topics-db-models>` や `データベースクエリ
-<topics-db-queries>` といったガイドを前提にしているので、このドキュメントを
+:doc:`モデル </topics/db/models>` や :doc:`データベースクエリ
+</topics/db/queries>` といったガイドを前提にしているので、このドキュメントを
 読む前に、予め読んで理解しておくとよいでしょう。
 
-このリファレンスでは、 :ref:`データベースクエリガイド <topics-db-queries>`
+このリファレンスでは、 :doc:`データベースクエリガイド </topics/db/queries>`
 の :ref:`Weblog のモデル例 <queryset-model-example>` を使います。
 
 オブジェクトの生成
@@ -24,31 +22,141 @@
 .. class:: Model(**kwargs)
 
 キーワード引数に指定できる名前は、モデルで定義したフィールドの名前です。
-モデルのインスタンスを生成しても、 ``save()`` を呼び出すまでデータベースは
-操作されません。
+モデルのインスタンスを生成しても、 :meth:`~Model.save()` を呼び出すまで
+データベースは操作されません。
+
+.. _validating-objects:
+
+Validating objects
+==================
+
+.. versionadded:: 1.2
+
+There are three steps involved in validating a model:
+
+1. Validate the model fields
+2. Validate the model as a whole
+3. Validate the field uniqueness
+
+All three steps are performed when you call a model's
+:meth:`~Model.full_clean()` method.
+
+When you use a :class:`~django.forms.ModelForm`, the call to
+:meth:`~django.forms.Form.is_valid()` will perform these validation steps for
+all the fields that are included on the form. See the :doc:`ModelForm
+documentation </topics/forms/modelforms>` for more information. You should only
+need to call a model's :meth:`~Model.full_clean()` method if you plan to handle
+validation errors yourself, or if you have excluded fields from the
+:class:`~django.forms.ModelForm` that require validation.
+
+.. method:: Model.full_clean(exclude=None)
+
+This method calls :meth:`Model.clean_fields()`, :meth:`Model.clean()`, and
+:meth:`Model.validate_unique()`, in that order and raises a
+:exc:`~django.core.exceptions.ValidationError` that has a ``message_dict``
+attribute containing errors from all three stages.
+
+The optional ``exclude`` argument can be used to provide a list of field names
+that can be excluded from validation and cleaning.
+:class:`~django.forms.ModelForm` uses this argument to exclude fields that
+aren't present on your form from being validated since any errors raised could
+not be corrected by the user.
+
+Note that ``full_clean()`` will *not* be called automatically when you call
+your model's :meth:`~Model.save()` method, nor as a result of
+:class:`~django.forms.ModelForm` validation. You'll need to call it manually
+when you want to run one-step model validation for your own manually created
+models.
+
+Example::
+
+    try:
+        article.full_clean()
+    except ValidationError, e:
+        # Do something based on the errors contained in e.message_dict.
+        # Display them to a user, or handle them programatically.
+
+The first step ``full_clean()`` performs is to clean each individual field.
+
+.. method:: Model.clean_fields(exclude=None)
+
+This method will validate all fields on your model. The optional ``exclude``
+argument lets you provide a list of field names to exclude from validation. It
+will raise a :exc:`~django.core.exceptions.ValidationError` if any fields fail
+validation.
+
+The second step ``full_clean()`` performs is to call :meth:`Model.clean()`.
+This method should be overridden to perform custom validation on your model.
+
+.. method:: Model.clean()
+
+This method should be used to provide custom model validation, and to modify
+attributes on your model if desired. For instance, you could use it to
+automatically provide a value for a field, or to do validation that requires
+access to more than a single field::
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        # Don't allow draft entries to have a pub_date.
+        if self.status == 'draft' and self.pub_date is not None:
+            raise ValidationError('Draft entries may not have a publication date.')
+        # Set the pub_date for published items if it hasn't been set already.
+        if self.status == 'published' and self.pub_date is None:
+            self.pub_date = datetime.datetime.now()
+
+Any :exc:`~django.core.exceptions.ValidationError` exceptions raised by
+``Model.clean()`` will be stored in a special key error dictionary key,
+``NON_FIELD_ERRORS``, that is used for errors that are tied to the entire model
+instead of to a specific field::
+
+    from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
+    try:
+        article.full_clean()
+    except ValidationError, e:
+        non_field_errors = e.message_dict[NON_FIELD_ERRORS]
+
+Finally, ``full_clean()`` will check any unique constraints on your model.
+
+.. method:: Model.validate_unique(exclude=None)
+
+This method is similar to :meth:`~Model.clean_fields`, but validates all
+uniqueness constraints on your model instead of individual field values. The
+optional ``exclude`` argument allows you to provide a list of field names to
+exclude from validation. It will raise a
+:exc:`~django.core.exceptions.ValidationError` if any fields fail validation.
+
+Note that if you provide an ``exclude`` argument to ``validate_unique()``, any
+:attr:`~django.db.models.Options.unique_together` constraint involving one of
+the fields you provided will not be checked.
+
 
 オブジェクトの保存
 ======================
 
 オブジェクトをデータベースに書き戻すには、 ``save()`` を使います:
 
-.. method:: Model.save([force_insert=False, force_update=False])
+.. method:: Model.save([force_insert=False, force_update=False, using=DEFAULT_DB_ALIAS])
 
-もちろん、 データベースへの保存には、以下に説明するような細かい注意点があり
-ます。
+.. versionadded:: 1.2
+   The ``using`` argument was added.
 
-.. versionadded:: 1.0
+If you want customized saving behavior, you can override this ``save()``
+method. See :ref:`overriding-model-methods` for more details.
 
-``save()`` メソッドのシグネチャが変更されました (``force_insert`` と
-``force_update`` が追加されました) メソッドをオーバライドするときには、正し
-いシグネチャを使ってください。
+.. The model save process also has some subtleties; see the sections below.
+
+モデルの保存処理にはいくつか細かい注意点があります。以下の章を参照してください。
 
 主キーの自動インクリメント
 --------------------------
 
-モデルに ``AutoField`` 、すなわち自動インクリメントされる主キーがある場合に
-は、オブジェクトに対して最初に ``save()`` を呼び出したときに自動インクリメ
-ント値が計算され、保存されます::
+.. If a model has an :class:`~django.db.models.AutoField` — an auto-incrementing
+   primary key — then that auto-incremented value will be calculated and saved as
+   an attribute on your object the first time you call ``save()``::
+
+モデルに :class:`~django.db.models.AutoField` 、すなわち自動インクリメントされる
+主キーがある場合には、オブジェクトに対して最初に ``save()`` を呼び出したときに
+自動インクリメント値が計算され、保存されます::
 
     >>> b2 = Blog(name='Cheddar Talk', tagline='Thoughts on cheese.')
     >>> b2.id     # b には ID がないので None を返します。
@@ -58,14 +166,18 @@
 ID の値は Django ではなくデータベースによって計算されるので、 ``save()`` を
 呼び出すまでは ID の値は分かりません。
 
-(利便性のため、明示的に ``primary_key=True`` を指定したフィールドを作成しな
-いかぎり、デフォルトでは各モデルに ``id`` という名前の ``AutoField``
-が追加されます。詳しくは ``AutoField`` のドキュメントを参照してください。)
+.. For convenience, each model has an :class:`~django.db.models.AutoField` named
+   ``id`` by default unless you explicitly specify ``primary_key=True`` on a field
+   in your model. See the documentation for :class:`~django.db.models.AutoField`
+   for more details.
+
+利便性のため、明示的に ``primary_key=True`` を指定したフィールドを
+作成しないかぎり、デフォルトでは各モデルに ``id`` という名前の
+:class:`~django.db.models.AutoField` が追加されます。詳しくは
+:class:`~django.db.models.AutoField` のドキュメントを参照してください。
 
 ``pk`` プロパティ
 ~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.0
 
 .. attribute:: Model.pk
 
@@ -80,9 +192,13 @@ ID の値は Django ではなくデータベースによって計算されるの
 自動主キーの値を明示的に指定する
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-モデルが ``AutoField`` を持っていて、新たなオブジェクトの ID を保存時に明示
-的に指定したい場合、 ID を自動的に決定させずに保存前に明示的に指定してくだ
-さい::
+.. If a model has an :class:`~django.db.models.AutoField` but you want to define a
+   new object's ID explicitly when saving, just define it explicitly before
+   saving, rather than relying on the auto-assignment of the ID::
+
+モデルが :class:`~django.db.models.AutoField` を持っていて、新たなオブジェクトの
+ID を保存時に明示的に指定したい場合、 ID を自動的に決定させずに保存前に明示的に
+指定してください::
 
     >>> b3 = Blog(id=3, name='Cheddar Talk', tagline='Thoughts on cheese.')
     >>> b3.id     # Returns 3.
@@ -110,42 +226,41 @@ ID の値は Django ではなくデータベースによって計算されるの
 
 Django は以下の段階を踏んでオブジェクトを保存します:
 
-    1. **``pre_save`` シグナルの発行** 
-       :attr:`django.db.models.signals.pre_save` :ref:`シグナル <ref-signals>`
-       の発行によって、何らかのオブジェクトを保存しようとしていることを通知
-       します。このシグナルを待ち受けている関数でカスタムの処理を実行できま
-       す。
+1. **pre_save シグナルの発行**
+   :attr:`django.db.models.signals.pre_save` :doc:`シグナル </ref/signals>`
+   の発行によって、何らかのオブジェクトを保存しようとしていることを通知
+   します。このシグナルを待ち受けている関数でカスタムの処理を実行できます。
 
-    2. **データの前処理** オブジェクトの各フィールドについて、保存時に自動
-       的に実行する必要があるデータ修飾処理がないか調べ、あれば実行します。
+2. **データの前処理** オブジェクトの各フィールドについて、保存時に自動的に
+   実行する必要があるデータ修飾処理がないか調べ、あれば実行します。
 
-       ほとんどのフィールドは前処理を *伴いません* 。フィールドのデータは 
-       そのまま保存されます。前処理が行われるのは、特殊な挙動を示すフィー
-       ルドだけです。例えば、 ``auto_now=True`` に設定された ``DateField``
-       の場合、前処理の段階で、フィールドの内容が現在の日付になるようデータ
-       を置き換えます (現時点では、「特殊な」挙動を示すフィールドのリストを
-       全て列挙したドキュメントはありません)。
+   ほとんどのフィールドは前処理を *伴いません* 。フィールドのデータはそのまま
+   保存されます。前処理が行われるのは、特殊な挙動を示すフィールドだけです。
+   例えば、 ``auto_now=True`` に設定された :class:`~django.db.models.DateField`
+   の場合、前処理の段階で、フィールドの内容が現在の日付になるようデータを
+   置き換えます (現時点では、「特殊な」挙動を示すフィールドのリストを
+   全て列挙したドキュメントはありません)。
 
-    3. **データベース保存用のデータ準備処理** 各フィールドについて、フィー
-       ルドの現在の値を元にデータベースに保存できる型のデータを生成します。
+3. **データベース保存用のデータ準備処理** 各フィールドについて、フィールドの
+   現在の値を元にデータベースに保存できる型のデータを生成します。
 
-       ほとんどのフィールドはデータ準備処理を *伴いません* 。整数や文字列は
-       Python オブジェクトとして「いつでもデータベースへの書き込みに使える」
-       形式になっています。ただ、より複雑なデータ型の場合、なにがしかの修飾
-       が必要なことがあります。
+   ほとんどのフィールドはデータ準備処理を *伴いません* 。整数や文字列は
+   Python オブジェクトとして「いつでもデータベースへの書き込みに使える」
+   形式になっています。ただ、より複雑なデータ型の場合、なにがしかの修飾
+   が必要なことがあります。
 
-       例えば、 ``DateField`` は、データの保存に Python の ``datetime`` 型
-       を使います。データベースは ``datetime`` オブジェクトを保存しないので、
-       データベースに保存するには、フィールドの値を ISO 準拠の日付文字列に
-       変換せねばなりません。
+   例えば、 :class:`~django.db.models.DateField` は、データの保存に Python の
+   ``datetime`` 型を使います。データベースは ``datetime`` オブジェクトを
+   保存しないので、データベースに保存するには、フィールドの値を ISO
+   準拠の日付文字列に変換せねばなりません。
 
-    4. **データベースへの保存** 前処理と準備処理を経たデータが SQL 文に組み
-       込まれ、データベースに挿入されます。
+4. **データベースへの保存** 前処理と準備処理を経たデータが SQL 文に組み込まれ、
+   データベースに挿入されます。
 
-    5. **``post_save`` シグナルの発行** `
-       :attr:`django.db.models.signals.pre_save` シグナルと同じく、オブジェ
-       クトが成功理に保存されたことを通知するために 
-       :attr:`django.db.models.signals.post_save` シグナルが発行されます。
+5. **post_save シグナルの発行**
+   :attr:`django.db.models.signals.pre_save` シグナルと同じく、オブジェクトが
+   成功理に保存されたことを通知するために
+   :attr:`django.db.models.signals.post_save` シグナルが発行されます。
 
 UPDATE と INSERT の区別
 -----------------------
@@ -156,13 +271,13 @@ Django データベースオブジェクトがオブジェクトの作成と変�
 に言うと、 ``save()`` を呼び出したときに、Django は以下のアルゴリズムに従い
 ます:
 
-    * オブジェクトの主キー属性の評価値が ``False`` でない場合 (``None`` や
-      空文字列の場合などでない場合) 、 Django は ``SELECT`` クエリを使って、
-      該当する主キーを持つレコードが存在するかどうか調べます。
-    * 該当する主キーを持つレコードがデータベース上に存在する場合には
-      ``UPDATE`` クエリを使います。
-    * オブジェクトの主キー属性が設定 *されていない* 場合や、主キーが設定さ
-      れているが該当するレコードは存在しない場合、 ``INSERT`` を使います。
+* オブジェクトの主キー属性の評価値が ``False`` でない場合 (``None`` や
+  空文字列の場合などでない場合) 、 Django は ``SELECT`` クエリを使って、
+  該当する主キーを持つレコードが存在するかどうか調べます。
+* 該当する主キーを持つレコードがデータベース上に存在する場合には
+  ``UPDATE`` クエリを使います。
+* オブジェクトの主キー属性が設定 *されていない* 場合や、主キーが設定さ
+  れているが該当するレコードは存在しない場合、 ``INSERT`` を使います。
 
 新たなオブジェクトを保存する際、まだ使われていない値を主キーに指定できる保
 証がないかぎり、主キーの値を明示的に指定しないよう注意してください。詳しく
@@ -175,14 +290,21 @@ Django データベースオブジェクトがオブジェクトの作成と変�
 INSERT や UPDATE を強制する
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.0
+.. In some rare circumstances, it's necessary to be able to force the
+   :meth:`~Model.save()` method to perform an SQL ``INSERT`` and not fall back to
+   doing an ``UPDATE``. Or vice-versa: update, if possible, but not insert a new
+   row. In these cases you can pass the ``force_insert=True`` or
+   ``force_update=True`` parameters to the :meth:`~Model.save()` method.
+   Obviously, passing both parameters is an error: you cannot both insert *and*
+   update at the same time!
 
-ごく稀に、 ``save()`` メソッドに ``INSERT`` だけを実行させ、 ``UPDATE`` に
-フォールバックさせたくない、あるいはその逆、すなわち ``UPDATE`` が可能なら
-実行するが、新たなレコードの ``INSERT`` はさせたくないような場合があります。
-そんなときには、 ``force_insert=True`` や ``force_update=True`` パラメタを
-``save()`` メソッドに渡してください。 ``INSERT`` と ``UPDATE`` は同時に行え
-ないので、両方のパラメタを同時に渡すとエラーを引き起こします。
+ごく稀に、 :meth:`~Model.save()` メソッドに ``INSERT`` だけを実行させ、
+``UPDATE`` にフォールバックさせたくない、あるいはその逆、すなわち ``UPDATE``
+が可能なら実行するが、新たなレコードの ``INSERT`` はさせたくないような場合が
+あります。そんなときには、 ``force_insert=True`` や ``force_update=True``
+パラメタを :meth:`~Model.save()` メソッドに渡してください。
+明らかなことではありますが、``INSERT`` と ``UPDATE`` は同時に行えないので、
+両方のパラメタを同時に渡すとエラーを引き起こします。
 
 このパラメタが必要なケースは本当にごく稀な場合だけです。たいていは、 Django
 は正しい SQL で保存を行いますし、パラメタをオーバライドすると、追跡の困難な
@@ -203,11 +325,16 @@ achieve this is to do something like::
 If the old ``number_sold`` value retrieved from the database was 10, then
 the value of 11 will be written back to the database.
 
-This can be optimized slightly by expressing the update relative to the
-original field value, rather than as an explicit assignment of a new value.
-Django provides :ref:`F() expressions <query-expressions>` as a way of
+This sequence has a standard update problem in that it contains a race
+condition. If another thread of execution has already saved an updated value
+after the current thread retrieved the old value, the current thread will only
+save the old value plus one, rather than the new (current) value plus one.
+
+The process can be made robust and slightly faster by expressing the update
+relative to the original field value, rather than as an explicit assignment of
+a new value. Django provides :ref:`F() expressions <query-expressions>` for
 performing this kind of relative update. Using ``F()`` expressions, the
-previous example would be expressed as::
+previous example is expressed as::
 
     >>> from django.db.models import F
     >>> product = Product.objects.get(name='Venezuelan Beaver Cheese')
@@ -215,8 +342,8 @@ previous example would be expressed as::
     >>> product.save()
 
 This approach doesn't use the initial value from the database. Instead, it
-makes the database do the update based on whatever value is current at the
-time that the save() is executed.
+makes the database do the update based on whatever value is current at the time
+that the :meth:`~Model.save()` is executed.
 
 Once the object has been saved, you must reload the object in order to access
 the actual value that was applied to the updated field::
@@ -232,14 +359,20 @@ For more details, see the documentation on :ref:`F() expressions
 Deleting objects
 ================
 
-.. method:: Model.delete()
+.. method:: Model.delete([using=DEFAULT_DB_ALIAS])
 
-   Issues a SQL ``DELETE`` for the object. This only deletes the object in the
-   database; the Python instance will still be around, and will still have data
-   in its fields.
+.. versionadded:: 1.2
+   The ``using`` argument was added.
 
-   For more details, including how to delete objects in bulk, see
-   :ref:`topics-db-queries-delete`.
+Issues a SQL ``DELETE`` for the object. This only deletes the object in the
+database; the Python instance will still exist and will still have data in
+its fields.
+
+For more details, including how to delete objects in bulk, see
+:ref:`topics-db-queries-delete`.
+
+If you want customized deletion behavior, you can override the ``delete()``
+method. See :ref:`overriding-model-methods` for more details.
 
 .. _model-instance-methods:
 
@@ -253,11 +386,21 @@ Deleting objects
 
 .. method:: Model.__unicode__()
 
+.. The ``__unicode__()`` method is called whenever you call ``unicode()`` on an
+   object. Django uses ``unicode(obj)`` (or the related function, :meth:`str(obj)
+   <Model.__str__>`) in a number of places. Most notably, to display an object in
+   the Django admin site and as the value inserted into a template when it
+   displays an object. Thus, you should always return a nice, human-readable
+   representation of the model from the ``__unicode__()`` method.
+
 ``__unicode__()`` メソッドは、オブジェクトに対して ``unicode()`` を呼び出し
-た際に呼び出されます。Django のデータベースバックエンドはモデルの属性値とし
-て Unicode 文字列を返すので、通常はモデルの ``__unicode__()`` メソッドを定
-義するとよいでしょう。前節の例を ``__unicode__()`` を使って書き直すと、以下
-のように簡単になります::
+た際に呼び出されます。Django uses ``unicode(obj)`` (or the related function,
+:meth:`str(obj) <Model.__str__>`) in a number of places. Most notably, to
+display an object in the Django admin site and as the value inserted into a
+template when it displays an object. Thus, you should always return a nice,
+human-readable representation of the model from the ``__unicode__()`` method.
+
+For example::
 
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
@@ -266,29 +409,24 @@ Deleting objects
         def __unicode__(self):
             return u'%s %s' % (self.first_name, self.last_name)
 
-モデルに ``__unicode__()`` メソッドだけを定義して、 ``__str__()`` は定義し
-ないでおくと、 Django が自動的に ``__str__()`` メソッドをモデルに追加します。
-この ``__str__()`` メソッドは、 ``__unicode__()`` を呼び出して、その戻り値
-を UTF-8 でエンコードした文字列を返します。開発上はこの仕様に従い、
-``__unicode__()`` だけを定義して、文字列オブジェクトへの変換は Django 任せ
-にするよう勧めます。
+モデルに ``__unicode__()`` メソッドだけを定義して、 :meth:`~Model.__str__()`
+は定義しないでおくと、 Django が自動的に :meth:`~Model.__str__()` メソッドを
+モデルに追加します。この :meth:`~Model.__str__()` メソッドは、 ``__unicode__()``
+を呼び出して、その戻り値を UTF-8 でエンコードした文字列を返します。
+開発上はこの仕様に従い、 ``__unicode__()`` だけを定義して、文字列オブジェクト
+への変換は Django 任せにするよう勧めます。
 
 ``__str__``
 -----------
 
 .. method:: Model.__str__()
 
-``__str__()`` は、オブジェクトに対して ``str()`` を呼び出した際に返す内容を
-定義するための Python の特殊メソッドです。 Django はそこかしこで
-``str(obj)`` (または ``unicode(obj)`` -- 下記参照) を使っています。ほとんど
-は、 Django の admin サイトでオブジェクトをレンダリングして表示したときの値
-として、またオブジェクトを表示するときにテンプレートに挿入される値として使
-われています。従って、オブジェクトの ``__str__`` は、人間可読なわかりやすい
-文字列を返さねばなりません。必須ではありませんが、強く推奨します (ただし、
-そこかしこに ``__str__`` メソッドを突っ込んでしまう前に ``__unicode__`` の
-説明を良く読んでくださいね)。
+The ``__str__()`` method is called whenever you call ``str()`` on an object. The main use for this method directly inside Django is when the ``repr()`` output of a model is displayed anywhere (for example, in debugging output).
+Thus, you should return a nice, human-readable string for the object's
+``__str__()``.  It isn't required to put ``__str__()`` methods everywhere if you have sensible :meth:`~Model.__unicode__()` methods.
 
-例を示します::
+The previous :meth:`~Model.__unicode__()` example could be similarly written
+using ``__str__()`` like this::
 
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
@@ -304,62 +442,121 @@ Deleting objects
 
 .. method:: Model.get_absolute_url()
 
-オブジェクトの URL を演算する方法を Django に教えるには
-``get_absolute_url`` メソッドを定義してください。例えば::
+.. Define a ``get_absolute_url()`` method to tell Django how to calculate the
+   canonical URL for an object. To callers, this method should appear to return a
+   string that can be used to refer to the object over HTTP.
+
+オブジェクトの正統的 (canonical) な URL を演算する方法を Django に教えるには
+``get_absolute_url`` メソッドを定義してください。To callers, this method should
+appear to return a string that can be used to refer to the object over HTTP.
+
+例えば::
 
     def get_absolute_url(self):
         return "/people/%i/" % self.id
 
-Django はこのメソッドを admin インタフェースで使います。オブジェクトが
-``get_absolute_url()`` を定義していた場合、オブジェクトの詳細ページには「サ
-イト上で表示 (View on site)」というリンクが表示されます。このリンクは、オブ
-ジェクトの ``get_absolute_url()`` に基づいて、オブジェクトを公開しているビュー
-に直接飛べるようになっています。
+(Whilst this code is correct and simple, it may not be the most portable way to
+write this kind of method. The :func:`permalink() decorator <permalink>`,
+documented below, is usually the best approach and you should read that section
+before diving into code implementation.)
 
-また、その他にも、例えば 
-:ref:`配信フィードフレームワーク <ref-contrib-syndication>` などで、
-``get_absolute_url()`` を使うことでユーザの利便性を高めています。
+.. One place Django uses ``get_absolute_url()`` is in the admin app. If an object
+   defines this method, the object-editing page will have a "View on site" link
+   that will jump you directly to the object's public view, as given by
+   ``get_absolute_url()``.
 
-テンプレートでオブジェクトの URL を表示する場合、ハードコードするのでは
-なく ``get_absolute_url()`` を使うようにするとよいでしょう。例えば、以下の
-テンプレート::
+Django が ``get_absolute_url()`` を使う場面の一例が admin インタフェースの
+中にあります。あるオブジェクトがこのメソッドを定義している場合、そのオブジェクト
+の編集ページには「サイト上で表示 (View on site)」というリンクが表示されます。
+このリンク先はオブジェクトの ``get_absolute_url()`` から得られる URL
+になっており、オブジェクトの公開ビューに直接飛べるようになります。
 
+.. Similarly, a couple of other bits of Django, such as the :doc:`syndication feed
+   framework </ref/contrib/syndication>`, use ``get_absolute_url()`` when it is
+   defined. If it makes sense for your model's instances to each have a unique
+   URL, you should define ``get_absolute_url()``.
+
+同様に、その他の例えば :doc:`配信フィードフレームワーク
+</ref/contrib/syndication>` などが ``get_absolute_url()`` を、定義されていれば
+使います。もしモデルのインスタンスごとに一意な URL を持つのが自然であるならば、
+``get_absolute_url()`` を定義するべきでしょう。
+
+.. It's good practice to use ``get_absolute_url()`` in templates, instead of
+   hard-coding your objects' URLs. For example, this template code is bad::
+
+テンプレートでは、オブジェクトの URL をハードコードする代わりに
+``get_absolute_url()`` を使うよう習慣づけすべきです。例えば、
+以下のテンプレートコードは悪い例です::
+
+    <!-- BAD template code. Avoid! -->
     <a href="/people/{{ object.id }}/">{{ object.name }}</a>
 
-は良い例ではなく、以下のようにするとよいでしょう::
+.. This template code is much better::
+
+こちらのテンプレートコードの方がもっと良いです::
 
     <a href="{{ object.get_absolute_url }}">{{ object.name }}</a>
 
+The logic here is that if you change the URL structure of your objects, even
+for something simple such as correcting a spelling error, you don't want to
+have to track down every place that the URL might be created. Specify it once,
+in ``get_absolute_url()`` and have all your other code call that one place.
+
 .. note::
-    ``get_absolute_url()`` の返す文字列は ASCII 文字だけで構成しなければな
-    りません (`RFC 2396`_ の URI 仕様でそのように要求されています)。また、
-    必要に応じて URL エンコードせねばなりません。 ``get_absolute_url()`` を
-    使うコードやテンプレートが、 ``get_absolute_url()`` の返す文字列を、追
-    加の処理を施さなくても直接利用できるようにせねばならないのです。
-    URI に Unicode 文字列を沢山使っているのなら、
-    ``django.utils.encoding.iri_to_uri()`` も使うことになるでしょう。
+    .. The string you return from ``get_absolute_url()`` **must** contain only
+       ASCII characters (required by the URI specfication, :rfc:`2396`) and be
+       URL-encoded, if necessary.
+
+    ``get_absolute_url()`` の返す文字列は ASCII 文字だけで構成されている
+    **必要** があります (`RFC 2396`_ の URI 仕様でそのように要求されています)。
+    また、必要に応じて URL エンコードせねばなりません。
+
+    .. Code and templates calling ``get_absolute_url()`` should be able to use the
+       result directly without any further processing. You may wish to use the
+       ``django.utils.encoding.iri_to_uri()`` function to help with this if you
+       are using unicode strings containing characters outside the ASCII range at
+       all.
+
+    戻り値については、まったく追加処理することなく ``get_absolute_url()``
+    を呼び出すコードやテンプレートからすぐ利用可能であるべきです。
+    完全に ASCII の範囲に入らない文字を含む Unicode 文字列を使っているのであれば、
+    ``django.utils.encoding.iri_to_uri()`` が役に立つかもしれません。
 
 .. _RFC 2396: http://www.ietf.org/rfc/rfc2396.txt
 
 ``permalink`` デコレータ
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-上に述べた ``get_absolute_url()`` には、いささか DRY 則の侵犯である、すなわ
-ちURLconf とモデルの両方で URL が定義されているという問題があります。
+.. The way we wrote ``get_absolute_url()`` above is a slightly violation of the
+   DRY principle: the URL for this object is defined both in the URLconf file and
+   in the model.
 
-``permalink`` デコレータを使うと、 URLconf からモデルを脱カップリングできま
-す:
+上に述べた ``get_absolute_url()`` を使う方法は、少し DRY 則を侵犯しています。
+このオブジェクトの URL が URLconf ファイルとモデルの両方で定義されているからです。
+
+.. You can decouple your models from the URLconf using the ``permalink`` decorator:
+
+``permalink`` デコレータを使うと、 URLconf からモデルを脱カップリングできます:
 
 .. function:: permalink()
 
-このデコレータには、ビュー関数、引数のリスト、そして (オプションとして)
-名前つきパラメタの入った辞書を指定します。これらの情報から、 Django は
-指定したパラメタで URLconf を置き換えて完全な URL パスを計算します。例えば、
-以下のような URLconf が定義されていたとしましょう::
+This decorator takes the name of a URL pattern (either a view name or a URL
+pattern name) and a list of position or keyword arguments and uses the URLconf
+patterns to construct the correct, full URL. It returns a string for the
+correct URL, with all parameters substituted in the correct positions.
+
+The ``permalink`` decorator is a Python-level equivalent to the :ttag:`url` template tag and a high-level wrapper for the :func:`django.core.urlresolvers.reverse()` function.
+
+An example should make it clear how to use ``permalink()``. Suppose your URLconf
+contains a line such as::
 
     (r'^people/(\d+)/$', 'people.views.details'),
 
-また、モデルの ``get_absolute_url`` メソッドは以下のように定義できます::
+.. ...your model could have a :meth:`~django.db.models.Model.get_absolute_url()`
+   method that looked like this::
+
+また、モデルの :meth:`~django.db.models.Model.get_absolute_url()`
+メソッドは以下のように定義できます::
 
     from django.db import models
 
@@ -367,63 +564,87 @@ Django はこのメソッドを admin インタフェースで使います。オ
     def get_absolute_url(self):
         return ('people.views.details', [str(self.id)])
 
-また、以下のような URLconf のエントリがあったとします::
+.. Similarly, if you had a URLconf entry that looked like::
 
-    (r'/archive/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', archive_view)
+また、以下のような URLconf のエントリがあったなら::
 
-``permalink()`` は以下のように使えます::
+    (r'/archive/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d{2})/$', archive_view)
+
+.. ...you could reference this using ``permalink()`` as follows::
+
+以下のように ``permalink()`` を使ってこれを参照できます::
 
     @models.permalink
     def get_absolute_url(self):
         return ('archive_view', (), {
             'year': self.created.year,
-            'month': self.created.month,
-            'day': self.created.day})
+            'month': self.created.strftime('%m'),
+            'day': self.created.strftime('%d')})
+
+.. Notice that we specify an empty sequence for the second parameter in this case,
+   because we only want to pass keyword parameters, not positional ones.
 
 この例では、第 2 引数に空の配列 (空のタプル) を指定していますが、これは引数
 リストを渡さず、キーワード引数だけを渡したいからです。
 
-``permalink`` を使えば、 URL に関する情報を繰り返すことなく、モデルの絶対
-URL と表示に使ったビューを結びつけられます。以前と同様、
-``get_absolute_url`` はテンプレート中でも使えます。
+.. In this way, you're associating the model's absolute path with the view that is
+   used to display it, without repeating the view's URL information anywhere. You
+   can still use the :meth:`~django.db.models.Model.get_absolute_url()` method in
+   templates, as before.
+
+この方法では、ビューの URL に関する情報を繰り返すことなく、モデルの
+絶対パスと表示に使ったビューを結びつけられます。以前と同様、
+:meth:`~django.db.models.Model.get_absolute_url()` はテンプレート中でも使えます。
+
+.. In some cases, such as the use of generic views or the re-use of custom views
+   for multiple models, specifying the view function may confuse the reverse URL
+   matcher (because multiple patterns point to the same view). For that case,
+   Django has :ref:`named URL patterns <naming-url-patterns>`. Using a named URL
+   pattern, it's possible to give a name to a pattern, and then reference the name
+   rather than the view function. A named URL pattern is defined by replacing the
+   pattern tuple by a call to the ``url`` function)::
 
 汎用ビューを使う場合や、複数のモデルに対して同じビューを再利用する場合、ビュー
 関数そのものを指定すると、（複数のパターンが同じビューを指してしまうため）
 URLディスパッチャが混乱をきたします。
+その場合、 Django には :ref:`名前つき URL パターン <naming-url-patterns>`
+があります。名前つき URL パターンを使えば、 URL パターンに固有の名前をつけておき、
+ビュー関数の代わりに参照できます。名前つき URL パターンを定義するには、
+タプル表記の URL パターンを ``url`` 関数に置き換えます::
 
-この問題を解決するために、 Django には **名前つき URL パターン** があります。
-名前つき URL パターンを使えば、 URL パターンに固有の名前をつけておき、ビュー
-関数の代わりに参照できます。名前つき URL パターンを定義するには、タプル表記
-の URL パターンを ``url`` 関数に置き換えます::
+    from django.conf.urls import patterns, url, include
 
-    from django.conf.urls.defaults import *
-
-    url(r'^people/(\d+)/$',
-        'django.views.generic.list_detail.object_detail',
-        name='people_view'),
+    url(r'^people/(\d+)/$', 'blog_views.generic_detail', name='people_view'),
 
 この名前を使って、URL からビューの名前を以下のようにして逆解決します::
 
-    from django.db.models import permalink
+    from django.db import models
 
+    @models.permalink
     def get_absolute_url(self):
         return ('people_view', [str(self.id)])
-    get_absolute_url = permalink(get_absolute_url)
 
-名前つき URL パターンの詳細は 
-:ref:`URL ディスパッチャのドキュメント<topics-http-urls>` を参照してください。
+.. More details on named URL patterns are in the :doc:`URL dispatch documentation
+   </topics/http/urls>`.
+
+名前つき URL パターンの詳細については :doc:`URL ディスパッチャのドキュメント
+</topics/http/urls>` を参照してください。
 
 追加のインスタンスメソッド
 ==========================
 
-``save()``, ``delete()`` に加えて、モデルオブジェクトは以下のいずれか、あるい
-は全てのメソッドを持つことがあります:
+.. In addition to :meth:`~Model.save()`, :meth:`~Model.delete()`, a model object
+   might have some of the following methods:
+
+:meth:`~Model.save()`, :meth:`~Model.delete()` に加えて、モデルオブジェクトは
+以下メソッドのうちいくつかを持つことがあります:
 
 .. method:: Model.get_FOO_display()
 
-``choices`` セットを持つ全てのフィールドについて、オブジェクトは
-``get_FOO_display()`` メソッドを持ちます。 ``FOO`` はフィールド名です。この
-メソッドは、「人間可読な」フィールド名を返します。例えば、以下のモデル::
+:attr:`~django.db.models.Field.choices` セットを持つ全てのフィールドについて、
+オブジェクトは ``get_FOO_display()`` メソッドを持ちます。 ``FOO``
+はフィールド名です。このメソッドは、「人間可読な」フィールド名を返します。
+例えば、以下のモデル::
 
     GENDER_CHOICES = (
         ('M', 'Male'),
@@ -446,15 +667,22 @@ URLディスパッチャが混乱をきたします。
 .. method:: Model.get_next_by_FOO(\**kwargs)
 .. method:: Model.get_previous_by_FOO(\**kwargs)
 
-``null=True`` であるような ``DateField`` および ``DateTimeField`` フィール
-ドについて、オブジェクトは ``get_next_by_FOO()`` および 
-``get_previous_by_FOO()`` メソッドを持ちます。 ``FOO`` はフィールド名です。
-このメソッドは該当の日付フィールドに応じて前のオブジェクトや次のオブジェク
-トを返します。適切なオブジェクトがなければ ``DoesNotExist`` を送出します。
+:attr:`null=True <django.db.models.Field.null>` であるような
+:class:`~django.db.models.DateField` および
+:class:`~django.db.models.DateTimeField` フィールドについて、オブジェクトは
+``get_next_by_FOO()`` および ``get_previous_by_FOO()`` メソッドを持ちます。
+``FOO`` はフィールド名です。このメソッドは該当の日付フィールドに応じて
+前のオブジェクトや次のオブジェクトを返します。適切なオブジェクトがなければ
+:exc:`~django.db.DoesNotExist` を送出します。
 
 これらのメソッドはいずれもオプションのキーワード引数をとります。引数は
 前述の「 :ref:`Field lookups <field-lookups>` 」で解説した形式にします。
 
-同じ日付値を持つオブジェクトがある場合、このメソッドは ID を使ったチェック
-にフォールバックします。これにより、レコードがスキップしたり重複したりしな
-いことが保証されています。
+.. Note that in the case of identical date values, these methods will use the
+   primary key as a tie-breaker. This guarantees that no records are skipped or
+   duplicated. That also means you cannot use those methods on unsaved objects.
+
+同じ日付値を持つオブジェクトがある場合、このメソッドは主キーを判断基準として
+使います。これにより、レコードがスキップしたり重複したりしないことが
+保証されています。また、これらのメソッドを未保存のオブジェクトでは使えないことも
+意味しています。
