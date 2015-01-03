@@ -1,109 +1,183 @@
+.. =================
+   Django Exceptions
+   =================
+
+=============
+Django の例外
+=============
+
+:revision-up-to: 17812 (1.4)
+
+.. Django raises some Django specific exceptions as well as many standard
+   Python exceptions.
+
+Django は多くの Python 標準の例外に加え、いくつかの Django
+固有の例外を送出します。
+
+.. Django-specific Exceptions
+   ==========================
+
+Django 固有の例外
 =================
-Django Exceptions
-=================
-
-:revision-up-to: 17812 (1.4) unfinished
-
-Django raises some Django specific exceptions as well as many standard
-Python exceptions.
-
-Django-specific Exceptions
-==========================
 
 .. module:: django.core.exceptions
     :synopsis: Django specific exceptions
 
-ObjectDoesNotExist and DoesNotExist
------------------------------------
+.. ObjectDoesNotExist and DoesNotExist
+   -----------------------------------
+
+ObjectDoesNotExist と DoesNotExist
+----------------------------------
 .. exception:: DoesNotExist
 .. exception:: ObjectDoesNotExist
 
-    The :exc:`DoesNotExist` exception is raised when an object is not found
-    for the given parameters of a query.
+    .. The :exc:`DoesNotExist` exception is raised when an object is not found
+       for the given parameters of a query.
 
-    :exc:`ObjectDoesNotExist` is defined in :mod:`django.core.exceptions`.
-    :exc:`DoesNotExist` is a subclass of the base :exc:`ObjectDoesNotExist`
-    exception that is provided on every model class as a way of
-    identifying the specific type of object that could not be found.
+    :exc:`DoesNotExist` 例外は指定されたクエリーパラメータでオブジェクトが
+    見つからなかったときに送出されます。
 
-    See :meth:`~django.db.models.query.QuerySet.get()` for further information
-    on :exc:`ObjectDoesNotExist` and :exc:`DoesNotExist`.
+    .. :exc:`ObjectDoesNotExist` is defined in :mod:`django.core.exceptions`.
+       :exc:`DoesNotExist` is a subclass of the base :exc:`ObjectDoesNotExist`
+       exception that is provided on every model class as a way of
+       identifying the specific type of object that could not be found.
+
+    :exc:`ObjectDoesNotExist` は :mod:`django.core.exceptions`
+    の中で定義されています。:exc:`DoesNotExist` は、:exc:`ObjectDoesNotExist`
+    例外をベースにしたサブクラスです。これは、どのタイプのオブジェクトを
+    見つけられなかったのかを特定する手段として全モデルクラスで提供されています
+    (訳注: モデルクラス ``Foo`` と ``Bar`` がある場合、 ``Foo.DoesNotExist``
+    および ``Bar.DoesNotExist`` という ``ObjectDoesNotExist``
+    を継承したクラスが定義されます)。
+
+    .. See :meth:`~django.db.models.query.QuerySet.get()` for further information
+       on :exc:`ObjectDoesNotExist` and :exc:`DoesNotExist`.
+
+    :exc:`ObjectDoesNotExist` と :exc:`DoesNotExist` のさらなる情報について、
+    :meth:`~django.db.models.query.QuerySet.get()` を参照してください。
 
 MultipleObjectsReturned
 -----------------------
 .. exception:: MultipleObjectsReturned
 
-    The :exc:`MultipleObjectsReturned` exception is raised by a query if only
-    one object is expected, but multiple objects are returned. A base version
-    of this exception is provided in :mod:`django.core.exceptions`; each model
-    class contains a subclassed version that can be used to identify the
-    specific object type that has returned multiple objects.
+    .. The :exc:`MultipleObjectsReturned` exception is raised by a query if only
+       one object is expected, but multiple objects are returned. A base version
+       of this exception is provided in :mod:`django.core.exceptions`; each model
+       class contains a subclassed version that can be used to identify the
+       specific object type that has returned multiple objects.
 
-    See :meth:`~django.db.models.query.QuerySet.get()` for further information.
+    :exc:`MultipleObjectsReturned` 例外は、一つのオブジェクトが期待されるにも
+    関わらず複数のオブジェクトが得られた場合に、クエリーによって送出されます。
+    この例外のベースとなるバージョンは :mod:`django.core.exceptions` の中で
+    定義されています。そして各モデルクラスはそれをサブクラス化した例外を
+    含んでおり、どのタイプのオブジェクトが複数のオブジェクトを
+    返したのかを特定するために使えます
+    (訳注: モデルクラス ``Foo`` と ``Bar`` がある場合、送出された例外が
+    ``Foo.MultipleObjectsReturned`` であれば複数の ``Foo`` のオブジェクトが
+    返されたと判断できます)。
+
+    .. See :meth:`~django.db.models.query.QuerySet.get()` for further information.
+
+    さらなる情報について :meth:`~django.db.models.query.QuerySet.get()`
+    を参照してください。
 
 SuspiciousOperation
 -------------------
 .. exception:: SuspiciousOperation
 
-    The :exc:`SuspiciousOperation` exception is raised when a user has performed
-    an operation that should be considered suspicious from a security perspective,
-    such as tampering with a session cookie.
+    .. The :exc:`SuspiciousOperation` exception is raised when a user has performed
+       an operation that should be considered suspicious from a security perspective,
+       such as tampering with a session cookie.
+
+    :exc:`SuspiciousOperation` 例外は、セキュリティ観点上、不審と考えられる
+    操作をユーザが行った場合に送出されます。たとえば、セッションクッキーが
+    改変された場合などです。
 
 PermissionDenied
 ----------------
 .. exception:: PermissionDenied
 
-    The :exc:`PermissionDenied` exception is raised when a user does not have
-    permission to perform the action requested.
+    .. The :exc:`PermissionDenied` exception is raised when a user does not have
+       permission to perform the action requested.
+
+    :exc:`PermissionDenied` 例外は、要求したアクションを実行する権限をユーザが
+    持っていない場合に送出されます。
 
 ViewDoesNotExist
 ----------------
 .. exception:: ViewDoesNotExist
 
-    The :exc:`ViewDoesNotExist` exception is raised by
-    :mod:`django.core.urlresolvers` when a requested view does not exist.
+    .. The :exc:`ViewDoesNotExist` exception is raised by
+       :mod:`django.core.urlresolvers` when a requested view does not exist.
+
+    :exc:`ViewDoesNotExist` 例外は、要求されたビューが存在しない場合に
+    :mod:`django.core.urlresolvers` によって送出されます。
 
 MiddlewareNotUsed
 -----------------
 .. exception:: MiddlewareNotUsed
 
-    The :exc:`MiddlewareNotUsed` exception is raised when a middleware is not
-    used in the server configuration.
+    .. The :exc:`MiddlewareNotUsed` exception is raised when a middleware is not
+       used in the server configuration.
+
+    :exc:`MiddlewareNotUsed` 例外は、サーバ設定にあるミドルウェアの中に
+    使われていないものがある場合に送出されます。
 
 ImproperlyConfigured
 --------------------
 .. exception:: ImproperlyConfigured
 
-    The :exc:`ImproperlyConfigured` exception is raised when Django is
-    somehow improperly configured -- for example, if a value in ``settings.py``
-    is incorrect or unparseable.
+    .. The :exc:`ImproperlyConfigured` exception is raised when Django is
+       somehow improperly configured -- for example, if a value in ``settings.py``
+       is incorrect or unparseable.
+
+    :exc:`ImproperlyConfigured` 例外は、 Django の設定の何かが正しくない場合に
+    送出されます -- たとえば ``settings.py`` の値が不正であったり、
+    書式不正である場合が挙げられます。
 
 FieldError
 ----------
 .. exception:: FieldError
 
-    The :exc:`FieldError` exception is raised when there is a problem with a
-    model field. This can happen for several reasons:
+    .. The :exc:`FieldError` exception is raised when there is a problem with a
+       model field. This can happen for several reasons:
 
-    - A field in a model clashes with a field of the same name from an
-      abstract base class
-    - An infinite loop is caused by ordering
-    - A keyword cannot be parsed from the filter parameters
-    - A field cannot be determined from a keyword in the query
-      parameters
-    - A join is not permitted on the specified field
-    - A field name is invalid
-    - A query contains invalid order_by arguments
+    :exc:`FieldError` 例外は、モデルのフィールドに関係した問題がある場合に
+    送出されます。いくつかの理由が考えられるます:
+
+    .. - A field in a model clashes with a field of the same name from an
+         abstract base class
+       - An infinite loop is caused by ordering
+       - A keyword cannot be parsed from the filter parameters
+       - A field cannot be determined from a keyword in the query
+         parameters
+       - A join is not permitted on the specified field
+       - A field name is invalid
+       - A query contains invalid order_by arguments
+
+    - モデルのフィールドが抽象ベースクラスの同名のフィールドと衝突している
+    - 並べ替え処理により無限ループが発生した
+    - フィルターパラメータ中のキーワードが解釈できない
+    - クエリーパラメータ中のキーワードからフィールドを特定できない
+    - 指定されたフィールドでの結合 (join) は許可されていない
+    - フィールド名が不正
+    - クエリーが不正な order_by 引数を含んでいる
 
 ValidationError
 ---------------
 .. exception:: ValidationError
 
-    The :exc:`ValidationError` exception is raised when data fails form or
-    model field validation. For more information about validation, see
-    :doc:`Form and Field Validation </ref/forms/validation>`,
-    :ref:`Model Field Validation <validating-objects>` and the
-    :doc:`Validator Reference </ref/validators>`.
+    .. The :exc:`ValidationError` exception is raised when data fails form or
+       model field validation. For more information about validation, see
+       :doc:`Form and Field Validation </ref/forms/validation>`,
+       :ref:`Model Field Validation <validating-objects>` and the
+       :doc:`Validator Reference </ref/validators>`.
+
+    :exc:`ValidationError` 例外は、フォームやモデルフィールドの検証 (validation)
+    に失敗した場合に送出されます。検証についての詳細は
+    :doc:`フォームやフィールドの検証 </ref/forms/validation>` 、
+    :ref:`モデルフィールドの検証 <validating-objects>` 、そして
+    :doc:`バリデータのリファレンス </ref/validators>` を参照してください。
 
 .. currentmodule:: django.core.urlresolvers
 
@@ -111,41 +185,75 @@ NoReverseMatch
 --------------
 .. exception:: NoReverseMatch
 
-    The :exc:`NoReverseMatch` exception is raised by
-    :mod:`django.core.urlresolvers` when a matching URL in your URLconf
-    cannot be identified based on the parameters supplied.
+    .. The :exc:`NoReverseMatch` exception is raised by
+       :mod:`django.core.urlresolvers` when a matching URL in your URLconf
+       cannot be identified based on the parameters supplied.
+
+    :exc:`NoReverseMatch` 例外は、指定パラメータに適合する URL を URLconf
+    から特定できなかった場合に :mod:`django.core.urlresolvers`
+    によって送出されます。
 
 .. currentmodule:: django.db
 
-Database Exceptions
-===================
+.. Database Exceptions
+   ===================
 
-Django wraps the standard database exceptions :exc:`DatabaseError` and
-:exc:`IntegrityError` so that your Django code has a guaranteed common
-implementation of these classes. These database exceptions are
-provided in :mod:`django.db`.
+データベースの例外
+==================
+
+.. Django wraps the standard database exceptions :exc:`DatabaseError` and
+   :exc:`IntegrityError` so that your Django code has a guaranteed common
+   implementation of these classes. These database exceptions are
+   provided in :mod:`django.db`.
+
+Django は標準 (訳注: :pep:`249`) のデータベース例外である :exc:`DatabaseError` と
+:exc:`IntegrityError` をラッピングするため、ユーザは Django 用のコードにて
+これらのクラスの共通の実装を利用できます。これらのデータベース例外は
+:mod:`django.db` の中で定義されています。
+(訳注: Django は標準 PEP 249 に従って例外クラスを定義しており、どのデータベース
+バックエンドを利用する場合でもこれらを使用します。なおこれらの例外は、
+送出のきっかけになった「データベースバックエンドが送出した例外オブジェクト」を
+ラッピングする、つまり属性を引き継ぎます。)
 
 .. exception:: DatabaseError
 .. exception:: IntegrityError
 
-The Django wrappers for database exceptions behave exactly the same as
-the underlying database exceptions. See :pep:`249`, the Python Database API
-Specification v2.0, for further information.
+.. The Django wrappers for database exceptions behave exactly the same as
+   the underlying database exceptions. See :pep:`249`, the Python Database API
+   Specification v2.0, for further information.
+
+Django のデータベース例外用のラッパーは、元になったデータベース例外と完全に
+同じ振る舞いをします。さらなる情報については Python データベース API 仕様 v2.0
+(:pep:`249`) を参照してください。
 
 .. currentmodule:: django.db.transaction
 
-Transaction Exceptions
-======================
+.. Transaction Exceptions
+   ======================
+
+トランザクション例外
+====================
 
 .. exception:: TransactionManagementError
 
-    The :exc:`TransactionManagementError` is raised for any and all problems
-    related to database transactions. It is available from
-    :mod:`django.db.transaction`.
+    .. The :exc:`TransactionManagementError` is raised for any and all problems
+       related to database transactions. It is available from
+       :mod:`django.db.transaction`.
 
-Python Exceptions
-=================
+    :exc:`TransactionManagementError` は、データベーストランザクションに関係した
+    あらゆる問題に対して送出されます。このクラスは
+    :mod:`django.db.transaction` の中で定義されています。
 
-Django raises built-in Python exceptions when appropriate as well. See the
-Python documentation for further information on the
-built-in :mod:`exceptions`.
+.. Python Exceptions
+   =================
+
+Python の例外
+=============
+
+.. Django raises built-in Python exceptions when appropriate as well. See the
+   Python documentation for further information on the
+   built-in :mod:`exceptions`.
+
+Django は、 Python 標準の例外を送出した方が適切な場面においては、そうします。
+さらなる情報については Python のドキュメントで標準 :mod:`exceptions`
+を参照してください。
