@@ -48,9 +48,13 @@ QuerySet API リファレンス
   データベースクエリを実行してリストを返します。(部分的または完全に) 評価した
   ``QuerySet`` をスライスした場合も、リストを返します。
 
-* **Pickling/Caching.** See the following section for details of what
-  is involved when `pickling QuerySets`_. The important thing for the
-  purposes of this section is that the results are read from the database.
+.. * **Pickling/Caching.** See the following section for details of what
+     is involved when `pickling QuerySets`_. The important thing for the
+     purposes of this section is that the results are read from the database.
+
+* **Pickle 化 / キャッシュ。**  `QuerySets を pickle する
+  <#pickling-querysets>`_ 時にどう関わってくるのか、詳しくは後述します。
+  この章の趣旨的に重要なのは、結果はデータベースから読み出されるということです。
 
 * **repr().** クエリセットに対して ``repr()`` を呼び出すと、クエリセッ
   トは値評価されます。これは Python 対話インタプリタでの利便性のための
@@ -77,17 +81,27 @@ QuerySet API リファレンス
   では、必要な分だけデータをロードしてオブジェクトをインスタンス化する
   という利点があります。
 
-* **bool().** Testing a ``QuerySet`` in a boolean context, such as using
-  ``bool()``, ``or``, ``and`` or an ``if`` statement, will cause the query
-  to be executed. If there is at least one result, the ``QuerySet`` is
-  ``True``, otherwise ``False``. For example::
+.. * **bool().** Testing a ``QuerySet`` in a boolean context, such as using
+     ``bool()``, ``or``, ``and`` or an ``if`` statement, will cause the query
+     to be executed. If there is at least one result, the ``QuerySet`` is
+     ``True``, otherwise ``False``. For example::
+
+* **bool()。** bool() の使用時や if 文での使用時など、真理値として QuerySet
+  を評価すると、クエリーが実行されます。もし一つ以上の結果が得られた場合、
+  QuerySet は真 (True) と評価され、さもなければ偽 (False) と評価されます。
+  たとえば::
 
       if Entry.objects.filter(headline="Test"):
          print "There is at least one Entry with the headline Test"
 
-  Note: *Don't* use this if all you want to do is determine if at least one
-  result exists, and don't need the actual objects. It's more efficient to
-  use :meth:`exists() <QuerySet.exists>` (see below).
+  .. Note: *Don't* use this if all you want to do is determine if at least one
+     result exists, and don't need the actual objects. It's more efficient to
+     use :meth:`exists() <QuerySet.exists>` (see below).
+
+  Note: もし一つ以上の結果が存在するかどうかを知りたいだけで、
+  実際のオブジェクトが必要無いのであれば、この方法は *使わないでください* 。
+  :meth:`exists() <QuerySet.exists>` を使った方がもっと効率的です
+  (後述します)。
 
 .. _pickling QuerySets:
 
@@ -143,27 +157,43 @@ described here.
     <chaining-filters>` させます。クエリセットに対するフィルタ操作は、
     ほとんどが新たなクエリセットを返します。これらのメソッドの詳細は後述します。
 
-    The ``QuerySet`` class has two public attributes you can use for
-    introspection:
+    .. The ``QuerySet`` class has two public attributes you can use for
+       introspection:
+
+    ``QuerySet`` クラスには状態の分析 (introspection) に使える公開された属性が
+    2 つあります:
 
     .. attribute:: ordered
 
-        ``True`` if the ``QuerySet`` is ordered — i.e. has an
-        :meth:`order_by()` clause or a default ordering on the model.
-        ``False`` otherwise.
+        .. ``True`` if the ``QuerySet`` is ordered — i.e. has an
+           :meth:`order_by()` clause or a default ordering on the model.
+           ``False`` otherwise.
+
+        ``QuerySet`` が整列済みであれば ``True`` になります — つまり、
+	:meth:`order_by()` 節またはデフォルト整列順序の指定がモデルにあれば
+	``True`` になります。さもなければ ``False`` になります。
 
     .. attribute:: db
 
-        The database that will be used if this query is executed now.
+        .. The database that will be used if this query is executed now.
+
+        そのクエリーを、その時点で実行した場合に使われるデータベースです。
 
     .. note::
 
-        The ``query`` parameter to :class:`QuerySet` exists so that specialized
-        query subclasses such as
-        :class:`~django.contrib.gis.db.models.GeoQuerySet` can reconstruct
-        internal query state. The value of the parameter is an opaque
-        representation of that query state and is not part of a public API.
-        To put it simply: if you need to ask, you don't need to use it.
+        .. The ``query`` parameter to :class:`QuerySet` exists so that specialized
+           query subclasses such as
+           :class:`~django.contrib.gis.db.models.GeoQuerySet` can reconstruct
+           internal query state. The value of the parameter is an opaque
+           representation of that query state and is not part of a public API.
+           To put it simply: if you need to ask, you don't need to use it.
+
+        :class:`QuerySet` の ``query`` パラメータが存在しているのは
+        :class:`~django.contrib.gis.db.models.GeoQuerySet` などの特殊な
+        クエリーを行うサブクラスが内部的なクエリーの状態を再構築できるように
+        するためです。パラメータの値はクエリーの素 (opaque) の表現であり、
+        公開 API の一部ではありません。簡単に言うと:
+        これについて質問するくらいであれば使う必要はありません。
 
 .. currentmodule:: django.db.models.query.QuerySet
 
@@ -229,22 +259,36 @@ annotate
 
 .. method:: annotate(*args, **kwargs)
 
-Annotates each object in the ``QuerySet`` with the provided list of
-aggregate values (averages, sums, etc) that have been computed over
-the objects that are related to the objects in the ``QuerySet``.
-Each argument to ``annotate()`` is an annotation that will be added
-to each object in the ``QuerySet`` that is returned.
+.. Annotates each object in the ``QuerySet`` with the provided list of
+   aggregate values (averages, sums, etc) that have been computed over
+   the objects that are related to the objects in the ``QuerySet``.
+   Each argument to ``annotate()`` is an annotation that will be added
+   to each object in the ``QuerySet`` that is returned.
 
-The aggregation functions that are provided by Django are described
-in `Aggregation Functions`_ below.
+``QuerySet`` 中の各オブジェクトを、クエリーに関係するオブジェクトを集計
+(aggregate) した値 (平均値や合計値など) のリストでアノテート (annotate)
+します。 ``annotate()`` の各引数は、返される ``QuerySet`` 中のオブジェクトに
+追加されるアノテーションです。
 
-Annotations specified using keyword arguments will use the keyword as
-the alias for the annotation. Anonymous arguments will have an alias
-generated for them based upon the name of the aggregate function and
-the model field that is being aggregated.
+.. The aggregation functions that are provided by Django are described
+   in `Aggregation Functions`_ below.
 
-For example, if you were manipulating a list of blogs, you may want
-to determine how many entries have been made in each blog::
+django が提供する集計関数については `Aggregation Functions`_ で後述します。
+
+.. Annotations specified using keyword arguments will use the keyword as
+   the alias for the annotation. Anonymous arguments will have an alias
+   generated for them based upon the name of the aggregate function and
+   the model field that is being aggregated.
+
+キーワード引数を使って指定したアノテーションは、そのキーワードをアノテーション
+の別名として使用します。無名の引数で指定した場合は、集計関数の名前と
+集計対象モデルフィールドの名前を元に別名が生成されます。
+
+.. For example, if you were manipulating a list of blogs, you may want
+   to determine how many entries have been made in each blog::
+
+たとえばブログのリストを操作しているとすると、各ブログに何個のエントリーが
+作られているのか知りたいと思うかもしれません::
 
     >>> q = Blog.objects.annotate(Count('entry'))
     # The name of the first blog
@@ -254,17 +298,23 @@ to determine how many entries have been made in each blog::
     >>> q[0].entry__count
     42
 
-The ``Blog`` model doesn't define an ``entry__count`` attribute by itself,
-but by using a keyword argument to specify the aggregate function, you can
-control the name of the annotation::
+.. The ``Blog`` model doesn't define an ``entry__count`` attribute by itself,
+   but by using a keyword argument to specify the aggregate function, you can
+   control the name of the annotation::
+
+``Blog`` モデル自体は ``entry__count`` 属性を定義していません。しかし集計関数
+の指定にキーワード引数を使うことでアノテーションの名前を変えられます::
 
     >>> q = Blog.objects.annotate(number_of_entries=Count('entry'))
     # The number of entries on the first blog, using the name provided
     >>> q[0].number_of_entries
     42
 
-For an in-depth discussion of aggregation, see :doc:`the topic guide on
-Aggregation </topics/db/aggregation>`.
+.. For an in-depth discussion of aggregation, see :doc:`the topic guide on
+   Aggregation </topics/db/aggregation>`.
+
+集計に関する深い議論については :doc:`集計のトピックガイド
+</topics/db/aggregation>` を参照してください。
 
 order_by
 ~~~~~~~~
@@ -325,12 +375,19 @@ Django はリレーション先のモデルのデフォルトの整列順 (:attr
 字の区別については、 Django は現在使っているデータベースバックエンドの整列
 方法に従います。
 
-If you don't want any ordering to be applied to a query, not even the default
-ordering, call :meth:`order_by()` with no parameters.
+.. If you don't want any ordering to be applied to a query, not even the default
+   ordering, call :meth:`order_by()` with no parameters.
 
-You can tell if a query is ordered or not by checking the
-:attr:`.QuerySet.ordered` attribute, which will be ``True`` if the
-``QuerySet`` has been ordered in any way.
+もしデフォルトの並び順すらも含めて整列させたくない場合、パラメータを付けずに
+:meth:`order_by()` を呼んでください。
+
+.. You can tell if a query is ordered or not by checking the
+   :attr:`.QuerySet.ordered` attribute, which will be ``True`` if the
+   ``QuerySet`` has been ordered in any way.
+
+:attr:`.QuerySet.ordered` 属性を確認すればクエリーが整列されているかどうか
+判定できます。この属性は、どのような整列方法であっても、整列されていれば
+``True`` になります。
 
 reverse
 ~~~~~~~
@@ -395,26 +452,46 @@ SQL クエリに ``SELECT DISTINCT`` を使う新たな ``QuerySet`` を返し�
 
 .. versionadded:: 1.4
 
-As of Django 1.4, you can pass positional arguments (``*fields``) in order to
-specify the names of fields to which the ``DISTINCT`` should apply. This
-translates to a ``SELECT DISTINCT ON`` SQL query.
+.. As of Django 1.4, you can pass positional arguments (``*fields``) in order to
+   specify the names of fields to which the ``DISTINCT`` should apply. This
+   translates to a ``SELECT DISTINCT ON`` SQL query.
 
-Here's the difference. For a normal ``distinct()`` call, the database compares
-*each* field in each row when determining which rows are distinct. For a
-``distinct()`` call with specified field names, the database will only compare
-the specified field names.
+Django 1.4 以降では、 ``DISTINCT`` が適用されるべきフィールド名を位置指定引数
+(``*fields``) で指定できます。これは SQL クエリーの ``SELECT DISTINCT ON``
+に変換されます。
+
+.. Here's the difference. For a normal ``distinct()`` call, the database compares
+   *each* field in each row when determining which rows are distinct. For a
+   ``distinct()`` call with specified field names, the database will only compare
+   the specified field names.
+
+違いを説明します。通常の ``distinct()`` の呼び出しでは、データベースは
+どの行が異なる (distinct) のかを判断するために各行の *全フィールドを* 比較します。
+フィールド名を指定した ``distinct()`` の呼び出しでは、データベースは指定された
+フィールド名だけを比較します。
 
 .. note::
-    This ability to specify field names is only available in PostgreSQL.
+    .. This ability to specify field names is only available in PostgreSQL.
+
+    このフィールド名を指定する機能は PostgreSQL でのみ利用可能です。
 
 .. note::
-    When you specify field names, you *must* provide an ``order_by()`` in the
-    QuerySet, and the fields in ``order_by()`` must start with the fields in
-    ``distinct()``, in the same order.
+    .. When you specify field names, you *must* provide an ``order_by()`` in the
+       QuerySet, and the fields in ``order_by()`` must start with the fields in
+       ``distinct()``, in the same order.
 
-    For example, ``SELECT DISTINCT ON (a)`` gives you the first row for each
-    value in column ``a``. If you don't specify an order, you'll get some
-    arbitrary row.
+    フィールド名を指定する場合、 ``order_by()`` を QuerySet に指定する
+    *必要 (must)* があり、また ``order_by()`` に指定するフィールド群は
+    ``distinct()`` に指定するフィールド群で始まっている (順番も同じ)
+    必要があります。
+
+    .. For example, ``SELECT DISTINCT ON (a)`` gives you the first row for each
+       value in column ``a``. If you don't specify an order, you'll get some
+       arbitrary row.
+
+    たとえば、 ``SELECT DISTINCT ON (a)`` は列 ``a`` の値それぞれについて、
+    その値が最初に現れる行を取得します。
+    If you don't specify an order, you'll get some arbitrary row.
 
 Examples::
 
@@ -498,11 +575,17 @@ values
   並べ替えが結果に思わぬ影響をもたらすことがあります。詳しくは
   :meth:`distinct` の節を参照してください。
 
-* If you use a ``values()`` clause after an :meth:`extra()` call,
-  any fields defined by a ``select`` argument in the :meth:`extra()` must
-  be explicitly included in the ``values()`` call. Any :meth:`extra()` call
-  made after a ``values()`` call will have its extra selected fields
-  ignored.
+.. * If you use a ``values()`` clause after an :meth:`extra()` call,
+     any fields defined by a ``select`` argument in the :meth:`extra()` must
+     be explicitly included in the ``values()`` call. Any :meth:`extra()` call
+     made after a ``values()`` call will have its extra selected fields
+     ignored.
+
+* もし :meth:`extra()` の呼び出し後に ``values()`` を使う場合、 :meth:`extra()`
+  の ``select`` 引数で定義されるフィールドすべてを明示的に ``values()``
+  の呼び出し時に指定する必要があります。 ``values()`` の呼び出し後に
+  :meth:`extra()` を呼び出した場合、 select で追加されるフィールドは
+  無視されます。
 
 ``ValuesQuerySet`` が便利なのは、わずかな数のフィールドの値しか必要でなく、
 モデルインスタンスオブジェクトの機能が必要でないと分かっている場合です。
@@ -523,13 +606,20 @@ Django の作者たちは、全ての SQL 関係のメソッドを先に配置�
 
 .. versionchanged:: 1.3
 
-The ``values()`` method previously did not return anything for
-:class:`~django.db.models.ManyToManyField` attributes and would raise an error
-if you tried to pass this type of field to it.
+.. The ``values()`` method previously did not return anything for
+   :class:`~django.db.models.ManyToManyField` attributes and would raise an error
+   if you tried to pass this type of field to it.
 
-This restriction has been lifted, and you can now also refer to fields on
-related models with reverse relations through ``OneToOneField``, ``ForeignKey``
-and ``ManyToManyField`` attributes::
+以前は ``values()`` メソッドに :class:`~django.db.models.ManyToManyField`
+属性を渡すと、何も返されず、エラーが送出されました。
+
+.. This restriction has been lifted, and you can now also refer to fields on
+   related models with reverse relations through ``OneToOneField``, ``ForeignKey``
+   and ``ManyToManyField`` attributes::
+
+この制限は無くなり、 ``OneToOneField`` 、 ``ForeignKey`` そして
+``ManyToManyField`` 属性を通して関係したモデルのフィールドを参照することも
+可能になりました::
 
     Blog.objects.values('name', 'entry__headline')
     [{'name': 'My blog', 'entry__headline': 'An entry'},
@@ -537,11 +627,16 @@ and ``ManyToManyField`` attributes::
 
 .. warning::
 
-   Because :class:`~django.db.models.ManyToManyField` attributes and reverse
-   relations can have multiple related rows, including these can have a
-   multiplier effect on the size of your result set. This will be especially
-   pronounced if you include multiple such fields in your ``values()`` query,
-   in which case all possible combinations will be returned.
+   .. Because :class:`~django.db.models.ManyToManyField` attributes and reverse
+      relations can have multiple related rows, including these can have a
+      multiplier effect on the size of your result set. This will be especially
+      pronounced if you include multiple such fields in your ``values()`` query,
+      in which case all possible combinations will be returned.
+
+   :class:`~django.db.models.ManyToManyField` 属性と逆引きのリレーションは複数
+   の行を持つ可能性があるので、これらを含めると結果セットのサイズが増えること
+   があります。これはそのようなフィールドを ``values()`` クエリーに複数含めると、
+   すべての組み合わせが返されるため、特に顕著になります。
 
 values_list
 ~~~~~~~~~~~
@@ -614,9 +709,13 @@ dates
 
 .. warning::
 
-    When :doc:`time zone support </topics/i18n/timezones>` is enabled, Django
-    uses UTC in the database connection, which means the aggregation is
-    performed in UTC. This is a known limitation of the current implementation.
+    .. When :doc:`time zone support </topics/i18n/timezones>` is enabled, Django
+       uses UTC in the database connection, which means the aggregation is
+       performed in UTC. This is a known limitation of the current implementation.
+
+    :doc:`タイムゾーンサポート </topics/i18n/timezones>`\が有効化されていると
+    Django はデータベース接続で UTC を使うので、集計は UTC にて行われます。
+    これは、現在の実装における既知の制限事項です。
 
 none
 ~~~~
@@ -716,12 +815,19 @@ select_related
     p = b.author         # 追跡済みのリレーション。データベースを操作しません。
     c = p.hometown       # 未追跡のリレーション。データベースを呼び出します。
 
-Sometimes you only want to access specific models that are related to your root
-model, not all of the related models. In these cases, you can pass the related
-field names to ``select_related()`` and it will only follow those relations.
-You can even do this for models that are more than one relation away by
-separating the field names with double underscores, just as for filters. For
-example, if you have this model::
+.. Sometimes you only want to access specific models that are related to your root
+   model, not all of the related models. In these cases, you can pass the related
+   field names to ``select_related()`` and it will only follow those relations.
+   You can even do this for models that are more than one relation away by
+   separating the field names with double underscores, just as for filters. For
+   example, if you have this model::
+
+時には関係するモデルすべてにアクセスするのではなく、特定のモデルにだけアクセス
+したいこともあるでしょう。そのような場合にはリレーションのフィールド名を
+``select_related()`` に渡すことで、それらのリレーションだけを追跡するよう
+にできます。これは複数の「レベル」のリレーションの先にあるモデルに対しても、
+フィルターの場合と同じようにアンダースコア 2 つでフィールド名を区切れば、
+同様に機能します。たとえば次のモデルがあって::
 
     class Room(models.Model):
         # ...
@@ -733,35 +839,61 @@ example, if you have this model::
         room = models.ForeignKey(Room)
         subject = models.ForeignKey(...)
 
-...and you only needed to work with the ``room`` and ``subject`` attributes,
-you could write this::
+.. ...and you only needed to work with the ``room`` and ``subject`` attributes,
+   you could write this::
+
+...さらに ``room`` と ``subject`` 属性だけが必要だとすれば、このように書けます::
 
     g = Group.objects.select_related('room', 'subject')
 
-This is also valid::
+.. This is also valid::
+
+こう書いても問題ありません::
 
     g = Group.objects.select_related('room__building', 'subject')
 
-...and would also pull in the ``building`` relation.
+.. ...and would also pull in the ``building`` relation.
 
-You can refer to any :class:`~django.db.models.ForeignKey` or
-:class:`~django.db.models.OneToOneField` relation in the list of fields
-passed to ``select_related()``. This includes foreign keys that have
-``null=True`` (which are omitted in a no-parameter ``select_related()`` call).
-It's an error to use both a list of fields and the ``depth`` parameter in the
-same ``select_related()`` call; they are conflicting options.
+...この場合は ``building`` のリレーションについても追跡します。
+
+.. You can refer to any :class:`~django.db.models.ForeignKey` or
+   :class:`~django.db.models.OneToOneField` relation in the list of fields
+   passed to ``select_related()``. This includes foreign keys that have
+   ``null=True`` (which are omitted in a no-parameter ``select_related()`` call).
+   It's an error to use both a list of fields and the ``depth`` parameter in the
+   same ``select_related()`` call; they are conflicting options.
+
+``select_related()`` に渡されたフィールドのリスト中のどの
+:class:`~django.db.models.ForeignKey` あるいは
+:class:`~django.db.models.OneToOneField` リレーションでも参照できます。
+これには ``null=True`` (パラメータ無しの ``select_related()`` の呼び出しでは
+除外される) 外部キーも含まれます。フィールドのリストと ``depth`` パラメータを
+同時に ``select_related()`` に指定するとエラーになります。これらは排他的に指定
+する必要のあるオプションです。
 
 .. versionchanged:: 1.2
 
-You can also refer to the reverse direction of a
-:class:`~django.db.models.OneToOneField` in the list of fields passed to
-``select_related`` — that is, you can traverse a
-:class:`~django.db.models.OneToOneField` back to the object on which the field
-is defined. Instead of specifying the field name, use the :attr:`related_name
-<django.db.models.ForeignKey.related_name>` for the field on the related object.
+.. You can also refer to the reverse direction of a
+   :class:`~django.db.models.OneToOneField` in the list of fields passed to
+   ``select_related`` — that is, you can traverse a
+   :class:`~django.db.models.OneToOneField` back to the object on which the field
+   is defined. Instead of specifying the field name, use the :attr:`related_name
+   <django.db.models.ForeignKey.related_name>` for the field on the related object.
 
-A :class:`~django.db.models.OneToOneField` is not traversed in the reverse
-direction if you are performing a depth-based ``select_related()`` call.
+``select_related`` に渡されたフィールドのリストの中にある
+:class:`~django.db.models.OneToOneField` の逆方向に参照を行うことも可能です
+— つまり、 :class:`~django.db.models.OneToOneField` からそのフィールドが
+定義されているオブジェクトへとさかのぼることができます。フィールド名を指定する
+かわりに、そのオブジェクトのフィールド用の
+:attr:`related_name <django.db.models.ForeignKey.related_name>`
+を使ってください。
+
+.. A :class:`~django.db.models.OneToOneField` is not traversed in the reverse
+   direction if you are performing a depth-based ``select_related()`` call.
+
+深さを指定した ``select_related()`` を実行している場合、
+:class:`~django.db.models.OneToOneField` を逆方向にさかのぼることは
+ありません。
 
 prefetch_related
 ~~~~~~~~~~~~~~~~
